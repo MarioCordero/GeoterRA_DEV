@@ -11,7 +11,7 @@
   height: 400vh;
   background-image: linear-gradient(rgba(166, 195, 227, 0.5),
   rgba(166, 195, 227, 0.5)), url(../images/background.png);
-  background-size:  contain;
+  background-size: absolute;
   background-repeat: no-repeat;
   background-position: absolute;
 }
