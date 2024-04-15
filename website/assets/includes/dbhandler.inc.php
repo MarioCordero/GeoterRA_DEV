@@ -1,7 +1,7 @@
 <?php
 
 $host = 'localhost';
-$dbname = 'users';
+$dbname = 'GeoterRA';
 $user = 'root';
 $pass = '';
 

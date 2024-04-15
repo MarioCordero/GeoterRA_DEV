@@ -1,0 +1,190 @@
+/* ------------------------------GENERAL------------------------------ */
+html {
+	scroll-behavior: smooth;
+}
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+/* ------------------------------FORMAT------------------------------ */
+.justify_text{
+	text-align: justify;
+}
+.justify_right{
+	float: right;
+	text-align: right;
+}
+.center-text{
+	text-align: center;
+}
+
+/* ------------------------------FONTS------------------------------ */
+.Montserrat-Regular{
+	font-family:Montserrat-Regular !important;
+}.Montserrat-Light{
+	font-family:Montserrat-Light !important;
+}.Montserrat-SemiBold{
+	font-family:Montserrat-SemiBold !important;
+}
+
+
+/* ------------------------------index.html------------------------------ */
+.general-container {
+	width: 100%;
+	min-height: 100vh;
+	height: 400vh;
+	background-image: linear-gradient(rgba(166, 195, 227, 0.5),
+			rgba(166, 195, 227, 0.5)), url(../images/background.png);
+	background-size: absolute;
+	background-repeat: no-repeat;
+	background-position: absolute;
+}
+
+.navbar {
+	position: fixed;
+	background-color: rgba(17, 26, 28, 0.6);
+	width: 100%;
+	overflow: hidden;
+	display: flex;
+	justify-content: space-between;
+	height: 8vh;
+	z-index: 20;
+}
+
+.logo-container{
+	display: flex;
+	align-items: center;
+	height: 8vh;
+	margin-left: 5%;
+}
+
+.menu{
+	display: flex;
+	align-items: center;
+	float: right;
+}.menu a{
+	color: #fff;
+	text-decoration: none;
+	font-size: 18px;
+	margin-right: 3em;
+	transition: all 250ms ease;
+}.menu a:hover{
+	transform: scale(1.1);
+	transition: all 250ms ease;
+}
+
+.btn {
+	display: flex;
+	align-items: center;
+	padding: 10px 20px;
+	border: 0;
+	outline: 0;
+	border-radius: 5px;
+	background: white;
+	color: rgba(70, 185, 218, 0.8);
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.welcome {
+	position: absolute;
+	font-weight: bold;
+	font-size: 5em;
+	color: rgba(255, 255, 255, 0.9);
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+
+/* ------------------------------login.html------------------------------ */
+.login {
+	display: flex;
+	width: 900px;
+	height: 420px;
+	align-items: center;
+	background-color: rgba(17, 26, 28, 0.6);
+	color: #fff;
+	box-shadow: 10px 13px 10px 5px rgba(0, 0, 0, 0.8);
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	border-radius: 10px;
+}
+
+.login h1 {
+	font-size: 2.3em;
+	text-align: center;
+	position: relative;
+	top: 5px;
+}
+
+.login form {
+	width: 900px;
+	height: 380px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.login .input-box {
+	position: relative;
+	width: 70%;
+	height: 50px;
+	margin: 30px 0px;
+	background-color: black;
+	border-radius: 10px;
+}
+
+.input-box input {
+	width: 100%;
+	height: 50px;
+	background-color: rgba(33, 182, 246, 0.85);
+	border-radius: 10px;
+	padding: 20px;
+	color: #fff;
+}
+
+.input-box input::placeholder {
+	color: #fff;
+}
+
+.input-box i {
+	position: absolute;
+	left: 90%;
+	margin: 16px;
+}
+
+.login .remember-forgot {
+	display: flex;
+	justify-content: space-between;
+	width: 627px;
+	height: 70px;
+	font-size: 1.2em;
+}
+
+.login .btn {
+	width: 25%;
+	padding: 10px;
+	border-radius: 10px;
+	margin: 15px;
+}
+
+.login .register-link {
+	font-size: 1.1em;
+	text-align: center;
+	margin: 5px;
+}
+
+.register-link p a {
+	color: #fff;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.register-link p a:hover {
+	text-decoration: underline;
+}
