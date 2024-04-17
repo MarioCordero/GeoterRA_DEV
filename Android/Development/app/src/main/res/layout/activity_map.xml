@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MapActivity">
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_menu"
@@ -18,6 +18,5 @@
         app:itemIconTint="@color/color_selector"
         app:itemTextColor="@color/color_selector"
         app:menu="@menu/bottom_menu"/>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

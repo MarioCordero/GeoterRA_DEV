@@ -1,10 +1,12 @@
 package com.inii.geoterra.development
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class RequestActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,5 +18,39 @@ class RequestActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_menu)
+        bottomNavigationView.selectedItemId = R.id.dashboardItem
+
+        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.homeItem -> {
+                    // Iniciar la actividad HomeActivity
+                    changeActivity(MainActivity::class.java, this::class.java)
+                    true
+                }
+                R.id.dashboardItem-> {
+                    // Iniciar la actividad DashboardActivity
+                    changeActivity(RequestActivity::class.java, this::class.java)
+                    true
+                }
+                R.id.accountItem -> {
+                    // Iniciar la actividad NotificationsActivity
+                    changeActivity(LoginActivity::class.java, this::class.java)
+                    true
+                }
+                else -> false
+            }
+        }
+
     }
+
+    fun changeActivity(destinationActivity: Class<*>, currentActivity: Class<*>) {
+        if (destinationActivity != currentActivity) {
+            val intent = Intent(this, destinationActivity)
+            startActivity(intent)
+        }
+    }
+
 }
+
