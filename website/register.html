@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link href=" assets/css/style.css" rel="stylesheet">
+  </head>
+  <body>
+
+			<!-- NAVBAR -->
+
+			<nav class="navbar Montserrat-Regular">
+
+				<div class="logo-container">
+					<a href="index.html"> <img id="logo" src="assets/images/GeoterRA.png" alt="Webpage logotype"> </a>
+				</div>
+
+				<div class="menu">
+
+					<a href="#">About Us</a>
+					<a href="#">Contact</a>
+					<a href="./map.html">Map</a>
+					<a href="./login.html">Login</a>
+
+				</div>
+
+			</nav>
+
+    <!-- REGISTER FORM -->
+
+			<div class="register Montserrat-Regular">
+
+				<form id="reg_form" action="assets/includes/register.inc.php" method="post">
+					<h1>Register</h1>
+
+					<div class="input-box">
+						<input name="first_name" type="text" placeholder="First Name" >
+						<i class='bx bxs-user'></i>
+					</div>
+
+					<div class="input-box">
+						<input name="last_name" type="text" placeholder="Last Name" >
+						<i class='bx bxs-lock'></i>
+					</div>
+
+					<div class="input-box">
+						<input name="password" type="password" placeholder="Password">
+						<i class='bx bxs-lock'></i>
+					</div>
+
+					<div class="input-box">
+						<input name="email" type="text" placeholder="Email" >
+						<i class='bx bxs-lock'></i>
+					</div>
+
+					<div class="input-box">
+						<input name="phone_num" type="text" placeholder="Phone Number">
+						<i class='bx bxs-lock'></i>
+					</div>
+
+					<button type="submit" class="btn">Register</button>
+
+				</form>
+
+        <p id="result"></p>
+
+			</div>
+  
+      <!-- AJAX info sent to php -->
+
+      <script>
+      document.getElementById("reg_form").addEventListener("submit",
+        function(event) {
+          event.preventDefault(); 
+          let formData = new FormData(this);
+          let xhr = new XMLHttpRequest();
+          xhr.open("POST", "assets/includes/register.inc.php", true);
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+              document.getElementById("result").innerHTML = xhr.responseText;
+            }
+          };
+          xhr.send(formData);
+        });
+      </script>
+
+  </body>
+</html>

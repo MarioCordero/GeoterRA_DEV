@@ -188,3 +188,60 @@ html {
 .register-link p a:hover {
 	text-decoration: underline;
 }
+
+
+/* ------------------------------register.html------------------------------ */
+.register {
+	display: flex;
+	width: 900px;
+	height: 720px;
+	align-items: center;
+	background-color: rgba(17, 26, 28, 0.6);
+	color: #fff;
+	box-shadow: 10px 13px 10px 5px rgba(0, 0, 0, 0.8);
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	border-radius: 10px;
+}
+
+.register h1 {
+	font-size: 2.3em;
+	text-align: center;
+}
+
+.register form {
+	width: 900px;
+	height: 280px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+  position: relative;
+  top: -100px;
+}
+
+.register .input-box {
+	position: relative;
+	width: 70%;
+	height: 50px;
+	margin: 20px 0px;
+	background-color: black;
+	border-radius: 10px;
+}
+
+.register input {
+	width: 100%;
+	height: 50px;
+	background-color: rgba(33, 182, 246, 0.85);
+	border-radius: 10px;
+	color: #fff;
+}
+
+.register input::placeholder {
+	color: #fff;
+}
+
+.register i {
+}
+

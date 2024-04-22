@@ -45,7 +45,7 @@
 
 			<div class="login Montserrat-Regular">
 
-				<form action="assets/includes/login.inc.php" method="post">
+				<form id="login_form" action="assets/includes/login.inc.php" method="post">
 					<h1>Login</h1>
 
 					<div class="input-box">
@@ -68,12 +68,33 @@
 
 					<div class="register-link">
 						<p>Don't have an account?
-							<a href="#">Register</a>
+							<a href="register.html">Register</a>
 						</p>
 					</div>
 
 				</form>
 			</div>
+
+      <!-- AJAX info sent to php -->
+
+      <div id="result"></div>
+
+      <script>
+      document.getElementById("login_form").addEventListener("submit",
+        function(event) {
+          event.preventDefault(); 
+
+          let formData = new FormData(this);
+          let xhr = new XMLHttpRequest();
+          xhr.open("POST", "assets/includes/login.inc.php", true);
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+              document.getElementById("result").innerHTML = xhr.responseText;
+            }
+          };
+          xhr.send(formData);
+        });
+      </script>
 
 		</div>
 	</body>

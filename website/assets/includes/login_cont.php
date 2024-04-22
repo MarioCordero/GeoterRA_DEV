@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
+// Function that checks if the credentials given are empty
 function input_empty(string $username, string $password)
 {
+  // Uses a php function to check if the variables are empty
+  // Returns true if they are empty
   if (empty($username) || empty($password)) {
     return true; 
   }
