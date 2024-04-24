@@ -7,6 +7,76 @@ html {
 	padding: 0;
 	box-sizing: border-box;
 }
+.general-container {
+	width: 100%;
+	max-height: 100vh;
+	min-height: 100vh;
+}
+.navbar {
+	position: fixed;
+	background-color: rgba(17, 26, 28, 0.6);
+	width: 100%;
+	overflow: hidden;
+	display: flex;
+	justify-content: space-between;
+	height: 8vh;
+	z-index: 20;
+}
+
+.logo-container{
+	display: flex;
+	align-items: center;
+	height: 8vh;
+	margin-left: 5%;
+}
+
+.header-logo{
+	height: 30px;
+}
+
+.menu{
+	display: flex;
+	align-items: center;
+	float: right;
+}.menu a{
+	color: #fff;
+	text-decoration: none;
+	font-size: 18px;
+	margin-right: 3em;
+	transition: all 250ms ease;
+}.menu a:hover{
+	transform: scale(1.1);
+	transition: all 250ms ease;
+}
+
+/* LOADER */
+.web-loader{
+	background-color: #fff;
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	top:0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	z-index: 21;
+	transition: 1s ease-in-out;
+ }
+.logoWelcome{
+    display: block;
+	margin: 22% auto;
+    width: 30%;
+}
+
+.footer-container{
+	bottom: 0;
+    overflow: hidden;
+    background-color: #000000;
+    padding: 1em 1em;
+}.footer{
+	color: #fff;
+	font-size: 12px;
+}
 
 /* ------------------------------FORMAT------------------------------ */
 .justify_text{
@@ -31,48 +101,48 @@ html {
 
 
 /* ------------------------------index.html------------------------------ */
-.general-container {
+
+.index-background{
 	width: 100%;
+	max-height: 100vh;
 	min-height: 100vh;
-	height: 400vh;
 	background-image: linear-gradient(rgba(166, 195, 227, 0.5),
-			rgba(166, 195, 227, 0.5)), url(../images/background.png);
-	background-size: absolute;
+			rgba(166, 195, 227, 0.5)), url(../images/index-background.png);
+	background-size:cover;
 	background-repeat: no-repeat;
-	background-position: absolute;
 }
 
-.navbar {
-	position: fixed;
-	background-color: rgba(17, 26, 28, 0.6);
+.index-container{
+	margin: auto;
+	min-height: 100vh;
+}
+
+.welcome {
+	height: 100vh;
+}.welcome p{
+	font-weight: bold;
+	font-size: 70px;
+	color: rgba(255, 255, 255, 0.9);
+	padding: 25% 0%;
+}
+
+
+/* ------------------------------login.html------------------------------ */
+
+.login-container{
+	margin: auto;
+	min-height: 100vh;
+}
+
+
+.login-background{
 	width: 100%;
-	overflow: hidden;
-	display: flex;
-	justify-content: space-between;
-	height: 8vh;
-	z-index: 20;
-}
-
-.logo-container{
-	display: flex;
-	align-items: center;
-	height: 8vh;
-	margin-left: 5%;
-}
-
-.menu{
-	display: flex;
-	align-items: center;
-	float: right;
-}.menu a{
-	color: #fff;
-	text-decoration: none;
-	font-size: 18px;
-	margin-right: 3em;
-	transition: all 250ms ease;
-}.menu a:hover{
-	transform: scale(1.1);
-	transition: all 250ms ease;
+	max-height: 100vh;
+	min-height: 100vh;
+	background-image: linear-gradient(rgba(166, 195, 227, 0.5),
+			rgba(166, 195, 227, 0.5)), url(../images/login-background.png);
+	background-size:cover;
+	background-repeat: no-repeat;
 }
 
 .btn {
@@ -87,19 +157,6 @@ html {
 	font-weight: bold;
 	cursor: pointer;
 }
-
-.welcome {
-	position: absolute;
-	font-weight: bold;
-	font-size: 5em;
-	color: rgba(255, 255, 255, 0.9);
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-}
-
-
-/* ------------------------------login.html------------------------------ */
 .login {
 	display: flex;
 	width: 900px;
