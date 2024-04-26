@@ -2,8 +2,6 @@
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-  echo "Hola desde php register.inc.php line 5 <br>";
-
   // Catches the username and password
   $user_params["first_name"] = $_POST["first_name"];
   $user_params["last_name"] = $_POST["last_name"];
@@ -36,17 +34,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     require_once 'conf_sess.inc.php';
 
+    echo $errors[0];
+
     // Check if there were any errors caught
     if($errors) {
       $_SESSION["error_register"] = $errors;
       header("Content-Type: application/json");
-      json_encode($errors);
+      echo json_encode($errors);
       die();
     }
 
     // If none of the previous errors happened it insert the user on the db
     if(insert_user($pdo, $user_params)) {
-      echo "Hello " . $user_params["first_name"] . "<br>";
+      header("Content-Type: application/json");
+      echo json_encode($errors);
     }
 
   } catch (PDOException $e) {

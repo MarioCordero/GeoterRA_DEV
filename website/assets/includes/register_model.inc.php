@@ -27,17 +27,13 @@ function insert_to_db(object $pdo, array $user_attributes)
   // $hashedPass = password_hash($user_attributes["password"],
   //   PASSWORD_BCRYPT, $options);
 
-  echo "ACA ESTAMOS <br>";
-
   $stmt->bindParam(":password", $user_attributes["password"]);
   $stmt->bindParam(":email", $user_attributes["email"]);
   $stmt->bindParam(":first_name", $user_attributes["first_name"]);
   $stmt->bindParam(":last_name", $user_attributes["last_name"]);
-  $stmt->bindParam(":phone_number", $user_attributes["phone_number"]);
+  $stmt->bindParam(":phone_number", $user_attributes["phone_num"]);
 
-  echo "BINDED";
-
-  $stmt->execute();
+  return $stmt->execute();
 }
 
 ?>
