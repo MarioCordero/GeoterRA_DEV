@@ -7,15 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".RequestActivity">
 
-    <com.google.android.material.bottomappbar.BottomAppBar
-        android:id="@+id/bottomAppBar"
-        android:layout_width="425dp"
-        android:layout_height="63dp"
-        android:layout_gravity="bottom"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="802dp"/>
-
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
@@ -30,57 +21,23 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/Request"
+        android:id="@+id/newRequestButton"
         android:layout_width="150dp"
         android:layout_height="45dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:backgroundTint="@color/ligthGray"
         android:drawableLeft="@drawable/baseline_article_24"
-        android:text="Instrucciones"
+        android:text="Crear Solicitud"
         android:textColor="@color/black"
         android:textSize="9sp"
         app:cornerRadius="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-
-
         />
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="64dp"
-        android:layout_height="34dp"
-        android:layout_marginStart="328dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/baseline_account_circle_24" />
-
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="64dp"
-        android:layout_height="34dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.034"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/baseline_add_home_24" />
-
-    <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="64dp"
-        android:layout_height="34dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/baseline_article_24" />
-
     <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="380dp"
         android:layout_height="306dp"
         android:layout_marginStart="16dp"
@@ -89,7 +46,7 @@
         android:background="@drawable/custom_rectangle_rounded2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Request">
+        app:layout_constraintTop_toBottomOf="@+id/newRequestButton">
 
 
         <ImageView
@@ -165,5 +122,32 @@
             />
 
     </FrameLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@color/white"
+        app:itemIconTint="@color/color_selector"
+        app:itemTextColor="@color/color_selector"
+        app:menu="@menu/bottom_menu"/>
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="200dp"
+        android:layout_marginTop="93dp"
+        android:layout_marginEnd="154dp"
+        android:layout_marginBottom="236dp"
+        android:text="@string/textview"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frameLayout" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,5 +3,14 @@
     <string name="title_activity_menu">MenuActivity</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_maps">Maps</string>
+    <string name="account">Account</string>
+    <string name="navigation_account" />
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="home">Home</string>
+    <string name="map">Map</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="textview">TextView</string>
+
 </resources>
