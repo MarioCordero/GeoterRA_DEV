@@ -32,7 +32,7 @@ class LoginActivity : AppCompatActivity() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_menu)
         bottomNavigationView.selectedItemId = R.id.accountItem
 
-        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
+        bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.homeItem -> {
                     // Iniciar la actividad HomeActivity
@@ -44,9 +44,9 @@ class LoginActivity : AppCompatActivity() {
                     changeActivity(RequestActivity::class.java, this::class.java)
                     true
                 }
-                R.id.accountItem -> {
+                R.id.mapItem -> {
                     // Iniciar la actividad NotificationsActivity
-                    changeActivity(LoginActivity::class.java, this::class.java)
+                    changeActivity(MapActivity::class.java, this::class.java)
                     true
                 }
                 else -> false

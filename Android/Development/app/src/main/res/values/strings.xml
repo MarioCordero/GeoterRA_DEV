@@ -11,5 +11,6 @@
     <string name="home">Home</string>
     <string name="map">Map</string>
     <string name="dashboard">Dashboard</string>
+    <string name="textview">TextView</string>
 
 </resources>

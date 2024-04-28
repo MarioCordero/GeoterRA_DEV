@@ -21,24 +21,23 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/Request"
+        android:id="@+id/newRequestButton"
         android:layout_width="150dp"
         android:layout_height="45dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:backgroundTint="@color/ligthGray"
         android:drawableLeft="@drawable/baseline_article_24"
-        android:text="Instrucciones"
+        android:text="Crear Solicitud"
         android:textColor="@color/black"
         android:textSize="9sp"
         app:cornerRadius="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-
-
         />
 
     <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="380dp"
         android:layout_height="306dp"
         android:layout_marginStart="16dp"
@@ -47,7 +46,7 @@
         android:background="@drawable/custom_rectangle_rounded2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Request">
+        app:layout_constraintTop_toBottomOf="@+id/newRequestButton">
 
 
         <ImageView
@@ -135,5 +134,20 @@
         app:itemIconTint="@color/color_selector"
         app:itemTextColor="@color/color_selector"
         app:menu="@menu/bottom_menu"/>
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="200dp"
+        android:layout_marginTop="93dp"
+        android:layout_marginEnd="154dp"
+        android:layout_marginBottom="236dp"
+        android:text="@string/textview"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frameLayout" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

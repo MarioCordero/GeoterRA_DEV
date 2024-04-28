@@ -2,11 +2,8 @@ package com.inii.geoterra.development
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatButton
-import androidx.core.graphics.toColor
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -28,11 +25,11 @@ class MainActivity : AppCompatActivity() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_menu)
         bottomNavigationView.selectedItemId = R.id.homeItem
 
-        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
+        bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.homeItem -> {
+                R.id.mapItem -> {
                     // Iniciar la actividad HomeActivity
-                    changeActivity(MainActivity::class.java, this::class.java)
+                    changeActivity(MapActivity::class.java, this::class.java)
                     true
                 }
                 R.id.dashboardItem-> {
@@ -61,8 +58,5 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun refreshMenuIcon() {
-
-    }
 
 }
