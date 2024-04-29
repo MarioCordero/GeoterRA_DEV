@@ -1,0 +1,304 @@
+/* ------------------------------GENERAL------------------------------ */
+html {
+	scroll-behavior: smooth;
+}
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+.general-container {
+	width: 100%;
+	max-height: 100vh;
+	min-height: 100vh;
+}
+.navbar {
+	position: fixed;
+	background-color: rgba(17, 26, 28, 0.6);
+	width: 100%;
+	overflow: hidden;
+	display: flex;
+	justify-content: space-between;
+	height: 8vh;
+	z-index: 20;
+}
+
+.logo-container{
+	display: flex;
+	align-items: center;
+	height: 8vh;
+	margin-left: 5%;
+}
+
+.header-logo{
+	height: 30px;
+}
+
+.menu{
+	display: flex;
+	align-items: center;
+	float: right;
+}.menu a{
+	color: #fff;
+	text-decoration: none;
+	font-size: 18px;
+	margin-right: 3em;
+	transition: all 250ms ease;
+}.menu a:hover{
+	transform: scale(1.1);
+	transition: all 250ms ease;
+}
+
+/* LOADER */
+.web-loader{
+	background-color: #fff;
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	top:0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	z-index: 21;
+	transition: 1s ease-in-out;
+ }
+.logoWelcome{
+    display: block;
+	margin: 22% auto;
+    width: 30%;
+}
+
+.footer-container{
+	bottom: 0;
+    overflow: hidden;
+    background-color: #000000;
+    padding: 1em 1em;
+}.footer{
+	color: #fff;
+	font-size: 12px;
+}
+
+/* ------------------------------FORMAT------------------------------ */
+.justify_text{
+	text-align: justify;
+}
+.justify_right{
+	float: right;
+	text-align: right;
+}
+.center-text{
+	text-align: center;
+}
+
+/* ------------------------------FONTS------------------------------ */
+.Montserrat-Regular{
+	font-family:Montserrat-Regular !important;
+}.Montserrat-Light{
+	font-family:Montserrat-Light !important;
+}.Montserrat-SemiBold{
+	font-family:Montserrat-SemiBold !important;
+}
+
+
+/* ------------------------------index.html------------------------------ */
+
+.index-background{
+	width: 100%;
+	max-height: 100vh;
+	min-height: 100vh;
+	background-image: linear-gradient(rgba(166, 195, 227, 0.5),
+			rgba(166, 195, 227, 0.5)), url(../images/index-background.png);
+	background-size:cover;
+	background-repeat: no-repeat;
+}
+
+.index-container{
+	margin: auto;
+	min-height: 100vh;
+}
+
+.welcome {
+	height: 100vh;
+}.welcome p{
+	font-weight: bold;
+	font-size: 70px;
+	color: rgba(255, 255, 255, 0.9);
+	padding: 25% 0%;
+}
+
+
+/* ------------------------------login.html------------------------------ */
+
+.login-container{
+	margin: auto;
+	min-height: 100vh;
+}
+
+
+.login-background{
+	width: 100%;
+	max-height: 100vh;
+	min-height: 100vh;
+	background-image: linear-gradient(rgba(166, 195, 227, 0.5),
+			rgba(166, 195, 227, 0.5)), url(../images/login-background.png);
+	background-size:cover;
+	background-repeat: no-repeat;
+}
+
+.btn {
+	display: flex;
+	align-items: center;
+	padding: 10px 20px;
+	border: 0;
+	outline: 0;
+	border-radius: 5px;
+	background: white;
+	color: rgba(70, 185, 218, 0.8);
+	font-weight: bold;
+	cursor: pointer;
+}
+.login {
+	display: flex;
+	width: 900px;
+	height: 420px;
+	align-items: center;
+	background-color: rgba(17, 26, 28, 0.6);
+	color: #fff;
+	box-shadow: 10px 13px 10px 5px rgba(0, 0, 0, 0.8);
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	border-radius: 10px;
+}
+
+.login h1 {
+	font-size: 2.3em;
+	text-align: center;
+	position: relative;
+	top: 5px;
+}
+
+.login form {
+	width: 900px;
+	height: 380px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.login .input-box {
+	position: relative;
+	width: 70%;
+	height: 50px;
+	margin: 30px 0px;
+	background-color: black;
+	border-radius: 10px;
+}
+
+.input-box input {
+	width: 100%;
+	height: 50px;
+	background-color: rgba(33, 182, 246, 0.85);
+	border-radius: 10px;
+	padding: 20px;
+	color: #fff;
+}
+
+.input-box input::placeholder {
+	color: #fff;
+}
+
+.input-box i {
+	position: absolute;
+	left: 90%;
+	margin: 16px;
+}
+
+.login .remember-forgot {
+	display: flex;
+	justify-content: space-between;
+	width: 627px;
+	height: 70px;
+	font-size: 1.2em;
+}
+
+.login .btn {
+	width: 25%;
+	padding: 10px;
+	border-radius: 10px;
+	margin: 15px;
+}
+
+.login .register-link {
+	font-size: 1.1em;
+	text-align: center;
+	margin: 5px;
+}
+
+.register-link p a {
+	color: #fff;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.register-link p a:hover {
+	text-decoration: underline;
+}
+
+
+/* ------------------------------register.html------------------------------ */
+.register {
+	display: flex;
+	width: 900px;
+	height: 720px;
+	align-items: center;
+	background-color: rgba(17, 26, 28, 0.6);
+	color: #fff;
+	box-shadow: 10px 13px 10px 5px rgba(0, 0, 0, 0.8);
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	border-radius: 10px;
+}
+
+.register h1 {
+	font-size: 2.3em;
+	text-align: center;
+}
+
+.register form {
+	width: 900px;
+	height: 280px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+  position: relative;
+  top: -100px;
+}
+
+.register .input-box {
+	position: relative;
+	width: 70%;
+	height: 50px;
+	margin: 20px 0px;
+	background-color: black;
+	border-radius: 10px;
+}
+
+.register input {
+	width: 100%;
+	height: 50px;
+	background-color: rgba(33, 182, 246, 0.85);
+	border-radius: 10px;
+	color: #fff;
+}
+
+.register input::placeholder {
+	color: #fff;
+}
+
+.register i {
+}
+

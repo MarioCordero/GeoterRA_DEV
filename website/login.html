@@ -1,52 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>Geoterra Webpage</title>
-    <link href="style_sheets/login.css" rel="stylesheet">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-  </head>
-  <body>
-      <div class="container">
-        <nav class="navbar"> 
-          <a href="index.html">
-            <img id="logo" src="images/GeoterRA.png" alt="Webpage logotype" style="height: 75px;">
-          </a>
-          <ul> 
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">Map</a></li>
-            <li><a href="login.html">Login</a></li>
-          </ul>
-        </nav>
 
-        <div class="login">
-          <form action="includes/login.inc.php" method="post">
-            <h1>Login</h1>
+	<head>
+			
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 
-            <div class="input-box">
-              <input name="username" type="text" placeholder="Username" required>
-              <i class='bx bxs-user'></i>
-            </div>
+		<!--CUSTOM CSS-->
+		<link rel="stylesheet" href="./assets/css/style.css">
+		<link rel="stylesheet" href="./assets/css/fonts.css">
+		<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+		<!-- <link rel="stylesheet" href="./assets/css/responsive.css"> -->
 
-            <div class="input-box">
-              <input name="password" type="password" placeholder="Password" required>
-              <i class='bx bxs-lock'></i>
-            </div>
+		<!--CUSTOM FONTS-->
+		<link rel="stylesheet" type="text/css" href="./assets/css/fuentes.css">
+		<!--ICON-->
+		<link rel="shortcut icon" type="image/x-icon" href="./GeoterRA.ico">
 
-            <div class="remember-forgot">
-              <label><input type="checkbox"> Remember me</label>
-              <a href="#">Forgot your password?</a>
-            </div>
+		<title>GeoterRA Login</title>
 
+	</head>
 
-            <button type="submit" class="btn">Login</button>
-            <div class="register-link">
-              <p>Don't have an account?
-              <a href="#">Register</a></p>
-            </div>
-          </form>
-        </div>
-      </div>
-  </body>
+	<body>
+		<div class="general-container login-background">
+
+			<!-- NAVBAR -->
+			<nav class="navbar Montserrat-Regular">
+
+				<div class="logo-container">
+					<a href="./index.html"> <img id="logo" src="./assets/images/GeoterRA-Logo.svg" class="header-logo" alt="Webpage logotype"> </a>
+				</div>
+
+				<div class="menu">
+
+					<a href="#">About Us</a>
+					<a href="#">Contact</a>
+					<a href="./map.html">Map</a>
+					<a href="./login.html">Login</a>
+
+				</div>
+
+			</nav>
+
+			<div class="login-container">
+
+				<!--------------------------------LOADER----------------------------------->
+				<div class="web-loader" id="loader">
+					<img src="./assets/images/GeoterRA-Logo.svg" class="logoWelcome" id="logoWelcome">
+					<div id="carga_pagina">
+
+					</div>
+				</div>
+				<!--------------------------------END LOADER------------------------------->
+
+				<div class="login Montserrat-Regular">
+										
+					<form id="login_form" action="assets/includes/login.inc.php" method="post">
+						<h1>Login</h1>
+					
+						<div class="input-box">
+							<input name="username" type="text" placeholder="Username" required>
+							<i class='bx bxs-user'></i>
+						</div>
+					
+						<div class="input-box">
+							<input name="password" type="password" placeholder="Password" required>
+							<i class='bx bxs-lock'></i>
+						</div>
+					
+						<div class="remember-forgot">
+							<label><input type="checkbox"> Remember me</label>
+							<a href="#">Forgot your password?</a>
+						</div>
+					
+					
+						<button type="submit" class="btn">Login</button>
+					
+						<div class="register-link">
+							<p>Don't have an account?
+								<a href="register.html">Register</a>
+							</p>
+						</div>
+					
+					</form>
+				
+				</div>
+
+				
+			</div>
+
+			<footer class="footer-container">
+				<div class="footer center-text Montserrat-Regular">
+					
+					<p> © 2021 Instituto de Investigaciones en Ingeniería - Universidad de Costa Rica.Ciudad Universitaria Rodrigo Facio </p>
+					<p> San Pedro, Montes de Oca.Tel: (506) 2511-6641 (506) 2511-6642 Fax: (506) 2224-2619 Apdo. postal: 3620-60 </p>
+					<p> Correo electrónico: inii@ucr.ac.cr </p> 
+					<p>Un Tema de SiteOrigin </p>
+					
+				</div>
+			</footer>
+
+			<!-- AJAX info sent to php -->
+			<div id="result"></div>
+			<script>
+				document.getElementById("login_form").addEventListener("submit",
+					function (event) {
+						event.preventDefault();
+
+						let formData = new FormData(this);
+						let xhr = new XMLHttpRequest();
+						xhr.open("POST", "assets/includes/login.inc.php", true);
+						xhr.onreadystatechange = function () {
+							if (xhr.readyState == 4 && xhr.status == 200) {
+								document.getElementById("result").innerHTML = xhr.responseText;
+							}
+						};
+						xhr.send(formData);
+					});
+			</script>
+			<script src="./assets/js/web-loader.js"></script>
+
+		</div>
+
+	</body>
+
 </html>
