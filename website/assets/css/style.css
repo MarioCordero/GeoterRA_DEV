@@ -248,6 +248,10 @@ html {
 
 
 /* ------------------------------register.html------------------------------ */
+.register-container{
+	margin: auto;
+	min-height: 100vh;
+}
 .register-background{
 	width: 100%;
 	max-height: 100vh;
@@ -299,4 +303,10 @@ html {
 	color: #fff;
 }.register-form input::placeholder {
 	color: #fff;
+}
+
+/* ------------------------------map.html------------------------------ */
+.map-container{
+	margin: auto;
+	min-height: 100vh;
 }
