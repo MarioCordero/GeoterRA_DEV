@@ -126,6 +126,52 @@ html {
 	padding: 25% 0%;
 }
 
+.A-container{
+	min-height: 60vh;
+	background-color: #dbdbdb;
+}
+.B-container{
+	min-height: 60vh;
+	background-color: #F49C2A;
+}
+
+
+/* ABOUT US */
+.about-us{
+	padding: 15% 10%;
+	display: flex;
+	align-items: center;
+	justify-content: space-evenly;
+}.about-us :nth-child(1){
+	width: 40%;
+}.about-us :nth-child(2) img{
+	width: 300px;
+}
+
+/* HOW WORKS */
+.how-works{
+	padding: 15% 10%;
+	display: flex;
+	align-items: center;
+}.how-works :nth-child(1) img{
+	box-shadow: 0 0 20px 0 #33333394;
+	width: 80%;
+}.how-works :nth-child(2){
+	width: 80%;
+}
+
+/* CONTACT US */
+.contact-us{
+	padding: 15% 10%;
+	display: flex;
+	align-items: center;
+	justify-content: space-evenly;
+}.contact-us :nth-child(1){
+	width: 40%;
+}.contact-us :nth-child(2) img{
+	width: 700px;
+}
+
 
 /* ------------------------------login.html------------------------------ */
 
