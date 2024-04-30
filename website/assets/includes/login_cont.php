@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 // Function that checks if the credentials given are empty
-function input_empty(string $username, string $password)
+function input_empty(string $email, string $password)
 {
   // Uses a php function to check if the variables are empty
   // Returns true if they are empty
-  if (empty($username) || empty($password)) {
+  if (empty($email) || empty($password)) {
     return true; 
   }
   else {
@@ -15,9 +15,9 @@ function input_empty(string $username, string $password)
   } 
 }
 
-function is_username_valid(object $pdo, string $username)
+function is_email_valid(object $pdo, string $email)
 {
-  if (get_user($pdo, $username)) { 
+  if (get_email($pdo, $email)) { 
     return true; 
   }
   else {
@@ -25,9 +25,9 @@ function is_username_valid(object $pdo, string $username)
   } 
 }
 
-function is_pass_valid(object $pdo, string $username)
+function is_pass_valid(object $pdo, string $password)
 {
-  if(get_pass($pdo, $username))
+  if(get_pass($pdo, $password))
   {
     return true; 
   }

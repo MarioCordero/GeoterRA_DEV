@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-function get_user(object $pdo, string $username)
+function get_email(object $pdo, string $email)
 {
-  $query = "SELECT username FROM reg_usr WHERE username = :username;";
+  $query = "SELECT email FROM reg_usr WHERE email = :email;";
   $stmt = $pdo->prepare($query);
-  $stmt->bindParam(":username", $username);
+  $stmt->bindParam(":email", $email);
   $stmt->execute();
 
   $result = $stmt->fetch(PDO::FETCH_ASSOC);
