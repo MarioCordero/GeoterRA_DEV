@@ -19,6 +19,9 @@ import kotlinx.coroutines.launch
 class RequestActivity : AppCompatActivity() {
     private lateinit var locationService : LocationService
 
+    /**
+     *
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -29,9 +32,11 @@ class RequestActivity : AppCompatActivity() {
             insets
         }
 
+        // Creates a variable to access the Bottom Menu.
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_menu)
         bottomNavigationView.selectedItemId = R.id.dashboardItem
 
+        // Ask if the user pressed an option button.
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.homeItem -> {
@@ -39,9 +44,7 @@ class RequestActivity : AppCompatActivity() {
                     changeActivity(MainActivity::class.java, this::class.java)
                     true
                 }
-
                 R.id.mapItem -> {
-                    // Iniciar la actividad DashboardActivity
                     changeActivity(MapActivity::class.java, this::class.java)
                     true
                 }
@@ -55,27 +58,36 @@ class RequestActivity : AppCompatActivity() {
                 else -> false
             }
         }
+        // Creates an object that manage the location requests.
         locationService = LocationService()
         val requestButton = findViewById<Button>(R.id.newRequestButton)
         requestButton.setOnClickListener { checkAppPermissions() }
-
     }
 
+
+    /**
+     *
+     */
     private fun checkAppPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-            && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            //Permiso no aceptado en el momento.
+            && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+            && ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED
+            && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
+
             requestLocationPermission()
         } else {
+
             locationService.setUserLocationPermissions(true)
             lifecycleScope.launch {
                 val result = locationService.getUserLocation(this@RequestActivity)
-                Toast.makeText(this@RequestActivity, "Latitud ${result?.latitude}  y longitud ${result?.latitude}", Toast.LENGTH_SHORT).show()
-                //Toast.makeText(this@RequestActivity,    "hoolaaaaa", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@RequestActivity, "Latitud ${result?.latitude}  y longitud ${result?.longitude}", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
+    /**
+     *
+     */
     private fun requestLocationPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
             // Decirle al usuario que necesia los permisos para funcionar la app y ahora el debe de activarlos el mismo
@@ -87,17 +99,24 @@ class RequestActivity : AppCompatActivity() {
         Toast.makeText(this,    "Permisos rechazados por primera vez", Toast.LENGTH_SHORT).show()
     }
 
+    /**
+     *
+     */
     override fun onRequestPermissionsResult(requestCode : Int,
                                             permissions : Array<out String>,
                                             grantResults : IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 777) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                && grantResults[1] == PackageManager.PERMISSION_GRANTED
+                && grantResults[2] == PackageManager.PERMISSION_GRANTED
+                && grantResults[3] == PackageManager.PERMISSION_GRANTED) {
+
                 locationService.setUserLocationPermissions(true)
                 lifecycleScope.launch {
                     val result = locationService.getUserLocation(this@RequestActivity)
                     if (result != null) {
-                        Toast.makeText(this@RequestActivity,    "Latitud ${result.latitude}  y longitud ${result.latitude}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@RequestActivity, "Latitud ${result.latitude}  y longitud ${result.longitude}", Toast.LENGTH_SHORT).show()
                     }
                 }
             } else {
@@ -108,6 +127,9 @@ class RequestActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     *
+     */
     private fun changeActivity(destinationActivity: Class<*>, currentActivity: Class<*>) {
         if (destinationActivity != currentActivity) {
             val intent = Intent(this, destinationActivity)

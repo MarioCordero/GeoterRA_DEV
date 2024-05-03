@@ -18,7 +18,8 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:visibility="visible"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
     <Button
         android:id="@+id/newRequestButton"
@@ -43,10 +44,11 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/custom_rectangle_rounded2"
+        android:background="@drawable/gray_rectangle_rounded2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/newRequestButton">
+        app:layout_constraintTop_toBottomOf="@+id/newRequestButton"
+        >
 
 
         <ImageView
@@ -56,10 +58,11 @@
             android:layout_marginVertical="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
-            android:background="@drawable/custom_rectangle_rounded2"
+            android:background="@drawable/gray_rectangle_rounded2"
             android:clipToOutline="true"
             app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@drawable/maps_image" />
+            app:srcCompat="@drawable/maps_image"
+            />
 
         <TextView
             android:id="@+id/textView2"
@@ -67,7 +70,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="160dp"
-            android:text="Nombre de la ubicacion" />
+            android:text="Nombre de la ubicacion"
+            />
 
         <TextView
             android:id="@+id/textView3"
@@ -75,7 +79,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="185dp"
-            android:text="Fecha solicitud" />
+            android:text="Fecha solicitud"
+            />
 
         <TextView
             android:id="@+id/textView4"
@@ -83,7 +88,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="205dp"
-            android:text="Estado" />
+            android:text="Estado"
+            />
 
         <Button
             android:id="@+id/contact_us"
@@ -100,7 +106,6 @@
             app:cornerRadius="15dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-
             />
 
         <Button
@@ -118,7 +123,6 @@
             app:cornerRadius="15dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-
             />
 
     </FrameLayout>
@@ -133,21 +137,7 @@
         android:background="@color/white"
         app:itemIconTint="@color/color_selector"
         app:itemTextColor="@color/color_selector"
-        app:menu="@menu/bottom_menu"/>
-
-    <TextView
-        android:id="@+id/textView5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="200dp"
-        android:layout_marginTop="93dp"
-        android:layout_marginEnd="154dp"
-        android:layout_marginBottom="236dp"
-        android:text="@string/textview"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frameLayout" />
-
+        app:menu="@menu/bottom_menu"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
