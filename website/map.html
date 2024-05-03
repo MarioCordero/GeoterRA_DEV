@@ -2,7 +2,7 @@
 <html lang="en">
 
 	<head>
-			
+        
 		<meta charset="UTF-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -16,14 +16,17 @@
 		<link rel="stylesheet" type="text/css" href="./assets/css/fuentes.css">
 		<!--ICON-->
 		<link rel="shortcut icon" type="image/x-icon" href="./GeoterRA.ico">
+    
+		<title>Map GeoterRA</title>
 
-		<title>User Register</title>
+		<!--LEAFLET-->
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 	</head>
 
 	<body>
 
-		<div class="general-container register-background">
+		<div class="general-container">
 
 			<!-- NAVBAR -->
 			<nav class="navbar Montserrat-Regular">
@@ -46,7 +49,7 @@
 			<!-- NAVBAR -->
 
 			<!-- BODY -->
-			<div class="register-container">
+			<div class="map-container Montserrat-Regular">
 
 				<!--------------------------------LOADER----------------------------------->
 				<div class="web-loader" id="loader">
@@ -56,47 +59,13 @@
 					</div>
 				</div>
 				<!--------------------------------END LOADER------------------------------->
-
-				<!-- REGISTER FORM -->
-				<div class="register-form Montserrat-Regular">
-					
-					<form id="reg_form" action="assets/includes/register.inc.php" method="post">
-						<h1>Register</h1>
-						
-						<div class="input-box">
-							<input name="first_name" type="text" placeholder="First Name" >
-							<i class='bx bxs-user'></i>
-						</div>
-						
-						<div class="input-box">
-							<input name="last_name" type="text" placeholder="Last Name" >
-							<i class='bx bxs-lock'></i>
-						</div>
-						
-						<div class="input-box">
-							<input name="password" type="password" placeholder="Password">
-							<i class='bx bxs-lock'></i>
-						</div>
-						
-						<div class="input-box">
-							<input name="email" type="text" placeholder="Email" >
-							<i class='bx bxs-lock'></i>
-						</div>
-						
-						<div class="input-box">
-							<input name="phone_num" type="text" placeholder="Phone Number">
-							<i class='bx bxs-lock'></i>
-						</div>
-						
-						<button type="submit" class="btn">Register</button>
-						
-					</form>
-					
-					<p id="result"></p>
-					
+				
+				<div id="map"> MAP
+					<!--LEAFLET JS-->
+					<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+					<script src="./assets/js/interactive-map.js" defer></script>
 				</div>
-				<!-- REGISTER FORM -->
-
+				
 			</div>
 			<!-- BODY -->
 
@@ -112,11 +81,8 @@
 				</div>
 			</footer>
 			<!-- FOOTER -->
-			
 
 			<!-- JS INCLUDES -->
-			<!-- AJAX info sent to php -->
-			<script src="./assets/js/send-register-php.js"></script>
 			<script src="./assets/js/web-loader.js"></script>
 
 		</div>
