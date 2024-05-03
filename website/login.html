@@ -18,11 +18,12 @@
 		<!--ICON-->
 		<link rel="shortcut icon" type="image/x-icon" href="./GeoterRA.ico">
 
-		<title>GeoterRA Login</title>
+		<title>Login</title>
 
 	</head>
 
 	<body>
+
 		<div class="general-container login-background">
 
 			<!-- NAVBAR -->
@@ -34,15 +35,18 @@
 
 				<div class="menu">
 
-					<a href="#">About Us</a>
-					<a href="#">Contact</a>
+					<a href="./index.html#about-us">About Us</a>
+					<a href="./index.html#how-works">How it works</a>
+					<a href="./index.html#contact-us">Contact</a>
 					<a href="./map.html">Map</a>
 					<a href="./login.html">Login</a>
 
 				</div>
 
 			</nav>
+			<!-- NAVBAR -->
 
+			<!-- BODY -->
 			<div class="login-container">
 
 				<!--------------------------------LOADER----------------------------------->
@@ -60,7 +64,7 @@
 						<h1>Login</h1>
 					
 						<div class="input-box">
-							<input name="username" type="text" placeholder="Username" required>
+							<input name="email" type="text" placeholder="Email" required>
 							<i class='bx bxs-user'></i>
 						</div>
 					
@@ -89,7 +93,9 @@
 
 				
 			</div>
+			<!-- BODY -->
 
+			<!-- FOOTER -->
 			<footer class="footer-container">
 				<div class="footer center-text Montserrat-Regular">
 					
@@ -100,29 +106,14 @@
 					
 				</div>
 			</footer>
+			<!-- FOOTER -->
 
+			<!-- JS INCLUDES -->
 			<!-- AJAX info sent to php -->
 			<div id="result"></div>
-			<script>
-				document.getElementById("login_form").addEventListener("submit",
-					function (event) {
-						event.preventDefault();
-
-						let formData = new FormData(this);
-						let xhr = new XMLHttpRequest();
-						xhr.open("POST", "assets/includes/login.inc.php", true);
-						xhr.onreadystatechange = function () {
-							if (xhr.readyState == 4 && xhr.status == 200) {
-								document.getElementById("result").innerHTML = xhr.responseText;
-							}
-						};
-						xhr.send(formData);
-					});
-			</script>
+			<script src="./assets/js/send-login-php.js"></script>
 			<script src="./assets/js/web-loader.js"></script>
 
 		</div>
-
 	</body>
-
 </html>

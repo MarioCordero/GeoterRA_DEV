@@ -3,10 +3,8 @@
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
   // Catches the username and password
-  $username = $_POST["username"];
+  $email = $_POST["email"];
   $password = $_POST["password"];
-
-  echo "Hola desde php, login.inc.php line 9";
 
   try {
     // Brings the files for the databse connection and the MVC pattern
@@ -15,26 +13,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     require_once 'login_model.inc.php';
     require_once 'login_cont.php';
 
+
     $errors = [];
 
-    if(input_empty($username, $password)) {
+    if(input_empty($email, $password)) {
       $errors["empty_input"] = "Rellene todos los campos";
-    }
-
-    if(is_username_valid($pdo, $username) && is_pass_valid($pdo, $password)) {
-      // Redirects to the html with a succesful login
-      echo "Hello $username<br>";
-    } else {
-      // Stays on the login page
-      $errors["invalid_cred"] = "Credenciales erroneas";
     }
 
     require_once 'conf_sess.inc.php';
 
+    if(is_email_valid($pdo, $email) && is_pass_valid($pdo, $password)) {
+      // Resends the info back to login.html
+      header("Content-Type: application/json");
+      echo json_encode($errors);
+      die();
+    } else {
+      $errors["invalid_cred"] = "Credenciales erroneas";
+    }
+
     if ($errors) {
       $_SESSION["error_login"] = $errors;
       header("Content-Type: application/json");
-      json_encode($errors);
+      echo json_encode($errors);
       die();
     }
 
