@@ -194,6 +194,7 @@ html {
 .btn {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	padding: 10px 20px;
 	border: 0;
 	outline: 0;
