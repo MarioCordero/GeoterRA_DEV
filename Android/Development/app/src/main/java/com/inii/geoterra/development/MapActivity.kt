@@ -3,10 +3,10 @@ package com.inii.geoterra.development
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
+import android.view.MotionEvent
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -18,7 +18,6 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.inii.geoterra.development.Components.CustomInfoOnMarker
 import kotlinx.coroutines.launch
-
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -31,6 +30,8 @@ class MapActivity : AppCompatActivity() {
     private lateinit var mapView : MapView
     private lateinit var userMarker : Marker
     private val locationService = LocationService()
+    private var isInfoWindowShown = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +76,12 @@ class MapActivity : AppCompatActivity() {
         Configuration.getInstance().load(this@MapActivity, PreferenceManager.getDefaultSharedPreferences(this@MapActivity));
         val compassOverlay = CompassOverlay(this, mapView)
         compassOverlay.enableCompass()
-         compassOverlay.setCompassCenter(40F, 50F)
+         compassOverlay.setCompassCenter(40F, 60F)
+         mapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+         mapView.setMultiTouchControls(false)
+
+// Establecer los límites del área visible en el mapa
+
 
         with(mapView) { this.setTileSource(TileSourceFactory.MAPNIK)
             this.controller?.setZoom(18.0)
@@ -102,7 +108,14 @@ class MapActivity : AppCompatActivity() {
                     // Manejar clics en los marcadores
                     userMarker.setOnMarkerClickListener { marker, mapView ->
                         // Abrir la ventana de información cuando se hace clic en el marcador
-                        infoWindow.open(marker, marker.position, 0, -150)
+                        if (!isInfoWindowShown) {
+                            infoWindow.open(marker, marker.position, 0, -150)
+                            isInfoWindowShown = true
+
+                        } else {
+                            userMarker.closeInfoWindow()
+                            isInfoWindowShown = false
+                        }
                         true // Indicar que el clic ha sido manejado
                     }
 
@@ -111,6 +124,35 @@ class MapActivity : AppCompatActivity() {
 
         }
 
+         mapView.setOnTouchListener { v, event ->
+             when (event.action) {
+                 MotionEvent.ACTION_MOVE -> {
+                     val center = mapView.mapCenter
+                     val latitude = center.latitude
+                     val longitude = center.longitude
+
+                     // Definir los límites del área visible para Costa Rica
+                     val minLat = 8.0
+                     val maxLat = 11.25
+                     val minLon = -86.0
+                     val maxLon = -82.5
+
+                     // Verificar si la posición del mapa está fuera de los límites
+                     val newLatitude = latitude.coerceIn(minLat, maxLat)
+                     val newLongitude = longitude.coerceIn(minLon, maxLon)
+
+                     // Si la posición está fuera de los límites, ajustar la posición del mapa
+                     if (latitude != newLatitude || longitude != newLongitude) {
+                         mapView.controller.animateTo(GeoPoint(newLatitude, newLongitude))
+                         true // Indicar que se ha manejado el evento de desplazamiento
+                     } else {
+                         false // Permitir el desplazamiento normal del mapa
+                     }
+                 }
+                 else -> false
+             }
+         }
+
     }
 
     /**
@@ -118,9 +160,9 @@ class MapActivity : AppCompatActivity() {
      */
     private fun checkAppPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-            && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-            && ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED
-            && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
+            || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+            || ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED
+            || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
 
             requestLocationPermission()
         } else {
@@ -142,9 +184,8 @@ class MapActivity : AppCompatActivity() {
             Toast.makeText(this, "Permisos rechazados", Toast.LENGTH_SHORT).show()
         } else {
             // No se han rechado los permisos y podemos activarlos por la ventana
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 777)
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE), 777)
         }
-        Toast.makeText(this, "Permisos rechazados por primera vez", Toast.LENGTH_SHORT).show()
     }
 
     /**

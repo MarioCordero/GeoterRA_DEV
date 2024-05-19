@@ -30,6 +30,6 @@ class CustomInfoOnMarker (layoutResId: Int, mapView: MapView) :
   }
 
   override fun onClose() {
-    TODO("Not yet implemented")
+    super.close()
   }
 }
