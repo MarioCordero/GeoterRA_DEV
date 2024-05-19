@@ -1,17 +1,3 @@
-let map = L.map('map').setView([9.9358333333333, -84.050555555556], 17);
-
-let osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-  icon: false
-}).addTo(map);
-
-let markers = []
-
-markers[0] = L.marker([9.9358333333333, -84.050555555556]).addTo(map)
-markers[1] = L.marker([9.9258333333333, -84.050555555556]).addTo(map)
-markers[2] = L.marker([9.9458333333333, -84.050555555556]).addTo(map)
-markers[3] = L.marker([9.9558333333333, -84.050555555556]).addTo(map)
-
 function onMarkerClick() {
   var latlng = this.getLatLng(); // 'this' refers to the marker clicked
   // Create a popup with the coordinates
@@ -21,9 +7,61 @@ function onMarkerClick() {
   .openOn(map);
 }
 
-for (var i = 0; i < markers.length; i++) {
-  markers[i].on('click', onMarkerClick);
+function fetchData() {
+  return new Promise ((resolve, reject) => {
+    let region = "Guanacaste"
+    let obtainedPoints = [];
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", "assets/includes/map_data.inc.php", true);
+    xhr.send(region);
+    xhr.onreadystatechange = function () {
+
+      if (xhr.readyState == 4 && xhr.status == 200) {
+        let splittedResponse = xhr.responseText.split("}");
+        for (let i = 0; i < splittedResponse.length - 1; i++) {
+          splittedResponse[i] += '}';
+        }
+        for (let i = 0; i < splittedResponse.length - 1; i++) {
+          obtainedPoints[i] = JSON.parse(splittedResponse[i]);
+        }
+        resolve(obtainedPoints);
+      } 
+    }
+  });
 }
+
+function createMarkers(obtainedPoints) {
+  // markers[0] = L.marker([pointsObtained[0].coord_x, pointsObtained[0].coord_y]).addTo(map)
+  let markers = []
+  markers[0] = L.marker([10.684953, 4.769269]).addTo(map)
+  markers[1] = L.marker([9.9258333333333, -84.050555555556]).addTo(map)
+  markers[2] = L.marker([9.9458333333333, -84.050555555556]).addTo(map)
+  markers[3] = L.marker([9.9558333333333, -84.050555555556]).addTo(map)
+
+  for (var i = 1; i < markers.length; i++) {
+    markers[i].on('click', onMarkerClick);
+  }
+  // Here are the markers created
+
+  console.log(obtainedPoints[0].id);
+  console.log(obtainedPoints[1].id);
+  console.log(obtainedPoints[2].id);
+  console.log(obtainedPoints);
+}
+
+
+// No se ordenar .JS Mario ayuda lo de arriba son solo funciones
+
+
+let map = L.map('map').setView([9.9358333333333, -84.050555555556], 17);
+
+let osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  icon: false
+}).addTo(map);
+
+fetchData().then(value => createMarkers(value));
+
 
 
 // ----------------------------------------CODE TO IMPLEMENT------------------------------------
