@@ -1,4 +1,5 @@
 package com.inii.geoterra.development
+
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
@@ -43,12 +44,10 @@ class LocationService {
         }
       }
     }
-
-    return null
   }
 
   fun setUserLocationPermissions(userPermission : Boolean) {
-    isUserLocationGranted = true
+    isUserLocationGranted = userPermission
     Log.i("setLocationPermissions","isUserLocationGranted: $isUserLocationGranted")
 
   }

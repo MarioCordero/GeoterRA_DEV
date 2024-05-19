@@ -9,7 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="lavender">#8692f7</color>
     <color name="gray">#AFAFAF</color>
-    <color name="ligthGray">#DFDFDF</color>
+    <color name="ligthGray">#FFF4F4F4</color>
     <color name="blue">#5199F1</color>
 
 </resources>
