@@ -1,3 +1,5 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.6.2/proj4.js"></script>
+
 function onMarkerClick() {
   var latlng = this.getLatLng(); // 'this' refers to the marker clicked
   // Create a popup with the coordinates
@@ -33,6 +35,16 @@ function fetchData() {
 function createMarkers(obtainedPoints) {
   // markers[0] = L.marker([pointsObtained[0].coord_x, pointsObtained[0].coord_y]).addTo(map)
   let markers = []
+  
+  let WGS84 = proj4('EPSG:4326');
+  let CRTM05 = proj4('EPSG:5367');
+
+  var pointCRTM05 = [200000, 1000000];
+
+  // Transform the point to WGS84 coordinates
+  var pointWGS84 = proj4(CRTM05, WGS84, pointCRTM05);
+  console.log(pointWGS84[0], pointWGS84[1]);
+
   markers[0] = L.marker([10.684953, 4.769269]).addTo(map)
   markers[1] = L.marker([9.9258333333333, -84.050555555556]).addTo(map)
   markers[2] = L.marker([9.9458333333333, -84.050555555556]).addTo(map)
