@@ -1,28 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>Geoterra Webpage</title>
-    <link href="style_sheets/style.css" rel="stylesheet">
-  </head>
-  <body>
-      <div class="container">
-        <nav class="navbar"> 
-          <a href="index.html">
-            <img id="logo" src="images/GeoterRA.png" alt="Webpage logotype" style="height: 75px;">
-          </a>
-          <ul> 
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">Map</a></li>
-            <li><a href="login.html">Login</a></li>
-          </ul>
-        </nav>
-        <div class="welcome">
-          <p>WELCOME</p>
-        </div>
 
-      </div>
-  </body>
+	<head>
+        
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+
+		<!--CUSTOM CSS-->
+		<link rel="stylesheet" href="./assets/css/style.css">
+		<link rel="stylesheet" href="./assets/css/fonts.css">
+		<!-- <link rel="stylesheet" href="./assets/css/responsive.css"> -->
+
+		<!--CUSTOM FONTS-->
+		<link rel="stylesheet" type="text/css" href="./assets/css/fuentes.css">
+		<!--ICON-->
+		<link rel="shortcut icon" type="image/x-icon" href="./GeoterRA.ico">
+
+		<title>GeoterRA</title>
+
+	</head>
+
+	<body>
+
+		<div class="general-container index-background">
+
+			<!-- NAVBAR -->
+			<nav class="navbar Montserrat-Regular">
+
+				<div class="logo-container">
+					<a href="./index.html"> <img id="logo" src="./assets/images/GeoterRA-Logo.svg" class="header-logo" alt="Webpage logotype"> </a>
+				</div>
+
+				<div class="menu">
+
+					<a href="#about-us">About Us</a>
+					<a href="#how-works">How it works</a>
+					<a href="#contact-us">Contact</a>
+					<a href="./map.html">Map</a>
+					<a href="./login.html">Login</a>
+
+				</div>
+
+			</nav>
+			<!-- NAVBAR -->
+
+			<!-- BODY -->
+			<div class="index-container Montserrat-Regular">
+
+				<!--------------------------------LOADER----------------------------------->
+				<div class="web-loader" id="loader">
+					<img src="./assets/images/GeoterRA-Logo.svg" class="logoWelcome" id="logoWelcome">
+					<div id="carga_pagina">
+
+					</div>
+				</div>
+				<!--------------------------------END LOADER------------------------------->
+				
+				<div class="welcome Montserrat-Regular center-text">
+					<p>WELCOME</p>
+				</div>
+
+				<!-- ABOUT US SECTION -->
+				<div class="A-container" id="about-us">
+					<div class="about-us">
+
+						<div>
+							<h1>ABOUT US</h1>
+							<p>
+								Lorem ipsum dolor sit, amet consectetur adipisicing elit. Aliquid asperiores quam ratione, 
+								repellendus eius libero possimus, voluptate nesciunt architecto soluta autem officia ullam 
+								placeat nihil vero. Expedita quam aut eius!. Lorem ipsum dolor sit, amet consectetur adipisicing elit. 
+								Aliquid asperiores quam ratione, repellendus eius libero possimus, voluptate nesciunt architecto 
+								soluta autem officia ullam placeat nihil vero. Expedita quam aut eius!
+							</p>
+						</div>
+
+						<div>
+							<img src="./assets/images/GeoterRA-Logo.svg" alt="">
+						</div>
+
+					</div>
+				</div>
+				<!-- ABOUT US SECTION -->
+				
+				<!-- HOW WORKS SECTION -->
+				<div class="B-container" id="how-works">
+					<div class="how-works">
+						
+						<div>
+							<img src="./assets/images/map-screenshot.png" alt="">
+						</div>
+
+						<div>
+							<h1>How it works</h1>
+							<p>
+								Lorem ipsum dolor sit, amet consectetur adipisicing elit. Aliquid asperiores quam ratione, 
+								repellendus eius libero possimus, voluptate nesciunt architecto soluta autem officia ullam 
+								placeat nihil vero. Expedita quam aut eius!. Lorem ipsum dolor sit, amet consectetur adipisicing elit. 
+								Aliquid asperiores quam ratione, repellendus eius libero possimus, voluptate nesciunt architecto 
+								soluta autem officia ullam placeat nihil vero. Expedita quam aut eius!
+							</p>
+						</div>
+
+					</div>
+				</div>
+				<!-- HOW WORKS SECTION -->
+				
+				<!-- CONTACT US SECTION -->
+				<div class="A-container" id="contact-us">
+					<div class="contact-us">
+
+						<div>
+							<h1>Get in touch</h1>
+							<p>
+								Lorem ipsum dolor sit, amet consectetur adipisicing elit. Aliquid asperiores quam ratione, 
+								repellendus eius libero possimus, voluptate nesciunt architecto soluta autem officia ullam 
+								placeat nihil vero. Expedita quam aut eius!
+							</p>
+						</div>
+						
+						<div>
+							<img src="./assets/images/index-background.png" alt="">
+						</div>
+
+					</div>
+				</div>
+				<!-- CONTACT US SECTION -->
+				
+			</div>
+			<!-- BODY -->
+
+			<!-- FOOTER -->
+			<footer class="footer-container">
+				<div class="footer center-text Montserrat-Regular">
+					
+					<p> © 2021 Instituto de Investigaciones en Ingeniería - Universidad de Costa Rica.Ciudad Universitaria Rodrigo Facio </p>
+					<p> San Pedro, Montes de Oca.Tel: (506) 2511-6641 (506) 2511-6642 Fax: (506) 2224-2619 Apdo. postal: 3620-60 </p>
+					<p> Correo electrónico: inii@ucr.ac.cr </p> 
+					<p>Un Tema de SiteOrigin </p>
+					
+				</div>
+			</footer>
+			<!-- FOOTER -->
+
+			<!-- JS INCLUDES -->
+			<script src="./assets/js/web-loader.js"></script>
+
+		</div>
+	</body>
 </html>
->
