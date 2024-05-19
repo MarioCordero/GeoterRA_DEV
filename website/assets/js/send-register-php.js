@@ -8,7 +8,7 @@ document.getElementById("reg_form").addEventListener("submit",
 				if (xhr.readyState == 4 && xhr.status == 200) {
 					let errorObject = JSON.parse(xhr.responseText);
 					if (errorObject.length === 0) {
-					window.location.href = "logged_in.html";
+					  window.location.href = "logged_in.html";
 					} else {
 					document.getElementById("result").innerHTML = "";
 					console.log(errorObject);

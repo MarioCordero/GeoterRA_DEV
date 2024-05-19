@@ -1,11 +1,11 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.6.2/proj4.js"></script>
-
 function onMarkerClick() {
-  var latlng = this.getLatLng(); // 'this' refers to the marker clicked
+  let latlng = this.getLatLng(); // 'this' refers to the marker clicked
+  let pointObt = this.point;
+  let content = "<div id= 'cont'>Lugar: " + pointObt.id + "<br>Longitude: " + latlng.lng.toFixed(4) + "<br>Latitude: " + latlng.lat.toFixed(4) + "</div>"
   // Create a popup with the coordinates
    L.popup()
   .setLatLng(latlng)
-  .setContent("Latitude: " + latlng.lat.toFixed(4) + "<br>Longitude: " + latlng.lng.toFixed(4))
+  .setContent(content)
   .openOn(map);
 }
 
@@ -23,6 +23,7 @@ function fetchData() {
         for (let i = 0; i < splittedResponse.length - 1; i++) {
           splittedResponse[i] += '}';
         }
+        console.log(splittedResponse);
         for (let i = 0; i < splittedResponse.length - 1; i++) {
           obtainedPoints[i] = JSON.parse(splittedResponse[i]);
         }
@@ -35,27 +36,23 @@ function fetchData() {
 function createMarkers(obtainedPoints) {
   // markers[0] = L.marker([pointsObtained[0].coord_x, pointsObtained[0].coord_y]).addTo(map)
   let markers = []
+
   
-  let WGS84 = proj4('EPSG:4326');
-  let CRTM05 = proj4('EPSG:5367');
+  markers[0] = L.marker([-11.72869269, 9.03640811]).addTo(map);
+  markers[1] = L.marker([9.9258333333333, -84.050555555556]).addTo(map);
+  markers[2] = L.marker([9.9458333333333, -84.050555555556]).addTo(map);
+  markers[3] = L.marker([9.9558333333333, -84.050555555556]).addTo(map);
 
-  var pointCRTM05 = [200000, 1000000];
-
-  // Transform the point to WGS84 coordinates
-  var pointWGS84 = proj4(CRTM05, WGS84, pointCRTM05);
-  console.log(pointWGS84[0], pointWGS84[1]);
-
-  markers[0] = L.marker([10.684953, 4.769269]).addTo(map)
-  markers[1] = L.marker([9.9258333333333, -84.050555555556]).addTo(map)
-  markers[2] = L.marker([9.9458333333333, -84.050555555556]).addTo(map)
-  markers[3] = L.marker([9.9558333333333, -84.050555555556]).addTo(map)
-
-  for (var i = 1; i < markers.length; i++) {
+  for (var i = 0; i < markers.length; i++) {
+    markers[i].point = obtainedPoints[i];
     markers[i].on('click', onMarkerClick);
   }
   // Here are the markers created
 
+
   console.log(obtainedPoints[0].id);
+  console.log(obtainedPoints[0].coord_x)
+  console.log(obtainedPoints[0].coord_y)
   console.log(obtainedPoints[1].id);
   console.log(obtainedPoints[2].id);
   console.log(obtainedPoints);
@@ -74,6 +71,17 @@ let osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 fetchData().then(value => createMarkers(value));
 
+// let CRTM05 = 'EPSG:9752';
+// let WGS84 = 'EPSG:4326';
+//
+// // Define a point in CRTM05 coordinates
+// let pointCRTM05 = [200000, 1000000];
+//
+// // Transform the point to WGS84 coordinates
+// let pointWGS84 = proj4(CRTM05, WGS84, pointCRTM05);
+//
+// console.log('X coordinate (longitude):', pointWGS84[0]);
+// console.log('Y coordinate (latitude):', pointWGS84[1]);
 
 
 // ----------------------------------------CODE TO IMPLEMENT------------------------------------
