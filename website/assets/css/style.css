@@ -5,6 +5,8 @@ https://www.psico.ucr.ac.cr/images/recursos/2019_manual-identidad-visual-web.pdf
 
 	--azul:#005da4;
 	--blanco: #ffffff;
+	--grisClaro: #ececec;
+	--grisOscuro: #bfc4d4;
 	--cafe1: #B76E11;
 	--celeste:#00c0f3;
 	--celeste2:#8ed8f8;
@@ -144,7 +146,7 @@ html {
 
 .A-container{
 	min-height: 60vh;
-	background-color: var(--blanco);
+	background-color: var(--grisClaro);
 }
 .B-container{
 	min-height: 60vh;
@@ -178,51 +180,81 @@ html {
 
 /* CONTACT US */
 .contact-us{
-	padding: 15% 10%;
+	padding: 10% 4% 10% 10%;
 	display: flex;
 	align-items: center;
 	justify-content: space-evenly;
+}.contact-us p{
+	margin: 5% 0px;
+	text-align: justify;
+	line-height: 1.5;
 }.contact-us div:nth-child(1){
-	margin: 5%;
+	margin: 5% 0px;
 }.contact-us div:nth-child(2) img{
-	width: 700px;
+	width: 90%;
+	display: block;
+	margin: auto;
+	box-shadow: rgba(51, 51, 51, 0.58) 0px 0px 20px 0px;
 }.contact-us div:nth-child(2){
 	margin: 5%;
 }
 
 .contact-us-form{
 	margin: 5% 0px;
+	padding: 0px 0px 5% 0px;
 	box-shadow: rgba(51, 51, 51, 0.58) 0px 0px 20px 0px;
-	background-color: var(--azul);
-	color: var(--blanco);
+	background-color: var(--blanco);
 	width: 100%;
 	border-radius: 8px;
-}.contact-us-form p{
-	padding: 2em;
+}.contact-us-form span{
 	display: block;
-	margin: auto;
+}.contact-us-form p{
+	font-size: 20px;
+	display: block;
+	margin: 2% auto;
+	background-color: var(--azul);
+	color: var(--blanco);
+	padding: 20px;
+	border-radius: 8px 8px 0px 0px;
 	width: 100%;
 }.contact-us-form input{
-	padding: 1em;
+	font-size: 15px;
+	color: var(--negro);
+	padding: 2%;
     border: none;
     outline: none;
-    color: #ffff;
+    background: none;
 	display: block;
 	margin: auto;
 	width: 100%;
+
 }.contact-us-form textarea{
-	padding: 1em;
+	font-size: 15px;
+	padding: 5% 2%;
     border: none;
     outline: none;
     background: none;
     border-bottom: 1px solid  var(--blanco);
-    color: #ffff;
+    color: var(--negro);
 	display: block;
 	margin: auto;
 	width: 100%;
+	resize:none;
 }.contact-us-form button{
+	font-size: 15px;
 	display: block;
-	margin: auto;
+	margin:auto;
+	width: 40%;
+    border-radius: 8px;
+	border: none;
+	padding: 10px;
+    transition: all 500ms ease;
+	background-color: var(--grisOscuro);
+
+}.contact-us-form button:hover{
+	cursor: pointer;
+	background-color: var(--negro);
+	color: var(--blanco);
 }
 
 

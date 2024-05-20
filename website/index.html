@@ -92,11 +92,53 @@
 						<div>
 							<h1>How it works</h1>
 							<p>
-								Lorem ipsum dolor sit, amet consectetur adipisicing elit. Aliquid asperiores quam ratione, 
-								repellendus eius libero possimus, voluptate nesciunt architecto soluta autem officia ullam 
-								placeat nihil vero. Expedita quam aut eius!. Lorem ipsum dolor sit, amet consectetur adipisicing elit. 
-								Aliquid asperiores quam ratione, repellendus eius libero possimus, voluptate nesciunt architecto 
-								soluta autem officia ullam placeat nihil vero. Expedita quam aut eius!
+								<h2>1. Recolección de Datos</h2>
+								GeoterRA comienza con la recolección integral de datos geológicos de diversas fuentes:
+								<ul>
+									<li>Investigación de Campo: Expertos realizan estudios de campo para recopilar información geológica esencial.</li>
+									<li>Aplicación Móvil: Los usuarios pueden contribuir subiendo fotos geolocalizadas y datos a través de la aplicación móvil de GeoterRA.</li>
+									<li>Datos de Terceros: La integración con bases de datos geológicas existentes asegura una rica y diversa recopilación de datos.</li>
+								</ul>
+
+								<h2>2. Procesamiento y Validación de Datos</h2>
+								Una vez recopilados, los datos pasan por un riguroso proceso de validación:
+								
+								Análisis Especializado: Los datos geológicos se analizan utilizando herramientas y metodologías avanzadas para asegurar su precisión.
+								Verificación: Todos los datos son revisados y verificados por expertos en geología para mantener altos estándares de fiabilidad.
+
+								<h2>3. Integración y Visualización de Datos</h2>
+								Los datos validados se integran en la plataforma GeoterRA:
+								
+								Gestión de Base de Datos: Los datos geológicos se almacenan en una base de datos PostgreSQL con extensión PostGIS para un manejo eficiente de datos espaciales.
+								Mapa Interactivo: Los usuarios pueden explorar los datos geológicos a través de un mapa interactivo, impulsado por QGIS y OpenLayers, que proporciona una representación geoespacial detallada.
+
+								<h2>4. Interacción del Usuario y Herramientas de Planificación</h2>
+								GeoterRA ofrece diversas herramientas para que los usuarios interactúen con los datos y planifiquen sus proyectos:
+								
+								Mapa Interactivo: El mapa en la web permite a los usuarios ver, buscar y filtrar información geológica específica de sus áreas de interés.
+								Visualización 3D: Los usuarios pueden previsualizar potenciales estructuras y edificaciones en 3D para comprender mejor el impacto de sus proyectos.
+								Autenticación de Usuarios: Un sistema robusto garantiza el acceso seguro a la plataforma, protegiendo la integridad de los datos.
+
+								<h2>5. Evaluación de Riesgos y Planificación</h2>
+								La plataforma proporciona información crucial para ayudar a los usuarios a minimizar riesgos:
+								
+								Informes Geológicos: Informes detallados y análisis ayudan a los usuarios a comprender las condiciones geológicas y los riesgos potenciales.
+								Asistencia en Planificación: Herramientas para la planificación de escenarios y evaluación de riesgos apoyan la toma de decisiones informadas y la planificación estratégica.
+
+								<h2>6. Actualizaciones Continuas y Contribuciones de la Comunidad</h2>
+								GeoterRA se actualiza continuamente con nuevos datos e información:
+								
+								Actualizaciones Regulares: La plataforma se actualiza regularmente con los últimos datos y hallazgos geológicos.
+								Participación Comunitaria: Los usuarios pueden solicitar datos adicionales y contribuir con sus propios hallazgos, fomentando un entorno colaborativo.
+
+								<h2>7. Integración Sin Fisuras en Diferentes Dispositivos</h2>
+								GeoterRA asegura una experiencia sin interrupciones en plataformas web y móviles:
+								
+								Aplicación Web: Accesible a través de cualquier navegador web, ofreciendo una suite completa de características para análisis en profundidad.
+								Aplicación Móvil: La aplicación Android, desarrollada con Kotlin, proporciona acceso móvil a datos y herramientas, permitiendo a los usuarios contribuir e interactuar con la plataforma desde el campo.
+								Combinando tecnología de vanguardia con datos geológicos completos, GeoterRA empodera a los usuarios para tomar decisiones informadas, reducir riesgos y aprovechar efectivamente la energía geotérmica.
+								
+								
 							</p>
 						</div>
 
@@ -109,45 +151,50 @@
 					<div class="contact-us">
 
 						<div>
-							<h1>Get in touch</h1>
+							<h1>Contactá con nosotros</h1>
 
 							<p>
-								Lorem ipsum dolor sit, amet consectetur adipisicing elit. Aliquid asperiores quam ratione, 
-								repellendus eius libero possimus, voluptate nesciunt architecto soluta autem officia ullam 
-								placeat nihil vero. Expedita quam aut eius!
+								Gracias por su interés en GeoterRA. Estamos aquí para ayudarle con cualquier pregunta, 
+								comentario o apoyo que pueda necesitar. No dude en comunicarse con nosotros rellenando 
+								este formulario:
 							</p>
 
 							<div class="contact-us-form">
 								<!-- USAR FORMSPREE -->
-							<form action="" method="POST" class="Montserrat-Regular">
-								
-								<p>
-									<label>
-										Nombre:
-										<input type="text" class="Montserrat-Regular" name="name" placeholder="Escribí tu nombre">
-									</label>
-								</p>
-								
-								<p>
-									<label>
-										Contacto:
-										<input type="tel" class="Montserrat-Regular" name="phone" placeholder="Escribí tu teléfono">
-									</label>
-								</p>
-								
-								<p>
-									<label>
-										Mensaje:
-										<textarea name="message" class="Montserrat-Regular" placeholder="Escribí un mensaje para nosotros"></textarea>
-									</label>
-								</p>
-								
-								<p>
-									<button type="submit" class="Gibson-Regular"> Enviar </button>
-								</p>
-								
+								<form action="" method="POST" class="Montserrat-Regular">
+									
+									<span>
+										<label>
+											<p>
+												Nombre
+											</p>
+											<input type="text" class="Montserrat-Regular" name="name" placeholder="Escribí tu nombre">
+										</label>
+									</span>
+									
+									<span>
+										<label>
+											<p>
+												Contacto
+											</p>
+											<input type="text" class="Montserrat-Regular" name="contact" placeholder="Escribí tu teléfono o correo">
+										</label>
+									</span>
+									
+									<span>
+										<label>
+											<p>
+												Mensaje
+											</p>
+											<textarea name="message" class="Montserrat-Regular" placeholder="Escribí un mensaje para nosotros"></textarea>
+										</label>
+									</span>
+									
+									<span>
+										<button type="submit" class="Montserrat-Regular"> Enviar </button>
+									</span>
+									
 								</form>
-
 							</div>
 						</div>
 						
