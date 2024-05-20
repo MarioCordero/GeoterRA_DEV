@@ -1,3 +1,19 @@
+/* 
+https://www.psico.ucr.ac.cr/images/recursos/2019_manual-identidad-visual-web.pdf
+*/
+:root{
+
+	--azul:#005da4;
+	--blanco: #ffffff;
+	--cafe1: #B76E11;
+	--celeste:#00c0f3;
+	--celeste2:#8ed8f8;
+	--celeste3:#bad2cd;
+    --celeste4:#80a9ba;
+	--naranja1:#e5b365;
+	--naranja2:#f99d1c;
+	--negro: #000000;
+}
 /* ------------------------------GENERAL------------------------------ */
 html {
 	scroll-behavior: smooth;
@@ -128,11 +144,11 @@ html {
 
 .A-container{
 	min-height: 60vh;
-	background-color: #dbdbdb;
+	background-color: var(--blanco);
 }
 .B-container{
 	min-height: 60vh;
-	background-color: #F49C2A;
+	background-color: var(--naranja2);
 }
 
 
@@ -166,11 +182,49 @@ html {
 	display: flex;
 	align-items: center;
 	justify-content: space-evenly;
-}.contact-us :nth-child(1){
-	width: 40%;
-}.contact-us :nth-child(2) img{
+}.contact-us div:nth-child(1){
+	margin: 5%;
+}.contact-us div:nth-child(2) img{
 	width: 700px;
+}.contact-us div:nth-child(2){
+	margin: 5%;
 }
+
+.contact-us-form{
+	margin: 5% 0px;
+	box-shadow: rgba(51, 51, 51, 0.58) 0px 0px 20px 0px;
+	background-color: var(--azul);
+	color: var(--blanco);
+	width: 100%;
+	border-radius: 8px;
+}.contact-us-form p{
+	padding: 2em;
+	display: block;
+	margin: auto;
+	width: 100%;
+}.contact-us-form input{
+	padding: 1em;
+    border: none;
+    outline: none;
+    color: #ffff;
+	display: block;
+	margin: auto;
+	width: 100%;
+}.contact-us-form textarea{
+	padding: 1em;
+    border: none;
+    outline: none;
+    background: none;
+    border-bottom: 1px solid  var(--blanco);
+    color: #ffff;
+	display: block;
+	margin: auto;
+	width: 100%;
+}.contact-us-form button{
+	display: block;
+	margin: auto;
+}
+
 
 
 /* ------------------------------login.html------------------------------ */
