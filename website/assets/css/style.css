@@ -425,6 +425,14 @@ html {
 
 /* ------------------------------Marker------------------------------ */
 #cont {
-  height: 50px;
-  width: 50px;
+  background-color: gray;
+  height: 80px;
+  width: 200px;
+}
+
+.show_point {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 }
