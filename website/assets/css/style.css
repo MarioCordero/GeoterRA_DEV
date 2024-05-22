@@ -15,6 +15,7 @@ https://www.psico.ucr.ac.cr/images/recursos/2019_manual-identidad-visual-web.pdf
 	--naranja1:#e5b365;
 	--naranja2:#f99d1c;
 	--negro: #000000;
+	--rojo: #fc2323;
 }
 /* ------------------------------GENERAL------------------------------ */
 html {
@@ -299,7 +300,6 @@ html {
 	min-height: 100vh;
 }
 
-
 .login-background{
 	width: 100%;
 	max-height: 100vh;
@@ -387,6 +387,10 @@ html {
 	width: 627px;
 	height: 70px;
 	font-size: 1.2em;
+}.remember-forgot a{
+	color: var(--grisClaro);
+}.remember-forgot a:hover{
+	color: var(--rojo);
 }
 
 .login .btn {
@@ -394,6 +398,12 @@ html {
 	padding: 10px;
 	border-radius: 10px;
 	margin: 15px;
+	transition: all 250ms ease;
+}.login .btn:hover {
+	cursor: pointer;
+	background-color: var(--azul);
+	color: var(--blanco);
+	transition: all 250ms ease;
 }
 
 .login .register-link {
@@ -470,6 +480,16 @@ html {
 }.register-form input::placeholder {
 	color: #fff;
 }
+
+.register-form .btn{
+	transition: all 250ms ease;
+}.register-form .btn:hover{
+	cursor: pointer;
+	background-color: var(--azul);
+	color: var(--blanco);
+	transition: all 250ms ease;
+}
+
 
 /* ------------------------------map.html------------------------------ */
 .map-container{
