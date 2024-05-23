@@ -41,13 +41,14 @@
                 />
 
             <EditText
-                android:id="@+id/username"
+                android:id="@+id/userEmail"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="40dp"
                 android:background="@drawable/gray_rectangle_rounded2"
                 android:drawableRight="@drawable/baseline_account_circle_24"
                 android:hint="Username"
+                android:inputType="textEmailAddress"
                 android:padding="14dp"
                 android:textColor="@color/black"
                 />
