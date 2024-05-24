@@ -60,7 +60,7 @@ html {
 }.menu a{
 	color: #fff;
 	text-decoration: none;
-	font-size: 18px;
+	font-size: 16px;
 	margin-right: 3em;
 	transition: all 250ms ease;
 }.menu a:hover{
@@ -422,7 +422,6 @@ html {
 	text-decoration: underline;
 }
 
-
 /* ------------------------------register.html------------------------------ */
 .register-container{
 	margin: auto;
@@ -520,4 +519,103 @@ html {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
+}
+
+/* ------------------------------logged.html------------------------------ */
+
+.loged-in-container{
+	margin: auto;
+	min-height: 100vh;
+}.loged-in-container h1{
+	padding-top: 10%;
+}
+
+.user-info{
+	padding: 2% 10%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+	min-height: 60vh;
+}
+
+.user-info-col-container{
+    display: flex;
+    flex-direction: row;
+    gap: 10%;
+}
+
+.user-info-col{
+	background-color: var(--grisOscuro);
+	box-shadow: rgba(80, 80, 80, 0.58) 0px 0px 20px 0px;
+	border-radius: 8px;
+	text-align: justify;
+	line-height: 2;
+	flex: 1;
+	padding: 10px;
+	min-height: 50vh;
+}
+
+.user-personal-data{
+	margin: 5% 10%;
+}.user-personal-data button{
+	border: 4px solid transparent;
+	width: 50%;
+	display: block;
+	background-color: var(--azul);
+	font-size: 20px;
+	margin: 5% auto;
+	padding: 2%;
+	border-radius: 8px;
+	color: var(--blanco);
+	transition: all 250ms ease;
+}.user-personal-data button:hover{
+	background-color: var(--blanco);
+	border: 4px solid var(--negro);
+	color: var(--negro);
+	cursor: pointer;
+	transition: all 250ms ease;
+}
+
+.user-requests{
+	padding: 5% 10%;
+}.user-requests li, ul{
+	list-style: none !important;
+	text-decoration: none;
+}.user-requests li{
+	border: 4px solid transparent;
+	width: 100%;
+	background-color: var(--azul);
+	font-size: 20px;
+	margin: 5% auto;
+	border-radius: 8px;
+	color: var(--blanco);
+	transition: all 250ms ease;
+}.user-requests li:hover{
+	background-color: var(--blanco);
+	border: 4px solid var(--negro);
+	color: var(--negro);
+	cursor: pointer;
+	transition: all 250ms ease;
+}
+
+.buttons-container {
+    display: flex;
+    margin: 2% auto;
+    justify-content: center;
+    gap: 20%;
+}.buttons-container button{
+	border: 4px solid transparent;
+	width: 20%;
+	padding: 2%;
+	background-color: var(--azul);
+	font-size: 20px;
+	border-radius: 8px;
+	color: var(--blanco);
+	transition: all 250ms ease;
+}.buttons-container button:hover{
+	background-color: var(--blanco);
+	border: 4px solid var(--negro);
+	color: var(--negro);
+	cursor: pointer;
+	transition: all 250ms ease;
 }
