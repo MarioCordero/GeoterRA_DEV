@@ -16,7 +16,6 @@ data class APIResponse<T>(
   val data    : T?
 )
 
-
 interface APIService {
   @FormUrlEncoded
   @POST("login.inc.php")
