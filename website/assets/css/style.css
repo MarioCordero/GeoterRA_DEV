@@ -494,16 +494,18 @@ html {
 .map-container{
 	margin: auto;
 	min-height: 100vh;
-  position: relative;
+  	position: relative;
+}.map-container h1{
+	padding-top: 5%;
 }
 
-#map {
-  height: 80%;
-  width: 80%;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
+.map {
+	box-shadow: rgba(80, 80, 80, 0.58) 0px 0px 20px 0px;
+	display: block;
+	margin: 20px auto 0px auto;
+  	width: 90%;
+	min-height: 80vh;
+	z-index: 0;
 }
 
 
