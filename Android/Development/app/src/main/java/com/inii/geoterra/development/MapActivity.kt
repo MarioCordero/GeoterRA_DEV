@@ -17,6 +17,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.inii.geoterra.development.Components.CustomInfoOnMarker
+import com.inii.geoterra.development.Components.LocationService
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -77,7 +78,7 @@ class MapActivity : AppCompatActivity() {
         val compassOverlay = CompassOverlay(this, mapView)
         compassOverlay.enableCompass()
          compassOverlay.setCompassCenter(40F, 60F)
-         mapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+         mapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
          mapView.setMultiTouchControls(false)
 
 // Establecer los límites del área visible en el mapa
