@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="20dp"
+    android:layout_marginBottom="65dp"
+
+    tools:context=".ui.FormFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="Formulario de Solicitud"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                >
+            </TextView>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="333dp"
+                android:layout_height="wrap_content"
+
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="15dp"
+
+                android:hint="Nombre Completo"
+                app:helperText="Requerido">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/nameTxtInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="textPersonName">
+                </com.google.android.material.textfield.TextInputEditText>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:hint="Numero de contacto"
+                android:layout_width="253dp"
+                android:layout_height="wrap_content"
+
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="15dp"
+                app:helperText="Requerido"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/phoneNumberTxtInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="number">
+                </com.google.android.material.textfield.TextInputEditText>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="10dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+
+                    android:hint="Fecha"
+                    app:helperText="Requerido">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/dateTxtInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:inputType="date">
+                    </com.google.android.material.textfield.TextInputEditText>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="1dp"
+
+                    android:hint="Sensación Térmica °C"
+                    app:helperText="Requerido">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/thermalSensationTxtInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:inputType="numberDecimal">
+                    </com.google.android.material.textfield.TextInputEditText>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="333dp"
+                android:layout_height="wrap_content"
+
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="15dp"
+                android:hint="Propietario de la zona"
+                app:helperText="Rellenar solo si es necesario">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/zoneOwnerTxtInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="textPersonName">
+                </com.google.android.material.textfield.TextInputEditText>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="333dp"
+                android:layout_height="wrap_content"
+
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="15dp"
+                android:hint="Uso actual"
+                app:helperText="Requerido">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/actualUseInputText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="textPersonName">
+                </com.google.android.material.textfield.TextInputEditText>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp">
+
+                <CheckBox
+                    android:id="@+id/bubbleCheckBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Presenta burbujeo">
+                </CheckBox>
+
+            </FrameLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="333dp"
+                android:layout_height="wrap_content"
+
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="15dp"
+                android:hint="Indicaciones adicionales">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/indicationsTxtInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="text">
+                </com.google.android.material.textfield.TextInputEditText>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center_vertical"
+                >
+
+                <Button
+                    android:id="@+id/locationImageButton"
+                    android:layout_width="130dp"
+                    android:layout_height="match_parent"
+
+                    android:backgroundTint="@color/ligthGray"
+                    android:drawableBottom="@drawable/baseline_add_photo_alternate_24"
+                    android:text="Insertar ubicación por foto"
+
+                    android:textColor="@color/black"
+                    android:textSize="6sp"
+                    style="?android:attr/buttonBarButtonStyle">
+                </Button>
+
+                <Button
+                    android:id="@+id/userLocationButton"
+                    android:layout_width="130dp"
+                    android:layout_height="match_parent"
+
+                    android:layout_marginStart="20dp"
+
+                    android:backgroundTint="@color/ligthGray"
+                    android:drawableBottom="@drawable/baseline_location_on_24"
+                    android:text="Insertar ubicación por GPS"
+
+                    android:textColor="@color/black"
+                    android:textSize="6sp"
+                    style="?android:attr/buttonBarButtonStyle">
+                </Button>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center_vertical"
+                >
+
+                <Button
+                    android:id="@+id/sendRequestButton"
+                    android:layout_width="200dp"
+                    android:layout_height="60dp"
+
+                    android:backgroundTint="@color/ligthGray"
+                    android:text="Enviar Solicitud"
+
+                    android:textColor="@color/black"
+                    android:textSize="12sp">
+
+                </Button>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</FrameLayout>

@@ -8,8 +8,25 @@
     android:layout_height="match_parent"
     tools:context=".RequestActivity">
 
+    <FrameLayout
+        android:id="@+id/formFrame"
+        android:layout_width="381dp"
+        android:layout_height="550dp"
+
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="65dp"
+
+        android:background="@drawable/gray_rectangle_rounded2"
+        android:visibility="invisible"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/requestText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
@@ -30,7 +47,7 @@
         android:layout_width="150dp"
         android:layout_height="45dp"
 
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="16dp"
 
         android:backgroundTint="@color/ligthGray"
@@ -49,7 +66,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
 
-
         android:layout_marginTop="80dp"
         android:layout_marginBottom="60dp"
 
@@ -57,10 +73,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/newRequestButton">
 
-
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:id="@+id/requestScrollView"
             android:layout_marginBottom="45dp">
 
             <LinearLayout

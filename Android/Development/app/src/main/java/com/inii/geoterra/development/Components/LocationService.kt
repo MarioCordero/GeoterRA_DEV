@@ -1,4 +1,4 @@
-package com.inii.geoterra.development
+package com.inii.geoterra.development.Components
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -49,7 +49,6 @@ class LocationService {
   fun setUserLocationPermissions(userPermission : Boolean) {
     isUserLocationGranted = userPermission
     Log.i("setLocationPermissions","isUserLocationGranted: $isUserLocationGranted")
-
   }
 
 }
