@@ -11,20 +11,15 @@
 		<link rel="stylesheet" href="./assets/css/style.css">
 		<link rel="stylesheet" href="./assets/css/fonts.css">
 		<!-- <link rel="stylesheet" href="./assets/css/responsive.css"> -->
-		
+
 		<!--ICON-->
 		<link rel="shortcut icon" type="image/x-icon" href="./GeoterRA.ico">
-    
-		<title>Map GeoterRA</title>
 
-		<!--LEAFLET-->
-		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+		<title>LOCATION: xxxxxx</title>
 
 	</head>
 
-	<body>
-
-		<div class="general-container">
+  	<body>
 
 			<!-- NAVBAR -->
 			<nav class="navbar Montserrat-Regular">
@@ -35,9 +30,8 @@
 
 				<div class="menu">
 
-					<a href="./index.html#about-us">About Us</a>
-					<a href="./index.html#how-works">How it works</a>
-					<a href="./index.html#contact-us">Contact</a>
+					<a href="#">About Us</a>
+					<a href="#">Contact</a>
 					<a href="./map.html">Map</a>
 					<a href="./login.html">Login</a>
 
@@ -47,7 +41,7 @@
 			<!-- NAVBAR -->
 
 			<!-- BODY -->
-			<div class="map-container Montserrat-Regular">
+			<div class="login-container">
 
 				<!--------------------------------LOADER----------------------------------->
 				<div class="web-loader" id="loader">
@@ -57,13 +51,13 @@
 					</div>
 				</div>
 				<!--------------------------------END LOADER------------------------------->
-				
-				<div id="map"> MAP
-					<!--LEAFLET JS-->
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.6.2/proj4.js"></script>
-					<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-					<script src="./assets/js/interactive-map.js" defer></script>
+
+				<div class="show_point Montserrat-Regular">
+          <p id="resultChanged">
+          </p>
+									
 				</div>
+
 				
 			</div>
 			<!-- BODY -->
@@ -81,9 +75,10 @@
 			</footer>
 			<!-- FOOTER -->
 
+
 			<!-- JS INCLUDES -->
 			<script src="./assets/js/web-loader.js"></script>
-
-		</div>
+			<script src="./assets/js/show-point.js"></script>
+			
 	</body>
 </html>

@@ -9,27 +9,28 @@ Una herramienta que brinde información geológica especializada y validada adem
 
 <!-- 
 
-Install node.js on linux
+Install LAMP native in linux
 
-Source: https://www.youtube.com/watch?v=4EW_En2JcCY
-        https://www.youtube.com/watch?v=DylHfRlT8ts&t=7s
+- [] https://www.youtube.com/watch?v=ocwukh0gs8w&t=400s
+In synaptics install
 
--[] curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+apache2
+mysql-server
+mysql-client
+phpmyadmin
 
--[] sudo apt-get install -y nodejs
+https://www.youtube.com/watch?v=MX4a8HSPR_8
 
--[] sudo apt install npm
+CREAR USUARIO PARA PHPMYADMIN
 
-ON THE INDEX DIRECTORY LEVEL
--[] npm init -y
+sudo mysql -u root -p
 
--[] npm install mysql
+CREATE USER 'USER'@'%' IDENTIFIED BY 'PASSWORD';
 
-IN ANSWER OF "code: 'ER_NOT_SUPPORTED_AUTH_MODE',"
+In this case
+User:       USER
+Password:   PASSWORD
 
--[] sudo mysql
-
--[] ALTER USER 'tu_usuario'@'localhost' IDENTIFIED WITH mysql_native_password BY 'tu_contraseña';
-
+GRANT ALL PRIVILEGES ON * . * TO 'USER'@'%';
 
  -->
