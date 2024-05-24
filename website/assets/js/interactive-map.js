@@ -1,3 +1,15 @@
+function convertCoordinates(easting, northing) {
+  // Define the projections
+  var projFrom = "+proj=tmerc +lat_0=0 +lon_0=-84 +k=0.9996 +x_0=500000 +y_0=0 +ellps=GRS80 +datum=WGS84 +units=m +no_defs";
+  var projTo = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
+
+  // Perform the transformation
+  var [longitude, latitude] = proj4(projFrom, projTo, [easting, northing]);
+
+  console.log(latitude, longitude);
+  return [latitude, longitude]
+}
+
 function onMarkerClick() {
   let latlng = this.getLatLng(); // 'this' refers to the marker clicked
   let pointObt = this.point;
@@ -33,7 +45,6 @@ function onMarkerClick() {
 
 }
 
-
 function fetchData() {
   return new Promise ((resolve, reject) => {
     let region = "Guanacaste"
@@ -61,29 +72,18 @@ function createMarkers(obtainedPoints) {
   // markers[0] = L.marker([pointsObtained[0].coord_x, pointsObtained[0].coord_y]).addTo(map)
   let markers = []
 
-  
-  markers[0] = L.marker([-11.72869269, 9.03640811]).addTo(map);
-  markers[1] = L.marker([9.9258333333333, -84.050555555556]).addTo(map);
-  markers[2] = L.marker([9.9458333333333, -84.050555555556]).addTo(map);
-  markers[3] = L.marker([9.9558333333333, -84.050555555556]).addTo(map);
-
-  for (var i = 0; i < markers.length; i++) {
+  for (let i = 0; i < obtainedPoints.length; i++) {
+    pointXY = convertCoordinates(obtainedPoints[i].coord_x, obtainedPoints[i].coord_y)
+    markers[i] = L.marker([pointXY[0],pointXY[1]]).addTo(map); 
     markers[i].point = obtainedPoints[i];
     markers[i].on('click', onMarkerClick);
+    console.log(i);
   }
-  // Here are the markers created
 
-  console.log(obtainedPoints[0].id);
-  console.log(obtainedPoints[0].coord_x)
-  console.log(obtainedPoints[0].coord_y)
-  console.log(obtainedPoints[1].id);
-  console.log(obtainedPoints[2].id);
   console.log(obtainedPoints);
 }
 
-
 // No se ordenar .JS Mario ayuda lo de arriba son solo funciones
-
 
 let map = L.map('map').setView([9.9358333333333, -84.050555555556], 17);
 
@@ -93,18 +93,6 @@ let osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 fetchData().then(value => createMarkers(value));
-
-// let CRTM05 = 'EPSG:9752';
-// let WGS84 = 'EPSG:4326';
-//
-// // Define a point in CRTM05 coordinates
-// let pointCRTM05 = [200000, 1000000];
-//
-// // Transform the point to WGS84 coordinates
-// let pointWGS84 = proj4(CRTM05, WGS84, pointCRTM05);
-//
-// console.log('X coordinate (longitude):', pointWGS84[0]);
-// console.log('Y coordinate (latitude):', pointWGS84[1]);
 
 
 // ----------------------------------------CODE TO IMPLEMENT------------------------------------
