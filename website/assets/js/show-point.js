@@ -6,8 +6,6 @@ let pointObject = JSON.parse(splittedCookie[0].substring(12));
 console.log(pointObject.id + pointObject.coord_x + pointObject.coord_y);
 const myElement = document.getElementById('resultChanged');
 myElement.textContent = pointObject.id + " " + pointObject.coord_x + " " + pointObject.coord_y;
-console.log("Event happened");
-document.cookie = 'pointObject=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 
 // Grafico
 
@@ -239,9 +237,6 @@ const existingSvg = document.getElementById("piperDiagram");
 d3.select(existingSvg)
   .append(() => svg.node());
 
-console.log(svg)
-
-// Draw grid lines
 // TriangleFillLines.forEach(line => {
 //   g.append("line")
 //     .attr("x1", xScale(line.x0))
