@@ -25,6 +25,8 @@ function convertCoordinates(easting, northing) {
 
 // Function to handle marker click events
 function onMarkerClick() {
+  // Deletes previous cookies from pointObject
+  
   let latlng = this.getLatLng();
   let pointObt = this.point;
   let content = `<div id='cont'>
@@ -42,16 +44,9 @@ function onMarkerClick() {
     .bindPopup('height= 100px')
     .openOn(map);
 
-  const toShow = document.getElementById('showPoint');
-  toShow.addEventListener('click', function(event) {
-    event.preventDefault();
-    let stringPoint = JSON.stringify(pointObt);
-    if(document.cookie) {
-      document.cookie = 'pointObject=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    }
-    document.cookie = "pointObject=" + stringPoint + ";path=/;";
-    window.location.href = "./show_point.html";
-  });
+  // Save the point clicked into the storage
+  let pointStr = JSON.stringify(pointObt)
+  localStorage.setItem("pointObject", pointStr);
 }
 
 // Function to fetch data from the server
