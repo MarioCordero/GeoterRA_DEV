@@ -46,6 +46,9 @@ function onMarkerClick() {
   toShow.addEventListener('click', function(event) {
     event.preventDefault();
     let stringPoint = JSON.stringify(pointObt);
+    if(document.cookie) {
+      document.cookie = 'pointObject=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    }
     document.cookie = "pointObject=" + stringPoint + ";path=/;";
     window.location.href = "./show_point.html";
   });
