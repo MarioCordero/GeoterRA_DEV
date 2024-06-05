@@ -34,8 +34,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     require_once 'conf_sess.inc.php';
 
-    echo $errors[0];
-
     // Check if there were any errors caught
     if($errors) {
       $_SESSION["error_register"] = $errors;

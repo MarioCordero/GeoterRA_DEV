@@ -2,6 +2,7 @@ package com.inii.geoterra.development
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
@@ -13,12 +14,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
-import org.json.JSONObject
+import org.json.JSONArray
 
 class LoginActivity : AppCompatActivity() {
 
@@ -65,7 +65,7 @@ class LoginActivity : AppCompatActivity() {
             email = findViewById<EditText>(R.id.userEmail).text.toString().trim()
             password = findViewById<EditText>(R.id.password).text.toString().trim()
 
-            //Log.i("Tomado de datos en login", "$email $password")
+            Log.i("Tomado de datos en login", "$email $password")
             if (email.isNotBlank() && password.isNotBlank()) {
                 if (email.isValidEmail() && password.length >= 8) {
                     loginUser(email, password)
@@ -93,9 +93,9 @@ class LoginActivity : AppCompatActivity() {
 
     private suspend fun login(email: String, password: String) {
         val client = OkHttpClient()
-        val json = JSONObject()
-        json.put("email", email)
-        json.put("password", password)
+        val json = JSONArray()
+        //json.put("email", email)
+        //json.put("password", password)
         //bsalerno1@vimeo.com
         //hK4@+Vg'1{
 
@@ -107,13 +107,13 @@ class LoginActivity : AppCompatActivity() {
             .post(requestBody)
             .build()
 
-        val response = withContext(Dispatchers.IO) {
-            client.newCall(request).execute()
-        }
-        //val responseBody = response.body?.byteStream()?.bufferedReader()?.use { it.readText() }
-
-
-        //return response.body?.string() ?: throw Exception("No se pudo obtener una respuesta del servidor")
+//        val response = withContext(Dispatchers.IO) {
+//            client.newCall(request).execute()
+//        }
+//        val responseBody = response.body?.byteStream()?.bufferedReader()?.use { it.readText() }
+//
+//
+//        return response.body?.string() ?: throw Exception("No se pudo obtener una respuesta del servidor")
     }
 
     private fun handleResponse(response : Unit) {
