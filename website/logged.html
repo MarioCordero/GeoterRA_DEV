@@ -10,7 +10,7 @@
 		<!--CUSTOM CSS-->
 		<link rel="stylesheet" href="./assets/css/style.css">
 		<link rel="stylesheet" href="./assets/css/fonts.css">
-		<!-- <link rel="stylesheet" href="./assets/css/responsive.css"> -->
+		<link rel="stylesheet" href="./assets/css/responsive.css">
 
 		<!--ICON-->
 		<link rel="shortcut icon" type="image/x-icon" href="./GeoterRA.ico">
@@ -25,37 +25,40 @@
 
 			<!-- NAVBAR -->
 			<nav class="navbar Montserrat-Regular">
-				
+
 				<div class="logo-container">
 					<a href="./index.html"> <img id="logo" src="./assets/images/GeoterRA-Logo.svg" class="header-logo" alt="Webpage logotype"> </a>
 				</div>
-				
+
 				<div class="menu">
-					
+
 					<a href="./index.html#about-us">Acerca de nosotros</a>
 					<a href="./index.html#how-works">Como funciona</a>
 					<a href="./index.html#contact-us">Contacto</a>
 					<a href="./map.html">Mapa</a>
 					<a href="./login.html">Iniciar Sesión</a>
-					
+
 				</div>
 
-				<script>
-					document.addEventListener("DOMContentLoaded", function() {
-						let xhr = new XMLHttpRequest();
-						xhr.open("GET", "assets/includes/verify_session.php", true);
-						xhr.onreadystatechange = function () {
-							if (xhr.readyState == 4 && xhr.status == 200) {
-								let response = JSON.parse(xhr.responseText);
-								if (response.status === 'not_loggedin') {
-									window.location.href = "login.html"; // Redirige al usuario si no está logueado
-								}
-							}
-						};
-						xhr.send();
-					});
-				</script>
-				
+				<input type="checkbox" id="checkbox">
+				<label for="checkbox" class="toggle">
+					<div class="bar bar--top"></div>
+					<div class="bar bar--middle"></div>
+					<div class="bar bar--bottom"></div>
+				</label>
+
+                <div class="menu-bars-background" id="menu-bars-background">
+                    <div class="menu-elements Gibson-Regular" id="menu-elements">
+
+						<a href="./index.html#about-us" 	class="a-menu-element">Acerca de nosotros	</a>
+						<a href="./index.html#how-works" 	class="a-menu-element">Como funciona		</a>
+						<a href="./index.html#contact-us" 	class="a-menu-element">Contacto				</a>
+						<a href="./map.html">Mapa														</a>
+						<a href="./login.html">Iniciar Sesión											</a>
+
+                    </div>
+                </div>
+
 			</nav>
 			<!-- NAVBAR -->
 
@@ -175,6 +178,7 @@
 
 			<!-- JS INCLUDES -->
 			<script src="./assets/js/web-loader.js"></script>
+			<script src="./assets/js/menu-bars.js"></script>
 		</div>
 	</body>
 </html>
