@@ -48,6 +48,8 @@
                 android:background="@drawable/gray_rectangle_rounded2"
                 android:drawableRight="@drawable/baseline_account_circle_24"
                 android:hint="Username"
+
+                android:text="bsalerno1@vimeo.com"
                 android:inputType="textEmailAddress"
                 android:padding="14dp"
                 android:textColor="@color/black"
@@ -62,6 +64,7 @@
                 android:drawableRight="@drawable/baseline_lock_24"
                 android:hint="Password"
 
+                android:text="hK4@+Vg'1{"
                 android:inputType="textPassword"
                 android:padding="14dp"
                 android:textColor="@color/black"

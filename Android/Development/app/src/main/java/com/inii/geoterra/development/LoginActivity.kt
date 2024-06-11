@@ -2,6 +2,7 @@ package com.inii.geoterra.development
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
@@ -14,11 +15,14 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import okio.IOException
+import org.json.JSONArray
 import org.json.JSONObject
+import java.net.InetAddress
 
 class LoginActivity : AppCompatActivity() {
 
@@ -84,56 +88,83 @@ class LoginActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = login(email, password)
-                handleResponse(response)
+                withContext(Dispatchers.Main) {
+                    handleResponse(response)
+                }
             } catch (e: Exception) {
-                showError(e.message ?: "Error desconocido")
+                withContext(Dispatchers.Main) {
+                    showError(e.message ?: "Error desconocido")
+                }
             }
         }
     }
 
-    private suspend fun login(email: String, password: String) {
+    private suspend fun login(email : String, password : String) : String {
         val client = OkHttpClient()
-        val json = JSONObject()
-        json.put("email", email)
-        json.put("password", password)
+        // Crear un JSONArray
+        val jsonArray = JSONArray().apply {
+            put(JSONObject().apply {
+                put("email", email)
+                put("password", password)
+            })
+        }
+
+
+        val ipAddress = "127.0.0.1" // Cambia esta dirección IP por la del servidor que deseas probar
+        val timeout = 5000 // Tiempo de espera en milisegundos
+
+        try {
+            val inetAddress = withContext(Dispatchers.IO) {
+                InetAddress.getByName(ipAddress)
+            }
+            if (withContext(Dispatchers.IO) {
+                    inetAddress.isReachable(timeout)
+                }) {
+                Log.d("Ping", "Ping exitoso a $ipAddress")
+            } else {
+                Log.d("Ping", "Ping fallido a $ipAddress")
+            }
+        } catch (e: IOException) {
+            Log.e("Ping", "Error al realizar el ping: ${e.message}")
+        }
         //bsalerno1@vimeo.com
         //hK4@+Vg'1{
 
-        val mediaType = MediaType.parse("application/json; charset=utf-8")
-        val requestBody = RequestBody.create(mediaType, json.toString())
+        val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()
+        val requestBody = jsonArray.toString().toRequestBody(mediaType)
 
         val request = Request.Builder()
-            .url("http://localhost/API/login_model.inc.php") // Reemplaza esto con la URL de tu API PHP
-            .post(requestBody)
-            .build()
+            .url("http://localhost/API/login_model.inc.php").post(requestBody).build()
+        val response = client.newCall(request).execute()
 
-        val response = withContext(Dispatchers.IO) {
-            client.newCall(request).execute()
+        if (!response.isSuccessful) {
+            Log.i("Request Error", "${response.code}")
+            throw Exception("Error en la solicitud: ${response.code}")
         }
-        //val responseBody = response.body?.byteStream()?.bufferedReader()?.use { it.readText() }
 
-
-        //return response.body?.string() ?: throw Exception("No se pudo obtener una respuesta del servidor")
+        return response.body?.string() ?: throw Exception("No se pudo obtener una respuesta del servidor")
     }
 
-    private fun handleResponse(response : Unit) {
-//        val jsonResponse = JSONObject(response)
-//        if (jsonResponse.getBoolean("success")) {
-//            val intent = Intent(this@LoginActivity, MainActivity::class.java)
-//            startActivity(intent)
-//            finish()
-//        } else {
-//            showError(jsonResponse.getString("error_message"))
-//        }
+    private fun handleResponse(response : String) {
+        val jsonResponse = JSONObject(response)
+        if (jsonResponse.has("invalid_cred") || jsonResponse.has("empty_input")) {
+            val errorMessage = jsonResponse.toString()
+            showError(errorMessage)
+        } else {
+            val intent = Intent(this@LoginActivity, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun showError(errorMessage: String) {
+        Log.i("Login request Error", errorMessage)
         runOnUiThread {
             Snackbar.make(loginButton, errorMessage, Snackbar.LENGTH_LONG).show()
         }
     }
 
-    fun String.isValidEmail(): Boolean {
+    private fun String.isValidEmail(): Boolean {
         return this.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(this).matches()
     }
 
