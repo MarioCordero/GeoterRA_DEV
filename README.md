@@ -20,6 +20,7 @@ mysql-client
 phpmyadmin
 
 https://www.youtube.com/watch?v=MX4a8HSPR_8
+
 CREAR USUARIO PARA PHPMYADMIN
 
 sudo mysql -u root -p

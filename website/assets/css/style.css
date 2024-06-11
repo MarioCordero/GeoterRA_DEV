@@ -1,3 +1,22 @@
+/* 
+https://www.psico.ucr.ac.cr/images/recursos/2019_manual-identidad-visual-web.pdf
+*/
+:root{
+
+	--azul:#005da4;
+	--blanco: #ffffff;
+	--grisClaro: #ececec;
+	--grisOscuro: #bfc4d4;
+	--cafe1: #B76E11;
+	--celeste:#00c0f3;
+	--celeste2:#8ed8f8;
+	--celeste3:#bad2cd;
+    --celeste4:#80a9ba;
+	--naranja1:#e5b365;
+	--naranja2:#f99d1c;
+	--negro: #000000;
+	--rojo: #fc2323;
+}
 /* ------------------------------GENERAL------------------------------ */
 html {
 	scroll-behavior: smooth;
@@ -128,11 +147,11 @@ html {
 
 .A-container{
 	min-height: 60vh;
-	background-color: #dbdbdb;
+	background-color: var(--grisClaro);
 }
 .B-container{
 	min-height: 60vh;
-	background-color: #F49C2A;
+	background-color: var(--naranja2);
 }
 
 
@@ -140,37 +159,138 @@ html {
 .about-us{
 	padding: 15% 10%;
 	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}.about-us-col-container{
 	align-items: center;
-	justify-content: space-evenly;
-}.about-us :nth-child(1){
-	width: 40%;
-}.about-us :nth-child(2) img{
-	width: 300px;
+	display: flex;
+	flex-direction: row;
+	gap: 20px;
+}.about-us-col{
+	text-align: justify;
+	line-height: 2;
+	flex: 1;
+	padding: 10px;
+}.about-us-col img{
+	box-shadow: rgba(80, 80, 80, 0.58) 0px 0px 20px 0px;
+	max-width: 90%;
+	margin: 5% auto;
+	display: block;
+	border-radius: 8px;
+	max-height: 50vh;
+}.about-us h1:nth-child(1){
+	font-size: 40px;
+	width: 100%;
+	padding: 10px;
 }
 
 /* HOW WORKS */
 .how-works{
 	padding: 15% 10%;
 	display: flex;
-	align-items: center;
-}.how-works :nth-child(1) img{
-	box-shadow: 0 0 20px 0 #33333394;
-	width: 80%;
-}.how-works :nth-child(2){
-	width: 80%;
+	flex-direction: column;
+	gap: 20px;
+}.how-works-col-container{
+	display: flex;
+	flex-direction: row;
+	gap: 20px;
+}.how-works-col{
+	text-align: justify;
+	line-height: 2;
+	flex: 1;
+	padding: 10px;
+}.how-works-col img{
+	box-shadow: rgba(27, 27, 27, 0.58) 0px 0px 20px 0px;
+	max-width: 90%;
+	margin: 10% auto;
+	display: block;
+	border-radius: 8px;
+	max-height: 60vh;
+}.how-works h1:nth-child(1){
+	font-size: 40px;
+	width: 100%;
+	padding: 10px;
 }
 
 /* CONTACT US */
 .contact-us{
-	padding: 15% 10%;
+	padding: 10% 4% 10% 10%;
 	display: flex;
 	align-items: center;
 	justify-content: space-evenly;
-}.contact-us :nth-child(1){
-	width: 40%;
-}.contact-us :nth-child(2) img{
-	width: 700px;
+}.contact-us p{
+	margin: 5% 0px;
+	text-align: justify;
+	line-height: 1.5;
+}.contact-us div:nth-child(1){
+	margin: 5% 0px;
+}.contact-us div:nth-child(2) img{
+	width: 90%;
+	display: block;
+	margin: auto;
+	box-shadow: rgba(51, 51, 51, 0.58) 0px 0px 20px 0px;
+}.contact-us div:nth-child(2){
+	margin: 5%;
 }
+
+.contact-us-form{
+	margin: 5% 0px;
+	padding: 0px 0px 5% 0px;
+	box-shadow: rgba(51, 51, 51, 0.58) 0px 0px 20px 0px;
+	background-color: var(--blanco);
+	width: 100%;
+	border-radius: 8px;
+}.contact-us-form span{
+	display: block;
+}.contact-us-form p{
+	font-size: 20px;
+	display: block;
+	margin: 2% auto;
+	background-color: var(--azul);
+	color: var(--blanco);
+	padding: 20px;
+	border-radius: 8px 8px 0px 0px;
+	width: 100%;
+}.contact-us-form input{
+	font-size: 15px;
+	color: var(--negro);
+	padding: 2%;
+    border: none;
+    outline: none;
+    background: none;
+	display: block;
+	margin: auto;
+	width: 100%;
+
+}.contact-us-form textarea{
+	font-size: 15px;
+	padding: 5% 2%;
+    border: none;
+    outline: none;
+    background: none;
+    border-bottom: 1px solid  var(--blanco);
+    color: var(--negro);
+	display: block;
+	margin: auto;
+	width: 100%;
+	resize:none;
+}.contact-us-form button{
+	font-size: 15px;
+	display: block;
+	margin:auto;
+	width: 40%;
+    border-radius: 8px;
+	border: none;
+	padding: 10px;
+    transition: all 500ms ease;
+	background-color: var(--grisOscuro);
+
+}.contact-us-form button:hover{
+	cursor: pointer;
+	background-color: var(--negro);
+	color: var(--blanco);
+}
+
 
 
 /* ------------------------------login.html------------------------------ */
@@ -179,7 +299,6 @@ html {
 	margin: auto;
 	min-height: 100vh;
 }
-
 
 .login-background{
 	width: 100%;
@@ -268,6 +387,10 @@ html {
 	width: 627px;
 	height: 70px;
 	font-size: 1.2em;
+}.remember-forgot a{
+	color: var(--grisClaro);
+}.remember-forgot a:hover{
+	color: var(--rojo);
 }
 
 .login .btn {
@@ -275,6 +398,12 @@ html {
 	padding: 10px;
 	border-radius: 10px;
 	margin: 15px;
+	transition: all 250ms ease;
+}.login .btn:hover {
+	cursor: pointer;
+	background-color: var(--azul);
+	color: var(--blanco);
+	transition: all 250ms ease;
 }
 
 .login .register-link {
@@ -352,6 +481,16 @@ html {
 	color: #fff;
 }
 
+.register-form .btn{
+	transition: all 250ms ease;
+}.register-form .btn:hover{
+	cursor: pointer;
+	background-color: var(--azul);
+	color: var(--blanco);
+	transition: all 250ms ease;
+}
+
+
 /* ------------------------------map.html------------------------------ */
 .map-container{
 	margin: auto;
@@ -362,6 +501,21 @@ html {
 #map {
   height: 80%;
   width: 80%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+
+/* ------------------------------Marker------------------------------ */
+#cont {
+  background-color: gray;
+  height: 80px;
+  width: 200px;
+}
+
+.show_point {
 	position: absolute;
 	top: 50%;
 	left: 50%;

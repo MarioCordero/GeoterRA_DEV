@@ -24,6 +24,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.net.InetAddress
 
+
 class LoginActivity : AppCompatActivity() {
 
     private var email : String = ""
@@ -69,7 +70,7 @@ class LoginActivity : AppCompatActivity() {
             email = findViewById<EditText>(R.id.userEmail).text.toString().trim()
             password = findViewById<EditText>(R.id.password).text.toString().trim()
 
-            //Log.i("Tomado de datos en login", "$email $password")
+            Log.i("Tomado de datos en login", "$email $password")
             if (email.isNotBlank() && password.isNotBlank()) {
                 if (email.isValidEmail() && password.length >= 8) {
                     loginUser(email, password)
@@ -127,6 +128,7 @@ class LoginActivity : AppCompatActivity() {
         } catch (e: IOException) {
             Log.e("Ping", "Error al realizar el ping: ${e.message}")
         }
+
         //bsalerno1@vimeo.com
         //hK4@+Vg'1{
 

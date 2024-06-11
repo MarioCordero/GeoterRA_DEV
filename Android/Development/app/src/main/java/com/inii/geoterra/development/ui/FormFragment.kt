@@ -55,7 +55,8 @@ class FormFragment : Fragment() {
     imageServices = ImageServices()
 
     val locationButton = rootView.findViewById<Button>(R.id.userLocationButton)
-    val imageLocation = rootView.findViewById<Button>(R.id.locationImageButton)
+    val imageButton = rootView.findViewById<Button>(R.id.locationImageButton)
+    val sendButton = rootView.findViewById<Button>(R.id.sendRequestButton)
 
     locationButton.setOnClickListener {
       if (checkLocationPermission()) {
@@ -64,18 +65,22 @@ class FormFragment : Fragment() {
         locationService.setUserLocationPermissions(true)
         lifecycleScope.launch {
           val location = locationService.getUserLocation(requireContext())
-          Toast.makeText(requireContext(), "Latitud ${location?.latitude}  y longitud ${location?.longitude}", Toast.LENGTH_SHORT).show()
+          println("Latitud ${location?.latitude}  y longitud ${location?.longitude}")
         }
       }
     }
 
-    imageLocation.setOnClickListener {
+    imageButton.setOnClickListener {
       if (checkGalleryPermissions()) {
         requestGalleryPermission()
       } else {
         imageServices.setGalleryAccess(true)
         openGallery()
       }
+    }
+
+    sendButton.setOnClickListener {
+
     }
 
     return rootView
@@ -209,7 +214,7 @@ class FormFragment : Fragment() {
       if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
         && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
         locationService.setUserLocationPermissions(true)
-        Toast.makeText(requireContext(), "entraaa", Toast.LENGTH_SHORT).show()
+        println("Se aceptaron los permisos")
       } else {
         // el permiso no ha sido aceptado POR PRIMERA VEZ
         locationService.setUserLocationPermissions(false)
@@ -219,10 +224,11 @@ class FormFragment : Fragment() {
     } else if (requestCode == 200) {
       if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
         && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-        Toast.makeText(requireContext(), "entraaa2222", Toast.LENGTH_SHORT).show()
+        println("Se aceptaron los permisos de internet")
       }
     } else if (requestCode == 100) {
       if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        println("Se aceptaron los permisos de galeria")
         imageServices.setGalleryAccess(true)
       } else {
         imageServices.setGalleryAccess(false)

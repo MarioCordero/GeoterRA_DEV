@@ -48,7 +48,7 @@ class LocationService {
 
   fun setUserLocationPermissions(userPermission : Boolean) {
     isUserLocationGranted = userPermission
-    Log.i("setLocationPermissions","isUserLocationGranted: $isUserLocationGranted")
+    println("isUserLocationGranted: $isUserLocationGranted")
   }
 
 }
