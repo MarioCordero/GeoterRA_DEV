@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="270dp"
 
-    android:layout_marginTop="20dp"
+    android:layout_marginBottom="20dp"
 
     android:background="@drawable/gray_rectangle_rounded2"
     app:layout_constraintEnd_toEndOf="parent"
@@ -31,17 +31,17 @@
         tools:targetApi="s" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/coordenatesTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
         android:layout_marginStart="170dp"
-        android:layout_marginTop="65dp"
+        android:layout_marginTop="60dp"
         android:text="Coordenadas: "
         />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/dateTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
@@ -51,7 +51,7 @@
         />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/stateTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 

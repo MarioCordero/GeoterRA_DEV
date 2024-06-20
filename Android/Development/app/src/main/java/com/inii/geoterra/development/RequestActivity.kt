@@ -24,7 +24,7 @@ class RequestActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_request)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.requestLayout)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -58,7 +58,8 @@ class RequestActivity : AppCompatActivity() {
         }
         val requestButton = findViewById<Button>(R.id.newRequestButton)
         requestButton.setOnClickListener {
-            showForms()}
+            showForms()
+        }
 
         val sheetScrollView = findViewById<LinearLayout>(R.id.sheetsLayout)
         for (i in 0 until 5) {

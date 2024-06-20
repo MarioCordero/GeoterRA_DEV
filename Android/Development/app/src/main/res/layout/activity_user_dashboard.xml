@@ -29,6 +29,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Aaron Sanchez"
+                android:textColor="@color/black"
                 android:textSize="30sp"
                 android:gravity="start"
                 >
@@ -54,22 +55,70 @@
             <Button
                 android:layout_width="120dp"
                 android:layout_height="100dp"
+                android:text="Ayuda"
+                android:textSize="15sp"
+                android:textColor="@color/black"
+
+                android:drawableTop="@drawable/baseline_filter_tilt_shift_24"
                 android:backgroundTint="@color/ligthGray"
                 app:cornerRadius="5dp"
                 >
             </Button>
 
             <Button
-                android:layout_marginStart="50dp"
+                android:layout_marginStart="40dp"
                 android:layout_width="120dp"
                 android:layout_height="100dp"
+                android:text="Actividad"
+                android:textSize="15sp"
+                android:textColor="@color/black"
+
+                android:drawableTop="@drawable/baseline_article_40"
                 android:backgroundTint="@color/ligthGray"
                 app:cornerRadius="5dp"
                 >
             </Button>
 
-
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:orientation="vertical"
+            android:layout_gravity="start"
+            android:layout_marginTop="20dp"
+            >
+
+            <TextView
+                android:layout_marginTop="15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text="Configuración"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+
+                app:drawableLeftCompat="@drawable/baseline_app_settings_alt_24"
+                android:drawablePadding="10dp"
+                >
+            </TextView>
+
+            <TextView
+                android:layout_marginTop="15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text="Mensajes"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+
+                app:drawableLeftCompat="@drawable/baseline_message_24"
+                android:drawablePadding="10dp"
+                >
+            </TextView>
+            
+        </LinearLayout>
+
     </LinearLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView

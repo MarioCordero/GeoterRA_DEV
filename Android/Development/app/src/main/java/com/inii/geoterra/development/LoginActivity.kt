@@ -3,26 +3,32 @@ package com.inii.geoterra.development
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.inii.geoterra.development.Components.Credentials
+import com.inii.geoterra.development.Components.LoginErrorResponse
+import com.inii.geoterra.development.Components.RetrofitClient
+import com.inii.geoterra.development.ui.SignUpFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import okio.IOException
-import org.json.JSONArray
 import org.json.JSONObject
-import java.net.InetAddress
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 
 class LoginActivity : AppCompatActivity() {
@@ -35,7 +41,7 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_login)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.loginLayout)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -83,14 +89,19 @@ class LoginActivity : AppCompatActivity() {
                 showError("Por favor, rellena todos los campos")
             }
         }
+        val sigUp = findViewById<TextView>(R.id.signUpText)
+        sigUp.setOnClickListener {
+            showSignUpForm()
+        }
+
     }
 
     private fun loginUser(email: String, password: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val response = login(email, password)
                 withContext(Dispatchers.Main) {
-                    handleResponse(response)
+                    val credentials = Credentials(email, password)
+                    sendCredentials(credentials)
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
@@ -100,63 +111,33 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun login(email : String, password : String) : String {
-        val client = OkHttpClient()
-        // Crear un JSONArray
-        val jsonArray = JSONArray().apply {
-            put(JSONObject().apply {
-                put("email", email)
-                put("password", password)
-            })
-        }
-
-
-        val ipAddress = "127.0.0.1" // Cambia esta dirección IP por la del servidor que deseas probar
-        val timeout = 5000 // Tiempo de espera en milisegundos
-
-        try {
-            val inetAddress = withContext(Dispatchers.IO) {
-                InetAddress.getByName(ipAddress)
+    private fun sendCredentials(credentials:Credentials) {
+        RetrofitClient.APIService.login(credentials).enqueue(object : Callback<List<LoginErrorResponse>> {
+            override fun onResponse(call: Call<List<LoginErrorResponse>>, response: Response<List<LoginErrorResponse>>) {
+                if (response.isSuccessful) {
+                    val errors = response.body()
+                    if (errors != null) {
+                        for (error in errors) {
+                            // Manejar los errores
+                            Log.i("Se leyeron bien", "Error: $error.")
+                        }
+                    }
+                } else {
+                    val errors = response.body()
+                    if (errors != null) {
+                        for (error in errors) {
+                            // Manejar los errores
+                            Log.i("ocurrieron errores", "Error: $error")
+                        }
+                    }
+                }
             }
-            if (withContext(Dispatchers.IO) {
-                    inetAddress.isReachable(timeout)
-                }) {
-                Log.d("Ping", "Ping exitoso a $ipAddress")
-            } else {
-                Log.d("Ping", "Ping fallido a $ipAddress")
+
+            override fun onFailure(call: Call<List<LoginErrorResponse>>, t: Throwable) {
+                // Manejar el caso de fallo en la llamada
+                Log.i("Error conexion", "Error:  ${t.message}")
             }
-        } catch (e: IOException) {
-            Log.e("Ping", "Error al realizar el ping: ${e.message}")
-        }
-
-        //bsalerno1@vimeo.com
-        //hK4@+Vg'1{
-
-        val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()
-        val requestBody = jsonArray.toString().toRequestBody(mediaType)
-
-        val request = Request.Builder()
-            .url("http://localhost/API/login_model.inc.php").post(requestBody).build()
-        val response = client.newCall(request).execute()
-
-        if (!response.isSuccessful) {
-            Log.i("Request Error", "${response.code}")
-            throw Exception("Error en la solicitud: ${response.code}")
-        }
-
-        return response.body?.string() ?: throw Exception("No se pudo obtener una respuesta del servidor")
-    }
-
-    private fun handleResponse(response : String) {
-        val jsonResponse = JSONObject(response)
-        if (jsonResponse.has("invalid_cred") || jsonResponse.has("empty_input")) {
-            val errorMessage = jsonResponse.toString()
-            showError(errorMessage)
-        } else {
-            val intent = Intent(this@LoginActivity, MainActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
+        })
     }
 
     private fun showError(errorMessage: String) {
@@ -168,6 +149,21 @@ class LoginActivity : AppCompatActivity() {
 
     private fun String.isValidEmail(): Boolean {
         return this.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(this).matches()
+    }
+
+    private fun showSignUpForm() {
+        val loginSpace = findViewById<CardView>(R.id.loginCard)
+        loginSpace.visibility = View.INVISIBLE
+        val fragmentSpace = findViewById<FrameLayout>(R.id.signupFragmentSpace)
+        fragmentSpace.visibility = View.VISIBLE
+        val drawable = ContextCompat.getDrawable(this, R.drawable.rocklake)
+        findViewById<ConstraintLayout>(R.id.loginLayout).background = drawable
+
+        val signUpFragment = SignUpFragment.newInstance("hola", "pedro")
+        // Insertar el fragmento en el contenedor
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.signupFragmentSpace, signUpFragment)
+            .commit()
     }
 
 
