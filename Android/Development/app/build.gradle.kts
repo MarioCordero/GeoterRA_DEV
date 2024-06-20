@@ -70,6 +70,10 @@ dependencies {
     implementation("androidx.preference:preference-ktx:1.2.1")
     //noinspection UseTomlInstead
     implementation("org.osmdroid:osmdroid-android:6.1.18")
+    implementation("androidx.exifinterface:exifinterface:1.3.7")
+    implementation("androidx.exifinterface:exifinterface:1.3.7")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+
 
     testImplementation(libs.junit)
 
