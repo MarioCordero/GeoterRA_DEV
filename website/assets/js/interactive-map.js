@@ -47,31 +47,14 @@ function onMarkerClick() {
     });
 }
 
-// // Function to fetch data from the server
-// function fetchData() {
-//     return new Promise((resolve, reject) => {
-//         let region = "Guanacaste";
-//         let obtainedPoints = [];
-//         let xhr = new XMLHttpRequest();
-//         xhr.open("POST", "assets/includes/map_data.inc.php", true);
-//         xhr.send(region);
-
-//         xhr.onreadystatechange = function () {
-
-//             if (xhr.readyState == 4 && xhr.status == 200) {
-//                 let splittedResponse = xhr.responseText.split("}");
-//                 for (let i = 0; i < splittedResponse.length - 1; i++) {
-//                     splittedResponse[i] += '}';
-//                 }
-//                 for (let i = 0; i < splittedResponse.length - 1; i++) {
-//                     obtainedPoints[i] = JSON.parse(splittedResponse[i]);
-//                 }
-//                 resolve(obtainedPoints);
-//             }
-//         };
-
-//     });
-// }
+// Function to clean th map markers
+function clearMarkers(){
+    for (let region in regionMarkers) {
+        regionMarkers[region].forEach(marker => {
+            map.removeLayer(marker);
+        });
+    }
+}
 
 // Function to query to de DB, receive the region as parameter
 function fetchData(region) {
@@ -89,44 +72,50 @@ function fetchData(region) {
 
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4 && xhr.status == 200) {
-            let splittedResponse = xhr.responseText.split("}");
-            for (let i = 0; i < splittedResponse.length - 1; i++) {
-                splittedResponse[i] += '}';
-            }
-            for (let i = 0; i < splittedResponse.length - 1; i++) {
-                obtainedPoints[i] = JSON.parse(splittedResponse[i]);
-            }
-            resolve(obtainedPoints);
+                let splittedResponse = xhr.responseText.split("}");
+                for (let i = 0; i < splittedResponse.length - 1; i++) {
+                    splittedResponse[i] += '}';
+                }
+                for (let i = 0; i < splittedResponse.length - 1; i++) {
+                    obtainedPoints[i] = JSON.parse(splittedResponse[i]);
+                }
+                resolve(obtainedPoints);
+
+                // Add region to regionActive if not already present
+                if (!regionActive.includes(region)) {
+                    regionActive.push(region);
+                }
             }
         };
     });
 }
 
-// Variable to store the markers
-let currentMarkers = [];
+// A array to track the active layers
+let regionActive = [];
 
-// Function to clean the map markers
-function clearMarkers() {
-    for (let marker of currentMarkers) {
-      map.removeLayer(marker);
-    }
-    currentMarkers = [];
-  }
+// Variable to store the markers of each region
+let regionMarkers = {
+    "Guanacaste": [],
+    "Cartago": []
+};
 
 // Function to create markers on the map
-function createMarkers(obtainedPoints) {
-    clearMarkers();
+function createMarkers(region, obtainedPoints) {
     for (let i = 0; i < obtainedPoints.length; i++) {
-      let pointXY = convertCoordinates(obtainedPoints[i].coord_x, obtainedPoints[i].coord_y);
-      let marker = L.marker([pointXY[0], pointXY[1]]).addTo(map);
-      marker.point = obtainedPoints[i];
-      marker.on('click', onMarkerClick);
-      currentMarkers.push(marker);
+        let pointXY = convertCoordinates(obtainedPoints[i].coord_x, obtainedPoints[i].coord_y);
+        let marker = L.marker([pointXY[0], pointXY[1]]).addTo(map);
+        marker.point = obtainedPoints[i];
+        marker.on('click', onMarkerClick);
+        regionMarkers[region].push(marker);
     }
 }
 
-// Initialize the markes to show something at the first look at the page
-fetchData("Guanacaste").then(value => createMarkers(value));
+// Initialize the markers to show something at the first look at the page
+fetchData("Guanacaste").then(value => {
+    createMarkers("Guanacaste", value);
+    // Add the layer to the map
+    overlayLayers["Guanacaste"].addTo(map);
+});
 
 // Object to map the regions with the layers (-TODO[]: ASK TO THE DB TO CREATE A JSON OBJECT AND ADD REGIONS ACCORDING THE DB)
 let regions = {
@@ -141,15 +130,105 @@ let baseLayers = {
 
 let overlayLayers = {};
 
-// Add the poits to the map according the region selected
+// Add the points to the map according to the region selected
 for (let region in regions) {
+
+    // Create a new group of layers in base of the object declared in "regions"
     overlayLayers[region] = L.layerGroup();
+
+    // onAdd event, when the layer is checked
     overlayLayers[region].onAdd = function() {
-        fetchData(regions[region]).then(value => createMarkers(value));
+        // Cuando se añade la capa al mapa, se realiza lo siguiente:
+        fetchData(regions[region]).then(value => createMarkers(regions[region], value));
+
+        
+        // Add region to regionActive if not already present
+        if (!regionActive.includes(region)) {
+            regionActive.push(region);
+        }
+
+        // Update the markers on the map
+        updateMarkers();
+
+        console.log(regionActive);
     };
+
+    // onRemove event, when the layer is unchecked
     overlayLayers[region].onRemove = function() {
-        clearMarkers();
+
+        
+        // The index of the region unckecked
+        let index = regionActive.indexOf(region);
+        
+        // Verify if the region exists
+        if (index !== -1) {
+            regionActive.splice(index, 1);
+        }
+
+        // Update the markers on the map
+        updateMarkers();
+
+        console.log(regionActive);
     };
+}
+
+// Function that update the markers shown on the map
+function updateMarkers() {
+
+    // Erase all the markers
+    clearMarkers();
+
+    // Add the active layers markers
+    for (let region of regionActive) {
+        // Get the points for the region from the DB
+        fetchData(regions[region]).then(value => {
+
+            // Create markers for the region obtained
+            createMarkers(region, value);
+
+            // Add the region to the control if it isn't added yet
+            if (!map.hasLayer(overlayLayers[region])) {
+                overlayLayers[region].addTo(map);
+            }
+        });
+    }
+}
+
+// CUSTOM STYLES FOR THE CONTROLS (-TODO[])
+document.addEventListener('DOMContentLoaded', (event) => {
+    // Crear un nuevo elemento h1
+    let h1 = document.createElement('h1');
+    // Añadirle texto
+    h1.textContent = 'Mapas disponibles';
+    h1.style.margin = "0 0 10px 0";  // Estilo opcional
+
+    // Seleccionar el elemento donde quieres insertar el h1
+    let mapDiv = document.querySelector('.leaflet-control-layers-base');
+
+    // Insertar el h1 como el primer hijo del div
+    mapDiv.insertBefore(h1, mapDiv.firstChild);
+});
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    // Crear un nuevo elemento h1
+    let h1 = document.createElement('h1');
+    // Añadirle texto
+    h1.textContent = 'Regiones disponibles';
+    h1.style.margin = "0 0 10px 0";  // Estilo opcional
+
+    // Seleccionar el elemento donde quieres insertar el h1
+    let mapDiv = document.querySelector('.leaflet-control-layers-overlays');
+
+    // Insertar el h1 como el primer hijo del div
+    mapDiv.insertBefore(h1, mapDiv.firstChild);
+});
+
+
+// The controls icon can be modified: https://www.youtube.com/watch?v=edeUsKlxQfw&list=PLaaTcPGicjqgLAUhR_grKBGCXbyKaP7qR&index=60
+
+// Function to get the currently active regions
+function getActiveRegions() {
+    return regionActive;
 }
 
 L.control.layers(baseLayers, overlayLayers).addTo(map);
