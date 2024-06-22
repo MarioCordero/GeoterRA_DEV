@@ -627,6 +627,10 @@ html {
 	margin-right: 10px;
 }
 
+.leaflet-control-attribution{
+	display: none;
+}
+
 
 /* ------------------------------Marker------------------------------ */
 #cont {
