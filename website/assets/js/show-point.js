@@ -268,7 +268,6 @@ let y = d3.scaleLinear().domain([0, 2.4]).range([height, 0]);
     ,{x: 1.4049999999999998, y: 1.9520508075688772, text: "80", rot: "60", FontSize: 8}
   ]
 
-<<<<<<< HEAD
   TextPos = [
     {x: 1.6099999999999999, y: 1.6922431864335457, text: "Calcium + Magnesium", rot: "60", FontSize: 18}
     ,{x: 0.9949999999999999, y: 1.6922431864335457, text: "Sulfate + Chloride", rot: "-60", FontSize: 18}

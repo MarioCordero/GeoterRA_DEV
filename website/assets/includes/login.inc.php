@@ -24,6 +24,7 @@
 
             //The credentials are ok
             if(is_email_valid($pdo, $email) && is_pass_valid($pdo, $password)) {
+                $_SESSION['user'] = $email;
                 // Resends the info back to login.html
                 header("Content-Type: application/json");
                 echo json_encode($errors);
