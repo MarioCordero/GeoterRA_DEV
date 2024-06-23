@@ -68,6 +68,121 @@ html {
 	transition: all 250ms ease;
 }
 
+/* MENU BARS */
+#checkbox {
+	display: none;
+}
+  
+.toggle {
+	visibility: hidden;
+	opacity: 0;
+	position: relative;
+	width: 40px;
+	cursor: pointer;
+	display: none;
+	height: calc(4px * 3 + 11px * 2);
+	margin-right: 5%;
+	height: 100%;
+	z-index: 23;
+}
+  
+.bar {
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: 4px;
+	border-radius: calc(4px / 2);
+	background: var(--blanco);
+	color: inherit;
+	opacity: 1;
+	transition: none 0.35s cubic-bezier(.5,-0.35,.35,1.5) 0s;
+}
+  
+/***** Spin Animation *****/
+  
+.bar--top {
+	bottom: calc(50% + 11px + 4px/ 2);
+	transition-property: bottom,transform;
+	transition-delay: calc(0s + 0.35s),0s;
+}
+
+.bar--middle {
+	top: calc(50% - 4px/ 2);
+	transition-property: opacity;
+	transition-delay: calc(0s + 0.35s);
+}
+  
+.bar--bottom {
+	top: calc(50% + 11px + 4px/ 2);
+	transition-property: top,transform;
+	transition-delay: calc(0s + 0.35s),0s;
+}
+
+#checkbox:checked + .toggle .bar--top {
+	bottom: calc(50% - 4px/ 2);
+	transform: rotate(135deg);
+	transition-delay: 0s,calc(0s + 0.35s);
+}
+  
+#checkbox:checked + .toggle .bar--middle {
+	opacity: 0;
+	transition-duration: 0s;
+	transition-delay: calc(0s + 0.35s);
+}
+  
+#checkbox:checked + .toggle .bar--bottom {
+	top: calc(50% - 4px/ 2);
+	transform: rotate(225deg);
+	transition-delay: 0s,calc(0s + 0.35s);
+}
+
+/* Once clicked the toggle button designed abovee*/
+.menu-bars-background{
+    position: fixed;
+    background: rgba(0, 0, 0, 0.7);
+    width: 100%;
+    height: 0%;
+    transition: all 500ms ease;
+    visibility: hidden;
+    opacity: 0;
+    z-index: 22;
+}.menu-bars-background.active{
+    transition: all 500ms ease;
+    visibility: visible;
+    opacity: 1;
+	height: 100%;
+}
+
+.menu-elements{
+	padding: 30vh 0px;
+    width: 100%;
+    height: 100vh;
+    float: right;
+    position: fixed;
+    top: 0;
+    right: 0;
+    transition: all 750ms ease;
+    z-index: 22;
+    visibility: hidden;
+    opacity: 0;
+    display: none;
+}.menu-elements.active{
+	visibility: visible;
+	opacity: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+}.menu-elements a{
+    display: block;
+    text-decoration: none;
+    padding: 20px;
+    color: var(--blanco);
+    border-left: 5px solid transparent ;
+    transition: all 400ms ease;
+}.menu-elements a:hover{
+    cursor: pointer;
+}
+
 /* LOADER */
 .web-loader{
 	background-color: #fff;
@@ -506,6 +621,14 @@ html {
   	width: 90%;
 	min-height: 80vh;
 	z-index: 0;
+}
+
+.leaflet-control-layers-base input{
+	margin-right: 10px;
+}
+
+.leaflet-control-attribution{
+	display: none;
 }
 
 

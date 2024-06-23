@@ -22,8 +22,8 @@ function createPiperDiagram() {
   .append("g")
   .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-  let x = d3.scaleLinear().domain([0, 2.4]).range([0, width])
-  let y = d3.scaleLinear().domain([0, 2.4]).range([height, 0]);
+let x = d3.scaleLinear().domain([0, 2.4]).range([0, width])
+let y = d3.scaleLinear().domain([0, 2.4]).range([height, 0]);
 
   xAxis = (g) =>
     g.attr("transform", `translate(0,${height})`).call(d3.axisBottom(x))
@@ -268,6 +268,7 @@ function createPiperDiagram() {
     ,{x: 1.4049999999999998, y: 1.9520508075688772, text: "80", rot: "60", FontSize: 8}
   ]
 
+<<<<<<< HEAD
   TextPos = [
     {x: 1.6099999999999999, y: 1.6922431864335457, text: "Calcium + Magnesium", rot: "60", FontSize: 18}
     ,{x: 0.9949999999999999, y: 1.6922431864335457, text: "Sulfate + Chloride", rot: "-60", FontSize: 18}
@@ -278,6 +279,17 @@ function createPiperDiagram() {
     ,{x: 0.7, y: 0.1, text: "Calcium", rot: "0", FontSize: 18}
     ,{x: 1.9, y: 0.1, text: "Chloride", rot: "0", FontSize: 18}
   ]
+for (let i in lines) {
+  g.append("line")
+    .style("stroke-width", 0.5)
+    .attr("stroke", "gray")
+    .style("stroke-dasharray", "5,1")
+    .attr("x1", x(lines[i].x0))
+    .attr("y1", y(lines[i].y0))
+    .attr("x2", x(lines[i].x1))
+    .attr("y2", y(lines[i].y1));
+}
+// Triangulo Exterior
 
   svg.selectAll("text.rotation")
     .data(TextPos.concat(TickLabels))
@@ -313,4 +325,101 @@ function createPiperDiagram() {
   d3.select(existingSvg)
     .append(() => svg.node());
 }
+
+for (let i in Triangle) {
+  g.append("line")
+    .style("stroke-width", 2)
+    .attr("stroke", "black")
+    .style("stroke-dasharray", "5,1")
+    .attr("x1", x(Triangle[i].x0))
+    .attr("y1", y(Triangle[i].y0))
+    .attr("x2", x(Triangle[i].x1))
+    .attr("y2", y(Triangle[i].y1));
+}
+
+// Etiquetas de los valores
+
+TickLabels = [
+   {x: 0.385, y: 0.17, text: "80", rot: "0", FontSize: 8}
+  ,{x: 0.5850000000000001, y: 0.17, text: "60", rot: "0", FontSize: 8}
+  ,{x: 0.785, y: 0.17, text: "40", rot: "0", FontSize: 8}
+  ,{x: 0.985, y: 0.17, text: "20", rot: "0", FontSize: 8}
+  ,{x: 0.58, y: 0.8828203230275509, text: "80", rot: "-60", FontSize: 8}
+  ,{x: 0.4799999999999999, y: 0.7096152422706632, text: "60", rot: "-60", FontSize: 8}
+  ,{x: 0.37999999999999995, y: 0.5364101615137755, text: "40", rot: "-60", FontSize: 8}
+  ,{x: 0.2799999999999999, y: 0.3632050807568877, text: "20", rot: "-60", FontSize: 8}
+  ,{x: 0.8049999999999999, y: 0.9128203230275509, text: "20", rot: "60", FontSize: 8}
+  ,{x: 0.9049999999999999, y: 0.7396152422706632, text: "40", rot: "60", FontSize: 8}
+  ,{x: 1.005, y: 0.5664101615137755, text: "60", rot: "60", FontSize: 8}
+  ,{x: 1.105, y: 0.3932050807568877, text: "80", rot: "60", FontSize: 8}
+  ,{x: 1.585, y: 0.17, text: "80", rot: "0", FontSize: 8}
+  ,{x: 1.785, y: 0.17, text: "60", rot: "0", FontSize: 8}
+  ,{x: 1.985, y: 0.17, text: "40", rot: "0", FontSize: 8}
+  ,{x: 2.185, y: 0.17, text: "20", rot: "0", FontSize: 8}
+  ,{x: 1.7799999999999998, y: 0.8828203230275509, text: "80", rot: "-60", FontSize: 8}
+  ,{x: 1.68, y: 0.7096152422706632, text: "60", rot: "-60", FontSize: 8}
+  ,{x: 1.5799999999999998, y: 0.5364101615137755, text: "40", rot: "-60", FontSize: 8}
+  ,{x: 1.48, y: 0.3632050807568877, text: "20", rot: "-60", FontSize: 8}
+  ,{x: 2.005, y: 0.9128203230275509, text: "20", rot: "60", FontSize: 8}
+  ,{x: 2.105, y: 0.7396152422706632, text: "40", rot: "60", FontSize: 8}
+  ,{x: 2.2049999999999996, y: 0.5664101615137755, text: "60", rot: "60", FontSize: 8}
+  ,{x: 2.3049999999999997, y: 0.3932050807568877, text: "80", rot: "60", FontSize: 8}
+  ,{x: 0.882, y: 1.4074355652982142, text: "20", rot: "-60", FontSize: 8}
+  ,{x: 0.982, y: 1.580640646055102, text: "40", rot: "-60", FontSize: 8}
+  ,{x: 1.082, y: 1.7538457268119896, text: "60", rot: "-60", FontSize: 8}
+  ,{x: 1.1820000000000002, y: 1.9270508075688773, text: "80", rot: "-60", FontSize: 8}
+  ,{x: 1.7049999999999998, y: 1.4324355652982141, text: "20", rot: "60", FontSize: 8}
+  ,{x: 1.605, y: 1.6056406460551018, text: "40", rot: "60", FontSize: 8}
+  ,{x: 1.505, y: 1.7788457268119895, text: "60", rot: "60", FontSize: 8}
+  ,{x: 1.4049999999999998, y: 1.9520508075688772, text: "80", rot: "60", FontSize: 8}
+]
+
+TextPos = [
+  {x: 1.6099999999999999, y: 1.6922431864335457, text: "Calcium + Magnesium", rot: "60", FontSize: 18}
+  ,{x: 0.9949999999999999, y: 1.6922431864335457, text: "Sulfate + Chloride", rot: "-60", FontSize: 18}
+  ,{x: 1, y: 0.6830127018922194, text: "Sodium + Potassium", rot: "60", FontSize: 18}
+  ,{x: 1.5999999999999999, y: 0.6830127018922194, text: "Carbonate + Bicarbonate", rot: "-60", FontSize: 18}
+  ,{x: 0.41000000000000003, y: 0.6730127018922194, text: "Magnesium", rot: "-60", FontSize: 18}
+  ,{x: 2.19, y: 0.6730127018922194, text: "Sulfate", rot: "60", FontSize: 18}
+  ,{x: 0.7, y: 0.1, text: "Calcium", rot: "0", FontSize: 18}
+  ,{x: 1.9, y: 0.1, text: "Chloride", rot: "0", FontSize: 18}
+]
+
+svg.selectAll("text.rotation")
+    .data(TextPos.concat(TickLabels))
+    .enter()
+    .append("text")
+    .text((d) => d.text)
+    .classed("rotation", true)
+    .attr("fill", "black")
+    .style("font-size", (d) => d.FontSize)
+    .attr("transform", (d, i) => {
+      return (
+        "translate( " + x(d.x) + " , " + y(d.y) + ")," + "rotate(" + d.rot + ")"
+      );
+    })
+    .attr("x", 0)
+    .style("text-anchor", "middle")
+    .attr("y", 0);
+
+console.log(lines)
+
+const existingSvg = document.getElementById("piperDiagram");
+
+// dataEq = data.map((x) => {
+//   x.Potassium /= 39.1;
+//   x.Sodium /= 22.9;
+//   x.Bicarbonate /= 61.02;
+//   x.Carbonate /= 30;
+//   x.Calcium /= 20.04;
+//   x.Magnesium /= 12.15;
+//   x.Chloride /= 35.45;
+//   x.Sulfate /= 48.03;
+//   return x;
+// })
+
+d3.select(existingSvg)
+  .append(() => svg.node());
+
+
 
