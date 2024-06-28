@@ -1,4 +1,5 @@
 <?php
+    session_start();
     // Receives a post method from the request
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -27,7 +28,7 @@
                 $_SESSION['user'] = $email;
                 // Resends the info back to login.html
                 header("Content-Type: application/json");
-                echo json_encode($errors);
+                echo json_encode(['status' => 'logged_in', 'errors' => $errors]);
                 die();
             } else {
                 $errors["invalid_cred"] = "Credenciales erroneas";
