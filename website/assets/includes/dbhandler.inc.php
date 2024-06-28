@@ -7,8 +7,6 @@ $credentials = [
     ['user' => 'mario', 'pass' => '2003']
 ];
 
-$pdo = null;
-
 foreach ($credentials as $cred) {
     try {
         $pdo = new PDO("mysql:host=$host;dbname=$dbname;", $cred['user'], $cred['pass']);
