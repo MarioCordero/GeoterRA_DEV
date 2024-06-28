@@ -7,6 +7,7 @@ document.getElementById("login_form").addEventListener("submit",function (event)
 	xhr.onreadystatechange = function () {
 
         if (xhr.readyState == 4 && xhr.status == 200) {
+            
             let errorObject = JSON.parse(xhr.responseText);
             if (errorObject.length === 0) {
 

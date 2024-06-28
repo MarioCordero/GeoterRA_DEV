@@ -1,10 +1,11 @@
 <?php
-session_start();
+    session_start();
 
-// Check if a specific session variable is set
-if (isset($_SESSION['user'])) {
-    echo json_encode(['status' => 'logged_in']);
-} else {
-    echo json_encode(['status' => 'not_logged_in']);
-}
+    // Check if a specific session variable is set
+    if (isset($_SESSION['user'])) {
+        echo "SESION DENTRO";
+        echo json_encode(['status' => 'logged_in']);
+    } else {
+        echo json_encode(['status' => 'not_logged_in']);
+    }
 ?>

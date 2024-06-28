@@ -9,6 +9,7 @@
         try {
             // Brings the files for the databse connection and the MVC pattern
             // MVC: Patron modelo vista controlador
+            
             require_once 'dbhandler.inc.php';
             require_once 'login_model.inc.php';
             require_once 'login_cont.php';
@@ -21,7 +22,6 @@
             }
 
             require_once 'conf_sess.inc.php';
-
             //The credentials are ok
             if(is_email_valid($pdo, $email) && is_pass_valid($pdo, $password)) {
                 $_SESSION['user'] = $email;

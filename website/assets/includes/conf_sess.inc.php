@@ -28,3 +28,5 @@ function regen_session_id() {
   session_regenerate_id();  
   $_SESSION["last_regeneration"] = time();
 }
+
+?>
