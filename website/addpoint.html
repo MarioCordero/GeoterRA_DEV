@@ -11,22 +11,15 @@
 		<link rel="stylesheet" href="./assets/css/style.css">
 		<link rel="stylesheet" href="./assets/css/fonts.css">
 		<link rel="stylesheet" href="./assets/css/responsive.css">
-		
+
 		<!--ICON-->
 		<link rel="shortcut icon" type="image/x-icon" href="./GeoterRA.ico">
-    
-		<title>Map GeoterRA</title>
 
-		<!--LEAFLET-->
-		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-
-    <!--JS-->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="./assets/js/check_session.js" defer></script>
+		<title id="tittle-page">Añadir punto</title>
 
 	</head>
 
-	<body>
+  	<body>
 
 		<div class="general-container">
 
@@ -65,9 +58,10 @@
 				</label>
 
                 <div class="menu-bars-background" id="menu-bars-background">
-                    <div class="menu-elements Gibson-Regular" id="menu-elements">
 
-						<!-- TODO[] : Agregar el menu de logged -->
+					<!-- TODO[] : Agregar el menu de logged -->
+
+                    <div class="menu-elements Gibson-Regular" id="menu-elements">
 
 						<a href="./index.html#about-us" 	class="a-menu-element">Acerca de nosotros	</a>
 						<a href="./index.html#how-works" 	class="a-menu-element">Como funciona		</a>
@@ -82,7 +76,9 @@
 			<!-- NAVBAR -->
 
 			<!-- BODY -->
-			<div class="map-container Montserrat-Regular">
+
+            <!-- TODO[] : Cambiar todo esto y agregar un forms, conectar con la base de datos -->
+			<div class="loged-in-container Montserrat-Regular">
 
 				<!--------------------------------LOADER----------------------------------->
 				<div class="web-loader" id="loader">
@@ -92,18 +88,95 @@
 					</div>
 				</div>
 				<!--------------------------------END LOADER------------------------------->
-				
-				<h1 class="center-text">MAPA GEOTERRA</h1>
 
-				<div class="map Montserrat-Regular" id="map"> MAP
-					<!--LEAFLET JS-->
-          			<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.6.2/proj4.js" defer></script>
-					<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-					<script src="./assets/js/interactive-map.js" defer></script>
+				<h1 class="center-text">BIENVENIDO XXXXX</h1>
+
+				<div class="user-info">
+					<!-- PERSONAL INFO -->
+
+					<div class="user-info-col-container">
+
+						<div class="user-info-col">
+							<h2 class="center-text">Información la persona usuaria</h2>
+							<hr>
+							<ul class="user-personal-data">
+								<li>
+									<h3>NOMBRE</h3>
+									<p>XXXXX</p>
+								</li>
+
+								<li>
+									<h3>CORREO</h3>
+									<p>XXXXX</p>
+								</li>
+
+								<li>
+									<h3>TELÉFONO</h3>
+									<p>XXXXX</p>
+								</li>
+
+								<button id="###">Editar información</button>
+
+							</ul>
+
+							<h2 class="center-text">Como agregar puntos al mapa</h2>
+							<hr>
+							<ul class="user-personal-data">
+								<li>
+									<h3>Paso 1</h3>
+									<p>XXXXX</p>
+								</li>
+
+								<li>
+									<h3>Paso 2</h3>
+									<p>XXXXX</p>
+								</li>
+
+							</ul>
+
+						</div>
+	
+						<!-- REQUEST INFO -->
+						<div class="user-info-col">
+
+							<h2 class="center-text">Solicitudes hechas por el usuario</h2>
+							<hr>
+							<div class="user-requests">
+								<ul class="center-text">
+									<li>Solicitud #1</li>
+									<li>Solicitud #2</li>
+									<li>Solicitud #3</li>
+								</ul>
+							</div>
+
+						</div>
+
+					</div>
+				</div>
+
+				<div class="buttons-container">
+					<button id="logout-btn">Cerrar Sesión</button>
+					<script>
+						document.getElementById("logout-btn").addEventListener("click", function() {
+							// Realiza una solicitud al servidor para cerrar la sesión
+							let xhr = new XMLHttpRequest();
+							xhr.open("GET", "assets/includes/logout.php", true);
+							xhr.onreadystatechange = function () {
+								if (xhr.readyState == 4 && xhr.status == 200) {
+									// Redirige al usuario a la página de inicio de sesión después de cerrar sesión
+									window.location.href = "login.html";
+								}
+							};
+							xhr.send();
+						});
+					</script>
+
+					<button id="">Crear solicitud</button>
 				</div>
 				
+
+
 			</div>
-			<!-- BODY -->
 
 			<!-- FOOTER -->
 			<footer class="footer-container">
@@ -121,7 +194,7 @@
 			<!-- JS INCLUDES -->
 			<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 			<script src="./assets/js/check-session.js" defer></script>
-
+			
 			<script src="./assets/js/web-loader.js"></script>
 			<script src="./assets/js/menu-bars.js"></script>
 		</div>

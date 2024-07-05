@@ -57,6 +57,8 @@ html {
 	display: flex;
 	align-items: center;
 	float: right;
+}.menu.active{
+	display: none;
 }.menu a{
 	color: #fff;
 	text-decoration: none;
@@ -68,11 +70,15 @@ html {
 	transition: all 250ms ease;
 }
 
+/* }.menu-bars-background.active{ */
+
 .menu-logged{
 	display: none;
 	/* display: flex; */
 	align-items: center;
 	float: right;
+}.menu-logged.active{
+	display: flex;
 }.menu-logged a{
 	color: #fff;
 	text-decoration: none;

@@ -29,13 +29,23 @@
 					<a href="./index.html"> <img id="logo" src="./assets/images/GeoterRA-Logo.svg" class="header-logo" alt="Webpage logotype"> </a>
 				</div>
 
-				<div class="menu">
+				<div class="menu" id="navbar">
 
 					<a href="./index.html#about-us">Acerca de nosotros</a>
 					<a href="./index.html#how-works">Como funciona</a>
 					<a href="./index.html#contact-us">Contacto</a>
 					<a href="./map.html">Mapa</a>
 					<a href="./login.html">Iniciar Sesión</a>
+
+				</div>
+
+				<div class="menu-logged" id="navbar-logged">
+
+					<a href="./index.html#about-us">Acerca de nosotros</a>
+					<a href="./index.html#how-works">Como funciona</a>
+					<a href="./index.html#contact-us">Contacto</a>
+					<a href="./map.html">Mapa</a>
+					<a href="./logged.html">Perfil</a>
 
 				</div>
 
@@ -48,6 +58,8 @@
 
                 <div class="menu-bars-background" id="menu-bars-background">
                     <div class="menu-elements Gibson-Regular" id="menu-elements">
+
+						<!-- TODO[] : Agregar el menu de logged -->
 
 						<a href="./index.html#about-us" 	class="a-menu-element">Acerca de nosotros	</a>
 						<a href="./index.html#how-works" 	class="a-menu-element">Como funciona		</a>
@@ -244,7 +256,7 @@
 
 			<!-- JS INCLUDES -->
 			<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-			<script src="./assets/js/check_session.js" defer></script>
+			<script src="./assets/js/check-session.js" defer></script>
 
 			<script src="./assets/js/web-loader.js"></script>
 			<script src="./assets/js/menu-bars.js"></script>

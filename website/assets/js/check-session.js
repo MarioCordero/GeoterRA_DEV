@@ -13,7 +13,14 @@ function checkSession() {
             if (response.status === 'logged_in') {
 
                 console.log('User is logged in');
-                console.log('User email:', response.user); // Muestra el email del usuario
+                console.log('User email:', response.user);
+
+                // Cambiar las nav bar si el usuario está logeado o no
+                const navBar = document.getElementById('navbar');
+                const loggedNavBar = document.getElementById('navbar-logged');
+
+                navBar.classList.toggle('active');
+                loggedNavBar.classList.toggle('active');
 				
             } else {
                 console.log('User is not logged in');
