@@ -3,12 +3,141 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.SignUpFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+
+        app:cardCornerRadius="5dp"
+        app:cardElevation="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/gray_rectangle_rounded2"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:visibility="visible">
+
+            <TextView
+                android:id="@+id/loginText"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp"
+                android:text="GeoterRa"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="36sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/userEmail"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="40dp"
+                android:background="@drawable/gray_rectangle_rounded2"
+                android:drawableRight="@drawable/baseline_account_circle_24"
+                android:hint="Email"
+
+                android:inputType="textEmailAddress"
+                android:padding="14dp"
+                android:text=""
+                android:textColor="@color/black" />
+
+            <EditText
+                android:id="@+id/userPassword"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/gray_rectangle_rounded2"
+                android:drawableRight="@drawable/baseline_lock_24"
+                android:hint="Contraseña"
+
+                android:inputType="textPassword"
+                android:padding="14dp"
+                android:text=""
+                android:textColor="@color/black" />
+
+            <EditText
+                android:id="@+id/userFirstName"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/gray_rectangle_rounded2"
+                android:drawableRight="@drawable/baseline_drive_file_rename_outline_24"
+                android:hint="Nombre"
+
+                android:inputType="textPersonName"
+                android:padding="14dp"
+                android:text=""
+                android:textColor="@color/black" />
+
+            <EditText
+                android:id="@+id/userLastName"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/gray_rectangle_rounded2"
+                android:drawableEnd="@drawable/baseline_drive_file_rename_outline_24"
+                android:hint="Apellidos"
+
+                android:inputType="text"
+                android:padding="14dp"
+                android:text=""
+                android:textColor="@color/black" />
+
+            <EditText
+                android:id="@+id/userPhoneNum"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/gray_rectangle_rounded2"
+                android:drawableEnd="@drawable/baseline_local_phone_24"
+                android:hint="Número de contacto"
+
+                android:inputType="numberDecimal"
+                android:padding="14dp"
+                android:text=""
+                android:textColor="@color/black" />
+
+            <Button
+                android:id="@+id/createAccountB"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="30dp"
+                android:backgroundTint="@color/black"
+                android:text="Crear cuenta"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                app:cornerRadius="5dp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="20dp"
+                android:background="@color/black">
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Instituto de Investigaciones en Ingeniería | REFORESTA"
+                android:textSize="12sp">
+            </TextView>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
 
 </FrameLayout>

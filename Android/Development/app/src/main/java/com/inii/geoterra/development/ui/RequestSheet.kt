@@ -28,9 +28,9 @@ class RequestSheet @JvmOverloads constructor(
 
     // Obtener referencias a los elementos visuales
     locationImage = view.findViewById(R.id.imageView5)
-    coordenates = view.findViewById(R.id.textView2)
-    date = view.findViewById(R.id.textView3)
-    state = view.findViewById(R.id.textView4)
+    coordenates = view.findViewById(R.id.coordenatesTxt)
+    date = view.findViewById(R.id.dateTxt)
+    state = view.findViewById(R.id.stateTxt)
     contactButton = view.findViewById(R.id.contact_us)
     repeatRequestButton = view.findViewById(R.id.repeat_request)
   }
@@ -42,7 +42,7 @@ class RequestSheet @JvmOverloads constructor(
     state.text = "Estado: $estado"
   }
 
-  fun setDimensiones(width: Int, height: Int) {
+  fun setDimensions(width: Int, height: Int) {
     // Respectable las nuevas dimensiones del contenedor principal
     val layoutParams = LayoutParams(width, height)
     setLayoutParams(layoutParams)

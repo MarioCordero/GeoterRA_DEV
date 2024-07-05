@@ -12,10 +12,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.inii.geoterra.development.Components.ActivityNavigator
+import com.inii.geoterra.development.Components.OnFragmentInteractionListener
 import com.inii.geoterra.development.ui.FormFragment
 import com.inii.geoterra.development.ui.RequestSheet
 
-class RequestActivity : AppCompatActivity() {
+class RequestActivity : AppCompatActivity(), OnFragmentInteractionListener {
 
     /**
      *
@@ -24,7 +26,7 @@ class RequestActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_request)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.requestLayout)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -39,17 +41,17 @@ class RequestActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.homeItem -> {
                     // Iniciar la actividad HomeActivity
-                    changeActivity(MainActivity::class.java, this::class.java)
+                    ActivityNavigator.changeActivity(this, MainActivity::class.java, this::class.java)
                     true
                 }
                 R.id.mapItem -> {
-                    changeActivity(MapActivity::class.java, this::class.java)
+                    ActivityNavigator.changeActivity(this, MapActivity::class.java, this::class.java)
                     true
                 }
 
                 R.id.accountItem -> {
-                    // Iniciar la actividad NotificationsActivity
-                    changeActivity(LoginActivity::class.java, this::class.java)
+                    // Iniciar la actividad LoginActivity
+                    ActivityNavigator.changeActivity(this, LoginActivity::class.java, this::class.java)
                     true
                 }
 
@@ -58,7 +60,8 @@ class RequestActivity : AppCompatActivity() {
         }
         val requestButton = findViewById<Button>(R.id.newRequestButton)
         requestButton.setOnClickListener {
-            showForms()}
+            showForms()
+        }
 
         val sheetScrollView = findViewById<LinearLayout>(R.id.sheetsLayout)
         for (i in 0 until 5) {
@@ -88,17 +91,11 @@ class RequestActivity : AppCompatActivity() {
 
     }
 
-
-    /**
-     *
-     */
-    private fun changeActivity(destinationActivity: Class<*>, currentActivity: Class<*>) {
-        if (destinationActivity != currentActivity) {
-            val intent = Intent(this, destinationActivity)
-            startActivity(intent)
-        }
+    override fun onFragmentFinished() {
+        // Aquí manejas el comportamiento cuando el fragmento finaliza
+        ActivityNavigator.changeActivity(this, RequestActivity::class.java, RequestActivity::class.java)
+        supportFragmentManager.popBackStack()
     }
-
 }
 
 
