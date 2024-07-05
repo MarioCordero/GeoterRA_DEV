@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -208,8 +209,9 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
         loginSpace.visibility = View.INVISIBLE
         val fragmentSpace = findViewById<FrameLayout>(R.id.signupFragmentSpace)
         fragmentSpace.visibility = View.VISIBLE
-        val drawable = ContextCompat.getDrawable(this, R.drawable.rocklake)
-        findViewById<ConstraintLayout>(R.id.loginLayout).background = drawable
+        val newImage = ContextCompat.getDrawable(this, R.drawable.rocklake)
+        val backgrounImage = findViewById<ImageView>(R.id.background_image)
+        backgrounImage.setImageDrawable(newImage)
 
         val signUpFragment = SignUpFragment.newInstance("hola", "pedro")
         // Insertar el fragmento en el contenedor

@@ -10,7 +10,7 @@
     <org.osmdroid.views.MapView
         android:id="@+id/MapView"
         android:layout_width="410dp"
-        android:layout_height="671dp"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toTopOf="@+id/bottom_menu"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

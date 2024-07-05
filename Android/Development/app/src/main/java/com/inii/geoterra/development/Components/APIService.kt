@@ -30,7 +30,6 @@ data class SignUpErrorResponse(
   @SerializedName("email_used") val emailUsed : String
 )
 
-
 interface APIService {
   @FormUrlEncoded
   @POST("login.inc.php")

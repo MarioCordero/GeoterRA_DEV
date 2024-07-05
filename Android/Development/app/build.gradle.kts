@@ -64,6 +64,8 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     //noinspection UseTomlInstead
     implementation("org.json:json:20210307")
+    implementation("com.google.android.material:material:1.5.0")
+
 
 
     //noinspection UseTomlInstead

@@ -24,7 +24,7 @@
         android:networkSecurityConfig="@xml/local_network_permission"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Development"
+        android:theme="@style/AppLightTheme"
         tools:targetApi="31">
         <activity
             android:name=".UserDashboardActivity"

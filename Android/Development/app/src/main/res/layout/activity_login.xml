@@ -7,21 +7,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="bottom"
-
-    android:background="@drawable/background"
+    android:foregroundGravity="center"
     tools:context=".LoginActivity">
+
+    <!-- Fondo -->
+    <ImageView
+        android:id="@+id/background_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/background"
+        android:scaleType="centerCrop"
+        android:alpha="0.8"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/loginCard"
-        android:layout_width="match_parent"
+        android:layout_width="350dp"
         android:layout_height="450dp"
-
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="100dp"
-        android:layout_marginEnd="16dp"
+        android:foregroundGravity="center"
 
         app:cardCornerRadius="5dp"
         app:cardElevation="10dp"
+        app:cardBackgroundColor="@color/white"
+
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -128,15 +141,14 @@
 
     <FrameLayout
         android:id="@+id/signupFragmentSpace"
-        android:layout_width="match_parent"
+        android:layout_width="380dp"
         android:layout_height="550dp"
-
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="30dp"
 
         android:visibility="invisible"
+        android:foregroundGravity="center"
 
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
