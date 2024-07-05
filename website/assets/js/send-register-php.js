@@ -10,7 +10,7 @@ document.getElementById("reg_form").addEventListener("submit",function(event) {
 
 			if (errorObject.length === 0) {
 
-				window.location.href = "logged_in.html";
+				window.location.href = "logged.html";
 				
 			} else {
 
