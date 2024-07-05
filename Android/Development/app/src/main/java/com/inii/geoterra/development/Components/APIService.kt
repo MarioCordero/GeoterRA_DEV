@@ -2,33 +2,50 @@ package com.inii.geoterra.development.Components
 
 import com.google.gson.annotations.SerializedName
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.Headers
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
-data class Credentials(
-  @SerializedName("email") val email: String,
-  @SerializedName("password") val password: String
+data class SignInCredentials(
+  @Field("email") val email: String,
+  @Field("password") val password: String
+)
+
+data class SingUpCredentials(
+  @Field("email") val email: String,
+  @Field("password") val password: String,
+  @Field("first_name") val firstName : String,
+  @Field("last_name") val lastName : String,
+  @Field("phone_num") val phoneNumber : String
 )
 
 
-data class LoginErrorResponse(
+data class SignInErrorResponse(
   @SerializedName("empty_input") val emptyInput: String,
   @SerializedName("invalid_cred") val invalidCred: String,
 )
 
-data class RegisterErrorResponse(
+data class SignUpErrorResponse(
   @SerializedName("empty_input") val emptyInput : String,
   @SerializedName("email_used") val emailUsed : String
 )
 
 
 interface APIService {
-  @Headers("Content-Type: application/json")
-  @POST("login.inc.php") // Request to see if the given credentials match with some user.
-  fun login(@Body credentials: Credentials) : Call<List<LoginErrorResponse>>
+  @FormUrlEncoded
+  @POST("login.inc.php")
+  fun signIn(
+    @Field("email") email: String,
+    @Field("password") password: String
+  ): Call<List<SignInErrorResponse>>
 
-  @Headers("Content-Type: application/json")
-  @POST("register.inc.php") // Request to create and register a new user.
-  fun signUp(@Body credentials : Credentials) : Call<List<RegisterErrorResponse>>
+  @FormUrlEncoded
+  @POST("register.inc.php")
+  fun signUp(
+    @Field("email") email: String,
+    @Field("password") password: String,
+    @Field("first_name") firstName : String,
+    @Field("last_name") lastName : String,
+    @Field("phone_num") phoneNumber : String
+  ): Call<List<SignUpErrorResponse>> // Cambiar String a List<LoginErrorResponse>
 }

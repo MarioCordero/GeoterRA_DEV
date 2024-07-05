@@ -16,18 +16,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/info_window_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textColor="@android:color/black"
-        android:padding="8dp"
-        android:background="@android:color/white"
-        android:gravity="center"
-        android:layout_margin="8dp"
-        tools:ignore="MissingConstraints" />
-
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_menu"
         android:layout_width="match_parent"
@@ -39,5 +27,22 @@
         app:itemIconTint="@color/color_selector"
         app:itemTextColor="@color/color_selector"
         app:menu="@menu/bottom_menu"/>
+
+    <Button
+        android:layout_width="50dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+
+        android:backgroundTint="@color/ligthBlack"
+        app:cornerRadius="1000dp"
+        android:drawableTop="@drawable/baseline_layers_24"
+
+        android:drawablePadding="0dp"
+        android:padding="10dp"
+        android:gravity="center"
+        android:elevation="10dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

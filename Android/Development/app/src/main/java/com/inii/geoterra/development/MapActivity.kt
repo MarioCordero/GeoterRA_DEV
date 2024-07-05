@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.inii.geoterra.development.Components.ActivityNavigator
 import com.inii.geoterra.development.Components.CustomInfoOnMarker
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -49,17 +50,17 @@ class MapActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.homeItem -> {
                     // Iniciar la actividad HomeActivity
-                    changeActivity(MainActivity::class.java, this::class.java)
+                    ActivityNavigator.changeActivity(this, MainActivity::class.java, this::class.java)
                     true
                 }
                 R.id.dashboardItem-> {
-                    // Iniciar la actividad DashboardActivity
-                    changeActivity(RequestActivity::class.java, this::class.java)
+                    // Iniciar la actividad RequestActivity
+                    ActivityNavigator.changeActivity(this, RequestActivity::class.java, this::class.java)
                     true
                 }
                 R.id.accountItem -> {
                     // Iniciar la actividad NotificationsActivity
-                    changeActivity(LoginActivity::class.java, this::class.java)
+                    ActivityNavigator.changeActivity(this, LoginActivity::class.java, this::class.java)
                     true
                 }
                 else -> false
@@ -78,17 +79,14 @@ class MapActivity : AppCompatActivity() {
          mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
          mapView.setMultiTouchControls(false)
 
-// Establecer los límites del área visible en el mapa
-
-
+         val userCoordenates = GPSManager.getLastKnownLocation()
+         // Establece lops limites de long y lat del mapa
         with(mapView) { this.setTileSource(TileSourceFactory.MAPNIK)
             this.controller?.setZoom(18.0)
             this.zoomController?.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
             this.setMultiTouchControls(true)
             this.overlays?.add(compassOverlay)
 
-
-            val userCoordenates = GPSManager.getLastKnownLocation()
             Log.i("Lectura Coordenadas", "Se leyeron las coordenadas del usuario")
             if (userCoordenates != null) {
                 Log.i("MapView Test", "Si entraaa")
@@ -164,13 +162,4 @@ class MapActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         GPSManager.handlePermissionResult(requestCode, grantResults, this)
     }
-
-    fun changeActivity(destinationActivity: Class<*>, currentActivity: Class<*>) {
-        if (destinationActivity != currentActivity) {
-            val intent = Intent(this, destinationActivity)
-            startActivity(intent)
-        }
-    }
-
-
 }

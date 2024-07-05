@@ -7,12 +7,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.inii.geoterra.development.Components.Credentials
-import com.inii.geoterra.development.Components.RegisterErrorResponse
+import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback
+import com.inii.geoterra.development.Components.ActivityNavigator
+import com.inii.geoterra.development.Components.SignUpErrorResponse
+import com.inii.geoterra.development.Components.OnFragmentInteractionListener
 import com.inii.geoterra.development.Components.RetrofitClient
+import com.inii.geoterra.development.Components.SingUpCredentials
+import com.inii.geoterra.development.LoginActivity
 import com.inii.geoterra.development.R
+import com.inii.geoterra.development.UserDashboardActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -54,11 +60,24 @@ class SignUpFragment : Fragment() {
     createAccountB.setOnClickListener {
       val email = rootView.findViewById<EditText>(R.id.userEmail).text.toString().trim()
       val password = rootView.findViewById<EditText>(R.id.userPassword).text.toString().trim()
+      val firstName = rootView.findViewById<EditText>(R.id.userFirstName).text.toString().trim()
+      val lastName = rootView.findViewById<EditText>(R.id.userLastName).text.toString().trim()
+      val phoneNum = rootView.findViewById<EditText>(R.id.userPhoneNum).text.toString().trim()
 
       Log.i("Tomado de datos en login", "$email $password")
       if (email.isNotBlank() && password.isNotBlank()) {
         if (email.isValidEmail() && password.length >= 8) {
-          createUser(email, password)
+          val credentials = SingUpCredentials(
+            email = email,
+            password = password,
+            firstName = firstName,
+            lastName = lastName,
+            phoneNumber = phoneNum
+          )
+          createUser(credentials)
+
+          val listener = activity as? OnFragmentInteractionListener
+          listener?.onFragmentFinished()
         } else if (!email.isValidEmail()) {
           showError("Por favor, ingresa un correo válido.")
         } else if (password.length < 8) {
@@ -91,11 +110,10 @@ class SignUpFragment : Fragment() {
     }
   }
 
-  private fun createUser(email: String, password: String) {
+  private fun createUser(credentials : SingUpCredentials) {
     lifecycleScope.launch(Dispatchers.IO) {
       try {
         withContext(Dispatchers.Main) {
-          val credentials = Credentials(email, password)
           sendCredentials(credentials)
         }
       } catch (e: Exception) {
@@ -106,36 +124,71 @@ class SignUpFragment : Fragment() {
     }
   }
 
-  private fun sendCredentials(credentials:Credentials) {
-    RetrofitClient.APIService.signUp(credentials).enqueue(object : Callback<List<RegisterErrorResponse>> {
-      override fun onResponse(call: Call<List<RegisterErrorResponse>>, response: Response<List<RegisterErrorResponse>>) {
-        val errors = response.body()
+  private fun sendCredentials(userCredentials : SingUpCredentials) {
+    val apiService = RetrofitClient.getAPIService()
+    val call = apiService.signUp(userCredentials.email,
+                                 userCredentials.password, userCredentials.firstName,
+                                 userCredentials.lastName, userCredentials.phoneNumber)
+
+    call.enqueue(object : Callback<List<SignUpErrorResponse>> {
+      override fun onResponse(call : Call<List<SignUpErrorResponse>>,
+                              response : Response<List<SignUpErrorResponse>>) {
         if (response.isSuccessful) {
-          if (errors != null) {
-            for (error in errors) {
-              // Manejar los errores
-              Log.i("Se leyeron bien", "Error: $error")
+          val errorResponse = response.body()
+          if (errorResponse != null) {
+            if (errorResponse.isEmpty()) {
+              // Caso donde la respuesta del servidor indica éxito pero devuelve un arreglo vacío de errores
+              Log.i("Success", "Login exitoso sin errores adicionales")
+              endFragment()
+            } else {
+              // Caso donde hay errores específicos que manejar
+              Log.i("Error", "Server returned errors: $errorResponse")
+              handleServerErrors(errorResponse)
             }
           }
         } else {
-          if (errors != null) {
-            for (error in errors) {
-              // Manejar los errores
-              Log.i("ocurrieron errores", "Error: $error")
-            }
-          }
+          Log.i("Error", "Unexpected code ${response.code()}")
+          showError("Error en la respuesta del servidor: ${response.code()}")
         }
       }
 
-      override fun onFailure(call: Call<List<RegisterErrorResponse>>, t: Throwable) {
-        // Manejar el caso de fallo en la llamada
-        Log.i("Error conexion", "Error:  ${t.message}")
+      override fun onFailure(call : Call<List<SignUpErrorResponse>>, t : Throwable) {
+        Log.i("Error conexion", "Error: ${t.message}")
+        showError("Error de conexión: ${t.message}")
       }
+
     })
   }
 
-  private fun showError(errorMessage: String) {
-    Log.i("create Acc Error", errorMessage)
+  private fun handleServerErrors(errors : List<SignUpErrorResponse>?) {
+    // Verifica si la lista de errores no es nula y no está vacía
+    if (!errors.isNullOrEmpty()) {
+      for (error in errors) {
+        // Aquí puedes manejar cada error individualmente
+        if (error.emptyInput != null) {
+          showError(error.emptyInput)
+        } else if (error.emailUsed != null) {
+          showError(error.emailUsed)
+        } else {
+          // Manejar otros tipos de errores si es necesario
+          showError("Error desconocido del servidor")
+        }
+      }
+    } else {
+      // Manejar el caso donde la lista de errores es nula o vacía
+      showError("Error desconocido del servidor")
+    }
+  }
+
+
+  private fun showError(message: String) {
+    // Se le muestra el mensaje de error al usuario.
+    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+  }
+
+  private fun endFragment() {
+    val listener = activity as? OnFragmentInteractionListener
+    listener?.onFragmentFinished()
   }
 
   private fun String.isValidEmail(): Boolean {

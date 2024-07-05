@@ -43,7 +43,7 @@
 
                 android:inputType="textEmailAddress"
                 android:padding="14dp"
-                android:text="bsalerno1@vimeo.com"
+                android:text=""
                 android:textColor="@color/black" />
 
             <EditText
@@ -53,11 +53,53 @@
                 android:layout_marginTop="15dp"
                 android:background="@drawable/gray_rectangle_rounded2"
                 android:drawableRight="@drawable/baseline_lock_24"
-                android:hint="Password"
+                android:hint="Contraseña"
 
                 android:inputType="textPassword"
                 android:padding="14dp"
-                android:text="hK4@+Vg'1{"
+                android:text=""
+                android:textColor="@color/black" />
+
+            <EditText
+                android:id="@+id/userFirstName"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/gray_rectangle_rounded2"
+                android:drawableRight="@drawable/baseline_drive_file_rename_outline_24"
+                android:hint="Nombre"
+
+                android:inputType="textPersonName"
+                android:padding="14dp"
+                android:text=""
+                android:textColor="@color/black" />
+
+            <EditText
+                android:id="@+id/userLastName"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/gray_rectangle_rounded2"
+                android:drawableEnd="@drawable/baseline_drive_file_rename_outline_24"
+                android:hint="Apellidos"
+
+                android:inputType="text"
+                android:padding="14dp"
+                android:text=""
+                android:textColor="@color/black" />
+
+            <EditText
+                android:id="@+id/userPhoneNum"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/gray_rectangle_rounded2"
+                android:drawableEnd="@drawable/baseline_local_phone_24"
+                android:hint="Número de contacto"
+
+                android:inputType="numberDecimal"
+                android:padding="14dp"
+                android:text=""
                 android:textColor="@color/black" />
 
             <Button

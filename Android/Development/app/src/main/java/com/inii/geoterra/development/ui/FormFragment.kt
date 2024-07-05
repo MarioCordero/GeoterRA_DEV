@@ -15,6 +15,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import com.inii.geoterra.development.Components.OnFragmentInteractionListener
 import com.inii.geoterra.development.R
 import java.io.IOException
 import java.io.InputStream
@@ -23,6 +24,9 @@ import java.io.InputStream
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
+
+private var listener: OnFragmentInteractionListener? = null
+
 
 class FormFragment : Fragment() {
   // TODO: Rename and change types of parameters
@@ -65,7 +69,8 @@ class FormFragment : Fragment() {
     }
 
     sendButton.setOnClickListener {
-
+      val listener = activity as? OnFragmentInteractionListener
+      listener?.onFragmentFinished()
     }
 
     return rootView

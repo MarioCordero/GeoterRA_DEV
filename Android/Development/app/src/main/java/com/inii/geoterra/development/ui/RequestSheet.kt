@@ -42,7 +42,7 @@ class RequestSheet @JvmOverloads constructor(
     state.text = "Estado: $estado"
   }
 
-  fun setDimensiones(width: Int, height: Int) {
+  fun setDimensions(width: Int, height: Int) {
     // Respectable las nuevas dimensiones del contenedor principal
     val layoutParams = LayoutParams(width, height)
     setLayoutParams(layoutParams)

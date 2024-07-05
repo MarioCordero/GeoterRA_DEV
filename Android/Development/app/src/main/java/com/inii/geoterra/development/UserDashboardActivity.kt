@@ -1,10 +1,13 @@
 package com.inii.geoterra.development
 
 import android.os.Bundle
+import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.inii.geoterra.development.Components.ActivityNavigator
 
 class UserDashboardActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState : Bundle?) {
@@ -17,6 +20,35 @@ class UserDashboardActivity : AppCompatActivity() {
       insets
     }
 
+    // Creates a variable to access the Bottom Menu.
+    val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_menu)
+    bottomNavigationView.selectedItemId = R.id.dashboardItem
 
+    bottomNavigationView.setOnItemSelectedListener { item ->
+      when (item.itemId) {
+        R.id.mapItem -> {
+          // Iniciar la actividad HomeActivity
+          ActivityNavigator.changeActivity(this, MapActivity::class.java, this::class.java)
+          true
+        }
+        R.id.dashboardItem-> {
+          // Iniciar la actividad RequestActivity
+          ActivityNavigator.changeActivity(this, RequestActivity::class.java, this::class.java)
+          true
+        }
+        R.id.accountItem -> {
+          // Iniciar la actividad LoginActivity
+          ActivityNavigator.changeActivity(this, LoginActivity::class.java, this::class.java)
+          true
+        }
+        else -> false
+      }
+
+    }
+
+    val userActivityButton = findViewById<Button>(R.id.activityButton)
+    userActivityButton.setOnClickListener {
+      ActivityNavigator.changeActivity(this, RequestActivity::class.java, UserDashboardActivity::class.java)
+    }
   }
 }

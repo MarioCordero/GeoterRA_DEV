@@ -7,7 +7,7 @@ import android.widget.Toast
 
 object GalleryManager {
 
-  const val GALLERY_PERMISSION_REQUEST_CODE = 2000
+  const val GALLERY_PERMISSION_REQUEST_CODE = 1000
   private var isInitialize = false
 
   fun initialize(context: Context) {

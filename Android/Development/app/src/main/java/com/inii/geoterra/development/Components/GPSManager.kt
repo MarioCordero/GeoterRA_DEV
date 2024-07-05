@@ -15,8 +15,7 @@ object GPSManager : LocationListener {
   private lateinit var locationManager: LocationManager
   private var currentLocation: Location? = null
   const val LOCATION_REQUEST_CODE = 1000
-  private var isInitialized = false
-
+  private var isInitialized = false;
   // Inicializa el servicio GPS
   fun initialize(context: Context) {
     if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

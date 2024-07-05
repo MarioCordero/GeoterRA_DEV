@@ -12,10 +12,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.inii.geoterra.development.Components.ActivityNavigator
+import com.inii.geoterra.development.Components.OnFragmentInteractionListener
 import com.inii.geoterra.development.ui.FormFragment
 import com.inii.geoterra.development.ui.RequestSheet
 
-class RequestActivity : AppCompatActivity() {
+class RequestActivity : AppCompatActivity(), OnFragmentInteractionListener {
 
     /**
      *
@@ -39,17 +41,17 @@ class RequestActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.homeItem -> {
                     // Iniciar la actividad HomeActivity
-                    changeActivity(MainActivity::class.java, this::class.java)
+                    ActivityNavigator.changeActivity(this, MainActivity::class.java, this::class.java)
                     true
                 }
                 R.id.mapItem -> {
-                    changeActivity(MapActivity::class.java, this::class.java)
+                    ActivityNavigator.changeActivity(this, MapActivity::class.java, this::class.java)
                     true
                 }
 
                 R.id.accountItem -> {
-                    // Iniciar la actividad NotificationsActivity
-                    changeActivity(LoginActivity::class.java, this::class.java)
+                    // Iniciar la actividad LoginActivity
+                    ActivityNavigator.changeActivity(this, LoginActivity::class.java, this::class.java)
                     true
                 }
 
@@ -89,17 +91,11 @@ class RequestActivity : AppCompatActivity() {
 
     }
 
-
-    /**
-     *
-     */
-    private fun changeActivity(destinationActivity: Class<*>, currentActivity: Class<*>) {
-        if (destinationActivity != currentActivity) {
-            val intent = Intent(this, destinationActivity)
-            startActivity(intent)
-        }
+    override fun onFragmentFinished() {
+        // Aquí manejas el comportamiento cuando el fragmento finaliza
+        ActivityNavigator.changeActivity(this, RequestActivity::class.java, RequestActivity::class.java)
+        supportFragmentManager.popBackStack()
     }
-
 }
 
 
