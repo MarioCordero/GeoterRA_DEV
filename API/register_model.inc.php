@@ -15,8 +15,8 @@ function check_email(object $pdo, string $email)
 
 function insert_to_db(object $pdo, array $user_attributes)
 {
-  $query = "INSERT INTO reg_usr (username, password, email, first_name, last_name, phone_number) VALUES
-('carlos', :password, :email, :first_name, :last_name, :phone_number);";
+  $query = "INSERT INTO reg_usr (email, password, first_name, last_name, phone_number) VALUES
+  (:email, :password, :first_name, :last_name, :phone_number);";
 
   $stmt = $pdo->prepare($query);
 
@@ -27,8 +27,8 @@ function insert_to_db(object $pdo, array $user_attributes)
   // $hashedPass = password_hash($user_attributes["password"],
   //   PASSWORD_BCRYPT, $options);
 
-  $stmt->bindParam(":password", $user_attributes["password"]);
   $stmt->bindParam(":email", $user_attributes["email"]);
+  $stmt->bindParam(":password", $user_attributes["password"]);
   $stmt->bindParam(":first_name", $user_attributes["first_name"]);
   $stmt->bindParam(":last_name", $user_attributes["last_name"]);
   $stmt->bindParam(":phone_number", $user_attributes["phone_num"]);
