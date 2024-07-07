@@ -12,17 +12,16 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.inii.geoterra.development.Components.ActivityNavigator
-import com.inii.geoterra.development.Components.SignInErrorResponse
-import com.inii.geoterra.development.Components.OnFragmentInteractionListener
-import com.inii.geoterra.development.Components.RetrofitClient
-import com.inii.geoterra.development.Components.SignInCredentials
+import com.inii.geoterra.development.components.ActivityNavigator
+import com.inii.geoterra.development.components.SignInErrorResponse
+import com.inii.geoterra.development.components.OnFragmentInteractionListener
+import com.inii.geoterra.development.components.RetrofitClient
+import com.inii.geoterra.development.components.SignInCredentials
 import com.inii.geoterra.development.ui.SignUpFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -56,17 +55,17 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
             when (item.itemId) {
                 R.id.homeItem -> {
                     // Iniciar la actividad HomeActivity
-                    ActivityNavigator.changeActivity(this, MainActivity::class.java, this::class.java)
+                    ActivityNavigator.changeActivity(this, MainActivity::class.java)
                     true
                 }
                 R.id.dashboardItem-> {
                     // Iniciar la actividad DashboardActivity
-                    ActivityNavigator.changeActivity(this, RequestActivity::class.java, this::class.java)
+                    ActivityNavigator.changeActivity(this, RequestActivity::class.java)
                     true
                 }
                 R.id.mapItem -> {
                     // Iniciar la actividad MapActivity
-                    ActivityNavigator.changeActivity(this, MapActivity::class.java, this::class.java)
+                    ActivityNavigator.changeActivity(this, MapActivity::class.java)
                     true
                 }
                 else -> false
@@ -196,7 +195,7 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
     }
 
     private fun switchToUserDashboard() {
-        ActivityNavigator.changeActivity(this, UserDashboardActivity::class.java, LoginActivity::class.java)
+        ActivityNavigator.changeActivity(this, UserDashboardActivity::class.java)
 
     }
 
@@ -222,7 +221,7 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
 
     override fun onFragmentFinished() {
         // Aquí manejas el comportamiento cuando el fragmento finaliza
-        ActivityNavigator.changeActivity(this, LoginActivity::class.java, LoginActivity::class.java)
+        ActivityNavigator.changeActivity(this, LoginActivity::class.java)
         supportFragmentManager.popBackStack()
     }
 }

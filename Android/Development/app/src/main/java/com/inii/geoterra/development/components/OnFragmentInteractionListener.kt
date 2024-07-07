@@ -1,4 +1,4 @@
-package com.inii.geoterra.development.Components
+package com.inii.geoterra.development.components
 
 interface OnFragmentInteractionListener {
   fun onFragmentFinished()

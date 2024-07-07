@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.inii.geoterra.development.Components.ActivityNavigator
+import com.inii.geoterra.development.components.ActivityNavigator
 
 class UserDashboardActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState : Bundle?) {
@@ -28,17 +28,17 @@ class UserDashboardActivity : AppCompatActivity() {
       when (item.itemId) {
         R.id.mapItem -> {
           // Iniciar la actividad HomeActivity
-          ActivityNavigator.changeActivity(this, MapActivity::class.java, this::class.java)
+          ActivityNavigator.changeActivity(this, MapActivity::class.java)
           true
         }
         R.id.dashboardItem-> {
           // Iniciar la actividad RequestActivity
-          ActivityNavigator.changeActivity(this, RequestActivity::class.java, this::class.java)
+          ActivityNavigator.changeActivity(this, RequestActivity::class.java)
           true
         }
         R.id.accountItem -> {
           // Iniciar la actividad LoginActivity
-          ActivityNavigator.changeActivity(this, LoginActivity::class.java, this::class.java)
+          ActivityNavigator.changeActivity(this, LoginActivity::class.java)
           true
         }
         else -> false
@@ -48,7 +48,7 @@ class UserDashboardActivity : AppCompatActivity() {
 
     val userActivityButton = findViewById<Button>(R.id.activityButton)
     userActivityButton.setOnClickListener {
-      ActivityNavigator.changeActivity(this, RequestActivity::class.java, UserDashboardActivity::class.java)
+      ActivityNavigator.changeActivity(this, RequestActivity::class.java)
     }
   }
 }

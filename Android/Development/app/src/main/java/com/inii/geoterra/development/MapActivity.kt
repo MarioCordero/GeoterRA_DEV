@@ -1,20 +1,17 @@
 package com.inii.geoterra.development
 
-import GPSManager
-import android.content.Intent
-import android.content.pm.PackageManager
+import com.inii.geoterra.development.components.GPSManager
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
 import android.view.MotionEvent
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.inii.geoterra.development.Components.ActivityNavigator
-import com.inii.geoterra.development.Components.CustomInfoOnMarker
+import com.inii.geoterra.development.components.ActivityNavigator
+import com.inii.geoterra.development.components.CustomInfoOnMarker
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -39,7 +36,7 @@ class MapActivity : AppCompatActivity() {
             insets
         }
 
-        if (!GPSManager.isInitialiazed()) {
+        if (!GPSManager.isInitialized()) {
             GPSManager.initialize(this)
         }
 
@@ -50,17 +47,17 @@ class MapActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.homeItem -> {
                     // Iniciar la actividad HomeActivity
-                    ActivityNavigator.changeActivity(this, MainActivity::class.java, this::class.java)
+                    ActivityNavigator.changeActivity(this, MainActivity::class.java)
                     true
                 }
                 R.id.dashboardItem-> {
                     // Iniciar la actividad RequestActivity
-                    ActivityNavigator.changeActivity(this, RequestActivity::class.java, this::class.java)
+                    ActivityNavigator.changeActivity(this, RequestActivity::class.java)
                     true
                 }
                 R.id.accountItem -> {
                     // Iniciar la actividad NotificationsActivity
-                    ActivityNavigator.changeActivity(this, LoginActivity::class.java, this::class.java)
+                    ActivityNavigator.changeActivity(this, LoginActivity::class.java)
                     true
                 }
                 else -> false
