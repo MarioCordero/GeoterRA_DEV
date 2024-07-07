@@ -11,7 +11,8 @@
         android:layout_height="match_parent"
 
         app:cardCornerRadius="5dp"
-        app:cardElevation="10dp">
+        app:cardElevation="10dp"
+        app:cardBackgroundColor="@color/white">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -19,7 +20,8 @@
             android:background="@drawable/gray_rectangle_rounded2"
             android:orientation="vertical"
             android:padding="24dp"
-            android:visibility="visible">
+            android:visibility="visible"
+            android:backgroundTint="@color/white">
 
             <TextView
                 android:id="@+id/loginText"
@@ -110,6 +112,7 @@
                 android:backgroundTint="@color/black"
                 android:text="Crear cuenta"
                 android:textAllCaps="false"
+                android:textColor="@color/white"
                 android:textSize="18sp"
                 app:cornerRadius="5dp" />
 
@@ -132,7 +135,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text="Instituto de Investigaciones en Ingeniería | REFORESTA"
-                android:textSize="12sp">
+                android:textSize="12sp"
+                android:textColor="@color/black">
             </TextView>
 
         </LinearLayout>
