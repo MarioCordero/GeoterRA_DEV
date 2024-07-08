@@ -253,8 +253,9 @@ html {
 	font-family:Montserrat-Light !important;
 }.Montserrat-SemiBold{
 	font-family:Montserrat-SemiBold !important;
+}.Montserrat-Bold{
+	font-family:Montserrat-Bold !important;
 }
-
 
 /* ------------------------------index.html------------------------------ */
 
@@ -765,4 +766,69 @@ html {
 	color: var(--negro);
 	cursor: pointer;
 	transition: all 250ms ease;
+}
+
+/* ------------------------------addpoint.html------------------------------ */
+.add-point{
+	padding: 10vh 10%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+	min-height: 60vh;
+}.add-point h1{
+	display: block;
+	margin: auto !important;
+	padding: 0 !important;
+}.add-point-form{
+	background-color: var(--grisOscuro);
+	box-shadow: rgba(80, 80, 80, 0.58) 0px 0px 20px 0px;
+	padding: 5% 10%;	
+	display: block;
+	margin: auto;
+	width: 50%;
+	border-radius: 8px;
+}.add-point-form p{
+	padding: 1em;
+}.add-point-form label{
+	width: 100%;
+}.add-point-form input{
+	width: 100%;
+    padding: 1em;
+    border: none;
+    background: var(--blanco);
+    color: #000000;
+	border-radius: 4px;
+	margin: 1vh 1vh;
+}
+
+.radio-buttons-container{
+	margin-left: 1em;
+	display: flex;
+	justify-content: space-evenly
+}.radio-buttons-container .option{
+	width: 25%;
+	background-color: var(--blanco);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	border-radius: 8px;
+	box-shadow: rgba(80, 80, 80, 0.58) 0px 0px 5px 5px;
+}.radio-buttons-container .option input{
+	height: 100%;
+	background-color: #9c9c9c !important;
+}
+
+.send-add-point-form{
+    width: 50% !important;
+    text-transform: uppercase;
+	margin: 3vh auto !important;
+	display: block;
+	background-color: var(--azul) !important;
+	color: var(--blanco) !important;
+    transition: all 500ms ease;
+}.send-add-point-form:hover{
+	color: var(--grisClaro) !important;
+	background-color: #000000 !important;
+    scale: 0.99;
+	cursor: pointer;
 }

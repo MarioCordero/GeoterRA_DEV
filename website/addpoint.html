@@ -89,92 +89,97 @@
 				</div>
 				<!--------------------------------END LOADER------------------------------->
 
-				<h1 class="center-text">BIENVENIDO XXXXX</h1>
+				<!-- TODO[] : ver si se puede hacer autoguardado -->
+				<div class="add-point">
 
-				<div class="user-info">
-					<!-- PERSONAL INFO -->
+					<h1>Formulario de Puntos Estudiados</h1>
 
-					<div class="user-info-col-container">
+					<form action="" method="post" class="add-point-form">
 
-						<div class="user-info-col">
-							<h2 class="center-text">Información la persona usuaria</h2>
-							<hr>
-							<ul class="user-personal-data">
-								<li>
-									<h3>NOMBRE</h3>
-									<p>XXXXX</p>
-								</li>
+						<p>
+							<label for="IDPoint" class="Montserrat-SemiBold">ID del punto</label>
+							<input type="text" class="Montserrat-Regular">
+						</p>
 
-								<li>
-									<h3>CORREO</h3>
-									<p>XXXXX</p>
-								</li>
+						<p>
+							<label for="contactNumber" class="Montserrat-SemiBold">Número de contacto</label>
+							<input type="text" class="Montserrat-Regular">
+						</p>
 
-								<li>
-									<h3>TELÉFONO</h3>
-									<p>XXXXX</p>
-								</li>
+						<p>
+							<label for="region" class="Montserrat-SemiBold">Fecha</label>
+							<input type="date" class="Montserrat-Regular">
+						</p>
+						
+						<p>
+							<label for="temperatura" class="Montserrat-SemiBold">Sensación térmica</label>
+							<div class="radio-buttons-container">
 
-								<button id="###">Editar información</button>
+								<div class="option">
+									<p>Caliente</p>
+									<input type="radio" name="options" value="Caliente">
+								</div>
 
-							</ul>
+								<div class="option">
+									<p>Tibio</p>
+									<input type="radio" name="options" value="Tibio">
+								</div>
 
-							<h2 class="center-text">Como agregar puntos al mapa</h2>
-							<hr>
-							<ul class="user-personal-data">
-								<li>
-									<h3>Paso 1</h3>
-									<p>XXXXX</p>
-								</li>
-
-								<li>
-									<h3>Paso 2</h3>
-									<p>XXXXX</p>
-								</li>
-
-							</ul>
-
-						</div>
-	
-						<!-- REQUEST INFO -->
-						<div class="user-info-col">
-
-							<h2 class="center-text">Solicitudes hechas por el usuario</h2>
-							<hr>
-							<div class="user-requests">
-								<ul class="center-text">
-									<li>Solicitud #1</li>
-									<li>Solicitud #2</li>
-									<li>Solicitud #3</li>
-								</ul>
+								<div class="option">
+									<p>Frio</p>
+									<input type="radio" name="options" value="Frio">
+								</div>
+								
 							</div>
+						</p>
+						
+						<p>
+							<label for="propietario" class="Montserrat-SemiBold">Propietario de la zona</label>
+							<input type="text" class="Montserrat-Regular">
+						</p>
+						
+						<p>
+							<label for="temp" class="Montserrat-SemiBold">Uso actual</label>
+							<input type="text" class="Montserrat-Regular">
+						</p>
+						
+						<p>
+							<label for="burbujeo" class="Montserrat-SemiBold">Presenta burbujeo</label>
+							<div class="radio-buttons-container">
 
-						</div>
+								<div class="option">
+									<p>Si</p>
+									<input type="radio" name="options" value="si">
+								</div>
 
-					</div>
+								<div class="option">
+									<p>No</p>
+									<input type="radio" name="options" value="no">
+								</div>
+								
+							</div>
+						</p>
+						
+						<p>
+							<label for="burbujeo" class="Montserrat-SemiBold">Indicaciones para llegar al lugar</label>
+							<input type="textarea" class="Montserrat-Regular">
+						</p>
+
+						<p>
+							<label for="foto" class="Montserrat-SemiBold">Subir Foto:</label>
+							<input type="file" class="Montserrat-Regular" id="foto" name="foto" accept="image/*">
+						</p>
+
+						<p>
+							<label for="burbujeo" class="Montserrat-SemiBold">Lugar en GPS</label>
+							<input type="text" class="Montserrat-Regular">
+						</p>
+						
+						<input type="submit" class="send-add-point-form Montserrat-Bold" value="Enviar">
+						
+					</form>
+
 				</div>
-
-				<div class="buttons-container">
-					<button id="logout-btn">Cerrar Sesión</button>
-					<script>
-						document.getElementById("logout-btn").addEventListener("click", function() {
-							// Realiza una solicitud al servidor para cerrar la sesión
-							let xhr = new XMLHttpRequest();
-							xhr.open("GET", "assets/includes/logout.php", true);
-							xhr.onreadystatechange = function () {
-								if (xhr.readyState == 4 && xhr.status == 200) {
-									// Redirige al usuario a la página de inicio de sesión después de cerrar sesión
-									window.location.href = "login.html";
-								}
-							};
-							xhr.send();
-						});
-					</script>
-
-					<button id="">Crear solicitud</button>
-				</div>
-				
-
 
 			</div>
 
