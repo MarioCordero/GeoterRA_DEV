@@ -101,6 +101,10 @@
 /*---------------------------------720 WIDTH-------------------------*/
 @media screen and (max-width: 720px){
 
+    .logoWelcome{
+        width: 50%;
+    }
+
     .menu-elements a{
         font-size: 20px;
     }
@@ -147,7 +151,7 @@
     }.about-us h1:nth-child(1) {
         font-size: 30px;
     }.about-us p{
-        font-size: 14px;
+        font-size: 12px;
     }
 
     .how-works-alt{
@@ -155,9 +159,13 @@
     }.how-works-alt h1{
         font-size: 30px;
     }.how-works-alt p{
-        font-size: 14px;
+        font-size: 12px;
     }.how-works-col img {
         max-height: 30vh;
+    }
+
+    .welcome p {
+        font-size: 50px;
     }
 
     .contact-us-alt{
@@ -165,7 +173,7 @@
     }.contact-us-alt h1{
         font-size: 30px;
     }.contact-us-alt p{
-        font-size: 14px;
+        font-size: 12px;
     }.contact-us-form {
         max-width: 90%;
     }
