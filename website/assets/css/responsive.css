@@ -176,5 +176,7 @@
         font-size: 12px;
     }.contact-us-form {
         max-width: 90%;
+    }.contact-us-form button {
+        font-size: 10px;
     }
 }
