@@ -350,6 +350,16 @@ html {
 	padding: 10px;
 }
 
+.how-works-alt{
+	padding: 15% 10%;
+	display: none;
+	flex-direction: column;
+	gap: 20px;
+	text-align: justify;
+    line-height: 2;
+    
+}
+
 /* CONTACT US */
 .contact-us{
 	padding: 10% 4% 10% 10%;
@@ -371,7 +381,21 @@ html {
 	margin: 5%;
 }
 
+.contact-us-alt{
+	padding: 10% 4% 10% 10%;
+	align-items: center;
+	justify-content: space-evenly;
+	display: none;
+}.contact-us-alt div{
+	display: flex;
+}.contact-us-alt div img{
+	display: block;
+	max-width: 40%;
+	height: auto;
+}
+
 .contact-us-form{
+	display: block;
 	margin: 5% 0px;
 	padding: 0px 0px 5% 0px;
 	box-shadow: rgba(51, 51, 51, 0.58) 0px 0px 20px 0px;
