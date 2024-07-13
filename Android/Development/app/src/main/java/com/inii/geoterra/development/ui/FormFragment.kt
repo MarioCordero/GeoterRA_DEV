@@ -54,7 +54,7 @@ class FormFragment : Fragment() {
     val sendButton = rootView.findViewById<Button>(R.id.sendRequestButton)
 
     locationButton.setOnClickListener {
-      if (!GPSManager.isInitialiazed()) {
+      if (!GPSManager.isInitialized()) {
         GPSManager.initialize(requireContext())
       }
       val userLocation = GPSManager.getLastKnownLocation()

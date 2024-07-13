@@ -208,9 +208,6 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
         loginSpace.visibility = View.INVISIBLE
         val fragmentSpace = findViewById<FrameLayout>(R.id.signupFragmentSpace)
         fragmentSpace.visibility = View.VISIBLE
-        val newImage = ContextCompat.getDrawable(this, R.drawable.rocklake)
-        val backgrounImage = findViewById<ImageView>(R.id.background_image)
-        backgrounImage.setImageDrawable(newImage)
 
         val signUpFragment = SignUpFragment.newInstance("hola", "pedro")
         // Insertar el fragmento en el contenedor
