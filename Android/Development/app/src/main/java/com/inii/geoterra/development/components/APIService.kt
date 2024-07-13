@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 /**
@@ -60,6 +61,19 @@ data class SignUpErrorResponse(
   @SerializedName("email_used") val emailUsed : String
 )
 
+data class MapPoint(
+  @SerializedName("id") val pointID : String,
+  @SerializedName("coord_x") val latitude : Double,
+  @SerializedName("coord_y") val longitude : Double,
+  val properties : PointProperties
+) {
+  data class PointProperties(
+    @SerializedName("temp") val temperature : Double,
+    @SerializedName("ph") val fieldPh : Double
+  )
+
+}
+
 /**
  * API interface that defines the services used in the application.
  *
@@ -99,4 +113,14 @@ interface APIService {
     @Field("last_name") lastName : String,
     @Field("phone_num") phoneNumber : String
   ): Call<List<SignUpErrorResponse>>
+
+  @FormUrlEncoded
+  @POST("map_data.inc.php")
+  fun getMapPoints(
+    @Field("region") region: String
+  ): Call<List<MapPoint>>
+
+  @GET("logout.php")
+  fun logout(
+  ): Call<Void>
 }

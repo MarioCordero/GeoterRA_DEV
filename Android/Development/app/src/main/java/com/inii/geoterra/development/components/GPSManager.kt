@@ -85,7 +85,6 @@ object GPSManager : LocationListener {
    * @param extras Additional status information.
    */
   override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-    TODO("implement this function")
   }
 
   /**
@@ -94,7 +93,6 @@ object GPSManager : LocationListener {
    * @param provider The name of the provider.
    */
   override fun onProviderEnabled(provider: String) {
-    TODO("implement this function")
   }
 
   /**
@@ -103,7 +101,6 @@ object GPSManager : LocationListener {
    * @param provider The name of the provider.
    */
   override fun onProviderDisabled(provider: String) {
-    TODO("implement this function")
   }
 
   /**
