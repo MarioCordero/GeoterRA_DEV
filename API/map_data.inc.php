@@ -33,9 +33,8 @@
 			// Check if there were any errors caught
 			if(!$errors) {
 				header("Content-Type: application/json");
-				foreach ($values as $value) {
-					echo json_encode($value);
-				}
+				echo json_encode($values);
+				
 			}
 
 		} catch (PDOException $e) {
@@ -45,7 +44,7 @@
 		}
 	
 	} else {
-		header("Location: ../../login.html");
+		//header("Location: ../../login.html");
 		die();
 	}
 

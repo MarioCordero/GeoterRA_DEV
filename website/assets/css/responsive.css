@@ -43,37 +43,140 @@
 
 /*---------------------------------1090 WIDTH-------------------------*/
 @media screen and (max-width: 1090px){
-    .toggle {
+    .toggle{
         visibility: visible;
         opacity: 1;
         display: block;
     }
-    .menu {
+    .menu{
         display: none;
+    }
+
+    .how-works{
+        display: none;
+    }
+    .how-works-alt{
+        display: flex;
+    }
+
+    .contact-us{
+        display: none;
+    }
+
+    .contact-us-alt{
+        line-height: 2;
+        display: block;
+    }.contact-us-alt div img{
+        display: block;
+        margin: auto;
+        max-width: 40%;
+    }
+
+    .contact-us-form{
+        max-width: 50%;
+        display: block !important;
+        margin: 2vh auto;
+    }.contact-us-form p{
+        margin: 0px auto 1vh auto;
     }
 }
 
 /*---------------------------------900 WIDTH-------------------------*/
 @media screen and (max-width: 900px){
-    
+    .contact-us-alt div {
+        flex-direction: column;
+    }
 }
 
 /*---------------------------------815 WIDTH-------------------------*/
 @media screen and (max-width: 815px){
-
+    .contact-us-form {
+        max-width: 70%;
+    }
+    .contact-us-alt div img {
+        max-width: 60%;
+    }
 }
 
 /*---------------------------------720 WIDTH-------------------------*/
 @media screen and (max-width: 720px){
 
+    .logoWelcome{
+        width: 50%;
+    }
+
+    .menu-elements a{
+        font-size: 20px;
+    }
+    
+    .how-works-col-container {
+        flex-direction: column-reverse;
+    }
+    .how-works-col img {
+        max-height:50vh ;
+        margin: auto;
+    }.how-works-col p{
+        margin-top: 3vh;
+    }
+    
+    .about-us-col-container {
+        flex-direction: column;
+    }.about-us-col-container :nth-child(2){
+        display: flex;
+        flex-direction: column-reverse;
+    }
 }
 
 /*---------------------------------615 WIDTH-------------------------*/
 @media screen and (max-width: 615px){
-
+    .about-us-col img {
+        max-width: 60%;
+    }
+    .how-works-col img {
+        max-width: 80%;
+        max-height: 40vh;
+    }
+    .contact-us-form {
+        max-width: 80%;
+    }
+    .contact-us-alt div img {
+        max-width: 70%;
+    }
 }
 
 /*---------------------------------419 WIDTH -------------------------*/
 @media screen and (max-width: 419px){
-    
+    .about-us{
+        padding: 15% 5%;
+    }.about-us h1:nth-child(1) {
+        font-size: 30px;
+    }.about-us p{
+        font-size: 12px;
+    }
+
+    .how-works-alt{
+        padding: 15% 5%;
+    }.how-works-alt h1{
+        font-size: 30px;
+    }.how-works-alt p{
+        font-size: 12px;
+    }.how-works-col img {
+        max-height: 30vh;
+    }
+
+    .welcome p {
+        font-size: 50px;
+    }
+
+    .contact-us-alt{
+        padding: 15% 5%;
+    }.contact-us-alt h1{
+        font-size: 30px;
+    }.contact-us-alt p{
+        font-size: 12px;
+    }.contact-us-form {
+        max-width: 90%;
+    }.contact-us-form button {
+        font-size: 10px;
+    }
 }

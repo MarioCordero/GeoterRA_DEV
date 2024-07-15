@@ -57,6 +57,8 @@ html {
 	display: flex;
 	align-items: center;
 	float: right;
+}.menu.active{
+	display: none;
 }.menu a{
 	color: #fff;
 	text-decoration: none;
@@ -68,11 +70,15 @@ html {
 	transition: all 250ms ease;
 }
 
+/* }.menu-bars-background.active{ */
+
 .menu-logged{
 	display: none;
 	/* display: flex; */
 	align-items: center;
 	float: right;
+}.menu-logged.active{
+	display: flex;
 }.menu-logged a{
 	color: #fff;
 	text-decoration: none;
@@ -214,7 +220,7 @@ html {
  }
 .logoWelcome{
     display: block;
-	margin: 22% auto;
+    margin: 40vh auto;
     width: 30%;
 }
 
@@ -247,8 +253,9 @@ html {
 	font-family:Montserrat-Light !important;
 }.Montserrat-SemiBold{
 	font-family:Montserrat-SemiBold !important;
+}.Montserrat-Bold{
+	font-family:Montserrat-Bold !important;
 }
-
 
 /* ------------------------------index.html------------------------------ */
 
@@ -343,6 +350,16 @@ html {
 	padding: 10px;
 }
 
+.how-works-alt{
+	padding: 15% 10%;
+	display: none;
+	flex-direction: column;
+	gap: 20px;
+	text-align: justify;
+    line-height: 2;
+    
+}
+
 /* CONTACT US */
 .contact-us{
 	padding: 10% 4% 10% 10%;
@@ -364,7 +381,21 @@ html {
 	margin: 5%;
 }
 
+.contact-us-alt{
+	padding: 10% 4% 10% 10%;
+	align-items: center;
+	justify-content: space-evenly;
+	display: none;
+}.contact-us-alt div{
+	display: flex;
+}.contact-us-alt div img{
+	display: block;
+	max-width: 40%;
+	height: auto;
+}
+
 .contact-us-form{
+	display: block;
 	margin: 5% 0px;
 	padding: 0px 0px 5% 0px;
 	box-shadow: rgba(51, 51, 51, 0.58) 0px 0px 20px 0px;
@@ -759,4 +790,69 @@ html {
 	color: var(--negro);
 	cursor: pointer;
 	transition: all 250ms ease;
+}
+
+/* ------------------------------addpoint.html------------------------------ */
+.add-point{
+	padding: 10vh 10%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+	min-height: 60vh;
+}.add-point h1{
+	display: block;
+	margin: auto !important;
+	padding: 0 !important;
+}.add-point-form{
+	background-color: var(--grisOscuro);
+	box-shadow: rgba(80, 80, 80, 0.58) 0px 0px 20px 0px;
+	padding: 5% 10%;	
+	display: block;
+	margin: auto;
+	width: 50%;
+	border-radius: 8px;
+}.add-point-form p{
+	padding: 1em;
+}.add-point-form label{
+	width: 100%;
+}.add-point-form input{
+	width: 100%;
+    padding: 1em;
+    border: none;
+    background: var(--blanco);
+    color: #000000;
+	border-radius: 4px;
+	margin: 1vh 1vh;
+}
+
+.radio-buttons-container{
+	margin-left: 1em;
+	display: flex;
+	justify-content: space-evenly
+}.radio-buttons-container .option{
+	width: 25%;
+	background-color: var(--blanco);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	border-radius: 8px;
+	box-shadow: rgba(80, 80, 80, 0.58) 0px 0px 5px 5px;
+}.radio-buttons-container .option input{
+	height: 100%;
+	background-color: #9c9c9c !important;
+}
+
+.send-add-point-form{
+    width: 50% !important;
+    text-transform: uppercase;
+	margin: 3vh auto !important;
+	display: block;
+	background-color: var(--azul) !important;
+	color: var(--blanco) !important;
+    transition: all 500ms ease;
+}.send-add-point-form:hover{
+	color: var(--grisClaro) !important;
+	background-color: #000000 !important;
+    scale: 0.99;
+	cursor: pointer;
 }

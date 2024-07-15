@@ -1,7 +1,5 @@
 package com.inii.geoterra.development.ui
 
-import GPSManager
-import GalleryManager
 import android.app.Activity
 import android.content.Intent
 import android.media.ExifInterface
@@ -15,8 +13,10 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import com.inii.geoterra.development.Components.OnFragmentInteractionListener
 import com.inii.geoterra.development.R
+import com.inii.geoterra.development.components.GPSManager
+import com.inii.geoterra.development.components.GalleryManager
+import com.inii.geoterra.development.components.OnFragmentInteractionListener
 import java.io.IOException
 import java.io.InputStream
 
@@ -54,18 +54,20 @@ class FormFragment : Fragment() {
     val sendButton = rootView.findViewById<Button>(R.id.sendRequestButton)
 
     locationButton.setOnClickListener {
-      if (!GPSManager.isInitialiazed()) {
+      if (!GPSManager.isInitialized()) {
         GPSManager.initialize(requireContext())
+      } else {
+        val userLocation = GPSManager.getLastKnownLocation()
+        Log.i("Coordenadas", "Latitud ${userLocation?.latitude}  y longitud ${userLocation?.longitude}")
       }
-      val userLocation = GPSManager.getLastKnownLocation()
-      Log.i("Coordenadas", "Latitud ${userLocation?.latitude}  y longitud ${userLocation?.longitude}")
     }
 
     imageButton.setOnClickListener {
       if (!GalleryManager.isInitialize()) {
         GalleryManager.initialize(requireContext())
+      } else {
+        openGallery()
       }
-      openGallery()
     }
 
     sendButton.setOnClickListener {

@@ -26,13 +26,16 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/loginCard"
-        android:layout_width="350dp"
-        android:layout_height="450dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:foregroundGravity="center"
-
         app:cardCornerRadius="5dp"
         app:cardElevation="10dp"
         app:cardBackgroundColor="@color/white"
+
+        android:layout_marginStart="35dp"
+        android:layout_marginEnd="35dp"
+        android:layout_marginBottom="20dp"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -41,7 +44,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:background="@drawable/gray_rectangle_rounded2"
             android:orientation="vertical"
             android:padding="24dp"
@@ -52,7 +55,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="GeoterRa"
+                android:text="@string/geoterra"
                 android:textAlignment="center"
                 android:textColor="@color/black"
                 android:textSize="36sp"
@@ -62,46 +65,54 @@
                 android:id="@+id/userEmail"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
+
                 android:layout_marginTop="40dp"
+
                 android:background="@drawable/gray_rectangle_rounded2"
                 android:drawableRight="@drawable/baseline_account_circle_24"
-                android:hint="Username"
 
+                android:hint="Correo"
                 android:inputType="textEmailAddress"
                 android:padding="14dp"
-                android:text="bsalerno1@vimeo.com"
                 android:textColor="@color/black" />
 
             <EditText
                 android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
+
                 android:layout_marginTop="15dp"
+
                 android:background="@drawable/gray_rectangle_rounded2"
                 android:drawableRight="@drawable/baseline_lock_24"
-                android:hint="Password"
 
+                android:hint="Contraseña"
                 android:inputType="textPassword"
                 android:padding="14dp"
-                android:text="hK4@+Vg'1{"
                 android:textColor="@color/black" />
 
             <Button
                 android:id="@+id/loginButton"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:layout_marginTop="30dp"
+
+                android:layout_marginTop="20dp"
+
                 android:backgroundTint="@color/black"
+
                 android:text="Iniciar sesión"
+                android:textColor="@color/white"
                 android:textAllCaps="false"
                 android:textSize="18sp"
-                app:cornerRadius="5dp" />
 
+                app:cornerRadius="5dp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+
+                android:layout_marginTop="10dp">
 
                 <TextView
                     android:id="@+id/notSignedText"
@@ -121,19 +132,15 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
-                android:layout_marginTop="35dp"
-                android:background="@color/black">
-
-            </LinearLayout>
+                android:layout_marginTop="10dp"
+                android:background="@color/black" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text="Instituto de Investigaciones en Ingeniería | REFORESTA"
-                android:textSize="12sp">
-
-            </TextView>
+                android:textSize="12sp" />
 
         </LinearLayout>
 
@@ -141,19 +148,15 @@
 
     <FrameLayout
         android:id="@+id/signupFragmentSpace"
-        android:layout_width="380dp"
-        android:layout_height="550dp"
-        android:layout_marginBottom="30dp"
-
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:visibility="invisible"
         android:foregroundGravity="center"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-    </FrameLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_menu"

@@ -6,23 +6,22 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.inii.geoterra.development.Components.ActivityNavigator
-import com.inii.geoterra.development.Components.SignInErrorResponse
-import com.inii.geoterra.development.Components.OnFragmentInteractionListener
-import com.inii.geoterra.development.Components.RetrofitClient
-import com.inii.geoterra.development.Components.SignInCredentials
+import com.inii.geoterra.development.components.ActivityNavigator
+import com.inii.geoterra.development.components.GPSManager
+import com.inii.geoterra.development.components.OnFragmentInteractionListener
+import com.inii.geoterra.development.components.RetrofitClient
+import com.inii.geoterra.development.components.SessionManager
+import com.inii.geoterra.development.components.SignInCredentials
+import com.inii.geoterra.development.components.SignInResponse
 import com.inii.geoterra.development.ui.SignUpFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,15 +29,13 @@ import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.net.InetAddress
 
 
 class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
 
-    private var email : String = ""
-    private var password : String = ""
     private lateinit var loginButton : Button
     override fun onCreate(savedInstanceState: Bundle?) {
+        SessionManager.init(this)
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -56,39 +53,63 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
             when (item.itemId) {
                 R.id.homeItem -> {
                     // Iniciar la actividad HomeActivity
-                    ActivityNavigator.changeActivity(this, MainActivity::class.java, this::class.java)
+                    ActivityNavigator.changeActivity(this, MainActivity::class.java)
                     true
                 }
                 R.id.dashboardItem-> {
                     // Iniciar la actividad DashboardActivity
-                    ActivityNavigator.changeActivity(this, RequestActivity::class.java, this::class.java)
+                    ActivityNavigator.changeActivity(this, RequestActivity::class.java)
                     true
                 }
                 R.id.mapItem -> {
-                    // Iniciar la actividad MapActivity
-                    ActivityNavigator.changeActivity(this, MapActivity::class.java, this::class.java)
+                    // Iniciar la actividad HomeActivity
+                    if (GPSManager.isInitialized()) {
+                        ActivityNavigator.changeActivity(this, MapActivity::class.java)
+                    } else {
+                        GPSManager.initialize(this)
+                    }
                     true
                 }
                 else -> false
             }
         }
+
+//        val apiService = RetrofitClient.getAPIService()
+//        val call = apiService.logout()
+//        call.enqueue(object : Callback<LoggedOutResponse> {
+//            override fun onResponse(call: Call<LoggedOutResponse>, response: Response<LoggedOutResponse>) {
+//                if (response.isSuccessful) {
+//                    val serverResponse = response.body()
+//                    if (serverResponse != null) {
+//                        Log.d("Logged Out", serverResponse.message)
+//                    }
+//
+//                } else {
+//                    Log.d("Logged Out", "Error al cerrar sesión: ${response.code()}")
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<LoggedOutResponse>, t: Throwable) {
+//                Log.d("Logout", "Error en la solicitud: ${t.message}")
+//            }
+//        })
+
         loginButton = findViewById(R.id.loginButton)
         loginButton.setOnClickListener {
+            val userEmail = findViewById<EditText>(R.id.userEmail).text.toString().trim()
+            val userPassword = findViewById<EditText>(R.id.password).text.toString().trim()
 
-            email = findViewById<EditText>(R.id.userEmail).text.toString().trim()
-            password = findViewById<EditText>(R.id.password).text.toString().trim()
-
-            Log.i("Tomado de datos en login", "$email $password")
-            if (email.isNotBlank() && password.isNotBlank()) {
-                if (email.isValidEmail() && password.length >= 8) {
+            Log.i("Tomado de datos en login", "$userEmail $userPassword")
+            if (userEmail.isNotBlank() && userPassword.isNotBlank()) {
+                if (userEmail.isValidEmail() && userPassword.length >= 8) {
                     val credentials = SignInCredentials(
-                        email = email,
-                        password = password
+                        email = userEmail,
+                        password = userPassword
                     )
                     loginUser(credentials)
-                } else if (!email.isValidEmail()) {
+                } else if (!userEmail.isValidEmail()) {
                     showError("Por favor, ingresa un correo válido.")
-                } else if (password.length < 8) {
+                } else if (userPassword.length < 8) {
                     showError("Por favor, ingresa una contraseña con al menos 8 carácteres.")
                 }
             } else {
@@ -105,14 +126,8 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
     private fun loginUser(credentials : SignInCredentials) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val pingResult = ping("127.0.0.1")
-                Log.i("Ping", pingResult)
                 withContext(Dispatchers.Main) {
-                    if (pingResult.contains("Ping exitoso")) {
-                        sendCredentialsAsForm(credentials)
-                    } else {
-                        showError(pingResult)
-                    }
+                    sendCredentialsAsForm(credentials)
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
@@ -122,70 +137,49 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
         }
     }
 
-    private fun ping(ipAddress: String): String {
-        return try {
-            val inetAddress: InetAddress = InetAddress.getByName(ipAddress)
-            val reachable: Boolean = inetAddress.isReachable(5000) // Tiempo de espera de 5 segundos
-            if (reachable) {
-                "Ping exitoso a $ipAddress"
-            } else {
-                "Ping fallido a $ipAddress"
-            }
-        } catch (e: Exception) {
-            "Error al hacer ping a $ipAddress: ${e.message}"
-        }
-    }
-
     private fun sendCredentialsAsForm(credentials : SignInCredentials) {
         val apiService = RetrofitClient.getAPIService()
-        val call = apiService.signIn(email, password)
+        val call = apiService.signIn(credentials.email, credentials.password)
 
-        call.enqueue(object : Callback<List<SignInErrorResponse>> { // Cambiar String a List<LoginErrorResponse>
-            override fun onResponse(call: Call<List<SignInErrorResponse>>, response: Response<List<SignInErrorResponse>>) {
+        call.enqueue(object : Callback<SignInResponse> { // Cambiar String a List<LoginErrorResponse>
+            override fun onResponse(call: Call<SignInResponse>, response: Response<SignInResponse>) {
                 if (response.isSuccessful) {
-                    val errorResponse = response.body()
-                    if (errorResponse != null) {
-                        if (errorResponse.isEmpty()) {
-                            // Caso donde la respuesta del servidor indica éxito pero devuelve un arreglo vacío de errores
-                            Log.i("Success", "Login exitoso sin errores adicionales")
-                            switchToUserDashboard()
+                    val serverResponse = response.body()
+                    if (serverResponse != null) {
+                        val status = serverResponse.status
+                        val errors = serverResponse.errors
+                        if (errors.isEmpty()) {
+                            if (status == "logged_in") {
+                                SessionManager.startSession(credentials.email)
+                                // Caso donde la respuesta del servidor indica éxito pero devuelve un arreglo vacío de errores
+                                Log.i("Success", "Login exitoso sin errores adicionales$errors")
+                                switchToUserDashboard()
+                            } else {
+                                Log.i("failed", "El usuario ya tiene un sesion activa")
+                            }
                         } else {
-                            // Caso donde hay errores específicos que manejar
-                            Log.i("Error", "Server returned errors: $errorResponse")
-                            handleServerErrors(errorResponse)
+                            handleServerErrors(errors)
                         }
                     }
-                } else {
-                    Log.i("Error", "Unexpected code ${response.code()}")
-                    showError("Error en la respuesta del servidor: ${response.code()}")
                 }
             }
 
-            override fun onFailure(call: Call<List<SignInErrorResponse>>, t: Throwable) {
+            override fun onFailure(call: Call<SignInResponse>, t: Throwable) {
                 Log.i("Error conexion", "Error: ${t.message}")
                 showError("Error de conexión: ${t.message}")
             }
         })
     }
 
-    private fun handleServerErrors(errors : List<SignInErrorResponse>?) {
+    private fun handleServerErrors(errors : List<SignInResponse.SignInErrors>) {
         // Verifica si la lista de errores no es nula y no está vacía
-        if (!errors.isNullOrEmpty()) {
-            for (error in errors) {
-                // Aquí puedes manejar cada error individualmente
-                if (error.emptyInput != null) {
-                    showError(error.emptyInput)
-                } else if (error.invalidCred != null) {
-                    showError(error.invalidCred)
-                } else {
-                    // Manejar otros tipos de errores si es necesario
-                    showError("Error desconocido del servidor")
-                }
-            }
-        } else {
-            // Manejar el caso donde la lista de errores es nula o vacía
-            showError("Error desconocido del servidor")
+        for (error in errors) {
+            Log.i(error.errorType, error.errorMessage)
         }
+    }
+
+    private fun switchToUserDashboard() {
+        ActivityNavigator.changeActivity(this, UserDashboardActivity::class.java)
     }
 
     private fun showError(message: String) {
@@ -193,11 +187,6 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
         runOnUiThread {
             Toast.makeText(this, message, Toast.LENGTH_LONG).show()
         }
-    }
-
-    private fun switchToUserDashboard() {
-        ActivityNavigator.changeActivity(this, UserDashboardActivity::class.java, LoginActivity::class.java)
-
     }
 
     private fun String.isValidEmail(): Boolean {
@@ -209,9 +198,6 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
         loginSpace.visibility = View.INVISIBLE
         val fragmentSpace = findViewById<FrameLayout>(R.id.signupFragmentSpace)
         fragmentSpace.visibility = View.VISIBLE
-        val newImage = ContextCompat.getDrawable(this, R.drawable.rocklake)
-        val backgrounImage = findViewById<ImageView>(R.id.background_image)
-        backgrounImage.setImageDrawable(newImage)
 
         val signUpFragment = SignUpFragment.newInstance("hola", "pedro")
         // Insertar el fragmento en el contenedor
@@ -222,7 +208,7 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
 
     override fun onFragmentFinished() {
         // Aquí manejas el comportamiento cuando el fragmento finaliza
-        ActivityNavigator.changeActivity(this, LoginActivity::class.java, LoginActivity::class.java)
+        ActivityNavigator.changeActivity(this, LoginActivity::class.java)
         supportFragmentManager.popBackStack()
     }
 }

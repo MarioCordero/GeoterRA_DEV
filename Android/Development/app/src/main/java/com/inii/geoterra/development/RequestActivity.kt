@@ -1,6 +1,5 @@
 package com.inii.geoterra.development
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -12,8 +11,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.inii.geoterra.development.Components.ActivityNavigator
-import com.inii.geoterra.development.Components.OnFragmentInteractionListener
+import com.inii.geoterra.development.components.ActivityNavigator
+import com.inii.geoterra.development.components.GPSManager
+import com.inii.geoterra.development.components.OnFragmentInteractionListener
+import com.inii.geoterra.development.components.SessionManager
 import com.inii.geoterra.development.ui.FormFragment
 import com.inii.geoterra.development.ui.RequestSheet
 
@@ -41,17 +42,26 @@ class RequestActivity : AppCompatActivity(), OnFragmentInteractionListener {
             when (item.itemId) {
                 R.id.homeItem -> {
                     // Iniciar la actividad HomeActivity
-                    ActivityNavigator.changeActivity(this, MainActivity::class.java, this::class.java)
+                    ActivityNavigator.changeActivity(this, MainActivity::class.java)
                     true
                 }
                 R.id.mapItem -> {
-                    ActivityNavigator.changeActivity(this, MapActivity::class.java, this::class.java)
+                    // Iniciar la actividad HomeActivity
+                    if (GPSManager.isInitialized()) {
+                        ActivityNavigator.changeActivity(this, MapActivity::class.java)
+                    } else {
+                        GPSManager.initialize(this)
+                    }
                     true
                 }
 
                 R.id.accountItem -> {
                     // Iniciar la actividad LoginActivity
-                    ActivityNavigator.changeActivity(this, LoginActivity::class.java, this::class.java)
+                    if (SessionManager.isSessionActive()) {
+                        ActivityNavigator.changeActivity(this, UserDashboardActivity::class.java)
+                    } else {
+                        ActivityNavigator.changeActivity(this, LoginActivity::class.java)
+                    }
                     true
                 }
 
@@ -93,7 +103,7 @@ class RequestActivity : AppCompatActivity(), OnFragmentInteractionListener {
 
     override fun onFragmentFinished() {
         // Aquí manejas el comportamiento cuando el fragmento finaliza
-        ActivityNavigator.changeActivity(this, RequestActivity::class.java, RequestActivity::class.java)
+        ActivityNavigator.changeActivity(this, RequestActivity::class.java)
         supportFragmentManager.popBackStack()
     }
 }

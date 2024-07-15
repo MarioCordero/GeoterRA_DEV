@@ -18,12 +18,10 @@
 		regen_session_id();
 
 	} else {
-
 		$interval = 60 * 15;
 		if (time() - $_SESSION["last_regeneration"] >= $interval) {
 			regen_session_id();
 		}
-
 	}
 
 
@@ -31,6 +29,5 @@
 
 		session_regenerate_id();
 		$_SESSION["last_regeneration"] = time();
-		
 	}
 ?>

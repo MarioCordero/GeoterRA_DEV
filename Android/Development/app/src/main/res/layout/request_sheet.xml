@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="270dp"
-
     android:layout_marginBottom="20dp"
-
     android:background="@drawable/gray_rectangle_rounded2"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintHorizontal_bias="0.0"
     app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/newRequestButton"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
+    app:layout_constraintTop_toBottomOf="@+id/newRequestButton">
 
     <ImageView
         android:id="@+id/imageView5"
@@ -25,7 +22,6 @@
 
         android:background="@drawable/gray_rectangle_rounded2"
         android:clipToOutline="true"
-
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/maps_image"
         tools:targetApi="s" />
@@ -37,8 +33,7 @@
 
         android:layout_marginStart="170dp"
         android:layout_marginTop="60dp"
-        android:text="Coordenadas: "
-        />
+        android:text="Coordenadas: " />
 
     <TextView
         android:id="@+id/dateTxt"
@@ -47,8 +42,7 @@
 
         android:layout_marginStart="170dp"
         android:layout_marginTop="100dp"
-        android:text="Fecha: "
-        />
+        android:text="Fecha: " />
 
     <TextView
         android:id="@+id/stateTxt"
@@ -57,8 +51,7 @@
 
         android:layout_marginStart="170dp"
         android:layout_marginTop="120dp"
-        android:text="Estado: "
-        />
+        android:text="Estado: " />
 
     <Button
         android:id="@+id/contact_us"
@@ -76,11 +69,10 @@
         android:text="Contáctanos"
         android:textColor="@color/white"
         android:textSize="11sp"
-
         app:cornerRadius="5dp"
+
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/repeat_request"
@@ -98,10 +90,8 @@
         android:text="Repetir solicitud"
         android:textColor="@color/black"
         android:textSize="11sp"
-
         app:cornerRadius="5dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </FrameLayout>
