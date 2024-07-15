@@ -57,14 +57,14 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.play.services)
     //noinspection UseTomlInstead
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
     //noinspection UseTomlInstead
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     //noinspection UseTomlInstead
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     //noinspection UseTomlInstead
-    implementation("org.json:json:20210307")
-    implementation("com.google.android.material:material:1.5.0")
+    implementation("org.json:json:20240303")
+    implementation(libs.material.v150)
 
 
 
@@ -74,10 +74,12 @@ dependencies {
     implementation("org.osmdroid:osmdroid-android:6.1.18")
     implementation("androidx.exifinterface:exifinterface:1.3.7")
     implementation("androidx.exifinterface:exifinterface:1.3.7")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("org.locationtech.proj4j:proj4j:1.1.0")
+  implementation(libs.firebase.firestore)
 
 
-    testImplementation(libs.junit)
+  testImplementation(libs.junit)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

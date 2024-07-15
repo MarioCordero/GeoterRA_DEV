@@ -1,6 +1,9 @@
 package com.inii.geoterra.development.components
 
+import com.google.gson.GsonBuilder
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -22,12 +25,29 @@ object RetrofitClient {
     level = HttpLoggingInterceptor.Level.BODY
   }
 
+  private val debuggingInterceptor = Interceptor { chain ->
+    val request = chain.request()
+    val response = chain.proceed(request)
+    val responseBody = response.body?.string()
+
+    println("JSON Response: $responseBody")
+
+    response.newBuilder()
+      .body(ResponseBody.create(response.body?.contentType(), responseBody ?: ""))
+      .build()
+  }
+
   /**
    * OkHttpClient instance with logging interceptor added.
    */
   private val client = OkHttpClient.Builder()
     .addInterceptor(loggingInterceptor)
+    .addInterceptor(debuggingInterceptor)
     .build()
+
+  private val gson = GsonBuilder()
+    .setLenient()
+    .create()
 
   /**
    * Retrofit instance configured with base URL, OkHttpClient, and Gson converter.
@@ -35,7 +55,7 @@ object RetrofitClient {
   private val retrofit = Retrofit.Builder()
     .baseUrl(BASE_URL)
     .client(client)
-    .addConverterFactory(GsonConverterFactory.create())
+    .addConverterFactory(GsonConverterFactory.create(gson))
     .build()
 
   /**

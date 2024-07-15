@@ -38,15 +38,32 @@ data class SingUpCredentials(
 )
 
 /**
- * Data class used to format the response of the server in the SignIn request.
+ * Sign in response
  *
- * @property emptyInput Error message for empty fields.
- * @property invalidCred Error message for invalid credentials.
- * @constructor Create empty Sign in error response
+ * @property status
+ * @property errors
+ * @constructor Create empty Sign in response
  */
-data class SignInErrorResponse(
-  @SerializedName("empty_input") val emptyInput: String,
-  @SerializedName("invalid_cred") val invalidCred: String,
+data class SignInResponse(
+  @SerializedName("status") val status : String,
+  @SerializedName("errors") val errors : List<SignInErrors>
+) {
+  /**
+   * Data class used to format the response of the server in the SignIn request.
+   *
+   * @property emptyInput Error message for empty fields.
+   * @property invalidCred Error message for invalid credentials.
+   * @constructor Create empty Sign in error response
+   */
+  data class SignInErrors(
+    @SerializedName("type") val errorType : String,
+    @SerializedName("message") val errorMessage: String,
+  )
+}
+
+data class LoggedOutResponse(
+  @SerializedName("status") val status : String,
+  @SerializedName("message") val message : String
 )
 
 /**
@@ -61,18 +78,34 @@ data class SignUpErrorResponse(
   @SerializedName("email_used") val emailUsed : String
 )
 
-data class MapPoint(
+data class CheckSessionResponse(
+  @SerializedName("status") val status : String,
+  @SerializedName("user") val userName : String
+)
+
+data class ThermalPoint(
   @SerializedName("id") val pointID : String,
   @SerializedName("coord_x") val latitude : Double,
   @SerializedName("coord_y") val longitude : Double,
-  val properties : PointProperties
-) {
-  data class PointProperties(
-    @SerializedName("temp") val temperature : Double,
-    @SerializedName("ph") val fieldPh : Double
-  )
 
-}
+  @SerializedName("temp") val temperature : Double,
+  @SerializedName("pH_campo") val fieldPh : Double,
+  @SerializedName("cond_campo") val fieldCond : Int,
+  @SerializedName("pH_lab") val labPh : Double,
+  @SerializedName("cond_lab") val labCond : Int,
+  @SerializedName("Cl") val chlorine : Double,
+  @SerializedName("Ca+") val calcium : Double,
+  @SerializedName("HCO3") val mgBicarbonate : Double,
+  @SerializedName("SO4") val sulfate : Double,
+  @SerializedName("Fe") val iron : String,
+  @SerializedName("Si") val silicon : Int,
+  @SerializedName("B") val boron : String,
+  @SerializedName("Li") val lithium : String,
+  @SerializedName("F") val fluorine : String,
+  @SerializedName("Na") val sodium : Double,
+  @SerializedName("K") val potassium : Double,
+  @SerializedName("MG+") val magnesiumIon : Double
+)
 
 /**
  * API interface that defines the services used in the application.
@@ -92,7 +125,7 @@ interface APIService {
   fun signIn(
     @Field("email") email: String,
     @Field("password") password: String
-  ): Call<List<SignInErrorResponse>>
+  ): Call<SignInResponse>
 
   /**
    * POST function to register the user.
@@ -118,9 +151,13 @@ interface APIService {
   @POST("map_data.inc.php")
   fun getMapPoints(
     @Field("region") region: String
-  ): Call<List<MapPoint>>
+  ): Call<List<ThermalPoint>>
+
+  @GET("check_session.php")
+  fun checkSession(
+  ): Call<CheckSessionResponse>
 
   @GET("logout.php")
   fun logout(
-  ): Call<Void>
+  ): Call<LoggedOutResponse>
 }

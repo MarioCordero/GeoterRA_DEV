@@ -10,7 +10,7 @@ import android.widget.Toast
 /**
  * Gallery manager
  *
- * @constructor Create empty Gallery manager
+ * @constructor Create empty Galler y manager
  */
 object GalleryManager {
 
