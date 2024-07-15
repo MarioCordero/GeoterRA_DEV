@@ -97,18 +97,18 @@
 					<form action="" method="post" class="add-point-form">
 
 						<p>
-							<label for="IDPoint" class="Montserrat-SemiBold">ID del punto</label>
-							<input type="text" class="Montserrat-Regular">
+							<label for="pointId" class="Montserrat-SemiBold">Nombre del punto</label>
+							<input name="pointId" type="text" class="Montserrat-Regular">
 						</p>
 
 						<p>
 							<label for="contactNumber" class="Montserrat-SemiBold">Número de contacto</label>
-							<input type="text" class="Montserrat-Regular">
+							<input name="contactNumber" type="text" class="Montserrat-Regular">
 						</p>
 
 						<p>
 							<label for="region" class="Montserrat-SemiBold">Fecha</label>
-							<input type="date" class="Montserrat-Regular">
+							<input name="region" type="date" class="Montserrat-Regular">
 						</p>
 						
 						<p>
@@ -135,12 +135,12 @@
 						
 						<p>
 							<label for="propietario" class="Montserrat-SemiBold">Propietario de la zona</label>
-							<input type="text" class="Montserrat-Regular">
+							<input name="propietario" type="text" class="Montserrat-Regular">
 						</p>
 						
 						<p>
-							<label for="temp" class="Montserrat-SemiBold">Uso actual</label>
-							<input type="text" class="Montserrat-Regular">
+							<label for="usoActual" class="Montserrat-SemiBold">Uso actual</label>
+							<input name="propietario" type="text" class="Montserrat-Regular">
 						</p>
 						
 						<p>
@@ -149,20 +149,20 @@
 
 								<div class="option">
 									<p>Si</p>
-									<input type="radio" name="options" value="si">
+									<input type="radio" name="burbujeo" value="1">
 								</div>
 
 								<div class="option">
 									<p>No</p>
-									<input type="radio" name="options" value="no">
+									<input type="radio" name="burbujeo" value="no">
 								</div>
 								
 							</div>
 						</p>
 						
 						<p>
-							<label for="burbujeo" class="Montserrat-SemiBold">Indicaciones para llegar al lugar</label>
-							<input type="textarea" class="Montserrat-Regular">
+							<label for="direccion" class="Montserrat-SemiBold">Indicaciones para llegar al lugar</label>
+							<input name="direccion" type="textarea" class="Montserrat-Regular">
 						</p>
 
 						<p>
@@ -171,8 +171,8 @@
 						</p>
 
 						<p>
-							<label for="burbujeo" class="Montserrat-SemiBold">Lugar en GPS</label>
-							<input type="text" class="Montserrat-Regular">
+							<label for="gps" class="Montserrat-SemiBold">Lugar en GPS</label>
+							<input name="gps" type="text" class="Montserrat-Regular">
 						</p>
 						
 						<input type="submit" class="send-add-point-form Montserrat-Bold" value="Enviar">
