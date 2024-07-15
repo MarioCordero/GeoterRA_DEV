@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/homeItem"
+        android:icon="@drawable/baseline_home_filled_24"
+        android:title="Inicio" />
+
+    <item
+        android:id="@+id/mapItem"
+        android:icon="@drawable/baseline_map_24"
+        android:title="Mapa" />
+
+    <item
+        android:id="@+id/dashboardItem"
+        android:icon="@drawable/baseline_article_24"
+        android:title="Actividad" />
+
+    <item
+        android:id="@+id/accountItem"
+        android:icon="@drawable/baseline_account_circle_24"
+        android:title="Cuenta" />
+
+</menu>
