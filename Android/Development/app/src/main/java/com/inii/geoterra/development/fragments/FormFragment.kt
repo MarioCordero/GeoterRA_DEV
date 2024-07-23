@@ -1,4 +1,4 @@
-package com.inii.geoterra.development.ui
+package com.inii.geoterra.development.fragments
 
 import android.app.Activity
 import android.content.Intent
@@ -13,33 +13,18 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.snackbar.Snackbar
 import com.inii.geoterra.development.R
-import com.inii.geoterra.development.components.GPSManager
-import com.inii.geoterra.development.components.GalleryManager
 import com.inii.geoterra.development.components.OnFragmentInteractionListener
+import com.inii.geoterra.development.components.services.GPSManager
+import com.inii.geoterra.development.components.services.GalleryManager
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.io.InputStream
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-private var listener: OnFragmentInteractionListener? = null
-
-
 class FormFragment : Fragment() {
-  // TODO: Rename and change types of parameters
-  private var param1 : String? = null
-  private var param2 : String? = null
-
-  override fun onCreate(savedInstanceState : Bundle?) {
-    super.onCreate(savedInstanceState)
-    arguments?.let {
-      param1 = it.getString(ARG_PARAM1)
-      param2 = it.getString(ARG_PARAM2)
-    }
-  }
+  private var listener: OnFragmentInteractionListener? = null
 
   override fun onCreateView(inflater : LayoutInflater,
                             container : ViewGroup?,
@@ -55,14 +40,23 @@ class FormFragment : Fragment() {
 
     locationButton.setOnClickListener {
       if (!GPSManager.isInitialized()) {
-        GPSManager.initialize(requireContext())
+          GPSManager.initialize(requireContext())
       } else {
         val userLocation = GPSManager.getLastKnownLocation()
-        Log.i("Coordenadas", "Latitud ${userLocation?.latitude}  y longitud ${userLocation?.longitude}")
+        Log.i("Coordenadas", "Latitud ${userLocation?.latitude}" +
+                "y longitud ${userLocation?.longitude}")
+        if (userLocation != null) {
+          Snackbar.make(
+            requireView(),
+            "Latitud ${userLocation.latitude} y longitud ${userLocation.longitude}",
+            Snackbar.LENGTH_LONG
+          ).show()
+        }
       }
     }
 
     imageButton.setOnClickListener {
+      Log.i("GalleryManager", "isInitialize: ${GalleryManager.isInitialize()}")
       if (!GalleryManager.isInitialize()) {
         GalleryManager.initialize(requireContext())
       } else {
@@ -71,29 +65,17 @@ class FormFragment : Fragment() {
     }
 
     sendButton.setOnClickListener {
-      val listener = activity as? OnFragmentInteractionListener
       listener?.onFragmentFinished()
     }
 
     return rootView
   }
 
-  companion object {
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FormFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    @JvmStatic
-    fun newInstance(param1 : String, param2 : String) = FormFragment().apply {
-      arguments = Bundle().apply {
-        putString(ARG_PARAM1, param1)
-        putString(ARG_PARAM2, param2)
-      }
+  private fun openGallery() {
+    lifecycleScope.launch {
+      val intent = Intent(Intent.ACTION_PICK)
+      intent.type = "image/*"
+      pickImageLauncher.launch(intent)
     }
   }
 
@@ -106,12 +88,6 @@ class FormFragment : Fragment() {
         handleImageUri(imageUri)
       }
     }
-  }
-
-  private fun openGallery() {
-    val intent = Intent(Intent.ACTION_PICK)
-    intent.type = "image/*"
-    pickImageLauncher.launch(intent)
   }
 
   private fun handleImageUri(imageUri: Uri?) {
@@ -137,6 +113,12 @@ class FormFragment : Fragment() {
           val latitude = latLong[0]
           val longitude = latLong[1]
           Log.i("Image Coor", "Latitud: $latitude, Longitud: $longitude")
+          Snackbar.make(
+            requireView(),
+            "Latitud $latitude y longitud $longitude",
+            Snackbar.LENGTH_LONG
+          ).show()
+
         } else {
           println("No se encontró información de ubicación en la imagen.")
         }
@@ -159,7 +141,7 @@ class FormFragment : Fragment() {
                                           permissions : Array<out String>,
                                           grantResults : IntArray) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    GalleryManager.handlePermissionResult(requestCode, grantResults, requireContext())
-    GPSManager.handlePermissionResult(requestCode, grantResults, requireContext())
+      GalleryManager.handlePermissionResult(requestCode, grantResults, requireContext())
+      GPSManager.handlePermissionResult(requestCode, grantResults, requireContext())
   }
 }

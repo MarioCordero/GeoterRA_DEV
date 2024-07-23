@@ -1,4 +1,4 @@
-package com.inii.geoterra.development.components
+package com.inii.geoterra.development.components.services
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
@@ -22,7 +22,7 @@ object GPSManager : LocationListener {
   /**
    * Request code for location permission.
    */
-  private const val LOCATION_REQUEST_CODE = 1000
+  private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
 
   private var isInitialized = false
 
@@ -33,7 +33,7 @@ object GPSManager : LocationListener {
    */
   fun initialize(context: Context) {
     if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-      ActivityCompat.requestPermissions(context as AppCompatActivity, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_REQUEST_CODE)
+      ActivityCompat.requestPermissions(context as AppCompatActivity, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
       return
     }
     locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -111,7 +111,7 @@ object GPSManager : LocationListener {
    * @param context The context used to show Toast messages.
    */
   fun handlePermissionResult(requestCode: Int, grantResults: IntArray, context: Context) {
-    if (requestCode == LOCATION_REQUEST_CODE) {
+    if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
       if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         Toast.makeText(context, "Permiso de ubicación concedido", Toast.LENGTH_SHORT).show()
       } else {

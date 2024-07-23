@@ -1,5 +1,5 @@
 [versions]
-agp = "8.5.0"
+agp = "8.5.1"
 gtEpsgHsql = "22.2"
 gtGeojsonVersion = "[30,)"
 gtMain = "25.0"

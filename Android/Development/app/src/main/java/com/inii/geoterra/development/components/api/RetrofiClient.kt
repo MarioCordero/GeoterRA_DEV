@@ -1,4 +1,4 @@
-package com.inii.geoterra.development.components
+package com.inii.geoterra.development.components.api
 
 import com.google.gson.GsonBuilder
 import okhttp3.Interceptor
@@ -16,7 +16,9 @@ object RetrofitClient {
   /**
    * Base URL for the API.
    */
-  private const val BASE_URL = "http://10.0.2.2:80/API/"
+  // 192.168.1.37:80 casa ip.
+  // 10.0.2.2:80 emulator ip.
+  private const val BASE_URL = "http://192.168.1.37:80/API_XPP/"
 
   /**
    * Interceptor for logging HTTP request and response data.

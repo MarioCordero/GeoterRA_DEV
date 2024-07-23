@@ -1,4 +1,4 @@
-package com.inii.geoterra.development.ui
+package com.inii.geoterra.development.fragments
 
 import android.os.Bundle
 import android.util.Log
@@ -10,11 +10,11 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.inii.geoterra.development.components.SignUpErrorResponse
-import com.inii.geoterra.development.components.OnFragmentInteractionListener
-import com.inii.geoterra.development.components.RetrofitClient
-import com.inii.geoterra.development.components.SingUpCredentials
 import com.inii.geoterra.development.R
+import com.inii.geoterra.development.components.OnFragmentInteractionListener
+import com.inii.geoterra.development.components.api.RetrofitClient
+import com.inii.geoterra.development.components.api.SignUpErrorResponse
+import com.inii.geoterra.development.components.api.SingUpCredentials
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -22,8 +22,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
@@ -33,17 +31,7 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class SignUpFragment : Fragment() {
-  // TODO: Rename and change types of parameters
-  private var param1 : String? = null
-  private var param2 : String? = null
-
-  override fun onCreate(savedInstanceState : Bundle?) {
-    super.onCreate(savedInstanceState)
-    arguments?.let {
-      param1 = it.getString(ARG_PARAM1)
-      param2 = it.getString(ARG_PARAM2)
-    }
-  }
+  private var listener : OnFragmentInteractionListener? = null
 
   override fun onCreateView(inflater : LayoutInflater,
                             container : ViewGroup?,
@@ -61,14 +49,15 @@ class SignUpFragment : Fragment() {
       val phoneNum = rootView.findViewById<EditText>(R.id.userPhoneNum).text.toString().trim()
 
       Log.i("Tomado de datos en login", "$email $password")
+
       if (email.isNotBlank() && password.isNotBlank()) {
         if (email.isValidEmail() && password.length >= 8) {
           val credentials = SingUpCredentials(
-            email = email,
-            password = password,
-            firstName = firstName,
-            lastName = lastName,
-            phoneNumber = phoneNum
+              email = email,
+              password = password,
+              firstName = firstName,
+              lastName = lastName,
+              phoneNumber = phoneNum
           )
           createUser(credentials)
 
@@ -87,35 +76,16 @@ class SignUpFragment : Fragment() {
     return rootView
   }
 
-  companion object {
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SignUpFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    @JvmStatic
-    fun newInstance(param1 : String, param2 : String) = SignUpFragment().apply {
-      arguments = Bundle().apply {
-        putString(ARG_PARAM1, param1)
-        putString(ARG_PARAM2, param2)
-      }
-    }
-  }
-
   private fun createUser(credentials : SingUpCredentials) {
     lifecycleScope.launch(Dispatchers.IO) {
       try {
-        withContext(Dispatchers.Main) {
-          sendCredentials(credentials)
-        }
+          withContext(Dispatchers.Main) {
+              sendCredentials(credentials)
+          }
       } catch (e: Exception) {
-        withContext(Dispatchers.Main) {
-          showError(e.message ?: "Error desconocido")
-        }
+          withContext(Dispatchers.Main) {
+              showError(e.message ?: "Error desconocido")
+          }
       }
     }
   }
@@ -128,28 +98,29 @@ class SignUpFragment : Fragment() {
 
     call.enqueue(object : Callback<List<SignUpErrorResponse>> {
       override fun onResponse(call : Call<List<SignUpErrorResponse>>,
-                              response : Response<List<SignUpErrorResponse>>) {
+                              response : Response<List<SignUpErrorResponse>>
+      ) {
         if (response.isSuccessful) {
           val errorResponse = response.body()
           if (errorResponse != null) {
             if (errorResponse.isEmpty()) {
               // Caso donde la respuesta del servidor indica éxito pero devuelve un arreglo vacío de errores
-              Log.i("Success", "Login exitoso sin errores adicionales")
+                Log.i("Success", "Login exitoso sin errores adicionales")
               endFragment()
             } else {
               // Caso donde hay errores específicos que manejar
-              Log.i("Error", "Server returned errors: $errorResponse")
+                Log.i("Error", "Server returned errors: $errorResponse")
               handleServerErrors(errorResponse)
             }
           }
         } else {
-          Log.i("Error", "Unexpected code ${response.code()}")
+            Log.i("Error", "Unexpected code ${response.code()}")
           showError("Error en la respuesta del servidor: ${response.code()}")
         }
       }
 
       override fun onFailure(call : Call<List<SignUpErrorResponse>>, t : Throwable) {
-        Log.i("Error conexion", "Error: ${t.message}")
+          Log.i("Error conexion", "Error: ${t.message}")
         showError("Error de conexión: ${t.message}")
       }
 
@@ -183,7 +154,6 @@ class SignUpFragment : Fragment() {
   }
 
   private fun endFragment() {
-    val listener = activity as? OnFragmentInteractionListener
     listener?.onFragmentFinished()
   }
 

@@ -1,4 +1,4 @@
-package com.inii.geoterra.development.components
+package com.inii.geoterra.development.components.api
 
 import com.google.gson.annotations.SerializedName
 import retrofit2.Call
@@ -46,20 +46,20 @@ data class SingUpCredentials(
  */
 data class SignInResponse(
   @SerializedName("status") val status : String,
-  @SerializedName("errors") val errors : List<SignInErrors>
-) {
-  /**
-   * Data class used to format the response of the server in the SignIn request.
-   *
-   * @property emptyInput Error message for empty fields.
-   * @property invalidCred Error message for invalid credentials.
-   * @constructor Create empty Sign in error response
-   */
-  data class SignInErrors(
-    @SerializedName("type") val errorType : String,
-    @SerializedName("message") val errorMessage: String,
-  )
-}
+  @SerializedName("errors") val errors : List<Error>
+)
+
+/**
+ * Data class used to format the response of the server in the SignIn request.
+ *
+ * @property type Error message for empty fields.
+ * @property message Error message for invalid credentials.
+ * @constructor Create empty Sign in error response
+ */
+data class Error(
+  @SerializedName("type") val type : String,
+  @SerializedName("message") val message: String,
+)
 
 data class LoggedOutResponse(
   @SerializedName("status") val status : String,
@@ -81,6 +81,34 @@ data class SignUpErrorResponse(
 data class CheckSessionResponse(
   @SerializedName("status") val status : String,
   @SerializedName("user") val userName : String
+)
+
+//$request_fields["IDPoint"] = $_POST["point_id"];
+//$request_fields["region"] = $_POST["region"];
+//$request_fields["fecha"] = $_POST["date"];
+//
+//$request_fields["propietario"] = $_POST["owner"];
+//$request_fields["uso_actual"] = $_POST["current_usage"];
+//$request_fields["direccion"] = $_POST["address"];
+//$request_fields["num_telefono"] = $_POST["contact_number"];
+//
+//$request_fields["gps"] = $_POST["coordinates"];
+//
+//$request_fields["sens_termica"] = $_POST["thermal_sensation"];
+//$request_fields["burbujeo"] = $_POST["bubbles"];
+
+data class RequestForm(
+  @Field("point_id") var pointID : String,
+  @Field("region") var region : String,
+  @Field("date") var date : String,
+
+  @Field("owner") var owner : String,
+  @Field("current_usage") var currentUsage : String,
+  @Field("address") var address : String,
+  @Field("contact_number") var contactNumber : Int,
+
+  @Field("thermal_sensation") var thermalSensation : Int,
+  @Field("bubbles") var bubbles : Boolean
 )
 
 data class ThermalPoint(

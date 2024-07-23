@@ -14,10 +14,10 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.inii.geoterra.development.components.ActivityNavigator
 import com.inii.geoterra.development.components.CustomInfoOnMarker
-import com.inii.geoterra.development.components.GPSManager
-import com.inii.geoterra.development.components.RetrofitClient
-import com.inii.geoterra.development.components.SessionManager
-import com.inii.geoterra.development.components.ThermalPoint
+import com.inii.geoterra.development.components.services.GPSManager
+import com.inii.geoterra.development.components.api.RetrofitClient
+import com.inii.geoterra.development.components.services.SessionManager
+import com.inii.geoterra.development.components.api.ThermalPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

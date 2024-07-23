@@ -8,7 +8,7 @@
     android:layout_marginEnd="16dp"
     android:layout_marginTop="20dp"
     android:layout_marginBottom="65dp"
-    tools:context=".ui.FormFragment">
+    tools:context=".fragments.FormFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -17,6 +17,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="24dp"
             android:orientation="vertical">
 
             <TextView
