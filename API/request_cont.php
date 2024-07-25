@@ -31,9 +31,9 @@ function check_fields(array &$request_fields, array &$errors)
   {
     $request_fields['propietario'] = 'NoInfo';
   }
-  if (empty($request_fields['usoActual']))
+  if (empty($request_fields['uso_actual']))
   {
-    $request_fields['usoActual'] = 'NoInfo';
+    $request_fields['uso_actual'] = 'NoInfo';
   }
 
   return true;
@@ -41,27 +41,27 @@ function check_fields(array &$request_fields, array &$errors)
 
 function validate_fields($request_fields, &$errors) {
   // Revisa si el nombre del punto esta vacio
-  if(empty($request_fields['pointId']))
+  if(empty($request_fields['IDPoint']))
   {
-    $errors['pointId'] = 'empty_field';
+    $errors['point_id'] = 'empty_field';
   }
 
   // Revisa que el numero de telefono no este vacio y que sea valido
   if(!empty($request_fields['contactNumber'])) 
   {
-    if (!preg_match("/^\d{8}$/", $request_fields["contactNumber"])) {
-      $errors['contactNumber'] = "invalid_format";
+    if (!preg_match("/^\d{8}$/", $request_fields["num_telefono"])) {
+      $errors['contact_number'] = "invalid_format";
     }
   } 
   else
   {
-    $errors['contactNumber'] = 'empty_field';
+    $errors['contact_number'] = 'empty_field';
   }
 
   // Revisa si la direccion esta vacia
   if(empty($request_fields['direccion'])) 
   {
-    $errors['direccion'] = 'empty_field';
+    $errors['address'] = 'empty_field';
   }
 }
 
@@ -77,7 +77,7 @@ function convert_fields(array &$request_fields, array &$errors) {
   }
   else 
   {
-    $errors['burbujeo'] = 'invalid_field';
+    $errors['bubbles'] = 'invalid_field';
   }
 
   // Revisa que la fecha brindada pueda ser formateada para mysql
@@ -88,7 +88,7 @@ function convert_fields(array &$request_fields, array &$errors) {
   }
   else 
   {
-    $errors['fecha'] = 'invalid_field';
+    $errors['date'] = 'invalid_field';
   }
 
   if (!empty($request_fields['gps']))

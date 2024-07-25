@@ -3,16 +3,19 @@
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
   // Catches the username and password
-  $request_fields["pointId"] = $_POST["pointId"];
-  $request_fields["contactNumber"] = $_POST["contactNumber"];
-  $request_fields["fecha"] = $_POST["fecha"];
-  $request_fields["sens_termica"] = $_POST["sens_termica"];
-  $request_fields["propietario"] = $_POST["propietario"];
-  $request_fields["usoActual"] = $_POST["usoActual"];
-  $request_fields["burbujeo"] = $_POST["burbujeo"];
-  $request_fields["direccion"] = $_POST["direccion"];
-  $request_fields["foto"] = $_POST["foto"];
-  $request_fields["gps"] = $_POST["gps"];
+  $request_fields["IDPoint"] = $_POST["point_id"];
+  $request_fields["region"] = $_POST["region"];
+  $request_fields["fecha"] = $_POST["date"];
+
+  $request_fields["propietario"] = $_POST["owner"];
+  $request_fields["uso_actual"] = $_POST["current_usage"];
+  $request_fields["direccion"] = $_POST["address"];
+  $request_fields["num_telefono"] = $_POST["contact_number"];     
+
+  $request_fields["gps"] = $_POST["coordinates"];
+
+  $request_fields["sens_termica"] = $_POST["thermal_sensation"];
+  $request_fields["burbujeo"] = $_POST["bubbles"];
 
   try {
     $errors = [];
