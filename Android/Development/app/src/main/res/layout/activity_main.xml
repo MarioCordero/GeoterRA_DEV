@@ -14,8 +14,6 @@
 
         android:layout_margin="10dp"
 
-        android:padding="15dp"
-
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/bottom_menu"
         app:layout_constraintStart_toStartOf="parent"
@@ -100,7 +98,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
+
+                android:layout_marginTop="15dp"
+                android:padding="15dp"
 
                 android:orientation="vertical">
 
@@ -131,8 +131,10 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
+
+                android:layout_marginTop="15dp"
                 android:layout_marginBottom="150dp"
+                android:padding="15dp"
 
                 android:gravity="center"
                 android:orientation="horizontal">
