@@ -10,29 +10,41 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.snackbar.Snackbar
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.components.OnFragmentInteractionListener
+import com.inii.geoterra.development.components.api.RequestForm
 import com.inii.geoterra.development.components.services.GPSManager
 import com.inii.geoterra.development.components.services.GalleryManager
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.io.InputStream
+import android.widget.CheckBox
+import com.inii.geoterra.development.components.api.Error
+import com.inii.geoterra.development.components.api.RequestResponse
+import com.inii.geoterra.development.components.api.RetrofitClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class FormFragment : Fragment() {
-  private var listener: OnFragmentInteractionListener? = null
+  private lateinit var rootView : View
+  private var listener : OnFragmentInteractionListener? = null
+  private lateinit var requestForm : RequestForm
 
   override fun onCreateView(inflater : LayoutInflater,
                             container : ViewGroup?,
                             savedInstanceState : Bundle?)
-  : View? {
-    val rootView = inflater.inflate(R.layout.fragment_form, container, false)
+  : View {
+     rootView = inflater.inflate(R.layout.fragment_form, container, false)
     // Inflate the layout for this fragment
     // Creates an object that manage the location requests.
+    listener = activity as? OnFragmentInteractionListener
+    requestForm = RequestForm("", "", "", "", "", "", 0, "", 0, 0)
 
     val locationButton = rootView.findViewById<Button>(R.id.userLocationButton)
     val imageButton = rootView.findViewById<Button>(R.id.locationImageButton)
@@ -46,11 +58,9 @@ class FormFragment : Fragment() {
         Log.i("Coordenadas", "Latitud ${userLocation?.latitude}" +
                 "y longitud ${userLocation?.longitude}")
         if (userLocation != null) {
-          Snackbar.make(
-            requireView(),
-            "Latitud ${userLocation.latitude} y longitud ${userLocation.longitude}",
-            Snackbar.LENGTH_LONG
-          ).show()
+          Toast.makeText(requireContext(), "Latitud ${userLocation.latitude} y longitud ${userLocation.longitude}", Toast.LENGTH_SHORT).show()
+          requestForm.coordinates = "${userLocation.latitude}, ${userLocation.longitude}"
+          Log.i("Coordenadas", requestForm.coordinates)
         }
       }
     }
@@ -65,10 +75,87 @@ class FormFragment : Fragment() {
     }
 
     sendButton.setOnClickListener {
+      getFormData()
+      sendRequest()
       listener?.onFragmentFinished()
     }
 
     return rootView
+  }
+
+  private fun getFormData() {
+    lifecycleScope.launch {
+      try {
+        val name = rootView.findViewById<EditText>(R.id.nameTxtInput).text.toString()
+        val phoneNumber = rootView.findViewById<EditText>(R.id.phoneNumberTxtInput).text.toString().toInt()
+        val date = rootView.findViewById<EditText>(R.id.dateTxtInput).text.toString()
+        val thermalSensation = rootView.findViewById<EditText>(R.id.thermalSensationTxtInput).text.toString().toInt()
+        val zoneOwner = rootView.findViewById<EditText>(R.id.zoneOwnerTxtInput).text.toString()
+        val currentUsage = rootView.findViewById<EditText>(R.id.currentUsageTxtInput).text.toString()
+        val address = rootView.findViewById<EditText>(R.id.indicationsTxtInput).text.toString()
+        val bubbles = if (rootView.findViewById<CheckBox>(R.id.bubbleCheckBox).isChecked) 1 else 0
+
+        requestForm.pointID = name
+        requestForm.contactNumber = phoneNumber
+        requestForm.date = date
+        requestForm.thermalSensation = thermalSensation
+        requestForm.owner = zoneOwner
+        requestForm.currentUsage = currentUsage
+        requestForm.address = address
+        requestForm.bubbles = bubbles
+
+        Log.i("Datos del formulario", requestForm.toString())
+
+      } catch (e : Exception) {
+          e.printStackTrace()
+      }
+    }
+  }
+
+  private fun sendRequest() {
+    val apiService = RetrofitClient.getAPIService()
+    val call = apiService.newRequest(requestForm.pointID, requestForm.region, requestForm.date,
+      requestForm.owner, requestForm.currentUsage, requestForm.address, requestForm.contactNumber,
+      requestForm.coordinates ,requestForm.thermalSensation, requestForm.bubbles)
+
+    call.enqueue(object : Callback<RequestResponse>{
+      override fun onResponse(call: Call<RequestResponse>, response: Response<RequestResponse>) {
+        if (response.isSuccessful) {
+          val serverResponse = response.body()
+          if (serverResponse != null) {
+            val status = serverResponse.status
+            val errors = serverResponse.errors
+            if (errors.isEmpty()) {
+              if (status == "request_created") {
+                Toast.makeText(requireContext(), "Solicitud creada correctamente.", Toast.LENGTH_SHORT).show()
+              } else {
+                Toast.makeText(requireContext(), "Error al crear la solicitud.", Toast.LENGTH_SHORT).show()
+              }
+            } else {
+              handleServerErrors(errors)
+            }
+          }
+        }
+      }
+
+      override fun onFailure(call: Call<RequestResponse>, t: Throwable) {
+        Log.i("Error conexion", "Error: ${t.message}")
+        showError("Error de conexión: ${t.message}")
+      }
+
+    })
+  }
+
+  private fun handleServerErrors(errors : List<Error>) {
+    // Verifica si la lista de errores no es nula y no está vacía
+    for (error in errors) {
+      Log.i(error.type, error.message)
+    }
+  }
+
+  private fun showError(message: String) {
+    // Se le muestra el mensaje de error al usuario.
+    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
   }
 
   private fun openGallery() {
@@ -113,14 +200,10 @@ class FormFragment : Fragment() {
           val latitude = latLong[0]
           val longitude = latLong[1]
           Log.i("Image Coor", "Latitud: $latitude, Longitud: $longitude")
-          Snackbar.make(
-            requireView(),
-            "Latitud $latitude y longitud $longitude",
-            Snackbar.LENGTH_LONG
-          ).show()
-
+          Toast.makeText(requireContext(), "Latitud: $latitude, Longitud: $longitude", Toast.LENGTH_SHORT).show()
+          requestForm.coordinates = "$latitude, $longitude"
         } else {
-          println("No se encontró información de ubicación en la imagen.")
+          Toast.makeText(requireContext(), "La imagen seleccionada no contiene información de coordenadas.", Toast.LENGTH_SHORT).show()
         }
       } else {
         Toast.makeText(requireContext(), "No se pudo abrir la imagen.", Toast.LENGTH_SHORT).show()
