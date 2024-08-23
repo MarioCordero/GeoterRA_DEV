@@ -6,7 +6,7 @@ $(document).ready(function () {
 
 function checkSession() {
     $.ajax({
-        url: 'assets/includes/check_session.php',
+        url: '../../../API/check_session.php',
         type: 'GET',
         dataType: 'json',
         success: function (response) {
