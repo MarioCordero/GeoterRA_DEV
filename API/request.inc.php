@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     require_once 'request_model.inc.php';
     require_once 'request_cont.php';
 
-    if(check_fields($request_fields, $errors)) {
+    if(!check_fields($request_fields, $errors)) {
       echo json_encode(['status' => 'fields_wrong', 'errors' => $errors]);
       die();
     }
