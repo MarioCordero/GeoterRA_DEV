@@ -24,8 +24,10 @@ if (!isset($_SESSION["last_regeneration"])) {
     }
 }
 
-function regen_session_id() {
-    session_regenerate_id(true);  // True to delete the old session ID
-    $_SESSION["last_regeneration"] = time();
-}
+function regen_session_id(){
+
+		session_regenerate_id();
+		$_SESSION["last_regeneration"] = time();
+		
+	}
 ?>

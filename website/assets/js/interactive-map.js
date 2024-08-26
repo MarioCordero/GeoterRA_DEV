@@ -68,19 +68,20 @@ function fetchData(region) {
         // This object is used to interact with servers and allows you to send HTTP 
         // requests and receive responses asynchronously, without reloading the web page.
         let xhr = new XMLHttpRequest();
-        xhr.open("POST", "assets/includes/map_data.inc.php", true);
+        xhr.open("POST", "../../../API/map_data.inc.php", true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        // Send a query to map_data.inc.php, asking for "region" value
+        // Send a query to map_data.inc., asking for "region" value
         xhr.send(`region=${region}`);
 
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4 && xhr.status == 200) {
                 let splittedResponse = xhr.responseText.split("}");
+
                 for (let i = 0; i < splittedResponse.length - 1; i++) {
                     splittedResponse[i] += '}';
                 }
                 for (let i = 0; i < splittedResponse.length - 1; i++) {
-                    obtainedPoints[i] = JSON.parse(splittedResponse[i]);
+                    obtainedPoints[i] = JSON.parse(splittedResponse[i].slice(1));
                 }
                 resolve(obtainedPoints);
 
