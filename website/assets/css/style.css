@@ -1,22 +1,63 @@
-/* 
-https://www.psico.ucr.ac.cr/images/recursos/2019_manual-identidad-visual-web.pdf
-*/
 :root{
+/* Color Palette */
 
-	--azul:#005da4;
+    /* Primary colors */
+	--naranja:#F39C29;
+	--azul:#084F9D;
+	--negro: #000000;
 	--blanco: #ffffff;
-	--grisClaro: #ececec;
-	--grisOscuro: #bfc4d4;
-	--cafe1: #B76E11;
+
+	/* Secundary colors */
+	--celesteClaro:#A6C3E3FF;
+	--grisClaro: #ECECEC;
 	--celeste:#00c0f3;
+	--cafe: #B66E0FFF;
+
+	/* Aux colors */
+	--azulOscuro:#12467E;
+	--naranjaClaro:#e5b365;
+
 	--celeste2:#8ed8f8;
 	--celeste3:#bad2cd;
-    --celeste4:#80a9ba;
-	--naranja1:#e5b365;
-	--naranja2:#f99d1c;
-	--negro: #000000;
+    --celeste4:#8aa1ac;
 	--rojo: #fc2323;
 }
+
+/* ------------------------------FORMAT------------------------------ */
+.justify_text{
+	text-align: justify;
+}
+.justify_right{
+	float: right;
+	text-align: right;
+}
+.center-text{
+	text-align: center;
+}
+
+/* ------------------------------FONTS------------------------------ */
+.Montserrat-Light{
+	font-family:Montserrat-Light !important;
+}.Montserrat-Regular{
+	font-family:Montserrat-Regular !important;
+}.Montserrat-Medium{
+	font-family:Montserrat-Medium !important;
+}.Montserrat-SemiBold{
+	font-family:Montserrat-SemiBold !important;
+}.Montserrat-Bold{
+	font-family:Montserrat-Bold !important;
+}.Montserrat-ExtraBold{
+	font-family:Montserrat-ExtraBold !important;
+}
+
+.Poppins-Light{
+	font-family:Poppins-Light !important;
+}.Poppins-SemiBold{
+	font-family:Poppins-SemiBold !important;
+}.Poppins-Bold{
+	font-family:Poppins-Bold !important;
+}
+
 /* ------------------------------GENERAL------------------------------ */
 html {
 	scroll-behavior: smooth;
@@ -207,7 +248,7 @@ html {
 
 /* LOADER */
 .web-loader{
-	background-color: #fff;
+	background-color: var(--blanco);
 	position: fixed;
 	width: 100%;
 	height: 100%;
@@ -227,36 +268,15 @@ html {
 .footer-container{
 	bottom: 0;
     overflow: hidden;
-    background-color: #000000;
+    background-color: var(--negro);
     padding: 1em 1em;
 }.footer{
 	color: #fff;
 	font-size: 12px;
 }
 
-/* ------------------------------FORMAT------------------------------ */
-.justify_text{
-	text-align: justify;
-}
-.justify_right{
-	float: right;
-	text-align: right;
-}
-.center-text{
-	text-align: center;
-}
-
-/* ------------------------------FONTS------------------------------ */
-.Montserrat-Regular{
-	font-family:Montserrat-Regular !important;
-}.Montserrat-Light{
-	font-family:Montserrat-Light !important;
-}.Montserrat-SemiBold{
-	font-family:Montserrat-SemiBold !important;
-}.Montserrat-Bold{
-	font-family:Montserrat-Bold !important;
-}.Montserrat-ExtraBold{
-	font-family:Montserrat-ExtraBold !important;
+.footer-logged{
+	background-color: var(--azul);
 }
 
 /* ------------------------------index.html------------------------------ */
@@ -482,7 +502,7 @@ html {
 	border: 0;
 	outline: 0;
 	border-radius: 5px;
-	background: white;
+	background: var(--blanco);
 	color: rgba(70, 185, 218, 0.8);
 	font-weight: bold;
 	cursor: pointer;
@@ -504,7 +524,7 @@ html {
 	text-align: center;
 	position: relative;
 	top: 5px;
-	color: var(--naranja2);
+	color: var(--naranja);
 }
 
 .login-form {
@@ -557,7 +577,7 @@ html {
 	display: block;
 	margin: 5vh auto;
 	transition: all 250ms ease;
-	background-color: var(--naranja2);
+	background-color: var(--naranja);
 	color: var(--blanco);
 	font-size: 20px;
 	min-width: min-content;
@@ -703,11 +723,11 @@ html {
 }
 
 .user-info{
+	color: var(--blanco);
 	padding: 2% 10%;
     display: flex;
     flex-direction: column;
     gap: 20px;
-	min-height: 60vh;
 }
 
 .user-info-col-container{
@@ -717,35 +737,53 @@ html {
 }
 
 .user-info-col{
-	background-color: var(--grisOscuro);
+	background-color: var(--azul);
 	box-shadow: rgba(80, 80, 80, 0.58) 0px 0px 20px 0px;
 	border-radius: 8px;
 	text-align: justify;
 	line-height: 2;
 	flex: 1;
 	padding: 10px;
-	min-height: 50vh;
 }
 
 .user-personal-data{
 	margin: 5% 10%;
+}.user-personal-data li{
+	display: flex;
+	margin: 4vh auto;
+	justify-content: space-between;
+}.user-personal-data li h3{
+	padding: 1vh 0vh;
+	width: 40%;
+}.user-personal-data li p{
+	background-color: var(--azulOscuro);
+	width: 100%;
+	padding: 1vh 0.5vh;
+	border-bottom: var(--naranja) 1px solid;
 }.user-personal-data button{
+	background-color: var(--naranja);
+	color: var(--blanco);
 	border: 4px solid transparent;
-	width: 50%;
-	display: block;
-	background-color: var(--azul);
-	font-size: 20px;
+	width: 40%;
 	margin: 5% auto;
 	padding: 2%;
+	display: block;
+	font-size: 20px;
 	border-radius: 8px;
-	color: var(--blanco);
 	transition: all 250ms ease;
 }.user-personal-data button:hover{
-	background-color: var(--blanco);
-	border: 4px solid var(--negro);
-	color: var(--negro);
+	border: var(--grisClaro) solid 4px;
 	cursor: pointer;
 	transition: all 250ms ease;
+}
+
+/* ERASE IN THE FUTURE */
+iframe {
+	width: 100%;
+	height: 400px;
+	border: 5px solid var(--azul);
+	border-radius: 10px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .user-requests{
@@ -754,20 +792,54 @@ html {
 	list-style: none !important;
 	text-decoration: none;
 }.user-requests li{
-	border: 4px solid transparent;
-	width: 100%;
-	background-color: var(--azul);
-	font-size: 20px;
-	margin: 5% auto;
-	border-radius: 8px;
+	background-color: var(--naranja);
 	color: var(--blanco);
+	display: flex;
+	justify-content: space-between;
+	width: 50%;
+	margin: 2vh auto;
+	min-height: 2vh;
+	font-size: 20px;
+	border-radius: 8px;
 	transition: all 250ms ease;
-}.user-requests li:hover{
+}.user-requests p{
+	margin: 2vh 0vh;
+}.user-requests li div{
 	background-color: var(--blanco);
-	border: 4px solid var(--negro);
-	color: var(--negro);
+	width: 40%;
+	display: flex;
+	align-items: center;
+	border-radius: 8px;
+}.user-requests li div a img{
+	width: 40%;
+}.user-requests li:hover{
+	cursor: default;
+	transition: all 250ms ease;
+}.user-requests ul{
+	padding: 3vh 0vh;
+	background-color: var(--azulOscuro);
+	border-radius: 4px;
+}.user-requests button{
+	background-color: var(--naranja);
+    color: var(--blanco);
+    border: 4px solid transparent;
+    width: 40%;
+    margin: 5% auto;
+    padding: 2%;
+    display: block;
+    font-size: 20px;
+    border-radius: 8px;
+    transition: all 250ms ease;
+}.user-requests button:hover{
+	border: var(--grisClaro) solid 4px;
 	cursor: pointer;
 	transition: all 250ms ease;
+}
+
+.linea-vertical-IDpunto{
+	border: 1px solid var(--naranja);
+	background-color: var(--naranja) !important;
+    height: 60%;
 }
 
 .buttons-container {
@@ -779,15 +851,13 @@ html {
 	border: 4px solid transparent;
 	width: 20%;
 	padding: 2%;
-	background-color: var(--azul);
+	background-color: var(--naranja);
 	font-size: 20px;
 	border-radius: 8px;
 	color: var(--blanco);
 	transition: all 250ms ease;
 }.buttons-container button:hover{
-	background-color: var(--blanco);
-	border: 4px solid var(--negro);
-	color: var(--negro);
+	border: 4px solid var(--grisClaro);
 	cursor: pointer;
 	transition: all 250ms ease;
 }

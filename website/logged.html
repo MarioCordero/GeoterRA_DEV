@@ -86,71 +86,111 @@
 				</div>
 				<!--------------------------------END LOADER------------------------------->
 
-				<h1 class="center-text">BIENVENIDO XXXXX</h1>
+				<h1 class="center-text">Bienvenida persona usuaria</h1>
 
 				<div class="user-info">
-					<!-- PERSONAL INFO -->
-
+					
+					<!-- PERSONAL INFO LEFT COL-->
 					<div class="user-info-col-container">
 
+						<!-- TODO[] : Hay que poner la información de cada usuario en la etiqueta correspondiente <p> </p> -->
 						<div class="user-info-col">
-							<h2 class="center-text">Información la persona usuaria</h2>
-							<hr>
+
 							<ul class="user-personal-data">
+
+								<h2 class="center-text Poppins-Bold">Información la persona usuaria</h2>
+
 								<li>
-									<h3>NOMBRE</h3>
-									<p>XXXXX</p>
+									<h3 class="Poppins-SemiBold">NOMBRE</h3>
+									<p class="Poppins-Light">Nombre ejemplo</p>
 								</li>
 
 								<li>
-									<h3>CORREO</h3>
-									<p>XXXXX</p>
+									<h3 class="Poppins-SemiBold">CORREO</h3>
+									<p class="Poppins-Light">ejemplo@tucorreo.com</p>
 								</li>
 
 								<li>
-									<h3>TELÉFONO</h3>
-									<p>XXXXX</p>
+									<h3 class="Poppins-SemiBold">TELÉFONO</h3>
+									<p class="Poppins-Light">0000-0000</p>
 								</li>
 
-								<button id="###">Editar información</button>
+								<button id="###" class="Montserrat-Medium">Editar</button>
 
 							</ul>
 
-							<h2 class="center-text">Como agregar puntos al mapa</h2>
-							<hr>
 							<ul class="user-personal-data">
-								<li>
-									<h3>Paso 1</h3>
-									<p>XXXXX</p>
-								</li>
 
-								<li>
-									<h3>Paso 2</h3>
-									<p>XXXXX</p>
-								</li>
+								<h2 class="center-text Poppins-Bold">Como agregar puntos al mapa</h2>
+
+								<iframe 
+									src="https://www.youtube.com/embed/0_CBDySHfMw" 
+									title="YouTube video player" 
+									frameborder="0" 
+									allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+									allowfullscreen>
+								</iframe>
 
 							</ul>
 
 						</div>
+						
 	
-						<!-- REQUEST INFO -->
+						<!-- REQUESTS OF THE USER RIGTH COL-->
 						<div class="user-info-col">
 
-							<h2 class="center-text">Solicitudes hechas por el usuario</h2>
-							<hr>
 							<div class="user-requests">
+
+								<h2 class="center-text Poppins-Bold">Solicitudes hechas por el usuario</h2>
+
+								<!-- LIST OF THE USER REQUESTS -->
 								<ul class="center-text">
-									<li>Solicitud #1</li>
-									<li>Solicitud #2</li>
-									<li>Solicitud #3</li>
+
+									<li>
+										<p>ID Punto</p>
+
+										<!-- CAMBIAR POR BUTTONS? -->
+										<div>
+											<a href=""><img src="./assets/images/icons/ojo.png" alt=""></a>
+											<div class="linea-vertical-IDpunto"></div>
+											<a href=""><img src="./assets/images/icons/eliminar.png" alt=""></a>
+										</div>
+									</li>
+									
+									<li>
+										<p>ID Punto</p>
+
+										<!-- CAMBIAR POR BUTTONS? -->
+										<div>
+											<a href=""><img src="./assets/images/icons/ojo.png" alt=""></a>
+											<div class="linea-vertical-IDpunto"></div>
+											<a href=""><img src="./assets/images/icons/eliminar.png" alt=""></a>
+										</div>
+									</li>
+
+									<li>
+										<p>ID Punto</p>
+
+										<!-- CAMBIAR POR BUTTONS? -->
+										<div>
+											<a href=""><img src="./assets/images/icons/ojo.png" alt=""></a>
+											<div class="linea-vertical-IDpunto"></div>
+											<a href=""><img src="./assets/images/icons/eliminar.png" alt=""></a>
+										</div>
+									</li>
 								</ul>
+
+								<!-- TODO[] : Hacer que este button nos redireccione a "addpoint.html" -->
+								<!-- <a href="addpoint.html" id="boton">Crear solicitud</a> -->
+								<button id="###" class="Montserrat-Medium">Agregar</button>
+
 							</div>
-
 						</div>
-
 					</div>
+
 				</div>
 
+				<!-- TODO[] : Hacer un logout decente, evitar codigo de JS en el HTML -->
 				<div class="buttons-container">
 					<button id="logout-btn">Cerrar Sesión</button>
 					<script>
@@ -167,8 +207,6 @@
 							xhr.send();
 						});
 					</script>
-
-					<a href="addpoint.html" id="boton">Crear solicitud</a>
 				</div>
 				
 
@@ -176,7 +214,7 @@
 			</div>
 
 			<!-- FOOTER -->
-			<footer class="footer-container">
+			<footer class="footer-container footer-logged">
 				<div class="footer center-text Montserrat-Regular">
 					
 					<p> © 2021 Instituto de Investigaciones en Ingeniería - Universidad de Costa Rica.Ciudad Universitaria Rodrigo Facio </p>
