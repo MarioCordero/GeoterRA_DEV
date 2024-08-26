@@ -796,17 +796,17 @@ iframe {
 	color: var(--blanco);
 	display: flex;
 	justify-content: space-between;
-	width: 50%;
+	width: 70%;
 	margin: 2vh auto;
 	min-height: 2vh;
 	font-size: 20px;
 	border-radius: 8px;
 	transition: all 250ms ease;
 }.user-requests p{
-	margin: 2vh 0vh;
+	margin: 2vh 1vh;
 }.user-requests li div{
 	background-color: var(--blanco);
-	width: 40%;
+	width: 30%;
 	display: flex;
 	align-items: center;
 	border-radius: 8px;
