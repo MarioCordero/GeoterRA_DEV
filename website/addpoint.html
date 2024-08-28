@@ -15,7 +15,7 @@
 		<!--ICON-->
 		<link rel="shortcut icon" type="image/x-icon" href="./GeoterRA.ico">
 
-		<title id="tittle-page">Añadir punto</title>
+		<title id="tittle-page">Agregar punto</title>
 
 	</head>
 
@@ -92,86 +92,93 @@
 				<!-- TODO[] : ver si se puede hacer autoguardado -->
 				<div class="add-point">
 
-					<h1>Formulario de Puntos Estudiados</h1>
+					<h1 class="Montserrat-SemiBold">Formulario de Puntos Estudiados</h1>
 
 					<form action="" method="post" class="add-point-form">
 
 						<p>
-							<label for="pointId" class="Montserrat-SemiBold">Nombre del punto</label>
-							<input name="pointId" type="text" class="Montserrat-Regular">
+							<label for="pointId" class="Poppins-Bold">Nombre del punto</label>
+							<input name="pointId" type="text" class="Poppins-Light" placeholder="Ingrese el ID del punto">
 						</p>
 
 						<p>
-							<label for="contactNumber" class="Montserrat-SemiBold">Número de contacto</label>
-							<input name="contactNumber" type="text" class="Montserrat-Regular">
+							<label for="contactNumber" class="Poppins-Bold">Número de contacto</label>
+							<input name="contactNumber" type="text" class="Poppins-Light" placeholder="Ingrese un número de contacto">
 						</p>
 
 						<p>
-							<label for="region" class="Montserrat-SemiBold">Fecha</label>
-							<input name="region" type="date" class="Montserrat-Regular">
+							<label for="region" class="Poppins-Bold">Fecha</label>
+							<input name="region" type="date" class="Poppins-Light">
+						</p>
+						
+						<!-- Cascade container -->
+						<p class="cascade-container">
+
+							<label for="temperatura" class="Poppins-Bold">Sensación térmica</label>
+
+							<div class="radio-buttons-container Poppins-Light">
+
+								<div class="option">
+									<input type="radio" name="sens_termica" value="Caliente" id="caliente">
+									<label for="caliente">Caliente</label>
+								</div>
+
+								<div class="option">
+									<input type="radio" name="sens_termica" value="Tibio" id="tibio">
+									<label for="tibio">Tibio</label>
+								</div>
+
+								<div class="option">
+									<input type="radio" name="sens_termica" value="Frio" id="frio">
+									<label for="frio">Frio</label>
+								</div>
+								
+							</div>
+
 						</p>
 						
 						<p>
-							<label for="temperatura" class="Montserrat-SemiBold">Sensación térmica</label>
-							<div class="radio-buttons-container">
+							<label for="propietario" class="Poppins-Bold">Propietario de la zona</label>
+							<input name="propietario" type="text" class="Poppins-Light" placeholder="En caso de que sea en propiedad privada">
+						</p>
+						
+						<p>
+							<label for="usoActual" class="Poppins-Bold">Uso actual</label>
+							<input name="propietario" type="text" class="Poppins-Light" placeholder="Uso que se le da a la zona">
+						</p>
+						
+						<p class="cascade-container">
+
+							<label for="burbujeo" class="Poppins-Bold">Presenta burbujeo</label>
+
+							<div class="radio-buttons-container Poppins-Light">
 
 								<div class="option">
-									<p>Caliente</p>
-									<input type="radio" name="sens_termica" value="Caliente">
+									<input type="radio" name="burbujeo" id="si">
+									<label for="si">Si</label>
 								</div>
 
 								<div class="option">
-									<p>Tibio</p>
-									<input type="radio" name="sens_termica" value="Tibio">
-								</div>
-
-								<div class="option">
-									<p>Frio</p>
-									<input type="radio" name="sens_termica" value="Frio">
+									<input type="radio" name="burbujeo" id="no">
+									<label for="no">No</label>
 								</div>
 								
 							</div>
 						</p>
 						
 						<p>
-							<label for="propietario" class="Montserrat-SemiBold">Propietario de la zona</label>
-							<input name="propietario" type="text" class="Montserrat-Regular">
-						</p>
-						
-						<p>
-							<label for="usoActual" class="Montserrat-SemiBold">Uso actual</label>
-							<input name="propietario" type="text" class="Montserrat-Regular">
-						</p>
-						
-						<p>
-							<label for="burbujeo" class="Montserrat-SemiBold">Presenta burbujeo</label>
-							<div class="radio-buttons-container">
-
-								<div class="option">
-									<p>Si</p>
-									<input type="radio" name="burbujeo" value="1">
-								</div>
-
-								<div class="option">
-									<p>No</p>
-									<input type="radio" name="burbujeo" value="no">
-								</div>
-								
-							</div>
-						</p>
-						
-						<p>
-							<label for="direccion" class="Montserrat-SemiBold">Indicaciones para llegar al lugar</label>
-							<input name="direccion" type="textarea" class="Montserrat-Regular">
+							<label for="direccion" class="Poppins-Bold">Indicaciones para llegar al lugar</label>
+							<input name="direccion" type="textarea" class="Poppins-Light" placeholder="Como se llega a la zona">
 						</p>
 
 						<p>
-							<label for="foto" class="Montserrat-SemiBold">Subir Foto:</label>
-							<input type="file" class="Montserrat-Regular" id="foto" name="foto" accept="image/*">
+							<label for="foto" class="Poppins-Bold">Subir Foto:</label>
+							<input type="file" class="Poppins-Light" id="foto" name="foto" accept="image/*">
 						</p>
 
-						<p>
-							<label for="gps" class="Montserrat-SemiBold">Lugar en GPS</label>
+						<p class="cascade-container">
+							<label for="gps" class="Poppins-Bold">Lugar en GPS</label>
+							<!-- TODO[] : ADD MAP OPTION -->
 							<input name="gps" type="text" class="Montserrat-Regular">
 						</p>
 						
@@ -184,7 +191,7 @@
 			</div>
 
 			<!-- FOOTER -->
-			<footer class="footer-container">
+			<footer class="footer-container footer-logged">
 				<div class="footer center-text Montserrat-Regular">
 					
 					<p> © 2021 Instituto de Investigaciones en Ingeniería - Universidad de Costa Rica.Ciudad Universitaria Rodrigo Facio </p>
