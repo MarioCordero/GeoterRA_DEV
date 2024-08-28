@@ -1,7 +1,10 @@
 package com.inii.geoterra.development.fragments
 
 import android.app.Activity
+import android.app.DatePickerDialog
 import android.content.Intent
+import android.icu.text.SimpleDateFormat
+import android.icu.util.Calendar
 import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
@@ -10,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,19 +21,19 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.components.OnFragmentInteractionListener
+import com.inii.geoterra.development.components.api.Error
 import com.inii.geoterra.development.components.api.RequestForm
+import com.inii.geoterra.development.components.api.RequestResponse
+import com.inii.geoterra.development.components.api.RetrofitClient
 import com.inii.geoterra.development.components.services.GPSManager
 import com.inii.geoterra.development.components.services.GalleryManager
 import kotlinx.coroutines.launch
-import java.io.IOException
-import java.io.InputStream
-import android.widget.CheckBox
-import com.inii.geoterra.development.components.api.Error
-import com.inii.geoterra.development.components.api.RequestResponse
-import com.inii.geoterra.development.components.api.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.IOException
+import java.io.InputStream
+import java.util.Locale
 
 class FormFragment : Fragment() {
   private lateinit var rootView : View
@@ -49,6 +53,22 @@ class FormFragment : Fragment() {
     val locationButton = rootView.findViewById<Button>(R.id.userLocationButton)
     val imageButton = rootView.findViewById<Button>(R.id.locationImageButton)
     val sendButton = rootView.findViewById<Button>(R.id.sendRequestButton)
+    val dateEditText = rootView.findViewById<EditText>(R.id.dateTxtInput)
+
+    // Crear un calendario con la fecha actual
+    val calendar = Calendar.getInstance()
+
+    // Definir un formato de fecha
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
+    // Configurar el DatePickerDialog
+    val dateSetListener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
+      calendar.set(Calendar.YEAR, year)
+      calendar.set(Calendar.MONTH, month)
+      calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+      // Formatear la fecha seleccionada y mostrarla en el EditText
+      dateEditText.setText(dateFormat.format(calendar.time))
+    }
 
     locationButton.setOnClickListener {
       if (!GPSManager.isInitialized()) {
@@ -74,6 +94,16 @@ class FormFragment : Fragment() {
       }
     }
 
+    dateEditText.setOnClickListener {
+      DatePickerDialog(
+        requireContext(),
+        dateSetListener,
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH),
+        calendar.get(Calendar.DAY_OF_MONTH)
+      ).show()
+    }
+
     sendButton.setOnClickListener {
       getFormData()
       sendRequest()
@@ -89,7 +119,8 @@ class FormFragment : Fragment() {
         val name = rootView.findViewById<EditText>(R.id.nameTxtInput).text.toString()
         val phoneNumber = rootView.findViewById<EditText>(R.id.phoneNumberTxtInput).text.toString().toInt()
         val date = rootView.findViewById<EditText>(R.id.dateTxtInput).text.toString()
-        val thermalSensation = rootView.findViewById<EditText>(R.id.thermalSensationTxtInput).text.toString().toInt()
+        val thermalSensation = rootView.findViewById<EditText>(R.id.temperatureSlider).text.toString().toInt()
+        // TODO : CORREGIR EL DE LA TEMPERATURA PARA QUE COINCIDA CON EL SLIDER.
         val zoneOwner = rootView.findViewById<EditText>(R.id.zoneOwnerTxtInput).text.toString()
         val currentUsage = rootView.findViewById<EditText>(R.id.currentUsageTxtInput).text.toString()
         val address = rootView.findViewById<EditText>(R.id.indicationsTxtInput).text.toString()
@@ -213,6 +244,17 @@ class FormFragment : Fragment() {
       Toast.makeText(requireContext(), "Error al leer los metadatos EXIF.", Toast.LENGTH_SHORT).show()
     } finally {
       inputStream?.close()
+    }
+  }
+
+  private fun isValidDate(date: String): Boolean {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    return try {
+      dateFormat.isLenient = false
+      dateFormat.parse(date)
+      true
+    } catch (e: Exception) {
+      false
     }
   }
 

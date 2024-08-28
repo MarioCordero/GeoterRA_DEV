@@ -1,106 +1,90 @@
 package com.inii.geoterra.development.components.services
+
 import android.annotation.SuppressLint
 import android.content.Context
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
-import android.os.Bundle
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import android.content.pm.PackageManager
+import android.location.Location
+import android.os.Looper
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 
 /**
- * Object that manages GPS location updates and permissions.
+ * Object that manages GPS location updates and permissions using FusedLocationProviderClient.
  */
-object GPSManager : LocationListener {
-
-  private lateinit var locationManager: LocationManager
-  private var currentLocation: Location? = null
-
-  /**
-   * Request code for location permission.
-   */
+object GPSManager : LocationCallback() {
+  // FusedLocationProviderClient for location services
+  private lateinit var fusedLocationClient : FusedLocationProviderClient
+  // LocationRequest to define the parameters for location updates
+  private lateinit var locationRequest : LocationRequest
+  private var currentLocation : Location? = null
+  private var isInitialized = false
   private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
 
-  private var isInitialized = false
-
   /**
-   * Initializes the GPS service.
-   *
-   * @param context The context used to access system services.
+   * Initializes the GPSManager.
    */
   fun initialize(context: Context) {
+    // Check if location permission is granted
     if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+      // Request location permission if not granted
       ActivityCompat.requestPermissions(context as AppCompatActivity, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
       return
     }
-    locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+    // Get FusedLocationProviderClient instance
+    fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+    // Build LocationRequest with high accuracy and defined intervals
+    locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000L)
+      .setMinUpdateIntervalMillis(2000L)
+      .build()
+
     startLocationUpdates()
     isInitialized = true
   }
 
   /**
-   * Starts requesting location updates from both GPS and Network providers.
+   * Starts location updates.
    */
   @SuppressLint("MissingPermission")
   private fun startLocationUpdates() {
-    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000L, 10f, this)
-    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000L, 10f, this)
+    fusedLocationClient.requestLocationUpdates(locationRequest, this, Looper.getMainLooper())
   }
 
   /**
-   * Returns the last known location.
-   *
-   * @return The last known location, or null if no location is available.
+   * Gets the last known location.
    */
   fun getLastKnownLocation(): Location? {
     return currentLocation
   }
 
   /**
-   * Checks if the com.inii.geoterra.development.Components.GPSManager is initialized.
-   *
-   * @return True if initialized, false otherwise.
+   * Stops location updates.
+   */
+  fun stopLocationUpdates() {
+    fusedLocationClient.removeLocationUpdates(this)
+  }
+
+  /**
+   * Checks if GPSManager is initialized.
    */
   fun isInitialized(): Boolean {
     return isInitialized
   }
 
   /**
-   * Called when the location has changed.
-   *
-   * @param location The new location.
+   * Called when a new location is available.
    */
-  override fun onLocationChanged(location: Location) {
-    currentLocation = location
-  }
-
-  /**
-   * Called when the provider status changes.
-   *
-   * @param provider The name of the provider.
-   * @param status The status of the provider.
-   * @param extras Additional status information.
-   */
-  override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-  }
-
-  /**
-   * Called when the provider is enabled by the user.
-   *
-   * @param provider The name of the provider.
-   */
-  override fun onProviderEnabled(provider: String) {
-  }
-
-  /**
-   * Called when the provider is disabled by the user.
-   *
-   * @param provider The name of the provider.
-   */
-  override fun onProviderDisabled(provider: String) {
+  override fun onLocationResult(locationResult: LocationResult) {
+    super.onLocationResult(locationResult)
+    currentLocation = locationResult.lastLocation
   }
 
   /**
@@ -113,9 +97,11 @@ object GPSManager : LocationListener {
   fun handlePermissionResult(requestCode: Int, grantResults: IntArray, context: Context) {
     if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
       if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-        Toast.makeText(context, "Permiso de ubicación concedido", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Location permission granted", Toast.LENGTH_SHORT).show()
+        // Re-initialize GPSManager if permission granted
+        initialize(context)
       } else {
-        Toast.makeText(context, "Permiso de ubicación denegado", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Location permission denied", Toast.LENGTH_SHORT).show()
       }
     }
   }

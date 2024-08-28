@@ -17,5 +17,6 @@
     <string name="lastname">Apellidos</string>
     <string name="contact_number">Número de contacto</string>
     <string name="create_account">Crear cuenta</string>
+    <string name="about_us">Acerca de nosotros</string>
 
 </resources>

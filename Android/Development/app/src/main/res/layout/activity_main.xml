@@ -44,7 +44,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="Acerca de nosotros"
+                    android:text="@string/about_us"
                     android:textColor="@color/black"
                     android:textSize="22sp">
                 </TextView>
@@ -134,10 +134,7 @@
 
                 android:layout_marginTop="15dp"
                 android:layout_marginBottom="150dp"
-                android:padding="15dp"
-
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:padding="15dp">
 
                 <TextView
                     android:id="@+id/endAbout"
