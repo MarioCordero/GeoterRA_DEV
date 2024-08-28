@@ -12,6 +12,10 @@
 		<link rel="stylesheet" href="./assets/css/fonts.css">
 		<link rel="stylesheet" href="./assets/css/responsive.css">
 
+		<!-- LEAFLET MAP -->
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+		<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
 		<!--ICON-->
 		<link rel="shortcut icon" type="image/x-icon" href="./GeoterRA.ico">
 
@@ -179,7 +183,15 @@
 						<p class="cascade-container">
 							<label for="gps" class="Poppins-Bold">Lugar en GPS</label>
 							<!-- TODO[] : ADD MAP OPTION -->
-							<input name="gps" type="text" class="Montserrat-Regular">
+
+							<!-- Leaflet map -->
+							<div id="add-point-map"></div>
+
+							<input type="text" id="lat" name="lat" placeholder="Ingresar latitud">
+							<input type="text" id="lng" name="lng" placeholder="Ingresar longitud">
+							
+							<input type="hidden" id="hiddenLat" name="lat">
+							<input type="hidden" id="hiddenLng" name="lng">
 						</p>
 						
 						<input type="submit" class="send-add-point-form Montserrat-Bold" value="Enviar">
@@ -209,6 +221,7 @@
 			
 			<script src="./assets/js/web-loader.js"></script>
 			<script src="./assets/js/menu-bars.js"></script>
+			<script src="./assets/js/add-point-map.js"></script>
 		</div>
 	</body>
 </html>

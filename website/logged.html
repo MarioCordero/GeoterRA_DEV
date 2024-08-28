@@ -180,9 +180,7 @@
 									</li>
 								</ul>
 
-								<!-- TODO[] : Hacer que este button nos redireccione a "addpoint.html" -->
-								<!-- <a href="addpoint.html" id="boton">Crear solicitud</a> -->
-								<button id="###" class="Montserrat-Medium">Agregar</button>
+								<button class="Montserrat-Medium" onclick="window.location.href='addpoint.html';">Agregar</button>
 
 							</div>
 						</div>
@@ -193,20 +191,6 @@
 				<!-- TODO[] : Hacer un logout decente, evitar codigo de JS en el HTML -->
 				<div class="buttons-container">
 					<button id="logout-btn">Cerrar Sesión</button>
-					<script>
-						document.getElementById("logout-btn").addEventListener("click", function() {
-							// Realiza una solicitud al servidor para cerrar la sesión
-							let xhr = new XMLHttpRequest();
-							xhr.open("GET", "../API/logout.php", true);
-							xhr.onreadystatechange = function () {
-								if (xhr.readyState == 4 && xhr.status == 200) {
-									// Redirige al usuario a la página de inicio de sesión después de cerrar sesión
-									window.location.href = "login.html";
-								}
-							};
-							xhr.send();
-						});
-					</script>
 				</div>
 				
 
@@ -232,6 +216,7 @@
 			
 			<script src="./assets/js/web-loader.js"></script>
 			<script src="./assets/js/menu-bars.js"></script>
+			<script src="./assets/js/logout.js"></script>
 		</div>
 	</body>
 </html>

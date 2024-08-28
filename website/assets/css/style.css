@@ -947,6 +947,11 @@ iframe {
 	border-radius: 4px;
 }
 
+#add-point-map{
+	height: 30vh;
+	width: 100%;
+}
+
 .send-add-point-form{
 	background-color: var(--naranja) !important;
 	color: var(--blanco) !important;
