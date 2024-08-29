@@ -950,6 +950,10 @@ iframe {
 #add-point-map{
 	height: 30vh;
 	width: 100%;
+	display: flex;
+}.coordinates{
+	text-align: center;
+	display: flex;
 }
 
 .send-add-point-form{
