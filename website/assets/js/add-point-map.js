@@ -1,5 +1,5 @@
 // Inicializa el mapa
-var map = L.map('add-point-map').setView([9.7489, -83.7534], 10); // Ajusta el nivel de zoom aquí
+var map = L.map('add-point-map').setView([9.936603897552947, -84.0442299188895], 20); // Ajusta el nivel de zoom aquí
 
 // Añade la capa de mapa (usando OpenStreetMap)
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
