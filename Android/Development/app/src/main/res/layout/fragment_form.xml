@@ -79,19 +79,29 @@
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="10dp"
                 android:layout_weight="1"
-
-                android:hint="Fecha (YYYY-MM-DD)"
-                android:padding="2dp"
-                app:helperText="Requerido">
+                android:paddingStart="20dp">
 
                 <TextView
-                    android:layout_width="200dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
 
-                    android:text="Fecha: YYYY-MM-DD"
+                    android:layout_marginTop="10dp"
+
+                    android:text="Fecha: YYYY/MM/DD"
                     android:textSize="20sp"
                     android:id="@+id/dateText">
                 </TextView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginTop="10dp"
+
+                    android:text="Requerido"
+                    android:textSize="13sp">
+                </TextView>
+
             </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
