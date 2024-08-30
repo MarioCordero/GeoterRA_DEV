@@ -247,7 +247,7 @@ class FormFragment : Fragment() {
       val data: Intent? = result.data
       if (data != null && data.data != null) {
         val imageUri = data.data
-        // Aquí almacenas el URI de la imagen para uso posterior
+        // Handle the selected image URI.
         handleImageUri(imageUri)
       }
     }
@@ -277,7 +277,6 @@ class FormFragment : Fragment() {
           Log.i("Image Coor", "Latitud: $latitude, Longitud: $longitude")
           Toast.makeText(requireContext(), "Latitud: $latitude, Longitud: $longitude", Toast.LENGTH_SHORT).show()
           requestForm.coordinates = "$latitude, $longitude"
-          // You can use the latitude and longitude values as needed.
         } else {
           Toast.makeText(requireContext(), "La imagen seleccionada no contiene información de coordenadas.", Toast.LENGTH_SHORT).show()
         }
