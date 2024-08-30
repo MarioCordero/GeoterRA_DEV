@@ -30,7 +30,7 @@
                 android:textColor="@color/black" />
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
@@ -50,7 +50,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
@@ -70,24 +70,28 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:id="@+id/dateLabelInput"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
 
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="10dp"
                 android:layout_weight="1"
-                android:padding="2dp"
 
                 android:hint="Fecha (YYYY-MM-DD)"
+                android:padding="2dp"
                 app:helperText="Requerido">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/dateTxtInput"
-                    android:layout_width="198dp"
+                <TextView
+                    android:layout_width="200dp"
                     android:layout_height="wrap_content"
-                    android:inputType="none" />
+
+                    android:text="Fecha: YYYY-MM-DD"
+                    android:textSize="20sp"
+                    android:id="@+id/dateText">
+                </TextView>
             </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
@@ -115,19 +119,25 @@
                     android:id="@+id/temperatureSlider"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-
                     android:valueFrom="1.0"
                     android:valueTo="3.0"
                     android:stepSize="1"
                     android:value="1"
-                    app:labelBehavior="visible"
-                    >
-                </com.google.android.material.slider.Slider>
+                    app:labelBehavior="gone" />
+
+                <TextView
+                    android:id="@+id/sliderLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Frío"
+                    android:textSize="25sp"
+                    android:layout_gravity="start">
+                </TextView>
 
             </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
@@ -147,7 +157,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
@@ -183,7 +193,7 @@
             </FrameLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
