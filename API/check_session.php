@@ -4,8 +4,6 @@
       session_start();
     }
 
-    session_start(); // Asegúrate de iniciar la sesión
-
     if (isset($_SESSION['user'])) {
         echo json_encode(['status' => 'logged_in', 'user' => $_SESSION['user']]);
     } else {

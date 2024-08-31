@@ -31,9 +31,9 @@ function check_fields(array &$request_fields, array &$errors)
   {
     $request_fields['propietario'] = 'NoInfo';
   }
-  if (empty($request_fields['usoActual']))
+  if (empty($request_fields['uso_actual']))
   {
-    $request_fields['usoActual'] = 'NoInfo';
+    $request_fields['uso_actual'] = 'NoInfo';
   }
 
   return true;
@@ -47,15 +47,15 @@ function validate_fields($request_fields, &$errors) {
   }
 
   // Revisa que el numero de telefono no este vacio y que sea valido
-  if(!empty($request_fields['contactNumber'])) 
+  if(!empty($request_fields['num_telefono'])) 
   {
-    if (!preg_match("/^\d{8}$/", $request_fields["contactNumber"])) {
-      $errors['contactNumber'] = "invalid_format";
+    if (!preg_match("/^\d{8}$/", $request_fields["num_telefono"])) {
+      $errors['num_telefono'] = "invalid_format";
     }
   } 
   else
   {
-    $errors['contactNumber'] = 'empty_field';
+    $errors['num_telefono'] = 'empty_field';
   }
 
   // Revisa si la direccion esta vacia
@@ -69,11 +69,11 @@ function convert_fields(array &$request_fields, array &$errors) {
   // Revisa el formato del burbujeo
   if($request_fields['burbujeo'] == '1')
   {
-    $request_fields['burbujeo'] = true;
+    $request_fields['burbujeo'] = 1;
   }
   elseif($request_fields['burbujeo'] == '0') 
   {
-    $request_fields['burbujeo'] = false;
+    $request_fields['burbujeo'] = 0;
   }
   else 
   {
@@ -101,13 +101,6 @@ function convert_fields(array &$request_fields, array &$errors) {
     $request_fields['coord_x'] = $splitted[0];
     $request_fields['coord_y'] = substr($splitted[1],1);
   }
-  else 
-  {
-    // Si esta vacio viene de la pagina web
-    $request_fields['coord_x'] = 0.0;
-    $request_fields['coord_y'] = 0.0;
-  }
-
 }
 
 
