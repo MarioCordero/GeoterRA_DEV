@@ -1,14 +1,11 @@
 <?php
 
-if (session_status() == PHP_SESSION_NONE) {
-session_start();
-}
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
   // Catches the username and password
   $request_fields["pointId"] = $_POST["pointId"];
-  $request_fields["email"] = $_SESSION["user"];
+  $request_fields["email"] = $_POST["email"];
   $request_fields["region"] = "Prueba";
   $request_fields["num_telefono"] = $_POST["contactNumber"];
   $request_fields["fecha"] = $_POST["fecha"];

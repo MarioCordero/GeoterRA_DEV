@@ -11,10 +11,11 @@ document.getElementById("add-point-form").addEventListener("submit", function (e
             let response = JSON.parse(xhr.responseText);
             console.log(response)
             if (response.status === 'request_created') {
-              console.log("creado")
-              // const modal = document.getElementById('modal');
-              // openModal(modal);  
-            } else {
+              const modal = document.getElementById('modal');
+              const overlay = document.getElementById('overlay');
+              openModal(modal, overlay);          
+            }
+            else {
                 let errorObject = response.errors;
                 console.log(errorObject);
             }
