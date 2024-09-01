@@ -41,9 +41,9 @@ function check_fields(array &$request_fields, array &$errors)
 
 function validate_fields($request_fields, &$errors) {
   // Revisa si el nombre del punto esta vacio
-  if(empty($request_fields['pointId']))
+  if(empty($request_fields['IDPoint']))
   {
-    $errors['pointId'] = 'empty_field';
+    $errors['point_id'] = 'empty_field';
   }
 
   // Revisa que el numero de telefono no este vacio y que sea valido
@@ -61,7 +61,7 @@ function validate_fields($request_fields, &$errors) {
   // Revisa si la direccion esta vacia
   if(empty($request_fields['direccion'])) 
   {
-    $errors['direccion'] = 'empty_field';
+    $errors['address'] = 'empty_field';
   }
 }
 
@@ -77,7 +77,7 @@ function convert_fields(array &$request_fields, array &$errors) {
   }
   else 
   {
-    $errors['burbujeo'] = 'invalid_field';
+    $errors['bubbles'] = 'invalid_field';
   }
 
   // Revisa que la fecha brindada pueda ser formateada para mysql
@@ -88,7 +88,7 @@ function convert_fields(array &$request_fields, array &$errors) {
   }
   else 
   {
-    $errors['fecha'] = 'invalid_field';
+    $errors['date'] = 'invalid_field';
   }
 
   if (!empty($request_fields['gps']))

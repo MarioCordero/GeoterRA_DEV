@@ -1,5 +1,5 @@
 [versions]
-agp = "8.5.0"
+agp = "8.5.1"
 gtEpsgHsql = "22.2"
 gtGeojsonVersion = "[30,)"
 gtMain = "25.0"
@@ -24,6 +24,7 @@ okhttp = "latest_version"
 okhttpVersion = "4.9.3"
 osmdroidAndroid = "6.1.18"
 playServices = "12.0.1"
+playServicesLocation = "21.3.0"
 playServicesMaps = "18.1.0"
 proj4j = "0.1.1"
 firebaseFirestore = "25.0.0"
@@ -51,6 +52,7 @@ okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okhttp-v493 = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttpVersion" }
 osmdroid-android = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroidAndroid" }
 play-services = { module = "com.google.android.gms:play-services", version.ref = "playServices" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 proj4j = { module = "org.osgeo:proj4j", version.ref = "proj4j" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
@@ -59,4 +61,3 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 googleAndroidLibrariesMapsplatformSecretsGradlePlugin = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "googleAndroidLibrariesMapsplatformSecretsGradlePlugin" }
-

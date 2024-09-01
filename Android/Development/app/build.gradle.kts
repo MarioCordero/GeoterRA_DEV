@@ -65,7 +65,7 @@ dependencies {
     //noinspection UseTomlInstead
     implementation("org.json:json:20240303")
     implementation(libs.material.v150)
-
+    implementation(libs.play.services.location)
 
 
     //noinspection UseTomlInstead

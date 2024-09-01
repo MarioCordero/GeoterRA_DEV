@@ -1,39 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.SignUpFragment"
-    android:layout_gravity="center">
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/white"
-        android:foregroundGravity="center">
-    </FrameLayout>
+    android:layout_gravity="center"
+    android:background="@color/white"
+    tools:context=".fragments.SignUpFragment">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
 
+        android:layout_height="wrap_content"
         android:background="@drawable/gray_rectangle_rounded2"
+        android:backgroundTint="@color/white"
         android:orientation="vertical"
         android:padding="24dp"
-        android:visibility="visible"
-        android:backgroundTint="@color/white"
 
-        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5">
 
         <TextView
             android:id="@+id/loginText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="GeoterRa"
+            android:text="@string/app_name"
             android:textAlignment="center"
             android:textColor="@color/black"
             android:textSize="30sp"
@@ -43,64 +39,81 @@
             android:id="@+id/userEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+
             android:layout_marginTop="25dp"
-            android:autofillHints=""
-            android:background="@drawable/gray_rectangle_rounded2"
-            android:drawableRight="@drawable/baseline_account_circle_24"
-            android:hint="Email"
-            android:inputType="textEmailAddress"
             android:padding="14dp"
+
+            android:background="@drawable/gray_rectangle_rounded2"
+            android:drawableEnd="@drawable/baseline_account_circle_24"
+
+            android:inputType="textEmailAddress"
+            android:autofillHints="emailAddress"
+            android:hint="@string/email"
             android:textColor="@color/black" />
 
         <EditText
             android:id="@+id/userPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+
             android:layout_marginTop="15dp"
-            android:autofillHints=""
-            android:background="@drawable/gray_rectangle_rounded2"
-            android:drawableRight="@drawable/baseline_lock_24"
-            android:hint="Contraseña"
-            android:inputType="textPassword"
             android:padding="14dp"
+
+            android:background="@drawable/gray_rectangle_rounded2"
+            android:drawableEnd="@drawable/baseline_lock_24"
+
+            android:inputType="textPassword"
+            android:autofillHints="password"
+            android:hint="@string/password"
             android:textColor="@color/black" />
 
         <EditText
             android:id="@+id/userFirstName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+
             android:layout_marginTop="15dp"
-            android:autofillHints=""
-            android:background="@drawable/gray_rectangle_rounded2"
-            android:drawableRight="@drawable/baseline_drive_file_rename_outline_24"
-            android:hint="Nombre"
-            android:inputType="textPersonName"
             android:padding="14dp"
+
+            android:background="@drawable/gray_rectangle_rounded2"
+            android:drawableEnd="@drawable/baseline_drive_file_rename_outline_24"
+
+            android:inputType="textPersonName"
+            android:autofillHints="personName"
+            android:hint="@string/name"
             android:textColor="@color/black" />
 
         <EditText
             android:id="@+id/userLastName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+
             android:layout_marginTop="15dp"
-            android:autofillHints=""
+            android:padding="14dp"
+
             android:background="@drawable/gray_rectangle_rounded2"
             android:drawableEnd="@drawable/baseline_drive_file_rename_outline_24"
-            android:hint="Apellidos"
-            android:inputType="text"
-            android:padding="14dp"
+
+            android:inputType="textPersonName"
+            android:autofillHints="personName"
+            android:hint="@string/lastname"
             android:textColor="@color/black" />
 
         <EditText
             android:id="@+id/userPhoneNum"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+
             android:layout_marginTop="15dp"
+            android:padding="14dp"
+
             android:background="@drawable/gray_rectangle_rounded2"
             android:drawableEnd="@drawable/baseline_local_phone_24"
-            android:hint="Número de contacto"
-            android:inputType="numberDecimal"
-            android:padding="14dp"
+
+            android:inputType="phone"
+            android:autofillHints="phone"
+            android:hint="@string/contact_number"
+
             android:textColor="@color/black" />
 
         <Button
@@ -109,16 +122,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:backgroundTint="@color/black"
-            android:text="Crear cuenta"
+            android:text="@string/create_account"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="18sp"
             app:cornerRadius="5dp" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -131,8 +139,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="Instituto de Investigaciones en Ingeniería | REFORESTA"
-            android:textSize="12sp"
-            android:textColor="@color/black" />
+            android:textColor="@color/black"
+            android:textSize="12sp" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
