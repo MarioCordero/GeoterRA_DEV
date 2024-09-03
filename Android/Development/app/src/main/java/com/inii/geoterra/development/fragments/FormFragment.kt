@@ -31,6 +31,7 @@ import com.inii.geoterra.development.components.api.RequestResponse
 import com.inii.geoterra.development.components.api.RetrofitClient
 import com.inii.geoterra.development.components.services.GPSManager
 import com.inii.geoterra.development.components.services.GalleryManager
+import com.inii.geoterra.development.components.services.SessionManager
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -52,7 +53,7 @@ class FormFragment : Fragment() {
     // Inflate the layout for this fragment
     // Creates an object that manage the location requests.
     listener = activity as? OnFragmentInteractionListener
-    requestForm = RequestForm("", "", "", "", "", "", 0, "", 0, 0)
+    requestForm = RequestForm("", "", "", "", "", "", "", "", "", 0, 0, "", "");
 
     val locationButton = rootView.findViewById<Button>(R.id.userLocationButton)
     val imageButton = rootView.findViewById<Button>(R.id.locationImageButton)
@@ -86,7 +87,7 @@ class FormFragment : Fragment() {
     val calendar = Calendar.getInstance()
 
     // Define the date format
-    val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
     // Set a click listener for the location button
     locationButton.setOnClickListener {
@@ -100,8 +101,9 @@ class FormFragment : Fragment() {
         if (userLocation != null) {
           Toast.makeText(requireContext(), "Latitud ${userLocation.latitude} y longitud ${userLocation.longitude}", Toast.LENGTH_SHORT).show()
           // Set the coordinates in the request form.
-          requestForm.coordinates = "${userLocation.latitude}, ${userLocation.longitude}"
-          Log.i("Coordenadas", requestForm.coordinates)
+          requestForm.latitude = "${userLocation.latitude}"
+          requestForm.longitude = "${userLocation.longitude}"
+          Log.i("Coordenadas", requestForm.latitude +"  " + requestForm.longitude)
         }
       }
     }
@@ -154,30 +156,41 @@ class FormFragment : Fragment() {
     lifecycleScope.launch {
       try {
         // Accessing all the given data in the form.
-        val name = rootView.findViewById<EditText>(R.id.nameTxtInput).text.toString()
-        val phoneNumber = rootView.findViewById<EditText>(R.id.phoneNumberTxtInput).text.toString().toInt()
-        val date = rootView.findViewById<EditText>(R.id.dateText).text.toString()
-        val thermalSensation = rootView.findViewById<EditText>(R.id.temperatureSlider).text.toString().toInt()
-        // TODO : CORREGIR EL DE LA TEMPERATURA PARA QUE COINCIDA CON EL SLIDER.
+        val pointID = rootView.findViewById<EditText>(R.id.nameTxtInput).text.toString()
+        val region = "Guanacaste"
+        val date = rootView.findViewById<TextView>(R.id.dateText).text.toString()
+
+        val user = SessionManager.getUserEmail()
+
         val zoneOwner = rootView.findViewById<EditText>(R.id.zoneOwnerTxtInput).text.toString()
         val currentUsage = rootView.findViewById<EditText>(R.id.currentUsageTxtInput).text.toString()
         val address = rootView.findViewById<EditText>(R.id.indicationsTxtInput).text.toString()
+        val phoneNumber =
+          rootView.findViewById<EditText>(R.id.phoneNumberTxtInput).text.toString()
+
+        val thermalSensation =
+          rootView.findViewById<Slider>(R.id.temperatureSlider).value.toInt()
+
         val bubbles = if (rootView.findViewById<CheckBox>(R.id.bubbleCheckBox).isChecked) 1 else 0
 
         // Set the data in the request form.
-        requestForm.pointID = name
-        requestForm.contactNumber = phoneNumber
+        requestForm.pointID = pointID
+        requestForm.region = region
         requestForm.date = date
-        requestForm.thermalSensation = thermalSensation
+        if (user != null) {
+          requestForm.email = user
+        }
         requestForm.owner = zoneOwner
         requestForm.currentUsage = currentUsage
         requestForm.address = address
+        requestForm.phoneNumber = phoneNumber
+        requestForm.thermalSensation = thermalSensation
         requestForm.bubbles = bubbles
 
         Log.i("Datos del formulario", requestForm.toString())
 
       } catch (e : Exception) {
-          e.printStackTrace()
+        e.printStackTrace()
       }
     }
   }
@@ -185,9 +198,22 @@ class FormFragment : Fragment() {
   private fun sendRequest() {
     // Create a new request.
     val apiService = RetrofitClient.getAPIService()
-    val call = apiService.newRequest(requestForm.pointID, requestForm.region, requestForm.date,
-      requestForm.owner, requestForm.currentUsage, requestForm.address, requestForm.contactNumber,
-      requestForm.coordinates ,requestForm.thermalSensation, requestForm.bubbles)
+    val call = apiService.newRequest(
+      requestForm.pointID,
+      requestForm.region,
+      requestForm.date,
+      requestForm.email,
+      requestForm.owner,
+      requestForm.currentUsage,
+      requestForm.address,
+      requestForm.phoneNumber,
+      requestForm.coordinates,
+      requestForm.thermalSensation,
+      requestForm.bubbles,
+      requestForm.latitude,
+      requestForm.longitude
+    )
+
 
     // Send the request.
     call.enqueue(object : Callback<RequestResponse>{
@@ -276,7 +302,8 @@ class FormFragment : Fragment() {
           val longitude = latLong[1]
           Log.i("Image Coor", "Latitud: $latitude, Longitud: $longitude")
           Toast.makeText(requireContext(), "Latitud: $latitude, Longitud: $longitude", Toast.LENGTH_SHORT).show()
-          requestForm.coordinates = "$latitude, $longitude"
+          requestForm.latitude = "$latitude"
+          requestForm.longitude = "$longitude"
         } else {
           Toast.makeText(requireContext(), "La imagen seleccionada no contiene información de coordenadas.", Toast.LENGTH_SHORT).show()
         }
