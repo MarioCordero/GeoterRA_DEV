@@ -1030,3 +1030,69 @@ iframe {
 	cursor: pointer;
 	border: 1px solid var(--naranja);
 }
+
+/* ------------------------------Modal------------------------------ */
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid #000;
+  border-radius: 10px;
+  z-index: 1001;
+  height: 200px;
+  width: 200px;
+  max-width: 80%;
+}
+
+.modal-body {
+  height: 100%;
+  width: 100%;
+  gap: 30px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Horizontally centers the content */
+  align-items: center; /* Vertically centers the content */
+	background-color: var(--azul);
+  color: var(--blanco);
+}
+
+.modal-body .close-button {
+  position: relative;
+  cursor: pointer;
+  border: 2px solid var(--blanco);
+  background-color: var(--azul);
+  border-radius: 40px;
+  font-size: 1rem;
+  width: 60px;
+  color: var(--blanco);
+}
+
+.modal-body .icon {
+  position: relative;
+  background-image: url('../images/icons/check.png');
+  width: 32px;
+  height: 32px;
+  background-size: cover;
+}
+
+#overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 1000;
+  transition: 200ms ease-in-out;
+  pointer-events: none;
+}
+
+#overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}

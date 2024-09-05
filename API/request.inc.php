@@ -1,18 +1,26 @@
 <?php
 
+if (session_status() == PHP_SESSION_NONE) {
+session_start();
+}
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
   // Catches the username and password
-  $request_fields["pointId"] = $_POST["pointId"];
-  $request_fields["contactNumber"] = $_POST["contactNumber"];
+  $request_fields["point_id"] = $_POST["point_id"];
+  $request_fields["email"] = $_POST["email"];
+  $request_fields["region"] = "Prueba";
+  $request_fields["num_telefono"] = $_POST["num_telefono"];
   $request_fields["fecha"] = $_POST["fecha"];
   $request_fields["sens_termica"] = $_POST["sens_termica"];
   $request_fields["propietario"] = $_POST["propietario"];
-  $request_fields["usoActual"] = $_POST["usoActual"];
+  $request_fields["uso_actual"] = $_POST["uso_actual"];
   $request_fields["burbujeo"] = $_POST["burbujeo"];
   $request_fields["direccion"] = $_POST["direccion"];
-  $request_fields["foto"] = $_POST["foto"];
-  $request_fields["gps"] = $_POST["gps"];
+  // $request_fields["foto"] = $_POST["foto"];
+  // $request_fields["gps"] = $_POST["gps"];
+  $request_fields["coord_x"] = $_POST["lat"];
+  $request_fields["coord_y"] = $_POST["lng"];
 
   try {
     $errors = [];
@@ -23,6 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     require_once 'request_cont.php';
 
     if(!check_fields($request_fields, $errors)) {
+      header("Content-Type: application/json");
       echo json_encode(['status' => 'fields_wrong', 'errors' => $errors]);
       die();
     }
@@ -34,7 +43,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
   } catch (PDOException $e) {
-    die("Query failed: " . $e->getMessage());
+    header("Content-Type: application/json");
+    echo json_encode(['status' => 'query_failed', 'errors' => $errors]);
   }
 }
 

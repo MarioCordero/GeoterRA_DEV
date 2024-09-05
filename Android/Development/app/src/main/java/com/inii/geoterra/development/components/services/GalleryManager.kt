@@ -1,4 +1,4 @@
-package com.inii.geoterra.development.components
+package com.inii.geoterra.development.components.services
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -14,7 +14,7 @@ import android.widget.Toast
  */
 object GalleryManager {
 
-  private const val GALLERY_PERMISSION_REQUEST_CODE = 1000
+  private const val GALLERY_PERMISSION_REQUEST_CODE = 2000
   private var isInitialize = false
 
   /**
@@ -23,8 +23,14 @@ object GalleryManager {
    * @param context
    */
   fun initialize(context: Context) {
-    if (!hasGalleryPermission(context)) {
-      requestGalleryPermission(context)
+    if (hasGalleryPermission(context)) {
+      this.isInitialize = true
+    } else {
+      // Solicitar permiso
+      ActivityCompat.requestPermissions(context as AppCompatActivity,
+        arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
+        GALLERY_PERMISSION_REQUEST_CODE
+      )
     }
   }
 
@@ -44,7 +50,8 @@ object GalleryManager {
    * @return
    */
   private fun hasGalleryPermission(context: Context): Boolean {
-    return ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+    return ContextCompat.checkSelfPermission(context,
+      android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
   }
 
   /**
@@ -70,6 +77,7 @@ object GalleryManager {
     if (requestCode == GALLERY_PERMISSION_REQUEST_CODE) {
       if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         Toast.makeText(context, "Permiso de galería concedido", Toast.LENGTH_SHORT).show()
+        this.isInitialize = true
       } else {
         Toast.makeText(context, "Permiso de galería denegado", Toast.LENGTH_SHORT).show()
       }

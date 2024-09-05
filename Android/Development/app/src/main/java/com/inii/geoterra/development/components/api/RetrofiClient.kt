@@ -1,9 +1,9 @@
-package com.inii.geoterra.development.components
+package com.inii.geoterra.development.components.api
 
 import com.google.gson.GsonBuilder
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -16,6 +16,8 @@ object RetrofitClient {
   /**
    * Base URL for the API.
    */
+  // 192.168.1.37:80 casa ip.
+  // 10.0.2.2:80 emulator ip.
   private const val BASE_URL = "http://10.0.2.2:80/API/"
 
   /**
@@ -31,9 +33,8 @@ object RetrofitClient {
     val responseBody = response.body?.string()
 
     println("JSON Response: $responseBody")
-
     response.newBuilder()
-      .body(ResponseBody.create(response.body?.contentType(), responseBody ?: ""))
+      .body((responseBody ?: "").toResponseBody(response.body?.contentType()))
       .build()
   }
 

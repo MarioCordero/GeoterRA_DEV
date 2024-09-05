@@ -98,7 +98,7 @@
 
 					<h1 class="Montserrat-SemiBold">Formulario de Puntos Estudiados</h1>
 
-					<form action="" method="post" class="add-point-form">
+					<form action="" method="post" id="add-point-form" class="add-point-form">
 
 						<p>
 							<label for="pointId" class="Poppins-Bold">Nombre del punto</label>
@@ -111,8 +111,8 @@
 						</p>
 
 						<p>
-							<label for="region" class="Poppins-Bold">Fecha</label>
-							<input name="region" type="date" class="Poppins-Light">
+							<label for="fecha" class="Poppins-Bold">Fecha</label>
+							<input name="fecha" type="date" class="Poppins-Light">
 						</p>
 						
 						<!-- Cascade container -->
@@ -123,17 +123,17 @@
 							<div class="radio-buttons-container Poppins-Light">
 
 								<div class="option">
-									<input type="radio" name="sens_termica" value="Caliente" id="caliente">
+									<input type="radio" name="sens_termica" value="3" id="caliente">
 									<label for="caliente">Caliente</label>
 								</div>
 
 								<div class="option">
-									<input type="radio" name="sens_termica" value="Tibio" id="tibio">
+									<input type="radio" name="sens_termica" value="2" id="tibio">
 									<label for="tibio">Tibio</label>
 								</div>
 
 								<div class="option">
-									<input type="radio" name="sens_termica" value="Frio" id="frio">
+									<input type="radio" name="sens_termica" value="1" id="frio">
 									<label for="frio">Frio</label>
 								</div>
 								
@@ -148,7 +148,7 @@
 						
 						<p>
 							<label for="usoActual" class="Poppins-Bold">Uso actual</label>
-							<input name="propietario" type="text" class="Poppins-Light" placeholder="Uso que se le da a la zona">
+							<input name="usoActual" type="text" class="Poppins-Light" placeholder="Uso que se le da a la zona">
 						</p>
 						
 						<p class="cascade-container">
@@ -158,12 +158,12 @@
 							<div class="radio-buttons-container Poppins-Light">
 
 								<div class="option">
-									<input type="radio" name="burbujeo" id="si">
+									<input type="radio" name="burbujeo" id="si" value="1">
 									<label for="si">Si</label>
 								</div>
 
 								<div class="option">
-									<input type="radio" name="burbujeo" id="no">
+									<input type="radio" name="burbujeo" id="no" value="0">
 									<label for="no">No</label>
 								</div>
 								
@@ -196,8 +196,17 @@
 						</p>
 						
 						<input type="submit" class="send-add-point-form Montserrat-Bold" value="Enviar">
-						
+
 					</form>
+
+          <div class="modal" id="modal">
+            <div class="modal-body">
+              Operacion exitosa
+              <div class="icon"></div>
+              <button data-close-button class="close-button">Ok</button>
+            </div>
+          </div>
+          <div id="overlay"></div>
 
 				</div>
 
@@ -220,8 +229,10 @@
 			<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 			<script src="./assets/js/check-session.js" defer></script>
 			
+			<script src="./assets/js/send-point-request-php.js"></script>
 			<script src="./assets/js/web-loader.js"></script>
 			<script src="./assets/js/menu-bars.js"></script>
+      <script src="./assets/js/modal-controller.js"></script>
 			<script src="./assets/js/add-point-map.js"></script>
 		</div>
 	</body>

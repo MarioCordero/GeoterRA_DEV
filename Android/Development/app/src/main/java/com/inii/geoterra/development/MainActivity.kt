@@ -8,10 +8,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.inii.geoterra.development.components.ActivityNavigator
-import com.inii.geoterra.development.components.CheckSessionResponse
-import com.inii.geoterra.development.components.GPSManager
-import com.inii.geoterra.development.components.RetrofitClient
-import com.inii.geoterra.development.components.SessionManager
+import com.inii.geoterra.development.components.api.CheckSessionResponse
+import com.inii.geoterra.development.components.api.RetrofitClient
+import com.inii.geoterra.development.components.services.GPSManager
+import com.inii.geoterra.development.components.services.SessionManager
 import com.inii.geoterra.development.databinding.ActivityMainBinding
 import retrofit2.Call
 import retrofit2.Callback
@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        checkSession()
+        //checkSession()
         SessionManager.init(this)
         if (SessionManager.isSessionActive()) {
             Log.i("user status", "activa")

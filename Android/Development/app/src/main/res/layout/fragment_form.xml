@@ -8,7 +8,7 @@
     android:layout_marginEnd="16dp"
     android:layout_marginTop="20dp"
     android:layout_marginBottom="65dp"
-    tools:context=".ui.FormFragment">
+    tools:context=".fragments.FormFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -17,6 +17,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="28dp"
             android:orientation="vertical">
 
             <TextView
@@ -29,13 +30,14 @@
                 android:textColor="@color/black" />
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginTop="15dp"
+                android:padding="2dp"
 
                 android:hint="Nombre Completo"
                 app:helperText="Requerido">
@@ -48,13 +50,14 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginTop="15dp"
+                android:padding="2dp"
 
                 android:hint="Numero de contacto"
                 app:helperText="Requerido">
@@ -66,6 +69,41 @@
                     android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/dateLabelInput"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="1"
+                android:paddingStart="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginTop="10dp"
+
+                    android:text="Fecha: YYYY-MM-DD"
+                    android:textSize="20sp"
+                    android:id="@+id/dateText">
+                </TextView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginTop="10dp"
+
+                    android:text="Requerido"
+                    android:textSize="13sp">
+                </TextView>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -73,52 +111,50 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="10dp"
+                android:layout_weight="1"
+                android:padding="2dp"
 
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                >
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="0dp"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:text="Sensación Térmica °C"
+                    android:textSize="20dp"
+                    >
+                </TextView>
 
-                    android:hint="Fecha"
-                    app:helperText="Requerido">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/dateTxtInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="date" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="0dp"
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/temperatureSlider"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:valueFrom="1.0"
+                    android:valueTo="3.0"
+                    android:stepSize="1"
+                    android:value="1"
+                    app:labelBehavior="gone" />
 
-                    android:layout_marginStart="10dp"
-                    android:hint="Sensación Térmica °C"
-                    app:helperText="Requerido">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/thermalSensationTxtInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="numberDecimal" />
-                </com.google.android.material.textfield.TextInputLayout>
+                <TextView
+                    android:id="@+id/sliderLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Frío"
+                    android:textSize="25sp"
+                    android:layout_gravity="start">
+                </TextView>
 
             </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginTop="15dp"
+                android:padding="2dp"
 
                 android:hint="Propietario de la zona"
                 app:helperText="Rellenar solo si es necesario">
@@ -131,19 +167,20 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginTop="15dp"
+                android:padding="2dp"
 
                 android:hint="Uso actual"
                 app:helperText="Requerido">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/actualUseInputText"
+                    android:id="@+id/currentUsageTxtInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPersonName" />
@@ -155,7 +192,8 @@
 
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginEnd="10dp">
+                android:layout_marginEnd="10dp"
+                android:padding="2dp">
 
                 <CheckBox
                     android:id="@+id/bubbleCheckBox"
@@ -165,13 +203,14 @@
             </FrameLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginTop="15dp"
+                android:padding="2dp"
 
                 android:hint="Indicaciones adicionales">
 
@@ -189,6 +228,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
+                android:padding="2dp"
 
                 android:orientation="horizontal"
                 android:gravity="center_horizontal"

@@ -1,4 +1,4 @@
-package com.inii.geoterra.development.components
+package com.inii.geoterra.development.components.api
 
 import com.google.gson.annotations.SerializedName
 import retrofit2.Call
@@ -30,57 +30,27 @@ data class SignInCredentials(
  * @constructor Create empty SingUp credentials
  */
 data class SingUpCredentials(
-  @Field("email") val email: String,
-  @Field("password") val password: String,
-  @Field("first_name") val firstName : String,
-  @Field("last_name") val lastName : String,
-  @Field("phone_num") val phoneNumber : String
+  val email: String,
+  val password: String,
+  val firstName : String,
+  val lastName : String,
+  val phoneNumber : String
 )
 
-/**
- * Sign in response
- *
- * @property status
- * @property errors
- * @constructor Create empty Sign in response
- */
-data class SignInResponse(
-  @SerializedName("status") val status : String,
-  @SerializedName("errors") val errors : List<SignInErrors>
-) {
-  /**
-   * Data class used to format the response of the server in the SignIn request.
-   *
-   * @property emptyInput Error message for empty fields.
-   * @property invalidCred Error message for invalid credentials.
-   * @constructor Create empty Sign in error response
-   */
-  data class SignInErrors(
-    @SerializedName("type") val errorType : String,
-    @SerializedName("message") val errorMessage: String,
-  )
-}
-
-data class LoggedOutResponse(
-  @SerializedName("status") val status : String,
-  @SerializedName("message") val message : String
-)
-
-/**
- * Data class used to format the response of the server in the SignUp request.
- *
- * @property emptyInput Error message for empty fields.
- * @property emailUsed Error message for used email.
- * @constructor Create empty Sign up error response
- */
-data class SignUpErrorResponse(
-  @SerializedName("empty_input") val emptyInput : String,
-  @SerializedName("email_used") val emailUsed : String
-)
-
-data class CheckSessionResponse(
-  @SerializedName("status") val status : String,
-  @SerializedName("user") val userName : String
+data class RequestForm(
+ var pointID : String,
+ var region : String,
+ var date : String,
+ var email : String,
+ var owner : String,
+ var currentUsage : String,
+ var address : String,
+ var phoneNumber : String,
+ var coordinates : String,
+ var thermalSensation : Int,
+ var bubbles : Int,
+ var latitude : String,
+ var longitude : String,
 )
 
 data class ThermalPoint(
@@ -105,6 +75,57 @@ data class ThermalPoint(
   @SerializedName("Na") val sodium : Double,
   @SerializedName("K") val potassium : Double,
   @SerializedName("MG+") val magnesiumIon : Double
+)
+
+/**
+ * Sign in response
+ *
+ * @property status
+ * @property errors
+ * @constructor Create empty Sign in response
+ */
+data class SignInResponse(
+  @SerializedName("status") val status : String,
+  @SerializedName("errors") val errors : List<Error>
+)
+
+data class LoggedOutResponse(
+  @SerializedName("status") val status : String,
+  @SerializedName("message") val message : String
+)
+
+/**
+ * Data class used to format the response of the server in the SignUp request.
+ *
+ * @property emptyInput Error message for empty fields.
+ * @property emailUsed Error message for used email.
+ * @constructor Create empty Sign up error response
+ */
+data class SignUpErrorResponse(
+  @SerializedName("empty_input") val emptyInput : String,
+  @SerializedName("email_used") val emailUsed : String
+)
+
+data class CheckSessionResponse(
+  @SerializedName("status") val status : String,
+  @SerializedName("user") val userName : String
+)
+
+data class RequestResponse(
+  @SerializedName("status") val status : String,
+  @SerializedName("errors") val errors : List<Error>
+)
+
+/**
+ * Data class used to format the response of the server in the SignIn request.
+ *
+ * @property type Error message for empty fields.
+ * @property message Error message for invalid credentials.
+ * @constructor Create empty Sign in error response
+ */
+data class Error(
+  @SerializedName("type") val type : String,
+  @SerializedName("message") val message: String,
 )
 
 /**
@@ -152,6 +173,28 @@ interface APIService {
   fun getMapPoints(
     @Field("region") region: String
   ): Call<List<ThermalPoint>>
+
+  @FormUrlEncoded
+  @POST("request.inc.php")
+  fun newRequest(
+    @Field("point_id") pointID : String,
+    @Field("region") region : String,
+    @Field("fecha") date : String,
+
+    @Field ("email") email : String,
+
+    @Field("propietario") owner : String,
+    @Field("uso_actual") currentUsage : String,
+    @Field("direccion") address : String,
+    @Field("num_telefono") contactNumber : String,
+
+    @Field("gps") coordinates : String,
+
+    @Field("sens_termica") thermalSensation : Int,
+    @Field("burbujeo") bubbles : Int,
+    @Field ("lat") latitude : String,
+    @Field ("lng") longitude : String,
+  ): Call<RequestResponse>
 
   @GET("check_session.php")
   fun checkSession(

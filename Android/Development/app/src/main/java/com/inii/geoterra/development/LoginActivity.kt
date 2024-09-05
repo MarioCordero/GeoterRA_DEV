@@ -16,13 +16,14 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.inii.geoterra.development.components.ActivityNavigator
-import com.inii.geoterra.development.components.GPSManager
+import com.inii.geoterra.development.components.api.Error
+import com.inii.geoterra.development.components.services.GPSManager
 import com.inii.geoterra.development.components.OnFragmentInteractionListener
-import com.inii.geoterra.development.components.RetrofitClient
-import com.inii.geoterra.development.components.SessionManager
-import com.inii.geoterra.development.components.SignInCredentials
-import com.inii.geoterra.development.components.SignInResponse
-import com.inii.geoterra.development.ui.SignUpFragment
+import com.inii.geoterra.development.components.api.RetrofitClient
+import com.inii.geoterra.development.components.services.SessionManager
+import com.inii.geoterra.development.components.api.SignInCredentials
+import com.inii.geoterra.development.components.api.SignInResponse
+import com.inii.geoterra.development.fragments.SignUpFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -171,10 +172,10 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
         })
     }
 
-    private fun handleServerErrors(errors : List<SignInResponse.SignInErrors>) {
+    private fun handleServerErrors(errors : List<Error>) {
         // Verifica si la lista de errores no es nula y no está vacía
         for (error in errors) {
-            Log.i(error.errorType, error.errorMessage)
+            Log.i(error.type, error.message)
         }
     }
 
@@ -199,7 +200,7 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
         val fragmentSpace = findViewById<FrameLayout>(R.id.signupFragmentSpace)
         fragmentSpace.visibility = View.VISIBLE
 
-        val signUpFragment = SignUpFragment.newInstance("hola", "pedro")
+        val signUpFragment = SignUpFragment()
         // Insertar el fragmento en el contenedor
         supportFragmentManager.beginTransaction()
             .replace(R.id.signupFragmentSpace, signUpFragment)

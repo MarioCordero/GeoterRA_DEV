@@ -12,10 +12,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.inii.geoterra.development.components.ActivityNavigator
-import com.inii.geoterra.development.components.GPSManager
+import com.inii.geoterra.development.components.services.GPSManager
 import com.inii.geoterra.development.components.OnFragmentInteractionListener
-import com.inii.geoterra.development.components.SessionManager
-import com.inii.geoterra.development.ui.FormFragment
+import com.inii.geoterra.development.components.services.SessionManager
+import com.inii.geoterra.development.fragments.FormFragment
 import com.inii.geoterra.development.ui.RequestSheet
 
 class RequestActivity : AppCompatActivity(), OnFragmentInteractionListener {
@@ -68,6 +68,7 @@ class RequestActivity : AppCompatActivity(), OnFragmentInteractionListener {
                 else -> false
             }
         }
+
         val requestButton = findViewById<Button>(R.id.newRequestButton)
         requestButton.setOnClickListener {
             showForms()
@@ -83,7 +84,7 @@ class RequestActivity : AppCompatActivity(), OnFragmentInteractionListener {
     }
 
     private fun showForms() {
-        val formsFragment = FormFragment.newInstance("hola", "paco")
+        val formsFragment = FormFragment()
 
         val requestButton = findViewById<Button>(R.id.newRequestButton)
         requestButton.visibility = View.INVISIBLE

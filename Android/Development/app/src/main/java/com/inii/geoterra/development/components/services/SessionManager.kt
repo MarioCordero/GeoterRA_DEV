@@ -1,4 +1,4 @@
-package com.inii.geoterra.development.components
+package com.inii.geoterra.development.components.services
 
 import android.content.Context
 import android.content.SharedPreferences
