@@ -1,4 +1,13 @@
-// NEW
+function credentialError() {
+    // Código para manejar errores de credenciales, por ejemplo:
+    document.getElementById("credential-error-container").classList.toggle('active');
+}
+
+document.getElementById("close-error-msg").onclick = function() {
+    document.getElementById("credential-error-container").classList.remove('active');
+    document.querySelector('input[name="email"]').value = "";
+    document.querySelector('input[name="password"]').value = "";
+};
 
 document.getElementById("login_form").addEventListener("submit", function (event) {
     event.preventDefault();
@@ -16,20 +25,13 @@ document.getElementById("login_form").addEventListener("submit", function (event
                 checkSession();
 
             } else {
-                let errorObject = response.errors;
-                document.getElementById("result").innerHTML = "";
-                console.log(errorObject);
-                Object.keys(errorObject).forEach(key => {
-                    let value = errorObject[key];
-                    document.getElementById("result").innerHTML += value + "<br>";
-                });
+                credentialError();
             }
 
         }
     };
     xhr.send(formData);
 });
-
 
 // OLD
 // document.getElementById("login_form").addEventListener("submit",function (event) {

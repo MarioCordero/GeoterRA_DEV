@@ -507,6 +507,65 @@ html {
 	font-weight: bold;
 	cursor: pointer;
 }
+
+#credential-error-container{
+	position: fixed;
+    background: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+    transition: all 500ms ease;
+    z-index: 22;
+	justify-content: center;
+    align-items: center;
+    visibility: hidden;
+    opacity: 0;
+	display: none;
+	display: flex;
+}#credential-error-container.active{
+	margin: auto;
+    visibility: visible;
+    opacity: 1;
+}
+.error-msg{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+    align-items: center;
+	width: 40%;
+	background-color: var(--blanco);
+	border-radius: 8px;
+}.error-msg h3{
+	border-radius: 8px 8px 0px 0px;
+	width: 100%;
+	text-align: center;
+	color: var(--blanco);
+	background-color: var(--azul);
+	padding: 3vh 0vh;
+	font-size: 25px;
+}.error-msg p{
+	width: 100%;
+	text-align: center;
+	background-color: var(--blanco);
+	color: var(--negro);
+	padding: 2vh 0vh;
+	margin: 2vh auto 1vh auto;
+}.error-msg button{
+	font-size: 15px;
+    display: block;
+    margin: 2vh auto;
+    width: 40%;
+    border-radius: 8px;
+    border: none;
+    padding: 10px;
+    transition: all 500ms ease;
+    background-color: var(--azul);
+    color: var(--blanco);
+}.error-msg button:hover{
+	cursor: pointer;
+	background-color: var(--naranja);
+	color: var(--blanco);
+}
+
 .login {
     display: flex;
     height: 100%;
