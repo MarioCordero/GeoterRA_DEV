@@ -1047,6 +1047,10 @@ iframe {
   max-width: 80%;
 }
 
+.modal.active { 
+  display: block;
+}
+
 .modal-body {
   height: 100%;
   width: 100%;
@@ -1093,6 +1097,7 @@ iframe {
 }
 
 #overlay.active {
+  display: block;
   opacity: 1;
   pointer-events: all;
 }
