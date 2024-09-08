@@ -12,13 +12,11 @@ import com.inii.geoterra.development.components.api.CheckSessionResponse
 import com.inii.geoterra.development.components.api.RetrofitClient
 import com.inii.geoterra.development.components.services.GPSManager
 import com.inii.geoterra.development.components.services.SessionManager
-import com.inii.geoterra.development.databinding.ActivityMainBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
-    lateinit var binding : ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -28,12 +26,15 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        //checkSession()
         SessionManager.init(this)
-        if (SessionManager.isSessionActive()) {
-            Log.i("user status", "activa")
-        } else {
-            Log.i("user status", "no activa")
+//        if (SessionManager.isSessionActive()) {
+//            Log.i("user status", "activa")
+//        } else {
+//            Log.i("user status", "no activa")
+//        }
+
+        if (GPSManager.isInitialized()) {
+            GPSManager.startLocationUpdates()
         }
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_menu)
@@ -42,10 +43,6 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.mapItem -> {
-                    if (!GPSManager.isInitialized()) {
-                        GPSManager.initialize(this)
-                    }
-
                     // Iniciar la actividad HomeActivity
                     if (GPSManager.isInitialized()) {
                         ActivityNavigator.changeActivity(this, MapActivity::class.java)

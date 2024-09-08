@@ -54,7 +54,7 @@ object GPSManager : LocationCallback() {
    * Starts location updates.
    */
   @SuppressLint("MissingPermission")
-  private fun startLocationUpdates() {
+  fun startLocationUpdates() {
     fusedLocationClient.requestLocationUpdates(locationRequest, this, Looper.getMainLooper())
   }
 

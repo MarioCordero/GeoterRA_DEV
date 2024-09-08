@@ -16,13 +16,13 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.inii.geoterra.development.components.ActivityNavigator
-import com.inii.geoterra.development.components.api.Error
-import com.inii.geoterra.development.components.services.GPSManager
 import com.inii.geoterra.development.components.OnFragmentInteractionListener
+import com.inii.geoterra.development.components.api.Error
 import com.inii.geoterra.development.components.api.RetrofitClient
-import com.inii.geoterra.development.components.services.SessionManager
 import com.inii.geoterra.development.components.api.SignInCredentials
 import com.inii.geoterra.development.components.api.SignInResponse
+import com.inii.geoterra.development.components.services.GPSManager
+import com.inii.geoterra.development.components.services.SessionManager
 import com.inii.geoterra.development.fragments.SignUpFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
