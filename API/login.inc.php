@@ -1,4 +1,5 @@
 <?php
+session_start(); // Importante: iniciar la sesión al principio
 require 'conf_sess.inc.php';  // Include session configuration
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -21,6 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             header("Content-Type: application/json");
             echo json_encode(['status' => 'logged_in', 'errors' => $errors, 'session' => $_SESSION['user']]);
             die();
+            // Success!
         } else {
             $errors[] = ['type' => 'invalid_cred', 'message' => 'Credenciales erroneas'];
         }
