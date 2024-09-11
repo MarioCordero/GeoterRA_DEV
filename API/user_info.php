@@ -1,52 +1,39 @@
 <?php
-require_once 'dbhandler.inc.php'; // archivo donde configuras PDO
+require_once 'dbhandler.inc.php'; // include your DB connection script
 
-// Establece el Content-Type para que sea JSON
-header("Content-Type: application/json");
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get email from the POST request
+    $email = $_POST['email'];
 
-try {
-    // Captura el cuerpo de la solicitud
-    $inputJSON = file_get_contents('php://input');
-    $input = json_decode($inputJSON, true);
+    if (!empty($email)) {
+        try {
+            // Prepare the SQL query
+            $stmt = $pdo->prepare("SELECT first_name, last_name, email, phone_number FROM reg_usr WHERE email = :email");
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
 
-    // Verifica si el JSON contiene el campo 'email'
-    if (!isset($input['email'])) {
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'Email no proporcionado.'
-        ]);
-        die();
-    }
+            // Fetch the user data
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Extrae el email del JSON
-    $email = $input['email'];
-
-    // Consulta SQL para obtener la información del usuario
-    $sql = "SELECT * FROM reg_usr WHERE email = :email";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-    $stmt->execute();
-
-    // Verifica si se encontró el usuario
-    if ($stmt->rowCount() > 0) {
-        // Si el usuario existe, devuelve los datos del usuario
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        echo json_encode([
-            'status' => 'success',
-            'user' => $user
-        ]);
+            // If user data is found, return it as JSON
+            if ($user) {
+                echo json_encode([
+                    'status' => 'success',
+                    'name' => $user['first_name'] . ' ' . $user['last_name'],
+                    'email' => $user['email'],
+                    'phone' => $user['phone_number']
+                ]);
+            } else {
+                // If no user is found
+                echo json_encode(['status' => 'error', 'message' => 'User not found.']);
+            }
+        } catch (PDOException $e) {
+            // Handle any errors
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
     } else {
-        // Si no se encuentra el usuario, devolver un mensaje de error
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'Usuario no encontrado.'
-        ]);
+        // Handle missing email
+        echo json_encode(['status' => 'error', 'message' => 'Email is required.']);
     }
-} catch (PDOException $e) {
-    // Manejo de errores en la conexión o consulta
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Error en la consulta: ' . $e->getMessage()
-    ]);
 }
 ?>

@@ -11,7 +11,6 @@ function checkSession() {
             if (response.status === 'logged_in') {
 
                 console.log('User is logged in');
-                console.log('User email:', response.user);
                 localStorage.setItem('userEmail', response.user);
 
                 // Cambiar las nav bar si el usuario está logeado o no
