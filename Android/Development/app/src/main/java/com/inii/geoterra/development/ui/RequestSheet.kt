@@ -26,7 +26,7 @@ class RequestSheet @JvmOverloads constructor(
     val inflater = LayoutInflater.from(context)
     val view = inflater.inflate(R.layout.request_sheet, this, true)
 
-    // Obtener referencias a los elementos visuales
+    // Obtain references to the views in the custom layout
     locationImage = view.findViewById(R.id.imageView5)
     coordenates = view.findViewById(R.id.coordenatesTxt)
     date = view.findViewById(R.id.dateTxt)
@@ -36,6 +36,7 @@ class RequestSheet @JvmOverloads constructor(
   }
 
   fun setInformation(coordenadas: String, fecha: String, estado: String) {
+    // Set the information in the custom layout views
     locationImage.clipToOutline
     coordenates.text = "Coordenadas: $coordenadas"
     date.text = "Fecha: $fecha"
@@ -43,7 +44,7 @@ class RequestSheet @JvmOverloads constructor(
   }
 
   fun setDimensions(width: Int, height: Int) {
-    // Respectable las nuevas dimensiones del contenedor principal
+    // Set the dimensions of the custom layout
     val layoutParams = LayoutParams(width, height)
     setLayoutParams(layoutParams)
   }
