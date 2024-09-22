@@ -2,6 +2,7 @@ package com.inii.geoterra.development
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +19,8 @@ import retrofit2.Response
 
 class UserDashboardActivity : AppCompatActivity() {
   private lateinit var bottomNavigationView : BottomNavigationView
+  private val rootView : View = findViewById(R.id.UserDashBoard)
+
   override fun onCreate(savedInstanceState : Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()

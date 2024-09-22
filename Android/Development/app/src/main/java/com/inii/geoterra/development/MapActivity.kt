@@ -3,6 +3,7 @@ package com.inii.geoterra.development
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -44,6 +45,7 @@ import retrofit2.Response
  */
 class MapActivity : AppCompatActivity() {
     private lateinit var mapView : MapView
+    private val rootView : View = findViewById(R.id.mapLayout)
     private lateinit var bottomNavigationView : BottomNavigationView
     private var activeMarkers : MutableMap<String, Marker> = mutableMapOf()
     private var thermalPoints: MutableMap<String, GeoPoint> = mutableMapOf()
@@ -60,9 +62,10 @@ class MapActivity : AppCompatActivity() {
             insets
         }
         // Initialize the map view
-        this.mapView = findViewById(R.id.MapView)
+        this.mapView = this.rootView.findViewById(R.id.MapView)
         // Initialize the bottom navigation view
-        this.bottomNavigationView = findViewById(R.id.bottom_menu)
+        this.bottomNavigationView = this.rootView.findViewById(R.id.bottom_menu)
+
 
         setupBottomMenuListener()
 

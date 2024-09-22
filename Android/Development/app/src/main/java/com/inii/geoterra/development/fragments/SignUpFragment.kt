@@ -32,32 +32,38 @@ private const val ARG_PARAM2 = "param2"
  */
 class SignUpFragment : Fragment() {
   private var listener : OnFragmentInteractionListener? = null
+  private lateinit var rootView : View
 
   override fun onCreateView(inflater : LayoutInflater,
                             container : ViewGroup?,
                             savedInstanceState : Bundle?) : View? {
     // Inflate the layout for this fragment
-    val rootView = inflater.inflate(R.layout.fragment_sign_up, container, false)
+    this.rootView = inflater.inflate(R.layout.fragment_sign_up, container, false)
 
-    val createAccountB = rootView.findViewById<Button>(R.id.createAccountB)
+    val createAccountB = this.rootView.findViewById<Button>(R.id.createAccountB)
+    setCreateAccountClickListener(createAccountB)
 
+    return rootView
+  }
+
+  private fun setCreateAccountClickListener(createAccountB : Button) {
     createAccountB.setOnClickListener {
-      val email = rootView.findViewById<EditText>(R.id.userEmail).text.toString().trim()
-      val password = rootView.findViewById<EditText>(R.id.userPassword).text.toString().trim()
-      val firstName = rootView.findViewById<EditText>(R.id.userFirstName).text.toString().trim()
-      val lastName = rootView.findViewById<EditText>(R.id.userLastName).text.toString().trim()
-      val phoneNum = rootView.findViewById<EditText>(R.id.userPhoneNum).text.toString().trim()
+      val email = this.rootView.findViewById<EditText>(R.id.userEmail).text.toString().trim()
+      val password = this.rootView.findViewById<EditText>(R.id.userPassword).text.toString().trim()
+      val firstName = this.rootView.findViewById<EditText>(R.id.userFirstName).text.toString().trim()
+      val lastName = this.rootView.findViewById<EditText>(R.id.userLastName).text.toString().trim()
+      val phoneNum = this.rootView.findViewById<EditText>(R.id.userPhoneNum).text.toString().trim()
 
       Log.i("Tomado de datos en login", "$email $password")
 
       if (email.isNotBlank() && password.isNotBlank()) {
         if (email.isValidEmail() && password.length >= 8) {
           val credentials = SingUpCredentials(
-              email = email,
-              password = password,
-              firstName = firstName,
-              lastName = lastName,
-              phoneNumber = phoneNum
+            email = email,
+            password = password,
+            firstName = firstName,
+            lastName = lastName,
+            phoneNumber = phoneNum
           )
           createUser(credentials)
 
@@ -72,8 +78,6 @@ class SignUpFragment : Fragment() {
         showError("Por favor, rellena todos los campos")
       }
     }
-
-    return rootView
   }
 
   private fun createUser(credentials : SingUpCredentials) {

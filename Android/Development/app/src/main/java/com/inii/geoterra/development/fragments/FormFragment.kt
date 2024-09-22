@@ -49,18 +49,18 @@ class FormFragment : Fragment() {
                             container : ViewGroup?,
                             savedInstanceState : Bundle?)
   : View {
-     rootView = inflater.inflate(R.layout.fragment_form, container, false)
+     this.rootView = inflater.inflate(R.layout.fragment_form, container, false)
     // Inflate the layout for this fragment
     // Creates an object that manage the location requests.
     listener = activity as? OnFragmentInteractionListener
     requestForm = RequestForm("", "", "", "", "", "", "", "", "", 0, 0, "", "");
 
-    val locationButton = rootView.findViewById<Button>(R.id.userLocationButton)
-    val imageButton = rootView.findViewById<Button>(R.id.locationImageButton)
-    val sendButton = rootView.findViewById<Button>(R.id.sendRequestButton)
-    val dateText = rootView.findViewById<TextView>(R.id.dateText)
-    val temperatureSlider = rootView.findViewById<Slider>(R.id.temperatureSlider)
-    val sliderLabel = rootView.findViewById<TextView>(R.id.sliderLabel)
+    val locationButton = this.rootView.findViewById<Button>(R.id.userLocationButton)
+    val imageButton = this.rootView.findViewById<Button>(R.id.locationImageButton)
+    val sendButton = this.rootView.findViewById<Button>(R.id.sendRequestButton)
+    val dateText = this.rootView.findViewById<TextView>(R.id.dateText)
+    val temperatureSlider = this.rootView.findViewById<Slider>(R.id.temperatureSlider)
+    val sliderLabel = this.rootView.findViewById<TextView>(R.id.sliderLabel)
 
     temperatureSlider.addOnChangeListener { _, value, _ ->
       // Update the label text GRAVITY based on the selected value
@@ -149,7 +149,7 @@ class FormFragment : Fragment() {
       listener?.onFragmentFinished()
     }
 
-    return rootView
+    return this.rootView
   }
 
   private fun getFormData() {

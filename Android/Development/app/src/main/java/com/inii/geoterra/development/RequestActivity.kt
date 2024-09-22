@@ -30,6 +30,7 @@ import retrofit2.Response
 class RequestActivity : AppCompatActivity(), OnFragmentInteractionListener {
     private var submittedRequest : List<RequestDataCard> = listOf()
     private lateinit var bottomNavigationView : BottomNavigationView
+    private val rootView : View = findViewById(R.id.requestLayout)
     /**
      *
      */
@@ -42,14 +43,13 @@ class RequestActivity : AppCompatActivity(), OnFragmentInteractionListener {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
         getSubmittedRequests()
 
         // Initialize the bottom navigation view
-        this.bottomNavigationView = findViewById(R.id.bottom_menu)
+        this.bottomNavigationView = this.rootView.findViewById(R.id.bottom_menu)
         setupBottomMenuListener()
 
-        val requestButton = findViewById<Button>(R.id.newRequestButton)
+        val requestButton = this.rootView.findViewById<Button>(R.id.newRequestButton)
         requestButton.setOnClickListener {
             showForms()
         }
@@ -110,14 +110,14 @@ class RequestActivity : AppCompatActivity(), OnFragmentInteractionListener {
     private fun showForms() {
         val formsFragment = FormFragment()
         // Hide the request button and text.
-        val requestButton = findViewById<Button>(R.id.newRequestButton)
+        val requestButton = this.rootView.findViewById<Button>(R.id.newRequestButton)
         requestButton.visibility = View.INVISIBLE
-        val requestText = findViewById<TextView>(R.id.requestText)
+        val requestText = this.rootView.findViewById<TextView>(R.id.requestText)
         requestText.visibility = View.INVISIBLE
-        val scrollView = findViewById<FrameLayout>(R.id.requestScrollView)
+        val scrollView = this.rootView.findViewById<FrameLayout>(R.id.requestScrollView)
         scrollView.visibility = View.INVISIBLE
         // Show the form fragment.
-        val frame = findViewById<FrameLayout>(R.id.formFrame)
+        val frame = this.rootView.findViewById<FrameLayout>(R.id.formFrame)
         frame.visibility = View.VISIBLE
 
         //Begin the transaction.

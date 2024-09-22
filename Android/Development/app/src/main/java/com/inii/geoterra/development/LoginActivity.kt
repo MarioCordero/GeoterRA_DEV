@@ -36,6 +36,7 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
 
     private lateinit var loginButton : Button
     private lateinit var bottomNavigationView : BottomNavigationView
+    private val rootView : View = findViewById(R.id.loginLayout)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         SessionManager.init(this)
@@ -43,18 +44,21 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_login)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.loginLayout)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(this.rootView.findViewById(R.id.loginLayout)
+) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
         // Initialize the bottom navigation view
-        this.bottomNavigationView = findViewById(R.id.bottom_menu)
+        this.bottomNavigationView = this.rootView.findViewById(R.id.bottom_menu)
+
 
         setupBottomMenuListener()
 
-        loginButton = findViewById(R.id.loginButton)
+        loginButton = this.rootView.findViewById(R.id.loginButton)
+
         loginButton.setOnClickListener {
             val userEmail = findViewById<EditText>(R.id.userEmail).text.toString().trim()
             val userPassword = findViewById<EditText>(R.id.password).text.toString().trim()

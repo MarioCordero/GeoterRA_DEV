@@ -3,6 +3,7 @@ package com.inii.geoterra.development
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -19,12 +20,14 @@ import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
     private lateinit var bottomNavigationView : BottomNavigationView
+    private val rootView : View = findViewById(R.id.mainLayout)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.mainLayout)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(this.rootView.findViewById(R.id.mainLayout)
+) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -45,7 +48,8 @@ class MainActivity : AppCompatActivity() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_menu)
         bottomNavigationView.selectedItemId = R.id.homeItem
         // Initialize the bottom navigation view
-        this.bottomNavigationView = findViewById(R.id.bottom_menu)
+        this.bottomNavigationView = this.rootView.findViewById(R.id.bottom_menu)
+
 
         setupBottomMenuListener()
 
