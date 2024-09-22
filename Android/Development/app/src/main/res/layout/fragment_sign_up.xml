@@ -92,7 +92,6 @@
             </CheckBox>
         </LinearLayout>
 
-
         <EditText
             android:id="@+id/userFirstName"
             android:layout_width="match_parent"

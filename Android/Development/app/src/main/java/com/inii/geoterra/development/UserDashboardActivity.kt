@@ -19,7 +19,7 @@ import retrofit2.Response
 
 class UserDashboardActivity : AppCompatActivity() {
   private lateinit var bottomNavigationView : BottomNavigationView
-  private val rootView : View = findViewById(R.id.UserDashBoard)
+  private lateinit var rootView : View
 
   override fun onCreate(savedInstanceState : Bundle?) {
     super.onCreate(savedInstanceState)
@@ -30,7 +30,7 @@ class UserDashboardActivity : AppCompatActivity() {
       v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
       insets
     }
-
+    this.rootView = findViewById(R.id.UserDashBoard)
     // Initialize the bottom navigation view
     this.bottomNavigationView = findViewById(R.id.bottom_menu)
 
