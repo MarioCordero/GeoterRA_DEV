@@ -53,6 +53,23 @@ data class RequestForm(
  var longitude : String,
 )
 
+data class RequestDataCard(
+  @SerializedName("id_soli") val requestID : String,
+  @SerializedName("email") val email : String,
+  @SerializedName("region") val region : String,
+  @SerializedName("fecha") val date : String,
+  @SerializedName("propietario") val owner : String,
+  @SerializedName("num_telefono") val contactNumber : String,
+  @SerializedName("coord_x") val latitude : Double,
+  @SerializedName("coord_y") val longitude : Double,
+  @SerializedName("direccion") val address : String,
+  @SerializedName("uso_actual") val currentUsage : String,
+  @SerializedName("sens_termica") val thermalSensation : Int,
+  @SerializedName("burbujeo") val bubbles : Int,
+  @SerializedName("ph_campo") val fieldPh : Double,
+  @SerializedName("cond_campo") val fieldCond : Int,
+)
+
 data class ThermalPoint(
   @SerializedName("id") val pointID : String,
   @SerializedName("coord_x") val latitude : Double,
@@ -116,6 +133,12 @@ data class RequestResponse(
   @SerializedName("errors") val errors : List<Error>
 )
 
+data class RequestsSubmittedResponse(
+  @SerializedName("status") val status : String,
+  @SerializedName("solicitudes mostras") val requests : List<RequestDataCard>,
+  @SerializedName("errors") val errors : List<Error>
+)
+
 /**
  * Data class used to format the response of the server in the SignIn request.
  *
@@ -173,6 +196,12 @@ interface APIService {
   fun getMapPoints(
     @Field("region") region: String
   ): Call<List<ThermalPoint>>
+
+  @FormUrlEncoded
+  @POST("get_request.inc.php")
+  fun getSubmittedRequests(
+    @Field("email") email : String
+  ): Call<RequestsSubmittedResponse>
 
   @FormUrlEncoded
   @POST("request.inc.php")
