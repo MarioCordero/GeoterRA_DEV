@@ -11,12 +11,13 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.inii.geoterra.development.components.ActivityNavigator
 import com.inii.geoterra.development.components.api.CheckSessionResponse
 import com.inii.geoterra.development.components.api.RetrofitClient
-import com.inii.geoterra.development.components.services.SessionManager
+import com.inii.geoterra.development.components.services.GPSManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class UserDashboardActivity : AppCompatActivity() {
+  private lateinit var bottomNavigationView : BottomNavigationView
   override fun onCreate(savedInstanceState : Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
@@ -27,40 +28,10 @@ class UserDashboardActivity : AppCompatActivity() {
       insets
     }
 
-    // Creates a variable to access the Bottom Menu.
-    val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_menu)
-    bottomNavigationView.selectedItemId = R.id.accountItem
+    // Initialize the bottom navigation view
+    this.bottomNavigationView = findViewById(R.id.bottom_menu)
 
-    bottomNavigationView.setOnItemSelectedListener { item ->
-      when (item.itemId) {
-        R.id.homeItem -> {
-          // Iniciar la actividad HomeActivity
-          ActivityNavigator.changeActivity(this, MainActivity::class.java)
-          true
-        }
-        R.id.mapItem -> {
-          // Iniciar la actividad HomeActivity
-          ActivityNavigator.changeActivity(this, MapActivity::class.java)
-          true
-        }
-        R.id.dashboardItem-> {
-          // Iniciar la actividad RequestActivity
-          ActivityNavigator.changeActivity(this, RequestActivity::class.java)
-          true
-        }
-        R.id.accountItem -> {
-          // Iniciar la actividad LoginActivity
-          if (SessionManager.isSessionActive()) {
-            ActivityNavigator.changeActivity(this, UserDashboardActivity::class.java)
-          } else {
-            ActivityNavigator.changeActivity(this, LoginActivity::class.java)
-          }
-          true
-        }
-        else -> false
-      }
-
-    }
+    setupBottomMenuListener()
 
     val helpButton = findViewById<Button>(R.id.helpButton)
     helpButton.setOnClickListener{
@@ -71,6 +42,39 @@ class UserDashboardActivity : AppCompatActivity() {
     val userActivityButton = findViewById<Button>(R.id.activityButton)
     userActivityButton.setOnClickListener {
       ActivityNavigator.changeActivity(this, RequestActivity::class.java)
+    }
+  }
+
+  /**
+   * Setup bottom menu listener
+   *
+   */
+  private fun setupBottomMenuListener() {
+    // Set the selected item in the bottom navigation view
+    this.bottomNavigationView.selectedItemId = R.id.accountItem
+    // Set up the bottom navigation listener
+    bottomNavigationView.setOnItemSelectedListener { item ->
+      // Handle item selection and navigate to the corresponding activity
+      when (item.itemId) {
+        R.id.homeItem -> {
+          ActivityNavigator.changeActivity(this, MainActivity::class.java)
+          true
+        }
+        R.id.mapItem-> {
+          // Start the gps service or ask for permissions
+          if (GPSManager.isInitialized()) {
+            ActivityNavigator.changeActivity(this, MapActivity::class.java)
+          } else {
+            GPSManager.initialize(this)
+          }
+          true
+        }
+        R.id.dashboardItem -> {
+          ActivityNavigator.changeActivity(this, RequestActivity::class.java)
+          true
+        }
+        else -> false
+      }
     }
   }
 

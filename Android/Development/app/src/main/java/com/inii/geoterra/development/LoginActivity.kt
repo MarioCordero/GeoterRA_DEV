@@ -35,6 +35,8 @@ import retrofit2.Response
 class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
 
     private lateinit var loginButton : Button
+    private lateinit var bottomNavigationView : BottomNavigationView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         SessionManager.init(this)
 
@@ -47,53 +49,10 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
             insets
         }
 
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_menu)
-        bottomNavigationView.selectedItemId = R.id.accountItem
+        // Initialize the bottom navigation view
+        this.bottomNavigationView = findViewById(R.id.bottom_menu)
 
-        bottomNavigationView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.homeItem -> {
-                    // Iniciar la actividad HomeActivity
-                    ActivityNavigator.changeActivity(this, MainActivity::class.java)
-                    true
-                }
-                R.id.dashboardItem-> {
-                    // Iniciar la actividad DashboardActivity
-                    ActivityNavigator.changeActivity(this, RequestActivity::class.java)
-                    true
-                }
-                R.id.mapItem -> {
-                    // Iniciar la actividad HomeActivity
-                    if (GPSManager.isInitialized()) {
-                        ActivityNavigator.changeActivity(this, MapActivity::class.java)
-                    } else {
-                        GPSManager.initialize(this)
-                    }
-                    true
-                }
-                else -> false
-            }
-        }
-
-//        val apiService = RetrofitClient.getAPIService()
-//        val call = apiService.logout()
-//        call.enqueue(object : Callback<LoggedOutResponse> {
-//            override fun onResponse(call: Call<LoggedOutResponse>, response: Response<LoggedOutResponse>) {
-//                if (response.isSuccessful) {
-//                    val serverResponse = response.body()
-//                    if (serverResponse != null) {
-//                        Log.d("Logged Out", serverResponse.message)
-//                    }
-//
-//                } else {
-//                    Log.d("Logged Out", "Error al cerrar sesión: ${response.code()}")
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<LoggedOutResponse>, t: Throwable) {
-//                Log.d("Logout", "Error en la solicitud: ${t.message}")
-//            }
-//        })
+        setupBottomMenuListener()
 
         loginButton = findViewById(R.id.loginButton)
         loginButton.setOnClickListener {
@@ -142,8 +101,9 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
         val apiService = RetrofitClient.getAPIService()
         val call = apiService.signIn(credentials.email, credentials.password)
 
-        call.enqueue(object : Callback<SignInResponse> { // Cambiar String a List<LoginErrorResponse>
-            override fun onResponse(call: Call<SignInResponse>, response: Response<SignInResponse>) {
+        call.enqueue(object : Callback<SignInResponse> {
+            override fun onResponse(call: Call<SignInResponse>, response:
+                Response<SignInResponse>) {
                 if (response.isSuccessful) {
                     val serverResponse = response.body()
                     if (serverResponse != null) {
@@ -152,8 +112,8 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
                         if (errors.isEmpty()) {
                             if (status == "logged_in") {
                                 SessionManager.startSession(credentials.email)
-                                // Caso donde la respuesta del servidor indica éxito pero devuelve un arreglo vacío de errores
-                                Log.i("Success", "Login exitoso sin errores adicionales$errors")
+                                Log.i("Success", "Login exitoso sin errores" +
+                                        " adicionales$errors")
                                 switchToUserDashboard()
                             } else {
                                 Log.i("failed", "El usuario ya tiene un sesion activa")
@@ -173,7 +133,7 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
     }
 
     private fun handleServerErrors(errors : List<Error>) {
-        // Verifica si la lista de errores no es nula y no está vacía
+        // Logs the errors to the console
         for (error in errors) {
             Log.i(error.type, error.message)
         }
@@ -184,7 +144,7 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
     }
 
     private fun showError(message: String) {
-        // Se le muestra el mensaje de error al usuario.
+        // Show the error message to the user
         runOnUiThread {
             Toast.makeText(this, message, Toast.LENGTH_LONG).show()
         }
@@ -201,14 +161,47 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
         fragmentSpace.visibility = View.VISIBLE
 
         val signUpFragment = SignUpFragment()
-        // Insertar el fragmento en el contenedor
+        // Add the fragment to the container
         supportFragmentManager.beginTransaction()
             .replace(R.id.signupFragmentSpace, signUpFragment)
             .commit()
     }
 
+    /**
+     * Setup bottom menu listener
+     *
+     */
+    private fun setupBottomMenuListener() {
+        // Set the selected item in the bottom navigation view
+        this.bottomNavigationView.selectedItemId = R.id.accountItem
+        // Set up the bottom navigation listener
+        bottomNavigationView.setOnItemSelectedListener { item ->
+            // Handle item selection and navigate to the corresponding activity
+            when (item.itemId) {
+                R.id.homeItem -> {
+                    ActivityNavigator.changeActivity(this, MainActivity::class.java)
+                    true
+                }
+                R.id.mapItem -> {
+                    // Start the gps service or ask for permissions
+                    if (GPSManager.isInitialized()) {
+                        ActivityNavigator.changeActivity(this, MapActivity::class.java)
+                    } else {
+                        GPSManager.initialize(this)
+                    }
+                    true
+                }
+                R.id.dashboardItem-> {
+                    ActivityNavigator.changeActivity(this, RequestActivity::class.java)
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
     override fun onFragmentFinished() {
-        // Aquí manejas el comportamiento cuando el fragmento finaliza
+        // Ends the opened fragment and returns to this activity
         ActivityNavigator.changeActivity(this, LoginActivity::class.java)
         supportFragmentManager.popBackStack()
     }

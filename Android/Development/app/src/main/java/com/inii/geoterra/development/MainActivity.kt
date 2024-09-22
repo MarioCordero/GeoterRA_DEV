@@ -1,5 +1,6 @@
 package com.inii.geoterra.development
 
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
@@ -17,6 +18,8 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var bottomNavigationView : BottomNavigationView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -35,30 +38,58 @@ class MainActivity : AppCompatActivity() {
 
         if (GPSManager.isInitialized()) {
             GPSManager.startLocationUpdates()
+        } else {
+            GPSManager.initialize(this)
         }
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_menu)
         bottomNavigationView.selectedItemId = R.id.homeItem
+        // Initialize the bottom navigation view
+        this.bottomNavigationView = findViewById(R.id.bottom_menu)
 
+        setupBottomMenuListener()
+
+    }
+
+    /**
+     * Setup bottom menu listener
+     *
+     */
+    private fun setupBottomMenuListener() {
+        // Set the selected item in the bottom navigation view
+        this.bottomNavigationView.selectedItemId = R.id.homeItem
+        // Set up the bottom navigation listener
         bottomNavigationView.setOnItemSelectedListener { item ->
+            // Handle item selection and navigate to the corresponding activity
             when (item.itemId) {
                 R.id.mapItem -> {
-                    // Iniciar la actividad HomeActivity
+                    // Start the gps service or ask for permissions
                     if (GPSManager.isInitialized()) {
-                        ActivityNavigator.changeActivity(this, MapActivity::class.java)
+                        if (GPSManager.getLastKnownLocation() != null) {
+                            ActivityNavigator.changeActivity(this, MapActivity::class.java)
+                        } else {
+                            // Esperar a que la ubicación esté lista
+                            GPSManager.setLocationCallbackListener(
+                                object : GPSManager.LocationCallbackListener {
+                                override fun onLocationReady(location : Location) {
+                                    ActivityNavigator.changeActivity(
+                                        this@MainActivity,
+                                        MapActivity::class.java
+                                    )
+                                }
+                            })
+                        }
                     } else {
                         GPSManager.initialize(this)
                     }
-
                     true
                 }
                 R.id.dashboardItem-> {
-                    // Iniciar la actividad RequestActivity
                     ActivityNavigator.changeActivity(this, RequestActivity::class.java)
                     true
                 }
                 R.id.accountItem -> {
-                    // Iniciar la actividad LoginActivity
+                    // Checks if the user is logged in
                     if (SessionManager.isSessionActive()) {
                         ActivityNavigator.changeActivity(this, UserDashboardActivity::class.java)
                     } else {
@@ -68,11 +99,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 else -> false
             }
-
         }
-
-
-
     }
 
     private fun checkSession() {

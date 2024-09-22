@@ -12,10 +12,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.inii.geoterra.development.components.ActivityNavigator
-import com.inii.geoterra.development.components.CustomInfoOnMarker
 import com.inii.geoterra.development.components.api.RetrofitClient
 import com.inii.geoterra.development.components.api.ThermalPoint
 import com.inii.geoterra.development.components.services.GPSManager
+import com.inii.geoterra.development.components.services.SessionManager
+import com.inii.geoterra.development.ui.CustomInfoOnMarker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -96,7 +97,7 @@ class MapActivity : AppCompatActivity() {
             this.mapView.overlays.add(marker)
 
             // Set the info window for the marker
-            val infoWindow = CustomInfoOnMarker(R.layout.custom_info_on_marker, mapView)
+            val infoWindow = CustomInfoOnMarker(R.layout.custom_info_on_marker, mapView, 0.0)
             marker.infoWindow = infoWindow
 
             // Handle the marker click event
@@ -160,9 +161,9 @@ class MapActivity : AppCompatActivity() {
     private fun requestPoints() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
+                val apiService = RetrofitClient.getAPIService()
+                val call = apiService.getMapPoints("Guanacaste")
                 withContext(Dispatchers.Main) {
-                    val apiService = RetrofitClient.getAPIService()
-                    val call = apiService.getMapPoints("Guanacaste")
                     call.enqueue(object : Callback<List<ThermalPoint>> {
                         override fun onResponse(call : Call<List<ThermalPoint>>,
                                                 response : Response<List<ThermalPoint>>) {
@@ -212,17 +213,22 @@ class MapActivity : AppCompatActivity() {
                     val geoPoint = convertCRT05toWGS84(point.latitude, point.longitude)
                     // Store the GeoPoint.
                     thermalPoints[point.pointID] = geoPoint
+                    val temperature = point.temperature
 
                     // Create a marker and set its properties
                     val marker = Marker(mapView)
                     marker.position = geoPoint
                     marker.title = point.pointID
-                    marker.snippet = "Lat: %.7f, Lon: %.7f".format(geoPoint.latitude, geoPoint.longitude)
+                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                    val infoWindow = CustomInfoOnMarker(R.layout.custom_info_on_marker, mapView,
+                                                        temperature)
+                    marker.infoWindow = infoWindow
 
                     // Adds a listener to the marker that will be called when the marker is clicked.
                     marker.setOnMarkerClickListener { clickedMarker, _ ->
                         if (!marker.isInfoWindowShown) {
-                            clickedMarker.showInfoWindow()  // Muestra la información
+                            // Show the info window and center the map on the clicked marker
+                            clickedMarker.showInfoWindow()
                             mapView.controller.setCenter(marker.position)
                         } else {
                             clickedMarker.closeInfoWindow()
@@ -231,7 +237,7 @@ class MapActivity : AppCompatActivity() {
                         true
                     }
 
-                    // Stablish the marker's icon
+                    // Establish the marker's icon
                     marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                     activeMarkers["${marker.title}"] = marker
                     // Add the marker to the map
@@ -281,33 +287,6 @@ class MapActivity : AppCompatActivity() {
         return normalizedCoor
     }
 
-//    /**
-//     * Restrict map movement
-//     *
-//     */
-//    @SuppressLint("ClickableViewAccessibility")
-//    private fun restrictMapMovement() {
-//        val center = mapView.mapCenter
-//        val latitude = center.latitude
-//        val longitude = center.longitude
-//
-//        // Definir los límites del área visible para Costa Rica
-//        val minLat = 8.0
-//        val maxLat = 11.25
-//        val minLon = -86.0
-//        val maxLon = -82.5
-//
-//        // Verificar si la posición del mapa está fuera de los límites
-//        val newLatitude = latitude.coerceIn(minLat, maxLat)
-//        val newLongitude = longitude.coerceIn(minLon, maxLon)
-//
-//        // Si la posición está fuera de los límites, ajustar la posición del mapa
-//        if (latitude != newLatitude || longitude != newLongitude) {
-//            val newCenter = GeoPoint(newLatitude, newLongitude)
-//            mapView.controller.animateTo(newCenter)
-//        }
-//    }
-
     /**
      * Setup map listener
      *
@@ -342,13 +321,17 @@ class MapActivity : AppCompatActivity() {
                     true
                 }
                 R.id.dashboardItem-> {
-                    // Iniciar la actividad RequestActivity
+
                     ActivityNavigator.changeActivity(this, RequestActivity::class.java)
                     true
                 }
                 R.id.accountItem -> {
-                    // Iniciar la actividad NotificationsActivity
-                    ActivityNavigator.changeActivity(this, LoginActivity::class.java)
+                    // Checks if the user is logged in
+                    if (SessionManager.isSessionActive()) {
+                        ActivityNavigator.changeActivity(this, UserDashboardActivity::class.java)
+                    } else {
+                        ActivityNavigator.changeActivity(this, LoginActivity::class.java)
+                    }
                     true
                 }
                 else -> false
