@@ -1033,6 +1033,28 @@ iframe {
 
 /* ------------------------------Modal------------------------------ */
 
+#overlay {
+	display: none;
+	opacity: 0;
+	visibility: hidden;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0,0,0,0.5);
+	z-index: 1000;
+	transition: 200ms ease-in-out;
+	pointer-events: none;
+  }
+  
+  #overlay.active {
+	display: block;
+	opacity: 1;
+	visibility: visible;
+	pointer-events: all;
+  }
+
 .modal {
   display: none;
   position: fixed;
@@ -1081,23 +1103,4 @@ iframe {
   width: 32px;
   height: 32px;
   background-size: cover;
-}
-
-#overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0,0,0,0.5);
-  z-index: 1000;
-  transition: 200ms ease-in-out;
-  pointer-events: none;
-}
-
-#overlay.active {
-  display: block;
-  opacity: 1;
-  pointer-events: all;
 }
