@@ -215,12 +215,60 @@
 
 /*---------------------------------1090 WIDTH-------------------------*/
 @media screen and (max-width: 1090px){
-
+    .menu-logged {
+        display: none;
+        visibility: hidden;
+        opacity: 0;
+    }
+    .menu {
+        display: none;
+        visibility: hidden;
+        opacity: 0;
+    }
+    .user-info-col h2 {
+        font-size: 18px;
+    }
+    .user-info {
+        padding: 2% 5%;
+    }
+    .user-personal-data li h3 {
+        font-size: 15px;
+    }
+    .user-personal-data li p {
+        font-size: 13px;
+    }
+    .user-personal-data button {
+        font-size: 15px;
+    }
+    .user-requests button {
+        font-size: 15px;
+    }
+    .buttons-container button {
+        width: 30%;
+        font-size: 18px;
+    }
 }
 
 /*---------------------------------900 WIDTH-------------------------*/
 @media screen and (max-width: 900px){
-
+    .user-info-col-container {
+        flex-direction: column;
+    }
+    .user-info {
+        padding: 5% 15%;
+    }
+    .user-info-col:nth-child(1) {
+        margin-bottom: 10vh;
+    }
+    .user-info-col h2 {
+        font-size: 25px;
+    }
+    .user-personal-data li h3 {
+        font-size: 18px;
+    }
+    .user-personal-data li p {
+        font-size: 15px;
+    }
 }
 
 /*---------------------------------815 WIDTH-------------------------*/
