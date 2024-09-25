@@ -220,6 +220,9 @@
         visibility: hidden;
         opacity: 0;
     }
+    .menu-logged.active {
+        display: none;
+    }
     .menu {
         display: none;
         visibility: hidden;
@@ -276,16 +279,18 @@
     .user-info {
         padding: 5% 10%;
     }
+    .loged-in-container h1 {
+        padding-top: 13vh;
+    }
 }
 
 /*---------------------------------720 WIDTH-------------------------*/
 @media screen and (max-width: 720px){
-
+    /* NOTHING */
 }
 
 /*---------------------------------615 WIDTH-------------------------*/
 @media screen and (max-width: 615px){
-
 }
 
 /*---------------------------------419 WIDTH -------------------------*/
