@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let userNameElement = document.getElementById('user-name');
                 let userEmailElement = document.getElementById('user-email');
                 let userPhoneElement = document.getElementById('user-phone');
-
+                
                 // Verificar si la respuesta contiene la información del usuario
                 if (response && response.name && response.email) {
                     userNameElement.textContent = response.name; // Ajustar según la estructura de tu JSON
@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (response.phone) {
                         userPhoneElement.textContent = response.phone;
                     }
+                    document.getElementById('tittle-page').textContent = response.name; // Update the title
                 } else {
                     userNameElement.textContent = 'No se encontró la información del usuario.';
                     userEmailElement.textContent = 'No se encontró la información del usuario.';
