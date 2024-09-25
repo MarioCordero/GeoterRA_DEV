@@ -138,14 +138,14 @@ html {
   
 .toggle {
 	visibility: hidden;
+	display: none;
 	opacity: 0;
 	position: relative;
 	width: 40px;
 	cursor: pointer;
-	display: none;
 	height: calc(4px * 3 + 11px * 2);
-	margin-right: 5%;
 	height: 100%;
+	margin-right: 5%;
 	z-index: 23;
 }
   
