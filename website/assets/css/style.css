@@ -1034,9 +1034,14 @@ iframe {
 /* ------------------------------Modal------------------------------ */
 
 #overlay {
+	/* display: block;
+	opacity: 1;
+	visibility: visible; */
+
 	display: none;
 	opacity: 0;
 	visibility: hidden;
+
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -1056,51 +1061,58 @@ iframe {
   }
 
 .modal {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border: 1px solid #000;
-  border-radius: 10px;
-  z-index: 1001;
-  height: 200px;
-  width: 200px;
-  max-width: 80%;
+	display: none;
+	opacity: 0;
+	visibility: hidden;
+
+	/* display: block;
+	opacity: 1;
+	visibility: visible; */
+
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	border-radius: 10px;
+	z-index: 10;
+	min-height: 40vh;
+	min-width: 40vh;
 }
 
 .modal.active { 
-  display: block;
+	display: block;
+	opacity: 1;
+	visibility: visible;
 }
 
 .modal-body {
-  height: 100%;
-  width: 100%;
-  gap: 30px;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* Horizontally centers the content */
-  align-items: center; /* Vertically centers the content */
+	height: 100%;
+	width: 100%;
+	gap: 30px;
+	border-radius: 8px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center; /* Horizontally centers the content */
+	align-items: center; /* Vertically centers the content */
 	background-color: var(--azul);
-  color: var(--blanco);
-}
-
-.modal-body .close-button {
-  position: relative;
-  cursor: pointer;
-  border: 2px solid var(--blanco);
-  background-color: var(--azul);
-  border-radius: 40px;
-  font-size: 1rem;
-  width: 60px;
-  color: var(--blanco);
-}
-
-.modal-body .icon {
-  position: relative;
-  background-image: url('../images/icons/check.png');
-  width: 32px;
-  height: 32px;
-  background-size: cover;
+	color: var(--blanco);
+}.modal-body .close-button {
+	position: relative;
+	cursor: pointer;
+	border: 2px solid var(--blanco);
+	background-color: var(--azul);
+	border-radius: 40px;
+	font-size: 1rem;
+	width: 60px;
+	color: var(--blanco);
+}.modal-body .icon {
+	position: relative;
+	background-image: url('../images/icons/check.png');
+	width: 32px;
+	height: 32px;
+	background-size: cover;
+}.modal-body h2{
+	margin: 1vh 1vh;
+}.modal-body p{
+	margin: 1vh 1vh;
 }

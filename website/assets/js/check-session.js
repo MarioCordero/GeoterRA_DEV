@@ -22,7 +22,7 @@ function checkSession() {
 				
             } else {
                 console.log('User is not logged in');
-                // window.location.href = 'login.html'; // Redirige a la página de inicio de sesión
+                window.location.href = 'login.html'; // Redirige a la página de inicio de sesión
             }
         },
         error: function (xhr, status, error) {
