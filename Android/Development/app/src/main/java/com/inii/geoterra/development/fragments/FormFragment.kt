@@ -163,7 +163,8 @@ class FormFragment : Fragment() {
         val user = SessionManager.getUserEmail()
 
         val zoneOwner = rootView.findViewById<EditText>(R.id.zoneOwnerTxtInput).text.toString()
-        val currentUsage = rootView.findViewById<EditText>(R.id.currentUsageTxtInput).text.toString()
+        val currentUsage =
+          rootView.findViewById<EditText>(R.id.currentUsageTxtInput).text.toString()
         val address = rootView.findViewById<EditText>(R.id.indicationsTxtInput).text.toString()
         val phoneNumber =
           rootView.findViewById<EditText>(R.id.phoneNumberTxtInput).text.toString()

@@ -89,7 +89,6 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
     sigUp.setOnClickListener {
       showSignUpForm()
     }
-
   }
 
   private fun loginUser(credentials : SignInCredentials) {
