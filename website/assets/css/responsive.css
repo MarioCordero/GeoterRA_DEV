@@ -471,17 +471,50 @@
 
 /*---------------------------------815 WIDTH-------------------------*/
 @media screen and (max-width: 815px){
-
+    /* NOTHING */
 }
 
 /*---------------------------------720 WIDTH-------------------------*/
 @media screen and (max-width: 720px){
-
+    .add-point h1 {
+        font-size: 30px;
+    }
+    .radio-buttons-container .option label {
+        font-size: 15px;
+    }
+    .add-point-form p label {
+        width: 100%;
+        font-size: 15px;
+        color: var(--blanco);
+    }
+    .add-point-form {
+        padding: 5% 8%;
+    }
+    .add-point {
+        padding: 13vh 5vh;
+        gap: 5vh;
+    }
 }
 
 /*---------------------------------615 WIDTH-------------------------*/
 @media screen and (max-width: 615px){
-
+    .add-point {
+        padding: 11vh 5vh;
+        gap: 3vh;
+    }
+    .add-point h1 {
+        font-size: 25px;
+    }
+    .add-point-form p label {
+        margin: 1vh;
+    }
+    .radio-buttons-container {
+        flex-direction: column;
+    }
+    .radio-buttons-container .option {
+        width: 40%;
+        margin: auto;
+    }
 }
 
 /*---------------------------------419 WIDTH -------------------------*/
