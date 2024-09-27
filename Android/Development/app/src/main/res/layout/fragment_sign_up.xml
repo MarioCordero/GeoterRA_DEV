@@ -67,6 +67,31 @@
             android:hint="@string/password"
             android:textColor="@color/black" />
 
+        <LinearLayout
+            android:id="@+id/togglePasswordLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            >
+            <TextView
+                android:id="@+id/txvTogglePassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:padding="8dp"
+                android:text="Show Password"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                >
+            </TextView>
+            <CheckBox
+                android:id="@+id/checkBoxTogglePassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="-15dp"
+                >
+            </CheckBox>
+        </LinearLayout>
+
         <EditText
             android:id="@+id/userFirstName"
             android:layout_width="match_parent"

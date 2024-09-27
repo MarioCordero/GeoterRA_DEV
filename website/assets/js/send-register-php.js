@@ -3,7 +3,7 @@ document.getElementById("reg_form").addEventListener("submit",function(event) {
 	event.preventDefault(); 
 	let formData = new FormData(this);
 	let xhr = new XMLHttpRequest();
-	xhr.open("POST", "assets/includes/register.inc.php", true);
+	xhr.open("POST", "../../../API/register.inc.php", true);
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == 4 && xhr.status == 200) {
 			let errorObject = JSON.parse(xhr.responseText);

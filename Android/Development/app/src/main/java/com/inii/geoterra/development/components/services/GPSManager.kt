@@ -24,6 +24,8 @@ object GPSManager : LocationCallback() {
   private lateinit var fusedLocationClient : FusedLocationProviderClient
   // LocationRequest to define the parameters for location updates
   private lateinit var locationRequest : LocationRequest
+  // Add a listener for when the location is ready
+  private var locationCallbackListener: LocationCallbackListener? = null
   private var currentLocation : Location? = null
   private var isInitialized = false
   private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
@@ -33,9 +35,16 @@ object GPSManager : LocationCallback() {
    */
   fun initialize(context: Context) {
     // Check if location permission is granted
-    if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+    if (ContextCompat.checkSelfPermission(
+        context,
+        android.Manifest.permission.ACCESS_FINE_LOCATION
+      ) != PackageManager.PERMISSION_GRANTED) {
       // Request location permission if not granted
-      ActivityCompat.requestPermissions(context as AppCompatActivity, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+      ActivityCompat.requestPermissions(
+        context as AppCompatActivity,
+        arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+        LOCATION_PERMISSION_REQUEST_CODE
+      )
       return
     }
 
@@ -54,8 +63,12 @@ object GPSManager : LocationCallback() {
    * Starts location updates.
    */
   @SuppressLint("MissingPermission")
-  private fun startLocationUpdates() {
+  fun startLocationUpdates() {
     fusedLocationClient.requestLocationUpdates(locationRequest, this, Looper.getMainLooper())
+  }
+
+  fun setLocationCallbackListener(listener: LocationCallbackListener) {
+    this.locationCallbackListener = listener
   }
 
   /**
@@ -85,6 +98,8 @@ object GPSManager : LocationCallback() {
   override fun onLocationResult(locationResult: LocationResult) {
     super.onLocationResult(locationResult)
     currentLocation = locationResult.lastLocation
+    // Notify the listener if location is ready
+    locationCallbackListener?.onLocationReady(currentLocation!!)
   }
 
   /**
@@ -105,4 +120,9 @@ object GPSManager : LocationCallback() {
       }
     }
   }
+
+  interface LocationCallbackListener {
+    fun onLocationReady(location: Location)
+  }
+
 }

@@ -8,7 +8,7 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/point_id"
+        android:id="@+id/user_position"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18dp"
@@ -19,7 +19,7 @@
         android:padding="5dp"
         >
     </TextView>
-    <!-- TextView para mostrar las coordenadas -->
+
     <TextView
         android:id="@+id/coordinates"
         android:layout_width="wrap_content"
@@ -29,18 +29,5 @@
         android:padding="8dp"
         android:textColor="@android:color/black"
         android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/temperature"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:gravity="center"
-        android:padding="8dp"
-        android:textColor="@android:color/black"
-        android:textSize="16sp" />
-
-
-    <!-- Otros elementos de la ventana de información (si los hay) -->
 
 </LinearLayout>

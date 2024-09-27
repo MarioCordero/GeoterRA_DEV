@@ -87,7 +87,7 @@
 
                     android:layout_marginTop="10dp"
 
-                    android:text="Fecha: YYYY/MM/DD"
+                    android:text="Fecha: YYYY-MM-DD"
                     android:textSize="20sp"
                     android:id="@+id/dateText">
                 </TextView>

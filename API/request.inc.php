@@ -1,21 +1,23 @@
 <?php
 
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
   // Catches the username and password
-  $request_fields["IDPoint"] = $_POST["point_id"];
-  $request_fields["region"] = $_POST["region"];
-  $request_fields["fecha"] = $_POST["date"];
-
-  $request_fields["propietario"] = $_POST["owner"];
-  $request_fields["uso_actual"] = $_POST["current_usage"];
-  $request_fields["direccion"] = $_POST["address"];
-  $request_fields["num_telefono"] = $_POST["contact_number"];     
-
-  $request_fields["gps"] = $_POST["coordinates"];
-
-  $request_fields["sens_termica"] = $_POST["thermal_sensation"];
-  $request_fields["burbujeo"] = $_POST["bubbles"];
+  $request_fields["point_id"] = $_POST["point_id"];
+  $request_fields["email"] = $_POST["email"];
+  $request_fields["region"] = "Prueba";
+  $request_fields["num_telefono"] = $_POST["num_telefono"];
+  $request_fields["fecha"] = $_POST["fecha"];
+  $request_fields["sens_termica"] = $_POST["sens_termica"];
+  $request_fields["propietario"] = $_POST["propietario"];
+  $request_fields["uso_actual"] = $_POST["uso_actual"];
+  $request_fields["burbujeo"] = $_POST["burbujeo"];
+  $request_fields["direccion"] = $_POST["direccion"];
+  // $request_fields["foto"] = $_POST["foto"];
+  // $request_fields["gps"] = $_POST["gps"];
+  $request_fields["coord_x"] = $_POST["lat"];
+  $request_fields["coord_y"] = $_POST["lng"];
 
   try {
     $errors = [];
@@ -25,7 +27,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     require_once 'request_model.inc.php';
     require_once 'request_cont.php';
 
-    if(check_fields($request_fields, $errors)) {
+    if(!check_fields($request_fields, $errors)) {
+      header("Content-Type: application/json");
       echo json_encode(['status' => 'fields_wrong', 'errors' => $errors]);
       die();
     }
@@ -37,7 +40,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
   } catch (PDOException $e) {
-    die("Query failed: " . $e->getMessage());
+    header("Content-Type: application/json");
+    echo json_encode(['status' => 'query_failed', 'errors' => $errors]);
   }
 }
 

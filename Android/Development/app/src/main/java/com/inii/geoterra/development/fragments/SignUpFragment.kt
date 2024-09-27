@@ -6,7 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -32,32 +34,75 @@ private const val ARG_PARAM2 = "param2"
  */
 class SignUpFragment : Fragment() {
   private var listener : OnFragmentInteractionListener? = null
+  private lateinit var rootView : View
 
   override fun onCreateView(inflater : LayoutInflater,
                             container : ViewGroup?,
                             savedInstanceState : Bundle?) : View? {
     // Inflate the layout for this fragment
-    val rootView = inflater.inflate(R.layout.fragment_sign_up, container, false)
+    this.rootView = inflater.inflate(R.layout.fragment_sign_up, container, false)
 
-    val createAccountB = rootView.findViewById<Button>(R.id.createAccountB)
+    val createAccountB = this.rootView.findViewById<Button>(R.id.createAccountB)
+    setCreateAccountClickListener(createAccountB)
+    val showPassword = this.rootView.findViewById<LinearLayout>(R.id.togglePasswordLayout)
+    setTogglePasswordClickListener(showPassword)
+    val showPasswordCheckBox = this.rootView.findViewById<CheckBox>(R.id.checkBoxTogglePassword)
+    setCheckboxOnChangeListener(showPasswordCheckBox)
 
+    return rootView
+  }
+
+  private fun setTogglePasswordClickListener(showPassword : LinearLayout) {
+    showPassword.setOnClickListener {
+      val toggleCheckBox = this.rootView.findViewById<CheckBox>(R.id.checkBoxTogglePassword)
+      val passwordEditText = this.rootView.findViewById<EditText>(R.id.userPassword)
+      toggleCheckBox.isChecked = !toggleCheckBox.isChecked
+      if (toggleCheckBox.isChecked) {
+        passwordEditText.inputType =  android.text.InputType.TYPE_CLASS_TEXT or
+                android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+      } else {
+        passwordEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT or
+                android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+      }
+      passwordEditText.setSelection(passwordEditText.text.length)
+    }
+  }
+
+  private fun setCheckboxOnChangeListener(checkBox : CheckBox) {
+    val passwordEditText = this.rootView.findViewById<EditText>(R.id.userPassword)
+    checkBox.setOnCheckedChangeListener { _, isChecked ->
+      updatePasswordVisibility(isChecked, passwordEditText)
+    }
+  }
+
+  private fun updatePasswordVisibility(checked : Boolean, passwordEditText : EditText) {
+    if (checked) {
+      passwordEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT or
+              android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+    } else {
+      passwordEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT or
+              android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+    }
+  }
+
+  private fun setCreateAccountClickListener(createAccountB : Button) {
     createAccountB.setOnClickListener {
-      val email = rootView.findViewById<EditText>(R.id.userEmail).text.toString().trim()
-      val password = rootView.findViewById<EditText>(R.id.userPassword).text.toString().trim()
-      val firstName = rootView.findViewById<EditText>(R.id.userFirstName).text.toString().trim()
-      val lastName = rootView.findViewById<EditText>(R.id.userLastName).text.toString().trim()
-      val phoneNum = rootView.findViewById<EditText>(R.id.userPhoneNum).text.toString().trim()
+      val email = this.rootView.findViewById<EditText>(R.id.userEmail).text.toString().trim()
+      val password = this.rootView.findViewById<EditText>(R.id.userPassword).text.toString().trim()
+      val firstName = this.rootView.findViewById<EditText>(R.id.userFirstName).text.toString().trim()
+      val lastName = this.rootView.findViewById<EditText>(R.id.userLastName).text.toString().trim()
+      val phoneNum = this.rootView.findViewById<EditText>(R.id.userPhoneNum).text.toString().trim()
 
       Log.i("Tomado de datos en login", "$email $password")
 
       if (email.isNotBlank() && password.isNotBlank()) {
         if (email.isValidEmail() && password.length >= 8) {
           val credentials = SingUpCredentials(
-              email = email,
-              password = password,
-              firstName = firstName,
-              lastName = lastName,
-              phoneNumber = phoneNum
+            email = email,
+            password = password,
+            firstName = firstName,
+            lastName = lastName,
+            phoneNumber = phoneNum
           )
           createUser(credentials)
 
@@ -72,8 +117,6 @@ class SignUpFragment : Fragment() {
         showError("Por favor, rellena todos los campos")
       }
     }
-
-    return rootView
   }
 
   private fun createUser(credentials : SingUpCredentials) {
@@ -134,11 +177,8 @@ class SignUpFragment : Fragment() {
         // Aquí puedes manejar cada error individualmente
         if (error.emptyInput != null) {
           showError(error.emptyInput)
-        } else if (error.emailUsed != null) {
-          showError(error.emailUsed)
         } else {
-          // Manejar otros tipos de errores si es necesario
-          showError("Error desconocido del servidor")
+          showError(error.emailUsed)
         }
       }
     } else {

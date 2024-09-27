@@ -2,11 +2,12 @@
 
 function insert_to_sol(object $pdo, array $request_fields)
 {
-  $query = "INSERT INTO solicitudes (id, region, fecha, propietario, num_telefono, coord_x, coord_y, direccion, uso_actual, sens_termica, burbujeo) 
-           VALUES (:id, :region, :fecha, :propietario, :num_telefono, :coord_x, :coord_y, :direccion, :uso_actual, :sens_termica, :burbujeo)";
-  $stmt = $pdo->prepare($query);
 
-  $stmt->bindParam(":id", $request_fields["IDPoint"]);
+  $query = "INSERT INTO solicitudes (email, region, fecha, propietario, num_telefono, coord_x, coord_y, direccion, uso_actual, sens_termica, burbujeo) 
+           VALUES (:email, :region, :fecha, :propietario, :num_telefono, :coord_x, :coord_y, :direccion, :uso_actual, :sens_termica, :burbujeo)";
+  $stmt = $pdo->prepare($query);
+  
+  $stmt->bindParam(":email", $request_fields['email']);
   $stmt->bindParam(":region", $request_fields["region"]);
   $stmt->bindParam(":fecha", $request_fields["fecha"]);
 

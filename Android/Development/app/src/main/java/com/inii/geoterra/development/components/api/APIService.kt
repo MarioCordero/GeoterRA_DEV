@@ -30,27 +30,44 @@ data class SignInCredentials(
  * @constructor Create empty SingUp credentials
  */
 data class SingUpCredentials(
-  @Field("email") val email: String,
-  @Field("password") val password: String,
-  @Field("first_name") val firstName : String,
-  @Field("last_name") val lastName : String,
-  @Field("phone_num") val phoneNumber : String
+  val email: String,
+  val password: String,
+  val firstName : String,
+  val lastName : String,
+  val phoneNumber : String
 )
 
 data class RequestForm(
-  @Field("point_id") var pointID : String,
-  @Field("region") var region : String,
-  @Field("date") var date : String,
+ var pointID : String,
+ var region : String,
+ var date : String,
+ var email : String,
+ var owner : String,
+ var currentUsage : String,
+ var address : String,
+ var phoneNumber : String,
+ var coordinates : String,
+ var thermalSensation : Int,
+ var bubbles : Int,
+ var latitude : String,
+ var longitude : String,
+)
 
-  @Field("owner") var owner : String,
-  @Field("current_usage") var currentUsage : String,
-  @Field("address") var address : String,
-  @Field("contact_number") var contactNumber : Int,
-
-  @Field("coordinates") var coordinates : String,
-
-  @Field("thermal_sensation") var thermalSensation : Int,
-  @Field("bubbles") var bubbles : Int
+data class RequestDataCard(
+  @SerializedName("id_soli") val requestID : String,
+  @SerializedName("email") val email : String,
+  @SerializedName("region") val region : String,
+  @SerializedName("fecha") val date : String,
+  @SerializedName("propietario") val owner : String,
+  @SerializedName("num_telefono") val contactNumber : String,
+  @SerializedName("coord_x") val latitude : Double,
+  @SerializedName("coord_y") val longitude : Double,
+  @SerializedName("direccion") val address : String,
+  @SerializedName("uso_actual") val currentUsage : String,
+  @SerializedName("sens_termica") val thermalSensation : Int,
+  @SerializedName("burbujeo") val bubbles : Int,
+  @SerializedName("ph_campo") val fieldPh : Double,
+  @SerializedName("cond_campo") val fieldCond : Int,
 )
 
 data class ThermalPoint(
@@ -116,6 +133,12 @@ data class RequestResponse(
   @SerializedName("errors") val errors : List<Error>
 )
 
+data class RequestsSubmittedResponse(
+  @SerializedName("status") val status : String,
+  @SerializedName("solicitudes mostras") val requests : List<RequestDataCard>,
+  @SerializedName("errors") val errors : List<Error>
+)
+
 /**
  * Data class used to format the response of the server in the SignIn request.
  *
@@ -175,21 +198,31 @@ interface APIService {
   ): Call<List<ThermalPoint>>
 
   @FormUrlEncoded
+  @POST("get_request.inc.php")
+  fun getSubmittedRequests(
+    @Field("email") email : String
+  ): Call<RequestsSubmittedResponse>
+
+  @FormUrlEncoded
   @POST("request.inc.php")
   fun newRequest(
     @Field("point_id") pointID : String,
     @Field("region") region : String,
-    @Field("date") date : String,
+    @Field("fecha") date : String,
 
-    @Field("owner") owner : String,
-    @Field("current_usage") currentUsage : String,
-    @Field("address") address : String,
-    @Field("contact_number") contactNumber : Int,
+    @Field ("email") email : String,
 
-    @Field("coordinates") coordinates : String,
+    @Field("propietario") owner : String,
+    @Field("uso_actual") currentUsage : String,
+    @Field("direccion") address : String,
+    @Field("num_telefono") contactNumber : String,
 
-    @Field("thermal_sensation") thermalSensation : Int,
-    @Field("bubbles") bubbles : Int
+    @Field("gps") coordinates : String,
+
+    @Field("sens_termica") thermalSensation : Int,
+    @Field("burbujeo") bubbles : Int,
+    @Field ("lat") latitude : String,
+    @Field ("lng") longitude : String,
   ): Call<RequestResponse>
 
   @GET("check_session.php")
