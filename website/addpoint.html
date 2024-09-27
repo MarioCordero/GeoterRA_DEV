@@ -96,7 +96,7 @@
 				<!-- TODO[] : ver si se puede hacer autoguardado -->
 				<div class="add-point">
 
-					<h1 class="Montserrat-SemiBold">Formulario de Puntos Estudiados</h1>
+					<h1 class="Montserrat-SemiBold">Formulario de solicitud de puntos</h1>
 
 					<form action="" method="post" id="add-point-form" class="add-point-form">
 
@@ -123,17 +123,17 @@
 							<div class="radio-buttons-container Poppins-Light">
 
 								<div class="option">
-									<input type="radio" name="sens_termica" value="3" id="caliente">
+									<input type="radio" name="sensTermica" value="3" id="caliente">
 									<label for="caliente">Caliente</label>
 								</div>
 
 								<div class="option">
-									<input type="radio" name="sens_termica" value="2" id="tibio">
+									<input type="radio" name="sensTermica" value="2" id="tibio">
 									<label for="tibio">Tibio</label>
 								</div>
 
 								<div class="option">
-									<input type="radio" name="sens_termica" value="1" id="frio">
+									<input type="radio" name="sensTermica" value="1" id="frio">
 									<label for="frio">Frio</label>
 								</div>
 								
@@ -199,14 +199,22 @@
 
 					</form>
 
-          <div class="modal" id="modal">
-            <div class="modal-body">
-              Operacion exitosa
-              <div class="icon"></div>
-              <button data-close-button class="close-button">Ok</button>
-            </div>
-          </div>
-          <div id="overlay"></div>
+					<!-- THE MODAL WITH THE MSG's -->
+					<div id="overlay">
+						<div class="modal" id="modal">
+							<div class="modal-body">
+
+								<div id="modal-icon"></div> <!-- Empty icon container -->
+								
+								<p id="modal-message">
+										<!-- The P elements to add by the JS -->
+								</p>
+
+								<button data-close-button class="close-button">Ok</button>
+							
+							</div>
+						</div>
+					</div>
 
 				</div>
 

@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($solicitudes) {
       header("Content-Type: application/json");
       echo json_encode(['status' => 'response_succeded',
-      'solicitudes' => $solicitudes, 'errors' => $errors]);
+      'solicitudes mostras' => $solicitudes, 'errors' => $errors]);
     } else {
       echo json_encode(['status' => 'response_failed', 'errors' => $errors]);
     }
