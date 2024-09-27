@@ -519,7 +519,19 @@
 
 /*---------------------------------419 WIDTH -------------------------*/
 @media screen and (max-width: 419px){
-
+    .add-point h1 {
+        font-size: 20px;
+        text-align: center;
+    }
+    .add-point {
+        padding: 11vh 1.5vh;
+    }
+    .add-point-form input::placeholder {
+        font-size: 10px;
+    }
+    .add-point-form p label {
+        font-size: 12px;
+    }
 }
 
 /* -------------------------------------------------------------------------------------------------- */
