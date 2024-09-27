@@ -17,6 +17,7 @@ import com.inii.geoterra.development.components.api.RetrofitClient
 import com.inii.geoterra.development.components.api.ThermalPoint
 import com.inii.geoterra.development.components.services.GPSManager
 import com.inii.geoterra.development.components.services.SessionManager
+import com.inii.geoterra.development.fragments.MapLayersMenuFragment
 import com.inii.geoterra.development.ui.CustomInfoOnMarker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,7 +52,7 @@ class MapActivity : AppCompatActivity() {
   private var thermalPoints: MutableMap<String, GeoPoint> = mutableMapOf()
   // Define the BoundingBox for the restricted area (e.g., a country)
 
-  // TODO: reestructuracion de codigo a partes mas dindependientes.
+  // TODO: reestructuracion de codigo a partes mas independientes.
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
@@ -66,9 +67,13 @@ class MapActivity : AppCompatActivity() {
     this.mapView = this.rootView.findViewById(R.id.MapView)
     // Initialize the bottom navigation view
     this.bottomNavigationView = this.rootView.findViewById(R.id.bottom_menu)
-
-
     setupBottomMenuListener()
+
+    val layersMenuButton = findViewById<Button>(R.id.layersButton)
+    layersMenuButton.setOnClickListener{
+      val layersMenuFragment = MapLayersMenuFragment()
+      layersMenuFragment.show(supportFragmentManager, "layersMenuFragment")
+    }
 
     val centerMapOnUserButton = findViewById<Button>(R.id.centerUserButton)
     centerMapOnUserButton.setOnClickListener{
@@ -101,7 +106,7 @@ class MapActivity : AppCompatActivity() {
       this.mapView.overlays.add(marker)
 
       // Set the info window for the marker
-      val infoWindow = CustomInfoOnMarker(R.layout.custom_info_on_marker, mapView, 0.0)
+      val infoWindow = CustomInfoOnMarker(R.layout.custom_info_on_marker_user, mapView)
       marker.infoWindow = infoWindow
 
       // Handle the marker click event
