@@ -13,11 +13,14 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.inii.geoterra.development.components.ActivityNavigator
+import com.inii.geoterra.development.components.MessageListener
+import com.inii.geoterra.development.components.OnFragmentInteractionListener
 import com.inii.geoterra.development.components.api.RetrofitClient
 import com.inii.geoterra.development.components.api.ThermalPoint
 import com.inii.geoterra.development.components.services.GPSManager
 import com.inii.geoterra.development.components.services.SessionManager
 import com.inii.geoterra.development.fragments.MapLayersMenuFragment
+import com.inii.geoterra.development.fragments.ThermalPointInfoFragment
 import com.inii.geoterra.development.ui.CustomInfoOnMarker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,12 +47,13 @@ import retrofit2.Response
  *
  * @constructor Create empty Map activity
  */
-class MapActivity : AppCompatActivity() {
+class MapActivity : AppCompatActivity(), OnFragmentInteractionListener, MessageListener {
   private lateinit var mapView : MapView
   private lateinit var rootView : View
   private lateinit var bottomNavigationView : BottomNavigationView
-  private var activeMarkers : MutableMap<String, Marker> = mutableMapOf()
-  private var thermalPoints: MutableMap<String, GeoPoint> = mutableMapOf()
+  private var mapMarkers : MutableMap<String, Marker> = mutableMapOf()
+  private var thermalGeoPoints : MutableMap<String, GeoPoint> = mutableMapOf()
+  private var thermalPoints : MutableMap<String, ThermalPoint> = mutableMapOf()
   // Define the BoundingBox for the restricted area (e.g., a country)
 
   // TODO: reestructuracion de codigo a partes mas independientes.
@@ -77,13 +81,75 @@ class MapActivity : AppCompatActivity() {
 
     val centerMapOnUserButton = findViewById<Button>(R.id.centerUserButton)
     centerMapOnUserButton.setOnClickListener{
-      mapView.controller.setCenter(activeMarkers["User"]!!.position)
+      // TODO : center map on user location when the info interface is finished.
+      // mapView.controller.setCenter(activeMarkers["User"]?.position)
+      mapView.controller.setCenter(mapMarkers["Termal Josue Ulate"]?.position)
     }
 
     mapManager()
     establishUserMarker()
     requestPoints()
     setupMapListener()
+  }
+
+  override fun onMessageReceived(message: String) {
+    // Aquí manejas el mensaje recibido
+    println("Mensaje recibido: $message")
+    prepareFragment(message)
+  }
+
+  private fun prepareFragment(thermalPointID: String) {
+    val infoFragment = ThermalPointInfoFragment.newInstance(this.thermalPoints[thermalPointID]!!)
+    // Hide the bottom navigation menu
+    val bottomMenu = this.rootView.findViewById<BottomNavigationView>(R.id.bottom_menu)
+    bottomMenu.visibility = View.INVISIBLE
+
+    // Hide the map view
+    val mapView = this.rootView.findViewById<MapView>(R.id.MapView)
+    mapView.visibility = View.INVISIBLE
+
+    // Hide the layers button.
+    val layersButton = this.rootView.findViewById<Button>(R.id.layersButton)
+    layersButton.visibility = View.INVISIBLE
+
+    // Hide the center user button.
+    val centerUserButton = this.rootView.findViewById<Button>(R.id.centerUserButton)
+    centerUserButton.visibility = View.INVISIBLE
+
+    //Begin the transaction.
+    supportFragmentManager.beginTransaction()
+      .replace(R.id.mapLayout, infoFragment)
+      .commit()
+  }
+
+  override fun onFragmentFinished(pointLat : Double, pointLong : Double) {
+    // Hide the bottom navigation menu
+    val bottomMenu = this.rootView.findViewById<BottomNavigationView>(R.id.bottom_menu)
+    bottomMenu.visibility = View.VISIBLE
+
+    // Shows the map view
+    val mapView = this.rootView.findViewById<MapView>(R.id.MapView)
+    mapView.visibility = View.VISIBLE
+
+    // Shows the layers button.
+    val layersButton = this.rootView.findViewById<Button>(R.id.layersButton)
+    layersButton.visibility = View.VISIBLE
+
+    // Shows the center user button.
+    val centerUserButton = this.rootView.findViewById<Button>(R.id.centerUserButton)
+    centerUserButton.visibility = View.VISIBLE
+
+    // Ends the related fragment and returns to this activity.
+    // ActivityNavigator.changeActivity(this, MapActivity::class.java)
+    this.mapView.controller.setCenter(convertCRT05toWGS84(pointLat, pointLong))
+    // Get the fragment by its ID
+    val fragment = supportFragmentManager.findFragmentById(R.id.mapLayout)
+    // Remove the fragment from the back stack
+    if (fragment != null) {
+      supportFragmentManager.beginTransaction()
+        .remove(fragment)
+        .commit()
+    }
   }
 
   /**
@@ -122,7 +188,7 @@ class MapActivity : AppCompatActivity() {
         true
       }
       // Add the marker to the active markers map
-      activeMarkers["User"] = marker
+      mapMarkers["User"] = marker
     } else {
       Log.e(
         "User Coordinates Error: ",
@@ -217,20 +283,26 @@ class MapActivity : AppCompatActivity() {
   private fun createThermalMarkers(points: List<ThermalPoint>) {
     lifecycleScope.launch(Dispatchers.IO) {
       try {
-        for (point in points) {
+        for (thermalPoint in points) {
           // Convert the point CRT05 coordinates to WGS84.
-          val geoPoint = convertCRT05toWGS84(point.latitude, point.longitude)
+          val geoPoint = convertCRT05toWGS84(thermalPoint.latitude, thermalPoint.longitude)
           // Store the GeoPoint.
-          thermalPoints[point.pointID] = geoPoint
-          val temperature = point.temperature
+          thermalGeoPoints[thermalPoint.pointID] = geoPoint
+          thermalPoints[thermalPoint.pointID] = thermalPoint
+
+          val temperature = thermalPoint.temperature
 
           // Create a marker and set its properties
           val marker = Marker(mapView)
           marker.position = geoPoint
-          marker.title = point.pointID
+          marker.title = thermalPoint.pointID
           marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-          val infoWindow = CustomInfoOnMarker(R.layout.custom_info_on_marker, mapView,
-                                              temperature)
+          val infoWindow = CustomInfoOnMarker(
+            R.layout.custom_info_on_marker, mapView, this@MapActivity, temperature
+          )
+
+          infoWindow.setMessageListener(this@MapActivity)
+
           marker.infoWindow = infoWindow
 
           // Adds a listener to the marker that will be called when the marker is clicked.
@@ -248,7 +320,7 @@ class MapActivity : AppCompatActivity() {
 
           // Establish the marker's icon
           marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-          activeMarkers["${marker.title}"] = marker
+          mapMarkers["${marker.title}"] = marker
           // Add the marker to the map
           mapView.overlays.add(marker)
         }
@@ -347,7 +419,6 @@ class MapActivity : AppCompatActivity() {
       }
     }
   }
-
 
 
   /**

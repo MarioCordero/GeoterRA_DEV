@@ -6,6 +6,7 @@ import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
+import java.io.Serializable
 
 /**
  * Data class that holds the user data for SignIn request
@@ -92,7 +93,7 @@ data class ThermalPoint(
   @SerializedName("Na") val sodium : Double,
   @SerializedName("K") val potassium : Double,
   @SerializedName("MG+") val magnesiumIon : Double
-)
+) : Serializable
 
 /**
  * Sign in response

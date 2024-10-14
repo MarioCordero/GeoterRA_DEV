@@ -1,10 +1,13 @@
 package com.inii.geoterra.development.ui
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
 import android.view.View
 import android.widget.TextView
 import com.inii.geoterra.development.R
+import com.inii.geoterra.development.components.MessageListener
+import com.inii.geoterra.development.components.api.ThermalPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.infowindow.InfoWindow
@@ -12,14 +15,21 @@ import org.osmdroid.views.overlay.infowindow.InfoWindow
 class CustomInfoOnMarker : InfoWindow {
   // Defines a nullable property `temperature` of type `Double` in case is the user's info window
   private var temperature: Double? = null
+  private var thermalPoint : ThermalPoint? = null
+  private var context : Context? = null
+  private var messageListener: MessageListener? = null
 
   // Primary constructor that receives `layoutResId`, `mapView`, and `temperature`.
   // Used for the point's info window.
-  constructor(layoutResId : Int, mapView : MapView, temperature : Double) : super(
+  constructor(layoutResId: Int,
+              mapView: MapView,
+              activity: Context,  // Pasamos la Activity
+              temperature: Double) : super(
     layoutResId,
-    mapView
+    mapView,
   ) {
     this.temperature = temperature
+    this.context = activity
   }
   // Secondary constructor that receives `layoutResId` and `mapView`.
   // Used for the user's info window.
@@ -57,16 +67,31 @@ class CustomInfoOnMarker : InfoWindow {
     if (temperature != null) {
       val pointId = mView.findViewById<TextView>(R.id.point_id)
       pointId.text = "Point ID: ${marker.title}"
+
+      val moreInfoText = mView.findViewById<TextView>(R.id.more_info)
+      moreInfoText.setOnClickListener {
+        Log.i("CustomInfoWindow", "More info button clicked")
+        sendMessageToActivity(marker)
+      }
     } else {
       val userPosition = mView.findViewById<TextView>(R.id.user_position)
       userPosition.text = "Tu ubicación actual"
     }
   }
 
-  /**
-   * Called when the info window is closed.
-   */
+  fun setMessageListener(listener: MessageListener) {
+    this.messageListener = listener
+  }
+
+  private fun sendMessageToActivity(marker : Marker) {
+    Log.i("CustomInfoWindow", "Sending message to activity, ${marker.title}")
+     messageListener?.onMessageReceived(marker.title)
+  }
+
   override fun onClose() {
     super.close()
   }
+
 }
+
+

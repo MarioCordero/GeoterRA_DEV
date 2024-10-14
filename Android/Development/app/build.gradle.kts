@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.googleAndroidLibrariesMapsplatformSecretsGradlePlugin)
+    // alias(libs.plugins.kotlinParcelize)
 }
 
 android {
@@ -37,6 +38,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs += "-Xparcelize"
     }
 
     buildFeatures {
@@ -76,7 +78,9 @@ dependencies {
     implementation("androidx.exifinterface:exifinterface:1.3.7")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("org.locationtech.proj4j:proj4j:1.1.0")
-  implementation(libs.firebase.firestore)
+    // implementation("org.jetbrains.kotlin:kotlin-android-extensions-runtime:<kotlin_version>")
+
+    implementation(libs.firebase.firestore)
 
 
   testImplementation(libs.junit)

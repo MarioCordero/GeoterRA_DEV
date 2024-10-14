@@ -284,7 +284,9 @@
                     android:backgroundTint="@color/ligthGray"
                     android:text="Enviar Solicitud"
                     android:textColor="@color/black"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    style="?android:attr/buttonBarButtonStyle"
+                    />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

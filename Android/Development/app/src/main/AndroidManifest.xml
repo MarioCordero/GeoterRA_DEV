@@ -27,12 +27,17 @@
         android:theme="@style/AppLightTheme"
         tools:targetApi="31">
         <activity
+            android:name=".ui.ThermalPointInformationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.thermalPointInformationActivity"
+            android:exported="false" />
+        <activity
             android:name=".UserDashboardActivity"
             android:exported="false" />
         <activity
             android:name=".MapActivity"
             android:exported="false" />
-
         <activity
             android:name=".RequestActivity"
             android:exported="false" />

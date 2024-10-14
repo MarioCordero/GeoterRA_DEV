@@ -16,9 +16,9 @@ object RetrofitClient {
   /**
    * Base URL for the API.
    */
-  // 192.168.1.37:80 casa ip.
+  // 163.178.171.105:80 Server ip
   // 10.0.2.2:80 emulator ip.
-  private const val BASE_URL = "http://10.0.2.2:80/API/"
+  private const val BASE_URL = "http://163.178.171.105:80/API/"
 
   /**
    * Interceptor for logging HTTP request and response data.
