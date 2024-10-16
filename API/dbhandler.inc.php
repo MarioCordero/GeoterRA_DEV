@@ -6,16 +6,16 @@ $dbname = $config['database']['name'];
 $user = $config['database']['user'];
 $pass = $config['database']['pass'];
 
+try {
+    // Attempt to create a PDO connection using the extracted credentials
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-foreach ($credentials as $cred) {
-    try {
-        $pdo = new PDO("mysql:host=$host;dbname=$dbname;", $cred['user'], $cred['pass']);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $usedCred = $cred; // Guarda las credenciales exitosas
-        break; // Si la conexión tiene éxito, sal del bucle
-    } catch (PDOException $e) {
-        // Captura la excepción si la conexión falla y continúa con el siguiente conjunto de credenciales
-    }
+    echo "Connection successful!";
+    
+} catch (PDOException $e) {
+    // Handle the error by displaying the error message (can be logged as well)
+    echo "Connection failed: " . $e->getMessage();
 }
 
 if ($pdo) {
