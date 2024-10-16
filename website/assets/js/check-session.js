@@ -21,8 +21,18 @@ function checkSession() {
                 loggedNavBar.classList.toggle('active');
 				
             } else {
-                console.log('User is not logged in');
-                window.location.href = 'login.html'; // Redirige a la página de inicio de sesión
+                // TODO[] Revisar, se puede mejorar
+                // Check the current page
+                const currentPage = window.location.pathname;
+                
+                // If the current page is one of the specified ones, redirect to login
+                const restrictedPages = ['/logged.html', '/addpoint.html'];
+                if (restrictedPages.includes(currentPage)) {
+                    console.log('User is not logged in, redirecting to login page');
+                    window.location.href = 'login.html'; // Redirige a la página de inicio de sesión
+                } else {
+                    console.log('User is not logged in, but no redirection required for this page');
+                }
             }
         },
         error: function (xhr, status, error) {
