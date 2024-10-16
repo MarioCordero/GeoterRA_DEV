@@ -1,5 +1,6 @@
 package com.inii.geoterra.development.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -15,12 +16,12 @@ class RequestSheet @JvmOverloads constructor(
   defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-  private val locationImage: ImageView
-  private val coordenates: TextView
-  private val date: TextView
-  private val state: TextView
-  private val contactButton: Button
-  private val repeatRequestButton: Button
+  private val locationImage : ImageView
+  private val coordinates : TextView
+  private val date : TextView
+  private val state : TextView
+  private val contactButton : Button
+  private val repeatRequestButton : Button
 
   init {
     val inflater = LayoutInflater.from(context)
@@ -28,19 +29,20 @@ class RequestSheet @JvmOverloads constructor(
 
     // Obtain references to the views in the custom layout
     locationImage = view.findViewById(R.id.imageView5)
-    coordenates = view.findViewById(R.id.coordenatesTxt)
+    coordinates = view.findViewById(R.id.coordenatesTxt)
     date = view.findViewById(R.id.dateTxt)
     state = view.findViewById(R.id.stateTxt)
     contactButton = view.findViewById(R.id.contact_us)
     repeatRequestButton = view.findViewById(R.id.repeat_request)
   }
 
-  fun setInformation(coordenadas: String, fecha: String, estado: String) {
+  @SuppressLint("SetTextI18n")
+  fun setInformation(latitude : Double, longitude : Double, date : String, state : String) {
     // Set the information in the custom layout views
     locationImage.clipToOutline
-    coordenates.text = "Coordenadas: $coordenadas"
-    date.text = "Fecha: $fecha"
-    state.text = "Estado: $estado"
+    this.coordinates.text = "Latitud: %.7f\nLongitud: %.7f".format(latitude, longitude)
+    this.date.text = "Fecha: $date"
+    this.state.text = "Estado: $state"
   }
 
   fun setDimensions(width: Int, height: Int) {
