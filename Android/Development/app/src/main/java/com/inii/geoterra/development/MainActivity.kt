@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity() {
     this.rootView = findViewById(R.id.mainLayout)
     this.bottomNavigationView = findViewById(R.id.bottom_menu)
 
-    // SessionManager.init(this)
 //        if (SessionManager.isSessionActive()) {
 //            Log.i("user status", "activa")
 //        } else {
@@ -49,6 +48,7 @@ class MainActivity : AppCompatActivity() {
     lifecycleScope.launch(Dispatchers.Main) {
       try {
         withContext(Dispatchers.IO) {
+          SessionManager.init(this@MainActivity)
           if (GPSManager.isInitialized()) {
             GPSManager.startLocationUpdates()
           } else {
