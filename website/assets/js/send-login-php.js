@@ -10,25 +10,29 @@ document.getElementById("close-error-msg").onclick = function() {
 };
 
 document.getElementById("login_form").addEventListener("submit", function (event) {
-    event.preventDefault();
-    let formData = new FormData(this);
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "../../API/login.inc.php", true);
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == 4 && xhr.status == 200) {
+  event.preventDefault();
+  let formData = new FormData(this);
+  let xhr = new XMLHttpRequest();
+  xhr.open("POST", "../../API/login.inc.php", true);
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState == 4 && xhr.status == 200) {
+      try{
+        let response = JSON.parse(xhr.responseText);
+        if (response.status === 'logged_in') {
 
-            let response = JSON.parse(xhr.responseText);
-            if (response.status === 'logged_in') {
-                
-                window.location.href = "logged.html";
-                // Llama a la función de verificación de sesión después de un inicio de sesión exitoso
-                checkSession();
+          window.location.href = "logged.html";
+          // Llama a la función de verificación de sesión después de un inicio de sesión exitoso
+          checkSession();
 
-            } else {
-                credentialError();
-            }
-
+        } else {
+          console.error('Server error:', xhr.responseText);
+          credentialError()
         }
-    };
-    xhr.send(formData);
+      }
+      catch {
+        console.log(xhr.responseText)
+      }
+    }
+  };
+  xhr.send(formData);
 });

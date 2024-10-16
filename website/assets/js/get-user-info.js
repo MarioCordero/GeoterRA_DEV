@@ -67,7 +67,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (response.status === 'response_succeded' && Array.isArray(response['solicitudes mostras'])) {
                     // Llamar a la función auxiliar para mostrar las solicitudes
                     displayUserRequests(response['solicitudes mostras']);
-                    console.log(response);
                 } else {
                     console.log("Error: no hay solicitudes");
                 }
