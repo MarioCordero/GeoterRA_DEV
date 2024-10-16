@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 01-09-2024 a las 01:41:44
+-- Tiempo de generación: 27-09-2024 a las 21:26:26
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -168,7 +168,10 @@ CREATE TABLE `solicitudes` (
 --
 
 INSERT INTO `solicitudes` (`id_soli`, `email`, `region`, `fecha`, `propietario`, `num_telefono`, `coord_x`, `coord_y`, `direccion`, `uso_actual`, `sens_termica`, `burbujeo`, `pH_campo`, `cond_campo`) VALUES
-(19, 'test@test.com', 'Prueba', '2024-08-30', 'Chris', '88888888', 9.936886826338672, -84.04367208480836, 'Por ahi', 'Ninguno', '1', 1, NULL, NULL);
+(19, 'test@test.com', 'Prueba', '2024-08-30', 'Chris', '88888888', 9.936886826338672, -84.04367208480836, 'Por ahi', 'Ninguno', '1', 1, NULL, NULL),
+(20, 'test@test.com', 'Prueba', '2024-08-23', 'Chris', '88888888', 9.936543822567252, -84.04560679726674, 'Por ahi', 'Ninguno', '1', 0, NULL, NULL),
+(21, 'test@test.com', 'Prueba', '2024-08-29', 'Chris', '88888888', 9.936272925409632, -84.04428899288179, 'Por ahi', 'Ninguno', '1', 1, NULL, NULL),
+(22, NULL, 'Prueba', '2024-09-10', 'Chris', '88888888', 9.93705717041161, -84.04303022665687, 'Por ahi', 'Ninguno', '2', 1, NULL, NULL);
 
 --
 -- Índices para tablas volcadas
@@ -208,7 +211,7 @@ ALTER TABLE `reg_usr`
 -- AUTO_INCREMENT de la tabla `solicitudes`
 --
 ALTER TABLE `solicitudes`
-  MODIFY `id_soli` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id_soli` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- Restricciones para tablas volcadas
