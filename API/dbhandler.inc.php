@@ -1,11 +1,11 @@
 <?php
 
-$host = 'localhost';
-$dbname = 'GeoterRA';
-$credentials = [
-    ['user' => 'root', 'pass' => ''],
-    ['user' => 'mario', 'pass' => '2003']
-];
+$config = parse_ini_file('/path/to/config.ini', true);
+$host = $config['database']['host'];
+$dbname = $config['database']['name'];
+$user = $config['database']['user'];
+$pass = $config['database']['pass'];
+
 
 foreach ($credentials as $cred) {
     try {
