@@ -1,5 +1,6 @@
 package com.inii.geoterra.development.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,10 @@ import androidx.fragment.app.Fragment
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.components.OnFragmentInteractionListener
 import com.inii.geoterra.development.components.api.ThermalPoint
+import org.locationtech.proj4j.CRSFactory
+import org.locationtech.proj4j.CoordinateTransformFactory
+import org.locationtech.proj4j.ProjCoordinate
+import org.osmdroid.util.GeoPoint
 
 /**
  * A simple [Fragment] subclass.
@@ -50,6 +55,7 @@ class ThermalPointInfoFragment : Fragment() {
     this.listener?.onFragmentFinished(this.thermalPoint!!.latitude, this.thermalPoint!!.longitude)
   }
 
+  @SuppressLint("SetTextI18n")
   private fun updateUI() {
     // Updates the UI with the thermal point information
     val thermalPointName = this.thermalPoint!!.pointID
@@ -59,8 +65,10 @@ class ThermalPointInfoFragment : Fragment() {
     val thermalPointLatitude = this.thermalPoint!!.latitude
     val thermalPointLongitude = this.thermalPoint!!.longitude
     val thermalPointCoordinatesTextView = this.rootView.findViewById<TextView>(R.id.coordenates)
+    val wsg84Coordinates = convertCRT05toWGS84(thermalPointLatitude, thermalPointLongitude)
+
     thermalPointCoordinatesTextView.text =
-      "Latitud: $thermalPointLatitude\nLongitud: $thermalPointLongitude"
+      "Latitud: ${wsg84Coordinates.x}\nLongitud: ${wsg84Coordinates.y}"
 
     val thermalPointTemperature = this.thermalPoint!!.temperature
     val thermalPointTemperatureTextView =
@@ -85,24 +93,24 @@ class ThermalPointInfoFragment : Fragment() {
 
     val thermalPointChlorine = this.thermalPoint!!.chlorine
     val thermalPointChlorineTextView = this.rootView.findViewById<TextView>(R.id.chlorine)
-    thermalPointChlorineTextView.text = "Chlorine: $thermalPointChlorine"
+    thermalPointChlorineTextView.text = "Cloro: $thermalPointChlorine"
 
     val thermalPointCalcium = this.thermalPoint!!.calcium
     val thermalPointCalciumTextView = this.rootView.findViewById<TextView>(R.id.calcium)
-    thermalPointCalciumTextView.text = "Calcium: $thermalPointCalcium"
+    thermalPointCalciumTextView.text = "Calcio: $thermalPointCalcium"
 
     val thermalPointMgBicarbonate = this.thermalPoint!!.mgBicarbonate
     val thermalPointMgBicarbonateTextView =
       this.rootView.findViewById<TextView>(R.id.mg_bicarbonate)
-    thermalPointMgBicarbonateTextView.text = "Mg Bicarbonate: $thermalPointMgBicarbonate"
+    thermalPointMgBicarbonateTextView.text = "Mg Bicarbonato: $thermalPointMgBicarbonate"
 
     val thermalPointSulfate = this.thermalPoint!!.sulfate
     val thermalPointSulfateTextView = this.rootView.findViewById<TextView>(R.id.sulfate)
-    thermalPointSulfateTextView.text = "Sulfate: $thermalPointSulfate"
+    thermalPointSulfateTextView.text = "Sulfato: $thermalPointSulfate"
 
     val thermalPointIron = this.thermalPoint!!.iron
     val thermalPointIronTextView = this.rootView.findViewById<TextView>(R.id.iron)
-    thermalPointIronTextView.text = "Iron: $thermalPointIron"
+    thermalPointIronTextView.text = "Hierro: $thermalPointIron"
 
     val thermalPointSilicon = this.thermalPoint!!.silicon
     val thermalPointSiliconTextView = this.rootView.findViewById<TextView>(R.id.silicon)
@@ -114,23 +122,23 @@ class ThermalPointInfoFragment : Fragment() {
 
     val thermalPointLithium = this.thermalPoint!!.lithium
     val thermalPointLithiumTextView = this.rootView.findViewById<TextView>(R.id.lithium)
-    thermalPointLithiumTextView.text = "Lithium: $thermalPointLithium"
+    thermalPointLithiumTextView.text = "Litio: $thermalPointLithium"
 
     val thermalPointFluorine = this.thermalPoint!!.fluorine
     val thermalPointFluorineTextView = this.rootView.findViewById<TextView>(R.id.fluorine)
-    thermalPointFluorineTextView.text = "Fluorine: $thermalPointFluorine"
+    thermalPointFluorineTextView.text = "Flúor: $thermalPointFluorine"
 
     val thermalPointSodium = this.thermalPoint!!.sodium
     val thermalPointSodiumTextView = this.rootView.findViewById<TextView>(R.id.sodium)
-    thermalPointSodiumTextView.text = "Sodium: $thermalPointSodium"
+    thermalPointSodiumTextView.text = "Sodio: $thermalPointSodium"
 
     val thermalPointPotassium = this.thermalPoint!!.potassium
     val thermalPointPotassiumTextView = this.rootView.findViewById<TextView>(R.id.potassium)
-    thermalPointPotassiumTextView.text = "Potassium: $thermalPointPotassium"
+    thermalPointPotassiumTextView.text = "Potasio: $thermalPointPotassium"
 
     val thermalPointMagnesiumIon = this.thermalPoint!!.magnesiumIon
     val thermalPointMagnesiumIonTextView = this.rootView.findViewById<TextView>(R.id.magnesium_Ion)
-    thermalPointMagnesiumIonTextView.text = "Magnesium Ion: $thermalPointMagnesiumIon"
+    thermalPointMagnesiumIonTextView.text = "Ion de Magnesio: $thermalPointMagnesiumIon"
 
   }
 
@@ -149,5 +157,33 @@ class ThermalPointInfoFragment : Fragment() {
         putSerializable(ARG_THERMAL_POINT, thermalPoint)
       }
     }
+  }
+
+  /**
+   * Convert c r t05to w g s84
+   *
+   * @param x
+   * @param y
+   * @return
+   */
+  private fun convertCRT05toWGS84(x: Double, y: Double): ProjCoordinate {
+    val crsFactory = CRSFactory()
+    val transformFactory = CoordinateTransformFactory()
+
+    // Define the coordinate systems
+    val sourceCRS = crsFactory.createFromName("EPSG:5367")
+    val targetCRS = crsFactory.createFromName("EPSG:4326")
+
+    // Creates the transform
+    val transform = transformFactory.createTransform(sourceCRS, targetCRS)
+
+    // Defines the source and destination coordinates
+    val srcCoord = ProjCoordinate(x, y)
+    val dstCoord = ProjCoordinate()
+
+    // Does the transformation
+    transform.transform(srcCoord, dstCoord)
+
+    return dstCoord
   }
 }

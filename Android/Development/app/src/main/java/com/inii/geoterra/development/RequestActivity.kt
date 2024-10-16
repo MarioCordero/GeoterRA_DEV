@@ -112,11 +112,11 @@ class RequestActivity : AppCompatActivity(), OnFragmentInteractionListener {
     // Create a request sheet for each submitted request
     for (request in submittedRequest) {
       val requestSheet = RequestSheet(this)
-      Log.i("Request: ", request.toString())
+      // Log.i("Request: ", request.toString())
       // Set the information of the request sheet
       requestSheet.setInformation(
-        "${request.latitude}, ${request.longitude}",
-        "${request.date}",
+        request.latitude, request.longitude,
+        request.date,
         "Recibido"
       )
       sheetScrollView.addView(requestSheet)
