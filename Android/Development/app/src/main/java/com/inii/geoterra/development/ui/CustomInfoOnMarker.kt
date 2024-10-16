@@ -62,8 +62,6 @@ class CustomInfoOnMarker : InfoWindow {
     // Center the map on the marker's location when the info window is opened
     mMapView.controller.setCenter(marker.position)
 
-    // Find and use other views in the info window layout if needed
-    val contentView = mView.findViewById<View>(R.id.info_window_marker_text)
     if (temperature != null) {
       val pointId = mView.findViewById<TextView>(R.id.point_id)
       pointId.text = "Point ID: ${marker.title}"
