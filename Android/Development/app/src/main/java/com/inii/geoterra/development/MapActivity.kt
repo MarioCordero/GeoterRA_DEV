@@ -82,8 +82,8 @@ class MapActivity : AppCompatActivity(), OnFragmentInteractionListener, MessageL
     val centerMapOnUserButton = findViewById<Button>(R.id.centerUserButton)
     centerMapOnUserButton.setOnClickListener{
       // TODO : center map on user location when the info interface is finished.
-      // mapView.controller.setCenter(activeMarkers["User"]?.position)
-      mapView.controller.setCenter(mapMarkers["Termal Josue Ulate"]?.position)
+      mapView.controller.setCenter(mapMarkers["User"]?.position)
+      // mapView.controller.setCenter(mapMarkers["Termal Josue Ulate"]?.position)
     }
 
     mapManager()
@@ -351,8 +351,8 @@ class MapActivity : AppCompatActivity(), OnFragmentInteractionListener, MessageL
     val transformFactory = CoordinateTransformFactory()
 
     // Define the coordinate systems
-    val sourceCRS = crsFactory.createFromName("EPSG:5367") // Reemplaza XXXXX con el código EPSG del sistema CRT05
-    val targetCRS = crsFactory.createFromName("EPSG:4326") // EPSG:4326 es el código para WGS84
+    val sourceCRS = crsFactory.createFromName("EPSG:5367")
+    val targetCRS = crsFactory.createFromName("EPSG:4326")
 
     // Creates the transform
     val transform = transformFactory.createTransform(sourceCRS, targetCRS)
