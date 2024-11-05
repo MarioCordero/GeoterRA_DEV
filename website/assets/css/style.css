@@ -112,8 +112,6 @@ html {
 	transition: all 250ms ease;
 }
 
-/* }.menu-bars-background.active{ */
-
 .menu-logged{
 	display: none;
 	/* display: flex; */
@@ -775,12 +773,52 @@ html {
 
 /* ------------------------------logged.html------------------------------ */
 
-.loged-in-container{
+.logged-sidebar {
+	height: 100vh;
+	width: 20vh;
+	float: left;
+	padding: 20px;
+	background-color: #f4f4f4;
+	border-right: 1px solid #ddd;
+}
+
+.logged-sidebar button {
+	display: block;
+	width: 100%;
+	margin-bottom: 10px;
+	padding: 10px;
+	background-color: #007acc;
+	color: white;
+	border: none;
+	cursor: pointer;
+}
+
+.logged-sidebar button:hover {
+	background-color: #005f99;
+}
+
+.logged-in-container{
 	margin: auto;
 	min-height: 100vh;
-}.loged-in-container h1{
+}.logged-in-container h1{
 	padding-top: 15vh;
 }
+
+
+/* Content container styling */
+.content-container {
+    margin-left: 220px;
+    padding: 20px;
+}
+
+.content-section {
+    display: none;
+}
+
+#user-info {
+    display: block; /* Default section */
+}
+
 
 .user-info{
 	color: var(--blanco);
