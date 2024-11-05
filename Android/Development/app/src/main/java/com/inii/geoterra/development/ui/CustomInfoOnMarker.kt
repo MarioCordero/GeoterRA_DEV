@@ -3,7 +3,6 @@ package com.inii.geoterra.development.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
-import android.view.View
 import android.widget.TextView
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.components.MessageListener
@@ -56,7 +55,7 @@ class CustomInfoOnMarker : InfoWindow {
     val temperatureTextView = mView.findViewById<TextView>(R.id.temperature)
 
     if (temperature != null) {
-      temperatureTextView.text = "Temperature: %.2f".format(temperature)
+      temperatureTextView.text = "Temperatura: %.2f".format(temperature)
     }
     Log.d("CustomInfoWindow", "onOpen: $temperature")
     // Center the map on the marker's location when the info window is opened

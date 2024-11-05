@@ -14,7 +14,6 @@ import com.inii.geoterra.development.components.api.ThermalPoint
 import org.locationtech.proj4j.CRSFactory
 import org.locationtech.proj4j.CoordinateTransformFactory
 import org.locationtech.proj4j.ProjCoordinate
-import org.osmdroid.util.GeoPoint
 
 /**
  * A simple [Fragment] subclass.
@@ -68,7 +67,7 @@ class ThermalPointInfoFragment : Fragment() {
     val wsg84Coordinates = convertCRT05toWGS84(thermalPointLatitude, thermalPointLongitude)
 
     thermalPointCoordinatesTextView.text =
-      "Latitud: ${wsg84Coordinates.x}\nLongitud: ${wsg84Coordinates.y}"
+      "Latitud: %.7f\nLongitud: %.7f".format(wsg84Coordinates.x, wsg84Coordinates.y)
 
     val thermalPointTemperature = this.thermalPoint!!.temperature
     val thermalPointTemperatureTextView =
@@ -77,68 +76,68 @@ class ThermalPointInfoFragment : Fragment() {
 
     val thermalPointFieldPh = this.thermalPoint!!.fieldPh
     val thermalPointFieldPhTextView = this.rootView.findViewById<TextView>(R.id.field_ph)
-    thermalPointFieldPhTextView.text = "Ph de Campo: $thermalPointFieldPh"
+    thermalPointFieldPhTextView.text = "Campo pH: $thermalPointFieldPh"
 
     val thermalPointFieldCond = this.thermalPoint!!.fieldCond
     val thermalPointFieldCondTextView = this.rootView.findViewById<TextView>(R.id.field_conditions)
-    thermalPointFieldCondTextView.text = "Condiciones de Campo: $thermalPointFieldCond"
+    thermalPointFieldCondTextView.text = "Campo Cond: $thermalPointFieldCond"
 
     val thermalPointLabPh = this.thermalPoint!!.labPh
     val thermalPointLabPhTextView = this.rootView.findViewById<TextView>(R.id.lab_ph)
-    thermalPointLabPhTextView.text = "PH de Laboratorio: $thermalPointLabPh"
+    thermalPointLabPhTextView.text = "Lab pH: $thermalPointLabPh"
 
     val thermalPointLabCond = this.thermalPoint!!.labCond
     val thermalPointLabCondTextView = this.rootView.findViewById<TextView>(R.id.lab_conditions)
-    thermalPointLabCondTextView.text = "Condiciones de Laboratorio: $thermalPointLabCond"
+    thermalPointLabCondTextView.text = "Lab Cond: $thermalPointLabCond"
 
     val thermalPointChlorine = this.thermalPoint!!.chlorine
     val thermalPointChlorineTextView = this.rootView.findViewById<TextView>(R.id.chlorine)
-    thermalPointChlorineTextView.text = "Cloro: $thermalPointChlorine"
+    thermalPointChlorineTextView.text = "Cl: $thermalPointChlorine"
 
     val thermalPointCalcium = this.thermalPoint!!.calcium
     val thermalPointCalciumTextView = this.rootView.findViewById<TextView>(R.id.calcium)
-    thermalPointCalciumTextView.text = "Calcio: $thermalPointCalcium"
+    thermalPointCalciumTextView.text = "Ca+: $thermalPointCalcium"
 
     val thermalPointMgBicarbonate = this.thermalPoint!!.mgBicarbonate
     val thermalPointMgBicarbonateTextView =
       this.rootView.findViewById<TextView>(R.id.mg_bicarbonate)
-    thermalPointMgBicarbonateTextView.text = "Mg Bicarbonato: $thermalPointMgBicarbonate"
+    thermalPointMgBicarbonateTextView.text = "HCO3: $thermalPointMgBicarbonate"
 
     val thermalPointSulfate = this.thermalPoint!!.sulfate
     val thermalPointSulfateTextView = this.rootView.findViewById<TextView>(R.id.sulfate)
-    thermalPointSulfateTextView.text = "Sulfato: $thermalPointSulfate"
+    thermalPointSulfateTextView.text = "SO4: $thermalPointSulfate"
 
     val thermalPointIron = this.thermalPoint!!.iron
     val thermalPointIronTextView = this.rootView.findViewById<TextView>(R.id.iron)
-    thermalPointIronTextView.text = "Hierro: $thermalPointIron"
+    thermalPointIronTextView.text = "Fe: $thermalPointIron"
 
     val thermalPointSilicon = this.thermalPoint!!.silicon
     val thermalPointSiliconTextView = this.rootView.findViewById<TextView>(R.id.silicon)
-    thermalPointSiliconTextView.text = "Silicon: $thermalPointSilicon"
+    thermalPointSiliconTextView.text = "Si: $thermalPointSilicon"
 
     val thermalPointBoron = this.thermalPoint!!.boron
     val thermalPointBoronTextView = this.rootView.findViewById<TextView>(R.id.boron)
-    thermalPointBoronTextView.text = "Boron: $thermalPointBoron"
+    thermalPointBoronTextView.text = "B: $thermalPointBoron"
 
     val thermalPointLithium = this.thermalPoint!!.lithium
     val thermalPointLithiumTextView = this.rootView.findViewById<TextView>(R.id.lithium)
-    thermalPointLithiumTextView.text = "Litio: $thermalPointLithium"
+    thermalPointLithiumTextView.text = "Li: $thermalPointLithium"
 
     val thermalPointFluorine = this.thermalPoint!!.fluorine
     val thermalPointFluorineTextView = this.rootView.findViewById<TextView>(R.id.fluorine)
-    thermalPointFluorineTextView.text = "Flúor: $thermalPointFluorine"
+    thermalPointFluorineTextView.text = "F: $thermalPointFluorine"
 
     val thermalPointSodium = this.thermalPoint!!.sodium
     val thermalPointSodiumTextView = this.rootView.findViewById<TextView>(R.id.sodium)
-    thermalPointSodiumTextView.text = "Sodio: $thermalPointSodium"
+    thermalPointSodiumTextView.text = "Na: $thermalPointSodium"
 
     val thermalPointPotassium = this.thermalPoint!!.potassium
     val thermalPointPotassiumTextView = this.rootView.findViewById<TextView>(R.id.potassium)
-    thermalPointPotassiumTextView.text = "Potasio: $thermalPointPotassium"
+    thermalPointPotassiumTextView.text = "K: $thermalPointPotassium"
 
     val thermalPointMagnesiumIon = this.thermalPoint!!.magnesiumIon
     val thermalPointMagnesiumIonTextView = this.rootView.findViewById<TextView>(R.id.magnesium_Ion)
-    thermalPointMagnesiumIonTextView.text = "Ion de Magnesio: $thermalPointMagnesiumIon"
+    thermalPointMagnesiumIonTextView.text = "Mg+: $thermalPointMagnesiumIon"
 
   }
 
