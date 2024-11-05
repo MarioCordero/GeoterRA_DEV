@@ -14,12 +14,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="30dp"
+        android:layout_margin="30dp"
 
         android:text="Punto Termal"
-
-        android:textStyle="bold"
         android:textColor="@color/black"
+
+        android:fontFamily="@font/poppins_semibold"
         android:textSize="22dp"
         >
     </TextView>
@@ -38,9 +38,8 @@
         android:layout_marginStart="30dp"
 
         android:backgroundTint="@color/ligthGray"
-        android:textColor="@color/black"
+        android:fontFamily="@font/poppins_semibold"
         android:text="Volver"
-        style="?android:attr/buttonBarButtonStyle"
         >
     </Button>
 
@@ -73,7 +72,9 @@
                 android:layout_height="wrap_content"
                 android:text="Latitude, Longitude"
                 android:textSize="18sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:fontFamily="@font/calibri_regular"
+                />
 
             <TextView
                 android:id="@+id/point_temperature"
@@ -81,7 +82,9 @@
                 android:layout_height="wrap_content"
                 android:text="Temperature"
                 android:textSize="18sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:fontFamily="@font/calibri_regular"
+                />
 
             <TextView
                 android:id="@+id/field_ph"
@@ -89,7 +92,9 @@
                 android:layout_height="wrap_content"
                 android:text="pH field"
                 android:textSize="18sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:fontFamily="@font/calibri_regular"
+                />
 
             <TextView
                 android:id="@+id/field_conditions"
@@ -97,7 +102,9 @@
                 android:layout_height="wrap_content"
                 android:text="Conditions field"
                 android:textSize="18sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:fontFamily="@font/calibri_regular"
+                />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
@@ -131,7 +138,9 @@
                 android:layout_height="wrap_content"
                 android:text="pH Lab"
                 android:textSize="18sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:fontFamily="@font/calibri_regular"
+                />
 
             <TextView
                 android:id="@+id/lab_conditions"
@@ -139,7 +148,9 @@
                 android:layout_height="wrap_content"
                 android:text="Lab Conditions"
                 android:textSize="18sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:fontFamily="@font/calibri_regular"
+                />
 
             <TextView
                 android:id="@+id/chlorine"
@@ -147,7 +158,9 @@
                 android:layout_height="wrap_content"
                 android:text="Chlorine"
                 android:textSize="18sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:fontFamily="@font/calibri_regular"
+                />
 
             <TextView
                 android:id="@+id/calcium"
@@ -155,7 +168,9 @@
                 android:layout_height="wrap_content"
                 android:text="Calcium"
                 android:textSize="18sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:fontFamily="@font/calibri_regular"
+                />
 
             <TextView
                 android:id="@+id/mg_bicarbonate"
@@ -163,7 +178,9 @@
                 android:layout_height="wrap_content"
                 android:text="Mg Bicarbonate"
                 android:textSize="18sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:fontFamily="@font/calibri_regular"
+                />
 
             <TextView
                 android:id="@+id/sulfate"
@@ -171,7 +188,9 @@
                 android:layout_height="wrap_content"
                 android:text="Sulfate"
                 android:textSize="18sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:fontFamily="@font/calibri_regular"
+                />
 
             <TextView
                 android:id="@+id/iron"
@@ -179,7 +198,9 @@
                 android:layout_height="wrap_content"
                 android:text="Iron"
                 android:textSize="18sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:fontFamily="@font/calibri_regular"
+                />
 
             <TextView
                 android:id="@+id/silicon"
@@ -187,7 +208,9 @@
                 android:layout_height="wrap_content"
                 android:text="Silicon"
                 android:textSize="18sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:fontFamily="@font/calibri_regular"
+                />
 
             <TextView
                 android:id="@+id/boron"
@@ -195,7 +218,9 @@
                 android:layout_height="wrap_content"
                 android:text="Boron"
                 android:textSize="18sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:fontFamily="@font/calibri_regular"
+                />
 
             <TextView
                 android:id="@+id/lithium"
@@ -203,7 +228,9 @@
                 android:layout_height="wrap_content"
                 android:text="Lithium"
                 android:textSize="18sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:fontFamily="@font/calibri_regular"
+                />
 
             <TextView
                 android:id="@+id/fluorine"
@@ -211,7 +238,9 @@
                 android:layout_height="wrap_content"
                 android:text="Fluorine"
                 android:textSize="18sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:fontFamily="@font/calibri_regular"
+                />
 
             <TextView
                 android:id="@+id/sodium"
@@ -219,7 +248,9 @@
                 android:layout_height="wrap_content"
                 android:text="Sodium"
                 android:textSize="18sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:fontFamily="@font/calibri_regular"
+                />
 
             <TextView
                 android:id="@+id/potassium"
@@ -227,7 +258,9 @@
                 android:layout_height="wrap_content"
                 android:text="Potassium"
                 android:textSize="18sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:fontFamily="@font/calibri_regular"
+                />
 
             <TextView
                 android:id="@+id/magnesium_Ion"
@@ -235,7 +268,9 @@
                 android:layout_height="wrap_content"
                 android:text="Magnesium Ion"
                 android:textSize="18sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:fontFamily="@font/calibri_regular"
+                />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

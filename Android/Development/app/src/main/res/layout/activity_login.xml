@@ -57,9 +57,10 @@
                 android:layout_marginTop="20dp"
                 android:text="@string/app_name"
                 android:textAlignment="center"
+                android:fontFamily="@font/poppins_semibold"
                 android:textColor="@color/black"
                 android:textSize="36sp"
-                android:textStyle="bold" />
+                />
 
             <EditText
                 android:id="@+id/userEmail"
@@ -104,6 +105,7 @@
                     android:padding="8dp"
                     android:text="Show Password"
                     android:textColor="@color/black"
+                    android:fontFamily="@font/calibri_regular"
                     android:textSize="12sp"
                     >
                 </TextView>
@@ -123,11 +125,11 @@
 
                 android:layout_marginTop="15dp"
 
-                android:backgroundTint="@color/black"
+                android:backgroundTint="@color/geoterra_yellow"
 
                 android:text="Iniciar sesión"
                 android:textColor="@color/white"
-                android:textAllCaps="false"
+                android:fontFamily="@font/poppins_semibold"
                 android:textSize="18sp"
 
                 app:cornerRadius="5dp" />
@@ -143,14 +145,15 @@
                     android:id="@+id/notSignedText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="No tienes una cuenta? " />
+                    android:text="No tienes una cuenta? "
+                    android:fontFamily="@font/calibri_regular" />
 
                 <TextView
                     android:id="@+id/signUpText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Regístrate ahora!"
-                    android:textStyle="bold" />
+                    android:fontFamily="@font/calibri_bold" />
 
             </LinearLayout>
 
@@ -165,6 +168,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text="Instituto de Investigaciones en Ingeniería | REFORESTA"
+                android:fontFamily="@font/calibri_regular"
                 android:textSize="12sp" />
 
         </LinearLayout>

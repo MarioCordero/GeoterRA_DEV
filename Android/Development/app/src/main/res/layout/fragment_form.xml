@@ -26,7 +26,7 @@
                 android:textAlignment="center"
                 android:text="Formulario de Solicitud"
                 android:textSize="20sp"
-                android:textStyle="bold"
+                android:fontFamily="@font/poppins_semibold"
                 android:textColor="@color/black" />
 
             <com.google.android.material.textfield.TextInputLayout
@@ -240,12 +240,13 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
 
-                    android:backgroundTint="@color/ligthGray"
+                    android:backgroundTint="@color/geoterra_ligth_gray"
                     android:drawableBottom="@drawable/baseline_add_photo_alternate_24"
                     android:text="Insertar ubicación por foto"
+                    android:fontFamily="@font/poppins_semibold"
                     android:textColor="@color/black"
-                    android:textSize="6sp"
-                    style="?android:attr/buttonBarButtonStyle" />
+                    android:textSize="10sp"
+                    />
 
                 <Button
                     android:id="@+id/userLocationButton"
@@ -254,12 +255,13 @@
                     android:layout_weight="1"
                     android:layout_marginStart="20dp"
 
-                    android:backgroundTint="@color/ligthGray"
+                    android:backgroundTint="@color/geoterra_ligth_gray"
                     android:drawableBottom="@drawable/baseline_location_on_24"
                     android:text="Insertar ubicación por GPS"
+                    android:fontFamily="@font/poppins_semibold"
                     android:textColor="@color/black"
-                    android:textSize="6sp"
-                    style="?android:attr/buttonBarButtonStyle" />
+                    android:textSize="10sp"
+                    />
             </LinearLayout>
 
             <LinearLayout
@@ -281,12 +283,11 @@
                     android:layout_height="60dp"
                     android:minWidth="200dp"
 
-                    android:backgroundTint="@color/ligthGray"
+                    android:backgroundTint="@color/geoterra_yellow"
                     android:text="Enviar Solicitud"
-                    android:textColor="@color/black"
-                    android:textSize="12sp"
-                    style="?android:attr/buttonBarButtonStyle"
-                    />
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:textSize="12sp"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

@@ -79,7 +79,7 @@
         android:fontFamily="@font/poppins_semibold"
         android:textColor="@color/black"
         android:textSize="11sp"
-        app:cornerRadius="15dp"
+        app:cornerRadius="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 

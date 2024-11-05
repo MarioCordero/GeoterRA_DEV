@@ -33,7 +33,7 @@
             android:textAlignment="center"
             android:textColor="@color/black"
             android:textSize="30sp"
-            android:textStyle="bold" />
+            android:fontFamily="@font/poppins_semibold" />
 
         <EditText
             android:id="@+id/userEmail"
@@ -79,6 +79,7 @@
 
                 android:padding="8dp"
                 android:text="Show Password"
+                android:fontFamily="@font/calibri_bold"
                 android:textColor="@color/black"
                 android:textSize="12sp"
                 >
@@ -146,9 +147,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:backgroundTint="@color/black"
+            android:backgroundTint="@color/geoterra_yellow"
             android:text="@string/create_account"
-            android:textAllCaps="false"
+            android:fontFamily="@font/poppins_semibold"
             android:textColor="@color/white"
             android:textSize="18sp"
             app:cornerRadius="5dp" />
@@ -163,8 +164,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:fontFamily="@font/calibri_bold"
             android:text="Instituto de Investigaciones en Ingeniería | REFORESTA"
-            android:textColor="@color/black"
             android:textSize="12sp" />
 
     </LinearLayout>

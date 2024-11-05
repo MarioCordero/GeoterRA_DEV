@@ -46,6 +46,7 @@
                     android:layout_gravity="center"
                     android:text="@string/about_us"
                     android:textColor="@color/black"
+                    android:fontFamily="@font/poppins_semibold"
                     android:textSize="22sp">
                 </TextView>
 
@@ -90,6 +91,7 @@
                     android:text="GeoterRA: optimiza decisiones en proyectos geotérmicos."
                     android:lineSpacingExtra="8sp"
                     android:textAlignment="textStart"
+                    android:fontFamily="@font/calibri_regular"
                     android:textSize="15sp">
                 </TextView>
 
@@ -110,6 +112,7 @@
 
                     android:text="Proporcionamos información precisa, reducimos riesgos y maximizamos eficiencia. Equipo multidisciplinario, promovemos energías renovables y desarrollo sostenible."
                     android:textSize="17sp"
+                    android:fontFamily="@font/calibri_regular"
                     android:justificationMode="inter_word">
                 </TextView>
 
@@ -149,6 +152,7 @@
                     android:justificationMode="inter_word"
                     android:lineSpacingExtra="8sp"
                     android:text="GeoterRA recopila datos geológicos de múltiples fuentes, incluyendo estudios de campo realizados por expertos y contribuciones de usuarios a través de la aplicación móvil. Integrando datos de bases de datos geológicas existentes, garantizamos una colección completa."
+                    android:fontFamily="@font/calibri_regular"
                     android:textSize="15sp">
                 </TextView>
 

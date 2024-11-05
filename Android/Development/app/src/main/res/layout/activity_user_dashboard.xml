@@ -28,9 +28,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Aaron Sanchez"
+                android:text="Nombre de usuario"
+                android:fontFamily="@font/poppins_semibold"
                 android:textColor="@color/black"
-                android:textSize="30sp"
+                android:textSize="20sp"
                 android:gravity="start"
                 >
             </TextView>
@@ -56,14 +57,16 @@
                 android:id="@+id/helpButton"
                 android:layout_width="120dp"
                 android:layout_height="100dp"
+
                 android:text="Ayuda"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:textColor="@color/black"
+                android:fontFamily="@font/poppins_semibold"
 
                 android:drawableTop="@drawable/baseline_filter_tilt_shift_24"
                 android:backgroundTint="@color/ligthGray"
-                app:cornerRadius="5dp"
-                style="?android:attr/buttonBarButtonStyle">
+
+                app:cornerRadius="5dp">
             </Button>
 
             <Button
@@ -71,14 +74,16 @@
                 android:layout_marginStart="40dp"
                 android:layout_width="120dp"
                 android:layout_height="100dp"
+
                 android:text="Actividad"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:textColor="@color/black"
+                android:fontFamily="@font/poppins_semibold"
 
                 android:drawableTop="@drawable/baseline_article_40"
                 android:backgroundTint="@color/ligthGray"
-                app:cornerRadius="5dp"
-                style="?android:attr/buttonBarButtonStyle">
+
+                app:cornerRadius="5dp">
             </Button>
 
         </LinearLayout>
@@ -99,6 +104,7 @@
                 android:text="Configuración"
                 android:textColor="@color/black"
                 android:textSize="18sp"
+                android:fontFamily="@font/calibri_regular"
 
                 app:drawableLeftCompat="@drawable/baseline_app_settings_alt_24"
                 android:drawablePadding="10dp"
@@ -109,7 +115,7 @@
                 android:layout_marginTop="15dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
+                android:fontFamily="@font/calibri_regular"
                 android:text="Mensajes"
                 android:textColor="@color/black"
                 android:textSize="18sp"

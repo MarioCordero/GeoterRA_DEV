@@ -5,7 +5,8 @@
     android:layout_height="100dp"
     android:background="@drawable/rounded_background"
     android:gravity="center"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="18dp">
 
     <TextView
         android:id="@+id/point_id"
@@ -16,7 +17,7 @@
 
         android:layout_margin="4dp"
         android:gravity="center"
-        android:padding="5dp"
+        android:fontFamily="@font/poppins_semibold"
         >
     </TextView>
     <!-- TextView para mostrar las coordenadas -->
@@ -28,6 +29,7 @@
         android:gravity="center"
         android:padding="8dp"
         android:textColor="@android:color/black"
+        android:fontFamily="@font/calibri_regular"
         android:textSize="16sp" />
 
     <TextView
@@ -36,8 +38,8 @@
         android:layout_height="wrap_content"
         android:background="@android:color/white"
         android:gravity="center"
-        android:padding="8dp"
         android:textColor="@android:color/black"
+        android:fontFamily="@font/calibri_regular"
         android:textSize="16sp" />
 
     <TextView
@@ -49,9 +51,9 @@
         android:textStyle="bold"
         android:textSize="16sp"
         android:textColor="@android:color/black"
+        android:fontFamily="@font/calibri_regular"
 
         android:gravity="center"
-        android:padding="8dp"
         android:clickable="true"
         >
     </TextView>

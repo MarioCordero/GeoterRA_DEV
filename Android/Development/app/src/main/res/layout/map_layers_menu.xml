@@ -5,28 +5,38 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/filters"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Filtros por provincia"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        android:padding="16dp"
-        android:clickable="true"
-        android:background="?android:attr/selectableItemBackground" />
+        android:padding="16dp">
 
-    <TextView
-        android:id="@+id/layers"
-        android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/filters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Filtros por provincia"
+            android:textSize="18sp"
+            android:fontFamily="@font/poppins_semibold"
+            android:textColor="@color/black"
+            android:clickable="true"
+            android:background="?android:attr/selectableItemBackground" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Detalles del mapa"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        android:padding="16dp"
-        android:clickable="true"
-        android:background="?android:attr/selectableItemBackground" />
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/layers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Detalles del mapa"
+            android:textSize="18sp"
+            android:fontFamily="@font/poppins_semibold"
+            android:textColor="@color/black"
+            android:clickable="true"
+            android:background="?android:attr/selectableItemBackground" />
+    </LinearLayout>
 
 </LinearLayout>
