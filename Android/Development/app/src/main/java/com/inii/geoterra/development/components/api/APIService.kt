@@ -207,23 +207,23 @@ interface APIService {
   @FormUrlEncoded
   @POST("request.inc.php")
   fun newRequest(
-    @Field("point_id") pointID : String,
+    @Field("pointId") pointID : String,
     @Field("region") region : String,
     @Field("fecha") date : String,
 
     @Field ("email") email : String,
 
     @Field("propietario") owner : String,
-    @Field("uso_actual") currentUsage : String,
+    @Field("usoActual") currentUsage : String,
     @Field("direccion") address : String,
-    @Field("num_telefono") contactNumber : String,
+    @Field("contactNumber") contactNumber : String,
 
     @Field("gps") coordinates : String,
 
-    @Field("sens_termica") thermalSensation : Int,
+    @Field("sensTermica") thermalSensation : Int,
     @Field("burbujeo") bubbles : Int,
-    @Field ("lat") latitude : String,
-    @Field ("lng") longitude : String,
+    @Field ("coord_x") latitude : String,
+    @Field ("coord_y") longitude : String,
   ): Call<RequestResponse>
 
   @GET("check_session.php")
