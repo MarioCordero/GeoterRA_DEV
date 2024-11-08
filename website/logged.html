@@ -30,6 +30,7 @@
 					<a href="./index.html"> <img id="logo" src="./assets/images/GeoterRA/GeoterRA-Logo.svg" class="header-logo" alt="Webpage logotype"> </a>
 				</div>
 
+				<!-- When the user is not logged -->
 				<div class="menu" id="navbar">
 
 					<a href="./index.html#about-us">Acerca de nosotros</a>
@@ -40,6 +41,7 @@
 
 				</div>
 
+				<!-- When the user is logged -->
 				<div class="menu-logged" id="navbar-logged">
 
 					<a href="./index.html#about-us">Acerca de nosotros</a>
@@ -50,6 +52,7 @@
 
 				</div>
 
+				<!-- Mobile bars -->
 				<input type="checkbox" id="checkbox">
 				<label for="checkbox" class="toggle">
 					<div class="bar bar--top"></div>
@@ -57,6 +60,7 @@
 					<div class="bar bar--bottom"></div>
 				</label>
 
+				<!-- When the user is logged Mobile bars -->
                 <div class="menu-bars-background" id="menu-bars-background">
                     <div class="menu-elements Gibson-Regular" id="menu-elements">
 
@@ -73,7 +77,7 @@
 			<!-- NAVBAR -->
 
 			<!-- BODY -->
-			<div class="loged-in-container Montserrat-Regular">
+			<div class="logged-in-container Montserrat-Regular">
 
 				<!--------------------------------LOADER----------------------------------->
 				<div class="web-loader" id="loader">
@@ -83,88 +87,103 @@
 					</div>
 				</div>
 				<!--------------------------------END LOADER------------------------------->
+	
 
-				<h1 class="center-text">Bienvenida persona usuaria</h1>
+				<div class="logged-UI">
+					<!-------------------------------- Sidebar Navigation -------------------------------->
+					<aside class="logged-sidebar">
+						<div class="logged-sidebar-container">
+							<h1 class="Montserrat-SemiBold">Bienvenid@</h1>
+							<h3 class="Montserrat-Light">GeoterRA Plataforma</h3>
+	
+							<hr>
+								<button class="Poppins-Bold" onclick="showSection('user-info')">Información del usuario</button>
+								<button class="Poppins-Bold" onclick="showSection('user-requests')">Solicitudes creadas</button>
+								<button class="Poppins-Bold" onclick="showSection('guide')">Guía de uso</button>
+							<hr>
+							
+							<div class="buttons-container"> <button id="logout-btn">Cerrar Sesión</button> </div>
+						</div>
+					</aside>
+					<!-------------------------------- Sidebar Navigation -------------------------------->
+	
+					<div class="section-container">
 
-				<div class="user-info">
-					
-					<!-- PERSONAL INFO LEFT COL-->
-					<div class="user-info-col-container">
-
-						<!-- TODO[] : Hay que poner la información de cada usuario en la etiqueta correspondiente <p> </p> -->
-						<div class="user-info-col">
-
+						<!-- User Info Section -->
+						<section id="user-info" class="content-section">
 							<ul class="user-personal-data">
-
+		
 								<h2 class="center-text Poppins-Bold">Información la persona usuaria</h2>
-
+		
 								<li>
 									<h3 class="Poppins-SemiBold">NOMBRE</h3>
 									<p class="Poppins-Light" id="user-name">Nombre ejemplo</p>
 								</li>
-
+		
 								<li>
 									<h3 class="Poppins-SemiBold">CORREO</h3>
 									<p class="Poppins-Light" id="user-email">ejemplo@tucorreo.com</p>
 								</li>
-
+		
 								<li>
 									<h3 class="Poppins-SemiBold">TELÉFONO</h3>
 									<p class="Poppins-Light" id="user-phone">0000-0000</p>
 								</li>
-
-								<button id="###" class="Montserrat-Medium">Editar</button>
-
+		
+								<button id="edit-btn" class="Montserrat-Medium" onclick="toggleEdit()"">Editar</button>
+		
 							</ul>
 
-							<ul class="user-personal-data">
+							<!-- Confirmation Modal -->
+							<div id="confirmation-modal" class="confirmation-modal" style="display:none;">
+								<div class="modal-content">
+									<h3>Confirma tu contraseña</h3>
+									<input type="password" id="user-password" placeholder="Ingresa tu contraseña" required>
+									<button id="confirm-btn" class="Montserrat-Medium" onclick="confirmEdit()">Confirmar</button>
+									<button class="Montserrat-Medium" onclick="closeModal()">Cancelar</button>
+								</div>
+							</div>
 
-								<h2 class="center-text Poppins-Bold">Como agregar puntos al mapa</h2>
-
-								<iframe 
-									src="https://www.youtube.com/embed/0_CBDySHfMw" 
-									title="YouTube video player" 
-									frameborder="0" 
-									allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-									allowfullscreen>
-								</iframe>
-
-							</ul>
-
-						</div>
+						</section>
 						
-	
-						<!-- REQUESTS OF THE USER RIGTH COL-->
-						<div class="user-info-col">
-							
+						<!-- User Requests Section -->
+						<section id="user-requests" class="content-section" style="display:none;">
+						<h2>Solicitudes creadas</h2>
+						<ul id="requests-list">
 							<div class="user-requests-test">
 								
 							</div>
-
+							
 							<div class="user-requests">
-
+								
 								<h2 class="center-text Poppins-Bold">Solicitudes hechas por la persiona usuaria</h2>
-
+								
 								<!-- LIST OF THE USER REQUESTS -->
 								<ul class="center-text">
 									<!-- DINAMICALLY ADD THE USER <li> REQUESTS -->
-								</ul>
-
-								<button class="Montserrat-Medium" onclick="window.location.href='addpoint.html';">Agregar</button>
-
-							</div>
-						</div>
+									</ul>
+									
+									<button class="Montserrat-Medium" onclick="window.location.href='addpoint.html';">Agregar</button>
+									
+								</div>
+							</ul>
+							<button onclick="window.location.href='addpoint.html';">Agregar nueva solicitud</button>
+						</section>
+					
+						<!-- Guide Section -->
+						<section id="guide" class="content-section" style="display:none;">
+							<h2>Guía de uso</h2>
+							<iframe 
+								src="https://www.youtube.com/embed/0_CBDySHfMw" 
+								title="YouTube video player"
+								frameborder="0"
+								allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+								allowfullscreen>
+							</iframe>
+						</section>
 					</div>
-
-				</div>
-
-				<!-- TODO[] : Hacer un logout decente, evitar codigo de JS en el HTML -->
-				<div class="buttons-container">
-					<button id="logout-btn">Cerrar Sesión</button>
 				</div>
 				
-
-
 			</div>
 
 			<!-- FOOTER -->
@@ -187,6 +206,8 @@
 			<script src="./assets/js/menu-bars.js"></script>
 			<script src="./assets/js/get-user-info.js"></script>
 			<script src="./assets/js/logout.js"></script>
+			<script src="./assets/js/section-switcher.js"></script>
+			<script src="./assets/js/edit-user-info.js"></script>
 		</div>
 	</body>
 </html>

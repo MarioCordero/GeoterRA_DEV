@@ -24,6 +24,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         userPhoneElement.textContent = response.phone;
                     }
                     document.getElementById('tittle-page').textContent = response.name; // Update the title
+                    // Store the initial values for later comparison
+                    localStorage.setItem( 'initialuserName' , response.name );
+                    localStorage.setItem( 'initialEmail' , response.email );
+                    localStorage.setItem( 'initialPhone' , response.phone );
+
                 } else {
                     userNameElement.textContent = 'No se encontró la información del usuario.';
                     userEmailElement.textContent = 'No se encontró la información del usuario.';
