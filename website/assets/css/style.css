@@ -275,7 +275,7 @@ html {
 }
 
 .footer-logged{
-	background-color: var(--azul);
+	background-color: var(--azulOscuro);
 }
 
 /* ------------------------------index.html------------------------------ */
@@ -773,16 +773,39 @@ html {
 
 /* ------------------------------logged.html------------------------------ */
 
-.logged-sidebar {
-	height: 100vh;
-	width: 20vh;
-	float: left;
-	padding: 20px;
-	background-color: #f4f4f4;
-	border-right: 1px solid #ddd;
+.logged-in-container{
+	margin: auto;
+	min-height: 100vh;
+}.logged-in-container h1{
+	padding-top: 15vh;
 }
 
-.logged-sidebar button {
+.logged-UI{
+	display: flex;
+}.logged-UI div{
+	justify-content: center;
+}
+
+.logged-sidebar {
+	height: 100vh;
+	width: auto;
+	float: left;
+	padding: 20px;
+	background-color: var(--azul);
+	color: var(--blanco);
+}.logged-sidebar-container{
+	display: flex;
+	flex-direction: column;
+}.logged-sidebar-container button{
+	margin: 2vh 0vh;
+}.logged-sidebar h1{
+	font-size: 40px;
+}.logged-sidebar h3{
+	font-size: 15px;
+	font-style: normal;
+}.logged-sidebar hr{
+	color: var(--blanco);
+}.logged-sidebar button {
 	display: block;
 	width: 100%;
 	margin-bottom: 10px;
@@ -791,61 +814,45 @@ html {
 	color: white;
 	border: none;
 	cursor: pointer;
-}
-
-.logged-sidebar button:hover {
+}.logged-sidebar button:hover {
 	background-color: #005f99;
 }
 
-.logged-in-container{
-	margin: auto;
-	min-height: 100vh;
-}.logged-in-container h1{
-	padding-top: 15vh;
-}
-
-
-/* Content container styling */
-.content-container {
-    margin-left: 220px;
-    padding: 20px;
+.buttons-container {
+    display: flex;
+    margin: 2% auto;
+    justify-content: center;
+    gap: 20%;
+}.buttons-container button{
+	border: 4px solid transparent;
+	width: 100%;
+	padding: 2%;
+	background-color: var(--naranja);
+	font-size: 20px;
+	border-radius: 8px;
+	color: var(--blanco);
+	transition: all 250ms ease;
+}.buttons-container button:hover{
+	border: 4px solid var(--grisClaro);
+	cursor: pointer;
+	transition: all 250ms ease;
 }
 
 .content-section {
     display: none;
 }
 
-#user-info {
-    display: block; /* Default section */
+.section-container{
+	margin: auto;
+	display: block;
 }
 
-
-.user-info{
-	color: var(--blanco);
-	padding: 2% 10%;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.user-info-col-container{
-    display: flex;
-    flex-direction: row;
-    gap: 10%;
-}
-
-.user-info-col{
-	background-color: var(--azul);
-	box-shadow: rgba(80, 80, 80, 0.58) 0px 0px 20px 0px;
-	border-radius: 8px;
-	text-align: justify;
-	line-height: 2;
-	flex: 1;
-	padding: 10px;
-}
-
+/* USER INFO SECTION */
 .user-personal-data{
-	margin: 5% 10%;
+	padding: 5vh;
+	background-color: var(--azul);
+	color: var(--blanco);
+	border-radius: 8px;
 }.user-personal-data li{
 	display: flex;
 	margin: 4vh auto;
@@ -875,6 +882,42 @@ html {
 	transition: all 250ms ease;
 }
 
+#edit-btn.edit-mode {
+    background-color: var(--celeste);
+    color: white;
+}
+
+.confirmation-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}.modal-content input {
+    margin: 10px 0;
+    padding: 10px;
+    width: 80%;
+}.modal-content button {
+    padding: 10px 20px;
+    margin: 10px 5px;
+    cursor: pointer;
+}
+
+.empty-field {
+    background-color: var(--rojo) !important; /* Light red background for empty fields */
+}
+
 /* ERASE IN THE FUTURE */
 iframe {
 	width: 100%;
@@ -884,6 +927,7 @@ iframe {
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* USER REQUESTS SECTION */
 .user-requests{
 	padding: 5% 10%;
 }.user-requests li, ul{
@@ -938,26 +982,6 @@ iframe {
 	border: 1px solid var(--naranja);
 	background-color: var(--naranja) !important;
     height: 60%;
-}
-
-.buttons-container {
-    display: flex;
-    margin: 2% auto;
-    justify-content: center;
-    gap: 20%;
-}.buttons-container button{
-	border: 4px solid transparent;
-	width: 20%;
-	padding: 2%;
-	background-color: var(--naranja);
-	font-size: 20px;
-	border-radius: 8px;
-	color: var(--blanco);
-	transition: all 250ms ease;
-}.buttons-container button:hover{
-	border: 4px solid var(--grisClaro);
-	cursor: pointer;
-	transition: all 250ms ease;
 }
 
 /* ------------------------------addpoint.html------------------------------ */
