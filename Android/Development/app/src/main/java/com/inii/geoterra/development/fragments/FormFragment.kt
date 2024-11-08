@@ -103,6 +103,7 @@ class FormFragment : Fragment() {
           // Set the coordinates in the request form.
           requestForm.latitude = "${userLocation.latitude}"
           requestForm.longitude = "${userLocation.longitude}"
+          requestForm.coordinates = "${userLocation.latitude}, ${userLocation.longitude}"
           Log.i("Coordenadas", requestForm.latitude +"  " + requestForm.longitude)
         }
       }

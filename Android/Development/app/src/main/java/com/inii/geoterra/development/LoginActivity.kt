@@ -242,8 +242,15 @@ class LoginActivity : AppCompatActivity(), OnFragmentInteractionListener {
   }
 
   override fun onFragmentFinished() {
-    // Ends the opened fragment and returns to this activity
-    ActivityNavigator.changeActivity(this, LoginActivity::class.java)
-    supportFragmentManager.popBackStack()
+//    // Ends the opened fragment and returns to this activity
+//    ActivityNavigator.changeActivity(this, LoginActivity::class.java)
+//    supportFragmentManager.popBackStack()
+    val fragment = supportFragmentManager.findFragmentById(R.id.loginLayout)
+    // Remove the fragment from the back stack
+    if (fragment != null) {
+      supportFragmentManager.beginTransaction()
+        .remove(fragment)
+        .commit()
+    }
   }
 }

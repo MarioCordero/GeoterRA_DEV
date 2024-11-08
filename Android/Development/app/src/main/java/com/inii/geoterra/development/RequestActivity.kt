@@ -177,8 +177,13 @@ class RequestActivity : AppCompatActivity(), OnFragmentInteractionListener {
 
   override fun onFragmentFinished() {
     // Ends the related fragment and returns to this activity.
-    ActivityNavigator.changeActivity(this, RequestActivity::class.java)
-    supportFragmentManager.popBackStack()
+    val fragment = supportFragmentManager.findFragmentById(R.id.requestLayout)
+    // Remove the fragment from the back stack
+    if (fragment != null) {
+      supportFragmentManager.beginTransaction()
+        .remove(fragment)
+        .commit()
+    }
   }
 }
 
