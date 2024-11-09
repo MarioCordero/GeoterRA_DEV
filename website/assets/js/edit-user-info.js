@@ -52,6 +52,7 @@ function toggleEdit() {
         
         // Show confirmation modal
         document.getElementById('confirmation-modal').style.display = 'flex';
+        
     }
 }
 

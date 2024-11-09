@@ -278,7 +278,203 @@ html {
 	background-color: var(--azulOscuro);
 }
 
-/* ------------------------------index.html------------------------------ */
+/* --------------------------------------------------- addpoint.html --------------------------------------------------- */
+.add-point{
+	padding: 10vh 10%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+	min-height: 60vh;
+}.add-point h1{
+	display: block;
+	margin: auto !important;
+	padding: 0 !important;
+}.add-point-form{
+	background-color: var(--azul);
+	box-shadow: rgba(80, 80, 80, 0.58) 0px 0px 20px 0px;
+	padding: 5% 10%;	
+	display: block;
+	margin: auto;
+	width: 60%;
+	border-radius: 8px;
+}.add-point-form p{
+	background-color: var(--azulOscuro);
+	display: flex;
+	align-items: center;
+	margin: 0vh auto 5vh auto;
+	text-align: center;
+}.add-point-form p label{
+	width: 100%;
+	color: var(--blanco);
+}.add-point-form input{
+	width: 100%;
+    border: 1px solid transparent;
+    background: var(--blanco);
+    color: var(--negro);
+	padding: 2vh 1vh;
+}
+
+.cascade-container{
+	display: flex;
+	font-size: 20px;
+	margin: 0px !important;
+	padding: 2vh 1vh;
+}
+
+.radio-buttons-container{
+	background-color: var(--blanco);
+	color: var(--blanco);
+	display: flex;
+	justify-content: space-evenly;
+	text-align: center;
+}.radio-buttons-container .option{
+	display: flex;
+	width: 100%;
+	margin: auto 2vh;
+	align-items: center;
+	flex-direction: column;
+}.radio-buttons-container .option input[type="radio"]{
+	display: none;
+}.radio-buttons-container .option label{
+	background-color: var(--azul);
+	color: var(--blanco);
+	width: 100%;
+	position: relative;
+	display: inline-block;
+	padding: 2vh 2vh;
+	margin: 2vh auto;
+	transition: all 250ms ease;
+}.radio-buttons-container .option label:hover{
+	background-color: var(--naranja);
+	color: var(--azul);
+	cursor: pointer;
+	transition: all 250ms ease;
+}.radio-buttons-container .option label:before{
+	content: "";
+	width: 17px;
+	height: 17px;
+	display: inline-block;
+	background: none;
+	position: absolute;
+}.radio-buttons-container input[type="radio"]:checked + label{
+	transition: all 250ms ease;
+	background-color: var(--naranja);
+	color: var(--azul);
+	border-radius: 4px;
+}
+
+#add-point-map{
+	height: 30vh;
+	width: 100%;
+	display: flex;
+}.coordinates{
+	text-align: center;
+	display: flex;
+}
+
+.send-add-point-form{
+	background-color: var(--naranja) !important;
+	color: var(--blanco) !important;
+    width: 50% !important;
+    text-transform: uppercase;
+	margin: 8vh auto 0vh auto !important;
+	display: block;
+    transition: all 500ms ease;
+}.send-add-point-form:hover{
+	color: var(--grisClaro) !important;
+	background-color: var(--azulOscuro) !important;
+    scale: 0.99;
+	cursor: pointer;
+	border: 1px solid var(--naranja);
+}
+
+/* ------------------------------Modal------------------------------ */
+
+#overlay {
+	/* display: block;
+	opacity: 1;
+	visibility: visible; */
+
+	display: none;
+	opacity: 0;
+	visibility: hidden;
+
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0,0,0,0.5);
+	z-index: 1000;
+	transition: 200ms ease-in-out;
+	pointer-events: none;
+  }
+  
+  #overlay.active {
+	display: block;
+	opacity: 1;
+	visibility: visible;
+	pointer-events: all;
+  }
+
+.modal {
+	display: none;
+	opacity: 0;
+	visibility: hidden;
+
+	/* display: block;
+	opacity: 1;
+	visibility: visible; */
+
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	border-radius: 10px;
+	z-index: 10;
+	min-height: 40vh;
+	min-width: 40vh;
+}
+
+.modal.active { 
+	display: block;
+	opacity: 1;
+	visibility: visible;
+}
+
+.modal-body {
+	height: 100%;
+	width: 100%;
+	gap: 30px;
+	border-radius: 8px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center; /* Horizontally centers the content */
+	align-items: center; /* Vertically centers the content */
+	background-color: var(--azul);
+	color: var(--blanco);
+}.modal-body .close-button {
+	position: relative;
+	cursor: pointer;
+	border: 2px solid var(--blanco);
+	background-color: var(--azul);
+	border-radius: 40px;
+	font-size: 1rem;
+	width: 60px;
+	color: var(--blanco);
+}.modal-body .icon {
+	position: relative;
+	background-image: url('../images/icons/check.png');
+	width: 32px;
+	height: 32px;
+	background-size: cover;
+}.modal-body h2{
+	margin: 1vh 1vh;
+}.modal-body p{
+	margin: 1vh 1vh;
+}
+
+/* --------------------------------------------------- index.html --------------------------------------------------- */
 
 .index-background{
 	width: 100%;
@@ -474,9 +670,266 @@ html {
 	color: var(--blanco);
 }
 
+/* --------------------------------------------------- logged.html --------------------------------------------------- */
+
+.logged-in-container{
+	margin: auto;
+	min-height: 100vh;
+}.logged-in-container h1{
+	padding-top: 15vh;
+}
+
+.logged-UI{
+	display: flex;
+}.logged-UI div{
+	justify-content: center;
+}
+
+.logged-sidebar {
+	height: 100vh;
+	width: auto;
+	float: left;
+	padding: 20px;
+	background-color: var(--azul);
+	color: var(--blanco);
+}.logged-sidebar-container{
+	display: flex;
+	flex-direction: column;
+}.logged-sidebar-container button{
+	margin: 2vh 0vh;
+}.logged-sidebar h1{
+	font-size: 40px;
+}.logged-sidebar h3{
+	font-size: 15px;
+	font-style: normal;
+}.logged-sidebar hr{
+	color: var(--blanco);
+}.logged-sidebar button {
+	display: block;
+	width: 100%;
+	margin-bottom: 10px;
+	padding: 10px;
+	background-color: #007acc;
+	color: white;
+	border: none;
+	cursor: pointer;
+}.logged-sidebar button:hover {
+	background-color: #005f99;
+}
+
+.buttons-container {
+    display: flex;
+    margin: 2% auto;
+    justify-content: center;
+    gap: 20%;
+}.buttons-container button{
+	border: 4px solid transparent;
+	width: 100%;
+	padding: 2%;
+	background-color: var(--naranja);
+	font-size: 20px;
+	border-radius: 8px;
+	color: var(--blanco);
+	transition: all 250ms ease;
+}.buttons-container button:hover{
+	border: 4px solid var(--grisClaro);
+	cursor: pointer;
+	transition: all 250ms ease;
+}
+
+.content-section {
+    display: none;
+}
+
+.section-container{
+	margin: auto;
+	display: block;
+}
+
+/* USER INFO SECTION */
+.user-personal-data{
+	padding: 5vh;
+	background-color: var(--azul);
+	color: var(--blanco);
+	border-radius: 8px;
+}.user-personal-data li{
+	display: flex;
+	margin: 4vh auto;
+	justify-content: space-between;
+}.user-personal-data li h3{
+	padding: 1vh 0vh;
+	width: 40%;
+}.user-personal-data li p{
+	background-color: var(--azulOscuro);
+	width: 100%;
+	padding: 1vh 0.5vh;
+	border-bottom: var(--naranja) 1px solid;
+}.user-personal-data button{
+	background-color: var(--naranja);
+	color: var(--blanco);
+	border: 4px solid transparent;
+	width: 40%;
+	margin: 5% auto;
+	padding: 2%;
+	display: block;
+	font-size: 20px;
+	border-radius: 8px;
+	transition: all 250ms ease;
+}.user-personal-data button:hover{
+	border: var(--grisClaro) solid 4px;
+	cursor: pointer;
+	transition: all 250ms ease;
+}
+
+#edit-btn.edit-mode {
+    background-color: var(--celeste);
+    color: white;
+}
+
+.confirmation-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}.modal-content input {
+    margin: 10px 0;
+    padding: 10px;
+    width: 80%;
+}.modal-content button {
+    padding: 10px 20px;
+    margin: 10px 5px;
+    cursor: pointer;
+}
+
+.empty-field {
+    background-color: var(--rojo) !important; /* Light red background for empty fields */
+}
+
+/* ERASE IN THE FUTURE */
+iframe {
+	width: 100%;
+	height: 40vh;
+	border: 5px solid var(--azul);
+	border-radius: 10px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* USER REQUESTS SECTION */
+.user-requests {
+    padding: 5% 10%;
+	background-color: var(--azul);
+	border-radius: 8px;
+	color: var(--blanco);
+}
+
+.user-requests li, ul {
+    list-style: none !important;
+    text-decoration: none;
+}
+
+.user-requests li {
+    background-color: var(--naranja);
+    color: var(--blanco);
+    display: flex;
+    justify-content: space-between;
+    width: 70%;
+    margin: 2vh auto;
+    min-height: 2vh;
+    font-size: 20px;
+    border-radius: 8px;
+    transition: all 250ms ease;
+}
+
+.user-requests p {
+    margin: 2vh 1vh;
+}
+
+.user-requests li div {
+    background-color: var(--blanco);
+    width: 20%;
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+}
+
+.user-requests li div a img {
+    width: 40%;
+}
+
+.user-requests li:hover {
+    cursor: default;
+    transition: all 250ms ease;
+}
+
+.user-requests ul {
+    padding: 3vh 0vh;
+    background-color: var(--azulOscuro);
+    border-radius: 4px;
+}
+
+.user-requests button {
+    background-color: var(--naranja);
+    color: var(--blanco);
+    border: 4px solid transparent;
+    width: 40%;
+    margin: 5% auto;
+    padding: 2%;
+    display: block;
+    font-size: 20px;
+    border-radius: 8px;
+    transition: all 250ms ease;
+}
+
+.user-requests button:hover {
+    border: var(--grisClaro) solid 4px;
+    cursor: pointer;
+    transition: all 250ms ease;
+}
+
+/* Estilo para la sección de desplazamiento */
+.requests-scroll {
+    max-height: 15vh;
+    overflow-y: auto;
+    padding-right: 10px; /* Espacio para la barra de desplazamiento */
+    scrollbar-width: thin;
+    scrollbar-color: var(--azulOscuro) var(--grisClaro);
+}
+
+/* Estilo para la barra de desplazamiento en navegadores webkit (Chrome, Edge, Safari) */
+.requests-scroll::-webkit-scrollbar {
+    width: 8px;
+}
+
+.requests-scroll::-webkit-scrollbar-thumb {
+    background-color: var(--azulOscuro);
+    border-radius: 4px;
+}
+
+.requests-scroll::-webkit-scrollbar-track {
+    background-color: var(--grisClaro);
+}
 
 
-/* ------------------------------login.html------------------------------ */
+.linea-vertical-IDpunto{
+	border: 0.5px solid var(--naranja);
+	width: 10%;
+	background-color: var(--naranja) !important;
+    height: 60%;
+}
+
+/* --------------------------------------------------- login.html --------------------------------------------------- */
 
 .login-container{
 	margin: auto;
@@ -662,7 +1115,42 @@ html {
 	text-decoration: underline;
 }
 
-/* ------------------------------register.html------------------------------ */
+/* --------------------------------------------------- map.html --------------------------------------------------- */
+.map-container{
+	margin: auto;
+	min-height: 100vh;
+  	position: relative;
+}.map-container h1{
+	padding-top: 5%;
+}
+
+.map {
+	box-shadow: rgba(80, 80, 80, 0.58) 0px 0px 20px 0px;
+	display: block;
+	margin: 20px auto 0px auto;
+  	width: 90%;
+	min-height: 80vh;
+	z-index: 0;
+}
+
+.leaflet-control-layers-base input{
+	margin-right: 10px;
+}
+
+.leaflet-control-attribution{
+	display: none;
+}
+
+
+/* ------------------------------Marker------------------------------ */
+
+#cont {
+  background-color: white;
+  height: 80px;
+  width: 200px;
+}
+
+/* --------------------------------------------------- register.html --------------------------------------------------- */
 .register-container{
 	margin: auto;
 	min-height: 100vh;
@@ -729,453 +1217,85 @@ html {
 	transition: all 250ms ease;
 }
 
+/* --------------------------------------------------- show-point.html --------------------------------------------------- */
 
-/* ------------------------------map.html------------------------------ */
-.map-container{
+.show-point-container{
 	margin: auto;
-	min-height: 100vh;
-  	position: relative;
-}.map-container h1{
-	padding-top: 5%;
-}
-
-.map {
-	box-shadow: rgba(80, 80, 80, 0.58) 0px 0px 20px 0px;
-	display: block;
-	margin: 20px auto 0px auto;
-  	width: 90%;
-	min-height: 80vh;
-	z-index: 0;
-}
-
-.leaflet-control-layers-base input{
-	margin-right: 10px;
-}
-
-.leaflet-control-attribution{
-	display: none;
-}
-
-
-/* ------------------------------Marker------------------------------ */
-#cont {
-  background-color: white;
-  height: 80px;
-  width: 200px;
-}
-
-.show_point {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-}
-
-/* ------------------------------logged.html------------------------------ */
-
-.logged-in-container{
-	margin: auto;
-	min-height: 100vh;
-}.logged-in-container h1{
-	padding-top: 15vh;
-}
-
-.logged-UI{
-	display: flex;
-}.logged-UI div{
-	justify-content: center;
-}
-
-.logged-sidebar {
-	height: 100vh;
-	width: auto;
-	float: left;
-	padding: 20px;
-	background-color: var(--azul);
-	color: var(--blanco);
-}.logged-sidebar-container{
-	display: flex;
-	flex-direction: column;
-}.logged-sidebar-container button{
-	margin: 2vh 0vh;
-}.logged-sidebar h1{
-	font-size: 40px;
-}.logged-sidebar h3{
-	font-size: 15px;
-	font-style: normal;
-}.logged-sidebar hr{
-	color: var(--blanco);
-}.logged-sidebar button {
-	display: block;
-	width: 100%;
-	margin-bottom: 10px;
-	padding: 10px;
-	background-color: #007acc;
-	color: white;
-	border: none;
-	cursor: pointer;
-}.logged-sidebar button:hover {
-	background-color: #005f99;
-}
-
-.buttons-container {
-    display: flex;
-    margin: 2% auto;
-    justify-content: center;
-    gap: 20%;
-}.buttons-container button{
-	border: 4px solid transparent;
-	width: 100%;
-	padding: 2%;
-	background-color: var(--naranja);
-	font-size: 20px;
-	border-radius: 8px;
-	color: var(--blanco);
-	transition: all 250ms ease;
-}.buttons-container button:hover{
-	border: 4px solid var(--grisClaro);
-	cursor: pointer;
-	transition: all 250ms ease;
-}
-
-.content-section {
-    display: none;
-}
-
-.section-container{
-	margin: auto;
-	display: block;
-}
-
-/* USER INFO SECTION */
-.user-personal-data{
 	padding: 5vh;
-	background-color: var(--azul);
-	color: var(--blanco);
-	border-radius: 8px;
-}.user-personal-data li{
-	display: flex;
-	margin: 4vh auto;
-	justify-content: space-between;
-}.user-personal-data li h3{
-	padding: 1vh 0vh;
-	width: 40%;
-}.user-personal-data li p{
-	background-color: var(--azulOscuro);
-	width: 100%;
-	padding: 1vh 0.5vh;
-	border-bottom: var(--naranja) 1px solid;
-}.user-personal-data button{
-	background-color: var(--naranja);
-	color: var(--blanco);
-	border: 4px solid transparent;
-	width: 40%;
-	margin: 5% auto;
-	padding: 2%;
-	display: block;
-	font-size: 20px;
-	border-radius: 8px;
-	transition: all 250ms ease;
-}.user-personal-data button:hover{
-	border: var(--grisClaro) solid 4px;
-	cursor: pointer;
-	transition: all 250ms ease;
-}
-
-#edit-btn.edit-mode {
-    background-color: var(--celeste);
-    color: white;
-}
-
-.confirmation-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-}.modal-content input {
-    margin: 10px 0;
-    padding: 10px;
-    width: 80%;
-}.modal-content button {
-    padding: 10px 20px;
-    margin: 10px 5px;
-    cursor: pointer;
+	min-height: 100vh;
 }
 
 .empty-field {
-    background-color: var(--rojo) !important; /* Light red background for empty fields */
+    color: red;
+    font-weight: bold;
 }
 
-/* ERASE IN THE FUTURE */
-iframe {
-	width: 100%;
-	height: 40vh;
-	border: 5px solid var(--azul);
-	border-radius: 10px;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* USER REQUESTS SECTION */
-.user-requests{
-	padding: 5% 10%;
-}.user-requests li, ul{
-	list-style: none !important;
-	text-decoration: none;
-}.user-requests li{
-	background-color: var(--naranja);
-	color: var(--blanco);
-	display: flex;
-	justify-content: space-between;
-	width: 70%;
-	margin: 2vh auto;
-	min-height: 2vh;
-	font-size: 20px;
-	border-radius: 8px;
-	transition: all 250ms ease;
-}.user-requests p{
-	margin: 2vh 1vh;
-}.user-requests li div{
-	background-color: var(--blanco);
-	width: 30%;
-	display: flex;
-	align-items: center;
-	border-radius: 8px;
-}.user-requests li div a img{
-	width: 40%;
-}.user-requests li:hover{
-	cursor: default;
-	transition: all 250ms ease;
-}.user-requests ul{
-	padding: 3vh 0vh;
-	background-color: var(--azulOscuro);
-	border-radius: 4px;
-}.user-requests button{
-	background-color: var(--naranja);
-    color: var(--blanco);
-    border: 4px solid transparent;
-    width: 40%;
-    margin: 5% auto;
-    padding: 2%;
-    display: block;
-    font-size: 20px;
+.show-point-container-info {
+    background-color: var(--grisClaro);
+    border: 2px solid var(--azulOscuro);
     border-radius: 8px;
-    transition: all 250ms ease;
-}.user-requests button:hover{
-	border: var(--grisClaro) solid 4px;
-	cursor: pointer;
-	transition: all 250ms ease;
-}
-
-.linea-vertical-IDpunto{
-	border: 1px solid var(--naranja);
-	background-color: var(--naranja) !important;
-    height: 60%;
-}
-
-/* ------------------------------addpoint.html------------------------------ */
-.add-point{
-	padding: 10vh 10%;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-	min-height: 60vh;
-}.add-point h1{
+    padding: 20px;
+	max-width: 90vh;
+    margin: 5vh auto;
 	display: block;
-	margin: auto !important;
-	padding: 0 !important;
-}.add-point-form{
-	background-color: var(--azul);
-	box-shadow: rgba(80, 80, 80, 0.58) 0px 0px 20px 0px;
-	padding: 5% 10%;	
-	display: block;
-	margin: auto;
-	width: 60%;
-	border-radius: 8px;
-}.add-point-form p{
-	background-color: var(--azulOscuro);
-	display: flex;
-	align-items: center;
-	margin: 0vh auto 5vh auto;
-	text-align: center;
-}.add-point-form p label{
-	width: 100%;
-	color: var(--blanco);
-}.add-point-form input{
-	width: 100%;
-    border: 1px solid transparent;
-    background: var(--blanco);
-    color: var(--negro);
-	padding: 2vh 1vh;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.cascade-container{
-	display: flex;
-	font-size: 20px;
-	margin: 0px !important;
-	padding: 2vh 1vh;
+.show-point-container-info h1 {
+    font-size: 24px;
+    color: var(--azulOscuro);
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-.radio-buttons-container{
-	background-color: var(--blanco);
-	color: var(--blanco);
-	display: flex;
-	justify-content: space-evenly;
-	text-align: center;
-}.radio-buttons-container .option{
-	display: flex;
-	width: 100%;
-	margin: auto 2vh;
-	align-items: center;
-	flex-direction: column;
-}.radio-buttons-container .option input[type="radio"]{
-	display: none;
-}.radio-buttons-container .option label{
-	background-color: var(--azul);
-	color: var(--blanco);
-	width: 100%;
-	position: relative;
-	display: inline-block;
-	padding: 2vh 2vh;
-	margin: 2vh auto;
-	transition: all 250ms ease;
-}.radio-buttons-container .option label:hover{
-	background-color: var(--naranja);
-	color: var(--azul);
-	cursor: pointer;
-	transition: all 250ms ease;
-}.radio-buttons-container .option label:before{
-	content: "";
-	width: 17px;
-	height: 17px;
-	display: inline-block;
-	background: none;
-	position: absolute;
-}.radio-buttons-container input[type="radio"]:checked + label{
-	transition: all 250ms ease;
-	background-color: var(--naranja);
-	color: var(--azul);
-	border-radius: 4px;
+#point-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
 }
 
-#add-point-map{
-	height: 30vh;
-	width: 100%;
-	display: flex;
-}.coordinates{
-	text-align: center;
-	display: flex;
+#point-form label {
+    font-size: 14px;
+    color: var(--azulOscuro);
+    font-weight: bold;
+    grid-column: span 1;
 }
 
-.send-add-point-form{
-	background-color: var(--naranja) !important;
-	color: var(--blanco) !important;
-    width: 50% !important;
-    text-transform: uppercase;
-	margin: 8vh auto 0vh auto !important;
-	display: block;
-    transition: all 500ms ease;
-}.send-add-point-form:hover{
-	color: var(--grisClaro) !important;
-	background-color: var(--azulOscuro) !important;
-    scale: 0.99;
-	cursor: pointer;
-	border: 1px solid var(--naranja);
+#point-form input {
+    font-size: 14px;
+    padding: 8px;
+    background-color: var(--celesteClaro);
+    color: var(--azulOscuro);
+    border: 1px solid var(--azulOscuro);
+    border-radius: 4px;
+    grid-column: span 1;
 }
 
-/* ------------------------------Modal------------------------------ */
-
-#overlay {
-	/* display: block;
-	opacity: 1;
-	visibility: visible; */
-
-	display: none;
-	opacity: 0;
-	visibility: hidden;
-
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-color: rgba(0,0,0,0.5);
-	z-index: 1000;
-	transition: 200ms ease-in-out;
-	pointer-events: none;
-  }
-  
-  #overlay.active {
-	display: block;
-	opacity: 1;
-	visibility: visible;
-	pointer-events: all;
-  }
-
-.modal {
-	display: none;
-	opacity: 0;
-	visibility: hidden;
-
-	/* display: block;
-	opacity: 1;
-	visibility: visible; */
-
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	border-radius: 10px;
-	z-index: 10;
-	min-height: 40vh;
-	min-width: 40vh;
+#point-form input[readonly] {
+    background-color: var(--grisClaro);
+    color: var(--azulOscuro);
 }
 
-.modal.active { 
-	display: block;
-	opacity: 1;
-	visibility: visible;
+#export-pdf {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: var(--naranja);
+    color: var(--blanco);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    width: 100%;
 }
 
-.modal-body {
-	height: 100%;
-	width: 100%;
-	gap: 30px;
-	border-radius: 8px;
-	display: flex;
-	flex-direction: column;
-	justify-content: center; /* Horizontally centers the content */
-	align-items: center; /* Vertically centers the content */
-	background-color: var(--azul);
-	color: var(--blanco);
-}.modal-body .close-button {
-	position: relative;
-	cursor: pointer;
-	border: 2px solid var(--blanco);
-	background-color: var(--azul);
-	border-radius: 40px;
-	font-size: 1rem;
-	width: 60px;
-	color: var(--blanco);
-}.modal-body .icon {
-	position: relative;
-	background-image: url('../images/icons/check.png');
-	width: 32px;
-	height: 32px;
-	background-size: cover;
-}.modal-body h2{
-	margin: 1vh 1vh;
-}.modal-body p{
-	margin: 1vh 1vh;
+#export-pdf:hover {
+    background-color: var(--naranjaClaro);
+}
+
+#piperDiagram {
+    margin-top: 30px;
+    display: block;
+    width: 100%;
+    height: auto;
 }
