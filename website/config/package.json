@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.html",
   "scripts": {
-    "build:css": "npx tailwindcss -i ./tailwindI.css -o ./dist/tailwindO.css --watch",
-    "browser-sync": "browser-sync start --proxy 'localhost:2000' --files '/opt/lampp/htdocs/geoterRA_dev/website/**/*.*'",
+    "build:css": "npx tailwindcss -i ../assets/css/tailwindI.css -o ../assets/css/dist/tailwindO.css --watch",
+    "browser-sync": "browser-sync start --proxy 'localhost:2000' --files '../**/*.*'",
     "start": "concurrently \"npm run build:css\" \"npm run browser-sync\""
   },
   "keywords": [],
