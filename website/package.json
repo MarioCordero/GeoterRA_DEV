@@ -1,15 +1,23 @@
 {
   "name": "website",
   "version": "1.0.0",
-  "description": "",
   "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:css": "npx tailwindcss -i ./tailwindI.css -o ./dist/tailwindO.css --watch",
+    "browser-sync": "browser-sync start --proxy 'localhost:2000' --files '/opt/lampp/htdocs/geoterRA_dev/website/**/*.*'",
+    "start": "concurrently \"npm run build:css\" \"npm run browser-sync\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "mysql": "^2.18.1"
-  }
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.0",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14"
+  },
+  "description": ""
 }
