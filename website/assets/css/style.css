@@ -1166,18 +1166,13 @@ iframe {
 }
 
 .register-form {
-	display: flex;
-	width: 900px;
-	height: 720px;
-	align-items: center;
-	background-color: rgba(17, 26, 28, 0.6);
-	color: #fff;
-	box-shadow: 10px 13px 10px 5px rgba(0, 0, 0, 0.8);
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	border-radius: 10px;
+	background-color: var(--azul);
+	box-shadow: rgba(80, 80, 80, 0.58) 0px 0px 20px 0px;
+	padding: 5% 10%;	
+	display: block;
+	margin: auto;
+	width: 60%;
+	border-radius: 8px;
 }
 
 .register-form h1 {
