@@ -10,7 +10,7 @@ document.getElementById("reg-form").addEventListener("submit",function(event) {
 
 			if (errorObject.length === 0) {
 
-				window.location.href = "logged.html";
+				window.location.href = "logged.php";
 				
 			} else {
 

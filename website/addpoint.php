@@ -28,55 +28,7 @@
 			<div class="general-container">
 
 				<!-- NAVBAR -->
-				<nav class="navbar Montserrat-Regular">
-
-					<div class="logo-container">
-						<a href="./index.html"> <img id="logo" src="./assets/images/GeoterRA/GeoterRA-Logo.svg" class="header-logo" alt="Webpage logotype"> </a>
-					</div>
-
-					<div class="menu" id="navbar">
-
-						<a href="./index.html#about-us">Acerca de nosotros</a>
-						<a href="./index.html#how-works">Como funciona</a>
-						<a href="./index.html#contact-us">Contacto</a>
-						<a href="./map.html">Mapa</a>
-						<a href="./login.html">Iniciar Sesión</a>
-
-					</div>
-
-					<div class="menu-logged" id="navbar-logged">
-
-						<a href="./index.html#about-us">Acerca de nosotros</a>
-						<a href="./index.html#how-works">Como funciona</a>
-						<a href="./index.html#contact-us">Contacto</a>
-						<a href="./map.html">Mapa</a>
-						<a href="./logged.html">Perfil</a>
-
-					</div>
-
-					<input type="checkbox" id="checkbox">
-					<label for="checkbox" class="toggle">
-						<div class="bar bar--top"></div>
-						<div class="bar bar--middle"></div>
-						<div class="bar bar--bottom"></div>
-					</label>
-
-					<div class="menu-bars-background" id="menu-bars-background">
-
-						<!-- TODO[] : Agregar el menu de logged -->
-
-						<div class="menu-elements Gibson-Regular" id="menu-elements">
-
-							<a href="./index.html#about-us" 	class="a-menu-element">Acerca de nosotros	</a>
-							<a href="./index.html#how-works" 	class="a-menu-element">Como funciona		</a>
-							<a href="./index.html#contact-us" 	class="a-menu-element">Contacto				</a>
-							<a href="./map.html">Mapa														</a>
-							<a href="./login.html">Iniciar Sesión											</a>
-
-						</div>
-					</div>
-
-				</nav>
+        <?php include './assets/partials/navbar.php'; ?>
 				<!-- NAVBAR -->
 
 				<!-- BODY -->

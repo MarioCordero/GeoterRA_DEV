@@ -13,18 +13,7 @@
 </head>
 
 <body>
-	<nav class="navbar Montserrat-Regular">
-		<div class="logo-container">
-			<a href="./index.html"><img id="logo" src="./assets/images/GeoterRA/GeoterRA-Logo.svg" class="header-logo" alt="Webpage logotype"></a>
-		</div>
-		<div class="menu" id="navbar">
-			<a href="./index.html#about-us">Acerca de nosotros</a>
-			<a href="./index.html#how-works">Como funciona</a>
-			<a href="./index.html#contact-us">Contacto</a>
-			<a href="./map.html">Mapa</a>
-			<a href="./login.html">Iniciar Sesión</a>
-		</div>
-	</nav>
+  <?php include './assets/partials/navbar.php'; ?>
 
 	<div class="show-point-container Montserrat-Regular">
 		<div class="show-point-container-info Montserrat-Regular">
@@ -58,11 +47,8 @@
 		</div>
 	</div>
 
-	<footer class="footer-container">
-		<div class="footer center-text Montserrat-Regular">
-			<p>© 2021 Instituto de Investigaciones en Ingeniería - Universidad de Costa Rica.</p>
-		</div>
-	</footer>
+  
+  <?php include './assets/partials/footer.php'; ?>
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="https://d3js.org/d3.v7.min.js"></script>

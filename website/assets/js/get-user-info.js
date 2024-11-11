@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to handle editing a request
     function editRequest(id) {
         // Redirect to an edit page or open a modal with request details for editing
-        window.location.href = `edit-request.html?id=${id}`;
+        window.location.href = `edit-request.php?id=${id}`;
         // Alternatively, you can open a modal or fetch more info and populate an edit form
     }
     

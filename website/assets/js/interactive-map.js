@@ -60,7 +60,7 @@ function onMarkerClick() {
                             Lugar: ${pointObt.id}<br>
                             Longitude: ${latlng.lng.toFixed(4)}<br>
                             Latitude: ${latlng.lat.toFixed(4)}<br>
-                            <a id='showPoint' href='./show_point.html'>Show more</a>
+                            <a id='showPoint' href='./show_point.php'>Show more</a>
                         </p>
                     </div>`;
 
@@ -82,7 +82,7 @@ function onMarkerClick() {
             document.cookie = 'pointObject=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         }
         document.cookie = "pointObject=" + stringPoint + ";path=/;";
-        window.location.href = "./show-point.html";
+        window.location.href = "./show-point.php";
     });
 }
 
