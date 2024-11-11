@@ -89,6 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     let response = JSON.parse(xhr.responseText);
                     if (response.status === "delete_success") {
                         alert("Request deleted successfully.");
+                        // TODO: BORRAR PUNTO DE LA BASE DE DATOS
                         loadRequests(); // Refresh the list after deletion
                     } else {
                         alert("Failed to delete request.");

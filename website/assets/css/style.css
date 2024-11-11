@@ -675,6 +675,7 @@ html {
 .logged-in-container{
 	margin: auto;
 	min-height: 100vh;
+	background-color: var(--grisClaro);
 }.logged-in-container h1{
 	padding-top: 15vh;
 }
@@ -924,7 +925,6 @@ iframe {
 
 .linea-vertical-IDpunto{
 	border: 0.5px solid var(--naranja);
-	width: 10%;
 	background-color: var(--naranja) !important;
     height: 60%;
 }
@@ -1120,6 +1120,7 @@ iframe {
 	margin: auto;
 	min-height: 100vh;
   	position: relative;
+	background-color: var(--grisClaro);
 }.map-container h1{
 	padding-top: 5%;
 }
@@ -1141,6 +1142,27 @@ iframe {
 	display: none;
 }
 
+/* Estilos para el botón de centrado en la ubicación */
+.leaflet-control-custom {
+    background-color: var(--blanco); /* Fondo del botón */
+    border: 2px solid var(--grisOscuro); /* Borde del botón */
+    border-radius: 50%; /* Hacer el botón circular */
+    width: 40px; /* Ancho del botón */
+    height: 40px; /* Altura del botón */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 20px 20px 20px 20px rgba(0,0,0,0.3) !important; /* Sombra del botón */
+    transition: background-color 0.3s, transform 0.2s; /* Efecto al pasar el ratón */
+}
+
+/* Cambia el color al pasar el ratón */
+.leaflet-control-custom:hover {
+    background-color: var(--grisOscuro); /* Color al pasar el ratón */
+    transform: scale(1.1); /* Aumenta ligeramente el tamaño */
+}
+
 
 /* ------------------------------Marker------------------------------ */
 
@@ -1151,21 +1173,18 @@ iframe {
 }
 
 /* --------------------------------------------------- register.html --------------------------------------------------- */
-.register-container{
-	margin: auto;
-	min-height: 100vh;
-}
-.register-background{
-	width: 100%;
-	max-height: 100vh;
-	min-height: 100vh;
-	background-image: linear-gradient(rgba(166, 195, 227, 0.5),
-			rgba(166, 195, 227, 0.5)), url(../images/register-background.jpg);
-	background-size:cover;
-	background-repeat: no-repeat;
-}
-
-.register-form {
+.reg-user{
+	padding: 10vh 10%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+	min-height: 60vh;
+}.reg-user h1{
+	display: block;
+	margin: auto !important;
+	padding: 0 !important;
+	font-size: 50px;
+}.reg-user-form{
 	background-color: var(--azul);
 	box-shadow: rgba(80, 80, 80, 0.58) 0px 0px 20px 0px;
 	padding: 5% 10%;	
@@ -1173,34 +1192,54 @@ iframe {
 	margin: auto;
 	width: 60%;
 	border-radius: 8px;
+}.reg-user-form p{
+	background-color: var(--azulOscuro);
+	display: flex;
+	align-items: center;
+	margin: 0vh auto 5vh auto;
+	text-align: center;
+}.reg-user-form p label{
+	width: 100%;
+	color: var(--blanco);
+}.reg-user-form input{
+	width: 100%;
+    border: 1px solid transparent;
+    background: var(--blanco);
+    color: var(--negro);
+	padding: 2vh 1vh;
 }
 
-.register-form h1 {
-	font-size: 2.3em;
-	text-align: center;
-}.register-form form {
-	width: 900px;
-	height: 280px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-  position: relative;
-  top: -100px;
-}.register-form .input-box {
-	position: relative;
-	width: 70%;
-	height: 50px;
-	margin: 20px 0px;
-	background-color: black;
-	border-radius: 10px;
-}.register-form input {
+.send-reg-user-form{
+	background-color: var(--naranja) !important;
+	color: var(--blanco) !important;
+    width: 50% !important;
+    text-transform: uppercase;
+	margin: 8vh auto 0vh auto !important;
+	display: block;
+    transition: all 500ms ease;
+	padding: 2vh;
+	border-radius: 8px;
+	border: 1px solid transparent;
+}.send-reg-user-form:hover{
+	color: var(--grisClaro) !important;
+	background-color: var(--azulOscuro) !important;
+    scale: 0.99;
+	cursor: pointer;
+	border: 1px solid var(--naranja);
+}
+
+
+.register-container{
+	margin: auto;
+	min-height: 100vh;
+}
+.register-background{
 	width: 100%;
-	height: 50px;
-	background-color: rgba(33, 182, 246, 0.85);
-	border-radius: 10px;
-	color: #fff;
-}.register-form input::placeholder {
-	color: #fff;
+	min-height: 100vh;
+	background-image: linear-gradient(rgba(166, 195, 227, 0.5),
+			rgba(166, 195, 227, 0.5)), url(../images/register-background.jpg);
+	background-size:cover;
+	background-repeat: no-repeat;
 }
 
 .register-form .btn{

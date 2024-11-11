@@ -1,4 +1,4 @@
-document.getElementById("reg_form").addEventListener("submit",function(event) {
+document.getElementById("reg-form").addEventListener("submit",function(event) {
 
 	event.preventDefault(); 
 	let formData = new FormData(this);
