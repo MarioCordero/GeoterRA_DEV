@@ -75,7 +75,7 @@
 					
 						<div class="register-link">
 							<p>¿No tiene cuenta?
-								<a href="register.html"> Registrarse </a>
+								<a href="register.php"> Registrarse </a>
 							</p>
 						</div>
 					
