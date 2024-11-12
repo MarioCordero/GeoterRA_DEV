@@ -121,7 +121,7 @@
 										<!-- DINAMICAMENTE SE AGREGAN LAS SOLICITUDES DEL USUARIO COMO <li> -->
 									</ul>
 									
-									<button class="Montserrat-Medium" onclick="window.location.href='addpoint.html';">Agregar</button>
+									<button class="Montserrat-Medium" onclick="window.location.href='addpoint.php';">Agregar</button>
 								</div>
 							</ul>
 							
