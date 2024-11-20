@@ -39,7 +39,6 @@ data class SingUpCredentials(
 )
 
 data class RequestForm(
- var pointID : String,
  var region : String,
  var date : String,
  var email : String,
@@ -55,7 +54,6 @@ data class RequestForm(
 )
 
 data class RequestDataCard(
-  @SerializedName("id_soli") val requestID : String,
   @SerializedName("email") val email : String,
   @SerializedName("region") val region : String,
   @SerializedName("fecha") val date : String,
@@ -152,6 +150,13 @@ data class Error(
   @SerializedName("message") val message: String,
 )
 
+data class UserInformation(
+  @SerializedName("status") var status : String,
+  @SerializedName("name") var name : String,
+  @SerializedName("email") var email : String,
+  @SerializedName("phone") var phone : String
+)
+
 /**
  * API interface that defines the services used in the application.
  *
@@ -193,6 +198,12 @@ interface APIService {
   ): Call<List<SignUpErrorResponse>>
 
   @FormUrlEncoded
+  @POST("user_info.php")
+  fun getUserInfo(
+    @Field("email") email: String
+  ): Call<UserInformation>
+
+  @FormUrlEncoded
   @POST("map_data.inc.php")
   fun getMapPoints(
     @Field("region") region: String
@@ -207,7 +218,6 @@ interface APIService {
   @FormUrlEncoded
   @POST("request.inc.php")
   fun newRequest(
-    @Field("pointId") pointID : String,
     @Field("region") region : String,
     @Field("fecha") date : String,
 
@@ -222,8 +232,8 @@ interface APIService {
 
     @Field("sensTermica") thermalSensation : Int,
     @Field("burbujeo") bubbles : Int,
-    @Field ("coord_x") latitude : String,
-    @Field ("coord_y") longitude : String,
+    @Field ("lat") latitude : String,
+    @Field ("lng") longitude : String,
   ): Call<RequestResponse>
 
   @GET("check_session.php")
