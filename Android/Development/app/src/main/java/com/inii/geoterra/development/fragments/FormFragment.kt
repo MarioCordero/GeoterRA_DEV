@@ -53,7 +53,7 @@ class FormFragment : Fragment() {
     // Inflate the layout for this fragment
     // Creates an object that manage the location requests.
     listener = activity as? OnFragmentInteractionListener
-    requestForm = RequestForm("", "", "", "", "", "", "", "", "", 0, 0, "", "");
+    requestForm = RequestForm("", "", "", "", "", "", "", "", 0, 0, "", "");
 
     val locationButton = this.rootView.findViewById<Button>(R.id.userLocationButton)
     val imageButton = this.rootView.findViewById<Button>(R.id.locationImageButton)
@@ -156,8 +156,6 @@ class FormFragment : Fragment() {
   private fun getFormData() {
     lifecycleScope.launch {
       try {
-        // Accessing all the given data in the form.
-        val pointID = rootView.findViewById<EditText>(R.id.nameTxtInput).text.toString()
         val region = "Guanacaste"
         val date = rootView.findViewById<TextView>(R.id.dateText).text.toString()
 
@@ -176,7 +174,6 @@ class FormFragment : Fragment() {
         val bubbles = if (rootView.findViewById<CheckBox>(R.id.bubbleCheckBox).isChecked) 1 else 0
 
         // Set the data in the request form.
-        requestForm.pointID = pointID
         requestForm.region = region
         requestForm.date = date
         if (user != null) {
@@ -201,7 +198,6 @@ class FormFragment : Fragment() {
     // Create a new request.
     val apiService = RetrofitClient.getAPIService()
     val call = apiService.newRequest(
-      requestForm.pointID,
       requestForm.region,
       requestForm.date,
       requestForm.email,
@@ -328,7 +324,7 @@ class FormFragment : Fragment() {
   override fun onRequestPermissionsResult(requestCode : Int,
                                           permissions : Array<out String>,
                                           grantResults : IntArray) {
-    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+      super.onRequestPermissionsResult(requestCode, permissions, grantResults)
       GalleryManager.handlePermissionResult(requestCode, grantResults, requireContext())
       GPSManager.handlePermissionResult(requestCode, grantResults, requireContext())
   }
