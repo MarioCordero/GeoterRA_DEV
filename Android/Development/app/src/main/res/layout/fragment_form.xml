@@ -40,26 +40,6 @@
                 android:layout_marginTop="15dp"
                 android:padding="2dp"
 
-                android:hint="Pseudo Nombre para el punto"
-                app:helperText="Requerido">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/nameTxtInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPersonName" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginTop="15dp"
-                android:padding="2dp"
-
                 android:hint="Numero de contacto"
                 app:helperText="Requerido">
 
