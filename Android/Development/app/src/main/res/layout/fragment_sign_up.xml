@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:layout_gravity="center"
     android:background="@color/white"
-    tools:context=".fragments.SignUpFragment">
+    tools:context=".ui.account.SignUpFragment">
 
     <LinearLayout
         android:id="@+id/linearLayout"
