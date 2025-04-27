@@ -11,6 +11,8 @@
 		<link rel="stylesheet" href="./assets/css/style.css">
 		<link rel="stylesheet" href="./assets/css/fonts.css">
 		<link rel="stylesheet" href="./assets/css/responsive.css">
+		<!-- CUSTOM CSS REACT -->
+		
 		<!--ICON-->
 		<link rel="shortcut icon" type="image/x-icon" href="./GeoterRA.ico">
 
@@ -23,7 +25,7 @@
 		<div class="general-container index-background">
 
 			<!-- NAVBAR -->
-      <?php include './assets/partials/navbar.php'; ?>
+      		<?php include './assets/partials/navbar.php'; ?>
 			<!-- NAVBAR -->
 
 			<!-- BODY -->
@@ -37,6 +39,10 @@
 					</div>
 				</div>
 				<!--------------------------------END LOADER------------------------------->
+
+				<!-- WELCOME -->
+				<div id="Welcome-card"></div>
+				<!-- WELCOME -->
 				
 				<div class="welcome Montserrat-Regular center-text">
 					<p>WELCOME</p>
@@ -312,6 +318,8 @@
 
 			<script src="./assets/js/web-loader.js"></script>
 			<script src="./assets/js/menu-bars.js"></script>
+			<!-- REACT INCLUDES -->
+			<script src="./react-components/dist/assets/index-BBRPubnU.js" defer></script>
 		</div>
 	</body>
 </html>
