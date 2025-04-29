@@ -12,7 +12,7 @@
 		<link rel="stylesheet" href="./assets/css/fonts.css">
 		<link rel="stylesheet" href="./assets/css/responsive.css">
 		<!-- CUSTOM CSS REACT -->
-		<link rel="stylesheet" href="./react-components/dist/assets/index-CI9OR0jG.css">
+		<link rel="stylesheet" href="./react-components/dist/assets/css/index-CI9OR0jG.css">
 		<!--ICON-->
 		<link rel="shortcut icon" type="image/x-icon" href="./GeoterRA.ico">
 
@@ -318,7 +318,7 @@
 			<script src="./assets/js/web-loader.js"></script>
 			<script src="./assets/js/menu-bars.js"></script>
 			<!-- REACT INCLUDES -->
-			<script src="./react-components/dist/assets/index-Cpjd2r7n.js" defer></script>
+			<script src="./react-components/dist/assets/js/index-7emNaOjt.js" defer></script>
 		</div>
 	</body>
 </html>
