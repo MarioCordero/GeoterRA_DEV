@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './main.css'
+import './main.css';
 import IndexWelcome from './index-welcome.jsx';
 
 const WelcomeCard = document.getElementById('Welcome-card'); // Busca el div con id "Welcome-card"
