@@ -1,1 +1,24 @@
 @import "tailwindcss";
+
+@layer base {
+    :root {
+      /* Define tus colores como variables CSS */
+      --geoterra-orange: #F39C29;
+      --geoterra-orange-rgb: 243, 156, 41;
+    }
+  }
+  
+  /* Clases personalizadas usando las variables */
+  @layer components {
+    .bg-geoterra-orange {
+      background-color: var(--geoterra-orange);
+    }
+    
+    .text-geoterra-orange {
+      color: var(--geoterra-orange);
+    }
+    
+    .bg-geoterra-orange-opacity {
+      background-color: rgba(var(--geoterra-orange-rgb), var(--tw-bg-opacity, 1));
+    }
+  }

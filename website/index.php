@@ -12,7 +12,7 @@
 		<link rel="stylesheet" href="./assets/css/fonts.css">
 		<link rel="stylesheet" href="./assets/css/responsive.css">
 		<!-- CUSTOM CSS REACT -->
-		
+		<link rel="stylesheet" href="./react-components/dist/assets/index-CI9OR0jG.css">
 		<!--ICON-->
 		<link rel="shortcut icon" type="image/x-icon" href="./GeoterRA.ico">
 
@@ -42,11 +42,10 @@
 
 				<!-- WELCOME -->
 				<div id="Welcome-card"></div>
-				<!-- WELCOME -->
-				
-				<div class="welcome Montserrat-Regular center-text">
+				<!-- WELCOME -->				
+				<!-- <div class="welcome Montserrat-Regular center-text">
 					<p>WELCOME</p>
-				</div>
+				</div> -->
 
 				<!-- ABOUT US SECTION -->
 				<div class="A-container" id="about-us">
@@ -319,7 +318,7 @@
 			<script src="./assets/js/web-loader.js"></script>
 			<script src="./assets/js/menu-bars.js"></script>
 			<!-- REACT INCLUDES -->
-			<script src="./react-components/dist/assets/index-BBRPubnU.js" defer></script>
+			<script src="./react-components/dist/assets/index-Cpjd2r7n.js" defer></script>
 		</div>
 	</body>
 </html>
