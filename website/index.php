@@ -22,7 +22,7 @@
 
 	<body>
 
-		<div class="general-container index-background">
+		<div class="general-container">
 
 			<!-- NAVBAR -->
       		<?php include './assets/partials/navbar.php'; ?>
@@ -40,8 +40,9 @@
 				</div>
 				<!--------------------------------END LOADER------------------------------->
 
-				<!-- WELCOME -->
+				<!-- WELCOME REACT COMPONENT -->
 				<div id="Welcome-card"></div>
+				
 				<!-- WELCOME -->				
 				<!-- <div class="welcome Montserrat-Regular center-text">
 					<p>WELCOME</p>
