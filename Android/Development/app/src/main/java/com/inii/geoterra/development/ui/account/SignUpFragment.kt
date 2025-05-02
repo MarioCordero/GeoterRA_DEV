@@ -42,11 +42,14 @@ class SignUpFragment : Fragment() {
 
     // Obtains the elements from the view.
     val createAccountB = this.rootView.findViewById<Button>(
-      R.id.createAccountB)
+      R.id.createAccountB
+    )
     val showPassword = this.rootView.findViewById<LinearLayout>(
-      R.id.togglePasswordLayout)
+      R.id.togglePasswordLayout
+    )
     val showPasswordCheckBox = this.rootView.findViewById<CheckBox>(
-      R.id.checkBoxTogglePassword)
+      R.id.checkBoxTogglePassword
+    )
 
     // Sets the listeners for the elements.
     this.setCreateAccountClickListener(createAccountB)
@@ -82,9 +85,11 @@ class SignUpFragment : Fragment() {
     showPassword.setOnClickListener {
       // Obtain the checkbox and the password EditText from the view.
       val toggleCheckBox = this.rootView.findViewById<CheckBox>(
-        R.id.checkBoxTogglePassword)
+        R.id.checkBoxTogglePassword
+      )
       val passwordEditText = this.rootView.findViewById<EditText>(
-        R.id.userPassword)
+        R.id.userPassword
+      )
       // Toggle the checkbox state.
       toggleCheckBox.isChecked = !toggleCheckBox.isChecked
       // Update the password visibility based on the checkbox state.
@@ -108,7 +113,8 @@ class SignUpFragment : Fragment() {
   private fun setCheckboxOnChangeListener(checkBox : CheckBox) {
     // Obtain the password EditText from the view.
     val passwordEditText = this.rootView.findViewById<EditText>(
-      R.id.userPassword)
+      R.id.userPassword
+    )
     // Set the listener for the checkbox.
     checkBox.setOnCheckedChangeListener { _, isChecked ->
       updatePasswordVisibility(isChecked, passwordEditText)
@@ -136,16 +142,16 @@ class SignUpFragment : Fragment() {
   private fun setCreateAccountClickListener(createAccountB : Button) {
     createAccountB.setOnClickListener {
       // Get the fields from the form.
-      val email = this.rootView.findViewById<EditText>(
-        R.id.userEmail).text.toString().trim()
-      val password = this.rootView.findViewById<EditText>(
-        R.id.userPassword).text.toString().trim()
-      val firstName = this.rootView.findViewById<EditText>(
-        R.id.userFirstName).text.toString().trim()
-      val lastName = this.rootView.findViewById<EditText>(
-        R.id.userLastName).text.toString().trim()
-      val phoneNum = this.rootView.findViewById<EditText>(
-        R.id.userPhoneNum).text.toString().trim()
+      val email = this.rootView.findViewById<EditText>(R.id.userEmail)
+        .text.toString().trim()
+      val password = this.rootView.findViewById<EditText>(R.id.userPassword)
+        .text.toString().trim()
+      val firstName = this.rootView.findViewById<EditText>(R.id.userFirstName)
+        .text.toString().trim()
+      val lastName = this.rootView.findViewById<EditText>(R.id.userLastName)
+        .text.toString().trim()
+      val phoneNum = this.rootView.findViewById<EditText>(R.id.userPhoneNum)
+        .text.toString().trim()
 
       Log.i("Tomado de datos en login", "$email $password")
       // Check if the fields are not empty
@@ -210,7 +216,7 @@ class SignUpFragment : Fragment() {
     // Enqueue the call to the server.
     call.enqueue(object : Callback<List<SignUpErrorResponse>> {
       override fun onResponse(call : Call<List<SignUpErrorResponse>>,
-                              response : Response<List<SignUpErrorResponse>>
+        response : Response<List<SignUpErrorResponse>>
       ) {
         // Check if the response is successful.
         if (response.isSuccessful) {
@@ -239,7 +245,6 @@ class SignUpFragment : Fragment() {
         Log.i("Error conexion", "Error: ${t.message}")
         showError("Error de conexión: ${t.message}")
       }
-
     })
   }
 

@@ -40,6 +40,5 @@ class MapLayersMenuFragment : BottomSheetDialogFragment() {
 
   override fun onDismiss(dialog: DialogInterface) {
     super.onDismiss(dialog)
-    // Puedes manejar el evento cuando el Bottom Sheet se cierra, si lo necesitas.
   }
 }

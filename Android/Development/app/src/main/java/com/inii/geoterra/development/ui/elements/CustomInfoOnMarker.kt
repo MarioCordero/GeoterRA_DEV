@@ -18,12 +18,13 @@ class CustomInfoOnMarker : InfoWindow {
   private var context : Context? = null
   private var messageListener: MessageListener? = null
 
-  // Primary constructor that receives `layoutResId`, `mapView`, and `temperature`.
+  // Primary constructor that receives `layoutResId`
+  // `mapView`, and `temperature`.
   // Used for the point's info window.
   constructor(
     layoutResId: Int,
     mapView: MapView,
-    activity: Context,  // Pasamos la Activity
+    activity: Context,
     temperature: Double) :
     super(layoutResId,
     mapView,
@@ -50,23 +51,25 @@ class CustomInfoOnMarker : InfoWindow {
     val longitude = marker.position.longitude
 
     // Display the coordinates in the info window
-    val textView = mView.findViewById<TextView>(R.id.coordinates)
+    val textView = this.mView.findViewById<TextView>(R.id.coordinates)
     textView.text = "Latitud: %.7f\nLongitud: %.7f".format(latitude, longitude)
 
-    val temperatureTextView = mView.findViewById<TextView>(R.id.temperature)
+    val temperatureTextView = this.mView.findViewById<TextView>(
+      R.id.temperature
+    )
 
-    if (temperature != null) {
-      temperatureTextView.text = "Temperatura: %.2f".format(temperature)
+    if (this.temperature != null) {
+      temperatureTextView.text = "Temperatura: %.2f".format(this.temperature)
     }
     Log.d("CustomInfoWindow", "onOpen: $temperature")
     // Center the map on the marker's location when the info window is opened
-    mMapView.controller.setCenter(marker.position)
+    this.mMapView.controller.setCenter(marker.position)
 
-    if (temperature != null) {
+    if (this.temperature != null) {
       val pointId = mView.findViewById<TextView>(R.id.point_id)
       pointId.text = "Point ID: ${marker.title}"
 
-      val moreInfoText = mView.findViewById<TextView>(R.id.more_info)
+      val moreInfoText = this.mView.findViewById<TextView>(R.id.more_info)
       moreInfoText.setOnClickListener {
         Log.i("CustomInfoWindow", "More info button clicked")
         sendMessageToActivity(marker)
@@ -86,7 +89,7 @@ class CustomInfoOnMarker : InfoWindow {
       "CustomInfoWindow",
       "Sending message to activity, ${marker.title}"
     )
-    messageListener?.onMessageReceived(marker.title)
+    this.messageListener?.onMessageReceived(marker.title)
   }
 
   override fun onClose() {

@@ -1,128 +1,217 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/fragment_account"
-    tools:context=".ui.account.AccountFragment">
+    tools:context=".ui.account.AccountFragment"
+    android:layout_gravity="center_horizontal"
+    android:padding="10dp"
+    >
 
     <LinearLayout
+        android:id="@+id/username_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="80dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        >
+
+        <TextView
+            android:id="@+id/userName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Nombre de usuario"
+            android:fontFamily="@font/poppins_semibold"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:gravity="start"
+            >
+        </TextView>
+
+        <ImageView
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="end"
+            android:src="@drawable/account_black_icon"
+            >
+        </ImageView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/phone_frame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/username_frame"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        >
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="end"
+            android:src="@drawable/mobile_gray_icon"
+            >
+        </ImageView>
+
+        <TextView
+            android:id="@+id/phoneNumber"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="5dp"
+            android:text="7788-9900"
+            android:fontFamily="@font/poppins_semibold"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:gravity="start" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/email_frame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/phone_frame"
+        app:layout_constraintBottom_toTopOf="@id/requestInformation_frame"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        >
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="end"
+            android:src="@drawable/mail_gray_icon"
+            >
+        </ImageView>
+
+        <TextView
+            android:id="@+id/email"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="5dp"
+            android:text="test@gmail.com"
+            android:fontFamily="@font/poppins_semibold"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:gravity="start"
+            >
+        </TextView>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/email_frame"
+        app:layout_constraintBottom_toTopOf="@+id/requestInformation_frame"
+        android:background="@color/geoterra_ligth_gray"
+        />
+
+    <LinearLayout
+        android:id="@+id/requestInformation_frame"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/email_frame"
+        app:layout_constraintBottom_toTopOf="@id/options_frame"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
         >
 
         <LinearLayout
+            android:id="@+id/requestMade_frame"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="10dp"
             >
 
             <TextView
-                android:id="@+id/userName"
-                android:layout_width="0dp"
+                android:id="@+id/requetsMade_count"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Nombre de usuario"
+                android:text="10"
+                android:fontFamily="@font/poppins_bold"
+                android:textColor="@color/geoterra_deep_blue"
+                android:textSize="20sp"
+                android:gravity="center"
+                >
+            </TextView>
+
+            <TextView
+                android:id="@+id/requetsMade_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Solicitudes realizadas"
                 android:fontFamily="@font/poppins_semibold"
                 android:textColor="@color/black"
-                android:textSize="20sp"
+                android:textSize="11sp"
                 android:gravity="start"
                 >
             </TextView>
 
-            <ImageView
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:layout_gravity="end"
-                android:src="@drawable/baseline_account_circle_24"
-                >
-            </ImageView>
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center"
-            android:layout_marginTop="20dp"
-            >
-
-            <Button
-                android:id="@+id/helpButton"
-                android:layout_width="120dp"
-                android:layout_height="100dp"
-
-                android:text="Ayuda"
-                android:textSize="12sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/poppins_semibold"
-
-                android:drawableTop="@drawable/baseline_filter_tilt_shift_24"
-                android:backgroundTint="@color/ligthGray"
-
-                app:cornerRadius="5dp">
-            </Button>
-
-            <Button
-                android:id="@+id/activityButton"
-                android:layout_marginStart="40dp"
-                android:layout_width="120dp"
-                android:layout_height="100dp"
-
-                android:text="Actividad"
-                android:textSize="12sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/poppins_semibold"
-
-                android:drawableTop="@drawable/baseline_article_40"
-                android:backgroundTint="@color/ligthGray"
-
-                app:cornerRadius="5dp">
-            </Button>
-
-        </LinearLayout>
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toEndOf="@id/requestMade_frame"
+            app:layout_constraintEnd_toStartOf="@id/requestsAccepted_frame"
+            app:layout_constraintTop_toBottomOf="@+id/email_frame"
+            app:layout_constraintBottom_toTopOf="@+id/options_frame"
+            android:background="@color/geoterra_ligth_gray"
+            />
 
         <LinearLayout
+            android:id="@+id/requestsAccepted_frame"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
             android:orientation="vertical"
-            android:layout_gravity="start"
-            android:layout_marginTop="20dp"
+            android:padding="10dp"
             >
 
             <TextView
-                android:layout_marginTop="15dp"
+                android:id="@+id/requetsAccepted_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
-                android:text="Configuración"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:fontFamily="@font/calibri_regular"
-
-                app:drawableLeftCompat="@drawable/baseline_app_settings_alt_24"
-                android:drawablePadding="10dp"
+                android:layout_weight="1"
+                android:text="9"
+                android:fontFamily="@font/poppins_bold"
+                android:textColor="@color/geoterra_deep_blue"
+                android:textSize="20sp"
+                android:gravity="center"
                 >
             </TextView>
 
             <TextView
-                android:layout_marginTop="15dp"
+                android:id="@+id/requetsAccepted_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/calibri_regular"
-                android:text="Mensajes"
+                android:layout_weight="1"
+                android:layout_marginTop="5dp"
+                android:text="Solicitudes realizadas"
+                android:fontFamily="@font/poppins_semibold"
                 android:textColor="@color/black"
-                android:textSize="18sp"
-
-                app:drawableLeftCompat="@drawable/baseline_message_24"
-                android:drawablePadding="10dp"
+                android:textSize="11sp"
+                android:gravity="start"
                 >
             </TextView>
 
@@ -130,4 +219,101 @@
 
     </LinearLayout>
 
-</FrameLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/requestInformation_frame"
+        app:layout_constraintBottom_toTopOf="@+id/options_frame"
+        android:background="@color/geoterra_ligth_gray"
+        />
+
+    <LinearLayout
+        android:id="@+id/options_frame"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="top"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/logout_frame"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/requestInformation_frame">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+
+            android:drawablePadding="10dp"
+            android:fontFamily="@font/poppins_semibold"
+            android:text="Ajustes"
+            android:textColor="@color/black"
+
+            android:textSize="18sp"
+            app:drawableLeftCompat="@drawable/settings_deepblue_icon">
+        </TextView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:drawablePadding="10dp"
+            android:fontFamily="@font/poppins_semibold"
+            android:text="Editar datos personales"
+            android:textColor="@color/black"
+
+            android:textSize="18sp"
+            app:drawableLeftCompat="@drawable/edit_pencil_deepblue_icon">
+        </TextView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:drawablePadding="10dp"
+            android:fontFamily="@font/poppins_semibold"
+            android:text="Editar datos personales"
+            android:textColor="@color/black"
+
+            android:textSize="18sp"
+            app:drawableLeftCompat="@drawable/notebook_deepblue_icon">
+        </TextView>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/logout_frame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="vertical"
+        >
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/geoterra_ligth_gray"
+            />
+
+        <TextView
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+
+            android:fontFamily="@font/poppins_semibold"
+            android:text="Cerrar Sesión"
+            android:textColor="@color/geoterra_orange"
+            android:textSize="18sp"
+
+            app:drawableLeftCompat="@drawable/logout_orange_icon"
+            android:drawablePadding="10dp"
+            >
+        </TextView>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -58,14 +58,19 @@ class FormFragment : Fragment() {
     // Creates an object that manage the location requests.
     this.requestForm = RequestForm()
     this.galleryPermissionManager = GalleryPermissionManager(requireContext())
-    val locationButton =
-      this.binding.findViewById<Button>(R.id.userLocationButton)
-    val imageButton =
-      this.binding.findViewById<Button>(R.id.locationImageButton)
-    val sendButton = this.binding.findViewById<Button>(R.id.sendRequestButton)
+    val locationButton = this.binding.findViewById<Button>(
+      R.id.userLocationButton
+    )
+    val imageButton = this.binding.findViewById<Button>(
+      R.id.locationImageButton
+    )
+    val sendButton = this.binding.findViewById<Button>(
+      R.id.sendRequestButton
+    )
     val dateText = this.binding.findViewById<TextView>(R.id.dateText)
-    val temperatureSlider =
-      this.binding.findViewById<Slider>(R.id.temperatureSlider)
+    val temperatureSlider = this.binding.findViewById<Slider>(
+      R.id.temperatureSlider
+    )
     val sliderLabel = this.binding.findViewById<TextView>(R.id.sliderLabel)
 
     temperatureSlider.addOnChangeListener { _, value, _ ->
@@ -77,6 +82,7 @@ class FormFragment : Fragment() {
         3 -> Gravity.END
         else -> Gravity.START
       }
+
       sliderLabel.layoutParams = layoutParams
 
       // Update the label text
@@ -188,21 +194,25 @@ class FormFragment : Fragment() {
     lifecycleScope.launch {
       try {
         val region = "Guanacaste"
-        val date = binding.findViewById<TextView>(
-          R.id.dateText).text.toString()
+        val date = binding.findViewById<TextView>(R.id.dateText)
+          .text.toString()
         val user = SessionManager.getUserEmail()
-        val zoneOwner =
-          binding.findViewById<EditText>(R.id.zoneOwnerTxtInput).text.toString()
+        val zoneOwner = binding.findViewById<EditText>(R.id.zoneOwnerTxtInput)
+          .text.toString()
         val currentUsage = binding.findViewById<EditText>(
-          R.id.currentUsageTxtInput).text.toString()
-        val address = binding.findViewById<EditText>(
-          R.id.indicationsTxtInput).text.toString()
+          R.id.currentUsageTxtInput
+        ).text.toString()
+        val address = binding.findViewById<EditText>(R.id.indicationsTxtInput)
+          .text.toString()
         val phoneNumber = binding.findViewById<EditText>(
-          R.id.phoneNumberTxtInput).text.toString()
+          R.id.phoneNumberTxtInput
+        ).text.toString()
         val thermalSensation = binding.findViewById<Slider>(
-          R.id.temperatureSlider).value.toInt()
-        val bubbles = if (binding.findViewById<CheckBox>(
-            R.id.bubbleCheckBox).isChecked) 1 else 0
+          R.id.temperatureSlider
+        ).value.toInt()
+        val bubbles = if (
+          binding.findViewById<CheckBox>(R.id.bubbleCheckBox
+        ).isChecked) 1 else 0
         // Set the data in the request form.
         requestForm.region = region
         requestForm.date = date
@@ -372,13 +382,19 @@ class FormFragment : Fragment() {
    *
    */
   @Deprecated("Deprecated in Java")
-  override fun onRequestPermissionsResult(requestCode : Int,
-                                          permissions : Array<out String>,
-                                          grantResults : IntArray) {
+  override fun onRequestPermissionsResult(
+    requestCode : Int,
+    permissions : Array<out String>,
+    grantResults : IntArray) {
       super.onRequestPermissionsResult(requestCode, permissions, grantResults)
       this.galleryPermissionManager.handlePermissionResult(
-        requestCode, grantResults
+        requestCode,
+        grantResults
       )
-      GPSManager.handlePermissionResult(requestCode, grantResults, requireContext())
+      GPSManager.handlePermissionResult(
+        requestCode,
+        grantResults,
+        requireContext()
+      )
   }
 }

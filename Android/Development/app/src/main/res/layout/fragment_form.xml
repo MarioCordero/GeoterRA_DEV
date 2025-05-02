@@ -265,7 +265,7 @@
                     android:layout_height="60dp"
                     android:minWidth="200dp"
 
-                    android:backgroundTint="@color/geoterra_yellow"
+                    android:backgroundTint="@color/geoterra_orange"
                     android:text="Enviar Solicitud"
                     android:textColor="@color/white"
                     android:fontFamily="@font/poppins_semibold"

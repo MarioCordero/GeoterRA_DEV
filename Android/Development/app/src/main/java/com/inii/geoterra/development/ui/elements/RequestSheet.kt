@@ -28,7 +28,7 @@ class RequestSheet @JvmOverloads constructor(
     val view = inflater.inflate(R.layout.request_sheet, this, true)
 
     // Obtain references to the views in the custom layout
-    locationImage = view.findViewById(R.id.imageView5)
+    locationImage = view.findViewById(R.id.map_position_image)
     coordinates = view.findViewById(R.id.coordenatesTxt)
     date = view.findViewById(R.id.dateTxt)
     state = view.findViewById(R.id.stateTxt)

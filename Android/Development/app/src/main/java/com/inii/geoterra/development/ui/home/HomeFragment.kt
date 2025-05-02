@@ -26,7 +26,9 @@ class HomeFragment : Fragment() {
     savedInstanceState: Bundle?
   ): View {
     // Inflate the layout for this fragment
-    this.binding = inflater.inflate(R.layout.fragment_home, container, false)
+    this.binding = inflater.inflate(
+      R.layout.fragment_home, container, false
+    )
 
     return this.binding
   }

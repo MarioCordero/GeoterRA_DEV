@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.googleAndroidLibrariesMapsplatformSecretsGradlePlugin)
+    alias(libs.plugins.kotlinParcelize)
 }
 
 android {
@@ -31,13 +32,12 @@ android {
 
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
-        freeCompilerArgs += "-Xparcelize"
+        jvmTarget = "17"
     }
 
     buildFeatures {
@@ -67,8 +67,6 @@ dependencies {
     implementation("org.json:json:20240303")
     implementation(libs.material.v150)
     implementation(libs.play.services.location)
-
-
     //noinspection UseTomlInstead
     implementation("androidx.preference:preference-ktx:1.2.1")
     //noinspection UseTomlInstead
@@ -78,12 +76,8 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("org.locationtech.proj4j:proj4j:1.1.0")
     // implementation("org.jetbrains.kotlin:kotlin-android-extensions-runtime:<kotlin_version>")
-
     implementation(libs.firebase.firestore)
-
-
-  testImplementation(libs.junit)
-
+    testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

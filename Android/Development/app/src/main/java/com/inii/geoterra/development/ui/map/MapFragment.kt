@@ -71,11 +71,12 @@ class MapFragment : PageFragment(), MessageListener {
       layersMenuFragment.show(parentFragmentManager, "layersMenuFragment")
     }
 
-    val centerMapOnUserButton
-    = this.binding.findViewById<Button>(R.id.centerUserButton)
+    val centerMapOnUserButton = this.binding.findViewById<Button>(
+      R.id.centerUserButton
+    )
     centerMapOnUserButton.setOnClickListener{
       // Try to get the user marker.
-      val userMarker = mapMarkers["USER"]
+      val userMarker = this.mapMarkers["USER"]
       if (userMarker != null) {
         // Centers the map on the user's location
         this.mapView.controller.setCenter(userMarker.position)
@@ -96,21 +97,31 @@ class MapFragment : PageFragment(), MessageListener {
           if (::mapView.isInitialized) {
             refreshUserMarker(location.latitude, location.longitude)
           }
-          Log.i("GPSManager", "Location ready:" +
-            " ${location.latitude}, ${location.longitude}")
+          Log.i(
+            "GPSManager", "Location ready:" +
+            " ${location.latitude}, ${location.longitude}"
+          )
         }
       }
     )
 
     this.requestPoints()
 
+    // Listen for back stack changes.
+    parentFragmentManager.addOnBackStackChangedListener {
+      // Check if the back stack is empty.
+      if (parentFragmentManager.backStackEntryCount == 0) {
+        setButtonsVisibility(true)
+      }
+    }
+
     return this.binding
   }
 
-  override fun onMessageReceived(pointID: String) {
+  override fun onMessageReceived(message: String) {
     // Aquí manejas el mensaje recibido
-    println("Mensaje recibido: $pointID")
-    prepareFragment(pointID)
+    println("Mensaje recibido: $message")
+    prepareFragment(message)
   }
 
   override fun onAttach(context: Context) {
@@ -126,16 +137,32 @@ class MapFragment : PageFragment(), MessageListener {
   }
 
   private fun prepareFragment(thermalPointID: String) {
-    // Create the thermal point info fragment.
-    val infoFragment = ThermalPointInfoFragment.newInstance(
-      this.thermalPoints[thermalPointID]!!
-    )
+    thermalPoints[thermalPointID]?.let {
+      // Set the buttons visibility to false.
+      this.setButtonsVisibility(false)
 
-    //Begin the transaction.
-    this.requireActivity().supportFragmentManager.beginTransaction()
-      .replace(R.id.fragment_map, infoFragment)
-      .addToBackStack(null)
-      .commit()
+      // Create the thermal point info fragment.
+      val infoFragment = ThermalPointInfoFragment.newInstance(
+        this.thermalPoints[thermalPointID]!!
+      )
+
+      //Begin the transaction.
+      this.requireActivity().supportFragmentManager.beginTransaction()
+        .replace(R.id.fragment_map, infoFragment)
+        .addToBackStack(null)
+        .commit()
+    } ?: run {
+      Log.e(
+        "MapFragment",
+        "ThermalPoint no encontrado para ID: $thermalPointID"
+      )
+    }
+  }
+
+  private fun setButtonsVisibility(visible: Boolean) {
+    val visibility = if (visible) View.VISIBLE else View.GONE
+    binding.findViewById<Button>(R.id.layersButton).visibility = visibility
+    binding.findViewById<Button>(R.id.centerUserButton).visibility = visibility
   }
 
   /**
@@ -163,8 +190,9 @@ class MapFragment : PageFragment(), MessageListener {
       this.mapView.overlays.add(marker)
 
       // Set the info window for the marker
-      val infoWindow = CustomInfoOnMarker(R.layout.custom_info_on_marker_user
-        , mapView
+      val infoWindow = CustomInfoOnMarker(
+        R.layout.custom_info_on_marker_user
+        , this.mapView
       )
 
       // Set the message listener for the info window
@@ -174,7 +202,7 @@ class MapFragment : PageFragment(), MessageListener {
       marker.setOnMarkerClickListener { clickedMarker, mapView ->
         if (!clickedMarker.isInfoWindowShown) {
           // Close the info window of all other markers.
-          mapMarkers.values.forEach { mapMarker ->
+          this.mapMarkers.values.forEach { mapMarker ->
             // Close all info windows except the clicked marker.
             if (mapMarker != clickedMarker) {
               mapMarker.closeInfoWindow()
@@ -186,11 +214,11 @@ class MapFragment : PageFragment(), MessageListener {
           mapView.controller.setCenter(clickedMarker.position)
 
           // Set the current open marker to the clicked marker.
-          currentOpenMarker = clickedMarker
+          this.currentOpenMarker = clickedMarker
         } else {
           // Close the info window of the clicked marker.
           clickedMarker.closeInfoWindow()
-          currentOpenMarker = null
+          this.currentOpenMarker = null
         }
         // Indicates that the click has been handled.
         true
@@ -207,7 +235,7 @@ class MapFragment : PageFragment(), MessageListener {
 
   private fun refreshUserMarker(latitude : Double, longitude : Double) {
     // Try to get the user marker.
-    val marker = mapMarkers["USER"]
+    val marker = this.mapMarkers["USER"]
     // If the marker exists, update its position.
     if (marker != null) {
       Log.i("User Coordinates: ", "x: $latitude, y: $longitude")
@@ -326,8 +354,10 @@ class MapFragment : PageFragment(), MessageListener {
       try {
         for (thermalPoint in points) {
           // Convert the point CRT05 coordinates to WGS84.
-          val geoPoint = convertCRT05toWGS84(thermalPoint.latitude
-                                             , thermalPoint.longitude)
+          val geoPoint = convertCRT05toWGS84(
+            thermalPoint.latitude,
+            thermalPoint.longitude
+          )
           this@MapFragment.thermalPoints[thermalPoint.pointID] = thermalPoint
           val temperature = thermalPoint.temperature
 
@@ -383,7 +413,7 @@ class MapFragment : PageFragment(), MessageListener {
 
           // Establish the marker's icon
           marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-          mapMarkers["${marker.title}"] = marker
+          mapMarkers[marker.title] = marker
           // Add the marker to the map
           mapView.overlays.add(marker)
         }
@@ -438,6 +468,7 @@ class MapFragment : PageFragment(), MessageListener {
    * @param permissions
    * @param grantResults
    */
+  @Deprecated("Deprecated in Java")
   override fun onRequestPermissionsResult(requestCode : Int,
     permissions : Array<out String>,
     grantResults : IntArray) {

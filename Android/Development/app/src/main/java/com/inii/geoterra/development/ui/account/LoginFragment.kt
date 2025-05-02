@@ -60,8 +60,10 @@ class LoginFragment : PageFragment() {
         } else if (!userEmail.isValidEmail()) {
           this.showError("Por favor, ingresa un correo válido.")
         } else if (userPassword.length < 8) {
-          this.showError("Por favor, ingresa una contraseña con al menos 8 " +
-                       "carácteres.")
+          this.showError(
+            "Por favor, ingresa una contraseña con al menos 8 " +
+              "carácteres."
+          )
         }
       } else {
         this.showError("Por favor, rellena todos los campos")
@@ -106,7 +108,9 @@ class LoginFragment : PageFragment() {
       val toggleCheckBox = this.binding.findViewById<CheckBox>(
         R.id.checkBoxTogglePassword
       )
-      val passwordEditText = this.binding.findViewById<EditText>(R.id.password)
+      val passwordEditText = this.binding.findViewById<EditText>(
+        R.id.userPassword
+      )
       toggleCheckBox.isChecked = !toggleCheckBox.isChecked
       if (toggleCheckBox.isChecked) {
         passwordEditText.inputType =  android.text.InputType.TYPE_CLASS_TEXT or
@@ -120,7 +124,9 @@ class LoginFragment : PageFragment() {
   }
 
   private fun setCheckboxOnChangeListener() {
-    val passwordEditText = this.binding.findViewById<EditText>(R.id.password)
+    val passwordEditText = this.binding.findViewById<EditText>(
+      R.id.userPassword
+    )
     this.binding.findViewById<CheckBox>(R.id.checkBoxTogglePassword)
       .setOnCheckedChangeListener { _, isChecked ->
       this.updatePasswordVisibility(isChecked, passwordEditText)

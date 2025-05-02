@@ -39,23 +39,15 @@ class AccountFragment : PageFragment() {
 
     this.accountInformation = UserInformation("", "", "", "")
 
-    val helpButton = this.binding.findViewById<Button>(R.id.helpButton)
-    helpButton.setOnClickListener{
-      checkSession()
-    }
-
     if (SessionManager.isSessionActive()) {
       getUserInformation()
     }
 
-    val userActivityButton = this.binding.findViewById<Button>(
-      R.id.activityButton)
-    userActivityButton.setOnClickListener {
-      // ActivityNavigator.changeActivity(this, RequestActivity::class.java)
-    }
-    println("Nombre del usuario: ${accountInformation.name}" +
-              ", Email: ${accountInformation.email}," +
-              " Phone: ${accountInformation.phone}")
+    println(
+      "Nombre del usuario: ${accountInformation.name}" +
+        ", Email: ${accountInformation.email}," +
+        " Phone: ${accountInformation.phone}"
+    )
     // Inflate the layout for this fragment
     return binding
   }
@@ -71,7 +63,8 @@ class AccountFragment : PageFragment() {
 
     // Send the request.
     call.enqueue(object : Callback<UserInformation> {
-      override fun onResponse(call: Call<UserInformation>, response: Response<UserInformation>) {
+      override fun onResponse(call: Call<UserInformation>,
+        response: Response<UserInformation>) {
         if (response.isSuccessful) {
           // Handle the response.
           val serverResponse = response.body()
@@ -129,17 +122,18 @@ class AccountFragment : PageFragment() {
           if (userData != null) {
             Log.i("consulta sesion", "entraaa")
             Log.i(userData.status, userData.userName)
-            if (userData.status == "logged_in") { //sessionActive = true
+            if (userData.status == "logged_in") {
               Log.i("sesion activa", "entraaa")
             } else {
-              Log.i("consulta sesion", "inactiva") //sessionActive = false
+              Log.i("consulta sesion", "inactiva")
             }
           }
         }
       }
       override fun onFailure(call : Call<CheckSessionResponse>,
         t : Throwable
-      ) { //Log.i("Error check", "Error en la consulta de session, $t")
+      ) {
+        Log.i("Error check", "Error en la consulta de session, $t")
       }
     })
   }
