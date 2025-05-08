@@ -47,7 +47,7 @@ class RequestsFragment : PageFragment() {
       this.getSubmittedRequests()
     }
 
-    val requestButton = this.binding.findViewById<Button>(R.id.newRequestButton)
+    val requestButton = this.binding.findViewById<Button>(R.id.new_request_button)
     this.setRequestButtonClickListener(requestButton)
     return this.binding
   }

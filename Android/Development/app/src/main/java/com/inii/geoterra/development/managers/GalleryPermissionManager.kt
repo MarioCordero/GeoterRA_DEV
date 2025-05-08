@@ -5,9 +5,11 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 
 /**
  * Manages gallery permission requests and state validation.
@@ -49,6 +51,35 @@ class GalleryPermissionManager(private val context: Context) {
   }
 
   /**
+   * Initialize the gallery permission check and request.
+   *
+   * @param activity The activity to request permissions.
+   */
+  fun initialize(activity: Activity) {
+    if (hasGalleryPermission()) {
+      isInitialized = true
+    } else {
+      activity.requestPermissions(arrayOf(requiredPermission), GALLERY_PERMISSION_REQUEST_CODE)
+    }
+  }
+
+  fun initialize(fragment: Fragment) {
+    if (hasGalleryPermission()) {
+      isInitialized = true
+    } else {
+      fragment.requestPermissions(arrayOf(requiredPermission), GALLERY_PERMISSION_REQUEST_CODE)
+    }
+  }
+
+  fun requestGalleryPermission(fragment: Fragment) {
+    if (!hasGalleryPermission()) {
+      fragment.requestPermissions(arrayOf(requiredPermission), GALLERY_PERMISSION_REQUEST_CODE)
+    } else {
+      isInitialized = true
+    }
+  }
+
+  /**
    * Requests gallery permission from the user if not already granted.
    *
    * @param activity An instance of [Activity] from which to launch the permission request dialog.
@@ -61,7 +92,7 @@ class GalleryPermissionManager(private val context: Context) {
         GALLERY_PERMISSION_REQUEST_CODE
       )
     } else {
-      isInitialized = true
+      this.isInitialized = true
     }
   }
 
@@ -73,7 +104,7 @@ class GalleryPermissionManager(private val context: Context) {
    */
   fun handlePermissionResult(requestCode: Int, grantResults: IntArray) {
     if (requestCode != GALLERY_PERMISSION_REQUEST_CODE) return
-
+    Log.i("GalleryManager", "handlePermissionResult $grantResults")
     if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
       Toast.makeText(context, "Gallery permission granted", Toast.LENGTH_SHORT).show()
       isInitialized = true

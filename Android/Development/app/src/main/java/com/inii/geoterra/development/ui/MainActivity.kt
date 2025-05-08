@@ -18,6 +18,7 @@ import com.inii.geoterra.development.interfaces.FragmentListener
 import com.inii.geoterra.development.api.CheckSessionResponse
 import com.inii.geoterra.development.api.RetrofitClient
 import com.inii.geoterra.development.device.GPSManager
+import com.inii.geoterra.development.managers.GalleryPermissionManager
 import com.inii.geoterra.development.managers.SessionManager
 import com.inii.geoterra.development.ui.account.LoginFragment
 import com.inii.geoterra.development.ui.home.HomeFragment
@@ -53,7 +54,7 @@ class MainActivity : AppCompatActivity(), FragmentListener {
     this.navigationMenu = this.rootView.findViewById(R.id.nav_menu)
     // Initialize the session manager.
     SessionManager.init(this@MainActivity)
-    if (! GPSManager.isInitialized()) {
+    if (!GPSManager.isInitialized()) {
       GPSManager.initialize(this@MainActivity)
     }
     // Check if the activity is being re-created.

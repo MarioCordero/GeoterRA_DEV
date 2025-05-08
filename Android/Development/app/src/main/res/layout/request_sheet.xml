@@ -5,8 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/frameLayout"
     android:layout_width="match_parent"
-    android:layout_height="270dp"
-    android:layout_marginBottom="20dp"
+    android:layout_height="wrap_content"
+    android:padding="15dp"
     android:background="@drawable/gray_rectangle_rounded2"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintHorizontal_bias="0.0"
@@ -20,10 +20,7 @@
 
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-
+      
         android:background="@drawable/gray_rectangle_rounded2"
         android:clipToOutline="true"
         app:srcCompat="@drawable/maps_image"
@@ -33,11 +30,10 @@
         android:id="@+id/coordenatesTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/calibri_regular"
+        android:fontFamily="@font/poppins_regular"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/map_position_image"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="30dp"
         android:text="Coordenadas: "
         android:textSize="18sp"/>
 
@@ -45,7 +41,7 @@
         android:id="@+id/dateTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/calibri_regular"
+        android:fontFamily="@font/poppins_regular"
         app:layout_constraintTop_toBottomOf="@id/coordenatesTxt"
         app:layout_constraintStart_toStartOf="@id/coordenatesTxt"
         android:layout_marginTop="5dp"
@@ -56,7 +52,7 @@
         android:id="@+id/typeTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/calibri_regular"
+        android:fontFamily="@font/poppins_regular"
         app:layout_constraintTop_toBottomOf="@id/dateTxt"
         app:layout_constraintStart_toStartOf="@id/dateTxt"
         android:layout_marginTop="5dp"
@@ -67,7 +63,7 @@
         android:id="@+id/stateTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/calibri_regular"
+        android:fontFamily="@font/poppins_regular"
         app:layout_constraintTop_toBottomOf="@id/typeTxt"
         app:layout_constraintStart_toStartOf="@id/typeTxt"
         android:layout_marginTop="5dp"
@@ -79,17 +75,14 @@
         android:layout_width="match_parent"
         android:layout_height="45dp"
 
-        android:layout_marginStart="16dp"
         android:layout_marginTop="160dp"
-        android:layout_marginEnd="16dp"
 
         android:backgroundTint="@color/geoterra_orange"
-        android:drawableStart="@drawable/baseline_add_call_24"
         android:drawableTint="@color/white"
         android:fontFamily="@font/poppins_semibold"
         android:text="Editar"
-        android:textColor="@color/white"
         android:textSize="16sp"
+        android:textColor="@color/white"
         app:cornerRadius="5dp"
 
         app:layout_constraintEnd_toEndOf="parent"
@@ -100,9 +93,7 @@
         android:layout_width="match_parent"
         android:layout_height="45dp"
 
-        android:layout_marginStart="16dp"
         android:layout_marginTop="205dp"
-        android:layout_marginEnd="16dp"
         android:fontFamily="@font/poppins_semibold"
         android:backgroundTint="@color/geoterra_deep_blue"
         android:drawableStart="@drawable/baseline_cached_24"

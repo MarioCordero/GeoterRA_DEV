@@ -50,7 +50,7 @@ class LoginFragment : PageFragment() {
     this.binding.findViewById<Button>(R.id.loginButton).setOnClickListener {
       val userEmail = this.binding.findViewById<EditText>(R.id.userEmail)
         .text.toString().trim()
-      val userPassword = this.binding.findViewById<EditText>(R.id.password)
+      val userPassword = this.binding.findViewById<EditText>(R.id.userPassword)
         .text.toString().trim()
 
       Log.i("Tomado de datos en login", "$userEmail $userPassword")
