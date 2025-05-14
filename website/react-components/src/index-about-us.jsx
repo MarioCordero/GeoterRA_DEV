@@ -1,5 +1,5 @@
 import React from 'react';
-import backgroundImage from './assets/images/geoterra-logo-white.svg'; // Asegúrate de que la ruta sea correcta
+import GeoterRA_LOGO_White from './assets/images/geoterra-logo-white.svg'; // Asegúrate de que la ruta sea correcta
 
 function IndexAboutUs() {
   return (
@@ -7,7 +7,7 @@ function IndexAboutUs() {
       {/* Background Image */}
       <div
         className="absolute top-0 right-0 w-1/2 h-1/2 bg-cover bg-no-repeat opacity-20"
-        style={{ backgroundImage: `url(${backgroundImage})` }}
+        style={{ backgroundImage: `url(${GeoterRA_LOGO_White})` }}
       ></div>
 
       <div className="text-6xl font-bold text-white mb-12 text-left">

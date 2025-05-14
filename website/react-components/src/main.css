@@ -12,6 +12,7 @@
     --azul: #084F9D;
     --negro: #000000;
     --blanco: #ffffff;
+    --gris: #ECECEC;
 
     /* Secondary colors */
     --celesteClaro: #A6C3E3;
@@ -93,6 +94,9 @@
   }
   .bg-rojo {
     background-color: var(--rojo);
+  }
+  .bg-gris {
+    background-color: var(--gris);
   }
 
   /* Text color classes */
