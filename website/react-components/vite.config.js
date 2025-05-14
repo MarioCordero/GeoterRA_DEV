@@ -11,17 +11,21 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name?.endsWith('.css')) return 'assets/css/[name]-[hash][extname]' // CSS con hash
-          if (assetInfo.name?.match(/\.(png|jpe?g|svg|gif|webp)$/)) {
-            return 'assets/images/[name][extname]' // Imágenes SIN hash (nombres originales)
+        entryFileNames: 'assets/js/GeoterRA-ReactComponents.js',
+        chunkFileNames: 'assets/js/[name].js',
+        assetFileNames: ({ name }) => {
+          if (/\.css$/.test(name ?? '')) {
+            return 'assets/css/GeoterRA-ReactComponents.css'
           }
-          return 'assets/[name]-[hash][extname]' // Otros assets con hash
+          if (/\.(woff2?|ttf|otf|eot)$/i.test(name ?? '')) {
+            return 'assets/fonts/[name][extname]'
+          }
+          return 'assets/[name][extname]'
         },
-        chunkFileNames: 'assets/js/[name]-[hash].js', // JS con hash
-        entryFileNames: 'assets/js/[name]-[hash].js' // JS con hash
-      }
+      },
     },
-    emptyOutDir: true
-  }
+    outDir: 'dist', // Asegúrate de que la salida vaya a la carpeta dist
+    emptyOutDir: true, // Limpia el directorio de salida antes de construir
+  },
+  base: './', // Esto es importante para rutas relativas
 })

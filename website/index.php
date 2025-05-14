@@ -12,7 +12,7 @@
 		<link rel="stylesheet" href="./assets/css/fonts.css">
 		<link rel="stylesheet" href="./assets/css/responsive.css">
 		<!-- CUSTOM CSS REACT -->
-		<link rel="stylesheet" href="./react-components/dist/assets/css/index-CI9OR0jG.css">
+		<link rel="stylesheet" href="./react-components/dist/assets/css/GeoterRA-ReactComponents.css">
 		<!--ICON-->
 		<link rel="shortcut icon" type="image/x-icon" href="./GeoterRA.ico">
 
@@ -42,51 +42,9 @@
 
 				<!-- WELCOME REACT COMPONENT -->
 				<div id="Welcome-card"></div>
-				
-				<!-- WELCOME -->				
-				<!-- <div class="welcome Montserrat-Regular center-text">
-					<p>WELCOME</p>
-				</div> -->
 
 				<!-- ABOUT US SECTION -->
-				<div class="A-container" id="about-us">
-					<div class="about-us">
-						
-						<h1>Acerca de nosotros</h1>
-
-						<!-- 2 cols -->
-						<div class="about-us-col-container">
-
-							<div class="about-us-col">
-								<p>
-									GeoterRA es una aplicación innovadora diseñada para optimizar la toma de decisiones en 
-									proyectos que aprovechan la energía geotérmica en el territorio nacional. Nuestra misión 
-									es proporcionar información geológica precisa y validada para inversores y desarrolladores, 
-									minimizando riesgos y maximizando la eficiencia en la planificación y ejecución de actividades 
-									económicas sostenibles. Con un equipo multidisciplinario de expertos en geología y tecnologías 
-									de la información, nos comprometemos a fomentar el uso de energías renovables y contribuir 
-									al desarrollo sostenible del país a través de herramientas interactivas y datos actualizados.
-								</p>
-
-								<img src="./assets/images/trabajo-campo1.jpeg" alt="">
-							</div>
-
-							<div class="about-us-col">
-								<img src="./assets/images/trabajo-campo5.jpeg" alt="">
-								<p>
-									Desde su concepción, GeoterRA ha sido impulsada por la necesidad crítica de contar con información 
-									especializada y esencial para aquellos que deseen invertir en la geotermia. Utilizando avanzadas 
-									tecnologías de visualización y análisis de datos, nuestra plataforma ofrece una vista integral y 
-									detallada del potencial geotérmico en diversas regiones. Esto permite a los usuarios realizar una 
-									planificación estratégica informada, reduciendo riesgos y aumentando las posibilidades de éxito en 
-									sus proyectos. Nos enorgullece ser una herramienta clave en la promoción de una transición energética 
-									hacia fuentes más limpias y sostenibles.
-								</p>
-							</div>
-						</div>
-					</div>
-				</div>
-				<!-- ABOUT US SECTION -->
+				<div id="About-us-card"></div>
 				
 				<!-- HOW WORKS SECTION -->
 				<div class="B-container" id="how-works">
@@ -319,7 +277,7 @@
 			<script src="./assets/js/web-loader.js"></script>
 			<script src="./assets/js/menu-bars.js"></script>
 			<!-- REACT INCLUDES -->
-			<script src="./react-components/dist/assets/js/index-7emNaOjt.js" defer></script>
+			<script src="./react-components/dist/assets/js/GeoterRA-ReactComponents.js" type="module" defer></script>
 		</div>
 	</body>
 </html>
