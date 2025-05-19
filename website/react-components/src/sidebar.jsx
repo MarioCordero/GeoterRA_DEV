@@ -1,15 +1,25 @@
-import React, { useState } from 'react';
-import { Layout, Menu } from 'antd';
 import {
   UserOutlined,
   DashboardOutlined,
   FileTextOutlined,
+  LogoutOutlined,
 } from '@ant-design/icons';
 
 const { Sider, Content } = Layout;
 
 const SidebarLayout = () => {
   const [selectedKey, setSelectedKey] = useState('1');
+
+  const handleLogout = () => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "../API/logout.php", true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        window.location.href = "login.php";
+      }
+    };
+    xhr.send();
+  };
 
   const renderContent = () => {
     switch (selectedKey) {
@@ -23,22 +33,19 @@ const SidebarLayout = () => {
         return null;
     }
   };
+
   return (
     <Layout
       style={{
-        position: 'fixed',         // fixed instead of sticky
-        top: 0,                    // stick to the top
-        left: 0,                   // stick to left
+        position: 'fixed',
+        top: 0,
+        left: 0,
         height: '100vh',
-        width: '220px',            // width for sidebar
-        zIndex: 99,                // must be higher than navbar (which is 20)
+        width: '220px',
+        zIndex: 99,
       }}
     >
-      <Sider width={220}>
-        <div
-          className="demo-logo"
-          style={{ height: 64, background: 'rgba(255,255,255,0.2)', margin: 16 }}
-        />
+      <Sider width={220} style={{ display: 'flex', flexDirection: 'column' }}>
         <Menu
           theme="dark"
           mode="inline"
@@ -50,10 +57,23 @@ const SidebarLayout = () => {
             { key: '3', icon: <FileTextOutlined />, label: 'Requests' },
           ]}
         />
+
+        <div style={{ flexGrow: 1 }} />
+
+        <div style={{ padding: '1rem' }}>
+          <Button
+            type="primary"
+            danger
+            icon={<LogoutOutlined />}
+            block
+            onClick={handleLogout}
+          >
+            Logout
+          </Button>
+        </div>
       </Sider>
     </Layout>
   );
-
 };
 
 export default SidebarLayout;
