@@ -1,4 +1,3 @@
-// sidebar.jsx
 import React, { useState } from 'react';
 import { Layout, Menu } from 'antd';
 import {
@@ -24,11 +23,22 @@ const SidebarLayout = () => {
         return null;
     }
   };
-
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Sider collapsible>
-        <div className="demo-logo" />
+    <Layout
+      style={{
+        position: 'fixed',         // fixed instead of sticky
+        top: 0,                    // stick to the top
+        left: 0,                   // stick to left
+        height: '100vh',
+        width: '220px',            // width for sidebar
+        zIndex: 99,                // must be higher than navbar (which is 20)
+      }}
+    >
+      <Sider width={220}>
+        <div
+          className="demo-logo"
+          style={{ height: 64, background: 'rgba(255,255,255,0.2)', margin: 16 }}
+        />
         <Menu
           theme="dark"
           mode="inline"
@@ -41,13 +51,9 @@ const SidebarLayout = () => {
           ]}
         />
       </Sider>
-      <Layout>
-        <Content style={{ margin: '24px 16px', padding: 24, background: '#fff' }}>
-          {renderContent()}
-        </Content>
-      </Layout>
     </Layout>
   );
+
 };
 
 export default SidebarLayout;
