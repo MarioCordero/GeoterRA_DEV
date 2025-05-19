@@ -56,13 +56,13 @@
 						</p>
 
 						<p>
-							<label for="password" class="Poppins-Bold">Correo</label>
-							<input name="password" type="password" placeholder="Contraseña" required>
-						</p>
-						
-						<p>
 							<label for="email" class="Poppins-Bold">Correo</label>
 							<input name="email" type="text" placeholder="Correo electrónico" required>
+						</p>
+
+						<p>
+							<label for="password" class="Poppins-Bold">Constraseña</label>
+							<input name="password" type="password" placeholder="Contraseña" required>
 						</p>
 						
 						<p>
