@@ -26,10 +26,10 @@ function checkSession() {
                 const currentPage = window.location.pathname;
                 
                 // If the current page is one of the specified ones, redirect to login
-                const restrictedPages = ['/logged.html', '/addpoint.html'];
+                const restrictedPages = ['/logged.php', '/addpoint.php'];
                 if (restrictedPages.includes(currentPage)) {
                     console.log('User is not logged in, redirecting to login page');
-                    window.location.href = 'login.html'; // Redirige a la página de inicio de sesión
+                    window.location.href = 'login.php'; // Redirige a la página de inicio de sesión
                 } else {
                     console.log('User is not logged in, but no redirection required for this page');
                 }

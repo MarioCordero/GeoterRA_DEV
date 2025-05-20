@@ -1,12 +1,36 @@
-
-// Obtain the point
-let pointStr = localStorage.getItem("pointObject")
+// Obtener el punto desde localStorage y llenar el formulario
+let pointStr = localStorage.getItem("pointObject");
 let pointObject = JSON.parse(pointStr);
-console.log(pointObject.id + pointObject.coord_x + pointObject.coord_y);
 
-// Change the pages text to the point received
-const myElement = document.getElementById('resultChanged');
-myElement.textContent = pointObject.id + " " + pointObject.coord_x + " " + pointObject.coord_y;
+// Asignar los valores al formulario
+document.getElementById('point-id').value   = pointObject.id;
+document.getElementById('region').value     = pointObject.region;
+document.getElementById('coord-x').value    = pointObject.coord_x;
+document.getElementById('coord-y').value    = pointObject.coord_y;
+document.getElementById('temp').value       = pointObject.temp;
+document.getElementById('ph-campo').value   = pointObject.pH_campo;
+document.getElementById('cond-campo').value = pointObject.cond_campo;
+
+// Exportar a PDF
+document.getElementById('export-pdf').addEventListener('click', function (e) {
+    e.preventDefault();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.text("Información del Punto", 10, 10);
+    doc.text(`ID: ${pointObject.id}`, 10, 20);
+    doc.text(`Región: ${pointObject.region}`, 10, 30);
+    doc.text(`Coordenada X: ${pointObject.coord_x}`, 10, 40);
+    doc.text(`Coordenada Y: ${pointObject.coord_y}`, 10, 50);
+    doc.text(`Temperatura: ${pointObject.temp}`, 10, 60);
+    doc.text(`pH (Campo): ${pointObject.pH_campo}`, 10, 70);
+    doc.text(`Conductividad (Campo): ${pointObject.cond_campo}`, 10, 80);
+    // Añade más campos si es necesario
+
+    doc.save("informacion_punto.pdf");
+    window.print();
+});
+
 
 createPiperDiagram()
 
@@ -419,6 +443,3 @@ const existingSvg = document.getElementById("piperDiagram");
 
 d3.select(existingSvg)
   .append(() => svg.node());
-
-
-

@@ -1,4 +1,4 @@
-document.getElementById("reg_form").addEventListener("submit",function(event) {
+document.getElementById("reg-form").addEventListener("submit",function(event) {
 
 	event.preventDefault(); 
 	let formData = new FormData(this);
@@ -10,7 +10,7 @@ document.getElementById("reg_form").addEventListener("submit",function(event) {
 
 			if (errorObject.length === 0) {
 
-				window.location.href = "logged.html";
+				window.location.href = "logged.php";
 				
 			} else {
 

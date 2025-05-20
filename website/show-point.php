@@ -22,66 +22,55 @@
   	<body>
 
 			<!-- NAVBAR -->
-			<nav class="navbar Montserrat-Regular">
-
-				<div class="logo-container">
-					<a href="./index.html"> <img id="logo" src="./assets/images/GeoterRA/GeoterRA-Logo.svg" class="header-logo" alt="Webpage logotype"> </a>
-				</div>
-
-				<div class="menu">
-
-					<a href="./index.html#about-us">Acerca de nosotros</a>
-					<a href="./index.html#how-works">Como funciona</a>
-					<a href="./index.html#contact-us">Contacto</a>
-					<a href="./map.html">Mapa</a>
-					<a href="./login.html">Iniciar Sesión</a>
-
-				</div>
-
-				<input type="checkbox" id="checkbox">
-				<label for="checkbox" class="toggle">
-					<div class="bar bar--top"></div>
-					<div class="bar bar--middle"></div>
-					<div class="bar bar--bottom"></div>
-				</label>
-
-                <div class="menu-bars-background" id="menu-bars-background">
-                    <div class="menu-elements Gibson-Regular" id="menu-elements">
-
-						<a href="./index.html#about-us" 	class="a-menu-element">Acerca de nosotros	</a>
-						<a href="./index.html#how-works" 	class="a-menu-element">Como funciona		</a>
-						<a href="./index.html#contact-us" 	class="a-menu-element">Contacto				</a>
-						<a href="./map.html">Mapa														</a>
-						<a href="./login.html">Iniciar Sesión											</a>
-
-                    </div>
-                </div>
-
-			</nav>
+      <?php include './assets/partials/navbar.php'; ?>
 			<!-- NAVBAR -->
 
 			<!-- BODY -->
-			<div class="login-container">
+			<div class="show-point-container Montserrat-Regular">
 
 				<!--------------------------------LOADER----------------------------------->
 				<div class="web-loader" id="loader">
 					<img src="./assets/images/GeoterRA/GeoterRA-Logo.svg" class="logoWelcome" id="logoWelcome">
-					<div id="carga_pagina">
-
-					</div>
+					<div id="carga_pagina"></div>
 				</div>
 				<!--------------------------------END LOADER------------------------------->
 
-      <div class="show_point Montserrat-Regular">
-        <p id="resultChanged">
-        </p>
+				<div class="show-point-container-info Montserrat-Regular">
 
+					<p id="resultChanged"></p>
 
-        <svg id="piperDiagram" width="600" height="600"></svg>
-          
+					<h1>Información del Punto</h1>
+					<form id="point-form">
+						<label for="point-id">ID:</label>
+						<input type="text" id="point-id" readonly>
+			
+						<label for="region">Región:</label>
+						<input type="text" id="region" readonly>
+			
+						<label for="coord-x">Coordenada X:</label>
+						<input type="text" id="coord-x" readonly>
+			
+						<label for="coord-y">Coordenada Y:</label>
+						<input type="text" id="coord-y" readonly>
+			
+						<label for="temp">Temperatura:</label>
+						<input type="text" id="temp" readonly>
+			
+						<label for="ph-campo">pH (Campo):</label>
+						<input type="text" id="ph-campo" readonly>
+			
+						<label for="cond-campo">Conductividad (Campo):</label>
+						<input type="text" id="cond-campo" readonly>
+			
+					</form>
+
+					<svg id="piperDiagram" width="600" height="600"></svg>
+
+					<button id="export-pdf">Exportar a PDF</button>
+
+					
 				</div>
 
-				
 			</div>
 			<!-- BODY -->
 
@@ -101,9 +90,10 @@
 
 			<!-- JS INCLUDES -->
 			<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-			<script src="./assets/js/check_session.js" defer></script>
-
-      		<script src="https://d3js.org/d3.v7.min.js"></script>
+			<script src="https://d3js.org/d3.v7.min.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+			
+			<script src="./assets/js/check-session.js" defer></script>
 			<script src="./assets/js/web-loader.js"></script>
 			<script src="./assets/js/show-point.js"></script>
 			<script src="./assets/js/menu-bars.js"></script>

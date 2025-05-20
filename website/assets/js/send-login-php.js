@@ -20,7 +20,7 @@ document.getElementById("login_form").addEventListener("submit", function (event
         let response = JSON.parse(xhr.responseText);
         if (response.status === 'logged_in') {
 
-          window.location.href = "logged.html";
+          window.location.href = "logged.php";
           // Llama a la función de verificación de sesión después de un inicio de sesión exitoso
           checkSession();
 
