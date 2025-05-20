@@ -8,12 +8,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.inii.geoterra.development.components.ActivityNavigator
 import com.inii.geoterra.development.components.api.CheckSessionResponse
+import com.inii.geoterra.development.components.api.Error
 import com.inii.geoterra.development.components.api.RetrofitClient
 import com.inii.geoterra.development.components.services.GPSManager
 import com.inii.geoterra.development.components.services.SessionManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -35,22 +40,33 @@ class MainActivity : AppCompatActivity() {
     this.rootView = findViewById(R.id.mainLayout)
     this.bottomNavigationView = findViewById(R.id.bottom_menu)
 
-    SessionManager.init(this)
 //        if (SessionManager.isSessionActive()) {
 //            Log.i("user status", "activa")
 //        } else {
 //            Log.i("user status", "no activa")
 //        }
-
-    if (GPSManager.isInitialized()) {
-      GPSManager.startLocationUpdates()
-    } else {
-      GPSManager.initialize(this)
+    lifecycleScope.launch(Dispatchers.Main) {
+      try {
+        withContext(Dispatchers.IO) {
+          SessionManager.init(this@MainActivity)
+          if (GPSManager.isInitialized()) {
+            GPSManager.startLocationUpdates()
+          } else {
+            GPSManager.initialize(this@MainActivity)
+          }
+          setupBottomMenuListener()
+        }
+        bottomNavigationView.selectedItemId = R.id.homeItem
+      } catch (e: Exception) {
+        withContext(Dispatchers.Main) {
+          Log.e(
+            "Thread Error: ",
+              e.message.toString()
+          )
+        }
+      }
     }
 
-    bottomNavigationView.selectedItemId = R.id.homeItem
-
-    setupBottomMenuListener()
   }
 
   /**

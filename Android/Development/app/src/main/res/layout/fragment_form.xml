@@ -39,7 +39,7 @@
                 android:layout_marginTop="15dp"
                 android:padding="2dp"
 
-                android:hint="Nombre Completo"
+                android:hint="Pseudo Nombre para el punto"
                 app:helperText="Requerido">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -237,7 +237,7 @@
                 <Button
                     android:id="@+id/locationImageButton"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
 
                     android:backgroundTint="@color/ligthGray"
@@ -250,7 +250,7 @@
                 <Button
                     android:id="@+id/userLocationButton"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:layout_marginStart="20dp"
 

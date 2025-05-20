@@ -24,6 +24,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         userPhoneElement.textContent = response.phone;
                     }
                     document.getElementById('tittle-page').textContent = response.name; // Update the title
+                    // Store the initial values for later comparison
+                    localStorage.setItem( 'initialuserName' , response.name );
+                    localStorage.setItem( 'initialEmail' , response.email );
+                    localStorage.setItem( 'initialPhone' , response.phone );
+
                 } else {
                     userNameElement.textContent = 'No se encontró la información del usuario.';
                     userEmailElement.textContent = 'No se encontró la información del usuario.';
@@ -36,23 +41,63 @@ document.addEventListener('DOMContentLoaded', function() {
         xhr.send(formData);
     }
 
-    // Función para mostrar las solicitudes en la lista
     function displayUserRequests(requests) {
         let listContainer = document.querySelector('.user-requests ul');
-        listContainer.innerHTML = ''; // Limpiar la lista antes de agregar nuevas entradas
-
+        listContainer.innerHTML = ''; // Clear the list before adding new entries
+    
         requests.forEach(request => {
             let listItem = document.createElement('li');
             listItem.innerHTML = `
                 <p>ID Punto: ${request.id_soli}</p>
                 <div>
-                    <a href=""><img src="./assets/images/icons/ojo.png" alt=""></a>
+                    <a href="#" class="edit-icon"><img src="./assets/images/icons/ojo.png" alt="Edit"></a>
                     <div class="linea-vertical-IDpunto"></div>
-                    <a href=""><img src="./assets/images/icons/eliminar.png" alt=""></a>
+                    <a href="#" class="delete-icon"><img src="./assets/images/icons/eliminar.png" alt="Delete"></a>
                 </div>
             `;
             listContainer.appendChild(listItem);
+    
+            // Add event listener for the edit (eye) icon
+            listItem.querySelector('.edit-icon').addEventListener('click', function(event) {
+                event.preventDefault();
+                editRequest(request.id_soli);
+            });
+    
+            // Add event listener for the delete (trash) icon
+            listItem.querySelector('.delete-icon').addEventListener('click', function(event) {
+                event.preventDefault();
+                deleteRequest(request.id_soli);
+            });
         });
+    }
+    
+    // Function to handle editing a request
+    function editRequest(id) {
+        // Redirect to an edit page or open a modal with request details for editing
+        window.location.href = `edit-request.php?id=${id}`;
+        // Alternatively, you can open a modal or fetch more info and populate an edit form
+    }
+    
+    // Function to handle deleting a request
+    function deleteRequest(id) {
+        if (confirm("Are you sure you want to delete this request?")) {
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", "../../API/delete_request.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    let response = JSON.parse(xhr.responseText);
+                    if (response.status === "delete_success") {
+                        alert("Request deleted successfully.");
+                        // TODO: BORRAR PUNTO DE LA BASE DE DATOS
+                        loadRequests(); // Refresh the list after deletion
+                    } else {
+                        alert("Failed to delete request.");
+                    }
+                }
+            };
+            xhr.send(`id=${id}`);
+        }
     }
 
     // Función para manejar la carga de solicitudes
@@ -67,7 +112,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (response.status === 'response_succeded' && Array.isArray(response['solicitudes mostras'])) {
                     // Llamar a la función auxiliar para mostrar las solicitudes
                     displayUserRequests(response['solicitudes mostras']);
-                    console.log(response);
                 } else {
                     console.log("Error: no hay solicitudes");
                 }

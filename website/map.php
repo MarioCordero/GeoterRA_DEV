@@ -11,6 +11,7 @@
 		<link rel="stylesheet" href="./assets/css/style.css">
 		<link rel="stylesheet" href="./assets/css/fonts.css">
 		<link rel="stylesheet" href="./assets/css/responsive.css">
+
 		
 		<!--ICON-->
 		<link rel="shortcut icon" type="image/x-icon" href="./GeoterRA.ico">
@@ -20,65 +21,14 @@
 		<!--LEAFLET-->
 		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
-    <!--JS-->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="./assets/js/check-session.js" defer></script>
-
 	</head>
-
+  
 	<body>
 
 		<div class="general-container">
 
 			<!-- NAVBAR -->
-			<nav class="navbar Montserrat-Regular">
-
-				<div class="logo-container">
-					<a href="./index.html"> <img id="logo" src="./assets/images/GeoterRA-Logo.svg" class="header-logo" alt="Webpage logotype"> </a>
-				</div>
-
-				<div class="menu" id="navbar">
-
-					<a href="./index.html#about-us">Acerca de nosotros</a>
-					<a href="./index.html#how-works">Como funciona</a>
-					<a href="./index.html#contact-us">Contacto</a>
-					<a href="./map.html">Mapa</a>
-					<a href="./login.html">Iniciar Sesión</a>
-
-				</div>
-
-				<div class="menu-logged" id="navbar-logged">
-
-					<a href="./index.html#about-us">Acerca de nosotros</a>
-					<a href="./index.html#how-works">Como funciona</a>
-					<a href="./index.html#contact-us">Contacto</a>
-					<a href="./map.html">Mapa</a>
-					<a href="./logged.html">Perfil</a>
-
-				</div>
-
-				<input type="checkbox" id="checkbox">
-				<label for="checkbox" class="toggle">
-					<div class="bar bar--top"></div>
-					<div class="bar bar--middle"></div>
-					<div class="bar bar--bottom"></div>
-				</label>
-
-                <div class="menu-bars-background" id="menu-bars-background">
-                    <div class="menu-elements Gibson-Regular" id="menu-elements">
-
-						<!-- TODO[] : Agregar el menu de logged -->
-
-						<a href="./index.html#about-us" 	class="a-menu-element">Acerca de nosotros	</a>
-						<a href="./index.html#how-works" 	class="a-menu-element">Como funciona		</a>
-						<a href="./index.html#contact-us" 	class="a-menu-element">Contacto				</a>
-						<a href="./map.html">Mapa														</a>
-						<a href="./login.html">Iniciar Sesión											</a>
-
-                    </div>
-                </div>
-
-			</nav>
+      <?php include './assets/partials/navbar.php'; ?>
 			<!-- NAVBAR -->
 
 			<!-- BODY -->
@@ -86,7 +36,7 @@
 
 				<!--------------------------------LOADER----------------------------------->
 				<div class="web-loader" id="loader">
-					<img src="./assets/images/GeoterRA-Logo.svg" class="logoWelcome" id="logoWelcome">
+					<img src="./assets/images/GeoterRA/GeoterRA-Logo.svg" class="logoWelcome" id="logoWelcome">
 					<div id="carga_pagina">
 
 					</div>

@@ -1,0 +1,14 @@
+# ----------------------- CONF
+# Activa el motor de reescritura
+RewriteEngine On
+
+# Si el request es directamente a un archivo PHP (como index.php), redirige sin el .php
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^\s]+)\.php\sHTTP
+RewriteRule ^(.*)\.php$ /$1 [R=301,L]
+
+# Si no es un archivo real ni carpeta real
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Trata de cargarlo como .php
+RewriteRule ^(.+)$ $1.php [L,QSA]

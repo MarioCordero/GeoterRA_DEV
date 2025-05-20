@@ -6,6 +6,55 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 18,
 }).addTo(map);
 
+// Function to center the map on the user's location and update the coordinates
+function centerMapOnUserLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                const { latitude, longitude } = position.coords;
+                
+                // Center the map and add a marker on the user's location
+                map.setView([latitude, longitude], 17);
+                if (marker) {
+                    marker.setLatLng([latitude, longitude]);
+                } else {
+                    marker = L.marker([latitude, longitude]).addTo(map)
+                        .bindPopup('Ubicación actual')
+                        .openPopup();
+                }
+                
+                // Update the input fields with the user's location
+                updateCoordinates({ lat: latitude, lng: longitude });
+            },
+            error => {
+                console.error("Error al obtener la ubicación del usuario:", error);
+                alert("No se pudo obtener la ubicación.");
+            }
+        );
+    } else {
+        alert("La geolocalización no es compatible con este navegador.");
+    }
+}
+
+// Add a custom button to the map to trigger the centering function
+let locationButton = L.control({ position: 'bottomright' });
+locationButton.onAdd = function() {
+    let div = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+    div.innerHTML = '📍'; // Button icon
+    div.style.width = '30px';
+    div.style.height = '30px';
+    div.style.cursor = 'pointer';
+    div.style.backgroundColor = 'white';
+    div.style.display = 'flex';
+    div.style.justifyContent = 'center';
+    div.style.alignItems = 'center';
+    div.title = 'Centrar en la ubicación del usuario';
+    div.onclick = centerMapOnUserLocation;
+    return div;
+};
+
+locationButton.addTo(map);
+
 // Inicializa el marcador en el centro del mapa
 var marker;
 

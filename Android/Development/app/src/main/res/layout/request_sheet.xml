@@ -30,28 +30,31 @@
         android:id="@+id/coordenatesTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
+        android:fontFamily="@font/calibri_regular"
         android:layout_marginStart="170dp"
         android:layout_marginTop="60dp"
-        android:text="Coordenadas: " />
+        android:text="Coordenadas: "
+        android:textSize="18sp"/>
 
     <TextView
         android:id="@+id/dateTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
+        android:fontFamily="@font/calibri_regular"
         android:layout_marginStart="170dp"
         android:layout_marginTop="100dp"
-        android:text="Fecha: " />
+        android:text="Fecha: "
+        android:textSize="18sp"/>
 
     <TextView
         android:id="@+id/stateTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
+        android:fontFamily="@font/calibri_regular"
         android:layout_marginStart="170dp"
         android:layout_marginTop="120dp"
-        android:text="Estado: " />
+        android:text="Estado: "
+        android:textSize="18sp"/>
 
     <Button
         android:id="@+id/contact_us"
@@ -62,10 +65,10 @@
         android:layout_marginTop="160dp"
         android:layout_marginEnd="16dp"
 
-        android:backgroundTint="@color/black"
+        android:backgroundTint="@color/geoterra_yellow"
         android:drawableStart="@drawable/baseline_add_call_24"
         android:drawableTint="@color/white"
-
+        android:fontFamily="@font/poppins_semibold"
         android:text="Contáctanos"
         android:textColor="@color/white"
         android:textSize="11sp"
@@ -82,8 +85,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="205dp"
         android:layout_marginEnd="16dp"
-
-        android:backgroundTint="@color/ligthGray"
+        android:fontFamily="@font/poppins_semibold"
+        android:backgroundTint="@color/geoterra_ligth_gray"
         android:drawableStart="@drawable/baseline_cached_24"
         android:drawableTint="@color/black"
 

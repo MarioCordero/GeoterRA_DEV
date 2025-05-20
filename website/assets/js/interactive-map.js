@@ -7,6 +7,42 @@ let osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     icon: false
 }).addTo(map);
 
+// Function to center the map on the user's location
+function centerMapOnUserLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+            const { latitude, longitude } = position.coords;
+            map.setView([latitude, longitude], 17); // Center the map with a zoom level of 17
+            L.marker([latitude, longitude]).addTo(map)
+                .bindPopup('Ubicación actual')
+                .openPopup();
+        }, error => {
+            console.error("Error al obtener la ubicación del usuario:", error);
+            alert("No se pudo obtener la ubicación.");
+        });
+    } else {
+        alert("La geolocalización no es compatible con este navegador.");
+    }
+}
+
+// Add a custom button to the map to trigger the centering function
+let locationButton = L.control({ position: 'bottomright' });
+locationButton.onAdd = function() {
+    let div = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+    div.innerHTML = '📍'; // Button icon
+    div.style.width = '50px';
+    div.style.height = '50px';
+    div.style.cursor = 'pointer';
+    div.style.backgroundColor = 'white';
+    div.style.display = 'flex';
+    div.style.justifyContent = 'center';
+    div.style.alignItems = 'center';
+    div.title = 'Centrar en la ubicación del usuario';
+    div.onclick = centerMapOnUserLocation;
+    return div;
+};
+locationButton.addTo(map);
+
 // Function to convert coordinates from projected to geographic
 function convertCoordinates(easting, northing) {
     var projFrom = "+proj=tmerc +lat_0=0 +lon_0=-84 +k=0.9996 +x_0=500000 +y_0=0 +ellps=GRS80 +datum=WGS84 +units=m +no_defs";
@@ -24,7 +60,7 @@ function onMarkerClick() {
                             Lugar: ${pointObt.id}<br>
                             Longitude: ${latlng.lng.toFixed(4)}<br>
                             Latitude: ${latlng.lat.toFixed(4)}<br>
-                            <a id='showPoint' href='./show_point.html'>Show more</a>
+                            <a id='showPoint' href='./show_point.php'>Show more</a>
                         </p>
                     </div>`;
 
@@ -46,7 +82,7 @@ function onMarkerClick() {
             document.cookie = 'pointObject=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         }
         document.cookie = "pointObject=" + stringPoint + ";path=/;";
-        window.location.href = "./show_point.html";
+        window.location.href = "./show-point.php";
     });
 }
 
