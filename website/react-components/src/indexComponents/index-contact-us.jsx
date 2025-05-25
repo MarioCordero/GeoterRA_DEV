@@ -1,5 +1,5 @@
 import React from 'react';
-import FondoContactUs from "./assets/images/trabajo-campo2.jpeg";
+import FondoContactUs from "../assets/images/trabajo-campo2.jpeg";
 
 function IndexContactUs() {
   return (
