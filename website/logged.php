@@ -13,6 +13,8 @@
 		<link rel="stylesheet" href="./assets/css/responsive.css">
 		<link rel="stylesheet" href="./assets/css/dist/tailwindO.css">
 
+		<!-- CUSTOM CSS REACT -->
+		<link rel="stylesheet" href="./react-components/dist/assets/css/GeoterRA-ReactComponents.css">
 		<!--ICON-->
 		<link rel="shortcut icon" type="image/x-icon" href="./GeoterRA.ico">
 
@@ -38,110 +40,10 @@
 					</div>
 				</div>
 				<!--------------------------------END LOADER------------------------------->
-	
 
-				<div class="logged-UI">
-          <!-------------------------------- Sidebar Navigation -------------------------------->
-          <aside class="bg-blue-600 text-white p-4 flex flex-col h-screen fixed">
-            <div class="flex flex-col flex-grow">
-              <h1 class="Montserrat-SemiBold text-2xl">Bienvenid@</h1>
-              <h3 class="Montserrat-Light text-lg">GeoterRA Plataforma</h3>
-
-              <hr class="my-4 border-gray-600">
-
-              <button class="Poppins-Bold w-full py-2 text-left hover:bg-blue-700" onclick="showSection('user-info')">Información del usuario</button>
-              <button class="Poppins-Bold w-full py-2 text-left hover:bg-blue-700" onclick="showSection('user-requests')">Solicitudes creadas</button>
-              <button class="Poppins-Bold w-full py-2 text-left hover:bg-blue-700" onclick="showSection('guide')">Guía de uso</button>
-
-              <hr class="my-4 border-gray-600">
-
-              <!-- Spacer pushes the logout button down -->
-              <div class="flex-grow"></div>
-
-              <!-- Logout button container -->
-              <div class="text-center mt-auto">
-                <button id="logout-btn" class="bg-orange-500 text-white py-2 px-4 w-full transform transition-transform duration-200 ease-in-out hover:scale-105">
-                  Cerrar Sesión
-                </button>
-              </div>
-            </div>
-          </aside>
-          <!-------------------------------- Sidebar Navigation -------------------------------->
-
-					<div class="section-container">
-
-						<!-- User Info Section -->
-						<section id="user-info" class="content-section">
-							<ul class="user-personal-data">
-		
-								<h2 class="center-text Poppins-Bold">Información la persona usuaria</h2>
-		
-								<li>
-									<h3 class="Poppins-SemiBold">NOMBRE</h3>
-									<p class="Poppins-Light" id="user-name">Nombre ejemplo</p>
-								</li>
-		
-								<li>
-									<h3 class="Poppins-SemiBold">CORREO</h3>
-									<p class="Poppins-Light" id="user-email">ejemplo@tucorreo.com</p>
-								</li>
-		
-								<li>
-									<h3 class="Poppins-SemiBold">TELÉFONO</h3>
-									<p class="Poppins-Light" id="user-phone">0000-0000</p>
-								</li>
-		
-								<button id="edit-btn" class="Montserrat-Medium" onclick="toggleEdit()"">Editar</button>
-		
-							</ul>
-
-							<!-- Confirmation Modal -->
-							<div id="confirmation-modal" class="confirmation-modal" style="display:none;">
-								<div class="modal-content">
-									<h3>Confirma tu contraseña</h3>
-									<input type="password" id="user-password" placeholder="Ingresa tu contraseña" required>
-									<button id="confirm-btn" class="Montserrat-Medium" onclick="confirmEdit()">Confirmar</button>
-									<button class="Montserrat-Medium" onclick="closeModal()">Cancelar</button>
-								</div>
-							</div>
-
-						</section>
-						
-						<!-- User Requests Section -->
-						<section id="user-requests" class="content-section" style="display:none;">
-
-							<ul id="requests-list" class="scrollable-requests">
-								<div class="user-requests-test"></div>
-								
-								<div class="user-requests">
-									<h2 class="center-text Poppins-Bold">Solicitudes hechas por la persona usuaria</h2>
-									
-									<!-- LIST OF THE USER REQUESTS -->
-									<ul class="center-text">
-										<!-- DINAMICAMENTE SE AGREGAN LAS SOLICITUDES DEL USUARIO COMO <li> -->
-									</ul>
-									
-									<button class="Montserrat-Medium" onclick="window.location.href='addpoint.php';">Agregar</button>
-								</div>
-							</ul>
-							
-						</section>
-					
-						<!-- Guide Section -->
-						<section id="guide" class="content-section" style="display:none;">
-							<h2>Guía de uso</h2>
-							<iframe 
-								src="https://www.youtube.com/embed/0_CBDySHfMw" 
-								title="YouTube video player"
-								frameborder="0"
-								allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-								allowfullscreen>
-							</iframe>
-						</section>
-					</div>
-				</div>
-				
-			</div>
+        <!-------------------------------- Sidebar Navigation -------------------------------->
+          <div id="Sidebar-ant"></div>
+        <!-------------------------------- Sidebar Navigation -------------------------------->
 
 			<!-- FOOTER -->
 			<footer class="footer-container footer-logged">
@@ -165,6 +67,9 @@
 			<script src="./assets/js/logout.js"></script>
 			<script src="./assets/js/section-switcher.js"></script>
 			<script src="./assets/js/edit-user-info.js"></script>
+
+			<!-- REACT INCLUDES -->
+			<script src="./react-components/dist/assets/js/GeoterRA-ReactComponents.js" type="module" defer></script>
 		</div>
 	</body>
 </html>

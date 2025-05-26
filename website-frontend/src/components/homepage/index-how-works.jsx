@@ -1,6 +1,6 @@
 import React from 'react';
-import GeoterRA_ISO_Black from "./assets/images/geoterra-iso-black.svg";
-import GeoterRA_LOGO_Color from "./assets/images/geoterra-logo-color.svg";
+import GeoterRA_ISO_Black from "../../assets/images/GeoterRA-ISO-Black.svg";
+import GeoterRA_LOGO_Color from "../../assets/images/GeoterRA-Logo-Color.svg";
 
 function IndexHowWorks() {
   return (

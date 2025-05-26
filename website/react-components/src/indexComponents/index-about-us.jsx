@@ -1,5 +1,5 @@
 import React from 'react';
-import GeoterRA_LOGO_White from './assets/images/geoterra-logo-white.svg'; // Asegúrate de que la ruta sea correcta
+import GeoterRA_LOGO_White from '../assets/images/GeoterRA-Logo-White.svg'; // Asegúrate de que la ruta sea correcta
 
 function IndexAboutUs() {
   return (

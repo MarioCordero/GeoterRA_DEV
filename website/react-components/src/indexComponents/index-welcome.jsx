@@ -1,6 +1,6 @@
 import React from 'react';
-import Fondo from "./assets/images/index-background.png";
-import GeoterRA_ISO from "./assets/images/geoterra-iso-black.svg";
+import Fondo from "../assets/images/index-background.png";
+import GeoterRA_ISO from "../assets/images/GeoterRA-ISO-Black.svg";
 
 function IndexWelcome() {
   const bgImage = {
