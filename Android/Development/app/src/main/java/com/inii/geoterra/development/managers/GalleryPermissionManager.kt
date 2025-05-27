@@ -1,5 +1,6 @@
 package com.inii.geoterra.development.managers
 
+// Good practice - All required permissions-related imports
 import android.Manifest
 import android.app.Activity
 import android.content.Context
@@ -11,39 +12,24 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 
-/**
- * Manages gallery permission requests and state validation.
- *
- * This class encapsulates the logic for checking and requesting
- * access to gallery/media-related content, adapting to Android 13+ permission changes.
- *
- * @constructor Creates an instance bound to a Context for permission operations.
- */
-class GalleryPermissionManager(private val context: Context) {
+object GalleryPermissionManager {
 
-  companion object {
-    private const val GALLERY_PERMISSION_REQUEST_CODE = 2000
+  private const val GALLERY_PERMISSION_REQUEST_CODE = 2000
 
-    /**
-     * Determines which permission string should be used
-     * depending on the current Android version.
-     */
-    private val requiredPermission: String
-      // Get the correct permission string based on the Android version.
-      get() = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
-          Manifest.permission.READ_MEDIA_IMAGES
-        else ->
-          Manifest.permission.READ_EXTERNAL_STORAGE
-      }
-  }
-  // Flag indicating whether gallery access has been initialized.
+  // Determines correct permission based on Android version
+  val requiredPermission: String
+    get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      Manifest.permission.READ_MEDIA_IMAGES
+    } else {
+      Manifest.permission.READ_EXTERNAL_STORAGE
+    }
+
   private var isInitialized: Boolean = false
 
   /**
-   * Returns whether the gallery permission has been granted.
+   * Checks if the app has gallery permission.
    */
-  private fun hasGalleryPermission(): Boolean {
+  fun hasGalleryPermission(context: Context): Boolean {
     return ContextCompat.checkSelfPermission(
       context,
       requiredPermission
@@ -51,71 +37,85 @@ class GalleryPermissionManager(private val context: Context) {
   }
 
   /**
-   * Initialize the gallery permission check and request.
-   *
-   * @param activity The activity to request permissions.
+   * Requests permission using an Activity context.
    */
   fun initialize(activity: Activity) {
-    if (hasGalleryPermission()) {
+    if (hasGalleryPermission(activity)) {
       isInitialized = true
     } else {
-      activity.requestPermissions(arrayOf(requiredPermission), GALLERY_PERMISSION_REQUEST_CODE)
-    }
-  }
-
-  fun initialize(fragment: Fragment) {
-    if (hasGalleryPermission()) {
-      isInitialized = true
-    } else {
-      fragment.requestPermissions(arrayOf(requiredPermission), GALLERY_PERMISSION_REQUEST_CODE)
-    }
-  }
-
-  fun requestGalleryPermission(fragment: Fragment) {
-    if (!hasGalleryPermission()) {
-      fragment.requestPermissions(arrayOf(requiredPermission), GALLERY_PERMISSION_REQUEST_CODE)
-    } else {
-      isInitialized = true
+      ActivityCompat.requestPermissions(
+        activity,
+        arrayOf(requiredPermission),
+        GALLERY_PERMISSION_REQUEST_CODE
+      )
     }
   }
 
   /**
-   * Requests gallery permission from the user if not already granted.
-   *
-   * @param activity An instance of [Activity] from which to launch the permission request dialog.
+   * Requests permission using a Fragment.
+   */
+  fun initialize(fragment: Fragment) {
+    if (hasGalleryPermission(fragment.requireContext())) {
+      isInitialized = true
+    } else {
+      fragment.requestPermissions(
+        arrayOf(requiredPermission),
+        GALLERY_PERMISSION_REQUEST_CODE
+      )
+    }
+  }
+
+  /**
+   * Request permission explicitly from an Activity.
    */
   fun requestGalleryPermission(activity: Activity) {
-    if (!hasGalleryPermission()) {
+    if (!hasGalleryPermission(activity)) {
       ActivityCompat.requestPermissions(
         activity,
         arrayOf(requiredPermission),
         GALLERY_PERMISSION_REQUEST_CODE
       )
     } else {
-      this.isInitialized = true
+      isInitialized = true
     }
   }
 
   /**
-   * Processes the result of a permission request and reacts accordingly.
-   *
-   * @param requestCode The request code received in the permission callback.
-   * @param grantResults The result array received from the permission callback.
+   * Request permission explicitly from a Fragment.
    */
-  fun handlePermissionResult(requestCode: Int, grantResults: IntArray) {
+  fun requestGalleryPermission(fragment: Fragment) {
+    if (!hasGalleryPermission(fragment.requireContext())) {
+      fragment.requestPermissions(
+        arrayOf(requiredPermission),
+        GALLERY_PERMISSION_REQUEST_CODE
+      )
+    } else {
+      isInitialized = true
+    }
+  }
+
+  /**
+   * Handles the result of the permission request.
+   */
+  fun handlePermissionResult(
+    requestCode: Int,
+    grantResults: IntArray,
+    context: Context
+  ) {
     if (requestCode != GALLERY_PERMISSION_REQUEST_CODE) return
-    Log.i("GalleryManager", "handlePermissionResult $grantResults")
-    if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-      Toast.makeText(context, "Gallery permission granted", Toast.LENGTH_SHORT).show()
+
+    if (grantResults.isNotEmpty() &&
+      grantResults[0] == PackageManager.PERMISSION_GRANTED
+    ) {
+      Toast.makeText(context.applicationContext, "Gallery permission granted", Toast.LENGTH_SHORT).show()
       isInitialized = true
     } else {
-      Toast.makeText(context, "Gallery permission denied", Toast.LENGTH_SHORT).show()
+      Toast.makeText(context.applicationContext, "Gallery permission denied", Toast.LENGTH_SHORT).show()
     }
   }
 
   /**
-   * Indicates whether gallery access was successfully initialized.
-   * Should be used to guard access to gallery-dependent features.
+   * Returns whether gallery permission has been granted and initialized.
    */
-  fun isInitialized() : Boolean = isInitialized
+  fun isInitialized(): Boolean = isInitialized
 }
