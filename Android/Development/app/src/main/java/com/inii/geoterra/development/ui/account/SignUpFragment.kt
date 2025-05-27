@@ -1,6 +1,5 @@
 package com.inii.geoterra.development.ui.account
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,8 +13,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.inii.geoterra.development.R
-import com.inii.geoterra.development.interfaces.FragmentListener
-import com.inii.geoterra.development.api.RetrofitClient
 import com.inii.geoterra.development.api.SignUpErrorResponse
 import com.inii.geoterra.development.api.SingUpCredentials
 import com.inii.geoterra.development.interfaces.PageFragment
@@ -30,24 +27,24 @@ import retrofit2.Response
  * A simple [Fragment] subclass.
  */
 class SignUpFragment : PageFragment() {
-  private lateinit var rootView : View
+  private lateinit var binding : View
 
   override fun onCreateView(inflater : LayoutInflater,
                             container : ViewGroup?,
                             savedInstanceState : Bundle?) : View {
     // Inflate the layout for this fragment
-    this.rootView = inflater.inflate(
+    this.binding = inflater.inflate(
       R.layout.fragment_sign_up, container, false
     )
 
     // Obtains the elements from the view.
-    val createAccountB = this.rootView.findViewById<Button>(
+    val createAccountB = this.binding.findViewById<Button>(
       R.id.createAccountB
     )
-    val showPassword = this.rootView.findViewById<LinearLayout>(
+    val showPassword = this.binding.findViewById<LinearLayout>(
       R.id.togglePasswordLayout
     )
-    val showPasswordCheckBox = this.rootView.findViewById<CheckBox>(
+    val showPasswordCheckBox = this.binding.findViewById<CheckBox>(
       R.id.checkBoxTogglePassword
     )
 
@@ -56,7 +53,7 @@ class SignUpFragment : PageFragment() {
     this.setTogglePasswordClickListener(showPassword)
     this.setCheckboxOnChangeListener(showPasswordCheckBox)
 
-    return rootView
+    return binding
   }
 
   /**
@@ -66,10 +63,10 @@ class SignUpFragment : PageFragment() {
     // Set the listener for the toggle password button.
     showPassword.setOnClickListener {
       // Obtain the checkbox and the password EditText from the view.
-      val toggleCheckBox = this.rootView.findViewById<CheckBox>(
+      val toggleCheckBox = this.binding.findViewById<CheckBox>(
         R.id.checkBoxTogglePassword
       )
-      val passwordEditText = this.rootView.findViewById<EditText>(
+      val passwordEditText = this.binding.findViewById<EditText>(
         R.id.userPassword
       )
       // Toggle the checkbox state.
@@ -94,7 +91,7 @@ class SignUpFragment : PageFragment() {
    */
   private fun setCheckboxOnChangeListener(checkBox : CheckBox) {
     // Obtain the password EditText from the view.
-    val passwordEditText = this.rootView.findViewById<EditText>(
+    val passwordEditText = this.binding.findViewById<EditText>(
       R.id.userPassword
     )
     // Set the listener for the checkbox.
@@ -124,15 +121,15 @@ class SignUpFragment : PageFragment() {
   private fun setCreateAccountClickListener(createAccountB : Button) {
     createAccountB.setOnClickListener {
       // Get the fields from the form.
-      val email = this.rootView.findViewById<EditText>(R.id.userEmail)
+      val email = this.binding.findViewById<EditText>(R.id.userEmail)
         .text.toString().trim()
-      val password = this.rootView.findViewById<EditText>(R.id.userPassword)
+      val password = this.binding.findViewById<EditText>(R.id.userPassword)
         .text.toString().trim()
-      val firstName = this.rootView.findViewById<EditText>(R.id.userFirstName)
+      val firstName = this.binding.findViewById<EditText>(R.id.userFirstName)
         .text.toString().trim()
-      val lastName = this.rootView.findViewById<EditText>(R.id.userLastName)
+      val lastName = this.binding.findViewById<EditText>(R.id.userLastName)
         .text.toString().trim()
-      val phoneNum = this.rootView.findViewById<EditText>(R.id.userPhoneNum)
+      val phoneNum = this.binding.findViewById<EditText>(R.id.userPhoneNum)
         .text.toString().trim()
 
       Log.i("Tomado de datos en login", "$email $password")

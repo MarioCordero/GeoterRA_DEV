@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(), FragmentListener {
   private var requestsFragment : RequestsFragment = RequestsFragment()
 
   private lateinit var navigationMenu : BottomNavigationView
-  private lateinit var rootView : View
+  private lateinit var binding : View
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -51,8 +51,8 @@ class MainActivity : AppCompatActivity(), FragmentListener {
       insets
     }
     // Initialize the root view and the navigation menu.
-    this.rootView = findViewById(R.id.mainLayout)
-    this.navigationMenu = this.rootView.findViewById(R.id.nav_menu)
+    this.binding = findViewById(R.id.mainLayout)
+    this.navigationMenu = this.binding.findViewById(R.id.nav_menu)
     // Initialize the session manager.
     SessionManager.init(this@MainActivity)
     if (!GPSManager.isInitialized()) {

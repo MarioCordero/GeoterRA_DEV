@@ -33,7 +33,9 @@ class AccountFragment : PageFragment() {
     inflater: LayoutInflater, container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-    this.binding = inflater.inflate(R.layout.fragment_account, container, false)
+    this.binding = inflater.inflate(
+      R.layout.fragment_account, container, false
+    )
 
     this.accountInformation = UserInformation("", "", "", "")
 
