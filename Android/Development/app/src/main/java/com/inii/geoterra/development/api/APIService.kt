@@ -39,18 +39,19 @@ data class SingUpCredentials(
 )
 
 data class RequestForm(
- var region : String = "",
- var date : String = "",
- var email : String = "",
- var owner : String = "",
- var currentUsage : String = "",
- var address : String = "",
- var phoneNumber : String = "",
- var coordinates : String = "",
- var thermalSensation : Int = -1,
- var bubbles : Int = -1,
- var latitude : String = "",
- var longitude : String = "",
+  var id : String = "",
+  var region : String = "",
+  var date : String = "",
+  var email : String = "",
+  var owner : String = "",
+  var currentUsage : String = "",
+  var address : String = "",
+  var phoneNumber : String = "",
+  var coordinates : String = "",
+  var thermalSensation : Int = -1,
+  var bubbles : Int = -1,
+  var latitude : String = "",
+  var longitude : String = "",
 )
 
 data class RequestDataCard(
@@ -218,6 +219,7 @@ interface APIService {
   @FormUrlEncoded
   @POST("request.inc.php")
   fun newRequest(
+    @Field("pointId") id : String,
     @Field("region") region : String,
     @Field("fecha") date : String,
 
