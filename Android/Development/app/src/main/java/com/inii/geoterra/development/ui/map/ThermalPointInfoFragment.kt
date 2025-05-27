@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.interfaces.FragmentListener
 import com.inii.geoterra.development.api.ThermalPoint
+import com.inii.geoterra.development.interfaces.PageFragment
 import org.locationtech.proj4j.CRSFactory
 import org.locationtech.proj4j.CoordinateTransformFactory
 import org.locationtech.proj4j.ProjCoordinate
@@ -23,9 +24,8 @@ import org.osmdroid.util.GeoPoint
  * Use the [ThermalPointInfoFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class ThermalPointInfoFragment : Fragment() {
+class ThermalPointInfoFragment : PageFragment() {
   private lateinit var rootView: View
-  private var listener : FragmentListener? = null
   private var thermalPoint: ThermalPoint? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,18 +59,6 @@ class ThermalPointInfoFragment : Fragment() {
       )
     }
     return this.rootView
-  }
-
-  override fun onAttach(context: Context) {
-    super.onAttach(context)
-    if (context is FragmentListener) {
-      this.listener = context
-    }
-  }
-
-  override fun onDetach() {
-    super.onDetach()
-    this.listener = null
   }
 
   @SuppressLint("SetTextI18n")
