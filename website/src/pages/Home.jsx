@@ -1,9 +1,10 @@
 import React from 'react';
-import WelcomeSection from '../components/homepage/index-welcome';
-import AboutUsSection from '../components/homepage/index-about-us';
-import HowWorksSection from '../components/homepage/index-how-works';
-import ContactUsSection from '../components/homepage/index-contact-us';
+import WelcomeSection from '../components/homeComponents/index-welcome';
+import AboutUsSection from '../components/homeComponents/index-about-us';
+import HowWorksSection from '../components/homeComponents/index-how-works';
+import ContactUsSection from '../components/homeComponents/index-contact-us';
 import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 const Home = () => {
   return (
@@ -19,6 +20,7 @@ const Home = () => {
       </div>
 
       {/* TODO: Replace with <Footer /> */}
+      <Footer />
     </div>
   );
 };
