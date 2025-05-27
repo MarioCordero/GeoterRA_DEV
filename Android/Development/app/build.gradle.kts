@@ -65,7 +65,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     //noinspection UseTomlInstead
     implementation("org.json:json:20240303")
-    implementation(libs.material.v150)
+    implementation(libs.material.v1110)
     implementation(libs.play.services.location)
     //noinspection UseTomlInstead
     implementation("androidx.preference:preference-ktx:1.2.1")

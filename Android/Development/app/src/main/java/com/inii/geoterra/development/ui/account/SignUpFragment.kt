@@ -18,6 +18,7 @@ import com.inii.geoterra.development.interfaces.FragmentListener
 import com.inii.geoterra.development.api.RetrofitClient
 import com.inii.geoterra.development.api.SignUpErrorResponse
 import com.inii.geoterra.development.api.SingUpCredentials
+import com.inii.geoterra.development.interfaces.PageFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -28,8 +29,7 @@ import retrofit2.Response
 /**
  * A simple [Fragment] subclass.
  */
-class SignUpFragment : Fragment() {
-  private var listener : FragmentListener? = null
+class SignUpFragment : PageFragment() {
   private lateinit var rootView : View
 
   override fun onCreateView(inflater : LayoutInflater,
@@ -57,24 +57,6 @@ class SignUpFragment : Fragment() {
     this.setCheckboxOnChangeListener(showPasswordCheckBox)
 
     return rootView
-  }
-
-  /**
-   * Called when the fragment is first attached to its activity.
-   */
-  override fun onAttach(context: Context) {
-    super.onAttach(context)
-    if (context is FragmentListener) {
-      this.listener = context
-    }
-  }
-
-  /**
-   * Called when the fragment is no longer attached to its activity.
-   */
-  override fun onDetach() {
-    super.onDetach()
-    this.listener = null
   }
 
   /**
@@ -204,10 +186,8 @@ class SignUpFragment : Fragment() {
    * Sends the credentials to the server.
    */
   private fun sendCredentials(userCredentials : SingUpCredentials) {
-    // Obtain the API service from the Retrofit client.
-    val apiService = RetrofitClient.getAPIService()
     // Create a new API call.
-    val call = apiService.signUp(
+    val call = this.apiService.signUp(
       userCredentials.email, userCredentials.password,
       userCredentials.firstName, userCredentials.lastName,
       userCredentials.phoneNumber

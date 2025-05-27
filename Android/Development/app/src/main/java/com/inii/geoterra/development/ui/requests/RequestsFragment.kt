@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
@@ -29,8 +30,6 @@ import retrofit2.Response
  * A simple [Fragment] subclass.
  */
 class RequestsFragment : PageFragment() {
-  private var API_INSTANCE : APIService = RetrofitClient.getAPIService()
-  private var listener : FragmentListener? = null
   private var submittedRequest : List<RequestDataCard> = listOf()
   private lateinit var binding : View
 
@@ -52,16 +51,17 @@ class RequestsFragment : PageFragment() {
     return this.binding
   }
 
-  override fun onAttach(context: Context) {
-    super.onAttach(context)
-    if (context is FragmentListener) {
-      this.listener = context
+  override fun onFragmentEvent(event: String, data: Any?) {
+    Log.i("FragmentEvent", "Event: $event")
+    when (event) {
+      "FINISHED" -> {
+        Log.i("FragmentEvent", "FINISHED")
+        this.binding.findViewById<FrameLayout>(
+          R.id.form_container
+        ).visibility = View.GONE
+        this.childFragmentManager.popBackStack()
+      }
     }
-  }
-
-  override fun onDetach() {
-    super.onDetach()
-    this.listener = null
   }
 
   private fun setRequestButtonClickListener(requestButton : Button) {
@@ -79,7 +79,7 @@ class RequestsFragment : PageFragment() {
   }
 
   private fun getSubmittedRequests() {
-    val call = this.API_INSTANCE.getSubmittedRequests(
+    val call = this.apiService.getSubmittedRequests(
       SessionManager.getUserEmail().toString()
     )
 
@@ -112,7 +112,7 @@ class RequestsFragment : PageFragment() {
     sheetScrollView.removeAllViews()
 
     // Create a request sheet for each submitted request
-    for (request in submittedRequest) {
+    for ((index, request) in submittedRequest.withIndex()) {
       val requestSheet = RequestSheet(requireContext())
       // Log.i("Request: ", request.toString())
       // Set the information of the request sheet
@@ -123,15 +123,27 @@ class RequestsFragment : PageFragment() {
         "Recibido"
       )
       sheetScrollView.addView(requestSheet)
+
+      if (index < submittedRequest.size - 1) {
+        val spacer = View(requireContext())
+        val layoutParams = LinearLayout.LayoutParams(
+          LinearLayout.LayoutParams.MATCH_PARENT,
+          40
+        )
+        spacer.layoutParams = layoutParams
+        sheetScrollView.addView(spacer)
+      }
     }
   }
 
   private fun showForms() {
     val formsFragment = FormFragment()
-
+    this.binding.findViewById<FrameLayout>(
+      R.id.form_container
+    ).visibility = View.VISIBLE
     //Begin the transaction.
-    this.requireActivity().supportFragmentManager.beginTransaction()
-      .replace(R.id.fragment_requests, formsFragment)
+    this.childFragmentManager.beginTransaction()
+      .replace(R.id.form_container, formsFragment)
       .addToBackStack(null)
       .commit()
   }

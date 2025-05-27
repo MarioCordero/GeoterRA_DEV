@@ -44,7 +44,6 @@
         android:fontFamily="@font/poppins_regular"
         app:layout_constraintTop_toBottomOf="@id/coordenatesTxt"
         app:layout_constraintStart_toStartOf="@id/coordenatesTxt"
-        android:layout_marginTop="5dp"
         android:text="Fecha: "
         android:textSize="18sp"/>
 
@@ -55,7 +54,6 @@
         android:fontFamily="@font/poppins_regular"
         app:layout_constraintTop_toBottomOf="@id/dateTxt"
         app:layout_constraintStart_toStartOf="@id/dateTxt"
-        android:layout_marginTop="5dp"
         android:text="Tipo: Terrestre"
         android:textSize="18sp"/>
 
@@ -66,7 +64,6 @@
         android:fontFamily="@font/poppins_regular"
         app:layout_constraintTop_toBottomOf="@id/typeTxt"
         app:layout_constraintStart_toStartOf="@id/typeTxt"
-        android:layout_marginTop="5dp"
         android:text="Estado: "
         android:textSize="18sp"/>
 

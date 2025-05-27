@@ -14,8 +14,6 @@ import androidx.lifecycle.lifecycleScope
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.interfaces.FragmentListener
 import com.inii.geoterra.development.interfaces.MessageListener
-import com.inii.geoterra.development.api.APIService
-import com.inii.geoterra.development.api.RetrofitClient
 import com.inii.geoterra.development.api.ThermalPoint
 import com.inii.geoterra.development.device.GPSManager
 import com.inii.geoterra.development.interfaces.PageFragment
@@ -43,8 +41,6 @@ import retrofit2.Response
  * create an instance of this fragment.
  */
 class MapFragment : PageFragment(), MessageListener {
-  private var API_INSTANCE : APIService = RetrofitClient.getAPIService()
-  private var listener : FragmentListener? = null
   private val MIN_DISTANCE_CHANGE : Float = 10f
 
   private lateinit var mapView : MapView
@@ -122,18 +118,6 @@ class MapFragment : PageFragment(), MessageListener {
     // Aquí manejas el mensaje recibido
     println("Mensaje recibido: $message")
     prepareFragment(message)
-  }
-
-  override fun onAttach(context: Context) {
-    super.onAttach(context)
-    if (context is FragmentListener) {
-      listener = context
-    }
-  }
-
-  override fun onDetach() {
-    super.onDetach()
-    listener = null
   }
 
   private fun prepareFragment(thermalPointID: String) {
@@ -317,7 +301,7 @@ class MapFragment : PageFragment(), MessageListener {
    *
    */
   private fun requestPoints() {
-    val call = this@MapFragment.API_INSTANCE.getMapPoints("Guanacaste")
+    val call = this.apiService.getMapPoints("Guanacaste")
     call.enqueue(object : Callback<List<ThermalPoint>> {
       override fun onResponse(call : Call<List<ThermalPoint>>,
         response : Response<List<ThermalPoint>>

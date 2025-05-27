@@ -10,15 +10,14 @@ import com.inii.geoterra.development.R
 import com.inii.geoterra.development.interfaces.FragmentListener
 import com.inii.geoterra.development.api.APIService
 import com.inii.geoterra.development.api.RetrofitClient
+import com.inii.geoterra.development.interfaces.PageFragment
 
 /**
  * A simple [Fragment] subclass.
  * Use the [HomeFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class HomeFragment : Fragment() {
-  private var API_INSTANCE : APIService = RetrofitClient.getAPIService()
-  private var listener : FragmentListener? = null
+class HomeFragment : PageFragment() {
   private lateinit var binding : View
 
   override fun onCreateView(
@@ -33,15 +32,4 @@ class HomeFragment : Fragment() {
     return this.binding
   }
 
-  override fun onAttach(context: Context) {
-    super.onAttach(context)
-    if (context is FragmentListener) {
-      this.listener = context
-    }
-  }
-
-  override fun onDetach() {
-    super.onDetach()
-    this.listener = null
-  }
 }

@@ -30,9 +30,7 @@ import retrofit2.Response
  * A simple [Fragment] subclass.
  */
 class LoginFragment : PageFragment() {
-  private var API_INSTANCE : APIService = RetrofitClient.getAPIService()
   private lateinit var binding : View
-  private var listener : FragmentListener? = null
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
@@ -90,18 +88,6 @@ class LoginFragment : PageFragment() {
     this.listener?.onFragmentEvent("USER_LOGGED_IN")
   }
 
-  override fun onAttach(context: Context) {
-    super.onAttach(context)
-    if (context is FragmentListener) {
-      this.listener = context
-    }
-  }
-
-  override fun onDetach() {
-    super.onDetach()
-    this.listener = null
-  }
-
   private fun setTogglePasswordClickListener() {
     this.binding.findViewById<LinearLayout>(R.id.togglePasswordLayout)
       .setOnClickListener {
@@ -145,7 +131,7 @@ class LoginFragment : PageFragment() {
   }
 
   private fun sendCredentialsAsForm(credentials : SignInCredentials) {
-    val call = this@LoginFragment.API_INSTANCE.signIn(
+    val call = this.apiService.signIn(
       credentials.email, credentials.password
     )
 

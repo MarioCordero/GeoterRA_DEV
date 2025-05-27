@@ -26,10 +26,8 @@ import retrofit2.Response
  * A simple [Fragment] subclass.
  */
 class AccountFragment : PageFragment() {
-  private var API_INSTANCE : APIService = RetrofitClient.getAPIService()
   private lateinit var accountInformation : UserInformation
   private lateinit var binding : View
-  private var listener : FragmentListener? = null
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
@@ -59,7 +57,7 @@ class AccountFragment : PageFragment() {
 
   private fun getUserInformation() {
     // Create a new request.
-    val call = this.API_INSTANCE.getUserInfo(SessionManager.getUserEmail()!!)
+    val call = this.apiService.getUserInfo(SessionManager.getUserEmail()!!)
 
     // Send the request.
     call.enqueue(object : Callback<UserInformation> {
@@ -89,18 +87,6 @@ class AccountFragment : PageFragment() {
     })
   }
 
-  override fun onAttach(context: Context) {
-    super.onAttach(context)
-    if (context is FragmentListener) {
-      listener = context
-    }
-  }
-
-  override fun onDetach() {
-    super.onDetach()
-    listener = null
-  }
-
   private fun handleServerErrors(message : String) {
     // Handle the server errors.
     Log.i("Error de datos del usuario", message)
@@ -112,7 +98,7 @@ class AccountFragment : PageFragment() {
   }
 
   private fun checkSession() {
-    val call = this@AccountFragment.API_INSTANCE.checkSession()
+    val call = this.apiService.checkSession()
     call.enqueue(object : Callback<CheckSessionResponse> {
       override fun onResponse(call : Call<CheckSessionResponse>,
         response : Response<CheckSessionResponse>

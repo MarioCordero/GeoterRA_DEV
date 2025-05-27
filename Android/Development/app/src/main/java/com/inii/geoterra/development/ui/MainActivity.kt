@@ -18,6 +18,7 @@ import com.inii.geoterra.development.interfaces.FragmentListener
 import com.inii.geoterra.development.api.CheckSessionResponse
 import com.inii.geoterra.development.api.RetrofitClient
 import com.inii.geoterra.development.device.GPSManager
+import com.inii.geoterra.development.interfaces.PageFragment
 import com.inii.geoterra.development.managers.GalleryPermissionManager
 import com.inii.geoterra.development.managers.SessionManager
 import com.inii.geoterra.development.ui.account.LoginFragment
@@ -57,6 +58,9 @@ class MainActivity : AppCompatActivity(), FragmentListener {
     if (!GPSManager.isInitialized()) {
       GPSManager.initialize(this@MainActivity)
     }
+    if (!GalleryPermissionManager.isInitialized()) {
+      GalleryPermissionManager.initialize(this@MainActivity)
+    }
     // Check if the activity is being re-created.
     if (savedInstanceState == null) {
       Log.i(
@@ -71,7 +75,7 @@ class MainActivity : AppCompatActivity(), FragmentListener {
       this, object : OnBackPressedCallback(true) {
       override fun handleOnBackPressed() {
         // If the back stack is empty, finish the activity.
-        handleBackPressed()
+        onBackPressed()
       }
     })
 
@@ -100,21 +104,18 @@ class MainActivity : AppCompatActivity(), FragmentListener {
       .commit()
   }
 
-  private fun handleBackPressed() {
-    if (supportFragmentManager.backStackEntryCount > 0) {
-      Log.i(
-        "MainActivity",
-        "Hay fragmentos en la pila, eliminando el último."
-      )
-      // Pops the last fragment.
-      supportFragmentManager.popBackStack()
+  override fun onBackPressed() {
+    // Obtener el fragmento visible (o el que debe manejar el back)
+    val currentFragment = supportFragmentManager
+      .primaryNavigationFragment // o fragment actual
+
+    if (currentFragment is PageFragment) {
+      val handled = currentFragment.onBackPressed()
+      if (!handled) {
+        super.onBackPressed()  // Si no se consumió, pasa al sistema
+      }
     } else {
-      Log.i(
-        "MainActivity",
-        "No hay fragmentos en la pila, cerrando actividad."
-      )
-      // Finish the activity.
-      finish()
+      super.onBackPressed()
     }
   }
 
