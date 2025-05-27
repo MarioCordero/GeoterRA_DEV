@@ -20,9 +20,12 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import android.widget.ViewSwitcher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.slider.Slider
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.interfaces.FragmentListener
@@ -31,8 +34,11 @@ import com.inii.geoterra.development.api.RequestForm
 import com.inii.geoterra.development.api.RequestResponse
 import com.inii.geoterra.development.api.RetrofitClient
 import com.inii.geoterra.development.device.GPSManager
+import com.inii.geoterra.development.interfaces.PageFragment
 import com.inii.geoterra.development.managers.GalleryPermissionManager
 import com.inii.geoterra.development.managers.SessionManager
+import com.inii.geoterra.development.ui.elements.SpringForm
+import com.inii.geoterra.development.ui.elements.TerrainForm
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -41,15 +47,16 @@ import java.io.IOException
 import java.io.InputStream
 import java.util.Locale
 
-class FormFragment : Fragment() {
+class FormFragment : PageFragment() {
   private lateinit var binding : View
   private lateinit var requestForm : RequestForm
-  private lateinit var galleryPermissionManager : GalleryPermissionManager
-  private var listener : FragmentListener? = null
+  private lateinit var terrainForm : TerrainForm
+  private lateinit var springForm : SpringForm
 
-  override fun onCreateView(inflater : LayoutInflater,
-                            container : ViewGroup?,
-                            savedInstanceState : Bundle?)
+  override fun onCreateView(
+    inflater : LayoutInflater,
+    container : ViewGroup?,
+    savedInstanceState : Bundle?)
   : View {
      this.binding = inflater.inflate(
        R.layout.fragment_form, container, false
@@ -57,45 +64,39 @@ class FormFragment : Fragment() {
     // Inflate the layout for this fragment
     // Creates an object that manage the location requests.
     this.requestForm = RequestForm()
-    this.galleryPermissionManager = GalleryPermissionManager(requireContext())
-    this.galleryPermissionManager.initialize(requireActivity())
-    val locationButton = this.binding.findViewById<Button>(
+
+    this.terrainForm = TerrainForm(requireContext())
+    this.springForm = SpringForm(requireContext())
+    this.binding.findViewById<ViewSwitcher>(
+      R.id.form_container
+    ).addView(this.terrainForm)
+    this.binding.findViewById<ViewSwitcher>(
+      R.id.form_container
+    ).addView(this.springForm)
+
+    this.binding.findViewById<MaterialButtonToggleGroup>(
+      R.id.terrain_type_button_group
+    ).addOnButtonCheckedListener { _, checkedId, isChecked ->
+      if (isChecked) {
+        when (checkedId) {
+          R.id.land_type_button -> showForm(0)
+          R.id.spring_type_button -> showForm(1)
+        }
+      }
+    }
+
+    val locationButton = this.binding.findViewById<MaterialButton>(
       R.id.gps_coordinates_button
     )
-    val imageButton = this.binding.findViewById<Button>(
+    locationButton.isChecked = true
+    val imageButton = this.binding.findViewById<MaterialButton>(
       R.id.image_coordinates_button
     )
+    imageButton.isChecked = false
     val sendButton = this.binding.findViewById<Button>(
       R.id.sendRequestButton
     )
     val dateText = this.binding.findViewById<TextView>(R.id.date_input)
-    // Slider for temperature.
-    // val temperatureSlider = this.binding.findViewById<Slider>(
-//      R.id.temperatureSlider
-//    )
-//    val sliderLabel = this.binding.findViewById<TextView>(R.id.sliderLabel)
-//
-//    temperatureSlider.addOnChangeListener { _, value, _ ->
-//      // Update the label text GRAVITY based on the selected value
-//      val layoutParams = sliderLabel.layoutParams as LinearLayout.LayoutParams
-//      layoutParams.gravity = when (value.toInt()) {
-//        1 -> Gravity.START
-//        2 -> Gravity.CENTER
-//        3 -> Gravity.END
-//        else -> Gravity.START
-//      }
-//
-//      sliderLabel.layoutParams = layoutParams
-//
-//      // Update the label text
-//      val label = when (value.toInt()) {
-//        1 -> "Frío"
-//        2 -> "Tibio"
-//        3 -> "Caliente"
-//        else -> ""
-//      }
-//      sliderLabel.text = label
-//    }
 
     // Create a calendar with the current date
     val calendar = Calendar.getInstance()
@@ -133,24 +134,19 @@ class FormFragment : Fragment() {
 
     // Set a click listener for the image button
     imageButton.setOnClickListener {
-      Log.i(
-        "GalleryManager",
-        "isInitialize: ${this.galleryPermissionManager.isInitialized()}"
-      )
-      if (!this.galleryPermissionManager.isInitialized()) {
-        this.galleryPermissionManager.initialize(this)
+      Log.i("GalleryManager", "isInitialize: ${GalleryPermissionManager.isInitialized()}")
 
-        Log.i(
-          "GalleryManager",
-          "Ya se pidieron permisos"
-        )
+      if (!GalleryPermissionManager.isInitialized()) {
+        if (!shouldShowRequestPermissionRationale(GalleryPermissionManager.requiredPermission)) {
+          // Aquí puedes mostrar un diálogo personalizado para llevar al usuario a los ajustes
+          Toast.makeText(requireContext(), "Activa el permiso de galería en Configuración", Toast.LENGTH_LONG).show()
+        } else {
+          GalleryPermissionManager.initialize(this)  // solo esto basta
+        }
       } else {
-        // Open the gallery.
+        // Ya tienes permiso
         this.openGallery()
-        Log.i(
-          "GalleryManager",
-          "Ya se abrio la galeria"
-        )
+        Log.i("GalleryManager", "Ya se abrió la galería")
       }
     }
 
@@ -186,21 +182,21 @@ class FormFragment : Fragment() {
     return this.binding
   }
 
-  override fun onAttach(context: Context) {
-    super.onAttach(context)
-    if (context is FragmentListener) {
-      this.listener = context
+  fun showForm(index: Int) {
+    val viewSwitcher = binding.findViewById<ViewSwitcher>(R.id.form_container)
+    if (index >= 0 && index < viewSwitcher.childCount) {
+      while (viewSwitcher.displayedChild != index) {
+        viewSwitcher.showNext()
+      }
     }
-  }
-
-  override fun onDetach() {
-    super.onDetach()
-    this.listener = null
   }
 
   private fun getFormData() {
     lifecycleScope.launch {
       try {
+        val identifier = binding.findViewById<EditText>(
+          R.id.identifier_input
+        ).text.toString()
         val region = "Guanacaste"
         val date = binding.findViewById<TextView>(R.id.date_input)
           .text.toString()
@@ -215,14 +211,16 @@ class FormFragment : Fragment() {
         val ownersContact = binding.findViewById<EditText>(
           R.id.owner_contact_input
         ).text.toString()
-        val thermalSensation = binding.findViewById<Slider>(
-          R.id.thermal_sensation_input
-        ).value.toInt()
+        val thermalSensation = 1
+//        val thermalSensation = binding.findViewById<Slider>(
+//          R.id.thermal_sensation_input
+//        ).value.toInt()
 //        val bubbles = if (
 //          binding.findViewById<CheckBox>(R.id.bubbleCheckBox
 //        ).isChecked) 1 else 0
         val bubbles = 1
         // Set the data in the request form.
+        requestForm.id = identifier
         requestForm.region = region
         requestForm.date = date
         if (user != null) {
@@ -245,8 +243,8 @@ class FormFragment : Fragment() {
 
   private fun sendRequest() {
     // Create a new request.
-    val apiService = RetrofitClient.getAPIService()
-    val call = apiService.newRequest(
+    val call = this.apiService.newRequest(
+      requestForm.id,
       requestForm.region,
       requestForm.date,
       requestForm.email,
@@ -278,7 +276,7 @@ class FormFragment : Fragment() {
                   "Solicitud creada correctamente.",
                   Toast.LENGTH_SHORT
                 ).show()
-                listener?.onFragmentEvent("FINISHED")
+                listener?.onFragmentEvent("FINISHED", null)
               } else {
                 Toast.makeText(
                   requireContext(),
@@ -396,10 +394,13 @@ class FormFragment : Fragment() {
     permissions : Array<out String>,
     grantResults : IntArray) {
       super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-      this.galleryPermissionManager.handlePermissionResult(
+
+      GalleryPermissionManager.handlePermissionResult(
         requestCode,
-        grantResults
+        grantResults,
+        requireContext()
       )
+
       GPSManager.handlePermissionResult(
         requestCode,
         grantResults,

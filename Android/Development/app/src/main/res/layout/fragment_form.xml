@@ -3,6 +3,7 @@
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
   android:background="@color/white"
   tools:context=".ui.requests.FormFragment">
   
@@ -160,10 +161,10 @@
         >
         
         <TextView
-          android:id="@+id/owner_contact_label"
+          android:id="@+id/actual_use_label"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="Uso"
+          android:text="Contacto propietario"
           android:textAlignment="center"
           android:fontFamily="@font/poppins_semibold"
           android:textColor="@color/geoterra_deep_blue"
@@ -200,10 +201,10 @@
         >
         
         <TextView
-          android:id="@+id/actual_use_label"
+          android:id="@+id/owner_contact_label"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="Contacto propietario"
+          android:text="Uso"
           android:textAlignment="center"
           android:fontFamily="@font/poppins_semibold"
           android:textColor="@color/geoterra_deep_blue"
@@ -277,124 +278,57 @@
         android:textSize="20sp"
         />
       
-      <LinearLayout
+      <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/terrain_type_button_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        >
-        
-        <Button
+        app:singleSelection="true"
+        app:selectionRequired="true">
+      
+      <com.google.android.material.button.MaterialButton
           android:id="@+id/land_type_button"
           android:layout_width="0dp"
           android:layout_height="60dp"
           android:layout_weight="1"
           android:layout_marginEnd="10dp"
           
+          style="@style/Widget.MaterialComponents.Button"
           android:textAllCaps="false"
-          android:backgroundTint="@color/geoterra_orange"
           android:text="Terreno"
           android:textColor="@color/white"
           android:fontFamily="@font/poppins_bold"
-          android:textSize="18sp"/>
+          android:textSize="18sp"
+          android:checkable="true"
+          android:checked="true"
+          android:backgroundTint="@color/button_orange_selector"
+          />
         
-        <Button
+        <com.google.android.material.button.MaterialButton
           android:id="@+id/spring_type_button"
           android:layout_width="0dp"
           android:layout_height="60dp"
           android:layout_weight="1"
           
           android:textAllCaps="false"
-          android:backgroundTint="@color/geoterra_orange"
           android:text="Manantial"
           android:textColor="@color/white"
           android:fontFamily="@font/poppins_bold"
-          android:textSize="18sp"/>
+          android:textSize="18sp"
+          android:checkable="true"
+          android:backgroundTint="@color/button_orange_selector"
+          />
         
-      </LinearLayout>
+      </com.google.android.material.button.MaterialButtonToggleGroup>
       
-      <LinearLayout
-        android:layout_width="wrap_content"
+      <ViewSwitcher
+        android:id="@+id/form_container"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         >
-        <TextView
-          android:id="@+id/thermal_sensation_label"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="Sensación térmica"
-          android:textAlignment="center"
-          android:fontFamily="@font/poppins_semibold"
-          android:textColor="@color/geoterra_deep_blue"
-          android:textSize="24sp"
-          />
         
-        <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="*"
-          android:textAlignment="center"
-          android:fontFamily="@font/poppins_semibold"
-          android:textColor="@color/geoterra_orange"
-          android:textSize="30sp"
-          />
-      </LinearLayout>
-      
-      <EditText
-        android:id="@+id/thermal_sensation_input"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        
-        android:autofillHints=""
-        android:background="@drawable/gray_rectangle_rounded2"
-        
-        android:hint="Seleccione una opción"
-        android:padding="14dp"
-        android:fontFamily="@font/poppins_regular"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        />
-      
-      <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        >
-        <TextView
-          android:id="@+id/bubbling_label"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="Presencia de burbujeo"
-          android:textAlignment="center"
-          android:fontFamily="@font/poppins_semibold"
-          android:textColor="@color/geoterra_deep_blue"
-          android:textSize="24sp"
-          />
-        
-        <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="*"
-          android:textAlignment="center"
-          android:fontFamily="@font/poppins_semibold"
-          android:textColor="@color/geoterra_orange"
-          android:textSize="30sp"
-          />
-      </LinearLayout>
-      
-      <EditText
-        android:id="@+id/bubbling_input"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        
-        android:autofillHints=""
-        android:background="@drawable/gray_rectangle_rounded2"
-        
-        android:hint="Seleccione una opción"
-        android:padding="14dp"
-        android:fontFamily="@font/poppins_regular"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        />
+      </ViewSwitcher>
       
       <LinearLayout
         android:layout_width="match_parent"
@@ -440,14 +374,16 @@
         android:textSize="20sp"
         />
       
-      <LinearLayout
+      <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/location_type_button_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:padding="10dp"
+        app:singleSelection="true"
+        app:selectionRequired="true"
         >
-        
-        <Button
+
+        <com.google.android.material.button.MaterialButton
           android:id="@+id/image_coordinates_button"
           android:layout_width="0dp"
           android:layout_height="60dp"
@@ -455,26 +391,29 @@
           android:layout_marginEnd="10dp"
           
           android:textAllCaps="false"
-          android:backgroundTint="@color/geoterra_orange"
+          android:checkable="true"
+          android:backgroundTint="@color/button_orange_selector"
           android:text="Fotografía"
           android:textColor="@color/white"
           android:fontFamily="@font/poppins_bold"
           android:textSize="16sp"/>
         
-        <Button
+        <com.google.android.material.button.MaterialButton
           android:id="@+id/gps_coordinates_button"
           android:layout_width="0dp"
           android:layout_height="60dp"
           android:layout_weight="1"
           
+          android:checkable="true"
+          android:checked="true"
           android:textAllCaps="false"
-          android:backgroundTint="@color/geoterra_orange"
+          android:backgroundTint="@color/button_orange_selector"
           android:text="GPS"
           android:textColor="@color/white"
           android:fontFamily="@font/poppins_bold"
           android:textSize="16sp"/>
       
-      </LinearLayout>
+      </com.google.android.material.button.MaterialButtonToggleGroup>
       
       <LinearLayout
         android:layout_width="wrap_content"
