@@ -33,72 +33,51 @@ function IndexContactUs() {
 
         {/* Contact Form */}
         <div className="bg-white p-8 rounded-lg shadow-md">
-          <form className="space-y-6">
-            {/* Name Field */}
-            <div>
-              <label htmlFor="name" className="block text-lg font-medium text-gray-700 mb-2">
-                Nombre
-              </label>
-              <input
-                type="text"
-                id="name"
-                placeholder="Ingrese su nombre"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
-            </div>
+          <form className="space-y-4">
 
-            {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="block text-lg font-medium text-gray-700 mb-2">
-                Correo
-              </label>
-              <input
-                type="email"
-                id="email"
-                placeholder="Ingrese su correo"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
+            {/* Name Field and Email Field */}
+            <div className="space-y-2 flex space-x-4">
+              <div className='flex-1'>
+                <h2 className="text-lg font-semibold text-geoterra-blue">Nombre</h2>
+                <input
+                  type="text"
+                  placeholder="Ingrese su nombre"
+                  className="w-full px-4 py-2 border border-geoterra-blue rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div className='flex-1'>
+                <h2 className="text-lg font-semibold text-geoterra-blue">Correo</h2>
+                <input
+                  type="email"
+                  placeholder="Ingrese su correo"
+                  className="w-full px-4 py-2 border border-geoterra-blue rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  required
+                />
+              </div>
             </div>
 
             {/* Message Field */}
-            <div>
-              <label htmlFor="message" className="block text-lg font-medium text-gray-700 mb-2">
-                Mensaje
-              </label>
+            <div className="space-y-2">
+              <h2 className="text-lg font-semibold text-geoterra-blue">Mensaje</h2>
               <textarea
-                id="message"
                 rows="4"
                 placeholder="Escriba un mensaje para nosotros"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-geoterra-blue rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                 required
               ></textarea>
-            </div>
-
-            {/* Photo Upload */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700 mb-2">
-                Con foto
-              </label>
-              <div className="mt-1 flex items-center">
-                <label className="cursor-pointer bg-blue-50 text-blue-700 hover:bg-blue-100 px-4 py-2 rounded-lg border border-blue-200">
-                  <span>Seleccionar archivo</span>
-                  <input type="file" className="hidden" />
-                </label>
-                <span className="ml-4 text-sm text-gray-500">Opcional</span>
-              </div>
             </div>
 
             {/* Submit Button */}
             <div>
               <button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200"
+                className="w-1/2 m-auto! block bg-geoterra-orange hover:bg-cafe text-white font-semibold py-2 px-4 rounded-md cursor-pointer transition duration-200"
               >
-                Enviar mensaje
+                Enviar
               </button>
             </div>
+
           </form>
         </div>
       </div>

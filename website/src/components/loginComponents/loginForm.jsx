@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import loginImage from "../../assets/images/login-background.png";
-import "../../colorModule.css"; // Import your CSS file for styles
+import "../../colorModule.css";
 
 function Login() {
   const bgImage = {
@@ -13,36 +13,51 @@ function Login() {
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
+  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg("");
 
-    try {
-      const formData = new FormData();
-      formData.append("email", email);
-      formData.append("password", password);
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("password", password);
 
-      const response = await fetch("/API/login.inc.php", {
+    try {
+      const response = await fetch("http://geoterra.com/API/login.inc.php", {
         method: "POST",
         body: formData,
       });
 
       const data = await response.json();
 
+      console.log("API response:", data);
+
       if (data.status === "logged_in") {
         window.location.href = "/logged.php";
+        // If you have a checkSession function, you can call it here
+        // checkSession();
       } else {
         setErrorMsg("Credenciales incorrectas");
+        setEmail("");
+        setPassword("");
       }
     } catch (err) {
       setErrorMsg("Error de conexión");
+      setEmail("");
+      setPassword("");
     }
+  };
+
+  // Handle closing the error message
+  const handleCloseError = () => {
+    setErrorMsg("");
+    setEmail("");
+    setPassword("");
   };
 
   return (
     <div className="min-h-screen flex bg-gray-100 relative">
-
-      {/* Capa de fondo con efectos */}
+      {/* ...background layers... */}
       <div 
         className="absolute inset-0 z-0"
         style={{
@@ -51,23 +66,22 @@ function Login() {
           opacity: 0.7,
         }}
       ></div>
-      
-      {/* Capa de luz blanca semi-transparente */}
       <div className="absolute inset-0 bg-red/30 z-0"></div>
 
       {/* Formulario alineado a la derecha */}
       <div className="flex-1 flex justify-end items-center relative z-10 h-screen">
         <div className="bg-gris max-w-1/2 rounded-lg shadow-md p-8 w-full h-screen flex flex-col justify-center">
-
-          {/* FORM */}
-          <form className="w-2/4 space-y-4 block  m-auto" onSubmit={handleSubmit}>
+          <form className="w-2/4 space-y-4 block m-auto" onSubmit={handleSubmit} id="login_form">
             <h1 className="text-4xl font-bold text-center bold text-geoterra-orange mb-2">Iniciar Sesión</h1>
+            
             {/* Error Message */}
             {errorMsg && (
-              <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+              <div id="credential-error-container" className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative active">
                 <span className="block">{errorMsg}</span>
                 <button
-                  onClick={() => setErrorMsg("")}
+                  id="close-error-msg"
+                  type="button"
+                  onClick={handleCloseError}
                   className="absolute top-0 right-0 mt-1 mr-2 text-red-500 hover:text-red-700"
                 >
                   ×
@@ -80,6 +94,7 @@ function Login() {
               <h2 className="text-lg font-semibold mb-4 text-geoterra-blue">Correo</h2>
               <input
                 type="email"
+                name="email"
                 placeholder="Ingrese su correo electrónico"
                 required
                 value={email}
@@ -93,6 +108,7 @@ function Login() {
               <h2 className="text-lg font-semibold mb-1 text-geoterra-blue">Contraseña</h2>
               <input
                 type="password"
+                name="password"
                 placeholder="Ingrese su contraseña"
                 required
                 value={password}
@@ -102,10 +118,8 @@ function Login() {
             </div>
 
             {/* RECOVERY PASSWORD LINK AND REMEMBER PASSWORD CHECKBOX */}
-            <div className="flex justify-between text-sm text-gray-600 space-y-2">
-
+            <div className="flex justify-between text-sm text-gray-600">
               <a href="#" className="text-blue-600 hover:underline block">Recuperar contraseña</a>
-
               <div className="flex items-center mb-2">
                 <input
                   id="remember"
@@ -116,7 +130,6 @@ function Login() {
                   Recordar contraseña
                 </label>
               </div>
-
             </div>
 
             {/* SUBMIT BUTTON */}
@@ -132,11 +145,11 @@ function Login() {
             {/* REGISTER LINK */}
             <div className="text-center text-sm">
               ¿No tiene cuenta?{" "}
-              <a href="/register.php" className="text-blue-600 hover:underline font-bold">
+              {/* TODO REGISTER COMPONENT */}
+              <a href="#" className="text-blue-600 hover:underline font-bold">
                 Registrarse
               </a>
             </div>
-            
           </form>
         </div>
       </div>
