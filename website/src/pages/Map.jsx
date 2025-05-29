@@ -1,6 +1,7 @@
 import React from 'react';
 import MapContainer from '../components/mapComponents/mapComponent';
 import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 const Map = () => {
   return (
@@ -13,6 +14,7 @@ const Map = () => {
       </div>
 
       {/* TODO: Replace with <Footer /> */}
+      <Footer />
     </div>
   );
 };
