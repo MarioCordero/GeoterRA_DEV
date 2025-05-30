@@ -22,6 +22,8 @@ export default function AppHeader() {
     <Header
       style={{
         position: 'fixed',
+        top: 0,
+        left: 0,
         zIndex: 1000,
         background: '#fff',
         padding: '0 24px',

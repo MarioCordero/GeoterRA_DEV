@@ -2,14 +2,15 @@ import React from 'react';
 import MapContainer from '../components/mapComponents/mapComponent';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import '../App.css';
 
 const Map = () => {
   return (
-    <div className="general-container">
+    <div className="">
       {/* TODO: Replace with <Navbar /> */}
       <Header />
 
-      <div className="index-container Montserrat-Regular">
+      <div className="general-container">
         <MapContainer />
       </div>
 
