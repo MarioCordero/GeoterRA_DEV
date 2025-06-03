@@ -1,9 +1,7 @@
 package com.inii.geoterra.development.ui.account
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,12 +10,8 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import com.inii.geoterra.development.R
-import com.inii.geoterra.development.interfaces.FragmentListener
-import com.inii.geoterra.development.api.APIService
 import com.inii.geoterra.development.api.Error
-import com.inii.geoterra.development.api.RetrofitClient
 import com.inii.geoterra.development.api.SignInCredentials
 import com.inii.geoterra.development.api.SignInResponse
 import com.inii.geoterra.development.interfaces.PageFragment
@@ -27,11 +21,19 @@ import retrofit2.Callback
 import retrofit2.Response
 
 /**
- * A simple [Fragment] subclass.
+ * @brief Fragment handling user authentication flow
+ *
+ * Manages login UI interactions, credential validation, and API communication.
+ * Provides password visibility toggle and sign-up navigation.
+ *
+ * @property binding Inflated view hierarchy reference for login form
  */
 class LoginFragment : PageFragment() {
-  private lateinit var binding : View
-
+  // =============== LIFECYCLE METHODS ===============
+  /**
+   * @brief Initializes login UI components and event listeners
+   * @return Inflated view hierarchy containing login form
+   */
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
     savedInstanceState: Bundle?
@@ -40,146 +42,196 @@ class LoginFragment : PageFragment() {
     this.binding = inflater.inflate(
       R.layout.fragment_login, container, false
     )
+    this.setupViewInteractions()
 
-    // Show and hide password on toggle button click
+    return binding
+  }
+
+  // =============== UI SETUP METHODS ===============
+  /**
+   * @brief Configures all UI event listeners and input validators
+   */
+  private fun setupViewInteractions() {
     this.setTogglePasswordClickListener()
     this.setCheckboxOnChangeListener()
-
-    this.binding.findViewById<Button>(R.id.loginButton).setOnClickListener {
-      val userEmail = this.binding.findViewById<EditText>(R.id.userEmail)
-        .text.toString().trim()
-      val userPassword = this.binding.findViewById<EditText>(R.id.userPassword)
-        .text.toString().trim()
-
-      Log.i("Tomado de datos en login", "$userEmail $userPassword")
-      if (userEmail.isNotBlank() && userPassword.isNotBlank()) {
-        if (userEmail.isValidEmail() && userPassword.length >= 8) {
-          this.sendCredentialsAsForm(SignInCredentials(userEmail, userPassword))
-        } else if (!userEmail.isValidEmail()) {
-          this.showError("Por favor, ingresa un correo válido.")
-        } else if (userPassword.length < 8) {
-          this.showError(
-            "Por favor, ingresa una contraseña con al menos 8 " +
-              "carácteres."
-          )
-        }
-      } else {
-        this.showError("Por favor, rellena todos los campos")
-      }
-    }
 
     this.binding.findViewById<TextView>(R.id.signUpText).setOnClickListener {
       this.showSignUpForm()
     }
 
-    return binding
+    this.binding.findViewById<Button>(R.id.loginButton).setOnClickListener {
+      this.handleLoginAttempt()
+    }
   }
 
+  /**
+   * @brief Toggles password field visibility state
+   */
+  private fun setTogglePasswordClickListener() {
+    this.binding.findViewById<LinearLayout>(
+      R.id.togglePasswordLayout).setOnClickListener {
+
+      val toggleCheckBox = this.binding.findViewById<CheckBox>(
+        R.id.checkBoxTogglePassword
+      )
+
+      toggleCheckBox.isChecked = !toggleCheckBox.isChecked
+      this.updatePasswordVisibility(toggleCheckBox.isChecked)
+    }
+  }
+
+  /**
+   * @brief Registers checkbox change listener for password visibility
+   */
+  private fun setCheckboxOnChangeListener() {
+    this.binding.findViewById<CheckBox>(R.id.checkBoxTogglePassword)
+      .setOnCheckedChangeListener { _, isChecked ->
+      this.updatePasswordVisibility(isChecked)
+    }
+  }
+
+  // =============== AUTHENTICATION FLOW ===============
+  /**
+   * @brief Validates and processes user login credentials
+   */
+  private fun handleLoginAttempt() {
+    val userEmail = this.binding.findViewById<EditText>(
+      R.id.userEmail
+    ).text.toString().trim()
+    val userPassword = this.binding.findViewById<EditText>(
+      R.id.userPassword
+    ).text.toString().trim()
+
+    Log.i("Tomado de datos en login", "$userEmail $userPassword")
+    if (userEmail.isNotBlank() && userPassword.isNotBlank()) {
+      if (userEmail.isValidEmail() && userPassword.length >= 8) {
+        this.sendCredentialsAsForm(SignInCredentials(userEmail, userPassword))
+      } else if (!userEmail.isValidEmail()) {
+        this.showError("Por favor, ingresa un correo válido.")
+      } else if (userPassword.length < 8) {
+        this.showError(
+          "Por favor, ingresa una contraseña con al menos 8 carácteres."
+        )
+      }
+    } else {
+      this.showError("Por favor, rellena todos los campos")
+    }
+  }
+
+  /**
+   * @brief Initiates authentication API call
+   * @param credentials Validated user credentials object
+   */
+  private fun sendCredentialsAsForm(credentials : SignInCredentials) {
+    this.apiService.signIn(
+      credentials.email, credentials.password
+    ).enqueue(
+      object : Callback<SignInResponse> {
+      override fun onResponse(call : Call<SignInResponse>,
+        response : Response<SignInResponse>
+      ) {
+        handleSignInResponse(response, credentials)
+      }
+
+      override fun onFailure(call : Call<SignInResponse>, t : Throwable) {
+        logNetworkError("Connection error: ${t.message}")
+        showError("Connection error: ${t.message}")
+      }
+    })
+  }
+
+  // =============== RESPONSE HANDLING ===============
+  /**
+   * @brief Processes authentication API response
+   * @param response Retrofit response object containing server data
+   * @param credentials Original credentials used for authentication
+   */
+  private fun handleSignInResponse(response: Response<SignInResponse>,
+    credentials: SignInCredentials) {
+    response.body()?.let { serverResponse ->
+      when {
+        serverResponse.errors.isNotEmpty() -> this.handleServerErrors(
+          serverResponse.errors
+        )
+        serverResponse.status == "logged_in" -> this.completeLoginFlow(
+          credentials
+        )
+        else -> this.handleSessionConflict()
+      }
+    }
+  }
+
+  /**
+   * @brief Finalizes successful login process
+   */
+  private fun completeLoginFlow(credentials: SignInCredentials) {
+    SessionManager.startSession(credentials.email)
+    this.onLoginSuccess()
+  }
+
+  // =============== ERROR HANDLING ===============
+  /**
+   * @brief Logs and displays server-side validation errors
+   * @param errors List of error objects from API response
+   */
+  private fun handleServerErrors(errors: List<Error>) {
+    errors.forEach { error ->
+      Log.i(error.type, error.message)
+      this.showError(error.message)
+    }
+  }
+
+  /**
+   * @brief Handles existing session conflict scenario
+   */
+  private fun handleSessionConflict() {
+    Log.i("SessionConflict", "User already has active session")
+    this.showError("Existing active session detected")
+  }
+
+  // =============== NAVIGATION METHODS ===============
+  /**
+   * @brief Transitions to user registration screen
+   */
   private fun showSignUpForm() {
-    val signUpFragment = SignUpFragment()
-    // Add the fragment to the container
     this.requireActivity().supportFragmentManager.beginTransaction()
-      .replace(R.id.mainLayout, signUpFragment)
+      .replace(R.id.mainLayout, SignUpFragment())
       .addToBackStack(null)
       .commit()
   }
 
+  /**
+   * @brief Notifies host component about successful login
+   */
   private fun onLoginSuccess() {
     this.listener?.onFragmentEvent("USER_LOGGED_IN")
   }
 
-  private fun setTogglePasswordClickListener() {
-    this.binding.findViewById<LinearLayout>(R.id.togglePasswordLayout)
-      .setOnClickListener {
-      val toggleCheckBox = this.binding.findViewById<CheckBox>(
-        R.id.checkBoxTogglePassword
-      )
-      val passwordEditText = this.binding.findViewById<EditText>(
-        R.id.userPassword
-      )
-      toggleCheckBox.isChecked = !toggleCheckBox.isChecked
-      if (toggleCheckBox.isChecked) {
-        passwordEditText.inputType =  android.text.InputType.TYPE_CLASS_TEXT or
-          android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-      } else {
-        passwordEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT or
-          android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-      }
-      passwordEditText.setSelection(passwordEditText.text.length)
-    }
-  }
-
-  private fun setCheckboxOnChangeListener() {
+  // =============== UTILITY METHODS ===============
+  /**
+   * @brief Updates password field visibility state
+   * @param showPassword Flag indicating whether to display password text
+   */
+  private fun updatePasswordVisibility(showPassword: Boolean) {
     val passwordEditText = this.binding.findViewById<EditText>(
       R.id.userPassword
     )
-    this.binding.findViewById<CheckBox>(R.id.checkBoxTogglePassword)
-      .setOnCheckedChangeListener { _, isChecked ->
-      this.updatePasswordVisibility(isChecked, passwordEditText)
-    }
-  }
 
-  private fun updatePasswordVisibility(
-    checked : Boolean, passwordEditText : EditText) {
-    if (checked) {
-      passwordEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT or
+    if (showPassword) {
+      passwordEditText.inputType =  android.text.InputType.TYPE_CLASS_TEXT or
         android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
     } else {
       passwordEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT or
         android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
     }
+
+    passwordEditText.setSelection(passwordEditText.text.length)
   }
 
-  private fun sendCredentialsAsForm(credentials : SignInCredentials) {
-    val call = this.apiService.signIn(
-      credentials.email, credentials.password
-    )
-
-    call.enqueue(object : Callback<SignInResponse> {
-      override fun onResponse(call : Call<SignInResponse>,
-        response : Response<SignInResponse>
-      ) {
-        if (response.isSuccessful) {
-          val serverResponse = response.body()
-          if (serverResponse != null) {
-            val status = serverResponse.status
-            val errors = serverResponse.errors
-            if (errors.isEmpty()) {
-              if (status == "logged_in") {
-                SessionManager.startSession(credentials.email)
-                onLoginSuccess()
-                Log.i("Success",
-                      "Login exitoso sin errores" + " adicionales$errors")
-              } else {
-                Log.i("failed", "El usuario ya tiene un sesion activa")
-              }
-            } else {
-              handleServerErrors(errors)
-            }
-          }
-        }
-      }
-
-      override fun onFailure(call : Call<SignInResponse>, t : Throwable) {
-        Log.i("Error conexion", "Error: ${t.message}")
-        showError("Error de conexión: ${t.message}")
-      }
-    })
-  }
-
-
-  private fun handleServerErrors(errors : List<Error>) {
-    // Logs the errors to the console
-    for (error in errors) {
-      Log.i(error.type, error.message)
-    }
-  }
-
-  private fun showError(message: String) {
-    // Show the error message to the user
-    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
-  }
-
+  /**
+   * @brief Validates email format using Android patterns
+   * @return Boolean indicating valid email format
+   */
   private fun String.isValidEmail(): Boolean {
     return this.isNotEmpty()
       && android.util.Patterns.EMAIL_ADDRESS.matcher(this).matches()

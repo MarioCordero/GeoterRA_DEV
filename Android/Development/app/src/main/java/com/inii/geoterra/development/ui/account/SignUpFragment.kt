@@ -9,8 +9,6 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.api.SignUpErrorResponse
@@ -24,11 +22,19 @@ import retrofit2.Callback
 import retrofit2.Response
 
 /**
- * A simple [Fragment] subclass.
+ * @brief Fragment handling user registration flow
+ *
+ * Manages sign-up form validation, credential submission, and error handling.
+ * Provides password visibility toggle and API communication for account creation.
+ *
+ * @property binding Inflated view hierarchy reference for registration form
  */
 class SignUpFragment : PageFragment() {
-  private lateinit var binding : View
-
+  // =============== LIFECYCLE METHODS ===============
+  /**
+   * @brief Initializes registration UI components and event listeners
+   * @return Inflated view hierarchy containing sign-up form
+   */
   override fun onCreateView(inflater : LayoutInflater,
                             container : ViewGroup?,
                             savedInstanceState : Bundle?) : View {
@@ -37,52 +43,41 @@ class SignUpFragment : PageFragment() {
       R.layout.fragment_sign_up, container, false
     )
 
-    // Obtains the elements from the view.
-    val createAccountB = this.binding.findViewById<Button>(
-      R.id.createAccountB
-    )
-    val showPassword = this.binding.findViewById<LinearLayout>(
-      R.id.togglePasswordLayout
-    )
-    val showPasswordCheckBox = this.binding.findViewById<CheckBox>(
-      R.id.checkBoxTogglePassword
-    )
-
-    // Sets the listeners for the elements.
-    this.setCreateAccountClickListener(createAccountB)
-    this.setTogglePasswordClickListener(showPassword)
-    this.setCheckboxOnChangeListener(showPasswordCheckBox)
+    this.setupViewInteractions()
 
     return binding
   }
 
+  // =============== UI INTERACTION METHODS ===============
   /**
-   * Sets the listener for the toggle password button.
+   * @brief Configures all UI event listeners and input validators
    */
-  private fun setTogglePasswordClickListener(showPassword : LinearLayout) {
-    // Set the listener for the toggle password button.
-    showPassword.setOnClickListener {
-      // Obtain the checkbox and the password EditText from the view.
-      val toggleCheckBox = this.binding.findViewById<CheckBox>(
-        R.id.checkBoxTogglePassword
-      )
-      val passwordEditText = this.binding.findViewById<EditText>(
-        R.id.userPassword
-      )
-      // Toggle the checkbox state.
+  private fun setupViewInteractions() {
+    val createAccountButton = binding.findViewById<Button>(
+      R.id.createAccountB
+    )
+    val showPasswordLayout = binding.findViewById<LinearLayout>(
+      R.id.togglePasswordLayout
+    )
+    val showPasswordCheckbox = binding.findViewById<CheckBox>(
+      R.id.checkBoxTogglePassword
+    )
+
+    // Sets the listeners for the elements.
+    this.setCreateAccountClickListener(createAccountButton)
+    this.setTogglePasswordClickListener(showPasswordLayout)
+    this.setCheckboxOnChangeListener(showPasswordCheckbox)
+  }
+
+  /**
+   * @brief Toggles password field visibility state
+   * @param showPasswordLayout Container view for password toggle interaction
+   */
+  private fun setTogglePasswordClickListener(showPasswordLayout: LinearLayout) {
+    showPasswordLayout.setOnClickListener {
+      val toggleCheckBox = binding.findViewById<CheckBox>(R.id.checkBoxTogglePassword)
       toggleCheckBox.isChecked = !toggleCheckBox.isChecked
-      // Update the password visibility based on the checkbox state.
-      if (toggleCheckBox.isChecked) {
-        passwordEditText.inputType =
-          android.text.InputType.TYPE_CLASS_TEXT or
-            android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-      } else {
-        passwordEditText.inputType =
-          android.text.InputType.TYPE_CLASS_TEXT or
-            android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-      }
-      // Set the cursor to the end of the password field.
-      passwordEditText.setSelection(passwordEditText.text.length)
+      this.updatePasswordVisibility(toggleCheckBox.isChecked)
     }
   }
 
@@ -90,28 +85,9 @@ class SignUpFragment : PageFragment() {
    * Sets the listener for the checkbox that toggles the password visibility.
    */
   private fun setCheckboxOnChangeListener(checkBox : CheckBox) {
-    // Obtain the password EditText from the view.
-    val passwordEditText = this.binding.findViewById<EditText>(
-      R.id.userPassword
-    )
     // Set the listener for the checkbox.
     checkBox.setOnCheckedChangeListener { _, isChecked ->
-      updatePasswordVisibility(isChecked, passwordEditText)
-    }
-  }
-
-  /**
-   * Updates the password visibility based on the checkbox state.
-   */
-  private fun updatePasswordVisibility(
-    checked : Boolean, passwordEditText : EditText) {
-    // Update the password visibility based on the checkbox state.
-    if (checked) {
-      passwordEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT or
-              android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-    } else {
-      passwordEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT or
-              android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+      this.updatePasswordVisibility(isChecked)
     }
   }
 
@@ -121,46 +97,43 @@ class SignUpFragment : PageFragment() {
   private fun setCreateAccountClickListener(createAccountB : Button) {
     createAccountB.setOnClickListener {
       // Get the fields from the form.
-      val email = this.binding.findViewById<EditText>(R.id.userEmail)
-        .text.toString().trim()
-      val password = this.binding.findViewById<EditText>(R.id.userPassword)
-        .text.toString().trim()
-      val firstName = this.binding.findViewById<EditText>(R.id.userFirstName)
-        .text.toString().trim()
-      val lastName = this.binding.findViewById<EditText>(R.id.userLastName)
-        .text.toString().trim()
-      val phoneNum = this.binding.findViewById<EditText>(R.id.userPhoneNum)
-        .text.toString().trim()
+      val email = this.binding.findViewById<EditText>(
+        R.id.userEmail
+      ).text.toString().trim()
+      val password = this.binding.findViewById<EditText>(
+        R.id.userPassword
+      ).text.toString().trim()
+      val firstName = this.binding.findViewById<EditText>(
+        R.id.userFirstName
+      ).text.toString().trim()
+      val lastName = this.binding.findViewById<EditText>(
+        R.id.userLastName
+      ).text.toString().trim()
+      val phone = this.binding.findViewById<EditText>(
+        R.id.userPhoneNum
+      ).text.toString().trim()
 
-      Log.i("Tomado de datos en login", "$email $password")
-      // Check if the fields are not empty
-      if (email.isNotBlank() && password.isNotBlank()) {
-        if (email.isValidEmail() && password.length >= 8) {
-          // Create a credentials object to store the data.
-          val credentials = SingUpCredentials(
-            email = email,
-            password = password,
-            firstName = firstName,
-            lastName = lastName,
-            phoneNumber = phoneNum
-          )
-          // Send the credentials to the server.
-          createUser(credentials)
-        } else if (!email.isValidEmail()) {
-          showError("Por favor, ingresa un correo válido.")
-        } else if (password.length < 8) {
-          showError(
-            "Por favor, ingresa una contraseña con al menos 8 carácteres."
-          )
-        }
-      } else {
-        showError("Por favor, rellena todos los campos")
+      when {
+        email.isBlank() || password.isBlank() -> this.showError(
+          "Please fill all required fields"
+        )
+        !email.isValidEmail() -> this.showError(
+          "Please enter a valid email address"
+        )
+        password.length < 4 -> this.showError(
+          "Password must contain at least 4 characters"
+        )
+        else -> this.createUser(SingUpCredentials(
+          email, password, firstName, lastName, phone)
+        )
       }
     }
   }
 
+  // =============== API COMMUNICATION ===============
   /**
-   * Sends the credentials to the server.
+   * @brief Initiates registration API call with credentials
+   * @param credentials Validated user registration data
    */
   private fun createUser(credentials : SingUpCredentials) {
     // Use a coroutine to perform the API call.
@@ -171,88 +144,101 @@ class SignUpFragment : PageFragment() {
           sendCredentials(credentials)
         }
       } catch (e: Exception) {
-        // Handle the error
         withContext(Dispatchers.Main) {
-            showError(e.message ?: "Error desconocido")
+          showError(e.message ?: "Error desconocido")
         }
       }
     }
   }
 
   /**
-   * Sends the credentials to the server.
+   * @brief Executes network request for user registration
+   * @param userCredentials Sanitized user registration data
    */
   private fun sendCredentials(userCredentials : SingUpCredentials) {
-    // Create a new API call.
-    val call = this.apiService.signUp(
+    this.apiService.signUp(
       userCredentials.email, userCredentials.password,
       userCredentials.firstName, userCredentials.lastName,
       userCredentials.phoneNumber
-    )
-
-    // Enqueue the call to the server.
-    call.enqueue(object : Callback<List<SignUpErrorResponse>> {
+    ).enqueue(object : Callback<List<SignUpErrorResponse>> {
       override fun onResponse(call : Call<List<SignUpErrorResponse>>,
         response : Response<List<SignUpErrorResponse>>
       ) {
-        // Check if the response is successful.
-        if (response.isSuccessful) {
-          val serverResponse = response.body()
-          if (serverResponse != null) {
-            if (serverResponse.isEmpty()) {
-              // There's no errors, so login is successful.
-              Log.i("Success", "Login exitoso sin errores adicionales")
-              listener?.onFragmentEvent("FINISHED")
-            } else {
-              // There are errors, so handle them.
-              Log.i(
-                "Error", "Server returned errors: $serverResponse"
-              )
-              handleServerErrors(serverResponse)
-            }
-          }
-        } else {
-          Log.i("Error", "Unexpected code ${response.code()}")
-          showError("Error en la respuesta del servidor: ${response.code()}")
+        when {
+          response.isSuccessful -> handleRegistrationResponse(response.body())
+          else -> showError("Server error: ${response.code()}")
         }
       }
 
       override fun onFailure(
         call : Call<List<SignUpErrorResponse>>, t : Throwable) {
-        Log.i("Error conexion", "Error: ${t.message}")
-        showError("Error de conexión: ${t.message}")
+        logNetworkError("Connection failure: ${t.message}")
+        showError("Connection error: ${t.message}")
       }
     })
   }
 
+  // =============== RESPONSE HANDLING ===============
   /**
-   * Handles the server errors.
+   * @brief Processes registration API response
+   * @param serverResponse Parsed API response data
    */
-  private fun handleServerErrors(errors : List<SignUpErrorResponse>?) {
-    if (!errors.isNullOrEmpty()) {
-      for (error in errors) {
-        // Handle each error type.
-        this.showError(error.emptyInput)
-      }
-    } else {
-      // Show an error message to the user.
-      this.showError("Error desconocido del servidor")
+  private fun handleRegistrationResponse(
+    serverResponse: List<SignUpErrorResponse>?) {
+    when {
+      serverResponse.isNullOrEmpty() -> completeRegistration()
+      else -> handleServerErrors(serverResponse)
     }
   }
 
   /**
-   * Shows an error message to the user.
+   * @brief Finalizes successful registration process
    */
-  private fun showError(message: String) {
-    // Show the error message to the user.
-    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+  private fun completeRegistration() {
+    Log.i("Registration", "Account created successfully")
+    listener?.onFragmentEvent("FINISHED")
+  }
+
+  // =============== ERROR HANDLING ===============
+  /**
+   * @brief Processes server-side validation errors
+   * @param errors List of error objects from API response
+   */
+  private fun handleServerErrors(errors: List<SignUpErrorResponse>) {
+    errors.forEach { error ->
+      Log.i("RegistrationError", error.toString())
+      showError(error.emptyInput ?: "Validation error")
+    }
+  }
+
+  // =============== UTILITY METHODS ===============
+  /**
+   * @brief Updates password field visibility state
+   * @param showPassword Flag indicating whether to display password text
+   */
+  private fun updatePasswordVisibility(showPassword: Boolean) {
+    val passwordEditText = this.binding.findViewById<EditText>(
+      R.id.userPassword
+    )
+
+    if (showPassword) {
+      passwordEditText.inputType =  android.text.InputType.TYPE_CLASS_TEXT or
+        android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+    } else {
+      passwordEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT or
+        android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+    }
+
+    passwordEditText.setSelection(passwordEditText.text.length)
   }
 
   /**
-   * Checks if the email is valid.
+   * @brief Validates email format using Android patterns
+   * @return Boolean indicating valid email format
    */
   private fun String.isValidEmail(): Boolean {
-    return this.isNotEmpty()
+    return isNotEmpty()
       && android.util.Patterns.EMAIL_ADDRESS.matcher(this).matches()
   }
+
 }

@@ -48,7 +48,6 @@ import java.io.InputStream
 import java.util.Locale
 
 class FormFragment : PageFragment() {
-  private lateinit var binding : View
   private lateinit var requestForm : RequestForm
   private lateinit var terrainForm : TerrainForm
   private lateinit var springForm : SpringForm
@@ -303,11 +302,6 @@ class FormFragment : PageFragment() {
     for (error in errors) {
       Log.i(error.type, error.message)
     }
-  }
-
-  private fun showError(message: String) {
-    // Show an error message to the user.
-    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
   }
 
   private fun openGallery() {

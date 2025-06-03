@@ -31,7 +31,6 @@ import retrofit2.Response
  */
 class RequestsFragment : PageFragment() {
   private var submittedRequest : List<RequestDataCard> = listOf()
-  private lateinit var binding : View
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
@@ -113,15 +112,10 @@ class RequestsFragment : PageFragment() {
 
     // Create a request sheet for each submitted request
     for ((index, request) in submittedRequest.withIndex()) {
-      val requestSheet = RequestSheet(requireContext())
-      // Log.i("Request: ", request.toString())
-      // Set the information of the request sheet
-      requestSheet.setInformation(
-        request.latitude,
-        request.longitude,
-        request.date,
-        "Recibido"
-      )
+
+      val requestSheet = RequestSheet(requireContext(), latitude = request
+        .latitude, longitude = request.longitude, date = request.date, state
+      = "aceptada")
       sheetScrollView.addView(requestSheet)
 
       if (index < submittedRequest.size - 1) {
