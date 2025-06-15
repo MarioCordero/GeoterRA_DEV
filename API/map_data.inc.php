@@ -33,8 +33,8 @@
 			// Check if there were any errors caught
 			if(!$errors) {
 				header("Content-Type: application/json");
+				// If there are no errors, return the values as a JSON response
 				echo json_encode($values);
-				
 			}
 
 		} catch (PDOException $e) {
@@ -50,7 +50,7 @@
 
 	// Function to verify if the regions exists in the DB
 	function region_exists($pdo, $region) {
-		// A string that contains the query
+		// A string that contains the query, a number of points studied in the region
 		$query = "SELECT COUNT(*) FROM `puntos_estudiados` WHERE region = :region";
 		// Prepare the query
 		$stmt = $pdo->prepare($query);

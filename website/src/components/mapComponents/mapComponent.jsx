@@ -12,21 +12,15 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png",
 });
 
+// Function to fetch points for a specific region
 const fetchPoints = async (region) => {
   const response = await fetch("http://geoterra.com/API/map_data.inc.php", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: `region=${encodeURIComponent(region)}`,
   });
-  const text = await response.text();
-  const points = [];
-  const regex = /{[^}]+}/g;
-  let match;
-  while ((match = regex.exec(text)) !== null) {
-    try {
-      points.push(JSON.parse(match[0] + "}"));
-    } catch (e) {}
-  }
+  const points = await response.json();
+  // console.log("Fetched points for region", region, ":", points);
   return points;
 };
 
@@ -77,7 +71,7 @@ export default function MapComponent() {
   // Fetch points when selected regions change
   useEffect(() => {
     const fetchDataForRegions = async () => {
-      console.log("Fetching data for regions:", selectedRegions);
+      // console.log("Fetching data for regions:", selectedRegions);
       setLoading(true);
       const newPoints = { ...allPoints };
       let hasNewData = false;
@@ -101,6 +95,7 @@ export default function MapComponent() {
 
       // Update visible points
       const pointsToShow = selectedRegions.flatMap(region => newPoints[region] || []);
+      // console.log("All visible points:", pointsToShow); // <-- Log here for all visible points
       setVisiblePoints(pointsToShow);
       setLoading(false);
     };
@@ -169,30 +164,33 @@ export default function MapComponent() {
             </div>
           )}
 
-          {visiblePoints.map((point, idx) => (
-            <Marker
-              key={`${point.region}-${idx}`}
-              position={[parseFloat(point.coord_y), parseFloat(point.coord_x)]}
-            >
-              <Popup>
-                <div>
-                  <strong>{point.id || "Punto"}</strong>
-                  <br />
-                  Región: {point.region}
-                  <br />
-                  X: {point.coord_x}
-                  <br />
-                  Y: {point.coord_y}
-                  <br />
-                  Temp: {point.temp}
-                  <br />
-                  pH: {point.pH_campo}
-                  <br />
-                  Cond: {point.cond_campo}
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+          {visiblePoints.map((point, idx) => {
+            // console.log(`Marker ${idx}:`, point, "Lat:", point.coord_y, "Lng:", point.coord_x);
+            return (
+              <Marker
+                key={`${point.region}-${idx}`}
+                position={[parseFloat(point.coord_y), parseFloat(point.coord_x)]}
+              >
+                <Popup>
+                  <div>
+                    <strong>{point.id || "Punto"}</strong>
+                    <br />
+                    Región: {point.region}
+                    <br />
+                    X: {point.coord_x}
+                    <br />
+                    Y: {point.coord_y}
+                    <br />
+                    Temp: {point.temp}
+                    <br />
+                    pH: {point.pH_campo}
+                    <br />
+                    Cond: {point.cond_campo}
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
           
           {/* Fullscreen button at top right */}
           <div

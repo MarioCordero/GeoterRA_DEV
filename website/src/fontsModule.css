@@ -1,0 +1,125 @@
+/* League Spartan Variable Font */
+@font-face {
+  font-family: 'LeagueSpartanVariable';
+  src: url('../assets/fonts/League_Spartan/LeagueSpartan-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* League Spartan Static Weights */
+@font-face {
+  font-family: 'LeagueSpartan';
+  src: url('../assets/fonts/League_Spartan/static/LeagueSpartan-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'LeagueSpartan';
+  src: url('../assets/fonts/League_Spartan/static/LeagueSpartan-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'LeagueSpartan';
+  src: url('../assets/fonts/League_Spartan/static/LeagueSpartan-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'LeagueSpartan';
+  src: url('../assets/fonts/League_Spartan/static/LeagueSpartan-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'LeagueSpartan';
+  src: url('../assets/fonts/League_Spartan/static/LeagueSpartan-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'LeagueSpartan';
+  src: url('../assets/fonts/League_Spartan/static/LeagueSpartan-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'LeagueSpartan';
+  src: url('../assets/fonts/League_Spartan/static/LeagueSpartan-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'LeagueSpartan';
+  src: url('../assets/fonts/League_Spartan/static/LeagueSpartan-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'LeagueSpartan';
+  src: url('../assets/fonts/League_Spartan/static/LeagueSpartan-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Poppins Fonts */
+@font-face {
+  font-family: 'Poppins';
+  src: url('../assets/fonts/Poppins/Poppins-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Poppins';
+  src: url('../assets/fonts/Poppins/Poppins-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Poppins';
+  src: url('../assets/fonts/Poppins/Poppins-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Poppins';
+  src: url('../assets/fonts/Poppins/Poppins-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Utility classes */
+.league-spartan-var {
+  font-family: 'LeagueSpartanVariable', sans-serif;
+}
+.league-spartan {
+  font-family: 'LeagueSpartan', sans-serif;
+}
+.league-spartan-thin { font-family: 'LeagueSpartan', sans-serif; font-weight: 100; }
+.league-spartan-extralight { font-family: 'LeagueSpartan', sans-serif; font-weight: 200; }
+.league-spartan-light { font-family: 'LeagueSpartan', sans-serif; font-weight: 300; }
+.league-spartan-regular { font-family: 'LeagueSpartan', sans-serif; font-weight: 400; }
+.league-spartan-medium { font-family: 'LeagueSpartan', sans-serif; font-weight: 500; }
+.league-spartan-semibold { font-family: 'LeagueSpartan', sans-serif; font-weight: 600; }
+.league-spartan-bold { font-family: 'LeagueSpartan', sans-serif; font-weight: 700; }
+.league-spartan-extrabold { font-family: 'LeagueSpartan', sans-serif; font-weight: 800; }
+.league-spartan-black { font-family: 'LeagueSpartan', sans-serif; font-weight: 900; }
+
+.poppins { font-family: 'Poppins', sans-serif; font-weight: 400; }
+.poppins-bold { font-family: 'Poppins', sans-serif; font-weight: 700; }
+.poppins-italic { font-family: 'Poppins', sans-serif; font-style: italic; font-weight: 400; }
+.poppins-bolditalic { font-family: 'Poppins', sans-serif; font-style: italic; font-weight: 700; }
