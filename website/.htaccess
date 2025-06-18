@@ -2,13 +2,13 @@
 # Activa el motor de reescritura
 RewriteEngine On
 
-# Si el request es directamente a un archivo PHP (como index.php), redirige sin el .php
-RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^\s]+)\.php\sHTTP
-RewriteRule ^(.*)\.php$ /$1 [R=301,L]
+# Si el request es directamente a un archivo HTML (como index.html), redirige sin el .html
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^\s]+)\.html\sHTTP
+RewriteRule ^(.*)\.html$ /$1 [R=301,L]
 
 # Si no es un archivo real ni carpeta real
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-# Trata de cargarlo como .php
-RewriteRule ^(.+)$ $1.php [L,QSA]
+# Trata de cargarlo como .html
+RewriteRule ^(.+)$ $1.html [L,QSA]
