@@ -1,6 +1,6 @@
 <?php
     require_once 'cors.inc.php'; // Include CORS configuration
-    $configFilePath = __DIR__ . '/config.ini';
+    $configFilePath = __DIR__ . '../../config.ini';
     $config = parse_ini_file($configFilePath, true);
 
     $host = $config['database']['host'];
