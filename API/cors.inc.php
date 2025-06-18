@@ -15,7 +15,8 @@
     $allowed_origins = [
         "http://localhost:5173",
         "http://geoterra.com",
-        "https://163.178.171.105"
+        "https://163.178.171.105",
+        "http://163.178.171.105"
     ];
     if (in_array($origin, $allowed_origins)) {
         header("Access-Control-Allow-Origin: $origin");
