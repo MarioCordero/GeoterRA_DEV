@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.inii.geoterra.development.R
@@ -27,8 +28,14 @@ import retrofit2.Response
  * Provides password visibility toggle and sign-up navigation.
  *
  * @property binding Inflated view hierarchy reference for login form
+ * @property formContainer FrameLayout container for displaying signup
  */
 class LoginFragment : PageFragment() {
+  /**
+   * FrameLayout container that hosts the signup form fragment.
+   * Visibility toggled between VISIBLE (when form is shown) and GONE.
+   */
+  private lateinit var formContainer: FrameLayout
   // =============== LIFECYCLE METHODS ===============
   /**
    * @brief Initializes login UI components and event listeners
@@ -62,6 +69,10 @@ class LoginFragment : PageFragment() {
     this.binding.findViewById<Button>(R.id.loginButton).setOnClickListener {
       this.handleLoginAttempt()
     }
+
+    this.formContainer = this.binding.findViewById(
+      R.id.fragment_signup_container
+    )
   }
 
   /**
@@ -122,7 +133,7 @@ class LoginFragment : PageFragment() {
    * @brief Initiates authentication API call
    * @param credentials Validated user credentials object
    */
-  private fun sendCredentialsAsForm(credentials : SignInCredentials) {
+  fun sendCredentialsAsForm(credentials : SignInCredentials) {
     this.apiService.signIn(
       credentials.email, credentials.password
     ).enqueue(
@@ -194,10 +205,32 @@ class LoginFragment : PageFragment() {
    * @brief Transitions to user registration screen
    */
   private fun showSignUpForm() {
-    this.requireActivity().supportFragmentManager.beginTransaction()
-      .replace(R.id.mainLayout, SignUpFragment())
-      .addToBackStack(null)
+    // Make form container visible
+    this.formContainer.visibility = View.VISIBLE
+
+    // Perform fragment transaction
+    this.childFragmentManager.beginTransaction()
+      .replace(this.formContainer.id, SignUpFragment())
+      .addToBackStack(null)  // Allow back navigation
       .commit()
+  }
+
+  /**
+   * @brief Handles the events triggered by child fragments.
+   *
+   * @param event Name of the event
+   * @param data Optional data associated with the event
+   */
+  override fun onFragmentEvent(event: String, data: Any?) {
+    Log.i("FragmentEvent", "Event: $event")
+    when (event) {
+      "FINISHED" -> {
+        // Handle form submission completion
+        Log.i("FragmentEvent", "FINISHED")
+        this.formContainer.visibility = View.GONE
+        this.childFragmentManager.popBackStack()
+      }
+    }
   }
 
   /**
