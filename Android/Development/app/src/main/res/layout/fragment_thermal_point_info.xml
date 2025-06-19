@@ -38,7 +38,7 @@
         android:layout_marginEnd="30dp"
         android:layout_marginStart="30dp"
 
-        android:backgroundTint="@color/ligthGray"
+        android:backgroundTint="@color/lightGray"
         android:fontFamily="@font/poppins_semibold"
         android:text="Volver"
         >
