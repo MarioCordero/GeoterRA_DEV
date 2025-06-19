@@ -6,11 +6,11 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
-    <color name="ligthBlack">#616161</color>
+    <color name="lightBlack">#616161</color>
     <color name="white">#FFFFFFFF</color>
     <color name="lavender">#8692f7</color>
     <color name="gray">#AFAFAF</color>
-    <color name="ligthGray">#FFF4F4F4</color>
+    <color name="lightGray">#FFF4F4F4</color>
     <color name="blue">#5199F1</color>
     <color name="light_blue_600">#FF039BE5</color>
     <color name="light_blue_900">#FF01579B</color>
@@ -18,8 +18,8 @@
     <color name="light_blue_A400">#FF00B0FF</color>
     <color name="black_overlay">#66000000</color>
     <color name="geoterra_orange">#F19B29</color>
-    <color name="geoterra_ligth_orange">#F5C280</color>
+    <color name="geoterra_light_orange">#F5C280</color>
     <color name="geoterra_deep_blue">#12457D</color>
-    <color name="geoterra_ligth_blue">#A6C3E3FF</color>
-    <color name="geoterra_ligth_gray">#C0C2C2</color>
+    <color name="geoterra_light_blue">#A6C3E3FF</color>
+    <color name="geoterra_light_gray">#C0C2C2</color>
 </resources>
