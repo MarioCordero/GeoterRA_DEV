@@ -274,7 +274,7 @@
         
         android:textAlignment="center"
         android:fontFamily="@font/poppins_regular"
-        android:textColor="@color/geoterra_ligth_gray"
+        android:textColor="@color/geoterra_light_gray"
         android:textSize="20sp"
         />
       
@@ -370,7 +370,7 @@
         
         android:textAlignment="center"
         android:fontFamily="@font/poppins_regular"
-        android:textColor="@color/geoterra_ligth_gray"
+        android:textColor="@color/geoterra_light_gray"
         android:textSize="20sp"
         />
       

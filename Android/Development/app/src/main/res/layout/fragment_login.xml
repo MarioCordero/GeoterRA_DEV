@@ -9,7 +9,14 @@
     android:foregroundGravity="center"
     android:id="@+id/fragment_login"
     tools:context=".ui.account.LoginFragment">
-
+    
+    <FrameLayout
+      android:id="@+id/fragment_signup_container"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:visibility="gone"
+      android:elevation="10dp" />
+    
     <!-- Fondo -->
     <ImageView
         android:id="@+id/background_image"
@@ -29,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:cardCornerRadius="5dp"
-        app:cardElevation="10dp"
+        app:cardElevation="6dp"
         app:cardBackgroundColor="@color/white"
 
         android:layout_gravity="center"
