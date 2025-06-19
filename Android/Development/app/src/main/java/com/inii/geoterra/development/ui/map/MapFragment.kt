@@ -51,7 +51,7 @@ import androidx.core.graphics.drawable.toDrawable
  * @property mapView Primary map display component
  * @property currentOpenMarker Currently active marker with visible info window
  * @property mapMarkers Collection of all markers on the map keyed by ID
- * @property this.thermalPoints Cache of thermal point data associated with markers
+ * @property thermalPoints Cache of thermal point data associated with markers
  */
 class MapFragment : PageFragment(), MessageListener {
   /** Minimum distance threshold for user location updates (meters) */
@@ -263,7 +263,7 @@ class MapFragment : PageFragment(), MessageListener {
     val marker = Marker(this.mapView).apply {
       icon = ContextCompat.getDrawable(
         requireContext(),
-        R.drawable.point_marker
+        R.drawable.user_point_marker
       )
       position = userPosition
       setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
