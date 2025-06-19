@@ -97,7 +97,7 @@ data class ThermalPoint(
  * @property latitude Latitude
  * @property longitude Longitude
  */
-data class RequestForm(
+data class AnalysisRequestPayload(
   var id : String = "",
   var region : String = "",
   var date : String = "",
@@ -121,11 +121,11 @@ data class RequestForm(
  */
 data class RequestsSubmittedResponse(
   @SerializedName("status") val status : String,
-  @SerializedName("solicitudes mostras") val requests : List<RequestDataCard>,
+  @SerializedName("solicitudes mostras") val requests : List<AnalysisRequest>,
   @SerializedName("errors") val errors : List<Error>
 )
 
-data class RequestDataCard(
+data class AnalysisRequest(
   @SerializedName("email") val email : String,
   @SerializedName("region") val region : String,
   @SerializedName("fecha") val date : String,
