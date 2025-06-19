@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.api.CheckSessionResponse
 import com.inii.geoterra.development.api.UserInformation
@@ -49,6 +51,48 @@ class AccountFragment : PageFragment() {
 
     if (SessionManager.isSessionActive()) {
       getUserInformation()
+    }
+
+    val settingsView = this.binding.findViewById<MaterialCardView>(
+      R.id.card_settings
+    )
+    settingsView.setOnClickListener {
+      // Navigate or handle action
+    }
+
+    val editData = this.binding.findViewById<MaterialCardView>(
+      R.id.card_edit_data
+    )
+    editData.setOnClickListener { // Navigate or handle action
+    }
+
+    val requestHistory = this.binding.findViewById<MaterialCardView>(
+      R.id.card_request_history
+    )
+    requestHistory.setOnClickListener { // Navigate or handle action
+
+    }
+
+    val logoutView = this.binding.findViewById<MaterialCardView>(
+      R.id.card_logout
+    )
+    logoutView.setOnClickListener { // Navigate or handle action
+      // Construimos el diálogo de confirmación usando MaterialAlertDialogBuilder
+      MaterialAlertDialogBuilder(requireContext())
+        .setTitle("Cerrar sesión") // Título del diálogo
+        .setMessage("¿Estás seguro de que deseas cerrar sesión?") // Mensaje
+        .setCancelable(false) // No cerrar al tocar fuera (opcional)
+        .setPositiveButton("Sí") { dialog, _ ->
+          // Acción al confirmar la salida
+          SessionManager.endSession()
+          this.listener?.onFragmentEvent("USER_LOGGED_OUT")
+          dialog.dismiss()
+        }
+        .setNegativeButton("No") { dialog, _ ->
+          // Acción al cancelar la salida (solo cerramos diálogo)
+          dialog.dismiss()
+        }
+        .show() // Mostrar el diálogo
     }
 
     return binding
