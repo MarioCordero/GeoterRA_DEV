@@ -19,7 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        >
+        tools:ignore="UseCompoundDrawables">
 
         <TextView
             android:id="@+id/userName"
@@ -116,7 +116,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/email_frame"
         app:layout_constraintBottom_toTopOf="@+id/requestInformation_frame"
-        android:background="@color/geoterra_ligth_gray"
+        android:background="@color/geoterra_light_gray"
         />
 
     <LinearLayout
@@ -175,7 +175,7 @@
             app:layout_constraintEnd_toStartOf="@id/requestsAccepted_frame"
             app:layout_constraintTop_toBottomOf="@+id/email_frame"
             app:layout_constraintBottom_toTopOf="@+id/options_frame"
-            android:background="@color/geoterra_ligth_gray"
+            android:background="@color/geoterra_light_gray"
             />
 
         <LinearLayout
@@ -226,7 +226,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/requestInformation_frame"
         app:layout_constraintBottom_toTopOf="@+id/options_frame"
-        android:background="@color/geoterra_ligth_gray"
+        android:background="@color/geoterra_light_gray"
         />
 
     <LinearLayout
@@ -238,46 +238,80 @@
         app:layout_constraintBottom_toTopOf="@+id/logout_frame"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/requestInformation_frame">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-
-            android:drawablePadding="10dp"
-            android:fontFamily="@font/poppins_semibold"
-            android:text="Ajustes"
-            android:textColor="@color/black"
-
-            android:textSize="18sp"
-            app:drawableLeftCompat="@drawable/settings_deepblue_icon">
-        </TextView>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:drawablePadding="10dp"
-            android:fontFamily="@font/poppins_semibold"
-            android:text="Editar datos personales"
-            android:textColor="@color/black"
-
-            android:textSize="18sp"
-            app:drawableLeftCompat="@drawable/edit_pencil_deepblue_icon">
-        </TextView>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:drawablePadding="10dp"
-            android:fontFamily="@font/poppins_semibold"
-            android:text="Editar datos personales"
-            android:textColor="@color/black"
-
-            android:textSize="18sp"
-            app:drawableLeftCompat="@drawable/notebook_deepblue_icon">
-        </TextView>
+        
+        <com.google.android.material.card.MaterialCardView
+          android:id="@+id/card_settings"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:cardElevation="0dp"
+          app:cardBackgroundColor="@android:color/transparent"
+          app:strokeWidth="0dp"
+          android:clickable="true"
+          android:focusable="true">
+            
+            <TextView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:drawablePadding="10dp"
+              android:padding="6dp"
+              android:fontFamily="@font/poppins_semibold"
+              android:text="Ajustes"
+              android:textColor="@color/black"
+              android:textSize="18sp"
+              android:gravity="start|center_vertical"
+              app:drawableLeftCompat="@drawable/settings_deepblue_icon"
+              />
+        </com.google.android.material.card.MaterialCardView>
+        
+        <com.google.android.material.card.MaterialCardView
+          android:id="@+id/card_edit_data"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:cardElevation="0dp"
+          app:cardBackgroundColor="@android:color/transparent"
+          app:strokeWidth="0dp"
+          android:clickable="true"
+          android:focusable="true">
+            
+            <TextView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:drawablePadding="10dp"
+              android:padding="6dp"
+              android:fontFamily="@font/poppins_semibold"
+              android:text="Editar datos personales"
+              android:textColor="@color/black"
+              
+              android:textSize="18sp"
+              app:drawableLeftCompat="@drawable/edit_pencil_deepblue_icon">
+            </TextView>
+            
+        </com.google.android.material.card.MaterialCardView>
+        
+        <com.google.android.material.card.MaterialCardView
+          android:id="@+id/card_request_history"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:cardElevation="0dp"
+          app:cardBackgroundColor="@android:color/transparent"
+          app:strokeWidth="0dp"
+          android:clickable="true"
+          android:focusable="true">
+            
+            <TextView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:drawablePadding="10dp"
+              android:padding="6dp"
+              android:fontFamily="@font/poppins_semibold"
+              android:text="Mirar historial de solicitudes"
+              android:textColor="@color/black"
+              
+              android:textSize="18sp"
+              app:drawableStartCompat="@drawable/notebook_deepblue_icon">
+            </TextView>
+            
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 
@@ -293,26 +327,37 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/geoterra_ligth_gray"
+            android:background="@color/geoterra_light_gray"
             />
-
-        <TextView
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-
-            android:fontFamily="@font/poppins_semibold"
-            android:text="Cerrar Sesión"
-            android:textColor="@color/geoterra_orange"
-            android:textSize="18sp"
-
-            app:drawableLeftCompat="@drawable/logout_orange_icon"
-            android:drawablePadding="10dp"
-            >
-        </TextView>
+        
+        <com.google.android.material.card.MaterialCardView
+          android:id="@+id/card_logout"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="20dp"
+          android:layout_marginBottom="20dp"
+          app:cardElevation="0dp"
+          app:cardBackgroundColor="@android:color/transparent"
+          app:strokeWidth="0dp"
+          android:clickable="true"
+          android:focusable="true">
+            
+            <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:padding="6dp"
+              android:gravity="center"
+              android:fontFamily="@font/poppins_semibold"
+              android:text="Cerrar Sesión"
+              android:textColor="@color/geoterra_orange"
+              android:textSize="18sp"
+              
+              app:drawableLeftCompat="@drawable/logout_orange_icon"
+              android:drawablePadding="10dp"
+              >
+            </TextView>
+          
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 
