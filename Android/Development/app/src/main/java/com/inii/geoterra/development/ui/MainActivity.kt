@@ -70,14 +70,25 @@ class MainActivity : AppCompatActivity(), FragmentListener {
       this.setupActivity()
     }
 
-    // Handle back button press event.
-    this.onBackPressedDispatcher.addCallback(
-      this, object : OnBackPressedCallback(true) {
+    this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
       override fun handleOnBackPressed() {
-        // If the back stack is empty, finish the activity.
-        onBackPressed()
+        val currentFragment = listOf(homeFragment, mapFragment, requestsFragment, accountFragment, loginFragment)
+          .firstOrNull { it.isVisible }
+
+        if (currentFragment is PageFragment) {
+          val handled = currentFragment.handleBackPress()
+          if (!handled) {
+            // Si el fragmento no maneja el back, pasar al sistema.
+            if (!supportFragmentManager.popBackStackImmediate()) {
+              finish() // o super.onBackPressed() en versiones más viejas
+            }
+          }
+        } else {
+          finish()
+        }
       }
     })
+
 
     // Set the navigation menu item click listener.
     this.navigationMenu.setOnItemSelectedListener { item ->
@@ -104,21 +115,6 @@ class MainActivity : AppCompatActivity(), FragmentListener {
       .commit()
   }
 
-  override fun onBackPressed() {
-    // Obtener el fragmento visible (o el que debe manejar el back)
-    val currentFragment = supportFragmentManager
-      .primaryNavigationFragment // o fragment actual
-
-    if (currentFragment is PageFragment) {
-      val handled = currentFragment.onBackPressed()
-      if (!handled) {
-        super.onBackPressed()  // Si no se consumió, pasa al sistema
-      }
-    } else {
-      super.onBackPressed()
-    }
-  }
-
   private fun handlePageNavigation(itemID : Int) {
     when (itemID) {
       R.id.nav_home -> showFragment(this.homeFragment)
@@ -139,14 +135,15 @@ class MainActivity : AppCompatActivity(), FragmentListener {
       }
       R.id.nav_requests ->  {
         Log.i("nav_requests", "boton de solicitudes presionado")
-        if (SessionManager.isSessionActive()) {
-          Log.i("nav_requests", "sesion activa")
-          showFragment(this.requestsFragment)
-        }
+//        if (SessionManager.isSessionActive()) {
+//          Log.i("nav_requests", "sesion activa")
+//          showFragment(this.requestsFragment)
+//        }
+        showFragment(this.requestsFragment)
       }
       R.id.nav_account -> {
         Log.i("nav_account", "boton de cuenta presionado")
-        if (SessionManager.isSessionActive()) {
+        if (!SessionManager.isSessionActive()) {
           showFragment(this.accountFragment)
         } else {
           showFragment(this.loginFragment)
@@ -156,13 +153,20 @@ class MainActivity : AppCompatActivity(), FragmentListener {
   }
 
   private fun showFragment(fragment: Fragment) {
-    this.supportFragmentManager.beginTransaction()
-      .hide(homeFragment)
-      .hide(mapFragment)
-      .hide(requestsFragment)
-      .hide(accountFragment)
-      .hide(loginFragment)
-      .show(fragment)
+    val transaction = supportFragmentManager.beginTransaction()
+
+    // Call onHide on all PageFragments
+    listOf(homeFragment, mapFragment, requestsFragment,
+           accountFragment, loginFragment
+    ).forEach {
+      it.onHide()
+      transaction.hide(it)
+    }
+
+    // Call onShow on the selected one
+    if (fragment is PageFragment) fragment.onShow()
+    transaction.show(fragment)
+      .setPrimaryNavigationFragment(fragment)
       .commit()
   }
 
@@ -171,6 +175,10 @@ class MainActivity : AppCompatActivity(), FragmentListener {
       "USER_LOGGED_IN" -> {
         Log.i("onFragmentEvent", event)
         this.showFragment(this.accountFragment)
+      }
+      "USER_LOGGED_OUT" -> {
+        Log.i("onFragmentEvent", event)
+        this.showFragment(this.loginFragment)
       }
       "FINISHED" -> {
         this.supportFragmentManager.popBackStack()

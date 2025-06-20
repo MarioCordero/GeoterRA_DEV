@@ -54,26 +54,29 @@
           />
       </LinearLayout>
       
-      <EditText
-        android:id="@+id/identifier_input"
+      <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/identifier_input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        
-        android:autofillHints=""
         android:background="@drawable/gray_rectangle_rounded2"
+        app:hintEnabled="false"
+        app:errorEnabled="true">
         
-        android:hint="Nombre de la solicitud"
-        android:inputType="textMultiLine"
-        android:gravity="top|start"
-        android:minLines="1"
-        android:maxLines="10"
-        android:scrollbars="none"
-        android:overScrollMode="never"
-        android:padding="14dp"
-        android:fontFamily="@font/poppins_regular"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        />
+        <com.google.android.material.textfield.TextInputEditText
+          android:id="@+id/identifier_input"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:inputType="textMultiLine"
+          android:minLines="1"
+          android:maxLines="10"
+          android:gravity="top|start"
+          android:hint="Nombre de la solicitud"
+          android:fontFamily="@font/poppins_regular"
+          android:textColor="@color/black"
+          android:textSize="20sp"
+          android:padding="14dp"
+          android:background="@android:color/transparent"/>
+      </com.google.android.material.textfield.TextInputLayout>
       
       <LinearLayout
         android:layout_width="wrap_content"
@@ -102,18 +105,27 @@
           />
       </LinearLayout>
       
-      <TextView
-        android:id="@+id/date_input"
+      <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/date_input_layout"
         android:layout_width="match_parent"
-        
         android:layout_height="wrap_content"
-        android:padding="14dp"
+        app:errorEnabled="true"
+        app:hintEnabled="false"
+        android:background="@drawable/gray_rectangle_rounded2">
         
-        android:background="@drawable/gray_rectangle_rounded2"
-        android:text="Fecha: YYYY-MM-DD"
-        android:fontFamily="@font/poppins_regular"
-        android:textSize="20sp">
-      </TextView>
+        <com.google.android.material.textfield.TextInputEditText
+          android:id="@+id/date_input"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:focusable="false"
+          android:clickable="true"
+          android:inputType="none"
+          android:hint="Fecha: YYYY-MM-DD"
+          android:textSize="20sp"
+          android:fontFamily="@font/poppins_regular"
+          android:padding="14dp"
+          android:background="@android:color/transparent" />
+      </com.google.android.material.textfield.TextInputLayout>
       
       <LinearLayout
         android:layout_width="wrap_content"
@@ -133,26 +145,23 @@
         
       </LinearLayout>
       
-      <EditText
-        android:id="@+id/owners_name_input"
+      <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:hintEnabled="false"
+        android:background="@drawable/gray_rectangle_rounded2">
         
-        android:autofillHints=""
-        android:background="@drawable/gray_rectangle_rounded2"
-        
-        android:hint="Nombre completo"
-        android:inputType="textMultiLine"
-        android:gravity="top|start"
-        android:minLines="1"
-        android:maxLines="10"
-        android:scrollbars="none"
-        android:overScrollMode="never"
-        android:padding="14dp"
-        android:fontFamily="@font/poppins_regular"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        />
+        <com.google.android.material.textfield.TextInputEditText
+          android:id="@+id/owners_name_input"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:fontFamily="@font/poppins_regular"
+          android:textColor="@color/black"
+          android:textSize="20sp"
+          android:hint="Nombre completo"
+          android:padding="14dp"
+          android:background="@android:color/transparent"/>
+      </com.google.android.material.textfield.TextInputLayout>
       
       <LinearLayout
         android:layout_width="wrap_content"
@@ -173,32 +182,29 @@
         
       </LinearLayout>
       
-      <EditText
-        android:id="@+id/owner_contact_input"
+      <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:hintEnabled="false"
+        android:background="@drawable/gray_rectangle_rounded2">
         
-        android:autofillHints=""
-        android:background="@drawable/gray_rectangle_rounded2"
-        
-        android:hint="Medio de contacto"
-        android:inputType="textMultiLine"
-        android:gravity="top|start"
-        android:minLines="1"
-        android:maxLines="10"
-        android:scrollbars="none"
-        android:overScrollMode="never"
-        android:padding="14dp"
-        android:fontFamily="@font/poppins_regular"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        />
+        <com.google.android.material.textfield.TextInputEditText
+          android:id="@+id/owner_contact_input"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:fontFamily="@font/poppins_regular"
+          android:textColor="@color/black"
+          android:textSize="20sp"
+          android:hint="Medio de contacto"
+          android:padding="14dp"
+          android:background="@android:color/transparent"/>
+      </com.google.android.material.textfield.TextInputLayout>
       
       <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
-        >
+        android:background="@drawable/gray_rectangle_rounded2">
         
         <TextView
           android:id="@+id/owner_contact_label"
@@ -213,26 +219,23 @@
         
       </LinearLayout>
       
-      <EditText
-        android:id="@+id/actual_use_input"
+      <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:hintEnabled="false"
+        android:background="@drawable/gray_rectangle_rounded2">
         
-        android:autofillHints=""
-        android:background="@drawable/gray_rectangle_rounded2"
-        
-        android:hint="Uso actual de la zona"
-        android:inputType="textMultiLine"
-        android:gravity="top|start"
-        android:minLines="1"
-        android:maxLines="10"
-        android:scrollbars="none"
-        android:overScrollMode="never"
-        android:padding="14dp"
-        android:fontFamily="@font/poppins_regular"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        />
+        <com.google.android.material.textfield.TextInputEditText
+          android:id="@+id/actual_use_input"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:fontFamily="@font/poppins_regular"
+          android:textColor="@color/black"
+          android:hint="Uso actual de la zona"
+          android:textSize="20sp"
+          android:padding="14dp"
+          android:background="@android:color/transparent"/>
+      </com.google.android.material.textfield.TextInputLayout>
       
       <LinearLayout
         android:layout_width="match_parent"
@@ -434,28 +437,28 @@
       
       </LinearLayout>
       
-      <EditText
-        android:id="@+id/details_input"
+      <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:hintEnabled="false"
+        android:background="@drawable/gray_rectangle_rounded2">
         
-        android:autofillHints=""
-        android:background="@drawable/gray_rectangle_rounded2"
-        
-        android:hint="Ingrese información que sea relevante"
-        android:inputType="textMultiLine"
-        android:gravity="top|start"
-        android:minLines="1"
-        android:maxLines="10"
-        android:scrollbars="none"
-        android:overScrollMode="never"
-        android:padding="14dp"
-        android:fontFamily="@font/poppins_regular"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        />
+        <com.google.android.material.textfield.TextInputEditText
+          android:id="@+id/details_input"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:inputType="textMultiLine"
+          android:minLines="1"
+          android:maxLines="15"
+          android:hint="Ingrese información que sea relevante"
+          android:gravity="top|start"
+          android:fontFamily="@font/poppins_regular"
+          android:textColor="@color/black"
+          android:textSize="20sp"
+          android:padding="14dp"
+          android:background="@android:color/transparent"/>
+      </com.google.android.material.textfield.TextInputLayout>
       
-        
       <Button
         android:id="@+id/sendRequestButton"
         android:layout_width="wrap_content"

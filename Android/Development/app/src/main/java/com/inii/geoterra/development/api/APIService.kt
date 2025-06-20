@@ -90,7 +90,7 @@ data class ThermalPoint(
  * @property owner Owner name
  * @property currentUsage Current usage
  * @property address Address
- * @property phoneNumber Phone number
+ * @property ownerContact Phone number
  * @property coordinates WGS84 formatted coordinates
  * @property thermalSensation Thermal sensation rating
  * @property bubbles Bubbles rating
@@ -104,8 +104,8 @@ data class AnalysisRequestPayload(
   var email : String = "",
   var owner : String = "",
   var currentUsage : String = "",
-  var address : String = "",
-  var phoneNumber : String = "",
+  var details : String = "",
+  var ownerContact : String = "",
   var coordinates : String = "",
   var thermalSensation : Int = -1,
   var bubbles : Int = -1,

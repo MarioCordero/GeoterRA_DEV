@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
   android:id="@+id/spring_form"
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
-  android:orientation="vertical"
-  >
+  android:orientation="vertical">
   
   <LinearLayout
     android:layout_width="wrap_content"
@@ -33,20 +32,23 @@
       />
   </LinearLayout>
   
-  <EditText
-    android:id="@+id/thermal_sensation_input"
+  <com.google.android.material.textfield.TextInputLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    
-    android:autofillHints=""
-    android:background="@drawable/gray_rectangle_rounded2"
-    
     android:hint="Seleccione una opción"
-    android:padding="14dp"
-    android:fontFamily="@font/poppins_regular"
-    android:textColor="@color/black"
-    android:textSize="20sp"
-    />
+    app:errorEnabled="true"
+    android:background="@drawable/gray_rectangle_rounded2">
+    
+    <com.google.android.material.textfield.TextInputEditText
+      android:id="@+id/thermal_sensation_input"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:fontFamily="@font/poppins_regular"
+      android:textColor="@color/black"
+      android:textSize="20sp"
+      android:padding="14dp"
+      android:background="@android:color/transparent"/>
+  </com.google.android.material.textfield.TextInputLayout>
   
   <LinearLayout
     android:layout_width="wrap_content"
@@ -75,19 +77,22 @@
       />
   </LinearLayout>
   
-  <EditText
-    android:id="@+id/bubbling_input"
+  <com.google.android.material.textfield.TextInputLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    
-    android:autofillHints=""
-    android:background="@drawable/gray_rectangle_rounded2"
-    
     android:hint="Seleccione una opción"
-    android:padding="14dp"
-    android:fontFamily="@font/poppins_regular"
-    android:textColor="@color/black"
-    android:textSize="20sp"
-    />
+    app:errorEnabled="true"
+    android:background="@drawable/gray_rectangle_rounded2">
+    
+    <com.google.android.material.textfield.TextInputEditText
+      android:id="@+id/bubbling_input"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:fontFamily="@font/poppins_regular"
+      android:textColor="@color/black"
+      android:textSize="20sp"
+      android:padding="14dp"
+      android:background="@android:color/transparent"/>
+  </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.LinearLayout
+import com.google.android.material.textfield.TextInputEditText
 import com.inii.geoterra.development.R
 
 /**
@@ -26,8 +27,8 @@ class SpringForm @JvmOverloads constructor(
   defStyle: Int = 0
 ) : LinearLayout(context, attrs, defStyle) {
 
-  private val thermalSensationInput: EditText
-  private val bubblesInput: EditText
+  private val thermalSensationInput: TextInputEditText
+  private val bubblesInput: TextInputEditText
 
   init {
     orientation = VERTICAL

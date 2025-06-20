@@ -470,6 +470,7 @@ class MapFragment : PageFragment(), MessageListener {
   private fun handlePointsResponse(response: Response<List<ThermalPoint>>) {
     if (response.isSuccessful) {
       response.body()?.let { points ->
+        Log.i("API Response", "Points received: ${points.size}")
         setupThermalMarkers(points)
       }
     } else {
@@ -504,6 +505,7 @@ class MapFragment : PageFragment(), MessageListener {
           R.drawable.point_marker
         )
         points.forEach { point ->
+          Log.i("MarkerCreation", "Creating marker for point: ${point.pointID}")
           createThermalMarker(point, icon)
         }
 

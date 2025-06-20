@@ -2,7 +2,6 @@ package com.inii.geoterra.development.ui.requests
 
 import android.app.Activity
 import android.app.DatePickerDialog
-import android.content.Context
 import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
@@ -16,13 +15,13 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import android.widget.ViewSwitcher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.api.AnalysisRequestPayload
 import com.inii.geoterra.development.api.Error
@@ -33,7 +32,6 @@ import com.inii.geoterra.development.managers.GalleryPermissionManager
 import com.inii.geoterra.development.managers.SessionManager
 import com.inii.geoterra.development.ui.elements.SpringForm
 import com.inii.geoterra.development.ui.elements.TerrainForm
-import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -61,12 +59,14 @@ import java.util.Locale
  * @property locationButton Button for capturing GPS coordinates
  * @property imageButton Button for selecting image with EXIF coordinates
  * @property sendButton Button for submitting the form
- * @property dateText TextView displaying and selecting the request date
- * @property identifierInput EditText for request identifier
- * @property ownersNameInput EditText for owner's name
- * @property currentUsageInput EditText for current usage information
- * @property addressInput EditText for location address details
- * @property ownersContactInput EditText for owner contact information
+ * @property identifierInputLayout TextInputEditText for request identifier
+ * @property dateInputLayout TextInputEditText for request date
+ * @property dateInput TextInputEditText displaying and selecting the request date
+ * @property identifierInput TextInputEditText for request identifier
+ * @property ownersNameInput TextInputEditText for owner's name
+ * @property currentUsageInput TextInputEditText for current usage information
+ * @property detailsInput TextInputEditText for location address details
+ * @property ownersContactInput TextInputEditText for owner contact information
  * @property bubbleCheckBox CheckBox for bubble presence indication
  * @property calendar Calendar instance for date management
  * @property dateFormat Date formatter for display
@@ -104,23 +104,29 @@ class FormFragment : PageFragment() {
   /** Button for submitting the form */
   private lateinit var sendButton: Button
 
-  /** TextView displaying and selecting the request date */
-  private lateinit var dateText: TextView
+  /** TextInputLayout for request identifier */
+  private lateinit var identifierInputLayout: TextInputLayout
+
+  /** TextInputLayout for request date */
+  private lateinit var dateInputLayout: TextInputLayout
+
+  /** TextInputEditText displaying and selecting the request date */
+  private lateinit var dateInput: TextInputEditText
 
   /** EditText for request identifier */
-  private lateinit var identifierInput: EditText
+  private lateinit var identifierInput: TextInputEditText
 
-  /** EditText for owner's name */
-  private lateinit var ownersNameInput: EditText
+  /** TextInputEditText for owner's name */
+  private lateinit var ownersNameInput: TextInputEditText
 
-  /** EditText for current usage information */
-  private lateinit var currentUsageInput: EditText
+  /** TextInputEditText for current usage information */
+  private lateinit var currentUsageInput: TextInputEditText
 
-  /** EditText for location address details */
-  private lateinit var addressInput: EditText
+  /** TextInputEditText for location address details */
+  private lateinit var detailsInput: TextInputEditText
 
-  /** EditText for owner contact information */
-  private lateinit var ownersContactInput: EditText
+  /** TextInputEditText for owner contact information */
+  private lateinit var ownersContactInput: TextInputEditText
 
   /** CheckBox for bubble presence indication */
   private lateinit var bubbleCheckBox: CheckBox
@@ -139,7 +145,7 @@ class FormFragment : PageFragment() {
     calendar.set(Calendar.YEAR, year)
     calendar.set(Calendar.MONTH, month)
     calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-    dateText.text = dateFormat.format(calendar.time)
+    dateInput.setText(dateFormat.format(calendar.time))
   }
 
   /** Activity launcher for image selection */
@@ -185,16 +191,18 @@ class FormFragment : PageFragment() {
     this.terrainTypeButtonGroup = binding.findViewById(
       R.id.terrain_type_button_group
     )
+    this.identifierInputLayout = binding.findViewById(R.id.identifier_input_layout)
+    this.dateInputLayout = binding.findViewById(R.id.date_input_layout)
     this.landTypeButton = binding.findViewById(R.id.land_type_button)
     this.springTypeButton = binding.findViewById(R.id.spring_type_button)
     this.locationButton = binding.findViewById(R.id.gps_coordinates_button)
     this.imageButton = binding.findViewById(R.id.image_coordinates_button)
     this.sendButton = binding.findViewById(R.id.sendRequestButton)
-    this.dateText = binding.findViewById(R.id.date_input)
+    this.dateInput = binding.findViewById(R.id.date_input)
     this.identifierInput = binding.findViewById(R.id.identifier_input)
     this.ownersNameInput = binding.findViewById(R.id.owners_name_input)
     this.currentUsageInput = binding.findViewById(R.id.actual_use_input)
-    this.addressInput = binding.findViewById(R.id.details_input)
+    this.detailsInput = binding.findViewById(R.id.details_input)
     this.ownersContactInput = binding.findViewById(R.id.owner_contact_input)
   }
 
@@ -311,8 +319,8 @@ class FormFragment : PageFragment() {
    * Sets up the date picker functionality.
    */
   private fun setupDatePicker() {
-    dateText.text = dateFormat.format(calendar.time)
-    dateText.setOnClickListener {
+    dateInput.setText(dateFormat.format(calendar.time))
+    dateInput.setOnClickListener {
       showDatePicker()
     }
   }
@@ -336,8 +344,9 @@ class FormFragment : PageFragment() {
    */
   private fun setupSendButton() {
     this.sendButton.setOnClickListener {
-      getFormData()
-      sendRequest()
+      if (getFormData()) {
+        sendRequest()
+      }
     }
   }
 
@@ -358,27 +367,63 @@ class FormFragment : PageFragment() {
   /**
    * Collects form data and populates the request form object.
    */
-  private fun getFormData() {
-    lifecycleScope.launch {
-      try {
-        AnalysisRequestPayload.apply {
-          id = identifierInput.text.toString()
-          region = "Guanacaste"
-          date = dateText.text.toString()
-          email = SessionManager.getUserEmail().toString()
-          owner = ownersNameInput.text.toString()
-          currentUsage = currentUsageInput.text.toString()
-          address = addressInput.text.toString()
-          phoneNumber = ownersContactInput.text.toString()
-          thermalSensation = 1 // Placeholder until slider is implemented
-          bubbles = if (bubbleCheckBox.isChecked) 1 else 0
-        }
-        Log.i("FormData", AnalysisRequestPayload.toString())
-      } catch (e: Exception) {
-        Log.e("FormData", "Error getting form data", e)
-      }
+  private fun getFormData(): Boolean {
+    var isValid = true
+
+    identifierInputLayout.error = null
+    dateInputLayout.error = null
+
+    if (identifierInput.text.toString().isBlank()) {
+      identifierInputLayout.error = "Ingrese un identificador"
+      isValid = false
     }
+
+    if (dateInput.text.toString().isBlank()) {
+      dateInputLayout.error = "Ingrese una fecha"
+      isValid = false
+    }
+
+    if (AnalysisRequestPayload.latitude.isBlank()
+      || AnalysisRequestPayload.longitude.isBlank()) {
+      showToast(
+        "Seleccione un método de captura de coordenadas",
+        Toast.LENGTH_SHORT
+      )
+      isValid = false
+    }
+
+    if (!isValid) return false
+
+    try {
+      if (viewSwitcher.currentView == terrainForm) {
+        AnalysisRequestPayload.thermalSensation =
+          terrainForm.getThermalSensation().toInt()
+      } else {
+        AnalysisRequestPayload.bubbles = springForm.getBubbling().toInt()
+      }
+
+      AnalysisRequestPayload.apply {
+        id = identifierInput.text.toString()
+        region = "Guanacaste"
+        date = dateInput.text.toString()
+        email = SessionManager.getUserEmail().toString()
+        owner = ownersNameInput.text.toString()
+        currentUsage = currentUsageInput.text.toString()
+        details = detailsInput.text.toString()
+        ownerContact = ownersContactInput.text.toString()
+        thermalSensation = 1 // Placeholder
+        bubbles = if (bubbleCheckBox.isChecked) 1 else 0
+      }
+
+      Log.i("FormData", AnalysisRequestPayload.toString())
+    } catch (e: Exception) {
+      Log.e("FormData", "Error getting form data", e)
+      return false
+    }
+
+    return true
   }
+
 
   /**
    * Sends the form data to the server.
@@ -391,8 +436,8 @@ class FormFragment : PageFragment() {
       AnalysisRequestPayload.email,
       AnalysisRequestPayload.owner,
       AnalysisRequestPayload.currentUsage,
-      AnalysisRequestPayload.address,
-      AnalysisRequestPayload.phoneNumber,
+      AnalysisRequestPayload.details,
+      AnalysisRequestPayload.ownerContact,
       AnalysisRequestPayload.coordinates,
       AnalysisRequestPayload.thermalSensation,
       AnalysisRequestPayload.bubbles,

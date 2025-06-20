@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.LinearLayout
+import com.google.android.material.textfield.TextInputEditText
 import com.inii.geoterra.development.R
 
 /**
@@ -23,10 +24,10 @@ class TerrainForm @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyle) {
   // =============== VIEW COMPONENTS ===============
   /** @brief Input for thermal sensation rating (1-5 scale) */
-  private val thermalSensationInput: EditText
+  private val thermalSensationInput: TextInputEditText
 
   /** @brief Input for terrain/hydrological conditions description */
-  private val conditionsInput: EditText
+  private val conditionsInput: TextInputEditText
 
   // =============== INITIALIZATION ===============
   init {
