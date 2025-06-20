@@ -6,6 +6,7 @@ import {
   FileTextOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
+import '../../fontsModule.css';
 
 const { Sider, Content } = Layout;
 

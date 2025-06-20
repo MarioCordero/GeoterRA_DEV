@@ -1,6 +1,7 @@
 import React from 'react';
 import GeoterRA_ISO_Black from "../../assets/images/GeoterRA-ISO-Black.svg";
 import GeoterRA_LOGO_Color from "../../assets/images/GeoterRA-Logo-Color.svg";
+import '../../fontsModule.css';
 
 function IndexHowWorks() {
   return (
@@ -24,7 +25,7 @@ function IndexHowWorks() {
       <div className="relative mx-auto px-4">
         {/* Section header */}
         <div className="text-center mb-30">
-          <h1 className="text-6xl font-bold text-black">Cómo funciona</h1>
+          <h1 className="text-6xl font-bold text-black poppins-bold">Cómo funciona</h1>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-20 mr-24 ml-14">
@@ -39,8 +40,8 @@ function IndexHowWorks() {
             </div>
 
             <div>
-              <h3 className="text-xl font-semibold text-black mb-3">Recolección de datos</h3>
-              <p className="text-gray-600 leading-relaxed">
+              <h3 className="text-xl font-semibold text-black mb-3 poppins-bold">Recolección de datos</h3>
+              <p className="text-gray-800 leading-relaxed poppins">
                 GeoterRA comienza con la recolección integral de datos geológicos de diversas 
                 fuentes. Expertos realizan estudios de campo para obtener información esencial, 
                 mientras que los usuarios contribuyen subiendo fotos y datos geolocalizados a 
@@ -71,8 +72,8 @@ function IndexHowWorks() {
             </div>
 
             <div>
-              <h3 className="text-xl font-semibold text-black mb-3">Validación y almacenamiento</h3>
-              <p className="text-gray-600 leading-relaxed">
+              <h3 className="text-xl font-semibold text-black mb-3 poppins-bold">Validación y almacenamiento</h3>
+              <p className="text-gray-800 leading-relaxed poppins">
                 Una vez recopilados, los datos pasan por un riguroso proceso de validación y análisis 
                 especializado para asegurar su precisión. Estos datos se almacenan en una base de datos 
                 SQL, lo que permite un manejo eficiente y estructurado de la información. Utilizando 
@@ -104,8 +105,8 @@ function IndexHowWorks() {
             
 
             <div>
-              <h3 className="text-xl font-semibold text-black mb-3">Herramientas avanzadas</h3>
-              <p className="text-gray-600 leading-relaxed">
+              <h3 className="text-xl font-semibold text-black mb-3 poppins-bold">Herramientas avanzadas</h3>
+              <p className="text-gray-800 leading-relaxed poppins">
                 GeoterRA proporciona herramientas avanzadas para la planificación y evaluación de 
                 proyectos. Los usuarios pueden interactuar con el mapa, buscar y filtrar información 
                 geológica específica, y visualizar estructuras en 3D. Un robusto sistema de 

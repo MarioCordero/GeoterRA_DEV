@@ -1,9 +1,10 @@
 import React from "react";
 import '../colorModule.css';
+import '../fontsModule.css';
 
 export default function Footer() {
   return (
-    <footer className="bg-geoterra-blue text-white text-sm p-6">
+    <footer className="bg-geoterra-blue text-white text-sm p-6 poppins-light">
       <div className="max-w-6xl mx-auto space-y-2 text-center">
         <p className="m-0">
           © 2021 Instituto de Investigaciones en Ingeniería - Universidad de Costa Rica.

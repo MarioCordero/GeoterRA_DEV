@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import loginImage from "../../assets/images/login-background.png";
 import "../../colorModule.css";
+import '../../fontsModule.css';
 
 function Login() {
   const bgImage = {
@@ -72,7 +73,7 @@ function Login() {
       <div className="flex-1 flex justify-end items-center relative z-10 h-screen">
         <div className="bg-gris max-w-1/2 rounded-lg shadow-md p-8 w-full h-screen flex flex-col justify-center">
           <form className="w-2/4 space-y-4 block m-auto" onSubmit={handleSubmit} id="login_form">
-            <h1 className="text-4xl font-bold text-center bold text-geoterra-orange mb-2">Iniciar Sesión</h1>
+            <h1 className="text-4xl font-bold text-center bold text-geoterra-orange mb-2 poppins-bold">Iniciar Sesión</h1>
             
             {/* Error Message */}
             {errorMsg && (
@@ -91,7 +92,7 @@ function Login() {
 
             {/* EMAIL INPUT */}
             <div>
-              <h2 className="text-lg font-semibold mb-4 text-geoterra-blue">Correo</h2>
+              <h2 className="text-lg font-semibold mb-4 text-geoterra-blue poppins-bold">Correo</h2>
               <input
                 type="email"
                 name="email"
@@ -99,13 +100,13 @@ function Login() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border border-geoterra-blue rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-geoterra-blue rounded focus:outline-none focus:ring-1 focus:ring-blue-500 poppins"
               />
             </div>
 
             {/* PASSWORD INPUT */}
             <div>
-              <h2 className="text-lg font-semibold mb-1 text-geoterra-blue">Contraseña</h2>
+              <h2 className="text-lg font-semibold mb-1 text-geoterra-blue poppins-bold">Contraseña</h2>
               <input
                 type="password"
                 name="password"
@@ -113,20 +114,20 @@ function Login() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-geoterra-blue rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-geoterra-blue rounded focus:outline-none focus:ring-1 focus:ring-blue-500 poppins"
               />
             </div>
 
             {/* RECOVERY PASSWORD LINK AND REMEMBER PASSWORD CHECKBOX */}
             <div className="flex justify-between text-sm text-gray-600">
-              <a href="#" className="text-blue-600 hover:underline block">Recuperar contraseña</a>
+              <a href="#" className="text-blue-600 hover:underline block poppins">Recuperar contraseña</a>
               <div className="flex items-center mb-2">
                 <input
                   id="remember"
                   type="checkbox"
                   className="mr-2 hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 />
-                <label htmlFor="remember" className="text-gray-700 select-none hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                <label htmlFor="remember" className="text-gray-700 select-none hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed poppins">
                   Recordar contraseña
                 </label>
               </div>
@@ -136,14 +137,14 @@ function Login() {
             <div className="space-y-3">
               <button
                 type="submit"
-                className="w-full bg-geoterra-orange text-white py-2 rounded font-bold hover:bg-cafe transition hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-geoterra-orange text-white py-2 rounded font-bold hover:bg-cafe transition hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed poppins-bold"
               >
                 Acceder
               </button>
             </div>
 
             {/* REGISTER LINK */}
-            <div className="text-center text-sm">
+            <div className="text-center text-sm poppins">
               ¿No tiene cuenta?{" "}
               {/* TODO REGISTER COMPONENT */}
               <a href="#" className="text-blue-600 hover:underline font-bold">

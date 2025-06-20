@@ -1,5 +1,6 @@
 import React from 'react';
 import FondoContactUs from "../../assets/images/trabajo-campo2.jpeg";
+import '../../fontsModule.css';
 
 function IndexContactUs() {
   return (
@@ -23,8 +24,8 @@ function IndexContactUs() {
       <div className="max-w-2xl mx-auto relative z-10">
         {/* Header */}
         <div className="mb-12">
-          <h1 className="text-6xl font-bold text-black mb-4">Contactá con nosotros</h1>
-          <p className="text-1xs text-black">
+          <h1 className="text-5xl font-bold text-black mb-4 poppins-bold">Contactá con nosotros</h1>
+          <p className="text-1xs text-black poppins">
             Gracias por su interés en GeoterRA. Estamos aquí para ayudarle con cualquier pregunta, 
             comentario o apoyo que pueda necesitar. No dude en comunicarse con nosotros rellenando 
             este formulario:
@@ -32,7 +33,7 @@ function IndexContactUs() {
         </div>
 
         {/* Contact Form */}
-        <div className="bg-white p-8 rounded-lg shadow-md">
+        <div className="bg-white p-8 rounded-lg shadow-md poppins">
           <form className="space-y-4">
 
             {/* Name Field and Email Field */}

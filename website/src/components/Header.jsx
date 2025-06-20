@@ -4,6 +4,7 @@ import { MenuOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import logo from '../assets/images/GeoterRA-Logo-Color.svg';
 import '../colorModule.css';
+import '../fontsModule.css';
 
 const { Header } = Layout;
 
@@ -47,7 +48,7 @@ export default function AppHeader() {
     <Button
       key={item.key}
       type="text"
-      className={item.key === 'login' ? 'bg-geoterra-orange text-blanco font-bold!' : ''}
+      className={item.key === 'login' ? 'bg-geoterra-orange poppins-bold text-blanco font-bold!' : 'poppins text-geoterra-blue'}
       style={{ transition: 'transform 0.2s' }}
       onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
       onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}

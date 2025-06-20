@@ -8,12 +8,14 @@ import Map from '../pages/Map'
 export default function AppRouter() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/Login" element={<Login />} />
-        <Route path="/Map" element={<Map />} />
-        {/* <Route path="/register" element={<Register />} /> */}
-      </Routes>
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' , margin: 0 , padding: 0 }}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/Login" element={<Login />} />
+          <Route path="/Map" element={<Map />} />
+          {/* <Route path="/register" element={<Register />} /> */}
+        </Routes>
+      </div>
     </Router>
   )
 }

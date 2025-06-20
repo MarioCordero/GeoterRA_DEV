@@ -1,5 +1,6 @@
 import React from 'react';
-import GeoterRA_LOGO_White from '../../assets/images/GeoterRA-Logo-White.svg'; // Asegúrate de que la ruta sea correcta
+import GeoterRA_LOGO_White from '../../assets/images/GeoterRA-Logo-White.svg';
+import '../../fontsModule.css';
 
 function IndexAboutUs() {
   return (
@@ -10,15 +11,15 @@ function IndexAboutUs() {
         style={{ backgroundImage: `url(${GeoterRA_LOGO_White})` }}
       ></div>
 
-      <div className="text-6xl font-bold text-white mb-12 text-left">
+      <div className="text-6xl font-bold text-white mb-12 text-left poppins-bold">
         <h1>Acerca de nosotros</h1>
         <div className="mt-5 bottom-0 left-0 w-1/4 border-b-4 border-white"></div>
       </div>
         
-      <div className="p-8 rounded-lg shadow-xl flex flex-col lg:flex-row gap-24">
+      <div className="p-8 rounded-lg shadow-xl flex flex-col lg:flex-row gap-24 poppins-light text-base">
         {/* Column 1 */}
         <div className="flex-1">
-          <p className="text-lg text-white mb-6 leading-relaxed">
+          <p className="text-white mb-6 leading-relaxed">
             GeoterRA es una aplicación innovadora diseñada para optimizar la toma de decisiones 
             en proyectos que aprovechan la energía geotérmica en el territorio nacional. Nuestra 
             misión es proporcionar información geológica precisa y validada para inversores y 
@@ -44,7 +45,7 @@ function IndexAboutUs() {
 
         {/* Column 2 */}
         <div className="flex-1 border-t pt-6 lg:pt-0 lg:border-t-0 lg:border-l lg:pl-6">
-          <p className="text-lg text-white leading-relaxed">
+          <p className="text-white leading-relaxed">
             Desde su concepción, GeoterRA ha sido impulsada por la necesidad crítica de contar con 
             información especializada y esencial para aquellos que deseen invertir en la geotermia. 
             Utilizando avanzadas tecnologías de visualización y análisis de datos, nuestra plataforma 
