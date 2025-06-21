@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Home from '../pages/Home'
 import Login from '../pages/Login'
 import Map from '../pages/Map'
+import Logged from '../pages/Logged';
 
 export default function AppRouter() {
   return (
@@ -13,7 +14,8 @@ export default function AppRouter() {
           <Route path="/" element={<Home />} />
           <Route path="/Login" element={<Login />} />
           <Route path="/Map" element={<Map />} />
-          {/* <Route path="/register" element={<Register />} /> */}
+          <Route path="/Logged" element={<Logged />} />
+          {/* <Route path="/register" element={<Register />} /> TODO [] */} 
         </Routes>
       </div>
     </Router>

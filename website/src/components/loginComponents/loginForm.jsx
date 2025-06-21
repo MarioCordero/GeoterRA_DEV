@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import loginImage from "../../assets/images/login-background.png";
 import "../../colorModule.css";
 import '../../fontsModule.css';
 
 function Login() {
+  const navigate = useNavigate();
   const bgImage = {
     backgroundImage: `url(${loginImage})`,
     backgroundRepeat: "no-repeat",
@@ -34,9 +36,8 @@ function Login() {
       console.log("API response:", data);
 
       if (data.status === "logged_in") {
-        window.location.href = "/logged.php";
-        // If you have a checkSession function, you can call it here
-        // checkSession();
+        navigate("/Logged"); // <-- Redirect to the React route
+        // checkSession();  // TODO []
       } else {
         setErrorMsg("Credenciales incorrectas");
         setEmail("");
