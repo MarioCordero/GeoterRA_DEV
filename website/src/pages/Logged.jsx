@@ -26,7 +26,7 @@ const DashboardPlaceholder = () => (
 const Logged = () => (
   <div className="min-h-screen flex flex-col">
     <Header />
-    <div className="flex flex-1 overflow-hidden">
+    <div className="flex flex-1 pt-16">
       <SidebarLayout />
       <div className="flex-1 flex flex-col overflow-auto">
         <DashboardPlaceholder />

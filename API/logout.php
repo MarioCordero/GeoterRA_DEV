@@ -1,21 +1,24 @@
 <?php
-// Iniciar sesión si aún no se ha iniciado
+    require_once 'cors.inc.php';
+    session_start();
+    require 'conf_sess.inc.php';
 
-session_start();
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
 
+	// Erase cookies related to the session
+	if (isset($_COOKIE[session_name()])) {
+		setcookie(session_name(), '', time() - 3600, '/');
+	}
 
-// Borra la cookie de sesión si está definida
-if (isset($_COOKIE[session_name()])) {
-    setcookie(session_name(), '', time() - 3600, '/');
-}
+	// Clear all session variables
+	$_SESSION = [];
 
-// Limpiar todas las variables de sesión
-$_SESSION = [];
+	// End the session
+	session_destroy();
 
-// Finalizar la sesión
-session_destroy();
-
-// Responder con un JSON indicando éxito
-header('Content-Type: application/json');
-echo json_encode(['status' => 'logged_out', 'message' => 'Sesión cerrada correctamente']);
+	// JSON response
+	header('Content-Type: application/json');
+	echo json_encode(['status' => 'logged_out', 'message' => 'Sesión cerrada correctamente']);
 ?>

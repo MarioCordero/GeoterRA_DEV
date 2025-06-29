@@ -148,9 +148,14 @@ function Login() {
             <div className="text-center text-sm poppins">
               ¿No tiene cuenta?{" "}
               {/* TODO REGISTER COMPONENT */}
-              <a href="#" className="text-blue-600 hover:underline font-bold">
-                Registrarse
-              </a>
+                <button
+                  type="button"
+                  onClick={() => navigate("/Register")}
+                  className="text-blue-600 hover:underline font-bold bg-transparent border-none p-0 m-0 cursor-pointer"
+                  style={{ background: "none" }}
+                >
+                  Registrarse
+                </button>
             </div>
           </form>
         </div>

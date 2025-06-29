@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { Layout, Menu, Button } from "antd";
 import {
@@ -12,16 +13,20 @@ const { Sider } = Layout;
 
 const SidebarLayout = () => {
   const [selectedKey, setSelectedKey] = useState('1');
+  const navigate = useNavigate();
 
-  const handleLogout = () => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", "../API/logout.php", true);
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState === 4 && xhr.status === 200) {
-        window.location.href = "login.php";
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("http://geoterra.com/API/logout.php", { method: "GET" });
+      if (response.ok) {
+        navigate("/Login");
+      } else {
+        alert("Error al cerrar sesión");
       }
-    };
-    xhr.send();
+    } catch (err) {
+      console.error("Error de conexión:", err);
+      alert("Error de conexión");
+    }
   };
 
   return (
@@ -40,6 +45,7 @@ const SidebarLayout = () => {
         mode="inline"
         defaultSelectedKeys={['1']}
         onClick={(e) => setSelectedKey(e.key)}
+        style={{ marginTop: '2rem' }} // Add this line
         items={[
           { key: '1', icon: <DashboardOutlined />, label: 'Dashboard' },
           { key: '2', icon: <UserOutlined />, label: 'Profile' },
