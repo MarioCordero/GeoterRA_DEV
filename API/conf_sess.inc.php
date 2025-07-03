@@ -7,11 +7,12 @@
 
         session_set_cookie_params([
             'lifetime' => 1800,
-            'domain' => 'localhost',
             'path' => '/',
-            'secure' => true,
+            // 'domain' => '163.178.171.105', // Uncomment and set if you have a fixed domain
+            'secure' => false, // Use true ONLY if you have HTTPS
             'httponly' => true
         ]);
+        
         session_start();
     }
 

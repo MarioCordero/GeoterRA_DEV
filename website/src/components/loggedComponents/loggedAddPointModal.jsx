@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Modal, Button, Form, Input, Radio, DatePicker, Upload } from "antd";
+import React, { useState, useEffect, useContext } from "react";
+import { Modal, Button, Form, Input, Radio, DatePicker, Upload, message, Spin } from "antd";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
-import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import dayjs from "dayjs";
+// import { UserContext } from "../../context/UserContext"; // Uncomment if using context
 
 const defaultPosition = [9.93333, -84.08333]; // Example: San José, Costa Rica
 const FORM_CACHE_KEY = "addPointFormCache";
@@ -20,10 +21,12 @@ function LocationMarker({ setLatLng }) {
   return position === null ? null : <Marker position={position} />;
 }
 
-const AddPointModal = () => {
+const AddPointModal = ({ user }) => {
+  // const { user } = useContext(UserContext); // Uncomment if using context
   const [visible, setVisible] = useState(false);
   const [latLng, setLatLng] = useState({});
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
 
   // Load cached form data when modal opens
   useEffect(() => {
@@ -31,6 +34,10 @@ const AddPointModal = () => {
       const cached = localStorage.getItem(FORM_CACHE_KEY);
       if (cached) {
         const parsed = JSON.parse(cached);
+        // Fix: Convert fecha to dayjs if it's a string
+        if (parsed.fecha && typeof parsed.fecha === "string") {
+          parsed.fecha = dayjs(parsed.fecha);
+        }
         form.setFieldsValue(parsed);
         if (parsed.lat && parsed.lng) setLatLng({ lat: parsed.lat, lng: parsed.lng });
       }
@@ -39,19 +46,66 @@ const AddPointModal = () => {
 
   // Save form data to cache on change
   const handleValuesChange = (_, allValues) => {
-    localStorage.setItem(FORM_CACHE_KEY, JSON.stringify(allValues));
+    // Save fecha as string for compatibility
+    const cache = { ...allValues };
+    if (cache.fecha && typeof cache.fecha !== "string") {
+      cache.fecha = cache.fecha.format("YYYY-MM-DD");
+    }
+    localStorage.setItem(FORM_CACHE_KEY, JSON.stringify(cache));
   };
 
-  const handleOk = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        // TODO: handle form submission (API call)
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
+      setLoading(true);
+
+      // Prepare form data for API
+      const formData = new FormData();
+      formData.append("pointId", values.pointId);
+      formData.append("contactNumber", values.contactNumber);
+      formData.append("fecha", values.fecha ? dayjs(values.fecha).format("YYYY-MM-DD") : "");
+      formData.append("sensTermica", values.sensTermica);
+      formData.append("propietario", values.propietario || "");
+      formData.append("usoActual", values.usoActual || "");
+      formData.append("burbujeo", values.burbujeo);
+      formData.append("direccion", values.direccion || "");
+      formData.append("lat", latLng.lat || "");
+      formData.append("lng", latLng.lng || "");
+      console.log("Email being sent:", user?.email);
+
+      // Handle file upload
+      if (values.foto && values.foto.length > 0) {
+        formData.append("foto", values.foto[0].originFileObj);
+      }
+
+      const response = await fetch("http://163.178.171.105/API/request.inc.php", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+      console.log("API result:", result);
+
+      if (result.response === "Ok") {
         setVisible(false);
         form.resetFields();
         localStorage.removeItem(FORM_CACHE_KEY);
-      })
-      .catch(() => {});
+        setLatLng({});
+        Modal.success({
+          title: "¡Solicitud enviada!",
+          content: result.message || "Tu solicitud fue enviada correctamente.",
+        });
+      } else {
+        message.error(
+          result.message ||
+            (Array.isArray(result.errors) && result.errors.length > 0 ? result.errors[0] : "Error al enviar la solicitud")
+        );
+      }
+    } catch (err) {
+      message.error("Error al enviar la solicitud");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -80,11 +134,12 @@ const AddPointModal = () => {
         onOk={handleOk}
         onCancel={handleCancel}
         width={700}
+        confirmLoading={loading}
         footer={[
-          <Button key="back" onClick={handleCancel}>
+          <Button key="back" onClick={handleCancel} disabled={loading}>
             Cancelar
           </Button>,
-          <Button key="submit" type="primary" onClick={handleOk}>
+          <Button key="submit" type="primary" onClick={handleOk} loading={loading}>
             Enviar
           </Button>,
         ]}
@@ -155,9 +210,14 @@ const AddPointModal = () => {
             </div>
           </Form.Item>
         </Form>
+        {loading && (
+          <div style={{ textAlign: "center", marginTop: 16 }}>
+            <Spin />
+          </div>
+        )}
       </Modal>
     </>
   );
 };
 
-export default AddPointModal; 
+export default AddPointModal;
