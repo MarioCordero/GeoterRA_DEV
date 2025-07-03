@@ -41,11 +41,21 @@ class SpringForm @JvmOverloads constructor(
     this.thermalSensationInput = binding.findViewById(
       R.id.thermal_sensation_input
     )
+
     this.bubblesInput = binding.findViewById(R.id.bubbling_input)
   }
 
-  fun getThermalSensation(): String = thermalSensationInput.text.toString()
+  fun getThermalSensation() : Int {
+    if (this.thermalSensationInput.text.toString().isEmpty()) {
+      return -2000
+    }
+    return thermalSensationInput.text.toString().toInt()
+  }
 
-  fun getBubbling(): String = bubblesInput.text.toString()
-
+  fun getBubbling(): Int {
+    if (this.bubblesInput.text.toString().isEmpty()) {
+      return 0
+    }
+    return bubblesInput.text.toString().toInt()
+  }
 }

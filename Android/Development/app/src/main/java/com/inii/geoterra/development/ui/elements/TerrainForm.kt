@@ -50,11 +50,18 @@ class TerrainForm @JvmOverloads constructor(
    * @brief Retrieves thermal sensation rating
    * @return String value from input field (1-5 scale)
    */
-  fun getThermalSensation(): String = thermalSensationInput.text.toString()
+  fun getThermalSensation() : Int {
+    if (thermalSensationInput.text.toString().isEmpty()) {
+      return -2000
+    }
+    return thermalSensationInput.text.toString().toInt()
+  }
 
   /**
    * @brief Retrieves terrain conditions description
    * @return Free-form text description of terrain conditions
    */
-  fun getConditions(): String = conditionsInput.text.toString()
+  fun getConditions(): String {
+    return conditionsInput.text.toString()
+  }
 }
