@@ -1,5 +1,6 @@
 import React from 'react';
 import { Table, Typography, Divider } from 'antd';
+import AddPointModal from './loggedAddPointModal'; // Import your modal component
 import '../../colorModule.css';
 import '../../fontsModule.css';
 
@@ -52,6 +53,9 @@ const Requests = () => {
   return (
     <div style={{ padding: '24px' }}>
       <Title level={2} style={{ marginBottom: '24px' }}>Solicitudes</Title>
+      <div style={{ marginBottom: '16px', textAlign: 'right' }}>
+        <AddPointModal /> {/* Button to open the modal */}
+      </div>
       <Divider />
       
       <Table
@@ -63,12 +67,6 @@ const Requests = () => {
       />
       
       <Divider />
-      
-      <div style={{ textAlign: 'right', marginTop: '16px' }}>
-        <span style={{ cursor: 'pointer', color: '#ff4d4f' }}>
-          Cerrar sesión
-        </span>
-      </div>
     </div>
   );
 };

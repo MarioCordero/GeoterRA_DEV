@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import React, { useState } from "react";
+import React from "react";
 import { Layout, Menu, Button } from "antd";
 import {
   UserOutlined,
@@ -12,13 +12,12 @@ import '../../colorModule.css';
 
 const { Sider } = Layout;
 
-const SidebarLayout = () => {
-  const [selectedKey, setSelectedKey] = useState('1');
+const SidebarLayout = ({ selectedKey, setSelectedKey }) => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("http://geoterra.com/API/logout.php", { method: "GET" });
+      const response = await fetch("http://163.178.171.105/API/logout.php", { method: "GET" });
       if (response.ok) {
         navigate("/Login");
       } else {
@@ -45,7 +44,7 @@ const SidebarLayout = () => {
       <Menu
         theme="light"
         mode="inline"
-        defaultSelectedKeys={['1']}
+        selectedKeys={[selectedKey]}
         onClick={(e) => setSelectedKey(e.key)}
         style={{ 
           marginTop: '2rem',

@@ -38,7 +38,7 @@ const Logged = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <div className="flex flex-1 pt-16">
+      <div className="flex flex-1 pt-16"> 
         <SidebarLayout selectedKey={selectedKey} setSelectedKey={setSelectedKey} />
         <div className="flex-1 flex flex-col overflow-auto">
           {content}
