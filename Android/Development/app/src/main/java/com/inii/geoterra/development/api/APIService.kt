@@ -58,8 +58,8 @@ data class SingUpCredentials(
  * @property magnesiumIon Mg+ concentration (mg/L)*/
 data class ThermalPoint(
   @SerializedName("id") val pointID : String,
-  @SerializedName("coord_x") val latitude : Double,
-  @SerializedName("coord_y") val longitude : Double,
+  @SerializedName("coord_y") val latitude : Double,
+  @SerializedName("coord_x") val longitude : Double,
 
   @SerializedName("temp") val temperature : Double,
   @SerializedName("pH_campo") val fieldPh : Double,
