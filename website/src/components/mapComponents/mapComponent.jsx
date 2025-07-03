@@ -20,7 +20,6 @@ const fetchPoints = async (region) => {
     body: `region=${encodeURIComponent(region)}`,
   });
   const points = await response.json();
-  // console.log("Fetched points for region", region, ":", points);
   return points;
 };
 
@@ -59,9 +58,9 @@ export default function MapComponent() {
     fetch("http://geoterra.com/API/get_regions.inc.php")
       .then(res => res.json())
       .then(data => {
-        setRegions(data);
-        if (data.length > 0) {
-          // Select first region by default
+        // Defensive: ensure regions is always an array
+        setRegions(Array.isArray(data) ? data : []);
+        if (Array.isArray(data) && data.length > 0) {
           setSelectedRegions([data[0]]);
         }
       })
@@ -71,7 +70,6 @@ export default function MapComponent() {
   // Fetch points when selected regions change
   useEffect(() => {
     const fetchDataForRegions = async () => {
-      // console.log("Fetching data for regions:", selectedRegions);
       setLoading(true);
       const newPoints = { ...allPoints };
       let hasNewData = false;
@@ -95,7 +93,6 @@ export default function MapComponent() {
 
       // Update visible points
       const pointsToShow = selectedRegions.flatMap(region => newPoints[region] || []);
-      // console.log("All visible points:", pointsToShow); // <-- Log here for all visible points
       setVisiblePoints(pointsToShow);
       setLoading(false);
     };
@@ -105,6 +102,7 @@ export default function MapComponent() {
     } else {
       setVisiblePoints([]);
     }
+    // eslint-disable-next-line
   }, [selectedRegions]);
 
   const toggleRegion = (region) => {
@@ -263,7 +261,7 @@ export default function MapComponent() {
               <div style={{ padding: "10px" }}>
                 <h3 style={{ margin: "0 0 10px 0", color: "#333", fontSize: "16px" }}>Regiones</h3>
                 <div style={{ maxHeight: "calc(100% - 50px)", overflowY: "auto" }}>
-                  {regions.map((reg) => (
+                  {Array.isArray(regions) && regions.map((reg) => (
                     <div 
                       key={reg}
                       style={{
