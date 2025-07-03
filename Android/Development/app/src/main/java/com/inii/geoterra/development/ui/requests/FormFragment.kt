@@ -387,10 +387,11 @@ class FormFragment : PageFragment<FragmentFormBinding>() {
 
     try {
       if (viewSwitcher.currentView == terrainForm) {
-        analysisRequestPayload.thermalSensation =
-          terrainForm.getThermalSensation().toInt()
+        analysisRequestPayload.thermalSensation = 2
+//          terrainForm.getThermalSensation().toInt()
       } else {
-        analysisRequestPayload.bubbles = springForm.getBubbling().toInt()
+        analysisRequestPayload.bubbles = 1
+//        analysisRequestPayload.bubbles = springForm.getBubbling().toInt()
       }
 
       analysisRequestPayload.apply {
@@ -401,9 +402,9 @@ class FormFragment : PageFragment<FragmentFormBinding>() {
         owner = ownersNameInput.text.toString()
         currentUsage = currentUsageInput.text.toString()
         details = detailsInput.text.toString()
-        ownerContact = ownersContactInput.text.toString()
-        thermalSensation = terrainForm.getThermalSensation()
-        bubbles = springForm.getBubbling()
+        ownerContact = 98989999.toString()
+        thermalSensation = 1
+        bubbles = 1
       }
 
       Log.i("FormData", analysisRequestPayload.toString())
