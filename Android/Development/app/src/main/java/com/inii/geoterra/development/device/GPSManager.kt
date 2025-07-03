@@ -40,6 +40,9 @@ object GPSManager : LocationCallback() {
   /** @brief Initialization state flag */
   private var isInitialized = false
 
+  /** @brief Flag indicating if location updates are active */
+  private var started = false
+
   /** @brief Listener for location update events */
   private var locationCallbackListener : LocationCallbackListener? = null
 
@@ -63,18 +66,21 @@ object GPSManager : LocationCallback() {
         arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
         LOCATION_PERMISSION_REQUEST_CODE
       )
+      Log.i("GPSManager", "Location permission not granted")
     } else {
+      Log.i("GPSManager", "Location permission already granted")
       // Initialize location service client
-      fusedLocationClient = LocationServices.getFusedLocationProviderClient(
+      this.fusedLocationClient = LocationServices
+        .getFusedLocationProviderClient(
         context
       )
       // Configure location update parameters
-      locationRequest = LocationRequest.Builder(
+      this.locationRequest = LocationRequest.Builder(
         Priority.PRIORITY_HIGH_ACCURACY, 5000L
       ).setMinUpdateIntervalMillis(2000L).build()
+      this.isInitialized = true
 
       this.startLocationUpdates()
-      isInitialized = true
     }
   }
 
@@ -86,18 +92,46 @@ object GPSManager : LocationCallback() {
    */
   @SuppressLint("MissingPermission")
   fun startLocationUpdates() {
-    fusedLocationClient.requestLocationUpdates(
-      locationRequest,
+    if (!::fusedLocationClient.isInitialized) {
+      Log.e(
+        "Location updates",
+        " fusedLocationClient is not initialized"
+      )
+      this.isInitialized = false
+      return
+    }
+
+    if (this.started) {
+      Log.e("Location updates", "Already started")
+      return
+    }
+
+    this.fusedLocationClient.requestLocationUpdates(
+      this.locationRequest,
       this,
       Looper.getMainLooper()
     )
+    this.started = true
   }
 
   /**
    * @brief Stops active location updates
    */
   fun stopLocationUpdates() {
-    fusedLocationClient.removeLocationUpdates(this)
+    if (!::fusedLocationClient.isInitialized) {
+      Log.e(
+        "Location updates",
+        " fusedLocationClient is not initialized"
+      )
+      this.isInitialized = false
+      return
+    }
+    if (!this.started) {
+      Log.e("Location updates", "Already stopped")
+      return
+    }
+    this.fusedLocationClient.removeLocationUpdates(this)
+    this.started = false
   }
 
   /**
@@ -113,6 +147,9 @@ object GPSManager : LocationCallback() {
    * @return Most recent Location object or null if unavailable
    */
   fun getLastKnownLocation(): Location? {
+    if (currentLocation == null) {
+      Log.e("GPSManager", "Location not available")
+    }
     return currentLocation
   }
 
@@ -128,7 +165,6 @@ object GPSManager : LocationCallback() {
    * @brief Processes permission request results
    * @param requestCode Request identifier from permission request
    * @param grantResults Array of permission grant results
-   * @param Context for displaying user feedback
    */
   fun handlePermissionResult(requestCode: Int, grantResults: IntArray,
     context: Context) {
@@ -161,13 +197,13 @@ object GPSManager : LocationCallback() {
    */
   override fun onLocationResult(locationResult: LocationResult) {
     super.onLocationResult(locationResult)
-    currentLocation = locationResult.lastLocation
+    this.currentLocation = locationResult.lastLocation
     Log.i(
-      "GPSManager", "New location: ${currentLocation?.latitude}" +
-      ", ${currentLocation?.longitude}"
+      "GPSManager", "New location: ${this.currentLocation?.latitude}" +
+      ", ${this.currentLocation?.longitude}"
     )
     // Notify listener with non-null location (enforced by !! operator)
-    locationCallbackListener?.onLocationReady(currentLocation !!)
+    this.locationCallbackListener?.onLocationReady(this.currentLocation !!)
   }
 
   /**
