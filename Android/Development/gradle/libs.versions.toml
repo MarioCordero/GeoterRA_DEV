@@ -1,64 +1,80 @@
 [versions]
-agp = "8.5.1"
-gtEpsgHsql = "22.2"
-gtGeojsonVersion = "[30,)"
-gtMain = "25.0"
-gtMainVersion = "22.2"
+agp = "8.9.0"
+androidxJunit = "1.1.5"
+core = "1.6.1"
+espressoCoreVersion = "3.6.1"           # versión unificada más reciente
+exifinterfaceVersion = "1.4.1"
+fragmentTesting = "1.8.8"               # Usamos solo esta versión
+googleMaterial = "1.12.0"               # Solo una versión para material
 kotlin = "1.9.0"
 coreKtx = "1.12.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
-espressoCore = "3.6.1"
 appcompat = "1.7.0"
 letsPlotKotlinGeotools = "4.7.3"
-material = "1.12.0"
+loggingInterceptor = "4.12.0"
 activity = "1.9.0"
 constraintlayout = "2.1.4"
 lifecycleLivedataKtx = "2.8.3"
 lifecycleViewmodelKtx = "2.8.3"
-materialVersion = "1.12.0"
 navigationFragmentKtx = "2.7.7"
 navigationUiKtx = "2.7.7"
 googleAndroidLibrariesMapsplatformSecretsGradlePlugin = "2.0.1"
-okhttp = "latest_version"
-okhttpVersion = "4.9.3"
+okhttpVersion = "4.12.0"                # Solo esta versión para OkHttp
 osmdroidAndroid = "6.1.18"
 playServices = "12.0.1"
 playServicesLocation = "21.3.0"
 playServicesMaps = "18.1.0"
-proj4j = "0.1.1"
+preferenceKtx = "1.2.1"
+proj4jVersion = "1.1.0"
 firebaseFirestore = "25.0.0"
+retrofitVersion = "2.11.0"
+junitKtx = "1.2.1"
+mockitoCore = "5.18.0"
+mockitoKotlin = "5.1.0"
+mockwebserver = "4.10.0"
 
 [libraries]
+androidx-core = { module = "androidx.test:core", version.ref = "core" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-geotools-gt-geojson = { module = "org.geotools:gt-geojson", version.ref = "gtGeojsonVersion" }
-gt-epsg-hsql = { module = "org.geotools:gt-epsg-hsql", version.ref = "gtEpsgHsql" }
-gt-main = { module = "org.geotools:gt-main", version.ref = "gtMain" }
-gt-main-v222 = { module = "org.geotools:gt-main", version.ref = "gtMainVersion" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCoreVersion" }
+androidx-exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterfaceVersion" }
+androidx-fragment-testing = { module = "androidx.fragment:fragment-testing", version.ref = "fragmentTesting" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtx" }
+geotools-gt-geojson = { module = "org.geotools:gt-geojson", version = "[30,)" }
+gt-epsg-hsql = { module = "org.geotools:gt-epsg-hsql", version = "22.2" }
+gt-main = { module = "org.geotools:gt-main", version = "25.0" }
+json = { module = "org.json:json", version = "20240303" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
 lets-plot-kotlin-geotools = { module = "org.jetbrains.lets-plot-kotlin:lets-plot-kotlin-geotools", version.ref = "letsPlotKotlinGeotools" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+locationtech-proj4j = { module = "org.locationtech.proj4j:proj4j", version.ref = "proj4jVersion" }
+logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
+material = { group = "com.google.android.material", name = "material", version.ref = "googleMaterial" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
-material-v150 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
-okhttp-v493 = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttpVersion" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
+mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "mockwebserver" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttpVersion" }
 osmdroid-android = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroidAndroid" }
 play-services = { module = "com.google.android.gms:play-services", version.ref = "playServices" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
-proj4j = { module = "org.osgeo:proj4j", version.ref = "proj4j" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+retrofit2-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofitVersion" }
+squareup-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofitVersion" }
+androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
 
 [plugins]
-kotlinParcelize = { id = "kotlin-parcelize", version = "1.9.0" }
+kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+googleSecrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version = "2.0.1" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 googleAndroidLibrariesMapsplatformSecretsGradlePlugin = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "googleAndroidLibrariesMapsplatformSecretsGradlePlugin" }
+kotlinParcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }

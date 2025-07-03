@@ -18,4 +18,13 @@
         <item name="fullscreenBackgroundColor">@color/light_blue_900</item>
         <item name="fullscreenTextColor">@color/light_blue_A400</item>
     </style>
+    
+    <style name="ThemeOverlay.Development.MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <!-- Color del texto para botones positivos -->
+        <item name="materialButtonOutlinedStyle">@style/Widget.Development.Button.Text</item>
+    </style>
+    
+    <style name="Widget.Development.Button.Text" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/purple_500</item>
+    </style>
 </resources>

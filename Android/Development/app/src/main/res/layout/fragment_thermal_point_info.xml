@@ -1,278 +1,366 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.map.ThermalPointInfoFragment"
     android:background="@color/white">
-
-    <TextView
-        android:id="@+id/PointID_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_margin="30dp"
-
-        android:text="Punto Termal"
-        android:textColor="@color/black"
-
-        android:fontFamily="@font/poppins_semibold"
-        android:textSize="22dp"
-        >
-    </TextView>
-
-    <Button
-        android:id="@+id/go_back_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        app:layout_constraintTop_toBottomOf="@id/card_lab_data"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginStart="30dp"
-
-        android:backgroundTint="@color/ligthGray"
-        android:fontFamily="@font/poppins_semibold"
-        android:text="Volver"
-        >
-    </Button>
-
-    <!-- CardView para Información General -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/card_info_general"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-
-        app:layout_constraintTop_toBottomOf="@id/PointID_name"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginStart="30dp"
-
-        app:cardElevation="4dp"
-        app:cardCornerRadius="8dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="20dp">
-
-            <TextView
-                android:id="@+id/coordenates"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Latitude, Longitude"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/calibri_regular"
-                />
-
-            <TextView
-                android:id="@+id/point_temperature"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Temperature"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/calibri_regular"
-                />
-
-            <TextView
-                android:id="@+id/field_ph"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="pH field"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/calibri_regular"
-                />
-
-            <TextView
-                android:id="@+id/field_conditions"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Conditions field"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/calibri_regular"
-                />
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-    <!-- CardView para Datos de Laboratorio -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/card_lab_data"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-
-        app:layout_constraintTop_toBottomOf="@id/card_info_general"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginStart="30dp"
-
-        app:cardElevation="4dp"
-        app:cardCornerRadius="8dp"
-        android:padding="16dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="20dp">
-
-            <TextView
-                android:id="@+id/lab_ph"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="pH Lab"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/calibri_regular"
-                />
-
-            <TextView
-                android:id="@+id/lab_conditions"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Lab Conditions"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/calibri_regular"
-                />
-
-            <TextView
-                android:id="@+id/chlorine"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Chlorine"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/calibri_regular"
-                />
-
-            <TextView
-                android:id="@+id/calcium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Calcium"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/calibri_regular"
-                />
-
-            <TextView
-                android:id="@+id/mg_bicarbonate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Mg Bicarbonate"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/calibri_regular"
-                />
-
-            <TextView
-                android:id="@+id/sulfate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sulfate"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/calibri_regular"
-                />
-
-            <TextView
-                android:id="@+id/iron"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Iron"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/calibri_regular"
-                />
-
-            <TextView
-                android:id="@+id/silicon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Silicon"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/calibri_regular"
-                />
-
-            <TextView
-                android:id="@+id/boron"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Boron"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/calibri_regular"
-                />
-
-            <TextView
-                android:id="@+id/lithium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Lithium"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/calibri_regular"
-                />
-
-            <TextView
-                android:id="@+id/fluorine"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Fluorine"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/calibri_regular"
-                />
-
-            <TextView
-                android:id="@+id/sodium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sodium"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/calibri_regular"
-                />
-
-            <TextView
-                android:id="@+id/potassium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Potassium"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/calibri_regular"
-                />
-
-            <TextView
-                android:id="@+id/magnesium_Ion"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Magnesium Ion"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/calibri_regular"
-                />
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    
+    <FrameLayout
+      android:id="@+id/fragment_container"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:visibility="gone"
+      android:elevation="10dp" />
+    
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_margin="20dp"
+      android:orientation="vertical" >
+        
+        <ScrollView
+          android:id="@+id/scrollview"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:scrollbarAlwaysDrawHorizontalTrack="false"
+          android:scrollbarAlwaysDrawVerticalTrack="false"
+          android:scrollbarSize="0dp">
+            
+            <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:scrollbarAlwaysDrawHorizontalTrack="false">
+                
+                <TextView
+                  android:id="@+id/PointID_name"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  
+                  android:layout_marginTop="40dp"
+                  android:fontFamily="@font/poppins_bold"
+                  android:text="Análisis: Campo geotérmico"
+                  android:textColor="@color/geoterra_orange"
+                  
+                  android:textSize="26sp"
+                  app:layout_constraintEnd_toEndOf="parent"
+                  
+                  app:layout_constraintStart_toStartOf="parent"
+                  app:layout_constraintTop_toTopOf="parent">
+                </TextView>
+                
+                <View
+                  android:layout_width="match_parent"
+                  android:layout_height="1dp"
+                  android:background="@color/geoterra_light_gray"
+                  app:layout_constraintEnd_toStartOf="@id/requestsAccepted_frame"
+                  app:layout_constraintStart_toEndOf="@id/requestMade_frame" />
+                
+                <TextView
+                  android:id="@+id/manifestation_label"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  
+                  android:layout_marginTop="10dp"
+                  android:fontFamily="@font/poppins_regular"
+                  android:text="Manifestación de tipo"
+                  android:textColor="@color/black"
+                  
+                  android:textSize="22sp"
+                  app:layout_constraintEnd_toEndOf="parent"
+                  
+                  app:layout_constraintStart_toStartOf="parent"
+                  app:layout_constraintTop_toBottomOf="@id/PointID_name">
+                </TextView>
+                
+                <TextView
+                  android:id="@+id/manifestation"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  
+                  android:layout_marginTop="10dp"
+                  android:fontFamily="@font/poppins_regular"
+                  android:text="Manantial"
+                  android:textColor="@color/black"
+                  
+                  android:textSize="60sp"
+                  app:layout_constraintEnd_toEndOf="parent"
+                  
+                  app:layout_constraintStart_toStartOf="parent"
+                  app:layout_constraintTop_toBottomOf="@id/manifestation_label">
+                </TextView>
+                
+                <TextView
+                  android:id="@+id/temperature_label"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  
+                  android:layout_marginTop="10dp"
+                  android:fontFamily="@font/poppins_regular"
+                  android:text="con la temperatura de"
+                  android:textColor="@color/black"
+                  
+                  android:textSize="22sp"
+                  app:layout_constraintEnd_toEndOf="parent"
+                  
+                  app:layout_constraintStart_toStartOf="parent"
+                  app:layout_constraintTop_toBottomOf="@id/manifestation">
+                </TextView>
+                
+                <TextView
+                  android:id="@+id/temperature_value"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  
+                  android:layout_marginTop="10dp"
+                  android:fontFamily="@font/poppins_regular"
+                  android:text="88 C"
+                  android:textColor="@color/black"
+                  
+                  android:textSize="50sp"
+                  app:layout_constraintEnd_toEndOf="parent"
+                  
+                  app:layout_constraintStart_toStartOf="parent"
+                  app:layout_constraintTop_toBottomOf="@id/temperature_label">
+                </TextView>
+                
+                <View
+                  android:layout_width="match_parent"
+                  android:layout_height="1dp"
+                  android:background="@color/geoterra_light_gray"
+                  app:layout_constraintEnd_toStartOf="@id/requestsAccepted_frame"
+                  app:layout_constraintStart_toEndOf="@id/requestMade_frame" />
+                
+                <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="vertical">
+                    
+                    <TextView
+                      android:id="@+id/province_label"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      
+                      android:layout_marginTop="10dp"
+                      android:fontFamily="@font/poppins_bold"
+                      android:gravity="center"
+                      android:text="Provincia"
+                      
+                      android:textColor="@color/black"
+                      android:textSize="22sp"
+                      
+                      app:layout_constraintEnd_toEndOf="parent"
+                      app:layout_constraintStart_toStartOf="parent">
+                    </TextView>
+                    
+                    <TextView
+                      android:id="@+id/province_text"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      
+                      android:layout_marginTop="5dp"
+                      android:fontFamily="@font/poppins_regular"
+                      android:gravity="center"
+                      android:text="Guanacaste"
+                      
+                      android:textColor="@color/black"
+                      android:textSize="22sp"
+                      
+                      app:layout_constraintEnd_toEndOf="parent"
+                      app:layout_constraintStart_toStartOf="parent">
+                    </TextView>
+                
+                </LinearLayout>
+                
+                <View
+                  android:layout_width="match_parent"
+                  android:layout_height="1dp"
+                  android:background="@color/geoterra_light_gray"
+                  app:layout_constraintEnd_toEndOf="parent"
+                  app:layout_constraintStart_toStartOf="parent" />
+                
+                <LinearLayout
+                  android:id="@+id/requestInformation_frame"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:gravity="center_horizontal"
+                  android:orientation="horizontal"
+                  app:layout_constraintEnd_toEndOf="parent"
+                  app:layout_constraintStart_toStartOf="parent">
+                    
+                    <LinearLayout
+                      android:id="@+id/requestMade_frame"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:gravity="center"
+                      android:orientation="vertical"
+                      android:padding="10dp">
+                        
+                        <TextView
+                          android:id="@+id/latitude_label"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:fontFamily="@font/poppins_bold"
+                          android:gravity="center"
+                          android:text="Lat"
+                          android:textColor="@color/black"
+                          android:textSize="22sp">
+                        </TextView>
+                        
+                        <TextView
+                          android:id="@+id/latitude_value"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_marginTop="5dp"
+                          android:fontFamily="@font/poppins_regular"
+                          android:gravity="start"
+                          android:text="89.88786"
+                          android:textColor="@color/black"
+                          android:textSize="22sp">
+                        </TextView>
+                    
+                    </LinearLayout>
+                    
+                    <View
+                      android:layout_width="1dp"
+                      android:layout_height="match_parent"
+                      android:background="@color/geoterra_light_gray"
+                      app:layout_constraintEnd_toStartOf="@id/requestsAccepted_frame"
+                      app:layout_constraintStart_toEndOf="@id/requestMade_frame" />
+                    
+                    <LinearLayout
+                      android:id="@+id/requestsAccepted_frame"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:gravity="center"
+                      android:orientation="vertical"
+                      android:padding="10dp">
+                        
+                        <TextView
+                          android:id="@+id/longitude_label"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_weight="1"
+                          android:fontFamily="@font/poppins_bold"
+                          android:gravity="center"
+                          android:text="Long"
+                          android:textColor="@color/black"
+                          android:textSize="22sp">
+                        </TextView>
+                        
+                        <TextView
+                          android:id="@+id/longitude_value"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_marginTop="5dp"
+                          android:layout_weight="1"
+                          android:fontFamily="@font/poppins_regular"
+                          android:gravity="start"
+                          android:text="10.98721"
+                          android:textColor="@color/black"
+                          android:textSize="22sp">
+                        </TextView>
+                    </LinearLayout>
+                </LinearLayout>
+                
+                <View
+                  android:layout_width="match_parent"
+                  android:layout_height="1dp"
+                  android:background="@color/geoterra_light_gray"
+                  app:layout_constraintEnd_toEndOf="parent"
+                  app:layout_constraintStart_toStartOf="parent" />
+                
+                <HorizontalScrollView
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:scrollbars="none">
+                    
+                    <LinearLayout
+                      style="?android:attr/buttonBarStyle"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="20dp"
+                      android:layout_marginBottom="20dp"
+                      android:orientation="horizontal">
+                        
+                        <Button
+                          style="?android:attr/buttonBarButtonStyle"
+                          android:layout_width="140dp"
+                          android:layout_height="160dp"
+                          android:id="@+id/chemistryAnalysisButton"
+                          android:layout_marginEnd="15dp"
+                          android:backgroundTint="@color/geoterra_orange"
+                          android:drawableTop="@drawable/expand_icon_white"
+                          android:fontFamily="@font/poppins_semibold"
+                          android:gravity="center"
+                          android:padding="20dp"
+                          android:text="Análisis\nquímico"
+                          android:textAllCaps="false"
+                          android:textColor="@color/white"
+                          android:textSize="16sp"
+                          app:cornerRadius="15dp" />
+                        
+                        <Button
+                          style="?android:attr/buttonBarButtonStyle"
+                          android:layout_width="146dp"
+                          android:layout_height="match_parent"
+                          android:layout_gravity="center"
+                          android:layout_marginEnd="15dp"
+                          android:backgroundTint="@color/geoterra_orange"
+                          android:drawableTop="@drawable/chart_pie_white"
+                          android:fontFamily="@font/poppins_semibold"
+                          
+                          android:padding="20dp"
+                          android:text="Diagrama\nde Piper"
+                          android:textAllCaps="false"
+                          android:textColor="@color/white"
+                          android:textSize="16sp"
+                          app:cornerRadius="15dp" />
+                        
+                        <Button
+                          style="?android:attr/buttonBarButtonStyle"
+                          android:layout_width="140dp"
+                          android:layout_height="match_parent"
+                          android:layout_gravity="center"
+                          android:layout_marginEnd="15dp"
+                          android:backgroundTint="@color/geoterra_orange"
+                          android:drawableTop="@drawable/share_ios_export_white"
+                          android:fontFamily="@font/poppins_semibold"
+                          
+                          android:padding="20dp"
+                          android:text="Descargar\nreporte"
+                          android:textAllCaps="false"
+                          android:textColor="@color/white"
+                          android:textSize="16sp"
+                          app:cornerRadius="15dp" />
+                        
+                        <Button
+                          style="?android:attr/buttonBarButtonStyle"
+                          android:layout_width="140dp"
+                          android:layout_height="match_parent"
+                          android:layout_gravity="center"
+                          android:layout_marginEnd="15dp"
+                          android:backgroundTint="@color/geoterra_orange"
+                          android:drawableTop="@drawable/outline_book_60"
+                          android:fontFamily="@font/poppins_semibold"
+                          
+                          android:padding="20dp"
+                          android:text="Historial"
+                          android:textAllCaps="false"
+                          android:textColor="@color/white"
+                          android:textSize="16sp"
+                          app:cornerRadius="15dp" />
+                        
+                        <!-- Más botones aquí -->
+                    
+                    </LinearLayout>
+                </HorizontalScrollView>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</LinearLayout>

@@ -49,7 +49,9 @@
             android:inputType="textEmailAddress"
             android:autofillHints="emailAddress"
             android:hint="@string/email"
-            android:textColor="@color/black" />
+            android:fontFamily="@font/poppins_regular"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
 
         <EditText
             android:id="@+id/userPassword"
@@ -65,7 +67,9 @@
             android:inputType="textPassword"
             android:autofillHints="password"
             android:hint="@string/password"
-            android:textColor="@color/black" />
+            android:fontFamily="@font/poppins_regular"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
 
         <LinearLayout
             android:id="@+id/togglePasswordLayout"
@@ -78,11 +82,11 @@
                 android:layout_height="wrap_content"
 
                 android:padding="8dp"
-                android:text="Show Password"
-                android:fontFamily="@font/calibri_bold"
+                android:text="Mostrar contraseña"
+                android:fontFamily="@font/poppins_regular"
                 android:textColor="@color/black"
                 android:textSize="12sp"
-                >
+              >
             </TextView>
             <CheckBox
                 android:id="@+id/checkBoxTogglePassword"
@@ -107,7 +111,9 @@
             android:inputType="textPersonName"
             android:autofillHints="personName"
             android:hint="@string/name"
-            android:textColor="@color/black" />
+            android:fontFamily="@font/poppins_regular"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
 
         <EditText
             android:id="@+id/userLastName"
@@ -123,7 +129,9 @@
             android:inputType="textPersonName"
             android:autofillHints="personName"
             android:hint="@string/lastname"
-            android:textColor="@color/black" />
+            android:fontFamily="@font/poppins_regular"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
 
         <EditText
             android:id="@+id/userPhoneNum"
@@ -139,15 +147,17 @@
             android:inputType="phone"
             android:autofillHints="phone"
             android:hint="@string/contact_number"
-
-            android:textColor="@color/black" />
-
+          
+            android:fontFamily="@font/poppins_regular"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
+        
         <Button
             android:id="@+id/createAccountB"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:backgroundTint="@color/geoterra_yellow"
+            android:backgroundTint="@color/geoterra_orange"
             android:text="@string/create_account"
             android:fontFamily="@font/poppins_semibold"
             android:textColor="@color/white"
@@ -164,7 +174,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:fontFamily="@font/calibri_bold"
+            android:fontFamily="@font/poppins_regular"
+            android:textColor="@color/black"
             android:text="Instituto de Investigaciones en Ingeniería | REFORESTA"
             android:textSize="12sp" />
 
