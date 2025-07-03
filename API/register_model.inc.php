@@ -1,39 +1,39 @@
 <?php
+	declare(strict_types=1);
 
-declare(strict_types=1);
+	function check_email(object $pdo, string $email) {
+		$query = "SELECT email FROM reg_usr WHERE email = :email;";
+		$stmt = $pdo->prepare($query);
+		$stmt->bindParam(":email", $email);
+		$stmt->execute();
 
-function check_email(object $pdo, string $email)
-{
-  $query = "SELECT email FROM reg_usr WHERE email = :email;";
-  $stmt = $pdo->prepare($query);
-  $stmt->bindParam(":email", $email);
-  $stmt->execute();
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		return $result;
+	}
 
-  $result = $stmt->fetch(PDO::FETCH_ASSOC);
-  return $result;
-}
+	function insert_to_db(object $pdo, array $user_attributes) {
+		$query = "INSERT INTO reg_usr (email, password, first_name, last_name, phone_number, rol) VALUES
+		(:email, :password, :first_name, :last_name, :phone_number, :rol);";
 
-function insert_to_db(object $pdo, array $user_attributes)
-{
-  $query = "INSERT INTO reg_usr (email, password, first_name, last_name, phone_number) VALUES
-  (:email, :password, :first_name, :last_name, :phone_number);";
+		$stmt = $pdo->prepare($query);
 
-  $stmt = $pdo->prepare($query);
+		$options = [
+			'cost' => 12
+		];
 
-  $options = [
-    'cost' => 12
-  ];
+		// Hasheo si querés activar esto después
+		// $hashedPass = password_hash($user_attributes["password"],
+		//   PASSWORD_BCRYPT, $options);
 
-  // $hashedPass = password_hash($user_attributes["password"],
-  //   PASSWORD_BCRYPT, $options);
+		$stmt->bindParam(":email", $user_attributes["email"]);
+		$stmt->bindParam(":password", $user_attributes["password"]);
+		$stmt->bindParam(":first_name", $user_attributes["first_name"]);
+		$stmt->bindParam(":last_name", $user_attributes["last_name"]);
+		$stmt->bindParam(":phone_number", $user_attributes["phone_num"]);
 
-  $stmt->bindParam(":email", $user_attributes["email"]);
-  $stmt->bindParam(":password", $user_attributes["password"]);
-  $stmt->bindParam(":first_name", $user_attributes["first_name"]);
-  $stmt->bindParam(":last_name", $user_attributes["last_name"]);
-  $stmt->bindParam(":phone_number", $user_attributes["phone_num"]);
+		$rol = $user_attributes["rol"] ?? "usr";
+		$stmt->bindParam(":rol", $rol);
 
-  return $stmt->execute();
-}
-
+		return $stmt->execute();
+	}
 ?>

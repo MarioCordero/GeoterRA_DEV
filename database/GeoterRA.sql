@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 15, 2025 at 09:58 AM
+-- Generation Time: Jul 03, 2025 at 01:54 PM
 -- Server version: 8.0.42-0ubuntu0.22.04.1
 -- PHP Version: 8.1.2-1ubuntu2.21
 
@@ -83,7 +83,7 @@ CREATE TABLE `reg_usr` (
   `first_name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
   `last_name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
   `phone_number` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `rol` varchar(10) COLLATE utf8mb4_general_ci NOT NULL
+  `rol` varchar(10) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'usr'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -141,7 +141,8 @@ INSERT INTO `reg_usr` (`id`, `email`, `password`, `first_name`, `last_name`, `ph
 (441, 'squaltro1b@shareasale.com', 'zP9<k1iBbgB|\"aVE', 'Swen', 'Qualtro', '1613555051', ''),
 (442, 'llower1c@biglobe.ne.jp', 'qD8!<|4=0', 'Luce', 'Lower', '7569086054', ''),
 (443, 'mcarlo1d@netscape.com', 'kB4/%On\'&9', 'Mollie', 'Carlo', '8838281420', ''),
-(444, 'test@test.com', 'test', 'Christopher', 'Acosta Madrigal', '86473533', '');
+(444, 'test@test.com', 'test', 'Christopher', 'Acosta Madrigal', '86473533', ''),
+(446, 'cordero@gmail.com', '2003', 'Mario', 'Cordero', '83443610', 'usr');
 
 -- --------------------------------------------------------
 
@@ -208,7 +209,7 @@ ALTER TABLE `solicitudes`
 -- AUTO_INCREMENT for table `reg_usr`
 --
 ALTER TABLE `reg_usr`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=445;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=447;
 
 --
 -- AUTO_INCREMENT for table `solicitudes`

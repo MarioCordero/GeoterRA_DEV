@@ -15,6 +15,7 @@
 		$user_params["password"] = $_POST["password"];
 		$user_params["email"] = $_POST["email"];
 		$user_params["phone_num"] = $_POST["phone_num"];
+		$user_params["rol"] = "usr";
 
 		try {
 			// Brings the files for the databse connection and the MVC pattern

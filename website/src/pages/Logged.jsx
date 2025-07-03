@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SidebarLayout from '../components/loggedComponents/loggedSidebar';
+import LoggedMainPage from '../components/loggedComponents/loggedMainPage';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+// Import other pages as needed
+import Solicitudes from '../components/loggedComponents/loggedRequests';
 
 const DashboardPlaceholder = () => (
   <div
@@ -23,17 +26,27 @@ const DashboardPlaceholder = () => (
   </div>
 );
 
-const Logged = () => (
-  <div className="min-h-screen flex flex-col">
-    <Header />
-    <div className="flex flex-1 pt-16">
-      <SidebarLayout />
-      <div className="flex-1 flex flex-col overflow-auto">
-        <DashboardPlaceholder />
-        <Footer />
+const Logged = () => {
+  const [selectedKey, setSelectedKey] = useState('1');
+
+  let content;
+  if (selectedKey === '1') content = <LoggedMainPage />;
+  else if (selectedKey === '2') content = <Perfil />;
+  else if (selectedKey === '3') content = <Solicitudes />;
+  else content = <DashboardPlaceholder />;
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <div className="flex flex-1 pt-16">
+        <SidebarLayout selectedKey={selectedKey} setSelectedKey={setSelectedKey} />
+        <div className="flex-1 flex flex-col overflow-auto">
+          {content}
+        </div>
       </div>
+      <Footer />
     </div>
-  </div>
-);
+  );
+};
 
 export default Logged;
