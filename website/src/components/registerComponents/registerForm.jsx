@@ -35,7 +35,7 @@ export default function Register() {
     form.append("phone_num", formData.phone_num);
 
     try {
-      const response = await fetch("http://geoterra.com/API/register.inc.php", {
+      const response = await fetch("http://163.178.171.105/API/register.inc.php", {
         method: "POST",
         body: form,
       });
