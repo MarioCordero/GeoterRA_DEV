@@ -22,7 +22,7 @@ object SessionManager {
   private lateinit var sharedPreferences: SharedPreferences
 
   // ==================== EVENT SYSTEM ====================
-  private val sessionListeners = mutableListOf<() -> Unit>()
+  private val sessionListeners = mutableListOf<(Boolean) -> Unit>()
 
   /**
    * @brief Initializes session storage system
@@ -42,28 +42,30 @@ object SessionManager {
   fun startSession(email: String) {
     sharedPreferences.edit() { putString(KEY_USER_EMAIL, email) }
     Log.d("SessionManager", "User logged in with email: $email")
-    sessionListeners.forEach { it.invoke() }
+    sessionListeners.forEach { it.invoke(true) }
   }
 
   /**
    * @brief Terminates current session and clears credentials
    */
   fun endSession() {
+    val currentlyActive = isSessionActive()
     sharedPreferences.edit() { remove(KEY_USER_EMAIL) }
     Log.d("SessionManager", "User logged out")
+    if (currentlyActive) {
+      sessionListeners.forEach { it.invoke(false) }
+    }
   }
 
   /**
    * @brief Registers session state change listener
-   * @param listener Callback to execute on session events
+   * @param listener Callback to execute on session events. The boolean parameter indicates if the session is active.
    *
-   * Immediately triggers callback if session is already active
+   * Immediately triggers callback with current session state.
    */
-  fun setOnSessionActiveListener(listener: () -> Unit) {
+  fun setOnSessionStateChangeListener(listener: (isActive: Boolean) -> Unit) {
     sessionListeners.add(listener)
-    if (isSessionActive()) {
-      listener()
-    }
+    listener(this.isSessionActive())
   }
 
   /**
