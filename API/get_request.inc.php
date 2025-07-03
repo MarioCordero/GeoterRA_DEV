@@ -1,33 +1,61 @@
 <?php
+    require_once 'cors.inc.php';
+    session_start();
+    require 'conf_sess.inc.php';
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+	if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-  // Obtains the username associated to the current session
-  $request_fields["email"] = $_POST["email"];
+	$request_fields["email"] = $_POST["email"] ?? null;
 
-  try {
-    $errors = [];
-    // Brings the files for the databse connection and the MVC pattern
-    // MVC: Patron modelo vista controlador
-    require_once 'dbhandler.inc.php';
-    require_once 'get_request_model.inc.php';
-    require_once 'get_request_cont.php';
+	$apiResponse = [
+		"response" => "Error",
+		"message" => "",
+		"errors" => [],
+		"data" => [],
+		"debug" => []
+	];
 
+	try {
+		require_once 'dbhandler.inc.php';
+		require_once 'get_request_model.inc.php';
+		require_once 'get_request_cont.php';
 
-    // If none of the previous errors happened it insert the user on the db
+		$solicitudes = get_requests($pdo, $request_fields);
 
-    $solicitudes = get_requests($pdo, $request_fields);
-    if ($solicitudes) {
-      header("Content-Type: application/json");
-      echo json_encode(['status' => 'response_succeded',
-      'solicitudes mostras' => $solicitudes, 'errors' => $errors]);
-    } else {
-      echo json_encode(['status' => 'response_failed', 'errors' => $errors]);
-    }
+		if ($solicitudes) {
+		$apiResponse["response"] = "Ok";
+		$apiResponse["message"] = "Solicitudes obtenidas correctamente";
+		$apiResponse["data"] = $solicitudes;
+		} else {
+		$apiResponse["message"] = "No se encontraron solicitudes";
+		$apiResponse["errors"][] = "No se encontraron solicitudes";
+		}
 
-  } catch (PDOException $e) {
-    die("Query failed: " . $e->getMessage());
-  }
-}
+		header("Content-Type: application/json");
+		echo json_encode($apiResponse);
+		die();
+
+	} catch (PDOException $e) {
+		$apiResponse["message"] = "Query failed";
+		$apiResponse["errors"][] = "Query failed";
+		$apiResponse["debug"][] = $e->getMessage();
+		header("Content-Type: application/json");
+		echo json_encode($apiResponse);
+		die();
+	}
+	} else {
+		header("Content-Type: application/json");
+		echo json_encode([
+			"response" => "Error",
+			"message" => "Invalid request method",
+			"errors" => ["Invalid request method"],
+			"data" => [],
+			"debug" => []
+		]);
+		die();
+	}
 
 ?>

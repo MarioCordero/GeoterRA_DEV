@@ -35,7 +35,7 @@ function Login() {
 
       console.log("API response:", data);
 
-      if (data.status === "logged_in") {
+      if (data.response === "Ok") {
         navigate("/Logged"); // <-- Redirect to the React route
         // checkSession();  // TODO []
       } else {

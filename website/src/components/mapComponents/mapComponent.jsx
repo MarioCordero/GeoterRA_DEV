@@ -165,11 +165,13 @@ export default function MapComponent() {
           )}
 
           {visiblePoints.map((point, idx) => {
-            // console.log(`Marker ${idx}:`, point, "Lat:", point.coord_y, "Lng:", point.coord_x);
+            const lat = parseFloat(point.coord_y);
+            const lng = parseFloat(point.coord_x);
+            if (isNaN(lat) || isNaN(lng)) return null; // Skip invalid points
             return (
               <Marker
                 key={`${point.region}-${idx}`}
-                position={[parseFloat(point.coord_y), parseFloat(point.coord_x)]}
+                position={[lat, lng]}
               >
                 <Popup>
                   <div>

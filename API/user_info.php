@@ -1,39 +1,58 @@
 <?php
-require_once 'dbhandler.inc.php'; // include your DB connection script
+    require_once 'cors.inc.php';
+	session_start();
+	require 'conf_sess.inc.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get email from the POST request
-    $email = $_POST['email'];
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+    require_once 'dbhandler.inc.php'; // include your DB connection script
 
-    if (!empty($email)) {
-        try {
-            // Prepare the SQL query
-            $stmt = $pdo->prepare("SELECT first_name, last_name, email, phone_number FROM reg_usr WHERE email = :email");
-            $stmt->bindParam(':email', $email);
-            $stmt->execute();
+    $apiResponse = [
+        "response" => "Error",
+        "message" => "",
+        "errors" => [],
+        "data" => [],
+        "debug" => []
+    ];
 
-            // Fetch the user data
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $email = $_POST['email'] ?? null;
 
-            // If user data is found, return it as JSON
-            if ($user) {
-                echo json_encode([
-                    'status' => 'success',
-                    'name' => $user['first_name'] . ' ' . $user['last_name'],
-                    'email' => $user['email'],
-                    'phone' => $user['phone_number']
-                ]);
-            } else {
-                // If no user is found
-                echo json_encode(['status' => 'error', 'message' => 'User not found.']);
+        if (!empty($email)) {
+            try {
+                $stmt = $pdo->prepare("SELECT first_name, last_name, email, phone_number FROM reg_usr WHERE email = :email");
+                $stmt->bindParam(':email', $email);
+                $stmt->execute();
+
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($user) {
+                    $apiResponse["response"] = "Ok";
+                    $apiResponse["message"] = "Usuario encontrado";
+                    $apiResponse["data"] = [
+                        "name" => $user['first_name'] . ' ' . $user['last_name'],
+                        "email" => $user['email'],
+                        "phone" => $user['phone_number']
+                    ];
+                } else {
+                    $apiResponse["message"] = "Usuario no encontrado";
+                    $apiResponse["errors"][] = "Usuario no encontrado";
+                }
+            } catch (PDOException $e) {
+                $apiResponse["message"] = "Database error";
+                $apiResponse["errors"][] = "Database error";
+                $apiResponse["debug"][] = $e->getMessage();
             }
-        } catch (PDOException $e) {
-            // Handle any errors
-            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        } else {
+            $apiResponse["message"] = "Email is required";
+            $apiResponse["errors"][] = "Email is required";
         }
     } else {
-        // Handle missing email
-        echo json_encode(['status' => 'error', 'message' => 'Email is required.']);
+        $apiResponse["message"] = "Invalid request method";
+        $apiResponse["errors"][] = "Invalid request method";
     }
-}
+
+    header('Content-Type: application/json');
+    echo json_encode($apiResponse);
 ?>

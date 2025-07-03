@@ -44,7 +44,7 @@ export default function Register() {
 
       console.log("API response:", data);
 
-      if (data.status === "registered") {
+      if (data.response === "Ok") {
         // Redirect to login or another page
         navigate("/Logged");
       } else {
