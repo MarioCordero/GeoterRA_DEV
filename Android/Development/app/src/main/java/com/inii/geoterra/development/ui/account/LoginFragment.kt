@@ -5,17 +5,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
 import android.widget.FrameLayout
-import android.widget.LinearLayout
-import android.widget.TextView
-import com.inii.geoterra.development.R
 import com.inii.geoterra.development.api.Error
 import com.inii.geoterra.development.api.SignInCredentials
 import com.inii.geoterra.development.api.SignInResponse
-import com.inii.geoterra.development.databinding.AnalysisPropertiesPageBinding
 import com.inii.geoterra.development.databinding.FragmentLoginBinding
 import com.inii.geoterra.development.interfaces.PageFragment
 import com.inii.geoterra.development.managers.SessionManager
@@ -175,7 +168,7 @@ class LoginFragment : PageFragment<FragmentLoginBinding>() {
         serverResponse.errors.isNotEmpty() -> this.handleServerErrors(
           serverResponse.errors
         )
-        serverResponse.status == "logged_in" -> this.completeLoginFlow(
+        serverResponse.response == "Ok" -> this.completeLoginFlow(
           credentials
         )
         else -> this.handleSessionConflict()

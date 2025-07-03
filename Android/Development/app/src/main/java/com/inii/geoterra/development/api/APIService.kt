@@ -116,12 +116,12 @@ data class AnalysisRequestPayload(
 /**
  * @brief API response for submitted service requests
  * @property status Status of the operation (success or error)
- * @property requests List of processed requests
+ * @property data List of processed requests
  * @property errors Validation errors if any
  */
 data class RequestsSubmittedResponse(
-  @SerializedName("status") val status : String,
-  @SerializedName("solicitudes mostras") val requests : List<AnalysisRequest>,
+  @SerializedName("response") val status : String,
+  @SerializedName("data") val data : List<AnalysisRequest>,
   @SerializedName("errors") val errors : List<Error>
 )
 
@@ -144,24 +144,24 @@ data class AnalysisRequest(
 /**
  * Sign in response
  *
- * @property status Status of the operation (success or error)
+ * @property response Status of the operation (success or error)
  * @property errors Validation errors if any
  * @constructor Create empty Sign in response
  */
 data class SignInResponse(
-  @SerializedName("status") val status : String,
+  @SerializedName("response") val response : String,
   @SerializedName("errors") val errors : List<Error>
 )
 
 /**
  * Logged out response
  *
- * @property status Status of the operation (success or error)
+ * @property response Status of the operation (success or error)
  * @property errors Validation errors if any
  * @constructor Create empty Logged out response
  */
 data class LoggedOutResponse(
-  @SerializedName("status") val status : String,
+  @SerializedName("response") val response : String,
   @SerializedName("errors") val errors : List<Error>
 )
 
@@ -172,9 +172,9 @@ data class LoggedOutResponse(
  * @property emailUsed Error message for used email.
  * @constructor Create empty Sign up error response
  */
-data class SignUpErrorResponse(
-  @SerializedName("empty_input") val emptyInput : String,
-  @SerializedName("email_used") val emailUsed : String
+data class SignUpResponse(
+  @SerializedName("response") val response : String,
+  @SerializedName("errors") val errors : List<Error>
 )
 
 /**
@@ -192,12 +192,12 @@ data class CheckSessionResponse(
 /**
  * Data class used to format the response of the server in the Request request.
  *
- * @property status Status of the operation (success or error)
+ * @property response Status of the operation (success or error)
  * @property errors Validation errors if any
  * @constructor Create empty Request response
  */
 data class RequestResponse(
-  @SerializedName("status") val status : String,
+  @SerializedName("response") val response : String,
   @SerializedName("errors") val errors : List<Error>
 )
 
@@ -213,18 +213,28 @@ data class Error(
   @SerializedName("message") val message: String,
 )
 
+data class UserInfoResponse(
+  @SerializedName("response") var response : String,
+  @SerializedName("data") var data : UserInformation
+)
+
 /**
  * @brief User profile information
- * @property status Status of the operation (success or error)
+ * @property response Status of the operation (success or error)
  * @property name User full name
  * @property email User email
  * @property phone User phone number
  */
 data class UserInformation(
-  @SerializedName("status") var status : String,
   @SerializedName("name") var name : String,
   @SerializedName("email") var email : String,
   @SerializedName("phone") var phone : String
+)
+
+data class ThermalPointResponse(
+  @SerializedName("response") val response : String,
+  @SerializedName("data") val points : List<ThermalPoint>,
+  @SerializedName("errors") val errors : List<Error>
 )
 
 /* ==================== API SERVICE ==================== */
@@ -254,7 +264,7 @@ interface APIService {
    * @param firstName Legal first name
    * @param lastName Legal last name
    * @param phoneNumber E.164 formatted phone number
-   * @return [SignUpErrorResponse] with validation errors
+   * @return [SignUpResponse] with validation errors
    */
   @FormUrlEncoded
   @POST("register.inc.php")
@@ -264,7 +274,7 @@ interface APIService {
     @Field("first_name") firstName : String,
     @Field("last_name") lastName : String,
     @Field("phone_num") phoneNumber : String
-  ): Call<List<SignUpErrorResponse>>
+  ): Call<SignUpResponse>
 
   /**
    * @brief Validates current session status
@@ -295,7 +305,7 @@ interface APIService {
   @POST("user_info.php")
   fun getUserInfo(
     @Field("email") email: String
-  ): Call<UserInformation>
+  ): Call<UserInfoResponse>
 
   /* ==================== GEOSPATIAL DATA ENDPOINTS ==================== */
 
@@ -309,7 +319,7 @@ interface APIService {
   @POST("map_data.inc.php")
   fun getMapPoints(
     @Field("region") region: String
-  ): Call<List<ThermalPoint>>
+  ): Call<ThermalPointResponse>
 
   /* ==================== SERVICE REQUEST ENDPOINTS ==================== */
 

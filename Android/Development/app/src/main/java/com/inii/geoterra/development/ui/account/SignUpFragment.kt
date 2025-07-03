@@ -7,13 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
-import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.lifecycle.lifecycleScope
-import com.inii.geoterra.development.R
-import com.inii.geoterra.development.api.SignUpErrorResponse
+import com.inii.geoterra.development.api.Error
+import com.inii.geoterra.development.api.SignUpResponse
 import com.inii.geoterra.development.api.SingUpCredentials
-import com.inii.geoterra.development.databinding.FragmentLoginBinding
 import com.inii.geoterra.development.databinding.FragmentSignUpBinding
 import com.inii.geoterra.development.interfaces.PageFragment
 import kotlinx.coroutines.Dispatchers
@@ -163,18 +161,18 @@ class SignUpFragment : PageFragment<FragmentSignUpBinding>() {
       userCredentials.email, userCredentials.password,
       userCredentials.firstName, userCredentials.lastName,
       userCredentials.phoneNumber
-    ).enqueue(object : Callback<List<SignUpErrorResponse>> {
-      override fun onResponse(call : Call<List<SignUpErrorResponse>>,
-        response : Response<List<SignUpErrorResponse>>
+    ).enqueue(object : Callback<SignUpResponse> {
+      override fun onResponse(call : Call<SignUpResponse>,
+                              response : Response<SignUpResponse>
       ) {
         when {
-          response.isSuccessful -> handleRegistrationResponse(response.body())
+          response.isSuccessful -> response.body()?.let { handleRegistrationResponse(it) }
           else -> showError("Server error: ${response.code()}")
         }
       }
 
       override fun onFailure(
-        call : Call<List<SignUpErrorResponse>>, t : Throwable) {
+        call : Call<SignUpResponse>, t : Throwable) {
         logNetworkError("Connection failure: ${t.message}")
         showError("Connection error: ${t.message}")
       }
@@ -187,10 +185,10 @@ class SignUpFragment : PageFragment<FragmentSignUpBinding>() {
    * @param serverResponse Parsed API response data
    */
   private fun handleRegistrationResponse(
-    serverResponse: List<SignUpErrorResponse>?) {
+    serverResponse: SignUpResponse) {
     when {
-      serverResponse.isNullOrEmpty() -> completeRegistration()
-      else -> handleServerErrors(serverResponse)
+      serverResponse.response == "Ok" -> completeRegistration()
+      else -> handleServerErrors(serverResponse.errors)
     }
   }
 
@@ -198,6 +196,7 @@ class SignUpFragment : PageFragment<FragmentSignUpBinding>() {
    * @brief Finalizes successful registration process
    */
   private fun completeRegistration() {
+    this.showToast("Registro de usuario completado")
     Log.i("Registration", "Account created successfully")
     listener?.onFragmentEvent("FINISHED")
   }
@@ -207,10 +206,10 @@ class SignUpFragment : PageFragment<FragmentSignUpBinding>() {
    * @brief Processes server-side validation errors
    * @param errors List of error objects from API response
    */
-  private fun handleServerErrors(errors: List<SignUpErrorResponse>) {
+  private fun handleServerErrors(errors: List<Error>) {
     errors.forEach { error ->
       Log.i("RegistrationError", error.toString())
-      showError(error.emptyInput)
+      showError("${error.type} :  ${error.message}")
     }
   }
 

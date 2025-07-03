@@ -5,14 +5,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.inii.geoterra.development.R
 import com.inii.geoterra.development.api.CheckSessionResponse
+import com.inii.geoterra.development.api.UserInfoResponse
 import com.inii.geoterra.development.api.UserInformation
 import com.inii.geoterra.development.databinding.FragmentAccountBinding
-import com.inii.geoterra.development.databinding.FragmentLoginBinding
 import com.inii.geoterra.development.interfaces.PageFragment
 import com.inii.geoterra.development.managers.SessionManager
 import retrofit2.Call
@@ -62,7 +59,7 @@ class AccountFragment : PageFragment<FragmentAccountBinding>() {
     container : ViewGroup?
   ) : View {
 
-    this.accountInformation = UserInformation("", "", "", "")
+    this.accountInformation = UserInformation("", "", "")
 
     if (SessionManager.isSessionActive()) {
       getUserInformation()
@@ -114,6 +111,8 @@ class AccountFragment : PageFragment<FragmentAccountBinding>() {
   private fun showUserInformation() {
     val nameTextView = this.binding.userName
     nameTextView.text = accountInformation.name
+    this.binding.email.text = this.accountInformation.email
+    this.binding.phoneNumber.text = this.accountInformation.phone
   }
 
   // =============== DATA HANDLING METHODS ===============
@@ -125,15 +124,17 @@ class AccountFragment : PageFragment<FragmentAccountBinding>() {
    */
   private fun getUserInformation() {
     this.apiService.getUserInfo(SessionManager.getUserEmail()!!).enqueue(
-      object : Callback<UserInformation> {
-      override fun onResponse(call: Call<UserInformation>,
-        response: Response<UserInformation>) {
-        if (response.isSuccessful) {
-          handleUserDataResponse(response.body())
+      object : Callback<UserInfoResponse> {
+      override fun onResponse(call: Call<UserInfoResponse>,
+        response: Response<UserInfoResponse>) {
+        when {
+          response.isSuccessful -> {
+            handleUserDataResponse(response.body())
+          }
         }
       }
 
-      override fun onFailure(call: Call<UserInformation>, t: Throwable) {
+      override fun onFailure(call: Call<UserInfoResponse>, t: Throwable) {
         logNetworkError("Error de conexión: ${t.message}")
         showError("Error de conexión: ${t.message}")
       }
@@ -173,12 +174,12 @@ class AccountFragment : PageFragment<FragmentAccountBinding>() {
    * @brief Handles successful user data response
    * @param serverResponse Parsed API response data
    */
-  private fun handleUserDataResponse(serverResponse: UserInformation?) {
-    if (serverResponse?.status == "success") {
-      this.accountInformation = serverResponse.copy()
+  private fun handleUserDataResponse(serverResponse: UserInfoResponse?) {
+    if (serverResponse?.response == "Ok") {
+      this.accountInformation = serverResponse.data
       this.showUserInformation()
     } else {
-      serverResponse?.status?.let { handleServerErrors(it) }
+      serverResponse?.response?.let { handleServerErrors(it) }
     }
   }
 

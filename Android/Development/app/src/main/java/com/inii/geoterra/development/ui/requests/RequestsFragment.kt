@@ -214,7 +214,7 @@ class RequestsFragment : PageFragment<FragmentRequestsBinding>() {
         if (response.isSuccessful) {
           response.body()?.let { responseBody ->
             // Update local requests collection
-            submittedRequests = responseBody.requests
+            submittedRequests = responseBody.data ?: emptyList()
 
             // Refresh UI on main thread
             updateRequestsUI()

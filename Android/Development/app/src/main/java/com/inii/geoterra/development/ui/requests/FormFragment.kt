@@ -25,7 +25,6 @@ import com.inii.geoterra.development.api.AnalysisRequestPayload
 import com.inii.geoterra.development.api.Error
 import com.inii.geoterra.development.api.RequestResponse
 import com.inii.geoterra.development.databinding.FragmentFormBinding
-import com.inii.geoterra.development.databinding.FragmentLoginBinding
 import com.inii.geoterra.development.device.GPSManager
 import com.inii.geoterra.development.interfaces.PageFragment
 import com.inii.geoterra.development.managers.GalleryPermissionManager
@@ -466,8 +465,8 @@ class FormFragment : PageFragment<FragmentFormBinding>() {
   private fun handleRequestResponse(response: RequestResponse?) {
     response?.let {
       if (it.errors.isEmpty()) {
-        when (it.status) {
-          "request_created" -> {
+        when (it.response) {
+          "Ok" -> {
             this.showToast(
               "Request created successfully",
               Toast.LENGTH_SHORT

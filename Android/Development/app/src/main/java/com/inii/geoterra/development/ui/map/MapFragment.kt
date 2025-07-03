@@ -19,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.interfaces.MessageListener
 import com.inii.geoterra.development.api.ThermalPoint
+import com.inii.geoterra.development.api.ThermalPointResponse
 import com.inii.geoterra.development.databinding.FragmentMapBinding
 import com.inii.geoterra.development.device.CoordinateConverter.convertCRT05toWGS84
 import com.inii.geoterra.development.device.GPSManager
@@ -54,7 +55,7 @@ import retrofit2.Response
  * @property mapMarkers Collection of all markers on the map keyed by ID
  * @property thermalPoints Cache of thermal point data associated with markers
  */
-class MapFragment : PageFragment<FragmentMapBinding>(), MessageListener {
+class MapFragment : PageFragment<FragmentMapBinding>(), MessageListener{
 
   /** Inflated view hierarchy reference for the map fragment */
   override val bindingInflater : (LayoutInflater, ViewGroup?, Boolean) ->
@@ -477,16 +478,20 @@ class MapFragment : PageFragment<FragmentMapBinding>(), MessageListener {
    *
    * @return Configured Callback instance
    */
-  private fun createPointsCallback(): Callback<List<ThermalPoint>> {
-    return object : Callback<List<ThermalPoint>> {
+  private fun createPointsCallback(): Callback<ThermalPointResponse> {
+    return object : Callback<ThermalPointResponse> {
       override fun onResponse(
-        call: Call<List<ThermalPoint>>,
-        response: Response<List<ThermalPoint>>
+        call: Call<ThermalPointResponse>,
+        response: Response<ThermalPointResponse>
       ) {
-        handlePointsResponse(response)
+        when {
+          response.isSuccessful -> response.body()?.let {
+            handlePointsResponse(it)
+          }
+          else -> showError("Server error: ${response.code()}")
+        }
       }
-
-      override fun onFailure(call: Call<List<ThermalPoint>>, t: Throwable) {
+      override fun onFailure(call: Call<ThermalPointResponse>, t: Throwable) {
         handlePointsFailure(t)
       }
     }
@@ -497,14 +502,10 @@ class MapFragment : PageFragment<FragmentMapBinding>(), MessageListener {
    *
    * @param response API response containing thermal points
    */
-  private fun handlePointsResponse(response: Response<List<ThermalPoint>>) {
-    if (response.isSuccessful) {
-      response.body()?.let { points ->
-        Log.i("API Response", "Points received: ${points.size}")
-        setupThermalMarkers(points)
-      }
-    } else {
-      showError("Server error: ${response.code()}")
+  private fun handlePointsResponse(serverResponse: ThermalPointResponse) {
+    when {
+      serverResponse.response == "Ok" -> setupThermalMarkers(serverResponse.points)
+      serverResponse.errors.isNotEmpty() -> showError("Error de servidor")
     }
   }
 
