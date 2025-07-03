@@ -3,12 +3,16 @@ package com.inii.geoterra.development.interfaces
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.viewbinding.ViewBinding
 import com.inii.geoterra.development.api.APIService
 import com.inii.geoterra.development.api.RetrofitClient
+import com.inii.geoterra.development.device.GPSManager
 
 /**
  * @brief Base fragment class for handling page navigation and lifecycle events
@@ -19,10 +23,18 @@ import com.inii.geoterra.development.api.RetrofitClient
  * - Back press handling
  * - Visibility state hooks
  */
-open class PageFragment : Fragment(), FragmentListener {
-  // =============== VIEW BINDING ===============
-  /** @brief Container for fragment's view elements */
-  protected lateinit var binding: View
+abstract class PageFragment<VB : ViewBinding> : Fragment(), FragmentListener {
+  /** ViewBinding instance (accessible only between onCreateView and onDestroyView) */
+  private var _binding: VB? = null
+
+  /** Non-null binding reference within valid lifecycle window */
+  protected val binding get() = _binding!!
+
+  /** Provide the inflate function for the specific ViewBinding of the subclass.
+   *
+   * Example: MyFragmentBinding::inflate
+   */
+  protected abstract val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> VB
 
   /** @brief Retrofit API service instance for network operations */
   var apiService: APIService = RetrofitClient.getAPIService()
@@ -42,7 +54,6 @@ open class PageFragment : Fragment(), FragmentListener {
    */
   final override fun onAttach(context: Context) {
     super.onAttach(context)
-
 //    (parentFragment as? PageFragment)?.onPause()
 
     val parent = parentFragment
@@ -68,18 +79,72 @@ open class PageFragment : Fragment(), FragmentListener {
   /**
    * @brief Cleans up FragmentListener reference during detachment
    */
-  final override fun onDetach() {
+  override fun onDetach() {
     super.onDetach()
     this.listener = null
-
-//    if (parentFragment is PageFragment) {
-//      this.onResume()
-//    }
   }
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+  /**
+   * @brief Cleans up ViewBinding reference during destruction
+   */
+  final override fun onDestroyView() {
+    super.onDestroyView()
+    this._binding = null
+  }
 
+
+  /**
+   * Called to create the view hierarchy associated with this page or fragment.
+   *
+   * This abstract method must be implemented by subclasses to inflate and return
+   * the root view of the page.
+   *
+   * @param inflater The LayoutInflater object that can be used to inflate any views.
+   * @param container The parent view that the fragment's UI should be attached to, or null.
+   * @return The root view for the fragment's UI.
+   */
+  protected abstract fun onPageViewCreated(
+    inflater: LayoutInflater,
+    container: ViewGroup?
+  ): View
+
+  /**
+   * Called after the view hierarchy associated with the fragment has been created.
+   *
+   * Subclasses should implement this method to initialize view components, set up observers,
+   * or restore state from [savedInstanceState].
+   *
+   * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
+   */
+  protected abstract fun onPageCreated(savedInstanceState: Bundle?)
+
+  /**
+   * Called to have the fragment instantiate its user interface view.
+   *
+   * This final implementation delegates the view creation to [onPageViewCreated].
+   *
+   * @param inflater The LayoutInflater object that can be used to inflate any views.
+   * @param container The parent view that the fragment's UI should be attached to, or null.
+   * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
+   * @return The root view for the fragment's UI.
+   */
+  final override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    this._binding = bindingInflater.invoke(inflater, container, false)
+    this.onPageViewCreated(inflater, container)
+    return this.binding.root
+  }
+
+  final override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    this.onPageCreated(savedInstanceState)
+    this.setupOnBackPressedCallback()
+  }
+
+  private fun setupOnBackPressedCallback() {
     // Initialize and add the OnBackPressedCallback
     // This callback will only be called when this Fragment is at least Started.
     this.onBackPressedCallback = object : OnBackPressedCallback(true) {
@@ -110,6 +175,7 @@ open class PageFragment : Fragment(), FragmentListener {
       onBackPressedCallback
     )
   }
+
   /**
    * @brief Logic to be executed when the back button is pressed within this fragment.
    * @return Boolean indicating if event was consumed (true) or should propagate (false).
@@ -123,7 +189,7 @@ open class PageFragment : Fragment(), FragmentListener {
     // Child fragments should override this to provide specific
     // back press handling.
     for (child in childFragmentManager.fragments) {
-      if (child is PageFragment && child.isVisible && child.handleBackPress()) {
+      if (child is PageFragment<*> && child.isVisible && child.handleBackPress()) {
         return true
       }
     }
@@ -187,6 +253,14 @@ open class PageFragment : Fragment(), FragmentListener {
             " disabling OnBackPressedCallback."
         )
         onBackPressedCallback.isEnabled = false
+        if (fragmentName == "MapFragment") {
+          Log.d(
+            "PageFragment",
+            "$fragmentName: onHiddenChanged(true) - Fragment hidden," +
+              " disabling OnBackPressedCallback, GPS stopped."
+          )
+          GPSManager.stopLocationUpdates()
+        }
       } else {
         // Fragment is now shown. Enable callback ONLY if fragment is also in resumed state.
         // This prevents enabling the callback if the fragment is shown but its onResume() hasn't run yet
@@ -198,6 +272,14 @@ open class PageFragment : Fragment(), FragmentListener {
               " AND resumed, enabling OnBackPressedCallback."
           )
           onBackPressedCallback.isEnabled = true
+          if (fragmentName == "MapFragment") {
+            Log.d(
+              "PageFragment",
+              "$fragmentName: onHiddenChanged(false) - Fragment shown" +
+                " AND resumed, enabling OnBackPressedCallback, GPS started."
+            )
+            GPSManager.startLocationUpdates()
+          }
         } else {
           Log.d(
             "PageFragment",
