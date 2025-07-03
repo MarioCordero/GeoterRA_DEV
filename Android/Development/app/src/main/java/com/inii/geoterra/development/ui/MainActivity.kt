@@ -53,14 +53,6 @@ class MainActivity : AppCompatActivity(), FragmentListener {
     // Initialize the root view and the navigation menu.
     this.binding = findViewById(R.id.mainLayout)
     this.navigationMenu = this.binding.findViewById(R.id.nav_menu)
-    // Initialize the session manager.
-    SessionManager.init(this@MainActivity)
-    if (!GPSManager.isInitialized()) {
-      GPSManager.initialize(this@MainActivity)
-    }
-    if (!GalleryPermissionManager.isInitialized()) {
-      GalleryPermissionManager.initialize(this@MainActivity)
-    }
     // Check if the activity is being re-created.
     if (savedInstanceState == null) {
       Log.i(
@@ -68,14 +60,20 @@ class MainActivity : AppCompatActivity(), FragmentListener {
         "El estado de la instancia es nulo"
       )
       this.setupActivity()
+      // Initialize the session manager.
+      SessionManager.init(this@MainActivity)
     }
 
-    this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+    this.onBackPressedDispatcher.addCallback(this, object :
+      OnBackPressedCallback(true) {
       override fun handleOnBackPressed() {
-        val currentFragment = listOf(homeFragment, mapFragment, requestsFragment, accountFragment, loginFragment)
-          .firstOrNull { it.isVisible }
+        val currentFragment = listOf(
+          homeFragment, mapFragment,
+          requestsFragment, accountFragment,
+          loginFragment
+        ).firstOrNull { it.isVisible }
 
-        if (currentFragment is PageFragment) {
+        if (currentFragment is PageFragment<*>) {
           val handled = currentFragment.handleBackPress()
           if (!handled) {
             // Si el fragmento no maneja el back, pasar al sistema.
@@ -88,7 +86,6 @@ class MainActivity : AppCompatActivity(), FragmentListener {
         }
       }
     })
-
 
     // Set the navigation menu item click listener.
     this.navigationMenu.setOnItemSelectedListener { item ->
@@ -117,36 +114,39 @@ class MainActivity : AppCompatActivity(), FragmentListener {
 
   private fun handlePageNavigation(itemID : Int) {
     when (itemID) {
-      R.id.nav_home -> showFragment(this.homeFragment)
+      R.id.nav_home -> {
+        GPSManager.stopLocationUpdates()
+        this.showFragment(this.homeFragment)
+      }
       R.id.nav_map -> {
         Log.i("nav_map", "boton de mapa presionado")
         // Start the gps service or ask for permissions
         if (GPSManager.isInitialized()) {
-          GPSManager.startLocationUpdates()
           Log.i("nav_map", "gps inicializado")
-
+          GPSManager.startLocationUpdates()
           if (GPSManager.getLastKnownLocation() != null) {
-            showFragment(this.mapFragment)
+            this.showFragment(this.mapFragment)
           }
         } else {
-          Log.i("nav_map", "gps no inicializado")
           GPSManager.initialize(this)
         }
       }
       R.id.nav_requests ->  {
         Log.i("nav_requests", "boton de solicitudes presionado")
-//        if (SessionManager.isSessionActive()) {
-//          Log.i("nav_requests", "sesion activa")
-//          showFragment(this.requestsFragment)
-//        }
-        showFragment(this.requestsFragment)
+        if (GPSManager.isInitialized()) {
+          Log.i("nav_requests", "gps inicializado")
+          GPSManager.startLocationUpdates()
+        }
+        this.showFragment(this.requestsFragment)
+//        this.showFragment(this.requestsFragment)
       }
       R.id.nav_account -> {
         Log.i("nav_account", "boton de cuenta presionado")
-        if (!SessionManager.isSessionActive()) {
-          showFragment(this.accountFragment)
+        GPSManager.stopLocationUpdates()
+        if (SessionManager.isSessionActive()) {
+          this.showFragment(this.accountFragment)
         } else {
-          showFragment(this.loginFragment)
+          this.showFragment(this.loginFragment)
         }
       }
     }
@@ -164,7 +164,7 @@ class MainActivity : AppCompatActivity(), FragmentListener {
     }
 
     // Call onShow on the selected one
-    if (fragment is PageFragment) fragment.onShow()
+    if (fragment is PageFragment<*>) fragment.onShow()
     transaction.show(fragment)
       .setPrimaryNavigationFragment(fragment)
       .commit()

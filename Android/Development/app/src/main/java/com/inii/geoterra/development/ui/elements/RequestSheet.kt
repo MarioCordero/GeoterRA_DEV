@@ -31,34 +31,27 @@ class RequestSheet @JvmOverloads constructor(
   state: String
 ) : LinearLayout(context, attrs, defStyleAttr) {
   // =============== VIEW BINDING ===============
+  // Inflate the layout for this custom view
   /** @brief Container for fragment's view elements */
-  private lateinit var binding: View
-
+  private var binding: View = LayoutInflater.from(context).inflate(
+    R.layout.request_sheet,
+    this,
+    true
+  )
   // =============== VIEW COMPONENTS ===============
-  /** @brief Visual representation of geographic location */
-  private val locationImage : ImageView
+  // Initialize views after inflation
   /** @brief Display for latitude/longitude values */
-  private val coordinates: TextView
+  private val coordinates: TextView =
+    this.binding.findViewById(R.id.coordenatesTxt)
+
   /** @brief Request submission timestamp */
-  private val dateView: TextView
+  private val dateView: TextView = findViewById(R.id.dateTxt)
+
   /** @brief Current request status */
-  private val stateView: TextView
+  private val stateView: TextView = findViewById(R.id.stateTxt)
 
   init {
-    // Inflate the layout for this custom view if it's not done by the parent XML
-    this.binding = LayoutInflater.from(context).inflate(
-      R.layout.request_sheet,
-      this,
-      true
-    )
-
-    // Initialize views after inflation
-    this.locationImage = this.binding.findViewById(R.id.map_position_image)
-    this.coordinates = this.binding.findViewById(R.id.coordenatesTxt) //
-    this.dateView = findViewById(R.id.dateTxt)           // Assuming you
-    this.stateView = findViewById(R.id.stateTxt)          // Assuming you
     setupView(latitude, longitude, date, state)
-
   }
 
   // =============== Setter ===============
@@ -75,12 +68,11 @@ class RequestSheet @JvmOverloads constructor(
   @SuppressLint("SetTextI18n")
   fun setupView(latitude: Double, longitude: Double, date: String,
     state: String) {
-    locationImage.clipToOutline = true
-    coordinates.text = "Latitude: %.7f\nLongitude: %.7f".format(
+    coordinates.text = "Latitud: %.7f\nLongitud: %.7f".format(
       latitude,
       longitude
     )
-    this.dateView.text = "Date: $date"
-    this.stateView.text = "Status: $state"
+    this.dateView.text = "Fecha: $date"
+    this.stateView.text = "Estado: $state"
   }
 }

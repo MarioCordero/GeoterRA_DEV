@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.inii.geoterra.development.R
+import com.inii.geoterra.development.databinding.FragmentHomeBinding
+import com.inii.geoterra.development.databinding.FragmentLoginBinding
 import com.inii.geoterra.development.interfaces.PageFragment
 
 /**
@@ -18,23 +20,36 @@ import com.inii.geoterra.development.interfaces.PageFragment
  *
  * Inherits PageFragment lifecycle management capabilities.
  */
-class HomeFragment : PageFragment() {
+class HomeFragment : PageFragment<FragmentHomeBinding>() {
+  /** Inflated view hierarchy reference for home page */
+  override val bindingInflater : (LayoutInflater, ViewGroup?, Boolean) ->
+  FragmentHomeBinding get() = FragmentHomeBinding::inflate
+
   // =============== LIFECYCLE METHODS ===============
   /**
-   * @brief Initializes home screen UI components
-   * @return Inflated view hierarchy for home dashboard
+   * Called after the view hierarchy associated with the fragment has been created.
    *
-   * Currently inflates basic layout structure.
+   * Subclasses should implement this method to initialize view components, set up observers,
+   * or restore state from [savedInstanceState].
+   *
+   * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
    */
-  override fun onCreateView(
-    inflater: LayoutInflater, container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View {
-    // Inflate the layout for this fragment
-    this.binding = inflater.inflate(
-      R.layout.fragment_home, container, false
-    )
+  override fun onPageCreated(savedInstanceState: Bundle?) {}
 
-    return this.binding
+  /**
+   * Called to create the view hierarchy associated with this page or fragment.
+   *
+   * This abstract method must be implemented by subclasses to inflate and return
+   * the root view of the page.
+   *
+   * @param inflater The LayoutInflater object that can be used to inflate any views.
+   * @param container The parent view that the fragment's UI should be attached to, or null.
+   * @return The root view for the fragment's UI.
+   */
+  override fun onPageViewCreated(inflater : LayoutInflater,
+    container : ViewGroup?
+  ) : View {
+
+    return this.binding.root
   }
 }

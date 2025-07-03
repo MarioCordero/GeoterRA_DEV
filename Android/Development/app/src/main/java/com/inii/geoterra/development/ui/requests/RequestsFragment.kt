@@ -12,6 +12,8 @@ import android.widget.Toast
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.api.AnalysisRequest
 import com.inii.geoterra.development.api.RequestsSubmittedResponse
+import com.inii.geoterra.development.databinding.FragmentLoginBinding
+import com.inii.geoterra.development.databinding.FragmentRequestsBinding
 import com.inii.geoterra.development.interfaces.PageFragment
 import com.inii.geoterra.development.managers.SessionManager
 import com.inii.geoterra.development.ui.elements.RequestSheet
@@ -33,7 +35,12 @@ import retrofit2.Response
  * @property formContainer Container frame for displaying request forms
  * @property sheetsLayout LinearLayout container for displaying request sheets
  */
-class RequestsFragment : PageFragment() {
+class RequestsFragment : PageFragment<FragmentRequestsBinding>() {
+
+  /** Inflates the fragment view binding */
+  override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean)
+  -> FragmentRequestsBinding get() = FragmentRequestsBinding::inflate
+
   /**
    * List of analysis requests submitted by the current user.
    * Populated from API response and used to render request sheets.
@@ -58,28 +65,9 @@ class RequestsFragment : PageFragment() {
    */
   private lateinit var sheetsLayout: LinearLayout
 
-  /**
-   * Creates the fragment view hierarchy.
-   *
-   * 1. Inflates the fragment layout
-   * 2. Initializes UI components
-   * 3. Sets up session listener
-   * 4. Configures button click handler
-   *
-   * @param inflater LayoutInflater to inflate views
-   * @param container Parent view group for the fragment
-   * @param savedInstanceState Previously saved fragment state
-   * @return Inflated view hierarchy for the fragment
-   */
-  override fun onCreateView(
-    inflater: LayoutInflater, container: ViewGroup?,
-    savedInstanceState: Bundle?
+  override fun onPageViewCreated(inflater : LayoutInflater,
+    container : ViewGroup?
   ) : View {
-    // Inflate the fragment layout from XML
-    binding = inflater.inflate(
-      R.layout.fragment_requests, container, false
-    )
-
     // Initialize all view references
     initViews()
 
@@ -88,7 +76,10 @@ class RequestsFragment : PageFragment() {
 
     // Configure request button behavior
     setupRequestButton()
-    return this.binding
+    return this.binding.root
+  }
+
+  override fun onPageCreated(savedInstanceState : Bundle?) {
   }
 
   /**
@@ -97,13 +88,13 @@ class RequestsFragment : PageFragment() {
    */
   private fun initViews() {
     // Button for creating new analysis requests
-    requestButton = binding.findViewById(R.id.new_request_button)
+    requestButton = binding.newRequestButton
 
     // Container for hosting form fragments
-    formContainer = binding.findViewById(R.id.form_container)
+    formContainer = binding.formContainer
 
     // Layout for displaying request summary sheets
-    sheetsLayout = binding.findViewById(R.id.sheetsLayout)
+    sheetsLayout = binding.sheetsLayout
   }
 
   /**
@@ -114,9 +105,9 @@ class RequestsFragment : PageFragment() {
    * - Session is restored
    */
   private fun setupSessionListener() {
-    SessionManager.setOnSessionActiveListener {
+    SessionManager.setOnSessionStateChangeListener {
       // Load requests when session becomes active
-      loadSubmittedRequests()
+      this.loadSubmittedRequests()
     }
   }
 
@@ -125,16 +116,14 @@ class RequestsFragment : PageFragment() {
    * Handles both authenticated and unauthenticated user flows.
    */
   private fun setupRequestButton() {
-    requestButton.setOnClickListener {
+    this.requestButton.setOnClickListener {
       // Check authentication status
       if (SessionManager.isSessionActive()) {
         // Show form for authenticated users
-        showRequestForm()
+        this.showRequestForm()
       } else {
-        // TODO : Delete this line when authentication is implemented
-        showRequestForm()
         // Show prompt for unauthenticated users
-        showLoginPrompt()
+        this.showLoginPrompt()
       }
     }
   }
@@ -145,7 +134,7 @@ class RequestsFragment : PageFragment() {
    */
   private fun showLoginPrompt() {
     this.showToast(
-      "Please log in to submit analysis requests",
+      "Por favor inicie sesión para crear una solicitud de análisis",
       Toast.LENGTH_SHORT
     )
   }
@@ -179,13 +168,16 @@ class RequestsFragment : PageFragment() {
    * @param data Optional data associated with the event
    */
   override fun onFragmentEvent(event: String, data: Any?) {
-    Log.i("FragmentEvent", "Event: $event")
+    Log.i("FragmentEvent", "Event: $event, Data: $data")
     when (event) {
-      "FINISHED" -> {
+      "FORM_FINISHED" -> {
         // Handle form submission completion
-        Log.i("FragmentEvent", "FINISHED")
+        Log.i("FragmentEvent", "FORM_FINISHED, $data")
         this.formContainer.visibility = View.GONE
         this.childFragmentManager.popBackStack()
+        if (data is Boolean && data == true) {
+          this.loadSubmittedRequests()
+        }
       }
     }
   }

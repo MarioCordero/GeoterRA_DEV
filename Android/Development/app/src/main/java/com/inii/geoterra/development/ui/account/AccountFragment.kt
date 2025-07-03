@@ -11,6 +11,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.api.CheckSessionResponse
 import com.inii.geoterra.development.api.UserInformation
+import com.inii.geoterra.development.databinding.FragmentAccountBinding
+import com.inii.geoterra.development.databinding.FragmentLoginBinding
 import com.inii.geoterra.development.interfaces.PageFragment
 import com.inii.geoterra.development.managers.SessionManager
 import retrofit2.Call
@@ -26,56 +28,63 @@ import retrofit2.Response
  * @property accountInformation Stores user data retrieved from API
  * @property binding Inflated view hierarchy reference
  */
-class AccountFragment : PageFragment() {
+class AccountFragment : PageFragment<FragmentAccountBinding>() {
+
+  /** Inflated view hierarchy reference */
+  override val bindingInflater : (LayoutInflater, ViewGroup?, Boolean) ->
+  FragmentAccountBinding get() = FragmentAccountBinding::inflate
+
   /** @brief Data model containing user profile information */
   private lateinit var accountInformation: UserInformation
 
   // =============== LIFECYCLE METHODS ===============
   /**
-   * @brief Initializes fragment UI and data
-   * @return Inflated view hierarchy for the fragment
+   * Called after the view hierarchy associated with the fragment has been created.
    *
-   * Checks active session and triggers user data loading if authenticated.
+   * Subclasses should implement this method to initialize view components, set up observers,
+   * or restore state from [savedInstanceState].
+   *
+   * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
    */
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View {
-    this.binding = inflater.inflate(
-      R.layout.fragment_account,
-      container,
-      false
-    )
+  override fun onPageCreated(savedInstanceState: Bundle?) {}
+
+  /**
+   * Called to create the view hierarchy associated with this page or fragment.
+   *
+   * This abstract method must be implemented by subclasses to inflate and return
+   * the root view of the page.
+   *
+   * @param inflater The LayoutInflater object that can be used to inflate any views.
+   * @param container The parent view that the fragment's UI should be attached to, or null.
+   * @return The root view for the fragment's UI.
+   */
+  override fun onPageViewCreated(inflater : LayoutInflater,
+    container : ViewGroup?
+  ) : View {
+
     this.accountInformation = UserInformation("", "", "", "")
 
     if (SessionManager.isSessionActive()) {
       getUserInformation()
     }
 
-    val settingsView = this.binding.findViewById<MaterialCardView>(
-      R.id.card_settings
-    )
+    val settingsView = this.binding.cardSettings
     settingsView.setOnClickListener {
       // Navigate or handle action
     }
 
-    val editData = this.binding.findViewById<MaterialCardView>(
-      R.id.card_edit_data
-    )
+    val editData = this.binding.cardEditData
     editData.setOnClickListener { // Navigate or handle action
     }
 
-    val requestHistory = this.binding.findViewById<MaterialCardView>(
-      R.id.card_request_history
-    )
+    val requestHistory = this.binding.cardRequestHistory
+
     requestHistory.setOnClickListener { // Navigate or handle action
 
     }
 
-    val logoutView = this.binding.findViewById<MaterialCardView>(
-      R.id.card_logout
-    )
+    val logoutView = this.binding.cardLogout
+
     logoutView.setOnClickListener { // Navigate or handle action
       // Construimos el diálogo de confirmación usando MaterialAlertDialogBuilder
       MaterialAlertDialogBuilder(requireContext())
@@ -95,7 +104,7 @@ class AccountFragment : PageFragment() {
         .show() // Mostrar el diálogo
     }
 
-    return binding
+    return binding.root
   }
 
   // =============== UI UPDATE METHODS ===============
@@ -103,7 +112,7 @@ class AccountFragment : PageFragment() {
    * @brief Updates UI components with user data
    */
   private fun showUserInformation() {
-    val nameTextView = this.binding.findViewById<TextView>(R.id.userName)
+    val nameTextView = this.binding.userName
     nameTextView.text = accountInformation.name
   }
 

@@ -8,9 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.api.ThermalPoint
+import com.inii.geoterra.development.databinding.FragmentLoginBinding
+import com.inii.geoterra.development.databinding.FragmentThermalPointInfoBinding
 import com.inii.geoterra.development.device.CoordinateConverter
+import com.inii.geoterra.development.device.GPSManager
 import com.inii.geoterra.development.interfaces.PageFragment
 import org.osmdroid.util.GeoPoint
 
@@ -20,52 +24,84 @@ import org.osmdroid.util.GeoPoint
  * Shows various properties of a thermal point including coordinates, temperature,
  * and chemical composition. Provides navigation back to the map view.
  */
-class ThermalPointInfoFragment : PageFragment() {
+class ThermalPointInfoFragment : PageFragment<FragmentThermalPointInfoBinding>() {
+
+  /** Inflated view hierarchy reference for the thermal point info fragment */
+  override val bindingInflater : (LayoutInflater, ViewGroup?, Boolean) ->
+  FragmentThermalPointInfoBinding get() = FragmentThermalPointInfoBinding::inflate
 
   private var thermalPoint: ThermalPoint? = null
 
   // UI Components
-  private lateinit var backButton: Button
-  private lateinit var thermalPointTextView: TextView
-  private lateinit var coordinatesTextView: TextView
-  private lateinit var temperatureTextView: TextView
+  private lateinit var pointName: TextView
+  private lateinit var latitude: TextView
+  private lateinit var longitude: TextView
+  private lateinit var temperature: TextView
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+  private lateinit var chemistryAnalysisButton : Button
+
+  override fun onPageViewCreated(inflater : LayoutInflater,
+    container : ViewGroup?
+  ) : View {
+    initViews()
+    updateUI()
+
+    return this.binding.root
+  }
+
+  override fun onPageCreated(savedInstanceState : Bundle?) {
     arguments?.let {
       @Suppress("DEPRECATION")
       thermalPoint = it.getSerializable(ARG_THERMAL_POINT) as? ThermalPoint
     }
   }
 
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View {
-    binding = inflater.inflate(R.layout.fragment_thermal_point_info, container, false)
-    initViews()
-    setupBackButton()
-    updateUI()
-    return binding
+  /**
+   * @brief Handles the events triggered by child fragments.
+   *
+   * @param event Name of the event
+   * @param data Optional data associated with the event
+   */
+  override fun onFragmentEvent(event: String, data: Any?) {
+    Log.i("FragmentEvent", "Event: $event")
+    when (event) {
+      "FINISHED" -> {
+        // Handle form submission completion
+        Log.i("FragmentEvent", "FINISHED")
+        this.childFragmentManager.popBackStack()
+        this.binding.fragmentContainer.visibility = View.GONE
+      }
+    }
+  }
+
+  /**
+   * Prepares fragment transition for thermal point detail view.
+   *
+   * @param pointValue Thermal point data to display
+   */
+  private fun prepareFragment(pointValue: ThermalPoint) {
+    Log.i("ThermalPointInfoFragment", "Preparing fragment")
+    this.binding.fragmentContainer.visibility = View.VISIBLE
+
+    val analysisPage = AnalysisPropertiesPage.newInstance(pointValue)
+    this.childFragmentManager.beginTransaction()
+      .replace(this.binding.fragmentContainer.id, analysisPage)
+      .addToBackStack(null)
+      .commit()
   }
 
   /**
    * Initializes all view references.
    */
   private fun initViews() {
-    backButton = binding.findViewById(R.id.go_back_button)
-  }
+    this.pointName = this.binding.PointIDName
+    this.latitude = this.binding.latitudeValue
+    this.longitude = this.binding.longitudeValue
+    this.temperature = this.binding.temperatureValue
+    this.chemistryAnalysisButton = this.binding.chemistryAnalysisButton
 
-  /**
-   * Configures the back button click listener.
-   */
-  private fun setupBackButton() {
-    backButton.setOnClickListener {
-      thermalPoint?.let {
-        Log.i("Navigation", "Exiting point info: ${it.pointID}")
-        notifyMapToCenterOnPoint(it)
-      }
+    this.chemistryAnalysisButton.setOnClickListener {
+      thermalPoint?.let { it1 -> this.prepareFragment(it1) }
     }
   }
 
@@ -88,7 +124,6 @@ class ThermalPointInfoFragment : PageFragment() {
   private fun updateUI() {
     thermalPoint?.let { point ->
       updateBasicInfo(point)
-      updateChemicalProperties(point)
     }
   }
 
@@ -98,50 +133,19 @@ class ThermalPointInfoFragment : PageFragment() {
    * @param point Thermal point data source
    */
   private fun updateBasicInfo(point: ThermalPoint) {
-    thermalPointTextView.text = "Thermal Point: ${point.pointID}"
+    this.pointName.text = "Análisis: ${point.pointID}"
 
-    val wsg84Coordinates = CoordinateConverter.convertCRT05toWGS84(
-      point.latitude,
-      point.longitude
+    // Corrigiendo orden coordenadas para el convertidor si lo requiere
+    val wgs84Coordinates = CoordinateConverter.convertCRT05toWGS84(
+      point.longitude, point.latitude
     )
-    coordinatesTextView.text =
-      "Latitude: %.7f\nLongitude: %.7f".format(wsg84Coordinates.x, wsg84Coordinates.y)
 
-    temperatureTextView.text = "Temperature: ${point.temperature}"
-  }
+    this.latitude.text = "%.7f".format(wgs84Coordinates.y)
+    this.longitude.text = "%.7f".format(wgs84Coordinates.x)
 
-  /**
-   * Updates chemical property views.
-   *
-   * @param point Thermal point data source
-   */
-  private fun updateChemicalProperties(point: ThermalPoint) {
-    updateTextView(R.id.field_ph, "Field pH: ${point.fieldPh}")
-    updateTextView(R.id.field_conditions, "Field Cond: ${point.fieldCond}")
-    updateTextView(R.id.lab_ph, "Lab pH: ${point.labPh}")
-    updateTextView(R.id.lab_conditions, "Lab Cond: ${point.labCond}")
-    updateTextView(R.id.chlorine, "Cl: ${point.chlorine}")
-    updateTextView(R.id.calcium, "Ca+: ${point.calcium}")
-    updateTextView(R.id.mg_bicarbonate, "HCO3: ${point.mgBicarbonate}")
-    updateTextView(R.id.sulfate, "SO4: ${point.sulfate}")
-    updateTextView(R.id.iron, "Fe: ${point.iron}")
-    updateTextView(R.id.silicon, "Si: ${point.silicon}")
-    updateTextView(R.id.boron, "B: ${point.boron}")
-    updateTextView(R.id.lithium, "Li: ${point.lithium}")
-    updateTextView(R.id.fluorine, "F: ${point.fluorine}")
-    updateTextView(R.id.sodium, "Na: ${point.sodium}")
-    updateTextView(R.id.potassium, "K: ${point.potassium}")
-    updateTextView(R.id.magnesium_Ion, "Mg+: ${point.magnesiumIon}")
-  }
-
-  /**
-   * Updates a TextView with the specified text.
-   *
-   * @param viewId Resource ID of the TextView
-   * @param text Text to display
-   */
-  private fun updateTextView(viewId: Int, text: String) {
-    binding.findViewById<TextView>(viewId)?.text = text
+    this.temperature.text = "%.2f °C".format(
+      point.temperature
+    )
   }
 
   companion object {

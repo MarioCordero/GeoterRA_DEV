@@ -3,7 +3,6 @@ package com.inii.geoterra.development.ui.map
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.location.Location
 import android.os.Bundle
@@ -12,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
@@ -19,6 +19,8 @@ import androidx.lifecycle.lifecycleScope
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.interfaces.MessageListener
 import com.inii.geoterra.development.api.ThermalPoint
+import com.inii.geoterra.development.databinding.FragmentMapBinding
+import com.inii.geoterra.development.device.CoordinateConverter.convertCRT05toWGS84
 import com.inii.geoterra.development.device.GPSManager
 import com.inii.geoterra.development.interfaces.PageFragment
 import com.inii.geoterra.development.ui.elements.CustomInfoOnMarker
@@ -38,7 +40,6 @@ import org.osmdroid.views.overlay.Marker
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import androidx.core.graphics.drawable.toDrawable
 
 /**
  * Fragment for displaying an interactive map with thermal points and user location.
@@ -53,9 +54,14 @@ import androidx.core.graphics.drawable.toDrawable
  * @property mapMarkers Collection of all markers on the map keyed by ID
  * @property thermalPoints Cache of thermal point data associated with markers
  */
-class MapFragment : PageFragment(), MessageListener {
+class MapFragment : PageFragment<FragmentMapBinding>(), MessageListener {
+
+  /** Inflated view hierarchy reference for the map fragment */
+  override val bindingInflater : (LayoutInflater, ViewGroup?, Boolean) ->
+  FragmentMapBinding get() = FragmentMapBinding::inflate
+
   /** Minimum distance threshold for user location updates (meters) */
-  private val MIN_DISTANCE_CHANGE: Float = 10f
+  private val MIN_DISTANCE_CHANGE: Float = 2f
 
   /** Reference to the map view component */
   private lateinit var mapView: MapView
@@ -67,38 +73,51 @@ class MapFragment : PageFragment(), MessageListener {
   private val iconCache = mutableMapOf<Int, Bitmap>()
   /** Map of point IDs to ThermalPoint data objects */
   private var thermalPoints: MutableMap<String, ThermalPoint> = mutableMapOf()
+  private lateinit var fragmentContainer : FrameLayout
 
   /**
    * Initializes the fragment view and components.
    *
    * @param inflater LayoutInflater to inflate views
    * @param container Parent view group for the fragment
-   * @param savedInstanceState Previously saved fragment state
    * @return Inflated view hierarchy for the fragment
    */
-  override fun onCreateView(
-    inflater: LayoutInflater, container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View {
-    // Inflate the layout for this fragment
-    this.binding = inflater.inflate(
-      R.layout.fragment_map, container, false
-    )
+  override fun onPageViewCreated(
+    inflater: LayoutInflater, container: ViewGroup?)
+  : View {
+    this.fragmentContainer = this.binding.fragmentContainer
 
     this.initializeMapView()
     this.setupControlButtons()
     this.setupUserLocationTracking()
     this.requestThermalPoints()
-    this.setupBackStackListener()
 
-    return this.binding
+    return this.binding.root
+  }
+
+  override fun onPageCreated(savedInstanceState : Bundle?) {
+  }
+
+  override fun onDetach() {
+    super.onDetach()
+    GPSManager.stopLocationUpdates()
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    GPSManager.stopLocationUpdates()
+  }
+
+  override fun onPause() {
+    super.onPause()
+    GPSManager.stopLocationUpdates()
   }
 
   /**
    * Initializes the map view component and applies base settings.
    */
   private fun initializeMapView() {
-    mapView = this.binding.findViewById(R.id.MapView)
+    mapView = this.binding.MapView
     setupMapSettings()
   }
 
@@ -114,7 +133,7 @@ class MapFragment : PageFragment(), MessageListener {
    * Sets up the layers menu button click listener.
    */
   private fun setupLayersButton() {
-    this.binding.findViewById<Button>(R.id.layersButton).setOnClickListener {
+    this.binding.layersButton.setOnClickListener {
       showLayersMenu()
     }
   }
@@ -130,7 +149,7 @@ class MapFragment : PageFragment(), MessageListener {
    * Sets up the center-on-user button click listener.
    */
   private fun setupCenterUserButton() {
-    this.binding.findViewById<Button>(R.id.centerUserButton).setOnClickListener {
+    this.binding.centerUserButton.setOnClickListener {
       centerMapOnUser()
     }
   }
@@ -173,21 +192,13 @@ class MapFragment : PageFragment(), MessageListener {
    * @param location New Location object containing coordinates
    */
   private fun handleNewLocation(location: Location) {
-    if (::mapView.isInitialized) {
-      refreshUserMarker(location.latitude, location.longitude)
+    if (::mapView.isInitialized && this.isVisible) {
+      this.refreshUserMarker(location.latitude, location.longitude)
     }
-    Log.i("GPSManager", "Location ready: ${location.latitude}, ${location.longitude}")
-  }
-
-  /**
-   * Sets up the back stack listener to manage UI visibility.
-   */
-  private fun setupBackStackListener() {
-    parentFragmentManager.addOnBackStackChangedListener {
-      if (parentFragmentManager.backStackEntryCount == 0) {
-        setButtonsVisibility(true)
-      }
-    }
+    Log.i(
+      "GPSManager",
+      "Location ready: ${location.latitude}, ${location.longitude}"
+    )
   }
 
   /**
@@ -198,9 +209,37 @@ class MapFragment : PageFragment(), MessageListener {
    */
   override fun onMessageReceived(message: String, data: Any?) {
     when (message) {
-      "SHOW_POINT" -> prepareFragment(data as ThermalPoint)
+      "SHOW_POINT" -> {
+        val point = data as? ThermalPoint
+        if (point != null) {
+          this.prepareFragment(point)
+        } else {
+          Log.e("MessageListener", "Invalid data for SHOW_POINT message")
+        }
+      }
     }
     Log.d("MessageListener", "Received message: $message")
+  }
+
+  /**
+   * @brief Handles the events triggered by child fragments.
+   *
+   * @param event Name of the event
+   * @param data Optional data associated with the event
+   */
+  override fun onFragmentEvent(event: String, data: Any?) {
+    Log.i("FragmentEvent", "Event: $event")
+    when (event) {
+      "FINISHED" -> {
+        // Handle form submission completion
+        Log.i("FragmentEvent", "FINISHED")
+        this.childFragmentManager.popBackStack()
+        this.fragmentContainer.visibility = View.GONE
+//        this.setButtonsVisibility(true)
+
+        GPSManager.startLocationUpdates()
+      }
+    }
   }
 
   /**
@@ -209,8 +248,11 @@ class MapFragment : PageFragment(), MessageListener {
    * @param pointValue Thermal point data to display
    */
   private fun prepareFragment(pointValue: ThermalPoint) {
-    setButtonsVisibility(false)
-    showThermalPointInfo(pointValue)
+    GPSManager.stopLocationUpdates()
+//    this.setButtonsVisibility(false)
+    this.fragmentContainer.visibility = View.VISIBLE
+
+    this.showThermalPointInfo(pointValue)
   }
 
   /**
@@ -220,22 +262,10 @@ class MapFragment : PageFragment(), MessageListener {
    */
   private fun showThermalPointInfo(point: ThermalPoint) {
     val infoFragment = ThermalPointInfoFragment.newInstance(point)
-    requireActivity().supportFragmentManager.beginTransaction()
-      .replace(R.id.fragment_map, infoFragment)
+    this.childFragmentManager.beginTransaction()
+      .replace(R.id.fragment_container, infoFragment)
       .addToBackStack(null)
       .commit()
-  }
-
-  /**
-   * Toggles visibility of map control buttons.
-   *
-   * @param visible True to show buttons, false to hide
-   */
-  private fun setButtonsVisibility(visible: Boolean) {
-    val visibility = if (visible) View.VISIBLE else View.GONE
-    this.binding.findViewById<Button>(R.id.layersButton).visibility = visibility
-    this.binding.findViewById<Button>(R.id.centerUserButton).visibility =
-      visibility
   }
 
   // ==================== MARKER MANAGEMENT ====================
@@ -508,8 +538,12 @@ class MapFragment : PageFragment(), MessageListener {
           Log.i("MarkerCreation", "Creating marker for point: ${point.pointID}")
           createThermalMarker(point, icon)
         }
+        withContext(Dispatchers.Main) {
+          mapView.invalidate()
+        }
+        val markerCount = mapView.overlays.count { it is Marker }
+        Log.d("MapInfo", "Total marcadores en el mapa: $markerCount")
 
-        mapView.invalidate()
       } catch (e: Exception) {
         Log.e("MarkerCreation", "Failed to create thermal markers", e)
       }
@@ -523,20 +557,25 @@ class MapFragment : PageFragment(), MessageListener {
    */
   private fun createThermalMarker(thermalPoint: ThermalPoint,
     definedIcon : Drawable? = null) {
-    val geoPoint = convertCRT05toWGS84(thermalPoint.latitude, thermalPoint.longitude)
+    val coordinates = convertCRT05toWGS84(
+      thermalPoint.longitude,
+      thermalPoint.latitude
+    )
+    Log.i("MarkerCreation", "Creating marker for point: $coordinates")
     this.thermalPoints[thermalPoint.pointID] = thermalPoint
 
     val marker = Marker(this.mapView).apply {
       definedIcon.apply {
         icon = this
       }
-      position = geoPoint
+      position = GeoPoint(coordinates.x, coordinates.y)
       title = thermalPoint.pointID
       setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
       infoWindow = CustomInfoOnMarker(
         R.layout.custom_info_on_marker,
         this@MapFragment.mapView,
         requireContext(),
+        thermalPoint,
         thermalPoint.temperature,
         this@MapFragment
       )
@@ -545,29 +584,6 @@ class MapFragment : PageFragment(), MessageListener {
 
     this.mapMarkers[thermalPoint.pointID] = marker
     this.mapView.overlays.add(marker)
-  }
-
-  /**
-   * Converts CRT05 coordinates to WGS84 standard.
-   *
-   * @param x CRT05 longitude value
-   * @param y CRT05 latitude value
-   * @return GeoPoint in WGS84 coordinate system
-   */
-  private fun convertCRT05toWGS84(x: Double, y: Double): GeoPoint {
-    val crsFactory = CRSFactory()
-    val transformFactory = CoordinateTransformFactory()
-
-    val sourceCRS = crsFactory.createFromName("EPSG:5367")
-    val targetCRS = crsFactory.createFromName("EPSG:4326")
-
-    val transform = transformFactory.createTransform(sourceCRS, targetCRS)
-
-    val srcCoord = ProjCoordinate(x, y)
-    val dstCoord = ProjCoordinate()
-
-    transform.transform(srcCoord, dstCoord)
-    return GeoPoint(dstCoord.y, dstCoord.x)
   }
 
   /**

@@ -13,6 +13,8 @@ import androidx.lifecycle.lifecycleScope
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.api.SignUpErrorResponse
 import com.inii.geoterra.development.api.SingUpCredentials
+import com.inii.geoterra.development.databinding.FragmentLoginBinding
+import com.inii.geoterra.development.databinding.FragmentSignUpBinding
 import com.inii.geoterra.development.interfaces.PageFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,23 +31,40 @@ import retrofit2.Response
  *
  * @property binding Inflated view hierarchy reference for registration form
  */
-class SignUpFragment : PageFragment() {
+class SignUpFragment : PageFragment<FragmentSignUpBinding>() {
+
+  /** Inflated view hierarchy reference for registration form */
+  override val bindingInflater : (LayoutInflater, ViewGroup?, Boolean) ->
+  FragmentSignUpBinding get() = FragmentSignUpBinding::inflate
+
   // =============== LIFECYCLE METHODS ===============
   /**
-   * @brief Initializes registration UI components and event listeners
-   * @return Inflated view hierarchy containing sign-up form
+   * Called after the view hierarchy associated with the fragment has been created.
+   *
+   * Subclasses should implement this method to initialize view components, set up observers,
+   * or restore state from [savedInstanceState].
+   *
+   * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
    */
-  override fun onCreateView(inflater : LayoutInflater,
-                            container : ViewGroup?,
-                            savedInstanceState : Bundle?) : View {
-    // Inflate the layout for this fragment
-    this.binding = inflater.inflate(
-      R.layout.fragment_sign_up, container, false
-    )
+  override fun onPageCreated(savedInstanceState: Bundle?) {}
+
+  /**
+   * Called to create the view hierarchy associated with this page or fragment.
+   *
+   * This abstract method must be implemented by subclasses to inflate and return
+   * the root view of the page.
+   *
+   * @param inflater The LayoutInflater object that can be used to inflate any views.
+   * @param container The parent view that the fragment's UI should be attached to, or null.
+   * @return The root view for the fragment's UI.
+   */
+  override fun onPageViewCreated(inflater : LayoutInflater,
+    container : ViewGroup?
+  ) : View {
 
     this.setupViewInteractions()
 
-    return binding
+    return binding.root
   }
 
   // =============== UI INTERACTION METHODS ===============
@@ -53,15 +72,9 @@ class SignUpFragment : PageFragment() {
    * @brief Configures all UI event listeners and input validators
    */
   private fun setupViewInteractions() {
-    val createAccountButton = binding.findViewById<Button>(
-      R.id.createAccountB
-    )
-    val showPasswordLayout = binding.findViewById<LinearLayout>(
-      R.id.togglePasswordLayout
-    )
-    val showPasswordCheckbox = binding.findViewById<CheckBox>(
-      R.id.checkBoxTogglePassword
-    )
+    val createAccountButton = binding.createAccountB
+    val showPasswordLayout = binding.togglePasswordLayout
+    val showPasswordCheckbox = binding.checkBoxTogglePassword
 
     // Sets the listeners for the elements.
     this.setCreateAccountClickListener(createAccountButton)
@@ -75,7 +88,7 @@ class SignUpFragment : PageFragment() {
    */
   private fun setTogglePasswordClickListener(showPasswordLayout: LinearLayout) {
     showPasswordLayout.setOnClickListener {
-      val toggleCheckBox = binding.findViewById<CheckBox>(R.id.checkBoxTogglePassword)
+      val toggleCheckBox = binding.checkBoxTogglePassword
       toggleCheckBox.isChecked = !toggleCheckBox.isChecked
       this.updatePasswordVisibility(toggleCheckBox.isChecked)
     }
@@ -97,21 +110,11 @@ class SignUpFragment : PageFragment() {
   private fun setCreateAccountClickListener(createAccountB : Button) {
     createAccountB.setOnClickListener {
       // Get the fields from the form.
-      val email = this.binding.findViewById<EditText>(
-        R.id.userEmail
-      ).text.toString().trim()
-      val password = this.binding.findViewById<EditText>(
-        R.id.userPassword
-      ).text.toString().trim()
-      val firstName = this.binding.findViewById<EditText>(
-        R.id.userFirstName
-      ).text.toString().trim()
-      val lastName = this.binding.findViewById<EditText>(
-        R.id.userLastName
-      ).text.toString().trim()
-      val phone = this.binding.findViewById<EditText>(
-        R.id.userPhoneNum
-      ).text.toString().trim()
+      val email = this.binding.userEmail.text.toString().trim()
+      val password = this.binding.userPassword.text.toString().trim()
+      val firstName = this.binding.userFirstName.text.toString().trim()
+      val lastName = this.binding.userLastName.text.toString().trim()
+      val phone = this.binding.userPhoneNum.text.toString().trim()
 
       when {
         email.isBlank() || password.isBlank() -> this.showError(
@@ -207,7 +210,7 @@ class SignUpFragment : PageFragment() {
   private fun handleServerErrors(errors: List<SignUpErrorResponse>) {
     errors.forEach { error ->
       Log.i("RegistrationError", error.toString())
-      showError(error.emptyInput ?: "Validation error")
+      showError(error.emptyInput)
     }
   }
 
@@ -217,9 +220,7 @@ class SignUpFragment : PageFragment() {
    * @param showPassword Flag indicating whether to display password text
    */
   private fun updatePasswordVisibility(showPassword: Boolean) {
-    val passwordEditText = this.binding.findViewById<EditText>(
-      R.id.userPassword
-    )
+    val passwordEditText = this.binding.userPassword
 
     if (showPassword) {
       passwordEditText.inputType =  android.text.InputType.TYPE_CLASS_TEXT or

@@ -13,8 +13,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
 import android.widget.Toast
 import android.widget.ViewSwitcher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,6 +24,8 @@ import com.inii.geoterra.development.R
 import com.inii.geoterra.development.api.AnalysisRequestPayload
 import com.inii.geoterra.development.api.Error
 import com.inii.geoterra.development.api.RequestResponse
+import com.inii.geoterra.development.databinding.FragmentFormBinding
+import com.inii.geoterra.development.databinding.FragmentLoginBinding
 import com.inii.geoterra.development.device.GPSManager
 import com.inii.geoterra.development.interfaces.PageFragment
 import com.inii.geoterra.development.managers.GalleryPermissionManager
@@ -73,9 +73,14 @@ import java.util.Locale
  * @property dateSetListener Listener for date selection events
  * @property pickImageLauncher Activity launcher for image selection
  */
-class FormFragment : PageFragment() {
+class FormFragment : PageFragment<FragmentFormBinding>() {
+
+  /** Inflates the fragment view binding */
+  override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean)
+  -> FragmentFormBinding get() = FragmentFormBinding::inflate
+
   /** Data container for request information */
-  private lateinit var AnalysisRequestPayload : AnalysisRequestPayload
+  private lateinit var analysisRequestPayload : AnalysisRequestPayload
 
   /** Custom view for terrain-specific inputs */
   private lateinit var terrainForm: TerrainForm
@@ -128,9 +133,6 @@ class FormFragment : PageFragment() {
   /** TextInputEditText for owner contact information */
   private lateinit var ownersContactInput: TextInputEditText
 
-  /** CheckBox for bubble presence indication */
-  private lateinit var bubbleCheckBox: CheckBox
-
   /** Calendar instance for date management */
   private val calendar = Calendar.getInstance()
 
@@ -161,56 +163,44 @@ class FormFragment : PageFragment() {
     }
   }
 
-  /**
-   * Creates the fragment view hierarchy.
-   *
-   * @param inflater LayoutInflater to inflate views
-   * @param container Parent view group for the fragment
-   * @param savedInstanceState Previously saved fragment state
-   * @return Inflated view hierarchy for the fragment
-   */
-  override fun onCreateView(
-    inflater : LayoutInflater,
-    container : ViewGroup?,
-    savedInstanceState : Bundle?)
-  : View {
-    this.binding = inflater.inflate(
-      R.layout.fragment_form, container, false
-    )
+  override fun onPageViewCreated(inflater : LayoutInflater,
+    container : ViewGroup?
+  ) : View {
     this.initViews()
     this.initFormObjects()
     this.setupUIComponents()
-    return binding
+    return binding.root
+  }
+
+  override fun onPageCreated(savedInstanceState : Bundle?) {
   }
 
   /**
    * Initializes all view references.
    */
   private fun initViews() {
-    this.viewSwitcher = binding.findViewById(R.id.form_container)
-    this.terrainTypeButtonGroup = binding.findViewById(
-      R.id.terrain_type_button_group
-    )
-    this.identifierInputLayout = binding.findViewById(R.id.identifier_input_layout)
-    this.dateInputLayout = binding.findViewById(R.id.date_input_layout)
-    this.landTypeButton = binding.findViewById(R.id.land_type_button)
-    this.springTypeButton = binding.findViewById(R.id.spring_type_button)
-    this.locationButton = binding.findViewById(R.id.gps_coordinates_button)
-    this.imageButton = binding.findViewById(R.id.image_coordinates_button)
-    this.sendButton = binding.findViewById(R.id.sendRequestButton)
-    this.dateInput = binding.findViewById(R.id.date_input)
-    this.identifierInput = binding.findViewById(R.id.identifier_input)
-    this.ownersNameInput = binding.findViewById(R.id.owners_name_input)
-    this.currentUsageInput = binding.findViewById(R.id.actual_use_input)
-    this.detailsInput = binding.findViewById(R.id.details_input)
-    this.ownersContactInput = binding.findViewById(R.id.owner_contact_input)
+    this.viewSwitcher = binding.formContainer
+    this.terrainTypeButtonGroup = binding.terrainTypeButtonGroup
+    this.identifierInputLayout = binding.identifierInputLayout
+    this.dateInputLayout = binding.dateInputLayout
+    this.landTypeButton = binding.landTypeButton
+    this.springTypeButton = binding.springTypeButton
+    this.locationButton = binding.gpsCoordinatesButton
+    this.imageButton = binding.imageCoordinatesButton
+    this.sendButton = binding.sendRequestButton
+    this.dateInput = binding.dateInput
+    this.identifierInput = binding.identifierInput
+    this.ownersNameInput = binding.ownersNameInput
+    this.currentUsageInput = binding.actualUseInput
+    this.detailsInput = binding.detailsInput
+    this.ownersContactInput = binding.ownerContactInput
   }
 
   /**
    * Initializes form objects and adds them to the view switcher.
    */
   private fun initFormObjects() {
-    this.AnalysisRequestPayload = AnalysisRequestPayload()
+    this.analysisRequestPayload = AnalysisRequestPayload()
     this.terrainForm = TerrainForm(requireContext())
     this.springForm = SpringForm(requireContext())
 
@@ -264,6 +254,7 @@ class FormFragment : PageFragment() {
     if (!GPSManager.isInitialized()) {
       GPSManager.initialize(requireContext())
     } else {
+      GPSManager.startLocationUpdates()
       val userLocation = GPSManager.getLastKnownLocation()
       Log.i(
         "Coordinates",
@@ -272,15 +263,15 @@ class FormFragment : PageFragment() {
 
       userLocation?.let {
         this.showToast("Lat ${it.latitude}, Lon ${it.longitude}")
-        AnalysisRequestPayload.apply {
+        analysisRequestPayload.apply {
           latitude = "${it.latitude}"
           longitude = "${it.longitude}"
           coordinates = "${it.latitude}, ${it.longitude}"
         }
         Log.i(
           "Coordinates",
-          "${AnalysisRequestPayload.latitude}" +
-            " ${AnalysisRequestPayload.longitude}"
+          "${analysisRequestPayload.latitude}" +
+            " ${analysisRequestPayload.longitude}"
         )
       }
     }
@@ -300,16 +291,17 @@ class FormFragment : PageFragment() {
    */
   private fun handleImageSelection() {
     if (!GalleryPermissionManager.isInitialized()) {
-      if (!shouldShowRequestPermissionRationale(
-          GalleryPermissionManager.requiredPermission
-      )) {
-        showToast(
-          "Activate gallery permission in Settings",
-          Toast.LENGTH_LONG
-        )
-      } else {
-        GalleryPermissionManager.initialize(this)
-      }
+      GalleryPermissionManager.initialize(this)
+//      if (!shouldShowRequestPermissionRationale(
+//          GalleryPermissionManager.requiredPermission
+//      )) {
+//        showToast(
+//          "Activate gallery permission in Settings",
+//          Toast.LENGTH_LONG
+//        )
+//      } else {
+//        GalleryPermissionManager.initialize(this)
+//      }
     } else {
       openGallery()
     }
@@ -356,7 +348,7 @@ class FormFragment : PageFragment() {
    * @param index Index of the form to show (0 for terrain, 1 for spring)
    */
   private fun viewSwitcherListener(index: Int) {
-    val viewSwitcher = binding.findViewById<ViewSwitcher>(R.id.form_container)
+    val viewSwitcher = this.binding.formContainer
     if (index >= 0 && index < viewSwitcher.childCount) {
       while (viewSwitcher.displayedChild != index) {
         viewSwitcher.showNext()
@@ -383,8 +375,8 @@ class FormFragment : PageFragment() {
       isValid = false
     }
 
-    if (AnalysisRequestPayload.latitude.isBlank()
-      || AnalysisRequestPayload.longitude.isBlank()) {
+    if (analysisRequestPayload.latitude.isBlank()
+      || analysisRequestPayload.longitude.isBlank()) {
       showToast(
         "Seleccione un método de captura de coordenadas",
         Toast.LENGTH_SHORT
@@ -396,13 +388,13 @@ class FormFragment : PageFragment() {
 
     try {
       if (viewSwitcher.currentView == terrainForm) {
-        AnalysisRequestPayload.thermalSensation =
+        analysisRequestPayload.thermalSensation =
           terrainForm.getThermalSensation().toInt()
       } else {
-        AnalysisRequestPayload.bubbles = springForm.getBubbling().toInt()
+        analysisRequestPayload.bubbles = springForm.getBubbling().toInt()
       }
 
-      AnalysisRequestPayload.apply {
+      analysisRequestPayload.apply {
         id = identifierInput.text.toString()
         region = "Guanacaste"
         date = dateInput.text.toString()
@@ -411,11 +403,11 @@ class FormFragment : PageFragment() {
         currentUsage = currentUsageInput.text.toString()
         details = detailsInput.text.toString()
         ownerContact = ownersContactInput.text.toString()
-        thermalSensation = 1 // Placeholder
-        bubbles = if (bubbleCheckBox.isChecked) 1 else 0
+        thermalSensation = terrainForm.getThermalSensation()
+        bubbles = springForm.getBubbling()
       }
 
-      Log.i("FormData", AnalysisRequestPayload.toString())
+      Log.i("FormData", analysisRequestPayload.toString())
     } catch (e: Exception) {
       Log.e("FormData", "Error getting form data", e)
       return false
@@ -430,19 +422,19 @@ class FormFragment : PageFragment() {
    */
   private fun sendRequest() {
     this.apiService.newRequest(
-      AnalysisRequestPayload.id,
-      AnalysisRequestPayload.region,
-      AnalysisRequestPayload.date,
-      AnalysisRequestPayload.email,
-      AnalysisRequestPayload.owner,
-      AnalysisRequestPayload.currentUsage,
-      AnalysisRequestPayload.details,
-      AnalysisRequestPayload.ownerContact,
-      AnalysisRequestPayload.coordinates,
-      AnalysisRequestPayload.thermalSensation,
-      AnalysisRequestPayload.bubbles,
-      AnalysisRequestPayload.latitude,
-      AnalysisRequestPayload.longitude
+      analysisRequestPayload.id,
+      analysisRequestPayload.region,
+      analysisRequestPayload.date,
+      analysisRequestPayload.email,
+      analysisRequestPayload.owner,
+      analysisRequestPayload.currentUsage,
+      analysisRequestPayload.details,
+      analysisRequestPayload.ownerContact,
+      analysisRequestPayload.coordinates,
+      analysisRequestPayload.thermalSensation,
+      analysisRequestPayload.bubbles,
+      analysisRequestPayload.latitude,
+      analysisRequestPayload.longitude
     ).enqueue(object : Callback<RequestResponse> {
       /**
        * Handles successful API response.
@@ -480,7 +472,7 @@ class FormFragment : PageFragment() {
               "Request created successfully",
               Toast.LENGTH_SHORT
             )
-            listener?.onFragmentEvent("FINISHED", null)
+            listener?.onFragmentEvent("FORM_FINISHED", true)
           }
           else -> this.showToast(
             "Error creating request",
@@ -549,7 +541,7 @@ class FormFragment : PageFragment() {
             Toast.LENGTH_SHORT
           )
 
-          AnalysisRequestPayload.apply {
+          analysisRequestPayload.apply {
             this.latitude = "$latitude"
             this.longitude = "$longitude"
           }

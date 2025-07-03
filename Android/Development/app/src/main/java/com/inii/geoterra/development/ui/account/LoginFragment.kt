@@ -15,6 +15,8 @@ import com.inii.geoterra.development.R
 import com.inii.geoterra.development.api.Error
 import com.inii.geoterra.development.api.SignInCredentials
 import com.inii.geoterra.development.api.SignInResponse
+import com.inii.geoterra.development.databinding.AnalysisPropertiesPageBinding
+import com.inii.geoterra.development.databinding.FragmentLoginBinding
 import com.inii.geoterra.development.interfaces.PageFragment
 import com.inii.geoterra.development.managers.SessionManager
 import retrofit2.Call
@@ -30,28 +32,45 @@ import retrofit2.Response
  * @property binding Inflated view hierarchy reference for login form
  * @property formContainer FrameLayout container for displaying signup
  */
-class LoginFragment : PageFragment() {
+class LoginFragment : PageFragment<FragmentLoginBinding>() {
+
+  /** Inflated view hierarchy reference */
+  override val bindingInflater : (LayoutInflater, ViewGroup?, Boolean) ->
+  FragmentLoginBinding get() = FragmentLoginBinding::inflate
+
   /**
    * FrameLayout container that hosts the signup form fragment.
    * Visibility toggled between VISIBLE (when form is shown) and GONE.
    */
   private lateinit var formContainer: FrameLayout
+
   // =============== LIFECYCLE METHODS ===============
   /**
-   * @brief Initializes login UI components and event listeners
-   * @return Inflated view hierarchy containing login form
+   * Called after the view hierarchy associated with the fragment has been created.
+   *
+   * Subclasses should implement this method to initialize view components, set up observers,
+   * or restore state from [savedInstanceState].
+   *
+   * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
    */
-  override fun onCreateView(
-    inflater: LayoutInflater, container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View {
-    // Inflate the layout for this fragment
-    this.binding = inflater.inflate(
-      R.layout.fragment_login, container, false
-    )
+  override fun onPageCreated(savedInstanceState: Bundle?) {}
+
+  /**
+   * Called to create the view hierarchy associated with this page or fragment.
+   *
+   * This abstract method must be implemented by subclasses to inflate and return
+   * the root view of the page.
+   *
+   * @param inflater The LayoutInflater object that can be used to inflate any views.
+   * @param container The parent view that the fragment's UI should be attached to, or null.
+   * @return The root view for the fragment's UI.
+   */
+  override fun onPageViewCreated(inflater : LayoutInflater,
+    container : ViewGroup?
+  ) : View {
     this.setupViewInteractions()
 
-    return binding
+    return binding.root
   }
 
   // =============== UI SETUP METHODS ===============
@@ -62,29 +81,25 @@ class LoginFragment : PageFragment() {
     this.setTogglePasswordClickListener()
     this.setCheckboxOnChangeListener()
 
-    this.binding.findViewById<TextView>(R.id.signUpText).setOnClickListener {
+    this.binding.signUpText.setOnClickListener {
       this.showSignUpForm()
     }
 
-    this.binding.findViewById<Button>(R.id.loginButton).setOnClickListener {
+    this.binding.loginButton.setOnClickListener {
       this.handleLoginAttempt()
     }
 
-    this.formContainer = this.binding.findViewById(
-      R.id.fragment_signup_container
-    )
+    this.formContainer = this.binding.fragmentSignupContainer
+
   }
 
   /**
    * @brief Toggles password field visibility state
    */
   private fun setTogglePasswordClickListener() {
-    this.binding.findViewById<LinearLayout>(
-      R.id.togglePasswordLayout).setOnClickListener {
+    this.binding.togglePasswordLayout.setOnClickListener {
 
-      val toggleCheckBox = this.binding.findViewById<CheckBox>(
-        R.id.checkBoxTogglePassword
-      )
+      val toggleCheckBox = this.binding.checkBoxTogglePassword
 
       toggleCheckBox.isChecked = !toggleCheckBox.isChecked
       this.updatePasswordVisibility(toggleCheckBox.isChecked)
@@ -95,7 +110,7 @@ class LoginFragment : PageFragment() {
    * @brief Registers checkbox change listener for password visibility
    */
   private fun setCheckboxOnChangeListener() {
-    this.binding.findViewById<CheckBox>(R.id.checkBoxTogglePassword)
+    this.binding.checkBoxTogglePassword
       .setOnCheckedChangeListener { _, isChecked ->
       this.updatePasswordVisibility(isChecked)
     }
@@ -106,20 +121,16 @@ class LoginFragment : PageFragment() {
    * @brief Validates and processes user login credentials
    */
   private fun handleLoginAttempt() {
-    val userEmail = this.binding.findViewById<EditText>(
-      R.id.userEmail
-    ).text.toString().trim()
-    val userPassword = this.binding.findViewById<EditText>(
-      R.id.userPassword
-    ).text.toString().trim()
+    val userEmail = this.binding.userEmail.text.toString().trim()
+    val userPassword = this.binding.userPassword.text.toString().trim()
 
     Log.i("Tomado de datos en login", "$userEmail $userPassword")
     if (userEmail.isNotBlank() && userPassword.isNotBlank()) {
-      if (userEmail.isValidEmail() && userPassword.length >= 8) {
+      if (userEmail.isValidEmail() && userPassword.length >= 4) {
         this.sendCredentialsAsForm(SignInCredentials(userEmail, userPassword))
       } else if (!userEmail.isValidEmail()) {
         this.showError("Por favor, ingresa un correo válido.")
-      } else if (userPassword.length < 8) {
+      } else if (userPassword.length < 4) {
         this.showError(
           "Por favor, ingresa una contraseña con al menos 8 carácteres."
         )
@@ -133,7 +144,7 @@ class LoginFragment : PageFragment() {
    * @brief Initiates authentication API call
    * @param credentials Validated user credentials object
    */
-  fun sendCredentialsAsForm(credentials : SignInCredentials) {
+  private fun sendCredentialsAsForm(credentials : SignInCredentials) {
     this.apiService.signIn(
       credentials.email, credentials.password
     ).enqueue(
@@ -246,12 +257,10 @@ class LoginFragment : PageFragment() {
    * @param showPassword Flag indicating whether to display password text
    */
   private fun updatePasswordVisibility(showPassword: Boolean) {
-    val passwordEditText = this.binding.findViewById<EditText>(
-      R.id.userPassword
-    )
+    val passwordEditText = this.binding.userPassword
 
     if (showPassword) {
-      passwordEditText.inputType =  android.text.InputType.TYPE_CLASS_TEXT or
+      passwordEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT or
         android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
     } else {
       passwordEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT or
