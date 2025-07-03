@@ -24,6 +24,14 @@
             $password = $_POST["password"] ?? '';
         }
 
+        $apiResponse = [
+            "response" => "Error",
+            "message" => "",
+            "errors" => [],
+            "data" => [],
+            "debug" => []
+        ];
+
         try {
             $errors = [];
             require_once 'dbhandler.inc.php';
@@ -46,6 +54,7 @@
 
             if (empty($email) || empty($password)) {
                 $errors[] = ['type' => 'empty_input', 'message' => 'Rellene todos los campos'];
+                $apiResponse["message"] = "Faltan campos obligatorios";
             } else {
                 $user = get_user_by_email($pdo, $email);
                 $debug['user_found'] = $user;
@@ -78,43 +87,56 @@
 
                     if ($passwordVerified) {
                         $_SESSION['user'] = $email;
+                        $apiResponse["response"] = "Ok";
+                        $apiResponse["message"] = "Inicio de sesión exitoso";
+                        $apiResponse["data"] = [
+                            "session" => $_SESSION['user'],
+                            "user" => [
+                                "email" => $user['email'],
+                                "first_name" => $user['first_name'] ?? null,
+                                "last_name" => $user['last_name'] ?? null,
+                                "rol" => $user['rol'] ?? null
+                            ]
+                        ];
+                        $apiResponse["errors"] = [];
+                        $apiResponse["debug"] = $debug;
                         header("Content-Type: application/json");
-                        echo json_encode([
-                            'status' => 'logged_in',
-                            'errors' => $errors,
-                            'session' => $_SESSION['user'],
-                            'debug' => $debug
-                        ]);
+                        echo json_encode($apiResponse);
                         die();
                     } else {
                         $errors[] = ['type' => 'invalid_cred', 'message' => 'Credenciales erroneas'];
+                        $apiResponse["message"] = "Credenciales erroneas";
                     }
                 } else {
                     $errors[] = ['type' => 'invalid_cred', 'message' => 'Credenciales erroneas'];
+                    $apiResponse["message"] = "Credenciales erroneas";
                 }
             }
 
-            // Output errors and debug info
+            $apiResponse["errors"] = $errors;
+            $apiResponse["debug"] = $debug;
             header("Content-Type: application/json");
-            echo json_encode([
-                'status' => 'logged_out',
-                'errors' => $errors,
-                'debug' => $debug
-            ]);
+            echo json_encode($apiResponse);
             die();
 
         } catch (PDOException $e) {
+            $apiResponse["response"] = "Error";
+            $apiResponse["message"] = "Database error";
+            $apiResponse["errors"][] = "Database error";
+            $apiResponse["debug"][] = $e->getMessage();
             header("Content-Type: application/json");
-            echo json_encode([
-                'status' => 'error',
-                'message' => 'Database error',
-                'error_details' => $e->getMessage()
-            ]);
+            echo json_encode($apiResponse);
             die();
         }
     } else {
         header("Content-Type: application/json");
-        echo json_encode(['status' => 'error', 'message' => 'Invalid request method']);
+        echo json_encode([
+            "response" => "Error",
+            "message" => "Invalid request method",
+            "errors" => ["Invalid request method"],
+            "data" => [],
+            "debug" => []
+        ]);
         die();
     }
 ?>

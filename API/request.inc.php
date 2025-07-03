@@ -1,45 +1,83 @@
 <?php
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    require_once 'cors.inc.php';
+	session_start();
+	require 'conf_sess.inc.php';
 
-  // Catches the username and password
-  $request_fields["pointId"] = $_POST["pointId"];
-  $request_fields["email"] = $_POST["email"];
-  $request_fields["region"] = "Prueba";
-  $request_fields["contactNumber"] = $_POST["contactNumber"];
-  $request_fields["fecha"] = $_POST["fecha"];
-  $request_fields["sensTermica"] = $_POST["sensTermica"];
-  $request_fields["propietario"] = $_POST["propietario"];
-  $request_fields["usoActual"] = $_POST["usoActual"];
-  $request_fields["burbujeo"] = $_POST["burbujeo"];
-  $request_fields["direccion"] = $_POST["direccion"];
-  $request_fields["coord_x"] = $_POST["lat"];
-  $request_fields["coord_y"] = $_POST["lng"];
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+	
+	if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-  try {
-    $errors = [];
-    // Brings the files for the databse connection and the MVC pattern
-    // MVC: Patron modelo vista controlador
-    require_once 'dbhandler.inc.php';
-    require_once 'request_model.inc.php';
-    require_once 'request_cont.php';
+		$request_fields["pointId"] = $_POST["pointId"];
+		$request_fields["email"] = $_POST["email"];
+		$request_fields["region"] = "Prueba";
+		$request_fields["contactNumber"] = $_POST["contactNumber"];
+		$request_fields["fecha"] = $_POST["fecha"];
+		$request_fields["sensTermica"] = $_POST["sensTermica"];
+		$request_fields["propietario"] = $_POST["propietario"];
+		$request_fields["usoActual"] = $_POST["usoActual"];
+		$request_fields["burbujeo"] = $_POST["burbujeo"];
+		$request_fields["direccion"] = $_POST["direccion"];
+		$request_fields["coord_x"] = $_POST["lat"];
+		$request_fields["coord_y"] = $_POST["lng"];
 
-    if(!check_fields($request_fields, $errors)) {
-      header("Content-Type: application/json");
-      echo json_encode(['status' => 'fields_wrong', 'errors' => $errors]);
-      die();
-    }
+		$apiResponse = [
+			"response" => "Error",
+			"message" => "",
+			"errors" => [],
+			"data" => [],
+			"debug" => []
+		];
 
-    // If none of the previous errors happened it insert the user on the db
-    if(insert_request($pdo, $request_fields)) {
-      header("Content-Type: application/json");
-      echo json_encode(['status' => 'request_created', 'errors' => $errors]);
-    }
+		try {
+			$errors = [];
+			require_once 'dbhandler.inc.php';
+			require_once 'request_model.inc.php';
+			require_once 'request_cont.php';
 
-  } catch (PDOException $e) {
-    header("Content-Type: application/json");
-    echo json_encode(['status' => 'query_failed', 'errors' => $errors]);
-  }
-}
+			if(!check_fields($request_fields, $errors)) {
+				$apiResponse["message"] = "Error en los datos enviados";
+				$apiResponse["errors"] = $errors;
+				header("Content-Type: application/json");
+				echo json_encode($apiResponse);
+				die();
+			}
+
+			if(insert_request($pdo, $request_fields)) {
+				$apiResponse["response"] = "Ok";
+				$apiResponse["message"] = "Solicitud creada exitosamente";
+				$apiResponse["data"] = [];
+				header("Content-Type: application/json");
+				echo json_encode($apiResponse);
+				die();
+			} else {
+				$apiResponse["message"] = "No se pudo crear la solicitud";
+				$apiResponse["errors"][] = "No se pudo crear la solicitud";
+				header("Content-Type: application/json");
+				echo json_encode($apiResponse);
+				die();
+			}
+
+		} catch (PDOException $e) {
+			$apiResponse["message"] = "Query failed";
+			$apiResponse["errors"][] = "Query failed";
+			$apiResponse["debug"][] = $e->getMessage();
+			header("Content-Type: application/json");
+			echo json_encode($apiResponse);
+			die();
+		}
+	} else {
+		header("Content-Type: application/json");
+		echo json_encode([
+			"response" => "Error",
+			"message" => "Invalid request method",
+			"errors" => ["Invalid request method"],
+			"data" => [],
+			"debug" => []
+		]);
+	die();
+	}
 
 ?>
