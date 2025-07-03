@@ -46,12 +46,14 @@ class CustomInfoOnMarker : InfoWindow {
    * @param listener Event callback handler
    */
   constructor(
-    layoutResId: Int,
-    mapView: MapView,
-    activity: Context,
-    temperature: Double,
-    listener: MessageListener
+    layoutResId : Int,
+    mapView : MapView,
+    activity : Context,
+    point : ThermalPoint? = null,
+    temperature : Double,
+    listener : MessageListener
   ) : super(layoutResId, mapView) {
+    this.thermalPoint = point
     this.temperature = temperature
     this.context = activity
     this.messageListener = listener
@@ -78,30 +80,30 @@ class CustomInfoOnMarker : InfoWindow {
     val position = marker.position
 
     // Coordinate display
-    mView.findViewById<TextView>(
+    this.mView.findViewById<TextView>(
       R.id.coordinates
-    ).text = "Latitude: %.7f\nLongitude: %.7f".format(
+    ).text = "Latitud: %.7f\nLongitud: %.7f".format(
       position.latitude, position.longitude
     )
 
     // Thermal point specific UI
-    temperature?.let { temp ->
-      mView.findViewById<TextView>(R.id.temperature).text =
-        "Temperature: %.2f°C".format(temp)
+    this.temperature?.let { temp ->
+      this.mView.findViewById<TextView>(R.id.temperature).text =
+        "Temperatura: %.2f°C".format(temp)
 
-      mView.findViewById<TextView>(R.id.point_id).text =
-        "Point ID: ${marker.title}"
+      this.mView.findViewById<TextView>(R.id.point_id).text =
+        "Análisis ID: ${marker.title}"
 
-      mView.findViewById<TextView>(R.id.more_info).setOnClickListener {
+      this.mView.findViewById<TextView>(R.id.more_info).setOnClickListener {
         handleMoreInfoClick(marker)
       }
     } ?: run {
       // User position UI
-      mView.findViewById<TextView>(R.id.user_position).text =
-        "Your current location"
+      this.mView.findViewById<TextView>(R.id.user_position).text =
+        "Tu ubicación actual"
     }
 
-    mMapView.controller.setCenter(position)
+    this.mMapView.controller.setCenter(position)
   }
 
   /**
@@ -117,17 +119,14 @@ class CustomInfoOnMarker : InfoWindow {
    * @param marker Source marker triggering the event
    */
   private fun handleMoreInfoClick(marker: Marker) {
-    Log.i("CustomInfoWindow", "Requesting details for ${marker.title}")
-    messageListener?.onMessageReceived("SHOW_POINT", thermalPoint)
-  }
-
-  // =============== DATA MANAGEMENT ===============
-  /**
-   * @brief Updates thermal point reference
-   * @param point New thermal data to associate with marker
-   */
-  fun setThermalPoint(point: ThermalPoint) {
-    thermalPoint = point
+    Log.i(
+      "CustomInfoWindow",
+          "Requesting details for ${marker.title}"
+    )
+    this.messageListener?.onMessageReceived(
+      "SHOW_POINT",
+      this.thermalPoint
+    )
   }
 }
 

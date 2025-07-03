@@ -12,30 +12,16 @@
     app:layout_constraintHorizontal_bias="0.0"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/newRequestButton">
-
-    <ImageView
-        android:id="@+id/map_position_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-      
-        android:background="@drawable/gray_rectangle_rounded2"
-        android:clipToOutline="true"
-        app:srcCompat="@drawable/maps_image"
-        tools:targetApi="s" />
-
+    
     <TextView
-        android:id="@+id/coordenatesTxt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/poppins_regular"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/map_position_image"
-        android:layout_marginStart="20dp"
-        android:text="Coordenadas: "
-        android:textSize="18sp"/>
+      android:id="@+id/coordenatesTxt"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:fontFamily="@font/poppins_regular"
+      android:text="Coordenadas: "
+      android:textSize="18sp"
+      app:layout_constraintTop_toTopOf="parent"
+      tools:layout_editor_absoluteX="172dp" />
 
     <TextView
         android:id="@+id/dateTxt"
