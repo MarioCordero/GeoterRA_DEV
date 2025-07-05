@@ -16,7 +16,7 @@ export default function AppHeader() {
     { key: 'how', path: '/#how-works', label: 'Cómo funciona' },
     { key: 'contact', path: '/#contact-us', label: 'Contacto' },
     { key: 'map', path: '/map', label: 'Mapa' },
-    { key: 'login', path: '/login', label: 'Iniciar Sesión' },
+    { key: 'login', path: '/login', label: 'Mi Perfil' },
   ];
 
   return (

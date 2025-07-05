@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import SidebarLayout from '../components/loggedComponents/loggedSidebar';
 import LoggedMainPage from '../components/loggedComponents/loggedMainPage';
-import Header from '../components/Header';
+import LoggedHeader from '../components/loggedHeader';
 import Footer from '../components/Footer';
 // Import other pages as needed
 import Solicitudes from '../components/loggedComponents/loggedRequests';
@@ -37,7 +37,7 @@ const Logged = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <LoggedHeader />
       <div className="flex flex-1 pt-16"> 
         <SidebarLayout selectedKey={selectedKey} setSelectedKey={setSelectedKey} />
         <div className="flex-1 flex flex-col overflow-auto">

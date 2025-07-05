@@ -26,9 +26,13 @@ function Login() {
     formData.append("password", password);
 
     try {
+      console.log("Sending login request...");
+      // http://geoterra.com/API/login.inc.php
+      // http://163.178.171.105/API/login.inc.php
       const response = await fetch("http://163.178.171.105/API/login.inc.php", {
         method: "POST",
         body: formData,
+        credentials: "include", // Important: include credentials for session
       });
 
       const data = await response.json();
@@ -36,14 +40,28 @@ function Login() {
       console.log("API response:", data);
 
       if (data.response === "Ok") {
-        navigate("/Logged"); // <-- Redirect to the React route
-        // checkSession();  // TODO []
+        console.log("Login successful, navigating to /Logged");
+          try {
+            // http://geoterra.com/API/check_session.php
+            // http://163.178.171.105/API/check_session.php
+            const sessionRes = await fetch("http://163.178.171.105/API/check_session.php", {
+              method: "GET",
+              credentials: "include",
+            });
+            const sessionData = await sessionRes.json();
+              console.log("Session check after login:", sessionData);
+          } catch (err) {
+            console.error("Session check after login failed:", err);
+          }
+        navigate("/Logged");
       } else {
+        console.log("Login failed, wrong credentials");
         setErrorMsg("Credenciales incorrectas");
         setEmail("");
         setPassword("");
       }
     } catch (err) {
+      console.error("Login request failed:", err);
       setErrorMsg("Error de conexión");
       setEmail("");
       setPassword("");

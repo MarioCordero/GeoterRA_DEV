@@ -1,5 +1,4 @@
 <?php
-    require_once 'cors.inc.php'; // Include CORS configuration
     // Ensure session is started with secure settings
     if (session_status() == PHP_SESSION_NONE) {
         ini_set('session.use_only_cookies', 1);

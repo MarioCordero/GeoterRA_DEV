@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import "../../colorModule.css";
 import '../../fontsModule.css';
 
-
 const Dashboard = ({ user }) => (
   <div
     style={{
@@ -36,9 +35,29 @@ const LoggedMainPage = () => {
   const [user, setUser] = useState({ name: '', requestedPoints: 0 });
 
   useEffect(() => {
+    // Check session on mount and log result
+    const checkSession = async () => {
+      try {
+        // http://geoterra.com/API/check_session.php
+        // http://163.178.171.105/API/check_session.php
+        const response = await fetch('http://geoterra.com/API/check_session.php', { credentials: 'include' });
+        const data = await response.json();
+        if (data.status === 'logged_in') {
+          console.log('Session is active');
+        } else {
+          console.log('Session is not active');
+        }
+      } catch {
+        console.log('Session check failed');
+      }
+    };
+
+    checkSession();
+
+    // Fetch user data as before
     const fetchUserData = async () => {
       try {
-        const response = await fetch('/API/user_info.php', { credentials: 'include' });
+        const response = await fetch('http://163.178.171.105/API/user_info.php', { credentials: 'include' });
         if (response.ok) {
           const data = await response.json();
           setUser({

@@ -1,8 +1,8 @@
 <?php
-    require_once 'cors.inc.php';
-    session_start();
-    require 'conf_sess.inc.php';
+    require_once 'cors.inc.php';      // Only sets headers, no output
+    require_once 'conf_sess.inc.php'; // Handles session config and session_start()
 
+    session_start();
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     error_reporting(E_ALL);
@@ -87,10 +87,22 @@
 
                     if ($passwordVerified) {
                         $_SESSION['user'] = $email;
+
+                        // Check if session is properly started and user is set
+                        if (isset($_SESSION['user']) && $_SESSION['user'] === $email) {
+                            $session_status = "Session started successfully";
+                            $session_ok = true;
+                        } else {
+                            $session_status = "Session NOT started";
+                            $session_ok = false;
+                        }
+
                         $apiResponse["response"] = "Ok";
                         $apiResponse["message"] = "Inicio de sesión exitoso";
                         $apiResponse["data"] = [
                             "session" => $_SESSION['user'],
+                            "session_ok" => $session_ok,
+                            "session_status" => $session_status,
                             "user" => [
                                 "email" => $user['email'],
                                 "first_name" => $user['first_name'] ?? null,
