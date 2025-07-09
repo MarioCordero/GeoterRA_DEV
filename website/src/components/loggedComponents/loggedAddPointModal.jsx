@@ -78,6 +78,8 @@ const AddPointModal = ({ user }) => {
         formData.append("foto", values.foto[0].originFileObj);
       }
 
+      // http://163.178.171.105/API/request.inc.php
+      // http://geoterra.com/API/request.inc.php
       const response = await fetch("http://163.178.171.105/API/request.inc.php", {
         method: "POST",
         body: formData,

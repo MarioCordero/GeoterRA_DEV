@@ -17,6 +17,8 @@ const SidebarLayout = ({ selectedKey, setSelectedKey }) => {
 
   const handleLogout = async () => {
     try {
+      // http://163.178.171.105/API/logout.php
+      // http://geoterra.com/API/logout.php
       const response = await fetch("http://163.178.171.105/API/logout.php", { method: "GET" });
       if (response.ok) {
         navigate("/Login");

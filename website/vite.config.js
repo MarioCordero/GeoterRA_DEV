@@ -8,5 +8,8 @@ export default defineConfig({
     react(),
     tailwindcss(),                          
   ],
+  server: {
+    host: 'geoterra.com',  // Add this
+    port: 5173             // Add this
+  }
 })
-

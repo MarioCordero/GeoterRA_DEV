@@ -14,10 +14,13 @@
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
     $allowed_origins = [
         "http://localhost:5173",
+        "http://localhost",
+        "http://geoterra.com:5173",    // ← Add this line
         "http://geoterra.com",
         "https://163.178.171.105",
         "http://163.178.171.105"
     ];
+    
     if (in_array($origin, $allowed_origins)) {
         header("Access-Control-Allow-Origin: $origin");
         header("Access-Control-Allow-Credentials: true");

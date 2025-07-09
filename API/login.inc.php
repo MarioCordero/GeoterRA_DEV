@@ -1,8 +1,9 @@
 <?php
-    require_once 'cors.inc.php';      // Only sets headers, no output
-    require_once 'conf_sess.inc.php'; // Handles session config and session_start()
+    require_once 'cors.inc.php'; 
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }     // Only sets headers, no output
 
-    session_start();
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     error_reporting(E_ALL);
@@ -85,8 +86,25 @@
                     }
                     $debug['password_verified'] = $passwordVerified;
 
+                    // LOGGED PROPERLY
                     if ($passwordVerified) {
                         $_SESSION['user'] = $email;
+
+                        // Enhanced debugging for session
+                        $debug_session = [
+                            'session_id_after_login' => session_id(),
+                            'session_status' => session_status(),
+                            'session_user_set' => isset($_SESSION['user']),
+                            'session_user_value' => $_SESSION['user'] ?? null,
+                            'session_data' => $_SESSION,
+                            'cookies_sent' => headers_list(),
+                            'session_save_path' => session_save_path(),
+                            'session_name' => session_name(),
+                            'php_session_id' => session_id(),
+                            'server_name' => $_SERVER['SERVER_NAME'] ?? null,
+                            'http_host' => $_SERVER['HTTP_HOST'] ?? null,
+                            'request_uri' => $_SERVER['REQUEST_URI'] ?? null
+                        ];
 
                         // Check if session is properly started and user is set
                         if (isset($_SESSION['user']) && $_SESSION['user'] === $email) {
@@ -103,6 +121,7 @@
                             "session" => $_SESSION['user'],
                             "session_ok" => $session_ok,
                             "session_status" => $session_status,
+                            "debug_session" => $debug_session,  // Add this detailed session debugging
                             "user" => [
                                 "email" => $user['email'],
                                 "first_name" => $user['first_name'] ?? null,

@@ -1,7 +1,8 @@
 <?php
     require_once 'cors.inc.php';
-    session_start();
-    require 'conf_sess.inc.php';
+	if (session_status() == PHP_SESSION_NONE) {
+        session_start();                // 2. Session start second
+    }
 
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);

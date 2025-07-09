@@ -26,36 +26,19 @@ function Login() {
     formData.append("password", password);
 
     try {
-      console.log("Sending login request...");
       // http://geoterra.com/API/login.inc.php
       // http://163.178.171.105/API/login.inc.php
       const response = await fetch("http://163.178.171.105/API/login.inc.php", {
         method: "POST",
         body: formData,
-        credentials: "include", // Important: include credentials for session
+        credentials: "include",
       });
 
       const data = await response.json();
 
-      console.log("API response:", data);
-
       if (data.response === "Ok") {
-        console.log("Login successful, navigating to /Logged");
-          try {
-            // http://geoterra.com/API/check_session.php
-            // http://163.178.171.105/API/check_session.php
-            const sessionRes = await fetch("http://163.178.171.105/API/check_session.php", {
-              method: "GET",
-              credentials: "include",
-            });
-            const sessionData = await sessionRes.json();
-              console.log("Session check after login:", sessionData);
-          } catch (err) {
-            console.error("Session check after login failed:", err);
-          }
         navigate("/Logged");
       } else {
-        console.log("Login failed, wrong credentials");
         setErrorMsg("Credenciales incorrectas");
         setEmail("");
         setPassword("");
@@ -77,7 +60,7 @@ function Login() {
 
   return (
     <div className="min-h-screen flex bg-gray-100 relative">
-      {/* ...background layers... */}
+      {/* Background layers */}
       <div 
         className="absolute inset-0 z-0"
         style={{
@@ -165,15 +148,14 @@ function Login() {
             {/* REGISTER LINK */}
             <div className="text-center text-sm poppins">
               ¿No tiene cuenta?{" "}
-              {/* TODO REGISTER COMPONENT */}
-                <button
-                  type="button"
-                  onClick={() => navigate("/Register")}
-                  className="text-blue-600 hover:underline font-bold bg-transparent border-none p-0 m-0 cursor-pointer"
-                  style={{ background: "none" }}
-                >
-                  Registrarse
-                </button>
+              <button
+                type="button"
+                onClick={() => navigate("/Register")}
+                className="text-blue-600 hover:underline font-bold bg-transparent border-none p-0 m-0 cursor-pointer"
+                style={{ background: "none" }}
+              >
+                Registrarse
+              </button>
             </div>
           </form>
         </div>
