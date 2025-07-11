@@ -6,7 +6,7 @@ import Login from '../pages/Login'
 import Map from '../pages/Map'
 import Logged from '../pages/Logged';
 import Register from '../pages/Register'
-
+import PointDetails from '../components/mapComponents/PointDetails'
 export default function AppRouter() {
   return (
     <Router>
@@ -17,6 +17,7 @@ export default function AppRouter() {
           <Route path="/Map" element={<Map />} />
           <Route path="/Logged" element={<Logged />} />
           <Route path="/Register" element={<Register />} />
+          <Route path="/point-details/:pointId" element={<PointDetails />} />
           {/* <Route path="/register" element={<Register />} /> TODO [] */} 
         </Routes>
       </div>

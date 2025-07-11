@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Layout, Button, Drawer } from 'antd';
 import { MenuOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/images/GeoterRA-Logo-Color.svg';
 import '../colorModule.css';
 import '../fontsModule.css';
@@ -10,14 +10,107 @@ const { Header } = Layout;
 
 export default function AppHeader() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const navigate = useNavigate();
+
+  // Function to check session before navigating to profile
+  const handleProfileClick = async (e) => {
+    e.preventDefault(); // Prevent default link behavior
+    
+    try {
+      console.log("Checking session before profile access...");
+      // http://geoterra.com/API/check_session.php
+      // http://163.178.171.105/API/check_session.php
+      const response = await fetch("http://geoterra.com/API/check_session.php", {
+        method: "GET",
+        credentials: "include",
+      });
+      const data = await response.json();
+      
+      if (data.status === 'logged_in') {
+        console.log('Session is active - redirecting to profile');
+        navigate('/Logged');
+      } else {
+        console.log('Session is not active - redirecting to login');
+        navigate('/Login');
+      }
+    } catch (err) {
+      console.error("Session check failed:", err);
+      console.log('Session check failed - redirecting to login');
+      navigate('/Login');
+    }
+  };
 
   const navItems = [
     { key: 'about', path: '/#about-us', label: 'Acerca de nosotros' },
     { key: 'how', path: '/#how-works', label: 'Cómo funciona' },
     { key: 'contact', path: '/#contact-us', label: 'Contacto' },
     { key: 'map', path: '/map', label: 'Mapa' },
-    { key: 'login', path: '/login', label: 'Mi Perfil' },
+    { key: 'profile', path: '/Logged', label: 'Mi Perfil', requiresAuth: true }, // Add flag
   ];
+
+  const renderNavButton = (item) => {
+    if (item.requiresAuth) {
+      // For "Mi Perfil", use click handler instead of Link
+      return (
+        <Button
+          key={item.key}
+          type="text"
+          className="poppins text-white! bg-geoterra-orange poppins-bold"
+          style={{ transition: 'transform 0.2s' }}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
+          onClick={handleProfileClick}
+        >
+          {item.label}
+        </Button>
+      );
+    } else {
+      // For other items, use regular Link
+      return (
+        <Button
+          key={item.key}
+          type="text"
+          className="poppins text-geoterra-blue"
+          style={{ transition: 'transform 0.2s' }}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
+        >
+          <Link to={item.path}>{item.label}</Link>
+        </Button>
+      );
+    }
+  };
+
+  const renderMobileNavButton = (item) => {
+    if (item.requiresAuth) {
+      return (
+        <Button
+          key={item.key}
+          type="text"
+          block
+          style={{ marginBottom: '8px' }}
+          onClick={(e) => {
+            setDrawerOpen(false);
+            handleProfileClick(e);
+          }}
+        >
+          {item.label}
+        </Button>
+      );
+    } else {
+      return (
+        <Button
+          key={item.key}
+          type="text"
+          block
+          style={{ marginBottom: '8px' }}
+          onClick={() => setDrawerOpen(false)}
+        >
+          <Link to={item.path}>{item.label}</Link>
+        </Button>
+      );
+    }
+  };
 
   return (
     <Header
@@ -42,46 +135,33 @@ export default function AppHeader() {
         </Link>
       </div>
 
-{/* Desktop Navigation */}
-<div className="desktop-menu" style={{ display: 'flex', gap: '16px' }}>
-  {navItems.map((item) => (
-    <Button
-      key={item.key}
-      type="text"
-      className={item.key === 'login' ? 'bg-geoterra-orange poppins-bold text-blanco font-bold!' : 'poppins text-geoterra-blue'}
-      style={{ transition: 'transform 0.2s' }}
-      onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
-      onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
-    >
-      <Link to={item.path}>{item.label}</Link>
-    </Button>
-  ))}
-</div>
+      {/* Desktop Navigation */}
+      <div className="desktop-menu" style={{ display: 'flex', gap: '16px' }}>
+        {navItems.map((item) => renderNavButton(item))}
+      </div>
 
-{/* Mobile Drawer */}
-<Drawer
-  placement="right"
-  onClose={() => setDrawerOpen(false)}
-  open={drawerOpen}
-  title={
-    <Link to="/">
-      <img src={logo} alt="GeoTerRA Logo" style={{ height: '40px' }} />
-    </Link>
-  }
->
-  {navItems.map((item) => (
-    <Button
-      key={item.key}
-      type="text"
-      className={item.key === 'login' ? 'bg-geoterra-orange text-blanco' : ''}
-      block
-      style={{ marginBottom: '8px' }}
-      onClick={() => setDrawerOpen(false)}
-    >
-      <Link to={item.path}>{item.label}</Link>
-    </Button>
-  ))}
-</Drawer>
+      {/* Mobile Menu Button */}
+      <Button
+        className="mobile-menu"
+        type="text"
+        icon={<MenuOutlined />}
+        onClick={() => setDrawerOpen(true)}
+        style={{ display: 'none' }}
+      />
+
+      {/* Mobile Drawer */}
+      <Drawer
+        placement="right"
+        onClose={() => setDrawerOpen(false)}
+        open={drawerOpen}
+        title={
+          <Link to="/">
+            <img src={logo} alt="GeoTerRA Logo" style={{ height: '40px' }} />
+          </Link>
+        }
+      >
+        {navItems.map((item) => renderMobileNavButton(item))}
+      </Drawer>
     </Header>
   );
 }

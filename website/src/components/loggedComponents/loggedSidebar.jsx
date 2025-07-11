@@ -17,17 +17,35 @@ const SidebarLayout = ({ selectedKey, setSelectedKey }) => {
 
   const handleLogout = async () => {
     try {
+      console.log("Starting logout process...");
+      
       // http://163.178.171.105/API/logout.php
       // http://geoterra.com/API/logout.php
-      const response = await fetch("http://163.178.171.105/API/logout.php", { method: "GET" });
+      const response = await fetch("http://geoterra.com/API/logout.php", { 
+        method: "POST", // Try POST instead of GET
+        credentials: "include", // Important: Include cookies
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log("Logout response status:", response.status);
+      console.log("Logout response ok:", response.ok);
+      
+      // Try to get the response data
+      const data = await response.json();
+      console.log("Logout response data:", data);
+
       if (response.ok) {
+        console.log("Logout successful, redirecting to login");
         navigate("/Login");
       } else {
-        alert("Error al cerrar sesión");
+        console.error("Logout failed:", data);
+        alert("Error al cerrar sesión: " + (data.message || "Unknown error"));
       }
     } catch (err) {
-      console.error("Error de conexión:", err);
-      alert("Error de conexión");
+      console.error("Logout error:", err);
+      alert("Error de conexión: " + err.message);
     }
   };
 

@@ -6,22 +6,53 @@ import Footer from '../components/Footer';
 
 const Map = () => {
   const [isLogged, setIsLogged] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const response = await fetch("http://163.178.171.105/API/check_session.php", {
+        console.log("Checking session...");
+        // http://geoterra.com/API/check_session.php
+        // http://163.178.171.105/API/check_session.php
+        const response = await fetch("http://geoterra.com/API/check_session.php", {
           method: "GET",
           credentials: "include",
         });
         const data = await response.json();
-        setIsLogged(data.status === "logged_in");
+        console.log("Session check response:", data);
+        
+        if (data.status === 'logged_in') {
+          console.log('Session is active');
+          setIsLogged(true);
+        } else {
+          console.log('Session is not active');
+          setIsLogged(false);
+        }
       } catch (err) {
+        console.error("Session check failed:", err);
+        console.log('Session check failed');
         setIsLogged(false);
+      } finally {
+        setIsLoading(false);
       }
     };
+    
     checkSession();
   }, []);
+
+  // Show loading state while checking session
+  if (isLoading) {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center' 
+      }}>
+        <div>Cargando...</div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

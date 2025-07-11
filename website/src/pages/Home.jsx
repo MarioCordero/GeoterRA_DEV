@@ -15,18 +15,29 @@ const Home = () => {
     const checkSession = async () => {
       try {
         console.log("Checking session...");
-        const response = await fetch("http://163.178.171.105/API/check_session.php", {
+        // http://163.178.171.105/API/check_session.php
+        // http://geoterra.com/API/check_session.php
+        const response = await fetch("http://geoterra.com/API/check_session.php", {
           method: "GET",
           credentials: "include",
         });
         const data = await response.json();
         console.log("Session check response:", data);
-        setIsLogged(data.status === "logged_in");
+        
+        if (data.status === 'logged_in') {
+          console.log('Session is active');
+          setIsLogged(true);
+        } else {
+          console.log('Session is not active');
+          setIsLogged(false);
+        }
       } catch (err) {
         console.error("Session check failed:", err);
+        console.log('Session check failed');
         setIsLogged(false);
       }
     };
+    
     checkSession();
   }, []);
 
