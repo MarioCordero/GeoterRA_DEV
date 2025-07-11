@@ -22,7 +22,7 @@ const SidebarLayout = ({ selectedKey, setSelectedKey }) => {
       
       // http://163.178.171.105/API/logout.php
       // http://geoterra.com/API/logout.php
-      const response = await fetch("http://geoterra.com/API/logout.php", { 
+      const response = await fetch("http://163.178.171.105/API/logout.php", { 
         method: "POST", // Try POST instead of GET
         credentials: "include", // Important: Include cookies
         headers: {

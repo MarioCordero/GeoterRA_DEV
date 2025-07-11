@@ -23,7 +23,9 @@ function Login() {
       const formData = new FormData();
       formData.append("email", email);
       
-      const response = await fetch("http://geoterra.com/API/user_info.php", {
+      // http://geoterra.com/API/user_info.php
+      // http://163.178.171.105/API/user_info.php
+      const response = await fetch("http://163.178.171.105/API/user_info.php", {
         method: "POST",
         body: formData,
         credentials: "include",
@@ -52,8 +54,9 @@ function Login() {
     formData.append("password", password);
 
     try {
-      // First, attempt login
-      const response = await fetch("http://geoterra.com/API/login.inc.php", {
+      // http://geoterra.com/API/login.inc.php
+      // http://163.178.171.105/API/login.inc.php
+      const response = await fetch("http://163.178.171.105/API/login.inc.php", {
         method: "POST",
         body: formData,
         credentials: "include",

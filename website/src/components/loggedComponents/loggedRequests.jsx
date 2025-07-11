@@ -15,15 +15,25 @@ const Requests = () => {
   // Function to get user session and email
   const getUserSession = async () => {
     try {
-      const response = await fetch("http://geoterra.com/API/check_session.php", {
+      // http://geoterra.com/API/check_session.php
+      // http://163.172.213.123/API/check_session.php
+      const response = await fetch("http://163.172.213.123/API/check_session.php", {
         method: "GET",
         credentials: "include",
       });
       const data = await response.json();
       
-      if (data.status === 'logged_in') {
-        return data.user; // This should be the email
+      // Check if the API response is successful
+      if (data.response === "Ok" && data.data.status === 'logged_in') {
+        return data.data.user; // Access user from data.data.user
       }
+      
+      // Log debug info if session fails
+      console.log("Session check failed:", data);
+      if (data.debug) {
+        console.log("Debug info:", data.debug);
+      }
+      
       return null;
     } catch (error) {
       console.error("Error checking session:", error);
@@ -34,7 +44,9 @@ const Requests = () => {
   // Function to fetch user's requests
   const fetchUserRequests = async (email) => {
     try {
-      const response = await fetch("http://geoterra.com/API/get_request.inc.php", {
+      // http://geoterra.com/API/get_request.inc.php
+      // http://163.172.213.123/API/get_request.inc.php
+      const response = await fetch("http://163.172.213.123/API/get_request.inc.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `email=${encodeURIComponent(email)}`,
@@ -50,10 +62,18 @@ const Requests = () => {
       if (result.response === "Ok") {
         return result.data || [];
       } else {
+        // If the API returns an error but it's about "no requests found", return empty array
+        if (result.message && result.message.includes("No se encontraron solicitudes")) {
+          return [];
+        }
         throw new Error(result.message || "Failed to fetch requests");
       }
     } catch (error) {
       console.error("Error fetching requests:", error);
+      // If it's a "no requests found" error, return empty array instead of throwing
+      if (error.message && error.message.includes("No se encontraron solicitudes")) {
+        return [];
+      }
       throw error;
     }
   };

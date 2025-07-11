@@ -40,9 +40,9 @@ const LoggedMainPage = () => {
       try {
         // http://geoterra.com/API/check_session.php
         // http://163.178.171.105/API/check_session.php
-        const response = await fetch('http://geoterra.com/API/check_session.php', { credentials: 'include' });
-        const data = await response.json();
-        if (data.status === 'logged_in') {
+        const response = await fetch('http://163.178.171.105/API/check_session.php', { credentials: 'include' });
+        const apiResponse = await response.json();
+        if (apiResponse.response === 'Ok' && apiResponse.data.status === 'logged_in') {
           console.log('Session is active');
         } else {
           console.log('Session is not active');
@@ -59,7 +59,7 @@ const LoggedMainPage = () => {
       try {
         // http://geoterra.com/API/user_info.php
         // http://163.178.171.105/API/user_info.php
-        const response = await fetch('http://geoterra.com/API/user_info.php', { credentials: 'include' });
+        const response = await fetch('http://163.178.171.105/API/user_info.php', { credentials: 'include' });
         if (response.ok) {
           const data = await response.json();
           setUser({

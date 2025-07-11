@@ -17,14 +17,14 @@ const Home = () => {
         console.log("Checking session...");
         // http://163.178.171.105/API/check_session.php
         // http://geoterra.com/API/check_session.php
-        const response = await fetch("http://geoterra.com/API/check_session.php", {
+        const response = await fetch("http://163.178.171.105/API/check_session.php", {
           method: "GET",
           credentials: "include",
         });
-        const data = await response.json();
-        console.log("Session check response:", data);
+        const apiResponse = await response.json();
+        console.log("Session check response:", apiResponse);
         
-        if (data.status === 'logged_in') {
+        if (apiResponse.response === 'Ok' && apiResponse.data.status === 'logged_in') {
           console.log('Session is active');
           setIsLogged(true);
         } else {

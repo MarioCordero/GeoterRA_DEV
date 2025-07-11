@@ -26,12 +26,32 @@ const DashboardPlaceholder = () => (
   </div>
 );
 
+const PerfilPlaceholder = () => (
+  <div
+    style={{
+      width: '100%',
+      height: '100%',
+      minHeight: '400px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '2rem',
+      color: '#888',
+      background: '#f5f5f5',
+      borderRadius: '8px',
+      margin: '2rem 0',
+    }}
+  >
+    👤 Perfil de usuario - En construcción...
+  </div>
+);
+
 const Logged = () => {
   const [selectedKey, setSelectedKey] = useState('1');
 
   let content;
   if (selectedKey === '1') content = <LoggedMainPage />;
-  else if (selectedKey === '2') content = <Perfil />;
+  else if (selectedKey === '2') content = <PerfilPlaceholder />;
   else if (selectedKey === '3') content = <Solicitudes />;
   else content = <DashboardPlaceholder />;
 

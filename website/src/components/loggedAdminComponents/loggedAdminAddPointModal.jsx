@@ -30,14 +30,16 @@ const AddPointModal = ({ onRequestAdded }) => {
   // Function to get user session and email
   const getUserSession = async () => {
     try {
-      const response = await fetch("http://geoterra.com/API/check_session.php", {
+      // http://163.178.171.105/API/check_session.php
+      // http://geoterra.com/API/check_session.php
+      const response = await fetch("http://163.178.171.105/API/check_session.php", {
         method: "GET",
         credentials: "include",
       });
-      const data = await response.json();
+      const apiResponse = await response.json();
       
-      if (data.status === 'logged_in') {
-        return data.user; // This should be the email
+      if (apiResponse.response === 'Ok' && apiResponse.data.status === 'logged_in') {
+        return apiResponse.data.user; // This should be the email
       }
       return null;
     } catch (error) {
@@ -117,7 +119,7 @@ const AddPointModal = ({ onRequestAdded }) => {
 
       // http://163.178.171.105/API/request.inc.php
       // http://geoterra.com/API/request.inc.php
-      const response = await fetch("http://geoterra.com/API/request.inc.php", {
+      const response = await fetch("http://163.178.171.105/API/request.inc.php", {
         method: "POST",
         body: formData,
         credentials: "include", // Include credentials for session

@@ -6,7 +6,9 @@ import { generatePointPDF, exportToCSV, formatPointForSharing } from './exportUt
 // Function to fetch single point data (if needed to refresh or get additional data)
 const fetchPointData = async (pointId, region) => {
   try {
-    const response = await fetch("http://geoterra.com/API/map_data.inc.php", {
+    // http://geoterra.com/API/map_data.inc.php
+    // http://163.178.171.105/API/map_data.inc.php
+    const response = await fetch("http://163.178.171.105/API/map_data.inc.php", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: `region=${encodeURIComponent(region)}`,

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Typography, Divider, Spin, Alert, Tag } from 'antd';
-import AddPointModal from './loggedAddPointModal';
+import AdminAddPointModal from './loggedAdminAddPointModal';
 import '../../colorModule.css';
 import '../../fontsModule.css';
 
@@ -15,14 +15,16 @@ const Requests = () => {
   // Function to get user session and email
   const getUserSession = async () => {
     try {
-      const response = await fetch("http://geoterra.com/API/check_session.php", {
+      // http://geoterra.com/API/check_session.php
+      // http://163.178.171.105/API/check_session.php
+      const response = await fetch("http://163.178.171.105/API/check_session.php", {
         method: "GET",
         credentials: "include",
       });
-      const data = await response.json();
+      const apiResponse = await response.json();
       
-      if (data.status === 'logged_in') {
-        return data.user; // This should be the email
+      if (apiResponse.response === 'Ok' && apiResponse.data.status === 'logged_in') {
+        return apiResponse.data.user; // This should be the email
       }
       return null;
     } catch (error) {
@@ -34,7 +36,9 @@ const Requests = () => {
   // Function to fetch user's requests
   const fetchUserRequests = async (email) => {
     try {
-      const response = await fetch("http://geoterra.com/API/get_request.inc.php", {
+      // http://geoterra.com/API/get_request.inc.php
+      // http://163.178.171.105/API/get_request.inc.php
+      const response = await fetch("http://163.178.171.105/API/get_request.inc.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `email=${encodeURIComponent(email)}`,
@@ -231,7 +235,7 @@ const Requests = () => {
         Mis Solicitudes ({requests.length})
       </Title>
       <div style={{ marginBottom: '16px', textAlign: 'right' }}>
-        <AddPointModal onRequestAdded={refreshRequests} />
+        <AdminAddPointModal onRequestAdded={refreshRequests} />
       </div>
       <Divider />
       
