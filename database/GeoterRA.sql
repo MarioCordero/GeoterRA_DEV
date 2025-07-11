@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.1.1deb5ubuntu1
+-- version 5.2.1deb3
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jul 03, 2025 at 01:54 PM
--- Server version: 8.0.42-0ubuntu0.22.04.1
--- PHP Version: 8.1.2-1ubuntu2.21
+-- Generation Time: Jul 11, 2025 at 10:14 PM
+-- Server version: 8.0.42-0ubuntu0.24.04.1
+-- PHP Version: 8.3.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -28,8 +28,8 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `puntos_estudiados` (
-  `id` varchar(30) COLLATE utf8mb4_general_ci NOT NULL,
-  `region` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `id` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `region` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `coord_x` double NOT NULL,
   `coord_y` double NOT NULL,
   `temp` double NOT NULL,
@@ -41,11 +41,11 @@ CREATE TABLE `puntos_estudiados` (
   `Ca+` double NOT NULL,
   `HCO3` double NOT NULL,
   `SO4` double NOT NULL,
-  `Fe` varchar(10) COLLATE utf8mb4_general_ci NOT NULL,
+  `Fe` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `Si` double NOT NULL,
-  `B` varchar(10) COLLATE utf8mb4_general_ci NOT NULL,
-  `Li` varchar(10) COLLATE utf8mb4_general_ci NOT NULL,
-  `F` varchar(10) COLLATE utf8mb4_general_ci NOT NULL,
+  `B` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `Li` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `F` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `Na` double NOT NULL,
   `K` double NOT NULL,
   `MG+` double NOT NULL
@@ -56,6 +56,8 @@ CREATE TABLE `puntos_estudiados` (
 --
 
 INSERT INTO `puntos_estudiados` (`id`, `region`, `coord_x`, `coord_y`, `temp`, `pH_campo`, `cond_campo`, `pH_lab`, `cond_lab`, `Cl`, `Ca+`, `HCO3`, `SO4`, `Fe`, `Si`, `B`, `Li`, `F`, `Na`, `K`, `MG+`) VALUES
+('POINT-0026', 'Prueba', -84.1278076171875, 9.893098633379584, 25, 7, 500, 7, 500, 10, 20, 30, 40, '< 0.07', 50, '< 1.0', '< 1', '< 0.5', 60, 70, 80),
+('POINT-0027', 'Prueba', -84.02343750000001, 10.152746165571939, 40, 7, 500, 7, 500, 10, 20, 30, 40, '< 0.07', 50, '< 1.0', '< 1', '< 0.5', 60, 70, 80),
 ('PRUEBA1', 'Heredia', -87.3937, 8.9276, 25, 7.1, 500, 7, 500, 10, 20, 30, 40, '0.1', 50, '0.2', '0.3', '0.4', 60, 70, 80),
 ('PRUEBA2', 'San José', -86.1102, 7.9272, 27, 6.8, 600, 7.2, 600, 11, 21, 31, 41, '0.2', 51, '0.3', '0.4', '0.5', 61, 71, 81),
 ('Termal CTP-1', 'Guanacaste', -85.3477, 10.7476, 41, 6.51, 685, 6.37, 665, 12.2, 59.8, 389, 42.1, '< 0.07', 142, '< 1,0', '< 1', '< 0.5', 68.8, 15.5, 32.7),
@@ -78,12 +80,12 @@ INSERT INTO `puntos_estudiados` (`id`, `region`, `coord_x`, `coord_y`, `temp`, `
 
 CREATE TABLE `reg_usr` (
   `id` int NOT NULL,
-  `email` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `password` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
-  `first_name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
-  `last_name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
-  `phone_number` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `rol` varchar(10) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'usr'
+  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `password` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `first_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `last_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `phone_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `rol` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'usr'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -141,7 +143,7 @@ INSERT INTO `reg_usr` (`id`, `email`, `password`, `first_name`, `last_name`, `ph
 (441, 'squaltro1b@shareasale.com', 'zP9<k1iBbgB|\"aVE', 'Swen', 'Qualtro', '1613555051', ''),
 (442, 'llower1c@biglobe.ne.jp', 'qD8!<|4=0', 'Luce', 'Lower', '7569086054', ''),
 (443, 'mcarlo1d@netscape.com', 'kB4/%On\'&9', 'Mollie', 'Carlo', '8838281420', ''),
-(444, 'test@test.com', 'test', 'Christopher', 'Acosta Madrigal', '86473533', ''),
+(444, 'test@test.com', 'test', 'Christopher', 'Acosta Madrigal', '86473533', 'admin'),
 (446, 'cordero@gmail.com', '2003', 'Mario', 'Cordero', '83443610', 'usr');
 
 -- --------------------------------------------------------
@@ -152,16 +154,16 @@ INSERT INTO `reg_usr` (`id`, `email`, `password`, `first_name`, `last_name`, `ph
 
 CREATE TABLE `solicitudes` (
   `id_soli` int NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `region` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `region` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `fecha` date DEFAULT NULL,
-  `propietario` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `num_telefono` varchar(8) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `propietario` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `num_telefono` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `coord_x` double DEFAULT NULL,
   `coord_y` double DEFAULT NULL,
-  `direccion` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `uso_actual` varchar(80) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `sens_termica` set('1','2','3') COLLATE utf8mb4_general_ci NOT NULL,
+  `direccion` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `uso_actual` varchar(80) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `sens_termica` set('1','2','3') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `burbujeo` tinyint(1) DEFAULT NULL,
   `pH_campo` double DEFAULT NULL,
   `cond_campo` double DEFAULT NULL
@@ -174,8 +176,7 @@ CREATE TABLE `solicitudes` (
 INSERT INTO `solicitudes` (`id_soli`, `email`, `region`, `fecha`, `propietario`, `num_telefono`, `coord_x`, `coord_y`, `direccion`, `uso_actual`, `sens_termica`, `burbujeo`, `pH_campo`, `cond_campo`) VALUES
 (19, 'test@test.com', 'Prueba', '2024-08-30', 'Chris', '88888888', 9.936886826338672, -84.04367208480836, 'Por ahi', 'Ninguno', '1', 1, NULL, NULL),
 (20, 'test@test.com', 'Prueba', '2024-08-23', 'Chris', '88888888', 9.936543822567252, -84.04560679726674, 'Por ahi', 'Ninguno', '1', 0, NULL, NULL),
-(21, 'test@test.com', 'Prueba', '2024-08-29', 'Chris', '88888888', 9.936272925409632, -84.04428899288179, 'Por ahi', 'Ninguno', '1', 1, NULL, NULL),
-(22, NULL, 'Prueba', '2024-09-10', 'Chris', '88888888', 9.93705717041161, -84.04303022665687, 'Por ahi', 'Ninguno', '2', 1, NULL, NULL);
+(21, 'test@test.com', 'Prueba', '2024-08-29', 'Chris', '88888888', 9.936272925409632, -84.04428899288179, 'Por ahi', 'Ninguno', '1', 1, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -215,7 +216,7 @@ ALTER TABLE `reg_usr`
 -- AUTO_INCREMENT for table `solicitudes`
 --
 ALTER TABLE `solicitudes`
-  MODIFY `id_soli` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id_soli` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- Constraints for dumped tables
