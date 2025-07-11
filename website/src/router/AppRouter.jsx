@@ -7,6 +7,8 @@ import Map from '../pages/Map'
 import Logged from '../pages/Logged';
 import Register from '../pages/Register'
 import PointDetails from '../components/mapComponents/PointDetails'
+import LoggedAdmin from '../pages/LoggedAdmin'
+
 export default function AppRouter() {
   return (
     <Router>
@@ -18,7 +20,7 @@ export default function AppRouter() {
           <Route path="/Logged" element={<Logged />} />
           <Route path="/Register" element={<Register />} />
           <Route path="/point-details/:pointId" element={<PointDetails />} />
-          {/* <Route path="/register" element={<Register />} /> TODO [] */} 
+          <Route path="/LoggedAdmin" element={<LoggedAdmin />} />
         </Routes>
       </div>
     </Router>

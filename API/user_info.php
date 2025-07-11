@@ -22,7 +22,7 @@
 
         if (!empty($email)) {
             try {
-                $stmt = $pdo->prepare("SELECT first_name, last_name, email, phone_number FROM reg_usr WHERE email = :email");
+                $stmt = $pdo->prepare("SELECT first_name, last_name, email, phone_number, rol FROM reg_usr WHERE email = :email");
                 $stmt->bindParam(':email', $email);
                 $stmt->execute();
 
@@ -34,7 +34,8 @@
                     $apiResponse["data"] = [
                         "name" => $user['first_name'] . ' ' . $user['last_name'],
                         "email" => $user['email'],
-                        "phone" => $user['phone_number']
+                        "phone" => $user['phone_number'],
+                        "rol" => $user['rol']
                     ];
                 } else {
                     $apiResponse["message"] = "Usuario no encontrado";

@@ -20,8 +20,8 @@
 		$request_fields["usoActual"] = $_POST["usoActual"];
 		$request_fields["burbujeo"] = $_POST["burbujeo"];
 		$request_fields["direccion"] = $_POST["direccion"];
-		$request_fields["coord_x"] = $_POST["lat"];
-		$request_fields["coord_y"] = $_POST["lng"];
+		$request_fields["coord_x"] = $_POST["lng"];  // X = longitude
+		$request_fields["coord_y"] = $_POST["lat"];  // Y = latitude
 
 		$apiResponse = [
 			"response" => "Error",

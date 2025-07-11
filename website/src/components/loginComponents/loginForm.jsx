@@ -15,19 +15,44 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Function to get user info after successful login
+  const getUserInfo = async (email) => {
+    try {
+      const formData = new FormData();
+      formData.append("email", email);
+      
+      const response = await fetch("http://geoterra.com/API/user_info.php", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+      
+      const data = await response.json();
+      
+      if (data.response === "Ok" && data.data) {
+        return data.data;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error getting user info:", error);
+      return null;
+    }
+  };
 
   // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg("");
+    setLoading(true);
 
     const formData = new FormData();
     formData.append("email", email);
     formData.append("password", password);
 
     try {
-      // http://geoterra.com/API/login.inc.php
-      // http://163.178.171.105/API/login.inc.php
+      // First, attempt login
       const response = await fetch("http://geoterra.com/API/login.inc.php", {
         method: "POST",
         body: formData,
@@ -37,9 +62,27 @@ function Login() {
       const data = await response.json();
 
       if (data.response === "Ok") {
-        navigate("/Logged");
+        // Login successful, now get user info to check role
+        const userInfo = await getUserInfo(email);
+        
+        if (userInfo) {
+          console.log("User info:", userInfo);
+          
+          // Check user role and redirect accordingly
+          if (userInfo.rol === "admin") {
+            console.log("Admin user detected, redirecting to admin panel");
+            navigate("/LoggedAdmin"); 
+          } else {
+            console.log("Regular user detected, redirecting to logged page");
+            navigate("/Logged");
+          }
+        } else {
+          // If we can't get user info, default to regular user page
+          console.log("Could not get user info, defaulting to regular user page");
+          navigate("/Logged");
+        }
       } else {
-        setErrorMsg("Credenciales incorrectas");
+        setErrorMsg(data.message || "Credenciales incorrectas");
         setEmail("");
         setPassword("");
       }
@@ -48,6 +91,8 @@ function Login() {
       setErrorMsg("Error de conexión");
       setEmail("");
       setPassword("");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -92,6 +137,13 @@ function Login() {
               </div>
             )}
 
+            {/* Loading indicator */}
+            {loading && (
+              <div className="mb-4 bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded text-center">
+                <span>Verificando credenciales...</span>
+              </div>
+            )}
+
             {/* EMAIL INPUT */}
             <div>
               <h2 className="text-lg font-semibold mb-4 text-geoterra-blue poppins-bold">Correo</h2>
@@ -102,7 +154,8 @@ function Login() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border border-geoterra-blue rounded focus:outline-none focus:ring-1 focus:ring-blue-500 poppins"
+                disabled={loading}
+                className="w-full px-4 py-2 border border-geoterra-blue rounded focus:outline-none focus:ring-1 focus:ring-blue-500 poppins disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
 
@@ -116,7 +169,8 @@ function Login() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-geoterra-blue rounded focus:outline-none focus:ring-1 focus:ring-blue-500 poppins"
+                disabled={loading}
+                className="w-full px-4 py-2 border border-geoterra-blue rounded focus:outline-none focus:ring-1 focus:ring-blue-500 poppins disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
 
@@ -127,6 +181,7 @@ function Login() {
                 <input
                   id="remember"
                   type="checkbox"
+                  disabled={loading}
                   className="mr-2 hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 <label htmlFor="remember" className="text-gray-700 select-none hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed poppins">
@@ -139,9 +194,10 @@ function Login() {
             <div className="space-y-3">
               <button
                 type="submit"
+                disabled={loading}
                 className="w-full bg-geoterra-orange text-white py-2 rounded font-bold hover:bg-cafe transition hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed poppins-bold"
               >
-                Acceder
+                {loading ? "Verificando..." : "Acceder"}
               </button>
             </div>
 
@@ -151,7 +207,8 @@ function Login() {
               <button
                 type="button"
                 onClick={() => navigate("/Register")}
-                className="text-blue-600 hover:underline font-bold bg-transparent border-none p-0 m-0 cursor-pointer"
+                disabled={loading}
+                className="text-blue-600 hover:underline font-bold bg-transparent border-none p-0 m-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ background: "none" }}
               >
                 Registrarse
