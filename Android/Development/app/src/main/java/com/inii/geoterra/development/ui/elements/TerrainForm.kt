@@ -3,7 +3,6 @@ package com.inii.geoterra.development.ui.elements
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.widget.EditText
 import android.widget.LinearLayout
 import com.google.android.material.textfield.TextInputEditText
 import com.inii.geoterra.development.R
@@ -36,7 +35,7 @@ class TerrainForm @JvmOverloads constructor(
 
     // Inflate and attach custom layout
     LayoutInflater.from(context).inflate(
-      R.layout.terrain_form,
+      R.layout.view_terrain_form,
       this,
       true
     ).apply {

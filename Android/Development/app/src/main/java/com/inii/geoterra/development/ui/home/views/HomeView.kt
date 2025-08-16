@@ -1,13 +1,16 @@
-package com.inii.geoterra.development.ui.home
+package com.inii.geoterra.development.ui.home.views
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.inii.geoterra.development.R
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import com.inii.geoterra.development.databinding.FragmentHomeBinding
-import com.inii.geoterra.development.databinding.FragmentLoginBinding
-import com.inii.geoterra.development.interfaces.PageFragment
+import com.inii.geoterra.development.interfaces.PageView
+import com.inii.geoterra.development.ui.home.models.HomeViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * @brief Primary landing screen fragment for application home view
@@ -18,12 +21,15 @@ import com.inii.geoterra.development.interfaces.PageFragment
  * - Quick actions
  * - Recent activity
  *
- * Inherits PageFragment lifecycle management capabilities.
+ * Inherits PageView lifecycle management capabilities.
  */
-class HomeFragment : PageFragment<FragmentHomeBinding>() {
-  /** Inflated view hierarchy reference for home page */
-  override val bindingInflater : (LayoutInflater, ViewGroup?, Boolean) ->
-  FragmentHomeBinding get() = FragmentHomeBinding::inflate
+@AndroidEntryPoint
+class HomeView : PageView<FragmentHomeBinding, HomeViewModel>(
+  FragmentHomeBinding::inflate,
+  HomeViewModel::class.java
+) {
+
+  override val viewModel : HomeViewModel by viewModels()
 
   // =============== LIFECYCLE METHODS ===============
   /**
@@ -34,7 +40,15 @@ class HomeFragment : PageFragment<FragmentHomeBinding>() {
    *
    * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
    */
-  override fun onPageCreated(savedInstanceState: Bundle?) {}
+  override fun onCreatePage(savedInstanceState: Bundle?) {}
+
+  /**
+   * @brief Sets all the listeners related to the View.
+   *
+   * Subclasses should implement this method to observe set their listeners.
+   */
+  override fun setUpListeners() {
+  }
 
   /**
    * Called to create the view hierarchy associated with this page or fragment.
@@ -46,10 +60,13 @@ class HomeFragment : PageFragment<FragmentHomeBinding>() {
    * @param container The parent view that the fragment's UI should be attached to, or null.
    * @return The root view for the fragment's UI.
    */
-  override fun onPageViewCreated(inflater : LayoutInflater,
+  override fun onCreatePageView(inflater : LayoutInflater,
     container : ViewGroup?
   ) : View {
 
     return this.binding.root
+  }
+
+  override fun observeViewModel() {
   }
 }

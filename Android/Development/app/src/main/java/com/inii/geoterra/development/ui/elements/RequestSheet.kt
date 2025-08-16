@@ -5,7 +5,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.inii.geoterra.development.R
@@ -34,7 +33,7 @@ class RequestSheet @JvmOverloads constructor(
   // Inflate the layout for this custom view
   /** @brief Container for fragment's view elements */
   private var binding: View = LayoutInflater.from(context).inflate(
-    R.layout.request_sheet,
+    R.layout.view_request_sheet,
     this,
     true
   )
