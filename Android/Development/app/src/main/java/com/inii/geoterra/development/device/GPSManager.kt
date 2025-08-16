@@ -1,220 +1,298 @@
 package com.inii.geoterra.development.device
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
+import com.inii.geoterra.development.interfaces.LocationCallbackListener
+import com.inii.geoterra.development.interfaces.PermissionRequester
+import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
- * @brief Object managing GPS location updates and permissions using FusedLocationProviderClient.
+ * @brief GPSManager sin FusedLocation, usando LocationManager directamente.
  *
- * This singleton handles location permission management, initializes location services,
- * and provides continuous location updates through a callback interface.
+ * Emula comportamiento de FusedLocationProviderClient combinando proveedores
+ * GPS y NETWORK para obtener ubicaciones precisas.
  */
-object GPSManager : LocationCallback() {
+@Singleton
+class GPSManager @Inject constructor(): LocationListener {
 
-  /** @brief Request code for location permission handling */
-  private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
+  private val LOCATION_PERMISSION_REQUEST_CODE = 1000
 
-  /** @brief FusedLocationProviderClient instance for accessing location services */
-  private lateinit var fusedLocationClient: FusedLocationProviderClient
+  private val requiredPermission = Manifest.permission.ACCESS_FINE_LOCATION
 
-  /** @brief Configuration parameters for location updates */
-  private lateinit var locationRequest: LocationRequest
+  /** Instancia de LocationManager del sistema */
+  private lateinit var locationManager: LocationManager
 
-  /** @brief Cache for the most recently received location */
+  /** Última ubicación conocida */
   private var currentLocation: Location? = null
 
-  /** @brief Initialization state flag */
+  /** Flag de inicialización */
   private var isInitialized = false
 
-  /** @brief Flag indicating if location updates are active */
+  /** Flag de inicio de actualizaciones */
   private var started = false
 
-  /** @brief Listener for location update events */
-  private var locationCallbackListener : LocationCallbackListener? = null
+  /** Intervalo mínimo de tiempo entre actualizaciones (en milisegundos) */
+  private val MIN_TIME_MS: Long = 2000
+
+  /** Distancia mínima en metros para actualizaciones */
+  private val MIN_DISTANCE_M: Float = 1.5f
+
+  // Internal list of registered listeners
+  private val listeners = mutableListOf<LocationCallbackListener>()
 
   /**
-   * @brief Initializes the GPSManager components
-   * @param context Context for permission checks and service initialization
+   * Adds a new listener to receive location updates.
    *
-   * Checks location permissions, initializes FusedLocationProviderClient,
-   * and configures location request parameters. Starts location updates
-   * if permissions are already granted.
+   * @param listener The listener to register.
    */
-  fun initialize(context: Context) {
-    // Permission check for fine location access
-    if (ContextCompat.checkSelfPermission(
-        context,
-        android.Manifest.permission.ACCESS_FINE_LOCATION
-      ) != PackageManager.PERMISSION_GRANTED) {
-      // Request missing permission from host activity
-      ActivityCompat.requestPermissions(
-        context as AppCompatActivity,
-        arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
-        LOCATION_PERMISSION_REQUEST_CODE
-      )
-      Log.i("GPSManager", "Location permission not granted")
-    } else {
-      Log.i("GPSManager", "Location permission already granted")
-      // Initialize location service client
-      this.fusedLocationClient = LocationServices
-        .getFusedLocationProviderClient(
-        context
-      )
-      // Configure location update parameters
-      this.locationRequest = LocationRequest.Builder(
-        Priority.PRIORITY_HIGH_ACCURACY, 5000L
-      ).setMinUpdateIntervalMillis(2000L).build()
-      this.isInitialized = true
-
-      this.startLocationUpdates()
+  fun addLocationCallbackListener(listener: LocationCallbackListener) {
+    if (!listeners.contains(listener)) {
+      listeners.add(listener)
     }
   }
 
   /**
-   * @brief Starts receiving location updates
+   * Removes a previously registered listener.
    *
-   * Requires ACCESS_FINE_LOCATION permission to be granted. Uses main looper
-   * for callback execution.
+   * @param listener The listener to unregister.
+   */
+  fun removeLocationCallbackListener(listener: LocationCallbackListener) {
+    listeners.remove(listener)
+  }
+
+  /**
+   * Clears all registered location listeners.
+   */
+  fun clearAllLocationListeners() {
+    listeners.clear()
+  }
+
+  /**
+   * Notifies all listeners with the updated location.
+   *
+   * @param location The new location.
+   */
+  private fun notifyLocationUpdated(location: Location) {
+    listeners.forEach { it.onLocationUpdated(location) }
+  }
+
+  /**
+   * Notifies all listeners that a provider has been enabled.
+   *
+   * @param provider The provider name.
+   */
+  private fun notifyProviderEnabled(provider: String) {
+    listeners.forEach { it.onProviderEnabled(provider) }
+  }
+
+  /**
+   * Notifies all listeners that a provider has been disabled.
+   *
+   * @param provider The provider name.
+   */
+  private fun notifyProviderDisabled(provider: String) {
+    listeners.forEach { it.onProviderDisabled(provider) }
+  }
+
+  /**
+   * Notifies listeners that the location service is unavailable.
+   */
+  private fun notifyLocationUnavailable() {
+    listeners.forEach { it.onLocationUnavailable() }
+  }
+
+  /**
+   * Notifies listeners of a location-related error.
+   *
+   * @param message Description of the error.
+   */
+  private fun notifyLocationError(message: String) {
+    listeners.forEach { it.onLocationError(message) }
+  }
+
+  /**
+   * Inicializa el GPSManager con los proveedores GPS y NETWORK.
+   */
+  fun initialize(permissionRequester: PermissionRequester) {
+    val context = permissionRequester.getContext()
+    if (hasLocationPermission(context)) {
+
+      locationManager = context.getSystemService(Context.LOCATION_SERVICE)
+        as LocationManager
+      isInitialized = true
+      startLocationUpdates()
+
+      return
+    }
+
+    // Verificamos si se debe mostrar el racional de permiso
+    val showRationale = permissionRequester.shouldShowRationale(requiredPermission)
+
+    if (showRationale) {
+      // Mostrar diálogo de explicación antes de solicitar permiso
+      showRationaleDialog(context)
+    }
+
+    permissionRequester.requestPermission(
+      arrayOf(requiredPermission),
+      LOCATION_PERMISSION_REQUEST_CODE
+    )
+  }
+
+  private fun showRationaleDialog(context : Context) {
+    AlertDialog.Builder(context)
+      .setTitle("Location Permission Required")
+      .setMessage("This app needs access to your location. Please grant the permission.")
+      .setNegativeButton("Cancel", null)
+      .show()
+  }
+
+  /**
+   * Verifica si el GPSManager está inicializado.
+   */
+  fun isInitialized(): Boolean {
+    return this.isInitialized
+  }
+
+  /**
+   * Inicia las actualizaciones de ubicación desde GPS y NETWORK.
    */
   @SuppressLint("MissingPermission")
   fun startLocationUpdates() {
-    if (!::fusedLocationClient.isInitialized) {
-      Log.e(
-        "Location updates",
-        " fusedLocationClient is not initialized"
-      )
-      this.isInitialized = false
+    if (!this.isInitialized) {
+      Timber.e("The gps was not initialized correctly")
       return
     }
 
     if (this.started) {
-      Log.e("Location updates", "Already started")
+      Timber.w("The gps was already started")
       return
     }
 
-    this.fusedLocationClient.requestLocationUpdates(
-      this.locationRequest,
-      this,
-      Looper.getMainLooper()
-    )
-    this.started = true
+    try {
+      // Solicita ubicación desde GPS
+      locationManager.requestLocationUpdates(
+        LocationManager.GPS_PROVIDER,
+        MIN_TIME_MS,
+        MIN_DISTANCE_M,
+        this,
+        Looper.getMainLooper()
+      )
+
+      // Solicita ubicación desde NETWORK
+      locationManager.requestLocationUpdates(
+        LocationManager.NETWORK_PROVIDER,
+        MIN_TIME_MS,
+        MIN_DISTANCE_M,
+        this,
+        Looper.getMainLooper()
+      )
+
+      this.started = true
+      Log.i("GPSManager", "Actualizaciones de ubicación iniciadas")
+    } catch (e: Exception) {
+      Log.e("GPSManager", "Error al iniciar actualizaciones: ${e.message}")
+    }
   }
 
   /**
-   * @brief Stops active location updates
+   * Detiene todas las actualizaciones de ubicación.
    */
   fun stopLocationUpdates() {
-    if (!::fusedLocationClient.isInitialized) {
-      Log.e(
-        "Location updates",
-        " fusedLocationClient is not initialized"
-      )
-      this.isInitialized = false
-      return
-    }
-    if (!this.started) {
-      Log.e("Location updates", "Already stopped")
-      return
-    }
-    this.fusedLocationClient.removeLocationUpdates(this)
+    if (!::locationManager.isInitialized || !this.started) return
+
+    locationManager.removeUpdates(this)
     this.started = false
+    Log.i("GPSManager", "Actualizaciones de ubicación detenidas")
   }
 
   /**
-   * @brief Registers a location update listener
-   * @param listener Callback implementation to receive location events
+   * Callback invocado cuando se recibe una nueva ubicación.
    */
-  fun setLocationCallbackListener(listener: LocationCallbackListener) {
-    locationCallbackListener = listener
+  override fun onLocationChanged(location: Location) {
+    this.currentLocation = location
+    Log.i("GPSManager", "Nueva ubicación: ${location.latitude}, ${location.longitude}")
+
+    // Notifica tanto la última ubicación como la actualización
+    listeners.forEach {
+      it.onLocationReady(location)
+      it.onLocationUpdated(location)
+    }
   }
 
+
   /**
-   * @brief Retrieves the last known valid location
-   * @return Most recent Location object or null if unavailable
+   * Retorna la última ubicación conocida.
    */
   fun getLastKnownLocation(): Location? {
-    if (currentLocation == null) {
-      Log.e("GPSManager", "Location not available")
+    if (!::locationManager.isInitialized) return null
+
+    val gpsLocation = try {
+      locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+    } catch (e: SecurityException) {
+      null
     }
-    return currentLocation
+
+    val netLocation = try {
+      locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+    } catch (e: SecurityException) {
+      null
+    }
+
+    // Elige la más reciente entre ambas
+    return listOfNotNull(gpsLocation, netLocation).maxByOrNull { it.time }
   }
 
   /**
-   * @brief Checks initialization status
-   * @return Boolean indicating initialization state
+   * Verifica si se tienen permisos de ubicación.
    */
-  fun isInitialized(): Boolean {
-    return isInitialized
+  private fun hasLocationPermission(context: Context): Boolean {
+    return ContextCompat.checkSelfPermission(
+      context, requiredPermission
+    ) == PackageManager.PERMISSION_GRANTED
   }
 
   /**
-   * @brief Processes permission request results
-   * @param requestCode Request identifier from permission request
-   * @param grantResults Array of permission grant results
+   * Solicita permiso de ubicación al usuario.
    */
-  fun handlePermissionResult(requestCode: Int, grantResults: IntArray,
-    context: Context) {
+  private fun requestLocationPermission(context: Context) {
+    ActivityCompat.requestPermissions(
+      context as AppCompatActivity,
+      arrayOf(requiredPermission),
+      LOCATION_PERMISSION_REQUEST_CODE
+    )
+    Log.w("GPSManager", "Permiso de ubicación solicitado")
+  }
+
+  /**
+   * Maneja el resultado de la solicitud de permisos.
+   */
+  fun handlePermissionResult(
+    requestCode: Int,
+    grantResults: IntArray,
+    permissionRequester: PermissionRequester
+  ) {
     if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-      if (grantResults.isNotEmpty() && grantResults[0]
-        == PackageManager.PERMISSION_GRANTED) {
-        Toast.makeText(
-          context,
-          "Location permission granted",
-          Toast.LENGTH_SHORT
-        ).show()
-        // Restart initialization with granted permission
-        initialize(context)
+      if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        Toast.makeText(permissionRequester.getContext(), "Permiso de ubicación concedido", Toast.LENGTH_SHORT).show()
+        initialize(permissionRequester)
       } else {
-        Toast.makeText(
-          context,
-          "Location permission denied",
-          Toast.LENGTH_SHORT
-        ).show()
+        Toast.makeText(permissionRequester.getContext(), "Permiso de ubicación denegado", Toast.LENGTH_SHORT).show()
       }
     }
   }
-
-  /**
-   * @brief Handles new location updates
-   * @param locationResult Container for received location data
-   *
-   * Called by the location services when new locations are available.
-   * Updates current location cache and notifies registered listeners.
-   */
-  override fun onLocationResult(locationResult: LocationResult) {
-    super.onLocationResult(locationResult)
-    this.currentLocation = locationResult.lastLocation
-    Log.i(
-      "GPSManager", "New location: ${this.currentLocation?.latitude}" +
-      ", ${this.currentLocation?.longitude}"
-    )
-    // Notify listener with non-null location (enforced by !! operator)
-    this.locationCallbackListener?.onLocationReady(this.currentLocation !!)
-  }
-
-  /**
-   * @brief Interface for receiving location update notifications
-   */
-  interface LocationCallbackListener {
-    /**
-     * @brief Called when a new location is available
-     * @param location Received Location object with coordinates
-     */
-    fun onLocationReady(location: Location)
-  }
-
 }
