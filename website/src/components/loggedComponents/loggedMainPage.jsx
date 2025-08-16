@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import "../../colorModule.css";
 import '../../fontsModule.css';
-import { buildApiUrl } from '../config/apiConf';
+import { buildApiUrl } from '../../config/apiConf';
 
 const Dashboard = ({ user }) => (
   <div

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../colorModule.css";
 import '../../fontsModule.css';
-import { buildApiUrl } from '../config/apiConf';
+import { buildApiUrl } from '../../config/apiConf';
 
 export default function Register() {
 

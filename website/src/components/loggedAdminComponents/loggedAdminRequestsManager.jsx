@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Typography, Divider, Spin, Alert, Modal, Descriptions, Form, Input, InputNumber, Select, message } from 'antd';
 import '../../colorModule.css';
 import '../../fontsModule.css';
-import { buildApiUrl } from '../config/apiConf';
+import { buildApiUrl } from '../../config/apiConf';
 
 const { Title } = Typography;
 const { Option } = Select;

@@ -3,7 +3,7 @@ import { Modal, Button, Form, Input, Radio, DatePicker, Upload, message, Spin } 
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import dayjs from "dayjs";
-import { buildApiUrl } from '../config/apiConf';
+import { buildApiUrl } from '../../config/apiConf';
 
 const defaultPosition = [9.93333, -84.08333]; // Example: San José, Costa Rica
 const FORM_CACHE_KEY = "addPointFormCache";

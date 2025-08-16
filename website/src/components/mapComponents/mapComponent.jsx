@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { FaExpand, FaCompress, FaChevronRight, FaChevronLeft, FaMapMarkerAlt } from "react-icons/fa";
-import { buildApiUrl } from '../config/apiConf';
+import { buildApiUrl } from '../../config/apiConf';
 
 
 // Fix Leaflet's default icon issue

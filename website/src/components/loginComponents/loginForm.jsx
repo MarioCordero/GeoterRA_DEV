@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import loginImage from "../../assets/images/login-background.png";
 import "../../colorModule.css";
 import '../../fontsModule.css';
-import { buildApiUrl } from '../config/apiConf';
+import { buildApiUrl } from '../../config/apiConf';
 
 function Login() {
   const navigate = useNavigate();

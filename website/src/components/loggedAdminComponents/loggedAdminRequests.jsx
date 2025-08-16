@@ -3,7 +3,7 @@ import { Table, Typography, Divider, Spin, Alert, Tag } from 'antd';
 import AdminAddPointModal from './loggedAdminAddPointModal';
 import '../../colorModule.css';
 import '../../fontsModule.css';
-import { buildApiUrl } from '../config/apiConf';
+import { buildApiUrl } from '../../config/apiConf';
 
 const { Title } = Typography;
 

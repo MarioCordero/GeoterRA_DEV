@@ -10,7 +10,7 @@ import {
 } from "@ant-design/icons";
 import '../../fontsModule.css';
 import '../../colorModule.css';
-import { buildApiUrl } from '../config/apiConf';
+import { buildApiUrl } from '../../config/apiConf';
 
 const { Sider } = Layout;
 
