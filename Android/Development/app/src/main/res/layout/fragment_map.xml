@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/map_page"
-    tools:context=".ui.map.MapFragment">
+    tools:context=".ui.map.views.MapView">
     
     <FrameLayout
       android:id="@+id/fragment_container"

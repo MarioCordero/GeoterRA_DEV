@@ -5,14 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/fragment_account"
-    tools:context=".ui.account.AccountFragment"
+    android:id="@+id/account_container"
+    tools:context=".ui.account.views.AccountView"
     android:layout_gravity="center_horizontal"
     android:padding="10dp"
-    >
-
+  
+  >
     <LinearLayout
-        android:id="@+id/username_frame"
+        android:id="@+id/username_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
@@ -22,7 +22,7 @@
         tools:ignore="UseCompoundDrawables">
 
         <TextView
-            android:id="@+id/userName"
+            android:id="@+id/tv_username"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -44,11 +44,11 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/phone_frame"
+        android:id="@+id/phone_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/username_frame"
+        app:layout_constraintTop_toBottomOf="@+id/username_section"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         >
@@ -62,7 +62,7 @@
         </ImageView>
 
         <TextView
-            android:id="@+id/phoneNumber"
+            android:id="@+id/tv_phone_number"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -75,12 +75,12 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/email_frame"
+        android:id="@+id/email_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/phone_frame"
-        app:layout_constraintBottom_toTopOf="@id/requestInformation_frame"
+        app:layout_constraintTop_toBottomOf="@+id/phone_section"
+        app:layout_constraintBottom_toTopOf="@id/requests_info_section"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         >
@@ -94,7 +94,7 @@
         </ImageView>
 
         <TextView
-            android:id="@+id/email"
+            android:id="@+id/tv_email"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -114,19 +114,19 @@
         android:layout_height="1dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/email_frame"
-        app:layout_constraintBottom_toTopOf="@+id/requestInformation_frame"
+        app:layout_constraintTop_toBottomOf="@+id/email_section"
+        app:layout_constraintBottom_toTopOf="@+id/requests_info_section"
         android:background="@color/geoterra_light_gray"
         />
 
     <LinearLayout
-        android:id="@+id/requestInformation_frame"
+        android:id="@+id/requests_info_section"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/email_frame"
-        app:layout_constraintBottom_toTopOf="@id/options_frame"
+        app:layout_constraintTop_toBottomOf="@+id/email_section"
+        app:layout_constraintBottom_toTopOf="@id/options_section"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
         >
@@ -142,7 +142,7 @@
             >
 
             <TextView
-                android:id="@+id/requetsMade_count"
+                android:id="@+id/tv_requests_made_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="10"
@@ -154,7 +154,7 @@
             </TextView>
 
             <TextView
-                android:id="@+id/requetsMade_text"
+                android:id="@+id/tv_requests_made_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -173,8 +173,8 @@
             android:layout_height="match_parent"
             app:layout_constraintStart_toEndOf="@id/requestMade_frame"
             app:layout_constraintEnd_toStartOf="@id/requestsAccepted_frame"
-            app:layout_constraintTop_toBottomOf="@+id/email_frame"
-            app:layout_constraintBottom_toTopOf="@+id/options_frame"
+            app:layout_constraintTop_toBottomOf="@+id/email_section"
+            app:layout_constraintBottom_toTopOf="@+id/options_section"
             android:background="@color/geoterra_light_gray"
             />
 
@@ -189,7 +189,7 @@
             >
 
             <TextView
-                android:id="@+id/requetsAccepted_count"
+                android:id="@+id/tv_requests_accepted_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -202,7 +202,7 @@
             </TextView>
 
             <TextView
-                android:id="@+id/requetsAccepted_text"
+                android:id="@+id/tv_requests_accepted_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -224,23 +224,23 @@
         android:layout_height="1dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/requestInformation_frame"
-        app:layout_constraintBottom_toTopOf="@+id/options_frame"
+        app:layout_constraintTop_toBottomOf="@+id/requests_info_section"
+        app:layout_constraintBottom_toTopOf="@+id/options_section"
         android:background="@color/geoterra_light_gray"
         />
 
     <LinearLayout
-        android:id="@+id/options_frame"
+        android:id="@+id/options_section"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="top"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/logout_frame"
+        app:layout_constraintBottom_toTopOf="@+id/logout_section"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/requestInformation_frame">
+        app:layout_constraintTop_toBottomOf="@+id/requests_info_section">
         
         <com.google.android.material.card.MaterialCardView
-          android:id="@+id/card_settings"
+          android:id="@+id/btn_settings"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           app:cardElevation="0dp"
@@ -264,7 +264,7 @@
         </com.google.android.material.card.MaterialCardView>
         
         <com.google.android.material.card.MaterialCardView
-          android:id="@+id/card_edit_data"
+          android:id="@+id/btn_edit_data"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           app:cardElevation="0dp"
@@ -289,7 +289,7 @@
         </com.google.android.material.card.MaterialCardView>
         
         <com.google.android.material.card.MaterialCardView
-          android:id="@+id/card_request_history"
+          android:id="@+id/btn_request_history"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           app:cardElevation="0dp"
@@ -316,7 +316,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/logout_frame"
+        android:id="@+id/logout_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
@@ -331,7 +331,7 @@
             />
         
         <com.google.android.material.card.MaterialCardView
-          android:id="@+id/card_logout"
+          android:id="@+id/btn_logout"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginTop="20dp"

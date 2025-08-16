@@ -8,7 +8,7 @@
     android:layout_gravity="center"
     android:foregroundGravity="center"
     android:id="@+id/fragment_login"
-    tools:context=".ui.account.LoginFragment">
+    tools:context=".ui.account.views.LoginView">
     
     <FrameLayout
       android:id="@+id/fragment_signup_container"
@@ -73,7 +73,7 @@
                 >
 
                 <TextView
-                    android:id="@+id/email"
+                    android:id="@+id/tv_email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Correo"

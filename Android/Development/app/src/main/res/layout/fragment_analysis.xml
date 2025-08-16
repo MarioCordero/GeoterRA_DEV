@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  tools:context=".ui.map.views.AnalysisView">
+  
+  <LinearLayout
+    android:id="@+id/container_properties"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginTop="20dp"
+    android:layout_marginBottom="20dp"
+    android:layout_marginStart="15dp"
+    android:layout_marginEnd="15dp"
+    
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    >
+    
+    <TextView
+      android:id="@+id/label_properties_title"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:layout_marginTop="10dp"
+      
+      android:text="Desgloce de propiedades"
+      android:textColor="@color/geoterra_deep_blue"
+      
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="26sp"
+      >
+    </TextView>
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+    <TextView
+      android:id="@+id/label_field_ph"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="10dp"
+      android:text="pH Campo"
+      android:textColor="@color/geoterra_light_gray"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="22sp" />
+    
+    <TextView
+      android:id="@+id/tv_field_ph"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:text="7.6"
+      android:textColor="@color/black"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="25sp" />
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+    <TextView
+      android:id="@+id/label_field_conditions"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="10dp"
+      android:text="Condiciones del Campo"
+      android:textColor="@color/geoterra_light_gray"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="22sp" />
+    
+    <TextView
+      android:id="@+id/tv_field_conditions"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Sunny"
+      android:textColor="@color/black"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="25sp" />
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+    <TextView
+      android:id="@+id/label_lab_ph"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:layout_marginTop="10dp"
+      android:text="pH Laboratorio"
+      android:textColor="@color/geoterra_light_gray"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="22sp" />
+    
+    <TextView
+      android:id="@+id/tv_lab_ph"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:text="7.4"
+      android:textColor="@color/black"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="25sp" />
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+    <TextView
+      android:id="@+id/label_lab_conditions"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:layout_marginTop="10dp"
+      android:text="Condiciones Laboratorio"
+      android:textColor="@color/geoterra_light_gray"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="22sp" />
+    
+    <TextView
+      android:id="@+id/tv_lab_conditions"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:text="Controlled"
+      android:textColor="@color/black"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="25sp" />
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+    <!-- Chlorine -->
+    <TextView
+      android:id="@+id/label_chlorine"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:layout_marginTop="10dp"
+      android:text="Cloro"
+      android:textColor="@color/geoterra_light_gray"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="22sp" />
+    
+    <TextView
+      android:id="@+id/tv_chlorine"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:text="0.5 mg/L"
+      android:textColor="@color/black"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="25sp" />
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+    <!-- Calcium -->
+    <TextView
+      android:id="@+id/label_calcium"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:layout_marginTop="10dp"
+      android:text="Calcio"
+      android:textColor="@color/geoterra_light_gray"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="22sp" />
+    
+    <TextView
+      android:id="@+id/tv_calcium"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:text="120 mg/L"
+      android:textColor="@color/black"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="25sp" />
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+    <!-- Mg Bicarbonate -->
+    <TextView
+      android:id="@+id/label_bicarbonate_mg"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:layout_marginTop="10dp"
+      android:text="Bicarbonato Mg"
+      android:textColor="@color/geoterra_light_gray"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="22sp" />
+    
+    <TextView
+      android:id="@+id/tv_bicarbonate_mg"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:text="35 mg/L"
+      android:textColor="@color/black"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="25sp" />
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+    <!-- Sulfate -->
+    <TextView
+      android:id="@+id/label_sulfate"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:layout_marginTop="10dp"
+      android:text="Sulfato"
+      android:textColor="@color/geoterra_light_gray"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="22sp" />
+    
+    <TextView
+      android:id="@+id/tv_sulfate"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:text="15 mg/L"
+      android:textColor="@color/black"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="25sp" />
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+    <!-- Iron -->
+    <TextView
+      android:id="@+id/label_iron"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:layout_marginTop="10dp"
+      android:text="Hierro"
+      android:textColor="@color/geoterra_light_gray"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="22sp" />
+    
+    <TextView
+      android:id="@+id/tv_iron"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      app:layout_constraintTop_toBottomOf="@id/label_iron"
+      android:text="0.3 mg/L"
+      android:textColor="@color/black"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="25sp" />
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+    <!-- Silicon -->
+    <TextView
+      android:id="@+id/label_silicon"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:layout_marginTop="10dp"
+      android:text="Silicio"
+      android:textColor="@color/geoterra_light_gray"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="22sp" />
+    
+    <TextView
+      android:id="@+id/tv_silicon"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      app:layout_constraintTop_toBottomOf="@id/label_silicon"
+      android:text="5 mg/L"
+      android:textColor="@color/black"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="25sp" />
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+    <!-- Boron -->
+    <TextView
+      android:id="@+id/label_boron"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:layout_marginTop="10dp"
+      android:text="Boron"
+      android:textColor="@color/geoterra_light_gray"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="22sp" />
+    
+    <TextView
+      android:id="@+id/tv_boron"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:text="0.2 mg/L"
+      android:textColor="@color/black"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="25sp" />
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+    <!-- Lithium -->
+    <TextView
+      android:id="@+id/label_lithium"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:layout_marginTop="10dp"
+      android:text="Litio"
+      android:textColor="@color/geoterra_light_gray"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="22sp" />
+    
+    <TextView
+      android:id="@+id/tv_lithium"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:text="0.01 mg/L"
+      android:textColor="@color/black"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="25sp" />
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+    <!-- Fluorine -->
+    <TextView
+      android:id="@+id/label_fluorine"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:layout_marginTop="10dp"
+      android:text="Flúor"
+      android:textColor="@color/geoterra_light_gray"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="22sp" />
+    
+    <TextView
+      android:id="@+id/tv_fluorine"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:text="0.7 mg/L"
+      android:textColor="@color/black"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="25sp" />
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+    <!-- Sodium -->
+    <TextView
+      android:id="@+id/label_sodium"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:layout_marginTop="10dp"
+      android:text="Sodio"
+      android:textColor="@color/geoterra_light_gray"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="22sp" />
+    
+    <TextView
+      android:id="@+id/tv_sodium"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:text="10 mg/L"
+      android:textColor="@color/black"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="25sp" />
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+    <!-- Potassium -->
+    <TextView
+      android:id="@+id/label_potassium"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:layout_marginTop="10dp"
+      android:text="Potasio"
+      android:textColor="@color/geoterra_light_gray"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="22sp" />
+    
+    <TextView
+      android:id="@+id/tv_potassium"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:text="4.5 mg/L"
+      android:textColor="@color/black"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="25sp" />
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+    <!-- Magnesium Ion -->
+    <TextView
+      android:id="@+id/label_magnesium_ion"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:layout_marginTop="10dp"
+      android:text="Iones Magnesio"
+      android:textColor="@color/geoterra_light_gray"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="22sp" />
+    
+    <TextView
+      android:id="@+id/tv_magnesium_ion"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+
+      android:text="20 mg/L"
+      android:textColor="@color/black"
+      android:fontFamily="@font/poppins_semibold"
+      android:textSize="25sp" />
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+  </LinearLayout>
+
+</ScrollView>
