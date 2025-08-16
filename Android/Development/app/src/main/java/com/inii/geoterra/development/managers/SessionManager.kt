@@ -41,7 +41,7 @@ object SessionManager {
    */
   fun startSession(email: String) {
     sharedPreferences.edit() { putString(KEY_USER_EMAIL, email) }
-    Log.d("SessionManager", "User logged in with email: $email")
+    Log.d("SessionManager", "User logged in with tv_email: $email")
     sessionListeners.forEach { it.invoke(true) }
   }
 
