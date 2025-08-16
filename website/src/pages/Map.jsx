@@ -3,6 +3,7 @@ import MapContainer from '../components/mapComponents/mapComponent';
 import LoggedHeader from '../components/loggedHeader';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { buildApiUrl } from '../config/api';
 
 const Map = () => {
   const [isLogged, setIsLogged] = useState(false);
@@ -12,9 +13,7 @@ const Map = () => {
     const checkSession = async () => {
       try {
         console.log("Checking session...");
-        // http://geoterra.com/API/check_session.php
-        // http://163.178.171.105/API/check_session.php
-        const response = await fetch("http://163.178.171.105/API/check_session.php", {
+        const response = await fetch(buildApiUrl("check_session.php"), {
           method: "GET",
           credentials: "include",
         });
