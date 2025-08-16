@@ -5,3 +5,9 @@ plugins {
     alias(libs.plugins.googleAndroidLibrariesMapsplatformSecretsGradlePlugin) apply false
     alias(libs.plugins.kotlinParcelize) apply false
 }
+
+buildscript {
+    dependencies {
+        classpath(libs.kotlin.gradle.plugin) // ✅ Correcto: en buildscript
+    }
+}
