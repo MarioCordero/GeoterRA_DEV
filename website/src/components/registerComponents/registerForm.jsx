@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../colorModule.css";
 import '../../fontsModule.css';
+import { buildApiUrl } from '../config/apiConf';
 
 export default function Register() {
 
@@ -35,9 +36,7 @@ export default function Register() {
     form.append("phone_num", formData.phone_num);
 
     try {
-      // http://163.178.171.105/API/register.inc.php
-      // http://geoterra.com/API/register.inc.php
-      const response = await fetch("http://163.178.171.105/API/register.inc.php", {
+      const response = await fetch(buildApiUrl("register.inc.php"), {
         method: "POST",
         body: form,
       });

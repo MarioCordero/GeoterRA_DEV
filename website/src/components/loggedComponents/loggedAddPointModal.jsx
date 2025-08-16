@@ -3,6 +3,7 @@ import { Modal, Button, Form, Input, Radio, DatePicker, Upload, message, Spin } 
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import dayjs from "dayjs";
+import { buildApiUrl } from '../config/apiConf';
 
 const defaultPosition = [9.93333, -84.08333]; // Example: San José, Costa Rica
 const FORM_CACHE_KEY = "addPointFormCache";
@@ -30,9 +31,7 @@ const AddPointModal = ({ onRequestAdded }) => {
   // Function to get user session and email
   const getUserSession = async () => {
     try {
-      // http://163.178.171.105/API/check_session.php
-      // http://geoterra.com/API/check_session.php
-      const response = await fetch("http://163.178.171.105/API/check_session.php", {
+      const response = await fetch(buildApiUrl("check_session.php"), {
         method: "GET",
         credentials: "include",
       });
@@ -117,9 +116,7 @@ const AddPointModal = ({ onRequestAdded }) => {
         formData.append("foto", values.foto[0].originFileObj);
       }
 
-      // http://163.178.171.105/API/request.inc.php
-      // http://geoterra.com/API/request.inc.php
-      const response = await fetch("http://163.178.171.105/API/request.inc.php", {
+      const response = await fetch(buildApiUrl("request.inc.php"), {
         method: "POST",
         body: formData,
         credentials: "include", // Include credentials for session

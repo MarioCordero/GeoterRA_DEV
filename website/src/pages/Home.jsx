@@ -6,6 +6,7 @@ import ContactUsSection from '../components/homeComponents/index-contact-us';
 import LoggedHeader from '../components/loggedHeader';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { buildApiUrl } from '../config/apiConf';
 
 const Home = () => {
   const [isLogged, setIsLogged] = useState(false);
@@ -15,9 +16,7 @@ const Home = () => {
     const checkSession = async () => {
       try {
         console.log("Checking session...");
-        // http://163.178.171.105/API/check_session.php
-        // http://geoterra.com/API/check_session.php
-        const response = await fetch("http://163.178.171.105/API/check_session.php", {
+        const response = await fetch(buildApiUrl("check_session.php"), {
           method: "GET",
           credentials: "include",
         });

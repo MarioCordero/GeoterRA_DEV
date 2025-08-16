@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { FaExpand, FaCompress, FaChevronRight, FaChevronLeft, FaMapMarkerAlt } from "react-icons/fa";
+import { buildApiUrl } from '../config/apiConf';
+
 
 // Fix Leaflet's default icon issue
 delete L.Icon.Default.prototype._getIconUrl;
@@ -16,9 +18,7 @@ L.Icon.Default.mergeOptions({
 // Function to fetch points for a specific region
 const fetchPoints = async (region) => {
   try {
-    // http://geoterra.com/API/map_data.inc.php
-    // http://163.178.171.105/API/map_data.inc.php
-    const response = await fetch("http://163.178.171.105/API/map_data.inc.php", {
+    const response = await fetch(buildApiUrl("map_data.inc.php"), {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: `region=${encodeURIComponent(region)}`,
@@ -46,9 +46,7 @@ const fetchPoints = async (region) => {
 // Function to fetch regions
 const fetchRegions = async () => {
   try {
-    // http://geoterra.com/API/get_regions.inc.php
-    // http://163.178.171.105/API/get_regions.inc.php
-    const response = await fetch("http://163.178.171.105/API/get_regions.inc.php");
+    const response = await fetch(buildApiUrl("get_regions.inc.php"));
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -72,9 +70,7 @@ const fetchRegions = async () => {
 // Function to check user session
 const checkUserSession = async () => {
   try {
-    // http://geoterra.com/API/check_session.php
-    // http://163.178.171.105/API/check_session.php
-    const response = await fetch("http://163.178.171.105/API/check_session.php");
+    const response = await fetch(buildApiUrl("check_session.php"));
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

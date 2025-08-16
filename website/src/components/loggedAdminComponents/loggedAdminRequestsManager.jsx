@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Typography, Divider, Spin, Alert, Modal, Descriptions, Form, Input, InputNumber, Select, message } from 'antd';
 import '../../colorModule.css';
 import '../../fontsModule.css';
+import { buildApiUrl } from '../config/apiConf';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -19,9 +20,7 @@ const AdminRequestsManager = () => {
   // Function to get user session and verify admin role
   const getUserSession = async () => {
     try {
-      // http://geoterra.com/API/check_session.php
-      // http://163.178.171.105/API/check_session.php
-      const response = await fetch("http://163.178.171.105/API/check_session.php", {
+      const response = await fetch(buildApiUrl("check_session.php"), {
         method: "GET",
         credentials: "include",
       });
@@ -50,9 +49,7 @@ const AdminRequestsManager = () => {
   // Function to fetch ALL requests (admin only)
   const fetchAllRequests = async () => {
     try {
-      // http://geoterra.com/API/get_all_requests.inc.php
-      // http://163.178.171.105/API/get_all_requests.inc.php
-      const response = await fetch("http://163.178.171.105/API/get_all_requests.inc.php", {
+      const response = await fetch(buildApiUrl("get_all_requests.inc.php"), {
         method: "GET",
         credentials: "include",
       });
@@ -79,9 +76,7 @@ const AdminRequestsManager = () => {
       const formData = new FormData();
       formData.append('id_soli', requestId);
 
-      // http://geoterra.com/API/delete_request.inc.php
-      // http://163.178.171.105/API/delete_request.inc.php
-      const response = await fetch("http://163.178.171.105/API/delete_request.inc.php", {
+      const response = await fetch(buildApiUrl("delete_request.inc.php"), {
         method: "POST",
         body: formData,
         credentials: "include",
@@ -169,9 +164,7 @@ const AdminRequestsManager = () => {
         console.log(`${key}: ${value} (${typeof value})`);
       }
 
-      // http://geoterra.com/API/add_approved_point.inc.php
-      // http://163.178.171.105/API/add_approved_point.inc.php
-      const response = await fetch("http://163.178.171.105/API/add_approved_point.inc.php", {
+      const response = await fetch(buildApiUrl("add_approved_point.inc.php"), {
         method: "POST",
         body: formData,
         credentials: "include",

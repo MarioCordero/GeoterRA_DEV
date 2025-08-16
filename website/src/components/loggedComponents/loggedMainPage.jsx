@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import "../../colorModule.css";
 import '../../fontsModule.css';
+import { buildApiUrl } from '../config/apiConf';
 
 const Dashboard = ({ user }) => (
   <div
@@ -38,9 +39,7 @@ const LoggedMainPage = () => {
     // Check session on mount and log result
     const checkSession = async () => {
       try {
-        // http://geoterra.com/API/check_session.php
-        // http://163.178.171.105/API/check_session.php
-        const response = await fetch('http://163.178.171.105/API/check_session.php', { credentials: 'include' });
+        const response = await fetch(buildApiUrl("check_session.php"), { credentials: 'include' });
         const apiResponse = await response.json();
         if (apiResponse.response === 'Ok' && apiResponse.data.status === 'logged_in') {
           console.log('Session is active');
@@ -57,9 +56,7 @@ const LoggedMainPage = () => {
     // Fetch user data as before
     const fetchUserData = async () => {
       try {
-        // http://geoterra.com/API/user_info.php
-        // http://163.178.171.105/API/user_info.php
-        const response = await fetch('http://163.178.171.105/API/user_info.php', { credentials: 'include' });
+        const response = await fetch(buildApiUrl("user_info.php"), { credentials: 'include' });
         if (response.ok) {
           const data = await response.json();
           setUser({

@@ -3,6 +3,7 @@ import { Table, Typography, Divider, Spin, Alert, Tag } from 'antd';
 import AdminAddPointModal from './loggedAdminAddPointModal';
 import '../../colorModule.css';
 import '../../fontsModule.css';
+import { buildApiUrl } from '../config/apiConf';
 
 const { Title } = Typography;
 
@@ -15,9 +16,7 @@ const Requests = () => {
   // Function to get user session and email
   const getUserSession = async () => {
     try {
-      // http://geoterra.com/API/check_session.php
-      // http://163.178.171.105/API/check_session.php
-      const response = await fetch("http://163.178.171.105/API/check_session.php", {
+      const response = await fetch(buildApiUrl("check_session.php"), {
         method: "GET",
         credentials: "include",
       });
@@ -36,9 +35,7 @@ const Requests = () => {
   // Function to fetch user's requests
   const fetchUserRequests = async (email) => {
     try {
-      // http://geoterra.com/API/get_request.inc.php
-      // http://163.178.171.105/API/get_request.inc.php
-      const response = await fetch("http://163.178.171.105/API/get_request.inc.php", {
+      const response = await fetch(buildApiUrl("get_request.inc.php"), {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `email=${encodeURIComponent(email)}`,

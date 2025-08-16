@@ -10,6 +10,7 @@ import {
 } from "@ant-design/icons";
 import '../../fontsModule.css';
 import '../../colorModule.css';
+import { buildApiUrl } from '../config/apiConf';
 
 const { Sider } = Layout;
 
@@ -20,9 +21,7 @@ const SidebarLayout = ({ selectedKey, setSelectedKey }) => {
     try {
       console.log("Starting logout process...");
       
-      // http://163.178.171.105/API/logout.php
-      // http://geoterra.com/API/logout.php
-      const response = await fetch("http://163.178.171.105/API/logout.php", { 
+      const response = await fetch(buildApiUrl("logout.php"), { 
         method: "POST", // Try POST instead of GET
         credentials: "include", // Important: Include cookies
         headers: {

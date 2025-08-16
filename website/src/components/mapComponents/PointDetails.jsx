@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaDownload, FaShare, FaPrint, FaMapMarkerAlt, FaFlask, FaThermometerHalf, FaFileCsv } from 'react-icons/fa';
 import { generatePointPDF, exportToCSV, formatPointForSharing } from './exportUtils';
+import { buildApiUrl } from '../config/apiConf';
 
 // Function to fetch single point data (if needed to refresh or get additional data)
 const fetchPointData = async (pointId, region) => {
   try {
-    // http://geoterra.com/API/map_data.inc.php
-    // http://163.178.171.105/API/map_data.inc.php
-    const response = await fetch("http://163.178.171.105/API/map_data.inc.php", {
+    const response = await fetch(buildApiUrl("map_data.inc.php"), {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: `region=${encodeURIComponent(region)}`,

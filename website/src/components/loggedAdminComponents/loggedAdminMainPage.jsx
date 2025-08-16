@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import "../../colorModule.css";
 import '../../fontsModule.css';
 
+import { buildApiUrl } from '../config/apiConf';
+
+
 const Dashboard = ({ user, loading, error }) => {
   if (loading) {
     return (
@@ -95,9 +98,7 @@ const LoggedMainPage = () => {
         setError(null);
 
         // Check session first
-        // http://geoterra.com/API/check_session.php
-        // http://163.178.171.105/API/check_session.php
-        const sessionResponse = await fetch('http://163.178.171.105/API/check_session.php', { 
+        const response = await fetch(buildApiUrl("check_session.php"), {
           credentials: 'include',
           method: 'GET',
           headers: {
@@ -115,9 +116,7 @@ const LoggedMainPage = () => {
           console.log('Session is active for user:', sessionData.data.user);
           
           // Fetch user data
-          // http://geoterra.com/API/user_info.php
-          // http://163.178.171.105/API/user_info.php
-          const userResponse = await fetch('http://163.178.171.105/API/user_info.php', { 
+          const userResponse = await fetch(buildApiUrl("user_info.php"), {
             credentials: 'include',
             method: 'GET',
             headers: {

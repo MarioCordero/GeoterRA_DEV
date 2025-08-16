@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/images/GeoterRA-Logo-Color.svg';
 import '../colorModule.css';
 import '../fontsModule.css';
+import { buildApiUrl } from '../config/apiConf';
 
 const { Header } = Layout;
 
@@ -18,9 +19,7 @@ export default function AppHeader() {
     
     try {
       console.log("Checking session before profile access...");
-      // http://geoterra.com/API/check_session.php
-      // http://163.178.171.105/API/check_session.php
-      const response = await fetch("http://163.178.171.105/API/check_session.php", {
+      const response = await fetch(buildApiUrl("check_session.php"), {
         method: "GET",
         credentials: "include",
       });

@@ -3,7 +3,7 @@ import MapContainer from '../components/mapComponents/mapComponent';
 import LoggedHeader from '../components/loggedHeader';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { buildApiUrl } from '../config/api';
+import { buildApiUrl } from '../config/apiConf';
 
 const Map = () => {
   const [isLogged, setIsLogged] = useState(false);
