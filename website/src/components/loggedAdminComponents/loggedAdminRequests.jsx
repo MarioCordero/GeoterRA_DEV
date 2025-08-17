@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Typography, Divider, Spin, Alert, Tag } from 'antd';
+import { useNavigate } from 'react-router-dom'; // Add this import
 import AdminAddPointModal from './loggedAdminAddPointModal';
 import '../../colorModule.css';
 import '../../fontsModule.css';
@@ -12,32 +13,86 @@ const Requests = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
+  const navigate = useNavigate(); // Add this hook declaration
 
-  // Function to get user session and email
+
+  // Session token management functions
+  const getSessionToken = () => {
+    return localStorage.getItem('geoterra_session_token');
+  };
+
+  const clearSessionToken = () => {
+    localStorage.removeItem('geoterra_session_token');
+  };
+
+  const buildHeaders = () => {
+    const headers = {
+      "Content-Type": "application/x-www-form-urlencoded"
+    };
+    const token = getSessionToken();
+    if (token) {
+      headers['X-Session-Token'] = token;
+    }
+    return headers;
+  };
+
+  // Enhanced function to get user session with token
   const getUserSession = async () => {
     try {
+      const token = getSessionToken();
+      
+      // Check if token exists first
+      if (!token) {
+        console.log("No session token found");
+        return null;
+      }
+
       const response = await fetch(buildApiUrl("check_session.php"), {
         method: "GET",
         credentials: "include",
+        headers: {
+          'X-Session-Token': token
+        },
       });
-      const apiResponse = await response.json();
       
-      if (apiResponse.response === 'Ok' && apiResponse.data.status === 'logged_in') {
-        return apiResponse.data.user; // This should be the email
+      const apiResponse = await response.json();
+      // console.log("Session check response:", apiResponse);
+      
+      // Check if the API response is successful AND user is admin
+      if (apiResponse.response === 'Ok' && 
+          apiResponse.data && 
+          apiResponse.data.status === 'logged_in') {
+        
+        // Verify admin privileges
+        const userData = apiResponse.data;
+        if (userData.user_type === 'admin' || userData.is_admin === true || userData.admin === true) {
+          return userData.user; // Return the email
+        } else {
+          console.log("User is not admin, redirecting...");
+          navigate('/Logged'); // Redirect non-admin users to regular user page
+          return null;
+        }
       }
+      
+      // Clear invalid token and redirect
+      console.log("Invalid session, clearing token");
+      clearSessionToken();
+      navigate('/Login');
       return null;
     } catch (error) {
       console.error("Error checking session:", error);
+      clearSessionToken();
+      navigate('/Login');
       return null;
     }
   };
 
-  // Function to fetch user's requests
+  // Enhanced function to fetch user's requests with token
   const fetchUserRequests = async (email) => {
     try {
       const response = await fetch(buildApiUrl("get_request.inc.php"), {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        headers: buildHeaders(), // Include session token
         body: `email=${encodeURIComponent(email)}`,
         credentials: "include",
       });
@@ -47,57 +102,78 @@ const Requests = () => {
       }
       
       const result = await response.json();
+      // console.log("Fetch requests response:", result);
       
       if (result.response === "Ok") {
         return result.data || [];
       } else {
+        // If the API returns an error but it's about "no requests found", return empty array
+        if (result.message && result.message.includes("No se encontraron solicitudes")) {
+          return [];
+        }
         throw new Error(result.message || "Failed to fetch requests");
       }
     } catch (error) {
       console.error("Error fetching requests:", error);
+      // If it's a "no requests found" error, return empty array instead of throwing
+      if (error.message && error.message.includes("No se encontraron solicitudes")) {
+        return [];
+      }
       throw error;
     }
   };
 
-  // Load requests on component mount
+  // Load requests on component mount with token verification
   useEffect(() => {
     const loadRequests = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        // First get user session
+        // First verify session and admin privileges with token
         const email = await getUserSession();
         if (!email) {
-          setError("Usuario no autenticado");
+          setError("Usuario no autenticado o sin privilegios de administrador");
           return;
         }
         
+        // console.log("✅ Admin session verified for user:", email);
         setUserEmail(email);
         
-        // Then fetch user's requests
+        // Then fetch user's requests with token
         const userRequests = await fetchUserRequests(email);
         setRequests(userRequests);
         
       } catch (err) {
         setError(err.message);
+        console.error("Error loading requests:", err);
       } finally {
         setLoading(false);
       }
     };
     
     loadRequests();
-  }, []);
+  }, [navigate]);
 
-  // Function to refresh requests (call this after adding a new request)
+  // Function to refresh requests with session check
   const refreshRequests = async () => {
     if (userEmail) {
       try {
         setLoading(true);
-        const userRequests = await fetchUserRequests(userEmail);
+        
+        // Verify session before refreshing
+        const currentEmail = await getUserSession();
+        if (!currentEmail) {
+          setError("Sesión expirada o sin privilegios");
+          return;
+        }
+        
+        const userRequests = await fetchUserRequests(currentEmail);
         setRequests(userRequests);
+        setError(null); // Clear any previous errors
       } catch (err) {
         setError(err.message);
+        console.error("Error refreshing requests:", err);
       } finally {
         setLoading(false);
       }

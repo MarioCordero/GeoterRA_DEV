@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Typography, Divider, Spin, Alert, Tag } from 'antd';
 import AddPointModal from './loggedAddPointModal';
+import { useNavigate } from 'react-router-dom';
 import '../../colorModule.css';
 import '../../fontsModule.css';
 import { buildApiUrl } from '../../config/apiConf';
@@ -12,14 +13,21 @@ const Requests = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
+  const navigate = useNavigate();
 
   // Session token management functions (same as in loginForm)
   const getSessionToken = () => {
     return localStorage.getItem('geoterra_session_token');
   };
 
+  const clearSessionToken = () => {
+    localStorage.removeItem('geoterra_session_token');
+  };
+
   const buildHeaders = () => {
-    const headers = {};
+    const headers = {
+      "Content-Type": "application/x-www-form-urlencoded"
+    };
     const token = getSessionToken();
     if (token) {
       headers['X-Session-Token'] = token;
@@ -27,17 +35,32 @@ const Requests = () => {
     return headers;
   };
 
-  // Function to get user session and email
+  // Enhanced function to get user session with token
   const getUserSession = async () => {
     try {
+      const token = getSessionToken();
+      
+      // Check if token exists first
+      if (!token) {
+        console.log("No session token found");
+        return null;
+      }
+
       const response = await fetch(buildApiUrl("check_session.php"), {
         method: "GET",
         credentials: "include",
+        headers: {
+          'X-Session-Token': token
+        },
       });
+      
       const data = await response.json();
+      console.log("Session check response:", data);
       
       // Check if the API response is successful
-      if (data.response === "Ok" && data.data.status === 'logged_in') {
+      if (data.response === "Ok" && 
+          data.data && 
+          data.data.status === 'logged_in') {
         return data.data.user; // Access user from data.data.user
       }
       
@@ -47,19 +70,24 @@ const Requests = () => {
         console.log("Debug info:", data.debug);
       }
       
+      // Clear invalid token and redirect
+      clearSessionToken();
+      navigate('/Login');
       return null;
     } catch (error) {
       console.error("Error checking session:", error);
+      clearSessionToken();
+      navigate('/Login');
       return null;
     }
   };
 
-  // Function to fetch user's requests
+  // Enhanced function to fetch user's requests with token
   const fetchUserRequests = async (email) => {
     try {
       const response = await fetch(buildApiUrl("get_request.inc.php"), {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        headers: buildHeaders(), // Include session token
         body: `email=${encodeURIComponent(email)}`,
         credentials: "include",
       });
@@ -69,6 +97,7 @@ const Requests = () => {
       }
       
       const result = await response.json();
+      console.log("Fetch requests response:", result);
       
       if (result.response === "Ok") {
         return result.data || [];
@@ -89,48 +118,81 @@ const Requests = () => {
     }
   };
 
-  // Load requests on component mount
+  // Load requests on component mount with session verification
   useEffect(() => {
     const loadRequests = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        // First get user session
+        // First verify session with token
         const email = await getUserSession();
         if (!email) {
           setError("Usuario no autenticado");
           return;
         }
         
+        console.log("✅ Session verified for user:", email);
         setUserEmail(email);
         
-        // Then fetch user's requests
+        // Then fetch user's requests with token
         const userRequests = await fetchUserRequests(email);
         setRequests(userRequests);
         
       } catch (err) {
         setError(err.message);
+        console.error("Error loading requests:", err);
       } finally {
         setLoading(false);
       }
     };
     
     loadRequests();
-  }, []);
+  }, [navigate]);
 
-  // Function to refresh requests (call this after adding a new request)
+  // Function to refresh requests with session check
   const refreshRequests = async () => {
     if (userEmail) {
       try {
         setLoading(true);
-        const userRequests = await fetchUserRequests(userEmail);
+        
+        // Verify session before refreshing
+        const currentEmail = await getUserSession();
+        if (!currentEmail) {
+          setError("Sesión expirada");
+          return;
+        }
+        
+        const userRequests = await fetchUserRequests(currentEmail);
         setRequests(userRequests);
+        setError(null); // Clear any previous errors
       } catch (err) {
         setError(err.message);
+        console.error("Error refreshing requests:", err);
       } finally {
         setLoading(false);
       }
+    }
+  };
+
+  // Enhanced delete function with token
+  const handleDelete = async (record) => {
+    try {
+      // Verify session before delete
+      const currentEmail = await getUserSession();
+      if (!currentEmail) {
+        setError("Sesión expirada");
+        return;
+      }
+
+      // Implement delete logic here
+      console.log('Eliminar:', record);
+      // Call delete API with token in headers
+      // After successful delete, refresh the list
+      // await refreshRequests();
+    } catch (error) {
+      console.error("Error deleting request:", error);
+      setError("Error al eliminar la solicitud");
     }
   };
 
@@ -188,10 +250,7 @@ const Requests = () => {
               cursor: 'pointer',
               fontSize: '12px'
             }}
-            onClick={() => {
-              // Delete functionality
-              console.log('Eliminar:', record);
-            }}
+            onClick={() => handleDelete(record)}
           >
             Eliminar
           </button>
@@ -251,6 +310,23 @@ const Requests = () => {
           description={error}
           type="error"
           showIcon
+          action={
+            error === "Sesión expirada" && (
+              <button 
+                onClick={() => navigate('/Login')}
+                style={{
+                  padding: '4px 8px',
+                  backgroundColor: '#1890ff',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Iniciar Sesión
+              </button>
+            )
+          }
         />
       </div>
     );

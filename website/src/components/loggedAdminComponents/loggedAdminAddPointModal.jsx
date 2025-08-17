@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Input, Radio, DatePicker, Upload, message, Spin } from "antd";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { useNavigate } from 'react-router-dom';
 import "leaflet/dist/leaflet.css";
 import dayjs from "dayjs";
 import { buildApiUrl } from '../../config/apiConf';
@@ -27,21 +28,78 @@ const AddPointModal = ({ onRequestAdded }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
+  const [sessionLoading, setSessionLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // Function to get user session and email
+  // Session token management functions
+  const getSessionToken = () => {
+    return localStorage.getItem('geoterra_session_token');
+  };
+
+  const clearSessionToken = () => {
+    localStorage.removeItem('geoterra_session_token');
+  };
+
+  const buildHeaders = () => {
+    const headers = {};
+    const token = getSessionToken();
+    if (token) {
+      headers['X-Session-Token'] = token;
+    }
+    return headers;
+  };
+
+  // Enhanced function to get user session with token and admin verification
   const getUserSession = async () => {
     try {
-      const response = await fetch(buildApiUrl("check_session.php"), { credentials: 'include' });
+      setSessionLoading(true);
+      const token = getSessionToken();
+      
+      // Check if token exists first
+      if (!token) {
+        console.log("No session token found");
+        return null;
+      }
+
+      const response = await fetch(buildApiUrl("check_session.php"), {
+        method: "GET",
+        credentials: "include",
+        headers: buildHeaders(), // Include session token
+      });
+      
       const apiResponse = await response.json();
-      console.log('Full session check response:', apiResponse);
-      console.log('Debug info:', apiResponse.debug); // This will show you what's in $_SESSION
-      if (apiResponse.response === 'Ok' && apiResponse.data.status === 'logged_in') {
-        console.log('Session is active');
+      // console.log('Full session check response:', apiResponse);
+      // console.log('Debug info:', apiResponse.debug);
+      
+      // Check if the API response is successful AND user is admin
+      if (apiResponse.response === 'Ok' && 
+          apiResponse.data && 
+          apiResponse.data.status === 'logged_in') {
+        
+        // Verify admin privileges
+        const userData = apiResponse.data;
+        if (userData.user_type === 'admin' || userData.is_admin === true || userData.admin === true) {
+          // console.log('✅ Admin session is active for user:', userData.user);
+          return userData.user; // Return the email
+        } else {
+          console.log("User is not admin, redirecting...");
+          message.error("No tienes privilegios de administrador");
+          navigate('/Logged'); // Redirect non-admin users
+          return null;
+        }
       } else {
         console.log('Session is not active');
+        clearSessionToken();
+        navigate('/Login');
+        return null;
       }
     } catch (error) {
       console.log('Session check failed:', error);
+      clearSessionToken();
+      navigate('/Login');
+      return null;
+    } finally {
+      setSessionLoading(false);
     }
   };
 
@@ -50,7 +108,7 @@ const AddPointModal = ({ onRequestAdded }) => {
     const loadUserEmail = async () => {
       const email = await getUserSession();
       setUserEmail(email);
-      console.log("User email loaded:", email);
+      // console.log("Admin user email loaded:", email);
     };
     
     loadUserEmail();
@@ -84,19 +142,20 @@ const AddPointModal = ({ onRequestAdded }) => {
 
   const handleOk = async () => {
     try {
-      // Check if user is logged in
-      if (!userEmail) {
-        message.error("Debes estar autenticado para enviar una solicitud");
+      // Verify admin session before submitting
+      const currentUserEmail = await getUserSession();
+      if (!currentUserEmail) {
+        message.error("Sesión expirada o sin privilegios de administrador");
         return;
       }
 
       const values = await form.validateFields();
       setLoading(true);
 
-      // Prepare form data for API
+      // Prepare form data for API with token
       const formData = new FormData();
       formData.append("pointId", values.pointId);
-      formData.append("email", userEmail); // Use the email from session
+      formData.append("email", currentUserEmail); // Use the verified admin email
       formData.append("contactNumber", values.contactNumber);
       formData.append("fecha", values.fecha ? dayjs(values.fecha).format("YYYY-MM-DD") : "");
       formData.append("sensTermica", values.sensTermica);
@@ -107,21 +166,26 @@ const AddPointModal = ({ onRequestAdded }) => {
       formData.append("lat", latLng.lat || "");
       formData.append("lng", latLng.lng || "");
       
-      console.log("Email being sent:", userEmail);
+      console.log("Admin email being sent:", currentUserEmail);
 
       // Handle file upload
       if (values.foto && values.foto.length > 0) {
         formData.append("foto", values.foto[0].originFileObj);
       }
 
+      // Enhanced request with token headers
       const response = await fetch(buildApiUrl("request.inc.php"), {
         method: "POST",
+        headers: {
+          // Don't set Content-Type for FormData, let browser set it with boundary
+          ...buildHeaders(), // Include session token (but not Content-Type)
+        },
         body: formData,
         credentials: "include", // Include credentials for session
       });
 
       const result = await response.json();
-      console.log("API result:", result);
+      // console.log("API result:", result);
 
       if (result.response === "Ok") {
         setVisible(false);
@@ -136,7 +200,7 @@ const AddPointModal = ({ onRequestAdded }) => {
         
         Modal.success({
           title: "¡Solicitud enviada!",
-          content: result.message || "Tu solicitud fue enviada correctamente.",
+          content: result.message || "La solicitud fue enviada correctamente.",
         });
       } else {
         const errorMessage = result.message || "Error al enviar la solicitud";
@@ -182,22 +246,42 @@ const AddPointModal = ({ onRequestAdded }) => {
         Agregar punto
       </Button>
       <Modal
-        title="Formulario de solicitud de puntos"
+        title="Formulario de solicitud de puntos (Admin)"
         open={visible}
         onOk={handleOk}
         onCancel={handleCancel}
         width={700}
         confirmLoading={loading}
         footer={[
-          <Button key="back" onClick={handleCancel} disabled={loading}>
+          <Button key="back" onClick={handleCancel} disabled={loading || sessionLoading}>
             Cancelar
           </Button>,
-          <Button key="submit" type="primary" onClick={handleOk} loading={loading}>
+          <Button 
+            key="submit" 
+            type="primary" 
+            onClick={handleOk} 
+            loading={loading}
+            disabled={!userEmail || sessionLoading}
+          >
             Enviar
           </Button>,
         ]}
       >
-        {!userEmail && (
+        {sessionLoading && (
+          <div style={{ 
+            padding: "10px", 
+            backgroundColor: "#e6f7ff", 
+            border: "1px solid #91d5ff", 
+            borderRadius: "4px", 
+            marginBottom: "16px",
+            color: "#1890ff",
+            textAlign: "center"
+          }}>
+            <Spin size="small" /> Verificando privilegios de administrador...
+          </div>
+        )}
+        
+        {!sessionLoading && !userEmail && (
           <div style={{ 
             padding: "10px", 
             backgroundColor: "#fff2e8", 
@@ -206,7 +290,20 @@ const AddPointModal = ({ onRequestAdded }) => {
             marginBottom: "16px",
             color: "#d46b08"
           }}>
-            ⚠️ Verificando sesión de usuario...
+            ⚠️ No se pudo verificar la sesión de administrador
+          </div>
+        )}
+
+        {!sessionLoading && userEmail && (
+          <div style={{ 
+            padding: "10px", 
+            backgroundColor: "#f6ffed", 
+            border: "1px solid #b7eb8f", 
+            borderRadius: "4px", 
+            marginBottom: "16px",
+            color: "#389e0d"
+          }}>
+            ✅ Sesión de administrador verificada: {userEmail}
           </div>
         )}
         

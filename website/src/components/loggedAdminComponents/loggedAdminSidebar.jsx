@@ -17,35 +17,72 @@ const { Sider } = Layout;
 const SidebarLayout = ({ selectedKey, setSelectedKey }) => {
   const navigate = useNavigate();
 
+  // Session token management functions
+  const getSessionToken = () => {
+    return localStorage.getItem('geoterra_session_token');
+  };
+
+  const clearSessionToken = () => {
+    localStorage.removeItem('geoterra_session_token');
+  };
+
+  const buildHeaders = () => {
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    const token = getSessionToken();
+    if (token) {
+      headers['X-Session-Token'] = token;
+    }
+    return headers;
+  };
+
+  // Enhanced logout function with token management
   const handleLogout = async () => {
     try {
       console.log("Starting logout process...");
       
+      // Check if we have a session token
+      const token = getSessionToken();
+      console.log("Session token present:", !!token);
+      
+      // Call logout endpoint with token in headers
       const response = await fetch(buildApiUrl("logout.php"), { 
-        method: "POST", // Try POST instead of GET
-        credentials: "include", // Important: Include cookies
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        method: "POST",
+        credentials: "include", // Include cookies
+        headers: buildHeaders(), // Include session token
       });
 
       console.log("Logout response status:", response.status);
       console.log("Logout response ok:", response.ok);
       
       // Try to get the response data
-      const data = await response.json();
-      console.log("Logout response data:", data);
-
-      if (response.ok) {
-        console.log("Logout successful, redirecting to login");
-        navigate("/Login");
-      } else {
-        console.error("Logout failed:", data);
-        alert("Error al cerrar sesión: " + (data.message || "Unknown error"));
+      let data = {};
+      try {
+        data = await response.json();
+        console.log("Logout response data:", data);
+      } catch (jsonError) {
+        console.log("No JSON response from logout endpoint");
       }
+
+      // Always clear the token and redirect, regardless of server response
+      console.log("Clearing session token and redirecting...");
+      clearSessionToken();
+      
+      if (response.ok || response.status === 200) {
+        // console.log("✅ Logout successful, redirecting to home");
+        navigate("/");
+      } else {
+        // console.log("⚠️ Logout API failed but token cleared, redirecting anyway");
+        navigate("/");
+      }
+      
     } catch (err) {
       console.error("Logout error:", err);
-      alert("Error de conexión: " + err.message);
+      // Even if the API call fails, clear the token and redirect
+      console.log("🔧 Network error during logout - clearing token anyway");
+      clearSessionToken();
+      navigate("/");
     }
   };
 
@@ -128,6 +165,7 @@ const SidebarLayout = ({ selectedKey, setSelectedKey }) => {
           block
           onClick={handleLogout}
           className="bg-geoterra-orange"
+          icon={<LogoutOutlined />}
           style={{
             textAlign: 'left',
             paddingLeft: '24px',
