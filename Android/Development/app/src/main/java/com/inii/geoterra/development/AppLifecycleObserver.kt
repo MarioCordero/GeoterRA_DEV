@@ -1,7 +1,6 @@
 package com.inii.geoterra.development
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import com.inii.geoterra.development.device.GPSManager
 import timber.log.Timber
 
 /**

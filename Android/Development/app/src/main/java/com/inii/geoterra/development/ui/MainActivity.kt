@@ -19,7 +19,6 @@ import com.inii.geoterra.development.api.CheckSessionResponse
 import com.inii.geoterra.development.api.RetrofitClient
 import com.inii.geoterra.development.databinding.ActivityMainBinding
 import com.inii.geoterra.development.device.ActivityPermissionRequester
-import com.inii.geoterra.development.device.GPSManager
 import com.inii.geoterra.development.interfaces.PageView
 import com.inii.geoterra.development.managers.SessionManager
 import com.inii.geoterra.development.ui.account.views.LoginView

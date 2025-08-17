@@ -75,7 +75,7 @@ class MapViewModel @Inject constructor(
   /**
    * @brief Initializes the GPS location listener to update user location LiveData.
    *
-   * Sets a callback on GPSManager to receive location updates asynchronously.
+   * Sets a callback on LocationTracker to receive location updates asynchronously.
    * Filters updates by minimum distance threshold to prevent redundant UI refreshes.
    * Also initializes LiveData with the last known location if available.
    */
@@ -239,7 +239,7 @@ class MapViewModel @Inject constructor(
 //  }
 
   /**
-   * @brief Instructs GPSManager to stop location updates.
+   * @brief Instructs LocationTracker to stop location updates.
    *
    * Should be called on lifecycle events to prevent unnecessary battery drain.
    */
@@ -248,7 +248,7 @@ class MapViewModel @Inject constructor(
   }
 
   /**
-   * @brief Instructs GPSManager to start location updates.
+   * @brief Instructs LocationTracker to start location updates.
    *
    * Should be called on lifecycle events to resume location tracking.
    */

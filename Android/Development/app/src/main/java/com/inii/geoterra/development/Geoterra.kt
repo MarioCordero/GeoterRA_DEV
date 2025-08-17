@@ -2,8 +2,8 @@ package com.inii.geoterra.development
 
 import android.app.Application
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.inii.geoterra.development.device.GPSManager
-import com.inii.geoterra.development.device.GalleryPermissionManager
+import com.inii.geoterra.development.device.LocationTracker
+import com.inii.geoterra.development.device.MediaPermissionHelper
 import com.inii.geoterra.development.interfaces.LocationCallbackListener
 import com.inii.geoterra.development.interfaces.PermissionRequester
 import dagger.hilt.android.HiltAndroidApp
@@ -19,10 +19,10 @@ import javax.inject.Inject
 class Geoterra : Application() {
 
   @Inject
-  lateinit var gpsmanager: GPSManager
+  lateinit var gpsmanager: LocationTracker
 
   @Inject
-  lateinit var gallerymanager : GalleryPermissionManager
+  lateinit var gallerymanager : MediaPermissionHelper
 
   override fun onCreate() {
     super.onCreate()
