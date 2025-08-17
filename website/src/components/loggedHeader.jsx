@@ -36,11 +36,11 @@ export default function AppHeader() {
     e.preventDefault(); // Prevent default link behavior
     
     try {
-      console.log("Checking session before profile access...");
+      // console.log("Checking session before profile access...");
       
       // Check if token exists first
       const token = getSessionToken();
-      console.log("Session token present:", !!token);
+      // console.log("Session token present:", !!token);
 
       const response = await fetch(buildApiUrl("check_session.php"), {
         method: "GET",
@@ -49,32 +49,32 @@ export default function AppHeader() {
       });
       
       const apiResponse = await response.json();
-      console.log("Session check response:", apiResponse);
+      // console.log("Session check response:", apiResponse);
       
       // Check if API response is successful
       if (apiResponse.response === 'Ok' && 
           apiResponse.data && 
           apiResponse.data.status === 'logged_in') {
-        console.log('✅ Session is active - checking user type');
+        // console.log('✅ Session is active - checking user type');
         
         const userData = apiResponse.data;
         
         // Check if user is admin
         if (userData.user_type === 'admin' || userData.is_admin === true || userData.admin === true) {
-          console.log('User is admin - redirecting to admin panel');
+          // console.log('User is admin - redirecting to admin panel');
           navigate('/LoggedAdmin');
         } else {
-          console.log('User is regular user - redirecting to user profile');
+          // console.log('User is regular user - redirecting to user profile');
           navigate('/Logged');
         }
       } else {
-        console.log('❌ Session is not active - clearing token and redirecting to login');
+        // console.log('❌ Session is not active - clearing token and redirecting to login');
         clearSessionToken(); // Clear invalid token
         navigate('/Login');
       }
     } catch (err) {
       console.error("Session check failed:", err);
-      console.log('Session check failed - clearing token and redirecting to login');
+      // console.log('Session check failed - clearing token and redirecting to login');
       clearSessionToken(); // Clear token on error
       navigate('/Login');
     }
@@ -89,7 +89,7 @@ export default function AppHeader() {
         credentials: "include",
         headers: buildHeaders(),
       });
-      console.log("Logout API called successfully");
+      // console.log("Logout API called successfully");
     } catch (error) {
       console.error("Error during logout:", error);
     } finally {
