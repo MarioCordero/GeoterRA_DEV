@@ -55,7 +55,7 @@ const Requests = () => {
       });
       
       const data = await response.json();
-      console.log("Session check response:", data);
+      // console.log("Session check response:", data);
       
       // Check if the API response is successful
       if (data.response === "Ok" && 
@@ -65,7 +65,7 @@ const Requests = () => {
       }
       
       // Log debug info if session fails
-      console.log("Session check failed:", data);
+      // console.log("Session check failed:", data);
       if (data.debug) {
         console.log("Debug info:", data.debug);
       }
@@ -97,7 +97,7 @@ const Requests = () => {
       }
       
       const result = await response.json();
-      console.log("Fetch requests response:", result);
+      // console.log("Fetch requests response:", result);
       
       if (result.response === "Ok") {
         return result.data || [];
@@ -132,7 +132,7 @@ const Requests = () => {
           return;
         }
         
-        console.log("✅ Session verified for user:", email);
+        // console.log("✅ Session verified for user:", email);
         setUserEmail(email);
         
         // Then fetch user's requests with token
@@ -186,7 +186,7 @@ const Requests = () => {
       }
 
       // Implement delete logic here
-      console.log('Eliminar:', record);
+      // console.log('Eliminar:', record);
       // Call delete API with token in headers
       // After successful delete, refresh the list
       // await refreshRequests();

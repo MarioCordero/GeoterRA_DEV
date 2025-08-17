@@ -40,11 +40,11 @@ const SidebarLayout = ({ selectedKey, setSelectedKey }) => {
   // Enhanced logout function with token management
   const handleLogout = async () => {
     try {
-      console.log("Starting logout process...");
+      // console.log("Starting logout process...");
       
       // Check if we have a session token
       const token = getSessionToken();
-      console.log("Session token present:", !!token);
+      // console.log("Session token present:", !!token);
       
       // Call logout endpoint with token in headers
       const response = await fetch(buildApiUrl("logout.php"), { 
@@ -53,20 +53,20 @@ const SidebarLayout = ({ selectedKey, setSelectedKey }) => {
         headers: buildHeaders(), // Include session token
       });
 
-      console.log("Logout response status:", response.status);
-      console.log("Logout response ok:", response.ok);
+      // console.log("Logout response status:", response.status);
+      // console.log("Logout response ok:", response.ok);
       
       // Try to get the response data
       let data = {};
       try {
         data = await response.json();
-        console.log("Logout response data:", data);
+        // console.log("Logout response data:", data);
       } catch (jsonError) {
         console.log("No JSON response from logout endpoint");
       }
 
       // Always clear the token and redirect, regardless of server response
-      console.log("Clearing session token and redirecting...");
+      // console.log("Clearing session token and redirecting...");
       clearSessionToken();
       
       if (response.ok || response.status === 200) {
