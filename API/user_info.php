@@ -1,5 +1,14 @@
 <?php
     require_once 'cors.inc.php';
+    
+    // Check if session token was sent in header
+    $session_token = $_SERVER['HTTP_X_SESSION_TOKEN'] ?? null;
+
+    if ($session_token) {
+        // Resume existing session using the token
+        session_id($session_token);
+    }
+    
     if (session_status() == PHP_SESSION_NONE) {
         session_start();                // 2. Session start second
     }
@@ -12,6 +21,8 @@
     // Debug information
     $debug = [
         'session_id' => session_id(),
+        'session_token_received' => $session_token,
+        'session_method' => $session_token ? 'token_header' : 'cookie',
         'session_status' => session_status(),
         'session_data' => $_SESSION,
         'cookies_received' => $_COOKIE,

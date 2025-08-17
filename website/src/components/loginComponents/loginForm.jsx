@@ -18,6 +18,29 @@ function Login() {
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Session token management
+  const getSessionToken = () => {
+    return localStorage.getItem('geoterra_session_token');
+  };
+
+  const setSessionToken = (token) => {
+    localStorage.setItem('geoterra_session_token', token);
+  };
+
+  const clearSessionToken = () => {
+    localStorage.removeItem('geoterra_session_token');
+  };
+
+  // Build headers with session token if available
+  const buildHeaders = () => {
+    const headers = {};
+    const token = getSessionToken();
+    if (token) {
+      headers['X-Session-Token'] = token;
+    }
+    return headers;
+  };
+
   // Function to get user info after successful login
   const getUserInfo = async (email) => {
     try {
@@ -28,6 +51,7 @@ function Login() {
         method: "POST",
         body: formData,
         credentials: "include",
+        headers: buildHeaders(),  // Add session token header
       });
       
       const data = await response.json();
@@ -49,30 +73,17 @@ function Login() {
       const response = await fetch(buildApiUrl("check_session.php"), {
         method: "GET",
         credentials: "include",
+        headers: buildHeaders(),  // Add session token header
       });
       
-      console.log("Session check response status:", response.status);
-      console.log("Session check response headers:", [...response.headers.entries()]);
-      
       const data = await response.json();
-      console.log("Session status debug:", data);
-      
-      // Log specific debug info
-      if (data.debug) {
-        console.log("Session ID:", data.debug.session_id);
-        console.log("Session data:", data.debug.session_data);
-        console.log("Cookies received by server:", data.debug.cookies_received);
-        console.log("PHP session cookie:", data.debug.php_session_cookie);
-      }
-      
+      console.log("Session check response:", data);
       return data;
     } catch (error) {
       console.error("Error checking session:", error);
       return null;
     }
-  };
-
-  // Handle form submit
+  };  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg("");
@@ -97,6 +108,14 @@ function Login() {
       console.log("Login API response:", data);
 
       if (data.response === "Ok") {
+        // 🔥 STORE SESSION TOKEN from login response
+        if (data.data && data.data.session_token) {
+          console.log("🎯 Storing session token:", data.data.session_token);
+          setSessionToken(data.data.session_token);
+        } else {
+          console.warn("⚠️ No session token in login response!");
+        }
+
         // DEBUG: Check session after login
         console.log("=== SESSION DEBUG - AFTER LOGIN ===");
         const sessionData = await checkSessionStatus();
@@ -154,6 +173,12 @@ function Login() {
     setErrorMsg("");
     setEmail("");
     setPassword("");
+  };
+
+  // Handle logout (can be called from other components)
+  const handleLogout = () => {
+    clearSessionToken();
+    navigate("/");
   };
 
   return (
@@ -241,74 +266,6 @@ function Login() {
                   Recordar contraseña
                 </label>
               </div>
-            </div>
-
-            {/* TEMPORARY: Session Test Button */}
-            <div className="space-y-3">
-              <button
-                type="button"
-                onClick={async () => {
-                  console.log("🧪 STEP 2: Testing basic session persistence...");
-                  
-                  // Check initial browser cookies
-                  console.log("🍪 Initial browser cookies:", document.cookie);
-                  
-                  // First request
-                  console.log("🔄 Making first request...");
-                  const response1 = await fetch(buildApiUrl("test_session.php"), {
-                    method: "GET",
-                    credentials: "include"
-                  });
-                  
-                  // Log response headers
-                  console.log("📋 Response 1 headers:", Object.fromEntries(response1.headers.entries()));
-                  
-                  const data1 = await response1.json();
-                  console.log("🧪 First request response:", data1);
-                  console.log("🍪 Browser cookies after first request:", document.cookie);
-                  
-                  // Wait a moment
-                  await new Promise(resolve => setTimeout(resolve, 1000));
-                  
-                  // Second request
-                  console.log("🔄 Making second request...");
-                  const response2 = await fetch(buildApiUrl("test_session.php"), {
-                    method: "GET", 
-                    credentials: "include"
-                  });
-                  
-                  console.log("📋 Response 2 headers:", Object.fromEntries(response2.headers.entries()));
-                  
-                  const data2 = await response2.json();
-                  console.log("🧪 Second request response:", data2);
-                  console.log("🍪 Browser cookies after second request:", document.cookie);
-                  
-                  // Detailed analysis
-                  console.log("🔍 DETAILED ANALYSIS:");
-                  console.log("Cookie params from server:", data1.cookie_params);
-                  console.log("Domain:", data1.domain);
-                  console.log("Protocol:", data1.protocol);
-                  console.log("Headers sent:", data1.headers_sent);
-                  console.log("Session status:", data1.session_status);
-                  
-                  // Check if session persists
-                  if (data1.session_id === data2.session_id) {
-                    console.log("✅ Session ID persists!");
-                    if (data2.counter > data1.counter) {
-                      console.log("✅ Session data persists correctly!");
-                    } else {
-                      console.log("❌ Session data is not persisting");
-                    }
-                  } else {
-                    console.log("❌ Session ID changes between requests");
-                    console.log(`First ID: ${data1.session_id}`);
-                    console.log(`Second ID: ${data2.session_id}`);
-                  }
-                }}
-                className="w-full bg-blue-500 text-white py-2 rounded font-bold hover:bg-blue-700 transition"
-              >
-                🧪 Test Session (Step 2 - Enhanced)
-              </button>
             </div>
 
             {/* SUBMIT BUTTON */}

@@ -17,26 +17,43 @@ const AdminRequestsManager = () => {
   const [reviewForm] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
 
-  // Function to get user session and verify admin role
+  // Session token management functions (add these)
+  const getSessionToken = () => {
+    return localStorage.getItem('geoterra_session_token');
+  };
+
+  const buildHeaders = () => {
+    const headers = {};
+    const token = getSessionToken();
+    if (token) {
+      headers['X-Session-Token'] = token;
+    }
+    return headers;
+  };
+
+  // Updated function to get user session with token support
   const getUserSession = async () => {
     try {
       const response = await fetch(buildApiUrl("check_session.php"), {
         method: "GET",
         credentials: "include",
+        headers: buildHeaders(),  // ← ADD TOKEN HEADERS HERE
       });
+      
       const apiResponse = await response.json();
       
       // Debug: Log the full response to see the structure
       console.log("Admin Session API Response:", apiResponse);
       
-      // Check for regular user session
+      // Check if session is active and user is logged in
       if (apiResponse.response === 'Ok' && apiResponse.data.status === 'logged_in') {
-        return apiResponse.data.user;
-      }
-      
-      // Check for admin session
-      if (apiResponse.response === 'Ok' && apiResponse.data.status === 'admin_logged_in') {
-        return apiResponse.data.admin || apiResponse.data.user;
+        // Verify if user is admin
+        if (apiResponse.data.is_admin) {
+          return apiResponse.data.user;
+        } else {
+          console.error("User is not admin");
+          return null;
+        }
       }
       
       return null;
@@ -46,12 +63,13 @@ const AdminRequestsManager = () => {
     }
   };
 
-  // Function to fetch ALL requests (admin only)
+  // Also update fetchAllRequests to use token headers
   const fetchAllRequests = async () => {
     try {
       const response = await fetch(buildApiUrl("get_all_requests.inc.php"), {
         method: "GET",
         credentials: "include",
+        headers: buildHeaders(),  // ← ADD TOKEN HEADERS HERE
       });
       
       if (!response.ok) {
@@ -71,7 +89,8 @@ const AdminRequestsManager = () => {
     }
   };
 
-    const deleteRequest = async (requestId) => {
+  // Update deleteRequest to use token headers
+  const deleteRequest = async (requestId) => {
     try {
       const formData = new FormData();
       formData.append('id_soli', requestId);
@@ -80,6 +99,7 @@ const AdminRequestsManager = () => {
         method: "POST",
         body: formData,
         credentials: "include",
+        headers: buildHeaders(),  // ← ADD TOKEN HEADERS HERE
       });
       
       if (!response.ok) {
@@ -168,6 +188,7 @@ const AdminRequestsManager = () => {
         method: "POST",
         body: formData,
         credentials: "include",
+        headers: buildHeaders(),  // ← ADD TOKEN HEADERS HERE
       });
       
       // Check if response is ok

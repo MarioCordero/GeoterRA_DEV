@@ -1,5 +1,14 @@
 <?php
     require_once 'cors.inc.php'; 
+    
+    // Check if session token was sent in header
+    $session_token = $_SERVER['HTTP_X_SESSION_TOKEN'] ?? null;
+
+    if ($session_token) {
+        // Resume existing session using the token
+        session_id($session_token);
+    }
+    
     ini_set('session.cookie_httponly', 0); // Allow JavaScript access for debugging
     ini_set('session.cookie_secure', 0);   // Set to 0 for HTTP (localhost)
     ini_set('session.cookie_samesite', 'Lax'); 
@@ -129,6 +138,7 @@
                             "session" => $_SESSION['user'],
                             "session_ok" => $session_ok,
                             "session_status" => $session_status,
+                            "session_token" => session_id(),  // Add session token
                             "debug_session" => $debug_session,  // Add this detailed session debugging
                             "user" => [
                                 "email" => $user['email'],

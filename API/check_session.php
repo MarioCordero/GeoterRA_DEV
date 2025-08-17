@@ -1,6 +1,14 @@
 <?php
     require_once 'cors.inc.php';
     
+    // Check if session token was sent in header (for cross-origin requests)
+    $session_token = $_SERVER['HTTP_X_SESSION_TOKEN'] ?? null;
+
+    if ($session_token) {
+        // Resume existing session using the token
+        session_id($session_token);
+    }
+    
     // Enhanced session configuration
     if (session_status() == PHP_SESSION_NONE) {
         // Set session cookie parameters before starting session
@@ -22,6 +30,8 @@
     // Comprehensive debug information
     $debug = [
         'session_id' => session_id(),
+        'session_token_received' => $session_token,
+        'session_method' => $session_token ? 'token_header' : 'cookie',
         'session_status' => session_status(),
         'session_status_text' => [
             PHP_SESSION_DISABLED => 'PHP_SESSION_DISABLED',
