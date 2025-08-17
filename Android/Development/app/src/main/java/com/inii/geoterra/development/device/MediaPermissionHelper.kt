@@ -10,23 +10,38 @@ import android.os.Build
 import android.provider.Settings
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import com.inii.geoterra.development.interfaces.PermissionRequester
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
 /**
- * @brief Manager for handling gallery access permissions across Android versions
+ * @class MediaPermissionHelper
+ * @brief Manages gallery permission requests and handling for the application.
  *
- * Centralizes permission management for media storage access with backward compatibility.
- * Handles both Activity and Fragment based permission requests.
+ * This singleton class simplifies the process of requesting and checking gallery permissions,
+ * adapting to different Android versions (TIRAMISU and above use READ_MEDIA_IMAGES,
+ * older versions use READ_EXTERNAL_STORAGE).
+ *
+ * It utilizes a [PermissionRequester] interface to delegate the actual permission request
+ * and rationale display to the calling component (e.g., an Activity or
+ * Fragment).
+ *
+ * @property galleryPermissionRequestCode A constant integer used for identifying the gallery permission request.
+ * @property requiredPermission A private property that dynamically returns the correct storage permission string
+ *                              based on the device's Android version.
+ * @property isInitialized A private boolean flag to track whether the permission flow has been
+ *                         initialized and the permission is granted.
  */
 @Singleton
-class GalleryPermissionManager @Inject constructor() {
-  private val GALLERY_PERMISSION_REQUEST_CODE = 2000
+class MediaPermissionHelper @Inject constructor() {
+  /**
+   * Request code for requesting gallery permission.
+   * This constant is used when requesting permission to access the device's gallery.
+   */
+  private val galleryPermissionRequestCode = 2000
 
   /**
    * @brief Dynamic permission requirement based on Android version
@@ -54,6 +69,13 @@ class GalleryPermissionManager @Inject constructor() {
     ) == PackageManager.PERMISSION_GRANTED
   }
 
+  /**
+   * Initializes the permission handling process for accessing the device's gallery.
+   *
+   * @param permissionRequester An instance of [PermissionRequester] responsible for
+   *                            handling the permission request lifecycle (e.g., an Activity or Fragment).
+   *                            It provides context, checks for rationale, and initiates the permission request.
+   */
   fun initialize(permissionRequester: PermissionRequester) {
     val context = permissionRequester.getContext()
 
@@ -64,15 +86,15 @@ class GalleryPermissionManager @Inject constructor() {
     }
 
     // Verificamos si se debe mostrar el racional de permiso
-    val showRationale = permissionRequester.shouldShowRationale(requiredPermission)
+    val shouldShowRationaleDialog = permissionRequester.shouldShowRationale(requiredPermission)
 
-    if (showRationale) {
+    if (shouldShowRationaleDialog) {
       // Mostrar diálogo de explicación antes de solicitar permiso
       showRationaleDialog(context)
     }
 
     // Solicitar el permiso a través de la interfaz
-    permissionRequester.requestPermission(arrayOf(requiredPermission), GALLERY_PERMISSION_REQUEST_CODE)
+    permissionRequester.requestPermission(arrayOf(requiredPermission), galleryPermissionRequestCode)
   }
 
 
@@ -89,7 +111,7 @@ class GalleryPermissionManager @Inject constructor() {
   ) {
     val context = permissionRequester.getContext()
 
-    if (requestCode == GALLERY_PERMISSION_REQUEST_CODE) {
+    if (requestCode == galleryPermissionRequestCode) {
       if (grantResults.isNotEmpty() &&
         grantResults[0] == PackageManager.PERMISSION_GRANTED
       ) {
