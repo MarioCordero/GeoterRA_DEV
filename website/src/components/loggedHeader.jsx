@@ -13,21 +13,49 @@ export default function AppHeader() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
 
+  // Session token management functions
+  const getSessionToken = () => {
+    return localStorage.getItem('geoterra_session_token');
+  };
+
+  const clearSessionToken = () => {
+    localStorage.removeItem('geoterra_session_token');
+  };
+
+  const buildHeaders = () => {
+    const headers = {};
+    const token = getSessionToken();
+    if (token) {
+      headers['X-Session-Token'] = token;
+    }
+    return headers;
+  };
+
   // Function to check session before navigating to profile
   const handleProfileClick = async (e) => {
     e.preventDefault(); // Prevent default link behavior
     
     try {
       console.log("Checking session before profile access...");
+      
+      // Check if token exists first
+      const token = getSessionToken();
+      console.log("Session token present:", !!token);
+
       const response = await fetch(buildApiUrl("check_session.php"), {
         method: "GET",
         credentials: "include",
+        headers: buildHeaders(), // Include session token
       });
+      
       const apiResponse = await response.json();
+      console.log("Session check response:", apiResponse);
       
       // Check if API response is successful
-      if (apiResponse.response === 'Ok' && apiResponse.data.status === 'logged_in') {
-        console.log('Session is active - checking user type');
+      if (apiResponse.response === 'Ok' && 
+          apiResponse.data && 
+          apiResponse.data.status === 'logged_in') {
+        console.log('✅ Session is active - checking user type');
         
         const userData = apiResponse.data;
         
@@ -40,13 +68,33 @@ export default function AppHeader() {
           navigate('/Logged');
         }
       } else {
-        console.log('Session is not active - redirecting to login');
+        console.log('❌ Session is not active - clearing token and redirecting to login');
+        clearSessionToken(); // Clear invalid token
         navigate('/Login');
       }
     } catch (err) {
       console.error("Session check failed:", err);
-      console.log('Session check failed - redirecting to login');
+      console.log('Session check failed - clearing token and redirecting to login');
+      clearSessionToken(); // Clear token on error
       navigate('/Login');
+    }
+  };
+
+  // Enhanced logout function
+  const handleLogout = async () => {
+    try {
+      // Call logout endpoint if you have one
+      await fetch(buildApiUrl("logout.php"), {
+        method: "POST",
+        credentials: "include",
+        headers: buildHeaders(),
+      });
+      console.log("Logout API called successfully");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    } finally {
+      clearSessionToken(); // Always clear token
+      navigate("/");
     }
   };
 
@@ -55,11 +103,27 @@ export default function AppHeader() {
     { key: 'how', path: '/#how-works', label: 'Cómo funciona' },
     { key: 'contact', path: '/#contact-us', label: 'Contacto' },
     { key: 'map', path: '/map', label: 'Mapa' },
-    { key: 'profile', path: '/Logged', label: 'Mi Perfil', requiresAuth: true }, // Add flag
+    { key: 'profile', path: '/Logged', label: 'Mi Perfil', requiresAuth: true },
+    { key: 'logout', label: 'Cerrar Sesión', requiresAuth: true, isLogout: true }, // Add logout option
   ];
 
   const renderNavButton = (item) => {
-    if (item.requiresAuth) {
+    if (item.isLogout) {
+      // Special handling for logout button
+      return (
+        <Button
+          key={item.key}
+          type="text"
+          className="poppins text-white! bg-red-500 poppins-bold"
+          style={{ transition: 'transform 0.2s' }}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
+          onClick={handleLogout}
+        >
+          {item.label}
+        </Button>
+      );
+    } else if (item.requiresAuth) {
       // For "Mi Perfil", use click handler instead of Link
       return (
         <Button
@@ -92,7 +156,22 @@ export default function AppHeader() {
   };
 
   const renderMobileNavButton = (item) => {
-    if (item.requiresAuth) {
+    if (item.isLogout) {
+      return (
+        <Button
+          key={item.key}
+          type="text"
+          block
+          style={{ marginBottom: '8px', backgroundColor: '#ef4444', color: 'white' }}
+          onClick={() => {
+            setDrawerOpen(false);
+            handleLogout();
+          }}
+        >
+          {item.label}
+        </Button>
+      );
+    } else if (item.requiresAuth) {
       return (
         <Button
           key={item.key}

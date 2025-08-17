@@ -13,6 +13,20 @@ const Requests = () => {
   const [error, setError] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
 
+  // Session token management functions (same as in loginForm)
+  const getSessionToken = () => {
+    return localStorage.getItem('geoterra_session_token');
+  };
+
+  const buildHeaders = () => {
+    const headers = {};
+    const token = getSessionToken();
+    if (token) {
+      headers['X-Session-Token'] = token;
+    }
+    return headers;
+  };
+
   // Function to get user session and email
   const getUserSession = async () => {
     try {
