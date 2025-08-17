@@ -1,4 +1,4 @@
-// vite.config.js
+// vite.config.js - Optimal for complete virtual host
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'   
@@ -9,7 +9,8 @@ export default defineConfig({
     tailwindcss(),                          
   ],
   server: {
-    host: 'geoterra.com',  // Add this
-    port: 5173             // Add this
+    host: 'geoterra.com',
+    port: 5173
+    // No proxy needed since your virtual host handles everything!
   }
 })

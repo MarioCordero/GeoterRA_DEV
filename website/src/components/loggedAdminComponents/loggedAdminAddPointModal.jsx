@@ -31,19 +31,17 @@ const AddPointModal = ({ onRequestAdded }) => {
   // Function to get user session and email
   const getUserSession = async () => {
     try {
-      const response = await fetch(buildApiUrl("check_session.php"), {
-        method: "GET",
-        credentials: "include",
-      });
+      const response = await fetch(buildApiUrl("check_session.php"), { credentials: 'include' });
       const apiResponse = await response.json();
-      
+      console.log('Full session check response:', apiResponse);
+      console.log('Debug info:', apiResponse.debug); // This will show you what's in $_SESSION
       if (apiResponse.response === 'Ok' && apiResponse.data.status === 'logged_in') {
-        return apiResponse.data.user; // This should be the email
+        console.log('Session is active');
+      } else {
+        console.log('Session is not active');
       }
-      return null;
     } catch (error) {
-      console.error("Error checking session:", error);
-      return null;
+      console.log('Session check failed:', error);
     }
   };
 

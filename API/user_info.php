@@ -9,12 +9,24 @@
     error_reporting(E_ALL);
     require_once 'dbhandler.inc.php'; // include your DB connection script
 
+    // Debug information
+    $debug = [
+        'session_id' => session_id(),
+        'session_status' => session_status(),
+        'session_data' => $_SESSION,
+        'cookies_received' => $_COOKIE,
+        'session_user_set' => isset($_SESSION['user']),
+        'session_user_value' => $_SESSION['user'] ?? null,
+        'request_method' => $_SERVER['REQUEST_METHOD'],
+        'post_data' => $_POST
+    ];
+
     $apiResponse = [
         "response" => "Error",
         "message" => "",
         "errors" => [],
         "data" => [],
-        "debug" => []
+        "debug" => $debug
     ];
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -44,7 +56,7 @@
             } catch (PDOException $e) {
                 $apiResponse["message"] = "Database error";
                 $apiResponse["errors"][] = "Database error";
-                $apiResponse["debug"][] = $e->getMessage();
+                $apiResponse["debug"]["db_error"] = $e->getMessage();
             }
         } else {
             $apiResponse["message"] = "Email is required";

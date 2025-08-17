@@ -1,5 +1,13 @@
 <?php
     require_once 'cors.inc.php'; 
+    ini_set('session.cookie_httponly', 0); // Allow JavaScript access for debugging
+    ini_set('session.cookie_secure', 0);   // Set to 0 for HTTP (localhost)
+    ini_set('session.cookie_samesite', 'Lax'); 
+    ini_set('session.use_cookies', 1);
+    ini_set('session.use_only_cookies', 1);
+    ini_set('session.cookie_domain', ''); // Empty for localhost
+    ini_set('session.cookie_path', '/');
+
     if (session_status() == PHP_SESSION_NONE) {
         session_start();
     }     // Only sets headers, no output

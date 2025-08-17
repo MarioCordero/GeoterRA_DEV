@@ -42,11 +42,45 @@ function Login() {
     }
   };
 
+  // DEBUG Check session status
+  const checkSessionStatus = async () => {
+    try {
+      console.log("Making session check request...");
+      const response = await fetch(buildApiUrl("check_session.php"), {
+        method: "GET",
+        credentials: "include",
+      });
+      
+      console.log("Session check response status:", response.status);
+      console.log("Session check response headers:", [...response.headers.entries()]);
+      
+      const data = await response.json();
+      console.log("Session status debug:", data);
+      
+      // Log specific debug info
+      if (data.debug) {
+        console.log("Session ID:", data.debug.session_id);
+        console.log("Session data:", data.debug.session_data);
+        console.log("Cookies received by server:", data.debug.cookies_received);
+        console.log("PHP session cookie:", data.debug.php_session_cookie);
+      }
+      
+      return data;
+    } catch (error) {
+      console.error("Error checking session:", error);
+      return null;
+    }
+  };
+
   // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg("");
     setLoading(true);
+
+    // DEBUG: Check session before login
+    console.log("=== SESSION DEBUG - BEFORE LOGIN ===");
+    await checkSessionStatus();
 
     const formData = new FormData();
     formData.append("email", email);
@@ -60,13 +94,32 @@ function Login() {
       });
 
       const data = await response.json();
+      console.log("Login API response:", data);
 
       if (data.response === "Ok") {
+        // DEBUG: Check session after login
+        console.log("=== SESSION DEBUG - AFTER LOGIN ===");
+        const sessionData = await checkSessionStatus();
+
         // Login successful, now get user info to check role
         const userInfo = await getUserInfo(email);
         
         if (userInfo) {
           console.log("User info:", userInfo);
+          
+          // DEBUG: Final session check before redirect
+          console.log("=== SESSION DEBUG - BEFORE REDIRECT ===");
+          const finalSessionCheck = await checkSessionStatus();
+          
+          // Additional validation using session data
+          if (sessionData && sessionData.response === "Ok" && sessionData.data.status === "logged_in") {
+            console.log("✅ Session confirmed active via check_session.php");
+            console.log("Session user:", sessionData.data.user);
+            console.log("User role from session:", sessionData.data.user_type);
+            console.log("Is admin from session:", sessionData.data.is_admin);
+          } else {
+            console.log("⚠️ Session check indicates user may not be properly logged in");
+          }
           
           // Check user role and redirect accordingly
           if (userInfo.rol === "admin") {
@@ -188,6 +241,74 @@ function Login() {
                   Recordar contraseña
                 </label>
               </div>
+            </div>
+
+            {/* TEMPORARY: Session Test Button */}
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={async () => {
+                  console.log("🧪 STEP 2: Testing basic session persistence...");
+                  
+                  // Check initial browser cookies
+                  console.log("🍪 Initial browser cookies:", document.cookie);
+                  
+                  // First request
+                  console.log("🔄 Making first request...");
+                  const response1 = await fetch(buildApiUrl("test_session.php"), {
+                    method: "GET",
+                    credentials: "include"
+                  });
+                  
+                  // Log response headers
+                  console.log("📋 Response 1 headers:", Object.fromEntries(response1.headers.entries()));
+                  
+                  const data1 = await response1.json();
+                  console.log("🧪 First request response:", data1);
+                  console.log("🍪 Browser cookies after first request:", document.cookie);
+                  
+                  // Wait a moment
+                  await new Promise(resolve => setTimeout(resolve, 1000));
+                  
+                  // Second request
+                  console.log("🔄 Making second request...");
+                  const response2 = await fetch(buildApiUrl("test_session.php"), {
+                    method: "GET", 
+                    credentials: "include"
+                  });
+                  
+                  console.log("📋 Response 2 headers:", Object.fromEntries(response2.headers.entries()));
+                  
+                  const data2 = await response2.json();
+                  console.log("🧪 Second request response:", data2);
+                  console.log("🍪 Browser cookies after second request:", document.cookie);
+                  
+                  // Detailed analysis
+                  console.log("🔍 DETAILED ANALYSIS:");
+                  console.log("Cookie params from server:", data1.cookie_params);
+                  console.log("Domain:", data1.domain);
+                  console.log("Protocol:", data1.protocol);
+                  console.log("Headers sent:", data1.headers_sent);
+                  console.log("Session status:", data1.session_status);
+                  
+                  // Check if session persists
+                  if (data1.session_id === data2.session_id) {
+                    console.log("✅ Session ID persists!");
+                    if (data2.counter > data1.counter) {
+                      console.log("✅ Session data persists correctly!");
+                    } else {
+                      console.log("❌ Session data is not persisting");
+                    }
+                  } else {
+                    console.log("❌ Session ID changes between requests");
+                    console.log(`First ID: ${data1.session_id}`);
+                    console.log(`Second ID: ${data2.session_id}`);
+                  }
+                }}
+                className="w-full bg-blue-500 text-white py-2 rounded font-bold hover:bg-blue-700 transition"
+              >
+                🧪 Test Session (Step 2 - Enhanced)
+              </button>
             </div>
 
             {/* SUBMIT BUTTON */}
