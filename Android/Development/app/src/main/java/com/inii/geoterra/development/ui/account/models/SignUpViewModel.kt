@@ -83,12 +83,21 @@ class SignUpViewModel @Inject constructor(
     ).enqueue(object : Callback<SignUpResponse> {
 
       override fun onResponse(call: Call<SignUpResponse>,
-        response: Response<SignUpResponse>) {
-        Timber.i("SignUpResponse: ${response.body()}")
-        if (response.isSuccessful) {
-          response.body()?.let { handleSignUpResponse(it) }
+        serverResponse: Response<SignUpResponse>) {
+        Timber.i("SignUpResponse: ${serverResponse.body()}")
+        if (serverResponse.isSuccessful) {
+          serverResponse.body()?.let {
+            when (it.response) {
+              "Ok" -> {
+                _signUpSuccess.value = true
+              }
+              "Error" -> {
+                handleServerErrors(it.errors)
+              }
+            }
+          }
         } else {
-          _errorMessage.value = "Server error: ${response.code()}"
+          _errorMessage.value = "Server error: ${serverResponse.code()}"
         }
       }
 
@@ -100,25 +109,12 @@ class SignUpViewModel @Inject constructor(
   }
 
   /**
-   * @brief Handles backend response for registration request.
-   *
-   * @param response Parsed API response.
-   */
-  private fun handleSignUpResponse(response: SignUpResponse) {
-    if (response.response == "Ok") {
-      _signUpSuccess.value = true
-    } else {
-      handleServerErrors(response.errors)
-    }
-  }
-
-  /**
    * @brief Processes server validation errors and emits them to observers.
    *
    * @param errors List of API-provided errors.
    */
-  private fun handleServerErrors(errors: List<Error>) {
-    val combined = errors.joinToString("\n") { "${it.type}: ${it.message}" }
+  private fun handleServerErrors(errors: Map<String, String>?) {
+    val combined = errors?.values?.joinToString(", ") ?: "Unknown error"
     _errorMessage.value = combined
   }
 

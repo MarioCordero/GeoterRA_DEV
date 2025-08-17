@@ -51,23 +51,23 @@ class SignUpView : PageView<FragmentSignUpBinding, SignUpViewModel>(
     this.binding.apply {
       createAccountB.setOnClickListener {
         val credentials = SingUpCredentials(
-          email = binding.userEmail.text.toString().trim(),
-          password = binding.userPassword.text.toString().trim(),
-          firstName = binding.userFirstName.text.toString().trim(),
-          lastName = binding.userLastName.text.toString().trim(),
-          phoneNumber = binding.userPhoneNum.text.toString().trim()
+          email = binding.etEmail.text.toString().trim(),
+          password = binding.etPassword.text.toString().trim(),
+          firstName = binding.etFirstName.text.toString().trim(),
+          lastName = binding.etLastName.text.toString().trim(),
+          phoneNumber = binding.etPhoneNumber.text.toString().trim()
         )
 
         // Delegate to ViewModel for validation and submission
         viewModel.validateAndCreateUser(credentials)
       }
 
-      togglePasswordLayout.setOnClickListener {
-        binding.checkBoxTogglePassword.isChecked =
-          !binding.checkBoxTogglePassword.isChecked
+      ltTogglePassword.setOnClickListener {
+        binding.cboxTogglePassword.isChecked =
+          !binding.cboxTogglePassword.isChecked
       }
 
-      checkBoxTogglePassword.setOnCheckedChangeListener { _, isChecked ->
+      cboxTogglePassword.setOnCheckedChangeListener { _, isChecked ->
         updatePasswordVisibility(isChecked)
       }
     }
@@ -112,8 +112,8 @@ class SignUpView : PageView<FragmentSignUpBinding, SignUpViewModel>(
       InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
     }
 
-    binding.userPassword.inputType = inputType
-    binding.userPassword.setSelection(binding.userPassword.text.length)
+    binding.etPassword.inputType = inputType
+    binding.etPassword.setSelection(binding.etPassword.text.length)
   }
 
 }

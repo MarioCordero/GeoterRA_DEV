@@ -92,8 +92,7 @@ class AnalysisFormViewModel @Inject constructor(
         analysisRequestPayload.longitude = "${userLocation.longitude}"
         analysisRequestPayload.coordinates = "${userLocation.latitude}, ${userLocation.longitude}"
         _toastMessage.value = "Lat ${userLocation.latitude}, Lon ${userLocation.longitude}"
-        Log.i("AnalysisFormViewModel",
-              "Coordinates set to payload: $analysisRequestPayload")
+        Timber.i("Coordinates set to payload: $analysisRequestPayload")
         return
       }
       this.app.initLocationService(FragmentPermissionRequester(view))

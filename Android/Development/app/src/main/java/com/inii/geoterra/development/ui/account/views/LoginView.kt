@@ -1,6 +1,7 @@
 package com.inii.geoterra.development.ui.account.views
 
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -8,13 +9,11 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.inii.geoterra.development.databinding.FragmentLoginBinding
 import com.inii.geoterra.development.interfaces.PageView
-import com.inii.geoterra.development.ui.account.models.AccountViewModel
 import com.inii.geoterra.development.ui.account.models.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import timber.log.Timber
 
 /**
  * @brief Fragment handling user authentication flow
@@ -30,12 +29,6 @@ class LoginView : PageView<FragmentLoginBinding, LoginViewModel>(
 ) {
 
   override val viewModel : LoginViewModel by viewModels()
-
-  /**
-   * FrameLayout container that hosts the signup form fragment.
-   * Visibility toggled between VISIBLE (when form is shown) and GONE.
-   */
-  private lateinit var formContainer: FrameLayout
 
   // =============== LIFECYCLE METHODS ===============
   /**
@@ -54,23 +47,30 @@ class LoginView : PageView<FragmentLoginBinding, LoginViewModel>(
    * Subclasses should implement this method to observe set their listeners.
    */
   override fun setUpListeners() {
-    this.setTogglePasswordClickListener()
-    this.setCheckboxOnChangeListener()
+    this.binding.apply {
 
-    this.binding.signUpText.setOnClickListener {
-      this.showSignUpForm()
+      ltTogglePassword.setOnClickListener {
+        binding.cboxTogglePassword.isChecked =
+          !binding.cboxTogglePassword.isChecked
+      }
+
+      cboxTogglePassword.setOnCheckedChangeListener { _, isChecked ->
+        updatePasswordVisibility(isChecked)
+      }
+
+      tvSignUp.setOnClickListener {
+        showSignUpForm()
+      }
+
+      btnLogin.setOnClickListener {
+        // Delegate login attempt to ViewModel
+        viewModel.attemptLogin(
+          binding.etEmail.text.toString(),
+          binding.etPassword.text.toString()
+        )
+      }
+
     }
-
-    this.binding.loginButton.setOnClickListener {
-      // Delegate login attempt to ViewModel
-      viewModel.attemptLogin(
-        binding.userEmail.text.toString(),
-        binding.userPassword.text.toString()
-      )
-    }
-
-    this.formContainer = this.binding.fragmentSignupContainer
-
   }
 
   /**
@@ -103,41 +103,18 @@ class LoginView : PageView<FragmentLoginBinding, LoginViewModel>(
     return binding.root
   }
 
-  // =============== UI SETUP METHODS ===============
-  /**
-   * @brief Toggles password field visibility state
-   */
-  private fun setTogglePasswordClickListener() {
-    this.binding.togglePasswordLayout.setOnClickListener {
-
-      val toggleCheckBox = this.binding.checkBoxTogglePassword
-
-      toggleCheckBox.isChecked = !toggleCheckBox.isChecked
-      this.updatePasswordVisibility(toggleCheckBox.isChecked)
-    }
-  }
-
-  /**
-   * @brief Registers checkbox change listener for password visibility
-   */
-  private fun setCheckboxOnChangeListener() {
-    this.binding.checkBoxTogglePassword
-      .setOnCheckedChangeListener { _, isChecked ->
-      this.updatePasswordVisibility(isChecked)
-    }
-  }
-
   // =============== NAVIGATION METHODS ===============
   /**
    * @brief Transitions to user registration screen
    */
   private fun showSignUpForm() {
     // Make form container visible
-    this.formContainer.visibility = View.VISIBLE
+    val container = this.binding.fragmentSignupContainer
+    container.visibility = View.VISIBLE
 
     // Perform fragment transaction
     this.childFragmentManager.beginTransaction()
-      .replace(this.formContainer.id, SignUpView())
+      .replace(container.id, SignUpView())
       .addToBackStack(null)  // Allow back navigation
       .commit()
   }
@@ -149,12 +126,12 @@ class LoginView : PageView<FragmentLoginBinding, LoginViewModel>(
    * @param data Optional data associated with the event
    */
   override fun onFragmentEvent(event: String, data: Any?) {
-    Log.i("FragmentEvent", "Event: $event")
+    Timber.i("Event: $event")
     when (event) {
       "FINISHED" -> {
         // Handle form submission completion
-        Log.i("FragmentEvent", "FINISHED")
-        this.formContainer.visibility = View.GONE
+        Timber.i("FINISHED")
+        this.binding.fragmentSignupContainer.visibility = View.GONE
         this.childFragmentManager.popBackStack()
       }
     }
@@ -173,17 +150,14 @@ class LoginView : PageView<FragmentLoginBinding, LoginViewModel>(
    * @param showPassword Flag indicating whether to display password text
    */
   private fun updatePasswordVisibility(showPassword: Boolean) {
-    val passwordEditText = this.binding.userPassword
-
-    if (showPassword) {
-      passwordEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT or
-        android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+    val inputType = if (showPassword) {
+      InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
     } else {
-      passwordEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT or
-        android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+      InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
     }
 
-    passwordEditText.setSelection(passwordEditText.text.length)
+    binding.etPassword.inputType = inputType
+    binding.etPassword.setSelection(binding.etPassword.text.length)
   }
 
 }

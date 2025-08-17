@@ -74,9 +74,8 @@ class AnalysisView : PageView<FragmentAnalysisBinding, AnalysisViewModel>(
   override fun onCreatePageView(inflater : LayoutInflater,
     container : ViewGroup?
   ) : View {
-
-    this.drawThermalData(this.viewModel.thermal.value!!)
-
+    val thermal = requireArguments().getSerializable(ARG_PARAM1) as ThermalPoint
+    this.drawThermalData(thermal)
     return binding.root
   }
 
@@ -86,8 +85,6 @@ class AnalysisView : PageView<FragmentAnalysisBinding, AnalysisViewModel>(
    * @param savedInstanceState Optional bundle used to restore previous state
    */
   override fun onCreatePage(savedInstanceState: Bundle?) {
-    // Recover thermal point from arguments and assign it to ViewModel
-
   }
 
   /**
@@ -95,10 +92,7 @@ class AnalysisView : PageView<FragmentAnalysisBinding, AnalysisViewModel>(
    *
    * Subclasses should implement this method to observe ViewModel's LiveData.
    */
-  override fun observeViewModel() {
-    viewModel.thermal.observe(viewLifecycleOwner) { point ->
-    }
-  }
+  override fun observeViewModel() {}
 
   /**
    * Updates the basic metadata about the thermal point.
@@ -107,22 +101,24 @@ class AnalysisView : PageView<FragmentAnalysisBinding, AnalysisViewModel>(
    */
   @SuppressLint("SetTextI18n")
   private fun drawThermalData(thermal: ThermalPoint) {
-    binding.tvFieldPh.text = "pH: ${thermal.fieldPh}"
-    binding.tvFieldConditions.text = "${thermal.fieldCond}"
-    binding.tvLabPh.text = "pH: ${thermal.labPh}"
-    binding.tvLabConditions.text = "${thermal.labCond}"
-    binding.tvChlorine.text = "Cl: ${thermal.chlorine}"
-    binding.tvCalcium.text = "Ca+: ${thermal.calcium}"
-    binding.tvBicarbonateMg.text = "HCO3: ${thermal.mgBicarbonate}"
-    binding.tvSulfate.text = "SO4: ${thermal.sulfate}"
-    binding.tvIron.text = "Fe: ${thermal.iron}"
-    binding.tvSilicon.text = "Si: ${thermal.silicon}"
-    binding.tvBoron.text = "B: ${thermal.boron}"
-    binding.tvLithium.text = "Li: ${thermal.lithium}"
-    binding.tvFluorine.text = "F: ${thermal.fluorine}"
-    binding.tvSodium.text = "Na: ${thermal.sodium}"
-    binding.tvPotassium.text = "K: ${thermal.potassium}"
-    binding.tvMagnesiumIon.text = "Mg+: ${thermal.magnesiumIon}"
+    this.binding.apply {
+      tvFieldPh.text = "pH: ${thermal.fieldPh}"
+      tvFieldConditions.text = "${thermal.fieldCond}"
+      tvLabPh.text = "pH: ${thermal.labPh}"
+      tvLabConditions.text = "${thermal.labCond}"
+      tvChlorine.text = "Cl: ${thermal.chlorine}"
+      tvCalcium.text = "Ca+: ${thermal.calcium}"
+      tvBicarbonateMg.text = "HCO3: ${thermal.mgBicarbonate}"
+      tvSulfate.text = "SO4: ${thermal.sulfate}"
+      tvIron.text = "Fe: ${thermal.iron}"
+      tvSilicon.text = "Si: ${thermal.silicon}"
+      tvBoron.text = "B: ${thermal.boron}"
+      tvLithium.text = "Li: ${thermal.lithium}"
+      tvFluorine.text = "F: ${thermal.fluorine}"
+      tvSodium.text = "Na: ${thermal.sodium}"
+      tvPotassium.text = "K: ${thermal.potassium}"
+      tvMagnesiumIon.text = "Mg+: ${thermal.magnesiumIon}"
+    }
   }
 
   /**

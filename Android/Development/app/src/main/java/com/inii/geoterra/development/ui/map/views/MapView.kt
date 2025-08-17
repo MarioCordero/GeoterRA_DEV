@@ -99,15 +99,20 @@ class MapView : PageView<FragmentMapBinding, MapViewModel>(
    * Subclasses should implement this method to observe set their listeners.
    */
   override fun setUpListeners() {
-    this.binding.layersButton.setOnClickListener {
-      MapLayersMenuFragment().show(
-        parentFragmentManager,
-        "layersMenuFragment"
-      )
+    this.binding.apply{
+
+      btnFilters.setOnClickListener {
+        MapLayersMenuFragment().show(
+          parentFragmentManager,
+          "layersMenuFragment"
+        )
+      }
+
+      btnCenterOnUser.setOnClickListener {
+        centerMapOnUser()
+      }
     }
-    this.binding.centerUserButton.setOnClickListener {
-      centerMapOnUser()
-    }
+
   }
 
   /**

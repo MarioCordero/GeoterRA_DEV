@@ -126,17 +126,17 @@ class ThermalView : PageView<FragmentThermalBinding, ThermalViewModel>(
    * @param point Thermal point data source
    */
   private fun drawThermalData(point: ThermalPoint) {
-    this.binding.PointIDName.text = "Análisis: ${point.id}"
+    this.binding.tvIdentifier.text = "Análisis: ${point.id}"
 
     // Corrigiendo orden coordenadas para el convertidor si lo requiere
     val wgs84Coordinates = CoordinateConverter.convertCRT05toWGS84(
       point.longitude, point.latitude
     )
 
-    this.binding.latitudeValue.text = "%.7f".format(wgs84Coordinates.y)
-    this.binding.longitudeValue.text = "%.7f".format(wgs84Coordinates.x)
+    this.binding.tvLatitude.text = "%.7f".format(wgs84Coordinates.y)
+    this.binding.tvLongitude.text = "%.7f".format(wgs84Coordinates.x)
 
-    this.binding.temperatureValue.text = "%.2f °C".format(
+    this.binding.tvTemperature.text = "%.2f °C".format(
       point.temperature
     )
   }

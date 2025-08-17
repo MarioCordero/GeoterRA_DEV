@@ -25,12 +25,12 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/layersButton"
+        android:id="@+id/btn_filters"
         android:layout_width="50dp"
         android:layout_height="60dp"
 
-        app:layout_constraintBottom_toTopOf="@id/centerUserButton"
-        app:layout_constraintStart_toStartOf="@id/centerUserButton"
+        app:layout_constraintBottom_toTopOf="@id/btn_centerOnUser"
+        app:layout_constraintStart_toStartOf="@id/btn_centerOnUser"
 
         android:backgroundTint="@color/lightBlack"
         app:cornerRadius="100dp"
@@ -42,7 +42,7 @@
         android:elevation="10dp" />
 
     <Button
-        android:id="@+id/centerUserButton"
+        android:id="@+id/btn_centerOnUser"
 
         android:layout_width="50dp"
         android:layout_height="60dp"

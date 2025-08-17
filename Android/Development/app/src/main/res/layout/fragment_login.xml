@@ -45,194 +45,199 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/gray_rectangle_rounded2"
-            android:orientation="vertical"
-            android:padding="24dp"
-            android:visibility="visible">
-
-            <TextView
-                android:id="@+id/loginText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="@string/app_name"
-                android:textAlignment="center"
-                android:fontFamily="@font/poppins_semibold"
-                android:textColor="@color/black"
-                android:textSize="36sp"
-                />
-
+        
+        <ScrollView
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+            >
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                >
-
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/gray_rectangle_rounded2"
+              android:orientation="vertical"
+              android:padding="24dp"
+              android:visibility="visible">
+                
                 <TextView
-                    android:id="@+id/tv_email"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Correo"
-                    android:textAlignment="center"
-                    android:fontFamily="@font/poppins_semibold"
-                    android:textColor="@color/geoterra_deep_blue"
-                    android:textSize="24sp"
-                    />
-
+                  android:id="@+id/tv_geoterraName"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="20dp"
+                  android:text="@string/app_name"
+                  android:textAlignment="center"
+                  android:fontFamily="@font/poppins_semibold"
+                  android:textColor="@color/black"
+                  android:textSize="36sp"
+                  />
+                
+                <LinearLayout
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="15dp"
+                  >
+                    
+                    <TextView
+                      android:id="@+id/tv_emailLabel"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="Correo"
+                      android:textAlignment="center"
+                      android:fontFamily="@font/poppins_semibold"
+                      android:textColor="@color/geoterra_deep_blue"
+                      android:textSize="24sp"
+                      />
+                    
+                    <TextView
+                      android:id="@+id/asterisk_1"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="*"
+                      android:textAlignment="center"
+                      android:fontFamily="@font/poppins_semibold"
+                      android:textColor="@color/geoterra_orange"
+                      android:textSize="30sp"
+                      />
+                </LinearLayout>
+                
+                <EditText
+                  android:id="@+id/et_email"
+                  android:layout_width="match_parent"
+                  android:layout_height="50dp"
+                  android:autofillHints=""
+                  android:background="@drawable/gray_rectangle_rounded2"
+                  android:drawableRight="@drawable/baseline_account_circle_24"
+                  
+                  android:hint="Ingrese el correo"
+                  android:inputType="textEmailAddress"
+                  android:padding="14dp"
+                  android:textColor="@color/black" />
+                
+                <LinearLayout
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="15dp"
+                  >
+                    <TextView
+                      android:id="@+id/tv_passwordLabel"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="Contraseña"
+                      android:textAlignment="center"
+                      android:fontFamily="@font/poppins_semibold"
+                      android:textColor="@color/geoterra_deep_blue"
+                      android:textSize="24sp"
+                      />
+                    
+                    <TextView
+                      android:id="@+id/asterisk_2"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="*"
+                      android:textAlignment="center"
+                      android:fontFamily="@font/poppins_semibold"
+                      android:textColor="@color/geoterra_orange"
+                      android:textSize="30sp"
+                      />
+                </LinearLayout>
+                
+                <EditText
+                  android:id="@+id/et_password"
+                  android:layout_width="match_parent"
+                  android:layout_height="50dp"
+                  
+                  android:background="@drawable/gray_rectangle_rounded2"
+                  android:drawableRight="@drawable/baseline_lock_24"
+                  
+                  android:hint="Ingrese la contraseña"
+                  android:inputType="textPassword"
+                  android:padding="14dp"
+                  android:textColor="@color/black" />
+                
+                <LinearLayout
+                  android:id="@+id/lt_togglePassword"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  >
+                    
+                    <CheckBox
+                      android:id="@+id/cbox_togglePassword"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_marginStart="-15dp"
+                      >
+                    </CheckBox>
+                    
+                    <TextView
+                      android:id="@+id/tv_togglePassword"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      
+                      android:padding="11dp"
+                      android:text="Mostrar contraseña"
+                      android:textColor="@color/black"
+                      android:fontFamily="@font/calibri_regular"
+                      android:textSize="12sp"
+                      >
+                    </TextView>
+                
+                </LinearLayout>
+                
+                <Button
+                  android:id="@+id/btn_login"
+                  android:layout_width="match_parent"
+                  android:layout_height="60dp"
+                  
+                  android:layout_marginTop="15dp"
+                  
+                  android:backgroundTint="@color/geoterra_orange"
+                  
+                  android:text="Iniciar sesión"
+                  android:textColor="@color/white"
+                  android:fontFamily="@font/poppins_semibold"
+                  android:textSize="18sp"
+                  
+                  app:cornerRadius="5dp" />
+                
+                <LinearLayout
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal"
+                  android:layout_marginTop="10dp"
+                  >
+                    
+                    <TextView
+                      android:id="@+id/tv_notSigned"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="No tienes una cuenta? "
+                      android:fontFamily="@font/calibri_regular" />
+                    
+                    <TextView
+                      android:id="@+id/tv_signUp"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="Regístrate ahora!"
+                      android:fontFamily="@font/calibri_bold"
+                      android:textColor="@color/black"
+                      />
+                </LinearLayout>
+                
+                <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="2dp"
+                  android:layout_marginTop="10dp"
+                  android:background="@color/black" />
+                
                 <TextView
-                    android:id="@+id/asterisk_1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="*"
-                    android:textAlignment="center"
-                    android:fontFamily="@font/poppins_semibold"
-                    android:textColor="@color/geoterra_orange"
-                    android:textSize="30sp"
-                    />
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="10dp"
+                  android:text="Instituto de Investigaciones en Ingeniería | REFORESTA"
+                  android:fontFamily="@font/calibri_regular"
+                  android:textSize="12sp" />
+            
             </LinearLayout>
-
-            <EditText
-                android:id="@+id/userEmail"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:autofillHints=""
-                android:background="@drawable/gray_rectangle_rounded2"
-                android:drawableRight="@drawable/baseline_account_circle_24"
-
-                android:hint="Ingrese el correo"
-                android:inputType="textEmailAddress"
-                android:padding="14dp"
-                android:textColor="@color/black" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                >
-                <TextView
-                    android:id="@+id/password"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Contraseña"
-                    android:textAlignment="center"
-                    android:fontFamily="@font/poppins_semibold"
-                    android:textColor="@color/geoterra_deep_blue"
-                    android:textSize="24sp"
-                    />
-
-                <TextView
-                    android:id="@+id/asterisk_2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="*"
-                    android:textAlignment="center"
-                    android:fontFamily="@font/poppins_semibold"
-                    android:textColor="@color/geoterra_orange"
-                    android:textSize="30sp"
-                    />
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/userPassword"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-
-                android:background="@drawable/gray_rectangle_rounded2"
-                android:drawableRight="@drawable/baseline_lock_24"
-
-                android:hint="Ingrese la contraseña"
-                android:inputType="textPassword"
-                android:padding="14dp"
-                android:textColor="@color/black" />
-
-            <LinearLayout
-                android:id="@+id/togglePasswordLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                >
-
-                <CheckBox
-                    android:id="@+id/checkBoxTogglePassword"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="-15dp"
-                    >
-                </CheckBox>
-
-                <TextView
-                    android:id="@+id/txvTogglePassword"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-
-                    android:padding="11dp"
-                    android:text="Mostrar contraseña"
-                    android:textColor="@color/black"
-                    android:fontFamily="@font/calibri_regular"
-                    android:textSize="12sp"
-                    >
-                </TextView>
-
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/loginButton"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-
-                android:layout_marginTop="15dp"
-
-                android:backgroundTint="@color/geoterra_orange"
-
-                android:text="Iniciar sesión"
-                android:textColor="@color/white"
-                android:fontFamily="@font/poppins_semibold"
-                android:textSize="18sp"
-
-                app:cornerRadius="5dp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="10dp"
-                >
-
-                <TextView
-                    android:id="@+id/notSignedText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="No tienes una cuenta? "
-                    android:fontFamily="@font/calibri_regular" />
-
-                <TextView
-                    android:id="@+id/signUpText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Regístrate ahora!"
-                    android:fontFamily="@font/calibri_bold"
-                    android:textColor="@color/black"
-                    />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_marginTop="10dp"
-                android:background="@color/black" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="Instituto de Investigaciones en Ingeniería | REFORESTA"
-                android:fontFamily="@font/calibri_regular"
-                android:textSize="12sp" />
-
-        </LinearLayout>
+        </ScrollView>
 
     </androidx.cardview.widget.CardView>
 
