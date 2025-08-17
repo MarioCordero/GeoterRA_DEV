@@ -7,40 +7,61 @@ import { buildApiUrl } from '../config/apiConf';
 
 const Map = () => {
   const [isLogged, setIsLogged] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+
+  // Session token management functions (same as in loginForm)
+  const getSessionToken = () => {
+    return localStorage.getItem('geoterra_session_token');
+  };
+
+  const buildHeaders = () => {
+    const headers = {};
+    const token = getSessionToken();
+    if (token) {
+      headers['X-Session-Token'] = token;
+    }
+    return headers;
+  };
 
   useEffect(() => {
+    // Check session on mount with token support
     const checkSession = async () => {
       try {
-        console.log("Checking session...");
+        setLoading(true);
+        const token = getSessionToken();
         const response = await fetch(buildApiUrl("check_session.php"), {
           method: "GET",
           credentials: "include",
+          headers: buildHeaders(), // Include token in headers
         });
         const apiResponse = await response.json();
-        console.log("Session check response:", apiResponse);
-        
-        if (apiResponse.response === 'Ok' && apiResponse.data.status === 'logged_in') {
-          console.log('Session is active');
-          setIsLogged(true);
+        if (apiResponse.response === 'Ok' && 
+            apiResponse.data && 
+            apiResponse.data.status === 'logged_in') {
+            setIsLogged(true);
         } else {
-          console.log('Session is not active');
           setIsLogged(false);
+          // Optionally clear invalid token
+          if (token) {
+            console.log('Clearing invalid session token');
+            localStorage.removeItem('geoterra_session_token');
+          }
         }
       } catch (err) {
         console.error("Session check failed:", err);
         console.log('Session check failed');
         setIsLogged(false);
+        // Clear token on error
+        localStorage.removeItem('geoterra_session_token');
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
-    
     checkSession();
   }, []);
 
   // Show loading state while checking session
-  if (isLoading) {
+  if (loading) {
     return (
       <div style={{ 
         minHeight: '100vh', 
