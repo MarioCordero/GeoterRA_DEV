@@ -38,7 +38,7 @@ data class SingUpCredentials(
 /* ==================== GEOSPATIAL MODELS ==================== */
 /**
  * @brief Thermal point data model with water analysis metrics
- * @property pointID Unique geological identifier
+ * @property id Unique geological identifier
  * @property latitude WGS84 decimal coordinate
  * @property longitude WGS84 decimal coordinate
  * @property temperature Ground temperature in Celsius
@@ -57,7 +57,7 @@ data class SingUpCredentials(
  * @property potassium K+ concentration (mg/L)
  * @property magnesiumIon Mg+ concentration (mg/L)*/
 data class ThermalPoint(
-  @SerializedName("id") val pointID : String,
+  @SerializedName("id") val id : String,
   @SerializedName("coord_y") val latitude : Double,
   @SerializedName("coord_x") val longitude : Double,
 
@@ -168,13 +168,14 @@ data class LoggedOutResponse(
 /**
  * Data class used to format the response of the server in the SignUp request.
  *
- * @property emptyInput Error message for empty fields.
- * @property emailUsed Error message for used email.
- * @constructor Create empty Sign up error response
+ * @property response Status of the operation (success or error)
+ * @property message Validation errors if any
+ * @property errors Validation errors if any
  */
 data class SignUpResponse(
   @SerializedName("response") val response : String,
-  @SerializedName("errors") val errors : List<Error>
+  @SerializedName("message") val message : String,
+  @SerializedName("errors") val errors : Map<String, String>?
 )
 
 /**
@@ -220,7 +221,6 @@ data class UserInfoResponse(
 
 /**
  * @brief User profile information
- * @property response Status of the operation (success or error)
  * @property name User full name
  * @property email User email
  * @property phone User phone number
@@ -281,7 +281,7 @@ interface APIService {
    * @return [CheckSessionResponse] with session state
    * @error
    */
-  @GET("check_session.php")
+  @POST("check_session.php")
   fun checkSession(
   ): Call<CheckSessionResponse>
 
@@ -289,7 +289,7 @@ interface APIService {
    * @brief Terminates current session
    * @return [LoggedOutResponse] confirmation
    */
-  @GET("logout.php")
+  @POST("logout.php")
   fun logout(
   ): Call<LoggedOutResponse>
 
@@ -342,8 +342,6 @@ interface APIService {
    * @param thermalSensation Field rating (1-5 scale)
    * @param bubbles Observed bubbling intensity (1-5)
    * @return [RequestResponse] with submission status
-   * @error
-   * @error
    */
   @FormUrlEncoded
   @POST("request.inc.php")
