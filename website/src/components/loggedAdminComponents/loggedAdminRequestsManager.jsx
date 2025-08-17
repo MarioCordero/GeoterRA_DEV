@@ -42,8 +42,8 @@ const AdminRequestsManager = () => {
       
       const apiResponse = await response.json();
       
-      // Debug: Log the full response to see the structure
-      console.log("Admin Session API Response:", apiResponse);
+      // DEBUG: Log the full response to see the structure
+      // console.log("Admin Session API Response:", apiResponse);
       
       // Check if session is active and user is logged in
       if (apiResponse.response === 'Ok' && apiResponse.data.status === 'logged_in') {
@@ -122,7 +122,8 @@ const AdminRequestsManager = () => {
   // Function to submit approved point to puntos_estudiados table
   const submitApprovedPoint = async (pointData) => {
     try {
-      console.log("Submitting point data:", pointData); // Debug log
+      // DEBUG
+      // console.log("Submitting point data:", pointData);
       
       // Validate required fields before sending
       const requiredFields = ['id', 'region', 'coord_x', 'coord_y'];
@@ -179,7 +180,8 @@ const AdminRequestsManager = () => {
         }
       });
 
-      console.log("FormData entries:"); // Debug log
+      // DEBUG
+      // console.log("FormData entries:");
       for (let [key, value] of formData.entries()) {
         console.log(`${key}: ${value} (${typeof value})`);
       }
@@ -199,7 +201,8 @@ const AdminRequestsManager = () => {
       }
       
       const responseText = await response.text();
-      console.log("Raw API Response:", responseText); // Debug log
+      // DEBUG
+      // console.log("Raw API Response:", responseText); // Debug log
       
       let result;
       try {
@@ -210,7 +213,8 @@ const AdminRequestsManager = () => {
         throw new Error("Respuesta inválida del servidor");
       }
       
-      console.log("Parsed API Response:", result); // Debug log
+      // DEBUG
+      // console.log("Parsed API Response:", result); // Debug log
       
       if (result.response === "Ok") {
         return true;
@@ -313,7 +317,8 @@ const AdminRequestsManager = () => {
   const handleSubmitApproval = async () => {
     try {
       const values = await reviewForm.validateFields();
-      console.log("Form values before submission:", values); // Debug log
+      // DEBUG
+      // console.log("Form values before submission:", values); // Debug log
       
       setSubmitting(true);
 
@@ -342,7 +347,8 @@ const AdminRequestsManager = () => {
       await refreshRequests();
       
     } catch (error) {
-      console.error("Error in handleSubmitApproval:", error); // Debug log
+      // DEBUG
+      // console.error("Error in handleSubmitApproval:", error); // Debug log
       
       if (error.errorFields) {
         message.error('Por favor complete todos los campos requeridos');

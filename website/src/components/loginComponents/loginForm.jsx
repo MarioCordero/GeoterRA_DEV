@@ -69,7 +69,9 @@ function Login() {
   // DEBUG Check session status
   const checkSessionStatus = async () => {
     try {
-      console.log("Making session check request...");
+      // DEBUG: Log the session check request
+      // console.log("Making session check request...");
+
       const response = await fetch(buildApiUrl("check_session.php"), {
         method: "GET",
         credentials: "include",
@@ -77,7 +79,8 @@ function Login() {
       });
       
       const data = await response.json();
-      console.log("Session check response:", data);
+      // DEBUG: Log the session check response
+      // console.log("Session check response:", data);
       return data;
     } catch (error) {
       console.error("Error checking session:", error);
@@ -90,8 +93,8 @@ function Login() {
     setLoading(true);
 
     // DEBUG: Check session before login
-    console.log("=== SESSION DEBUG - BEFORE LOGIN ===");
-    await checkSessionStatus();
+    // console.log("=== SESSION DEBUG - BEFORE LOGIN ===");
+    // await checkSessionStatus();
 
     const formData = new FormData();
     formData.append("email", email);
@@ -105,11 +108,13 @@ function Login() {
       });
 
       const data = await response.json();
-      console.log("Login API response:", data);
+      // DEBUG: Log the response from the login API
+      // console.log("Login API response:", data);
 
       if (data.response === "Ok") {
         // 🔥 STORE SESSION TOKEN from login response
         if (data.data && data.data.session_token) {
+          // DEBUG
           console.log("🎯 Storing session token:", data.data.session_token);
           setSessionToken(data.data.session_token);
         } else {
@@ -117,35 +122,34 @@ function Login() {
         }
 
         // DEBUG: Check session after login
-        console.log("=== SESSION DEBUG - AFTER LOGIN ===");
+        // console.log("=== SESSION DEBUG - AFTER LOGIN ===");
         const sessionData = await checkSessionStatus();
 
         // Login successful, now get user info to check role
         const userInfo = await getUserInfo(email);
         
         if (userInfo) {
-          console.log("User info:", userInfo);
-          
           // DEBUG: Final session check before redirect
-          console.log("=== SESSION DEBUG - BEFORE REDIRECT ===");
-          const finalSessionCheck = await checkSessionStatus();
-          
+          // console.log("User info:", userInfo);
+          // console.log("=== SESSION DEBUG - BEFORE REDIRECT ===");
+          // const finalSessionCheck = await checkSessionStatus();
           // Additional validation using session data
-          if (sessionData && sessionData.response === "Ok" && sessionData.data.status === "logged_in") {
-            console.log("✅ Session confirmed active via check_session.php");
-            console.log("Session user:", sessionData.data.user);
-            console.log("User role from session:", sessionData.data.user_type);
-            console.log("Is admin from session:", sessionData.data.is_admin);
-          } else {
-            console.log("⚠️ Session check indicates user may not be properly logged in");
-          }
+          // if (sessionData && sessionData.response === "Ok" && sessionData.data.status === "logged_in") {
+          //   console.log("✅ Session confirmed active via check_session.php");
+          //   console.log("Session user:", sessionData.data.user);
+          //   console.log("User role from session:", sessionData.data.user_type);
+          //   console.log("Is admin from session:", sessionData.data.is_admin);
+          // } else {
+          //   console.log("⚠️ Session check indicates user may not be properly logged in");
+          // }
           
           // Check user role and redirect accordingly
           if (userInfo.rol === "admin") {
-            console.log("Admin user detected, redirecting to admin panel");
+            // DEBUG
+            // console.log("Admin user detected, redirecting to admin panel");
             navigate("/LoggedAdmin"); 
           } else {
-            console.log("Regular user detected, redirecting to logged page");
+            // console.log("Regular user detected, redirecting to logged page");
             navigate("/Logged");
           }
         } else {
