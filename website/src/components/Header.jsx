@@ -64,10 +64,7 @@ export default function AppHeader() {
         className="desktop-menu" 
         style={{ 
           display: 'flex', 
-          gap: '16px',
-          '@media (max-width: 768px)': {
-            display: 'none'
-          }
+          gap: '16px'
         }}
       >
         {navItems.map((item) => (
@@ -98,10 +95,7 @@ export default function AppHeader() {
         style={{
           display: 'none',
           fontSize: '18px',
-          color: '#1890ff',
-          '@media (max-width: 768px)': {
-            display: 'flex'
-          }
+          color: '#1890ff'
         }}
       />
 
@@ -122,7 +116,7 @@ export default function AppHeader() {
           </div>
         }
         width={280}
-        bodyStyle={{ padding: '20px' }}
+        styles={{ body: { padding: '20px' } }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {navItems.map((item) => (
@@ -148,7 +142,7 @@ export default function AppHeader() {
         </div>
       </Drawer>
 
-      <style jsx>{`
+      <style jsx="true">{`
         @media (max-width: 768px) {
           .desktop-menu {
             display: none !important;
