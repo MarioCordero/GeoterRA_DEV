@@ -8,25 +8,49 @@ const Dashboard = ({ user }) => (
   <div
     style={{
       width: '100%',
+      maxWidth: '800px',
       minHeight: '400px',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      fontSize: '1.5rem',
+      fontSize: 'clamp(1.2rem, 4vw, 1.5rem)',
       color: '#222',
       background: '#f5f5f5',
       borderRadius: '8px',
-      margin: '2rem 0',
-      padding: '2rem',
+      margin: '2rem auto',
+      padding: 'clamp(1rem, 4vw, 2rem)',
+      boxSizing: 'border-box',
     }}
   >
-    <div style={{ marginBottom: '1.5rem', fontSize: '2rem', fontWeight: 'bold' }}>
+    <div 
+      style={{ 
+        marginBottom: '1.5rem', 
+        fontSize: 'clamp(1.5rem, 5vw, 2rem)', 
+        fontWeight: 'bold',
+        textAlign: 'center',
+        wordBreak: 'break-word'
+      }}
+    >
       ¡Bienvenido, {user?.name || 'Usuario'}!
     </div>
-    <div>
-      <span style={{ fontWeight: 'bold' }}>Puntos solicitados:</span>{' '}
-      <span style={{ color: '#fa8c16', fontSize: '1.8rem' }}>
+    <div 
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+        gap: '0.5rem'
+      }}
+    >
+      <span style={{ fontWeight: 'bold' }}>Puntos solicitados:</span>
+      <span 
+        style={{ 
+          color: '#fa8c16', 
+          fontSize: 'clamp(1.4rem, 5vw, 1.8rem)',
+          fontWeight: 'bold'
+        }}
+      >
         {user?.requestedPoints ?? 0}
       </span>
     </div>
@@ -134,9 +158,12 @@ const LoggedMainPage = () => {
         display: 'flex', 
         justifyContent: 'center', 
         alignItems: 'center', 
-        minHeight: '400px' 
+        minHeight: '400px',
+        padding: '1rem'
       }}>
-        <p>Verificando sesión...</p>
+        <p style={{ fontSize: 'clamp(1rem, 3vw, 1.2rem)' }}>
+          Verificando sesión...
+        </p>
       </div>
     );
   }
@@ -148,9 +175,15 @@ const LoggedMainPage = () => {
         display: 'flex', 
         justifyContent: 'center', 
         alignItems: 'center', 
-        minHeight: '400px' 
+        minHeight: '400px',
+        padding: '1rem'
       }}>
-        <p>Acceso no autorizado</p>
+        <p style={{ 
+          fontSize: 'clamp(1rem, 3vw, 1.2rem)',
+          textAlign: 'center' 
+        }}>
+          Acceso no autorizado
+        </p>
       </div>
     );
   }
