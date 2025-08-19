@@ -11,7 +11,16 @@
 
       if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-        $user_params["first_name"] = $_POST["first_name"];
+        // Handle multiple first names - clean and validate
+        $first_name = isset($_POST["first_name"]) ? trim($_POST["first_name"]) : "";
+        if (!empty($first_name)) {
+            // Remove extra spaces and keep only letters, spaces, hyphens, and apostrophes
+            $first_name = preg_replace('/\s+/', ' ', $first_name); // Replace multiple spaces with single space
+            $first_name = preg_replace('/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-\']/u', '', $first_name); // Remove invalid characters
+            $first_name = trim($first_name);
+        }
+        
+        $user_params["first_name"] = $first_name;
         $user_params["last_name"] = $_POST["last_name"];
         $user_params["password"] = $_POST["password"];
         $user_params["email"] = $_POST["email"];
@@ -33,6 +42,24 @@
             require_once 'register_cont.php';
 
             $errors = array();
+
+            // Additional validation for first_name field
+            if (!empty($user_params["first_name"])) {
+                // Check if name contains only valid characters
+                if (!preg_match('/^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-\']+$/u', $user_params["first_name"])) {
+                    $errors["invalid_first_name"] = "El nombre contiene caracteres inválidos";
+                }
+                
+                // Check minimum length
+                if (strlen($user_params["first_name"]) < 2) {
+                    $errors["short_first_name"] = "El nombre debe tener al menos 2 caracteres";
+                }
+                
+                // Check maximum length
+                if (strlen($user_params["first_name"]) > 100) {
+                    $errors["long_first_name"] = "El nombre es demasiado largo";
+                }
+            }
 
             if(params_empty($user_params)) {
                 $errors["empty_input"] = "Rellene todos los campos";

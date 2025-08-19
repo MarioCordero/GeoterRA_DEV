@@ -33,6 +33,16 @@ export default function Register() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    // Allow multiple names in first_name field (letters, spaces, and common name characters)
+    if (name === 'first_name') {
+      // Allow letters, spaces, hyphens, and apostrophes for compound names
+      const nameRegex = /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-']*$/;
+      if (!nameRegex.test(value)) {
+        return; // Don't update if invalid characters
+      }
+    }
+
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -42,13 +52,32 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Debug: Print current form state
+    console.log("=== FORM DATA DEBUG ===");
+    console.log("Raw form data:", formData);
+
+    // Trim and clean the first name before sending
+    const cleanFirstName = formData.first_name.trim().replace(/\s+/g, ' ');
+
+    // Debug: Show cleaned first name
+    console.log("Cleaned first_name:", cleanFirstName);
+
     const form = new FormData();
-    form.append("first_name", formData.first_name);
+    form.append("first_name", cleanFirstName);
     form.append("last_name", formData.last_name);
     form.append("email", formData.email);
     form.append("password", formData.password);
     form.append("confirm_password", formData.confirm_password);
     form.append("phone_num", formData.phone_num);
+
+    // Debug: Print FormData as JSON-like object
+    console.log("=== FORM DATA BEING SENT ===");
+    const formDataObject = {};
+    for (let [key, value] of form.entries()) {
+      formDataObject[key] = value;
+    }
+    console.log("FormData as object:", formDataObject);
+    console.log("FormData as JSON:", JSON.stringify(formDataObject, null, 2));
 
     try {
       const response = await fetch(buildApiUrl("register.inc.php"), {
@@ -58,17 +87,27 @@ export default function Register() {
 
       const data = await response.json();
 
-      console.log("API response:", data);
+      // Debug: Print API response
+      // console.log("=== API RESPONSE ===");
+      // console.log("API response:", data);
+      // console.log("Response as JSON:", JSON.stringify(data, null, 2));
 
       if (data.response === "Ok") {
         // Show success popup instead of navigating
         setShowSuccessModal(true);
       } else {
         // Handle registration error (show message, etc.)
+        // Debug
+        // console.log("=== REGISTRATION ERROR ===");
+        // console.log("Error message:", data.message);
+        // console.log("Errors array:", data.errors);
         alert(data.message || "Error en el registro");
       }
     } catch (err) {
-      console.log("API response:", err);
+      // Debug
+      // console.log("=== FETCH ERROR ===");
+      // console.log("API response:", err);
+      // console.log("Error details:", err.message);
       alert("Error de conexión");
     }
   };
@@ -97,27 +136,31 @@ export default function Register() {
             <div className="flex flex-col md:flex-row md:space-x-4 space-y-3 md:space-y-0">
               <div className="flex-1">
                 <label className="block poppins-bold mb-1 sm:mb-2 text-sm sm:text-base text-geoterra-blue">
-                  Nombre
+                  Nombre(s)
                 </label>
                 <input
                   name="first_name"
                   type="text"
-                  placeholder="Ingrese su nombre"
+                  placeholder="Ingrese su(s) nombre(s)"
                   required
                   value={formData.first_name}
                   onChange={handleInputChange}
                   className="w-full poppins-light px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-geoterra-blue focus:border-transparent transition-all duration-200 text-sm sm:text-base"
+                  title="Puede ingresar uno o varios nombres (ej: Mario Gabriel)"
                 />
+                <small className="text-xs text-gray-500 mt-1">
+                  Puede ingresar varios nombres separados por espacio
+                </small>
               </div>
 
               <div className="flex-1">
                 <label className="block poppins-bold mb-1 sm:mb-2 text-sm sm:text-base text-geoterra-blue">
-                  Apellido
+                  Apellido(s)
                 </label>
                 <input
                   name="last_name"
                   type="text"
-                  placeholder="Ingrese su apellido"
+                  placeholder="Ingrese su(s) apellido(s)"
                   required
                   value={formData.last_name}
                   onChange={handleInputChange}
@@ -236,7 +279,7 @@ export default function Register() {
 
       {/* Success Modal - Full Screen */}
       {showSuccessModal && (
-        <div className="fixed inset-0 bg-opacity-60 bg-white/30 backdrop-blur-sm flex items-center justify-center z-1000">
+        <div className="fixed inset-0 bg-white/30 bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-1000">
           <div className="bg-white rounded-lg p-8 sm:p-12 max-w-lg w-full mx-6 shadow-2xl">
             <div className="text-center">
               <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
