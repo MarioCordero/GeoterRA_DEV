@@ -184,7 +184,13 @@ export default function AppHeader() {
           key={item.key}
           type="text"
           block
-          style={{ marginBottom: '8px' }}
+          className="bg-geoterra-orange poppins-bold text-blanco"
+          style={{ 
+            marginBottom: '8px',
+            textAlign: 'left',
+            height: '48px',
+            borderRadius: '8px'
+          }}
           onClick={(e) => {
             setDrawerOpen(false);
             handleProfileClick(e);
@@ -199,7 +205,13 @@ export default function AppHeader() {
           key={item.key}
           type="text"
           block
-          style={{ marginBottom: '8px' }}
+          className="poppins text-geoterra-blue"
+          style={{ 
+            marginBottom: '8px',
+            textAlign: 'left',
+            height: '48px',
+            borderRadius: '8px'
+          }}
           onClick={() => setDrawerOpen(false)}
         >
           <Link to={item.path}>{item.label}</Link>
@@ -252,17 +264,22 @@ export default function AppHeader() {
           <Button
             key={item.key}
             type="text"
-            className={item.key === 'login' ? 'bg-geoterra-orange poppins-bold text-blanco font-bold!' : 'poppins text-geoterra-blue'}
+            className={item.key === 'profile' ? 'bg-geoterra-orange poppins-bold text-blanco font-bold!' : 'poppins text-geoterra-blue'}
             style={{ 
               transition: 'transform 0.2s',
               whiteSpace: 'nowrap'
             }}
             onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
             onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
+            onClick={item.key === 'profile' ? handleProfileClick : undefined}
           >
-            <Link to={item.path} style={{ textDecoration: 'none' }}>
-              {item.label}
-            </Link>
+            {item.key === 'profile' ? (
+              item.label
+            ) : (
+              <Link to={item.path} style={{ textDecoration: 'none' }}>
+                {item.label}
+              </Link>
+            )}
           </Button>
         ))}
       </div>
@@ -300,26 +317,7 @@ export default function AppHeader() {
         styles={{ body: { padding: '20px' } }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {navItems.map((item) => (
-            <Button
-              key={item.key}
-              type="text"
-              className={item.key === 'login' ? 'bg-geoterra-orange poppins-bold text-blanco' : 'poppins text-geoterra-blue'}
-              block
-              size="large"
-              style={{ 
-                marginBottom: '8px',
-                textAlign: 'left',
-                height: '48px',
-                borderRadius: '8px'
-              }}
-              onClick={onClose}
-            >
-              <Link to={item.path} style={{ textDecoration: 'none', width: '100%', display: 'block' }}>
-                {item.label}
-              </Link>
-            </Button>
-          ))}
+          {navItems.map(renderMobileNavButton)}
         </div>
       </Drawer>
 
