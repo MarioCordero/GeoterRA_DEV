@@ -45,7 +45,7 @@ function IndexAboutUs() {
         </div>
 
         {/* Column 2 */}
-        <div className="flex-1 border-t pt-6 lg:pt-0 lg:border-t-0 lg:border-l lg:pl-6 lg:border-white lg:border-opacity-30">
+        <div className="flex-1 border-t pt-6 lg:pt-0 lg:border-t-0 lg:border-l lg:pl-6">
           <p className="text-white leading-relaxed">
             Desde su concepción, GeoterRA ha sido impulsada por la necesidad crítica de contar con 
             información especializada y esencial para aquellos que deseen invertir en la geotermia. 
