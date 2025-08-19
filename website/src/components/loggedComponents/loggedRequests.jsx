@@ -1,21 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Typography, Divider, Spin, Alert, Tag } from 'antd';
+import { Table, Typography, Divider, Spin, Alert, Tag, Button, Card, Row, Col } from 'antd';
+import { EditOutlined, DeleteOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import AddPointModal from './loggedAddPointModal';
 import { useNavigate } from 'react-router-dom';
 import '../../colorModule.css';
 import '../../fontsModule.css';
 import { buildApiUrl } from '../../config/apiConf';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const Requests = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
 
-  // Session token management functions (same as in loginForm)
+  // Check if screen is mobile size
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  // Session token management functions
   const getSessionToken = () => {
     return localStorage.getItem('geoterra_session_token');
   };
@@ -40,7 +54,6 @@ const Requests = () => {
     try {
       const token = getSessionToken();
       
-      // Check if token exists first
       if (!token) {
         console.log("No session token found");
         return null;
@@ -55,22 +68,17 @@ const Requests = () => {
       });
       
       const data = await response.json();
-      // console.log("Session check response:", data);
       
-      // Check if the API response is successful
       if (data.response === "Ok" && 
           data.data && 
           data.data.status === 'logged_in') {
-        return data.data.user; // Access user from data.data.user
+        return data.data.user;
       }
       
-      // Log debug info if session fails
-      // console.log("Session check failed:", data);
       if (data.debug) {
         console.log("Debug info:", data.debug);
       }
       
-      // Clear invalid token and redirect
       clearSessionToken();
       navigate('/Login');
       return null;
@@ -87,7 +95,7 @@ const Requests = () => {
     try {
       const response = await fetch(buildApiUrl("get_request.inc.php"), {
         method: "POST",
-        headers: buildHeaders(), // Include session token
+        headers: buildHeaders(),
         body: `email=${encodeURIComponent(email)}`,
         credentials: "include",
       });
@@ -97,12 +105,10 @@ const Requests = () => {
       }
       
       const result = await response.json();
-      // console.log("Fetch requests response:", result);
       
       if (result.response === "Ok") {
         return result.data || [];
       } else {
-        // If the API returns an error but it's about "no requests found", return empty array
         if (result.message && result.message.includes("No se encontraron solicitudes")) {
           return [];
         }
@@ -110,7 +116,6 @@ const Requests = () => {
       }
     } catch (error) {
       console.error("Error fetching requests:", error);
-      // If it's a "no requests found" error, return empty array instead of throwing
       if (error.message && error.message.includes("No se encontraron solicitudes")) {
         return [];
       }
@@ -125,17 +130,13 @@ const Requests = () => {
         setLoading(true);
         setError(null);
         
-        // First verify session with token
         const email = await getUserSession();
         if (!email) {
           setError("Usuario no autenticado");
           return;
         }
         
-        // console.log("✅ Session verified for user:", email);
         setUserEmail(email);
-        
-        // Then fetch user's requests with token
         const userRequests = await fetchUserRequests(email);
         setRequests(userRequests);
         
@@ -156,7 +157,6 @@ const Requests = () => {
       try {
         setLoading(true);
         
-        // Verify session before refreshing
         const currentEmail = await getUserSession();
         if (!currentEmail) {
           setError("Sesión expirada");
@@ -165,7 +165,7 @@ const Requests = () => {
         
         const userRequests = await fetchUserRequests(currentEmail);
         setRequests(userRequests);
-        setError(null); // Clear any previous errors
+        setError(null);
       } catch (err) {
         setError(err.message);
         console.error("Error refreshing requests:", err);
@@ -178,22 +178,25 @@ const Requests = () => {
   // Enhanced delete function with token
   const handleDelete = async (record) => {
     try {
-      // Verify session before delete
       const currentEmail = await getUserSession();
       if (!currentEmail) {
         setError("Sesión expirada");
         return;
       }
 
-      // Implement delete logic here
-      // console.log('Eliminar:', record);
-      // Call delete API with token in headers
-      // After successful delete, refresh the list
-      // await refreshRequests();
+      console.log('Eliminar:', record);
     } catch (error) {
       console.error("Error deleting request:", error);
       setError("Error al eliminar la solicitud");
     }
+  };
+
+  const handleView = (record) => {
+    console.log('Ver detalles:', record);
+  };
+
+  const handleEdit = (record) => {
+    console.log('Editar:', record);
   };
 
   // Format data for the table
@@ -214,97 +217,166 @@ const Requests = () => {
     cond_campo: request.cond_campo,
   }));
 
-  // Table columns
+  // Desktop Table columns
   const columns = [
     {
       title: 'ID del Punto',
       dataIndex: 'id',
       key: 'id',
       width: '25%',
+      responsive: ['md'],
     },
     {
       title: 'Fecha solicitud',
       dataIndex: 'fecha',
       key: 'fecha',
       width: '25%',
+      responsive: ['sm'],
     },
     {
       title: 'Estado',
       key: 'estado',
       width: '25%',
       render: () => <Tag color="orange">Pendiente</Tag>,
+      responsive: ['md'],
     },
     {
-      title: 'Opciones',
+      title: 'Acciones',
       key: 'opciones',
       width: '25%',
       render: (_, record) => (
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button 
-            style={{
-              padding: '4px 8px',
-              backgroundColor: '#f5222d',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '12px'
-            }}
+        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+          <Button
+            size="small"
+            type="primary"
+            danger
+            icon={<DeleteOutlined />}
             onClick={() => handleDelete(record)}
-          >
-            Eliminar
-          </button>
-          <button 
-            style={{
-              padding: '4px 8px',
-              backgroundColor: '#1890ff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '12px'
-            }}
-            onClick={() => {
-              // View details functionality
-              console.log('Ver detalles:', record);
-            }}
-          >
-            Ver
-          </button>
-          <button 
-            style={{
-              padding: '4px 8px',
-              backgroundColor: '#52c41a',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '12px'
-            }}
-            onClick={() => {
-              // Edit functionality
-              console.log('Editar:', record);
-            }}
-          >
-            Editar
-          </button>
+          />
+          <Button
+            size="small"
+            type="primary"
+            icon={<EyeOutlined />}
+            onClick={() => handleView(record)}
+          />
+          <Button
+            size="small"
+            type="primary"
+            icon={<EditOutlined />}
+            style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+            onClick={() => handleEdit(record)}
+          />
         </div>
       ),
     },
   ];
 
+  // Mobile card component
+  const MobileRequestCard = ({ request }) => (
+    <Card
+      size="small"
+      style={{ 
+        marginBottom: '16px',
+        borderRadius: '8px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+      }}
+      title={
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Text strong style={{ fontSize: '14px' }}>
+            {request.id}
+          </Text>
+          <Tag color="orange" style={{ margin: 0 }}>
+            Pendiente
+          </Tag>
+        </div>
+      }
+    >
+      <div style={{ marginBottom: '12px' }}>
+        <Text type="secondary" style={{ fontSize: '12px' }}>
+          Fecha: {request.fecha}
+        </Text>
+      </div>
+      
+      {request.region && (
+        <div style={{ marginBottom: '8px' }}>
+          <Text style={{ fontSize: '13px' }}>
+            <strong>Región:</strong> {request.region}
+          </Text>
+        </div>
+      )}
+      
+      {request.propietario && (
+        <div style={{ marginBottom: '8px' }}>
+          <Text style={{ fontSize: '13px' }}>
+            <strong>Propietario:</strong> {request.propietario}
+          </Text>
+        </div>
+      )}
+      
+      {request.direccion && (
+        <div style={{ marginBottom: '12px' }}>
+          <Text style={{ fontSize: '13px' }}>
+            <strong>Dirección:</strong> {request.direccion}
+          </Text>
+        </div>
+      )}
+      
+      <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+        <Button
+          size="small"
+          type="primary"
+          danger
+          icon={<DeleteOutlined />}
+          onClick={() => handleDelete(request)}
+        >
+          Eliminar
+        </Button>
+        <Button
+          size="small"
+          type="primary"
+          icon={<EyeOutlined />}
+          onClick={() => handleView(request)}
+        >
+          Ver
+        </Button>
+        <Button
+          size="small"
+          type="primary"
+          icon={<EditOutlined />}
+          style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+          onClick={() => handleEdit(request)}
+        >
+          Editar
+        </Button>
+      </div>
+    </Card>
+  );
+
   if (loading) {
     return (
-      <div style={{ padding: '24px', textAlign: 'center' }}>
+      <div style={{ 
+        padding: 'clamp(16px, 4vw, 24px)', 
+        textAlign: 'center',
+        minHeight: '200px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
         <Spin size="large" />
-        <p style={{ marginTop: '16px' }}>Cargando solicitudes...</p>
+        <p style={{ 
+          marginTop: '16px', 
+          fontSize: 'clamp(14px, 3vw, 16px)' 
+        }}>
+          Cargando solicitudes...
+        </p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div style={{ padding: '24px' }}>
+      <div style={{ padding: 'clamp(16px, 4vw, 24px)' }}>
         <Alert
           message="Error"
           description={error}
@@ -312,19 +384,13 @@ const Requests = () => {
           showIcon
           action={
             error === "Sesión expirada" && (
-              <button 
+              <Button 
+                type="primary"
+                size="small"
                 onClick={() => navigate('/Login')}
-                style={{
-                  padding: '4px 8px',
-                  backgroundColor: '#1890ff',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
               >
                 Iniciar Sesión
-              </button>
+              </Button>
             )
           }
         />
@@ -333,42 +399,112 @@ const Requests = () => {
   }
 
   return (
-    <div style={{ padding: '24px' }}>
-      <Title level={2} style={{ marginBottom: '24px' }}>
-        Mis Solicitudes ({requests.length})
-      </Title>
-      <div style={{ marginBottom: '16px', textAlign: 'right' }}>
-        <AddPointModal onRequestAdded={refreshRequests} />
+    <div style={{ 
+      padding: 'clamp(16px, 4vw, 24px)',
+      maxWidth: '100%',
+      overflow: 'hidden'
+    }}>
+      {/* Header Section */}
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: isMobile ? 'column' : 'row',
+        justifyContent: 'space-between',
+        alignItems: isMobile ? 'flex-start' : 'center',
+        marginBottom: 'clamp(16px, 4vw, 24px)',
+        gap: '16px'
+      }}>
+        <Title 
+          level={isMobile ? 3 : 2} 
+          style={{ 
+            margin: 0,
+            fontSize: isMobile ? 'clamp(18px, 5vw, 24px)' : 'clamp(24px, 4vw, 32px)'
+          }}
+        >
+          Mis Solicitudes ({requests.length})
+        </Title>
+        
+        <AddPointModal 
+          onRequestAdded={refreshRequests}
+          trigger={
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              className="bg-geoterra-orange"
+              size={isMobile ? "middle" : "large"}
+              style={{
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }}
+            >
+              {isMobile ? "Agregar" : "Agregar Punto"}
+            </Button>
+          }
+        />
       </div>
-      <Divider />
       
+      <Divider style={{ margin: '16px 0' }} />
+      
+      {/* Content Section */}
       {requests.length === 0 ? (
         <div style={{ 
           textAlign: 'center', 
-          padding: '40px',
-          color: '#666'
+          padding: 'clamp(24px, 6vw, 40px)',
+          color: '#666',
+          backgroundColor: '#fafafa',
+          borderRadius: '8px',
+          border: '1px dashed #d9d9d9'
         }}>
-          <p style={{ fontSize: '16px' }}>No tienes solicitudes registradas</p>
-          <p>Utiliza el botón "Agregar Punto" para crear tu primera solicitud</p>
+          <p style={{ 
+            fontSize: 'clamp(14px, 3vw, 16px)',
+            marginBottom: '8px'
+          }}>
+            No tienes solicitudes registradas
+          </p>
+          <p style={{ 
+            fontSize: 'clamp(12px, 2.5vw, 14px)',
+            color: '#999'
+          }}>
+            Utiliza el botón "Agregar Punto" para crear tu primera solicitud
+          </p>
         </div>
       ) : (
-        <Table
-          dataSource={dataSource}
-          columns={columns}
-          pagination={{
-            pageSize: 10,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total, range) => 
-              `${range[0]}-${range[1]} de ${total} solicitudes`,
-          }}
-          bordered
-          scroll={{ x: 1200 }}
-          style={{ marginTop: '16px' }}
-        />
+        <>
+          {/* Mobile View - Cards */}
+          {isMobile ? (
+            <div>
+              {dataSource.map((request) => (
+                <MobileRequestCard key={request.key} request={request} />
+              ))}
+            </div>
+          ) : (
+            /* Desktop View - Table */
+            <Table
+              dataSource={dataSource}
+              columns={columns}
+              pagination={{
+                pageSize: 10,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                showTotal: (total, range) => 
+                  `${range[0]}-${range[1]} de ${total} solicitudes`,
+                responsive: true,
+              }}
+              bordered
+              scroll={{ x: 800 }}
+              style={{ 
+                marginTop: '16px',
+                backgroundColor: '#fff',
+                borderRadius: '8px',
+                overflow: 'hidden'
+              }}
+              size="middle"
+            />
+          )}
+        </>
       )}
       
-      <Divider />
+      <Divider style={{ margin: '16px 0' }} />
     </div>
   );
 };

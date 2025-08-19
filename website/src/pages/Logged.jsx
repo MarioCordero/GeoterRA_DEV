@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SidebarLayout from '../components/loggedComponents/loggedSidebar';
 import LoggedMainPage from '../components/loggedComponents/loggedMainPage';
 import LoggedHeader from '../components/loggedHeader';
@@ -48,6 +48,24 @@ const PerfilPlaceholder = () => (
 
 const Logged = () => {
   const [selectedKey, setSelectedKey] = useState('1');
+  const [collapsed, setCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if screen is mobile size
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      if (mobile) {
+        setCollapsed(true);
+      }
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   let content;
   if (selectedKey === '1') content = <LoggedMainPage />;
@@ -59,8 +77,21 @@ const Logged = () => {
     <div className="min-h-screen flex flex-col">
       <LoggedHeader />
       <div className="flex flex-1 pt-16"> 
-        <SidebarLayout selectedKey={selectedKey} setSelectedKey={setSelectedKey} />
-        <div className="flex-1 flex flex-col overflow-auto">
+        <SidebarLayout 
+          selectedKey={selectedKey} 
+          setSelectedKey={setSelectedKey} 
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+          isMobile={isMobile}
+        />
+        <div 
+          className="flex-1 flex flex-col overflow-auto"
+          style={{
+            marginLeft: isMobile ? 0 : (collapsed ? '80px' : '220px'),
+            transition: 'margin-left 0.3s ease',
+            marginBottom: isMobile ? '60px' : 0, // Space for mobile bottom nav
+          }}
+        >
           {content}
         </div>
       </div>

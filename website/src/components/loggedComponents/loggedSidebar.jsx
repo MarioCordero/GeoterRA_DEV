@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Layout, Menu, Button, Modal } from "antd";
 import {
   UserOutlined,
@@ -15,28 +15,10 @@ import { buildApiUrl } from '../../config/apiConf';
 
 const { Sider } = Layout;
 
-const SidebarLayout = ({ selectedKey, setSelectedKey }) => {
+const SidebarLayout = ({ selectedKey, setSelectedKey, collapsed, setCollapsed, isMobile }) => {
   const navigate = useNavigate();
-  const [collapsed, setCollapsed] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
-
-  // Check if screen is mobile size
-  useEffect(() => {
-    const checkScreenSize = () => {
-      const mobile = window.innerWidth <= 768;
-      setIsMobile(mobile);
-      if (mobile) {
-        setCollapsed(true);
-      }
-    };
-
-    checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-    
-    return () => window.removeEventListener('resize', checkScreenSize);
-  }, []);
 
   const handleLogout = async () => {
     try {
@@ -194,9 +176,6 @@ const SidebarLayout = ({ selectedKey, setSelectedKey }) => {
             </span>
           </Button>
         </div>
-        
-        {/* Spacer to prevent content from being hidden behind bottom nav */}
-        <div style={{ height: '60px' }} />
 
         {/* Logout Confirmation Modal */}
         <Modal
