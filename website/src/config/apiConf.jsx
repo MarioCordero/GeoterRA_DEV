@@ -1,7 +1,7 @@
 // API Configuration for Complete Virtual Host Setup
 const API_CONFIG = {
   // Switch between 'local' and 'production' for development
-  environment: 'local',
+  environment: 'production',
   
   baseUrls: {
     production: 'http://163.178.171.105/API',
