@@ -30,7 +30,7 @@ class MapLayersMenuFragment : BottomSheetDialogFragment() {
     savedInstanceState: Bundle?
   ): View? {
     // Inflate the bottom sheet layout
-    return inflater.inflate(R.layout.map_layers_menu, container, false)
+    return inflater.inflate(R.layout.view_filters_menu, container, false)
   }
 
   /**

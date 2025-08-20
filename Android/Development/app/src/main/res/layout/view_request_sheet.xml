@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,14 +8,16 @@
     android:layout_height="wrap_content"
     android:padding="15dp"
     android:background="@drawable/gray_rectangle_rounded2"
+    android:orientation="vertical"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintHorizontal_bias="0.0"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/newRequestButton">
     
     <TextView
+      app:layout_constraintStart_toStartOf="parent"
       android:id="@+id/coordenatesTxt"
-      android:layout_width="wrap_content"
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:fontFamily="@font/poppins_regular"
       android:text="Coordenadas: "
@@ -25,7 +27,7 @@
 
     <TextView
         android:id="@+id/dateTxt"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppins_regular"
         app:layout_constraintTop_toBottomOf="@id/coordenatesTxt"
@@ -35,7 +37,7 @@
 
     <TextView
         android:id="@+id/typeTxt"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppins_regular"
         app:layout_constraintTop_toBottomOf="@id/dateTxt"
@@ -45,7 +47,7 @@
 
     <TextView
         android:id="@+id/stateTxt"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppins_regular"
         app:layout_constraintTop_toBottomOf="@id/typeTxt"
@@ -58,7 +60,7 @@
         android:layout_width="match_parent"
         android:layout_height="45dp"
 
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="20dp"
 
         android:backgroundTint="@color/geoterra_orange"
         android:drawableTint="@color/white"
@@ -76,7 +78,7 @@
         android:layout_width="match_parent"
         android:layout_height="45dp"
 
-        android:layout_marginTop="205dp"
+        android:layout_marginTop="5dp"
         android:fontFamily="@font/poppins_semibold"
         android:backgroundTint="@color/geoterra_deep_blue"
         android:drawableStart="@drawable/baseline_cached_24"
@@ -88,4 +90,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

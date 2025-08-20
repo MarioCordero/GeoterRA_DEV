@@ -2,7 +2,6 @@ package com.inii.geoterra.development.ui
 
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -10,49 +9,56 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.inii.geoterra.development.ui.map.MapFragment
+import com.inii.geoterra.development.Geoterra
+import com.inii.geoterra.development.ui.map.views.MapView
 import com.inii.geoterra.development.R
-import com.inii.geoterra.development.ui.requests.RequestsFragment
-import com.inii.geoterra.development.ui.account.AccountFragment
+import com.inii.geoterra.development.ui.requests.views.RequestsView
+import com.inii.geoterra.development.ui.account.views.AccountView
 import com.inii.geoterra.development.interfaces.FragmentListener
 import com.inii.geoterra.development.api.CheckSessionResponse
 import com.inii.geoterra.development.api.RetrofitClient
-import com.inii.geoterra.development.device.GPSManager
-import com.inii.geoterra.development.interfaces.PageFragment
-import com.inii.geoterra.development.managers.GalleryPermissionManager
+import com.inii.geoterra.development.databinding.ActivityMainBinding
+import com.inii.geoterra.development.device.ActivityPermissionRequester
+import com.inii.geoterra.development.interfaces.PageView
 import com.inii.geoterra.development.managers.SessionManager
-import com.inii.geoterra.development.ui.account.LoginFragment
-import com.inii.geoterra.development.ui.home.HomeFragment
+import com.inii.geoterra.development.ui.account.views.LoginView
+import com.inii.geoterra.development.ui.home.views.HomeView
+import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), FragmentListener {
-  private var homeFragment : HomeFragment = HomeFragment()
-  private var mapFragment : MapFragment = MapFragment()
-  private var accountFragment : AccountFragment = AccountFragment()
-  private var loginFragment : LoginFragment = LoginFragment()
-  private var requestsFragment : RequestsFragment = RequestsFragment()
+  @Inject
+  lateinit var app: Geoterra
+
+  private var homeFragment : HomeView = HomeView()
+  private var mapView : MapView = MapView()
+  private var accountView : AccountView = AccountView()
+  private var loginView : LoginView = LoginView()
+  private var requestsFragment : RequestsView = RequestsView()
 
   private lateinit var navigationMenu : BottomNavigationView
-  private lateinit var binding : View
+  private lateinit var binding : ActivityMainBinding
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
-    setContentView(R.layout.activity_main)
-    ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.mainLayout)
-    ) { v, insets ->
+    this.binding = ActivityMainBinding.inflate(layoutInflater)
+    setContentView(binding.root)
+
+    ViewCompat.setOnApplyWindowInsetsListener(binding.mainContainer) { view, insets ->
       val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-      v.setPadding(
+      view.setPadding(
         systemBars.left, systemBars.top,
         systemBars.right, systemBars.bottom
       )
       insets
     }
-    // Initialize the root view and the navigation menu.
-    this.binding = findViewById(R.id.mainLayout)
-    this.navigationMenu = this.binding.findViewById(R.id.nav_menu)
+
+    this.navigationMenu = this.binding.bottomNav
     // Check if the activity is being re-created.
     if (savedInstanceState == null) {
       Log.i(
@@ -68,12 +74,12 @@ class MainActivity : AppCompatActivity(), FragmentListener {
       OnBackPressedCallback(true) {
       override fun handleOnBackPressed() {
         val currentFragment = listOf(
-          homeFragment, mapFragment,
-          requestsFragment, accountFragment,
-          loginFragment
+          homeFragment, mapView,
+          requestsFragment, accountView,
+          loginView
         ).firstOrNull { it.isVisible }
 
-        if (currentFragment is PageFragment<*>) {
+        if (currentFragment is PageView<*, *>) {
           val handled = currentFragment.handleBackPress()
           if (!handled) {
             // Si el fragmento no maneja el back, pasar al sistema.
@@ -99,54 +105,56 @@ class MainActivity : AppCompatActivity(), FragmentListener {
   private fun setupActivity() {
     // Add the fragments to the activity.
     supportFragmentManager.beginTransaction()
-      .add(R.id.fragment_container_view, this.homeFragment, "home")
+      .add(R.id.nav_host_fragment, this.homeFragment, "home")
       .hide(this.homeFragment)
-      .add(R.id.fragment_container_view, this.mapFragment, "map")
-      .hide(this.mapFragment)
-      .add(R.id.fragment_container_view, this.requestsFragment, "requests")
+      .add(R.id.nav_host_fragment, this.mapView, "map")
+      .hide(this.mapView)
+      .add(R.id.nav_host_fragment, this.requestsFragment, "requests")
       .hide(requestsFragment)
-      .add(R.id.fragment_container_view, this.accountFragment, "account")
-      .hide(this.accountFragment)
-      .add(R.id.fragment_container_view, this.loginFragment, "login")
-      .hide(this.loginFragment)
+      .add(R.id.nav_host_fragment, this.accountView, "account")
+      .hide(this.accountView)
+      .add(R.id.nav_host_fragment, this.loginView, "login")
+      .hide(this.loginView)
       .commit()
   }
 
   private fun handlePageNavigation(itemID : Int) {
     when (itemID) {
       R.id.nav_home -> {
-        GPSManager.stopLocationUpdates()
+        app.stopLocationUpdates()
         this.showFragment(this.homeFragment)
       }
       R.id.nav_map -> {
         Log.i("nav_map", "boton de mapa presionado")
         // Start the gps service or ask for permissions
-        if (GPSManager.isInitialized()) {
+        if (this.app.isGPSManagerInitialized()) {
           Log.i("nav_map", "gps inicializado")
-          GPSManager.startLocationUpdates()
-          if (GPSManager.getLastKnownLocation() != null) {
-            this.showFragment(this.mapFragment)
+          this.app.startLocationUpdates()
+          if (this.app.getLastKnownLocation() != null) {
+            this.showFragment(this.mapView)
           }
         } else {
-          GPSManager.initialize(this)
+          this.app.initLocationService(ActivityPermissionRequester(
+            this)
+          )
         }
       }
       R.id.nav_requests ->  {
         Log.i("nav_requests", "boton de solicitudes presionado")
-        if (GPSManager.isInitialized()) {
+        if (this.app.isGPSManagerInitialized()) {
           Log.i("nav_requests", "gps inicializado")
-          GPSManager.startLocationUpdates()
+          this.app.startLocationUpdates()
         }
         this.showFragment(this.requestsFragment)
 //        this.showFragment(this.requestsFragment)
       }
       R.id.nav_account -> {
         Log.i("nav_account", "boton de cuenta presionado")
-        GPSManager.stopLocationUpdates()
+        this.app.stopLocationUpdates()
         if (SessionManager.isSessionActive()) {
-          this.showFragment(this.accountFragment)
+          this.showFragment(this.accountView)
         } else {
-          this.showFragment(this.loginFragment)
+          this.showFragment(this.loginView)
         }
       }
     }
@@ -156,15 +164,15 @@ class MainActivity : AppCompatActivity(), FragmentListener {
     val transaction = supportFragmentManager.beginTransaction()
 
     // Call onHide on all PageFragments
-    listOf(homeFragment, mapFragment, requestsFragment,
-           accountFragment, loginFragment
+    listOf(homeFragment, mapView, requestsFragment,
+           accountView, loginView
     ).forEach {
       it.onHide()
       transaction.hide(it)
     }
 
     // Call onShow on the selected one
-    if (fragment is PageFragment<*>) fragment.onShow()
+    if (fragment is PageView<*, *>) fragment.onShow()
     transaction.show(fragment)
       .setPrimaryNavigationFragment(fragment)
       .commit()
@@ -174,11 +182,11 @@ class MainActivity : AppCompatActivity(), FragmentListener {
     when (event) {
       "USER_LOGGED_IN" -> {
         Log.i("onFragmentEvent", event)
-        this.showFragment(this.accountFragment)
+        this.showFragment(this.accountView)
       }
       "USER_LOGGED_OUT" -> {
         Log.i("onFragmentEvent", event)
-        this.showFragment(this.loginFragment)
+        this.showFragment(this.loginView)
       }
       "FINISHED" -> {
         this.supportFragmentManager.popBackStack()

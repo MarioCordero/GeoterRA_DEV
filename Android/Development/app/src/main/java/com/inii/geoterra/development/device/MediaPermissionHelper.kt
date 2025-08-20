@@ -1,4 +1,4 @@
-package com.inii.geoterra.development.managers
+package com.inii.geoterra.development.device
 
 import android.Manifest
 import android.app.Activity
@@ -12,16 +12,36 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
+import com.inii.geoterra.development.interfaces.PermissionRequester
+import javax.inject.Inject
+import javax.inject.Singleton
+
 
 /**
- * @brief Manager for handling gallery access permissions across Android versions
+ * @class MediaPermissionHelper
+ * @brief Manages gallery permission requests and handling for the application.
  *
- * Centralizes permission management for media storage access with backward compatibility.
- * Handles both Activity and Fragment based permission requests.
+ * This singleton class simplifies the process of requesting and checking gallery permissions,
+ * adapting to different Android versions (TIRAMISU and above use READ_MEDIA_IMAGES,
+ * older versions use READ_EXTERNAL_STORAGE).
+ *
+ * It utilizes a [PermissionRequester] interface to delegate the actual permission request
+ * and rationale display to the calling component (e.g., an Activity or
+ * Fragment).
+ *
+ * @property galleryPermissionRequestCode A constant integer used for identifying the gallery permission request.
+ * @property requiredPermission A private property that dynamically returns the correct storage permission string
+ *                              based on the device's Android version.
+ * @property isInitialized A private boolean flag to track whether the permission flow has been
+ *                         initialized and the permission is granted.
  */
-object GalleryPermissionManager {
-  private const val GALLERY_PERMISSION_REQUEST_CODE = 2000
+@Singleton
+class MediaPermissionHelper @Inject constructor() {
+  /**
+   * Request code for requesting gallery permission.
+   * This constant is used when requesting permission to access the device's gallery.
+   */
+  private val galleryPermissionRequestCode = 2000
 
   /**
    * @brief Dynamic permission requirement based on Android version
@@ -50,60 +70,48 @@ object GalleryPermissionManager {
   }
 
   /**
-   * @brief Initializes permission flow from Activity context
-   * @param activity Host activity for permission request
+   * Initializes the permission handling process for accessing the device's gallery.
+   *
+   * @param permissionRequester An instance of [PermissionRequester] responsible for
+   *                            handling the permission request lifecycle (e.g., an Activity or Fragment).
+   *                            It provides context, checks for rationale, and initiates the permission request.
    */
-  fun initialize(activity: Activity) {
-    if (hasGalleryPermission(activity)) {
+  fun initialize(permissionRequester: PermissionRequester) {
+    val context = permissionRequester.getContext()
+
+    // Si ya tiene el permiso, marcamos como inicializado
+    if (hasGalleryPermission(context)) {
       isInitialized = true
-    } else {
-      val showRationale = ActivityCompat.shouldShowRequestPermissionRationale(
-        activity, requiredPermission
-      )
-      if (showRationale) {
-        showRationaleDialog(activity)
-      } else {
-        ActivityCompat.requestPermissions(
-          activity,
-          arrayOf(requiredPermission),
-          GALLERY_PERMISSION_REQUEST_CODE
-        )
-      }
+      return
     }
+
+    // Verificamos si se debe mostrar el racional de permiso
+    val shouldShowRationaleDialog = permissionRequester.shouldShowRationale(requiredPermission)
+
+    if (shouldShowRationaleDialog) {
+      // Mostrar diálogo de explicación antes de solicitar permiso
+      showRationaleDialog(context)
+    }
+
+    // Solicitar el permiso a través de la interfaz
+    permissionRequester.requestPermission(arrayOf(requiredPermission), galleryPermissionRequestCode)
   }
 
-  /**
-   * @brief Initializes permission flow from Fragment context
-   * @param fragment Host fragment for permission request
-   */
-  fun initialize(fragment: Fragment) {
-    if (hasGalleryPermission(fragment.requireContext())) {
-      isInitialized = true
-    } else {
-      val showRationale = fragment.shouldShowRequestPermissionRationale(requiredPermission)
-      if (showRationale) {
-        showRationaleDialog(fragment)
-      } else {
-        fragment.requestPermissions(
-          arrayOf(requiredPermission),
-          GALLERY_PERMISSION_REQUEST_CODE
-        )
-      }
-    }
-  }
 
   /**
    * @brief Processes permission request results
    * @param requestCode Code from permission request
    * @param grantResults Array of permission grant outcomes
-   * @param context Context for UI feedback
+   * @param permissionRequester Object implementing PermissionRequester interface
    */
   fun handlePermissionResult(
     requestCode: Int,
     grantResults: IntArray,
-    context: Context
+    permissionRequester: PermissionRequester
   ) {
-    if (requestCode == GALLERY_PERMISSION_REQUEST_CODE) {
+    val context = permissionRequester.getContext()
+
+    if (requestCode == galleryPermissionRequestCode) {
       if (grantResults.isNotEmpty() &&
         grantResults[0] == PackageManager.PERMISSION_GRANTED
       ) {
@@ -132,31 +140,10 @@ object GalleryPermissionManager {
   /**
    * @brief Shows a dialog explaining why gallery permissions are needed.
    */
-  private fun showRationaleDialog(activity: Activity) {
-    AlertDialog.Builder(activity)
+  private fun showRationaleDialog(context : Context) {
+    AlertDialog.Builder(context)
       .setTitle("Gallery Permission Required")
       .setMessage("This app needs access to your gallery to select images. Please grant the permission.")
-      .setPositiveButton("Allow") { _, _ ->
-        ActivityCompat.requestPermissions(
-          activity,
-          arrayOf(requiredPermission),
-          GALLERY_PERMISSION_REQUEST_CODE
-        )
-      }
-      .setNegativeButton("Cancel", null)
-      .show()
-  }
-
-  private fun showRationaleDialog(fragment: Fragment) {
-    AlertDialog.Builder(fragment.requireContext())
-      .setTitle("Gallery Permission Required")
-      .setMessage("This app needs access to your gallery to select images. Please grant the permission.")
-      .setPositiveButton("Allow") { _, _ ->
-        fragment.requestPermissions(
-          arrayOf(requiredPermission),
-          GALLERY_PERMISSION_REQUEST_CODE
-        )
-      }
       .setNegativeButton("Cancel", null)
       .show()
   }

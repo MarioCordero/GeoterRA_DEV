@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.googleAndroidLibrariesMapsplatformSecretsGradlePlugin)
     alias(libs.plugins.kotlinParcelize)
+    alias(libs.plugins.kotlinKapt)
+    alias(libs.plugins.daggerHilt)
 }
 
 val localProperties = Properties().apply {
@@ -13,7 +15,6 @@ val localProperties = Properties().apply {
         load(localFile.inputStream())
     }
 }
-
 
 android {
     namespace = "com.inii.geoterra.development"
@@ -31,8 +32,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
+            isShrinkResources = false
 
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -58,6 +59,14 @@ android {
         jvmTarget = "17"
     }
 
+    kotlin {
+        jvmToolchain(17)
+    }
+
+    hilt {
+        enableAggregatingTask = false
+    }
+
     buildFeatures {
         viewBinding = true
         buildConfig = true
@@ -74,36 +83,33 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
-    implementation(libs.play.services)
+    implementation(libs.androidx.junit.ktx)
+    implementation(libs.androidx.preference.ktx)
+    implementation(libs.androidx.exifinterface)
+    implementation(libs.timber)
+
+    implementation(
+        libs.hilt.android
+    )
+    implementation(libs.androidx.lifecycle.process)
+    implementation(libs.play.services.base.v1872)
+    implementation(libs.play.services.ads.identifier.v1820)
+
+    kapt(libs.hilt.compiler)
+
     implementation(libs.retrofit2.retrofit)
     implementation(libs.squareup.converter.gson)
     implementation(libs.okhttp)
     implementation(libs.json)
-    implementation(libs.play.services.location)
-    implementation(libs.androidx.preference.ktx)
     implementation(libs.osmdroid.android)
-    implementation(libs.androidx.exifinterface)
     implementation(libs.logging.interceptor)
     implementation(libs.locationtech.proj4j)
-    implementation(libs.firebase.firestore)
-    implementation(libs.androidx.junit.ktx)
 
     testImplementation(libs.junit)
-//    testImplementation(libs.mockito.core)
-//    testImplementation(libs.mockito.kotlin)
-//    testImplementation(libs.mockwebserver)
     testImplementation(libs.retrofit2.retrofit)
     testImplementation(libs.squareup.converter.gson)
 
     androidTestImplementation(libs.androidx.core)
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.fragment.testing)
-    androidTestImplementation(libs.androidx.junit)
-//    androidTestImplementation(libs.mockwebserver)
-//    androidTestImplementation(libs.mockito.core)
-//    androidTestImplementation(libs.mockito.kotlin)
-    androidTestImplementation(libs.androidx.fragment.testing)
-    androidTestImplementation("androidx.fragment:fragment-testing:1.6.0")
     androidTestImplementation(libs.androidx.espresso.core)
 }

@@ -5,7 +5,7 @@
   android:layout_height="match_parent"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   android:background="@color/white"
-  tools:context=".ui.requests.FormFragment">
+  tools:context=".ui.requests.views.AnalysisFormView">
   
   <ScrollView
     android:layout_width="match_parent"
@@ -55,15 +55,14 @@
       </LinearLayout>
       
       <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/identifier_input_layout"
+        android:id="@+id/tilIdentifier"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/gray_rectangle_rounded2"
-        app:hintEnabled="false"
-        app:errorEnabled="true">
+        app:hintEnabled="false">
         
         <com.google.android.material.textfield.TextInputEditText
-          android:id="@+id/identifier_input"
+          android:id="@+id/etIdentifier"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:inputType="textMultiLine"
@@ -84,7 +83,6 @@
         android:layout_marginTop="15dp"
         >
         <TextView
-          android:id="@+id/date_label"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:text="Fecha"
@@ -106,15 +104,14 @@
       </LinearLayout>
       
       <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/date_input_layout"
+        android:id="@+id/tilDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:errorEnabled="true"
         app:hintEnabled="false"
         android:background="@drawable/gray_rectangle_rounded2">
         
         <com.google.android.material.textfield.TextInputEditText
-          android:id="@+id/date_input"
+          android:id="@+id/etDate"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:focusable="false"
@@ -133,7 +130,7 @@
         android:layout_marginTop="15dp"
         >
         <TextView
-          android:id="@+id/owners_name_label"
+          android:id="@+id/tilOwnersName"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:text="Nombre del propietario"
@@ -152,7 +149,7 @@
         android:background="@drawable/gray_rectangle_rounded2">
         
         <com.google.android.material.textfield.TextInputEditText
-          android:id="@+id/owners_name_input"
+          android:id="@+id/etOwnerName"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:fontFamily="@font/poppins_regular"
@@ -189,7 +186,7 @@
         android:background="@drawable/gray_rectangle_rounded2">
         
         <com.google.android.material.textfield.TextInputEditText
-          android:id="@+id/owner_contact_input"
+          android:id="@+id/etOwnerContact"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:fontFamily="@font/poppins_regular"
@@ -225,7 +222,7 @@
         android:background="@drawable/gray_rectangle_rounded2">
         
         <com.google.android.material.textfield.TextInputEditText
-          android:id="@+id/actual_use_input"
+          android:id="@+id/etCurrentUse"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:fontFamily="@font/poppins_regular"
@@ -281,7 +278,7 @@
         />
       
       <com.google.android.material.button.MaterialButtonToggleGroup
-        android:id="@+id/terrain_type_button_group"
+        android:id="@+id/toggleGroupTerrainType"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -289,7 +286,7 @@
         app:selectionRequired="true">
       
       <com.google.android.material.button.MaterialButton
-          android:id="@+id/land_type_button"
+          android:id="@+id/btnTerrainLand"
           android:layout_width="0dp"
           android:layout_height="60dp"
           android:layout_weight="1"
@@ -307,7 +304,7 @@
           />
         
         <com.google.android.material.button.MaterialButton
-          android:id="@+id/spring_type_button"
+          android:id="@+id/btnTerrainSpring"
           android:layout_width="0dp"
           android:layout_height="60dp"
           android:layout_weight="1"
@@ -324,7 +321,7 @@
       </com.google.android.material.button.MaterialButtonToggleGroup>
       
       <ViewSwitcher
-        android:id="@+id/form_container"
+        android:id="@+id/viewSwitcherForm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
@@ -377,7 +374,7 @@
         />
       
       <com.google.android.material.button.MaterialButtonToggleGroup
-        android:id="@+id/location_type_button_group"
+        android:id="@+id/toggleGroupLocationMethod"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -386,7 +383,7 @@
         >
 
         <com.google.android.material.button.MaterialButton
-          android:id="@+id/image_coordinates_button"
+          android:id="@+id/btnLocationPhoto"
           android:layout_width="0dp"
           android:layout_height="60dp"
           android:layout_weight="1"
@@ -401,7 +398,7 @@
           android:textSize="16sp"/>
         
         <com.google.android.material.button.MaterialButton
-          android:id="@+id/gps_coordinates_button"
+          android:id="@+id/btnLocationGPS"
           android:layout_width="0dp"
           android:layout_height="60dp"
           android:layout_weight="1"
@@ -443,7 +440,7 @@
         android:background="@drawable/gray_rectangle_rounded2">
         
         <com.google.android.material.textfield.TextInputEditText
-          android:id="@+id/details_input"
+          android:id="@+id/etAdditionalDetails"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:inputType="textMultiLine"
@@ -459,17 +456,19 @@
       </com.google.android.material.textfield.TextInputLayout>
       
       <Button
-        android:id="@+id/sendRequestButton"
+        android:id="@+id/btnSendRequest"
         android:layout_width="wrap_content"
-        android:layout_height="75dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="20dp"
+        android:paddingVertical="20dp"
+        android:paddingHorizontal="15dp"
         
         android:backgroundTint="@color/geoterra_deep_blue"
         android:text="Enviar Solicitud"
         android:textColor="@color/white"
         android:fontFamily="@font/poppins_bold"
-        android:textSize="24sp"/>
+        android:textSize="20sp"/>
     </LinearLayout>
   </ScrollView>
 </FrameLayout>

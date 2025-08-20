@@ -3,7 +3,6 @@ package com.inii.geoterra.development.ui.elements
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.widget.EditText
 import android.widget.LinearLayout
 import com.google.android.material.textfield.TextInputEditText
 import com.inii.geoterra.development.R
@@ -12,7 +11,7 @@ import com.inii.geoterra.development.R
  * A custom LinearLayout view representing a form for capturing spring-related information.
  * This form includes input fields for thermal sensation and bubbles.
  *
- * The layout for this form is defined in `R.layout.spring_form`.
+ * The layout for this form is defined in `R.layout.view_spring_form`.
  *
  * @param context The context the view is running in, through which it can
  *                access the current theme, resources, etc.
@@ -33,7 +32,7 @@ class SpringForm @JvmOverloads constructor(
   init {
     orientation = VERTICAL
     val binding = LayoutInflater.from(context).inflate(
-      R.layout.spring_form,
+      R.layout.view_spring_form,
       this,
       true
     )

@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.map.ThermalPointInfoFragment"
+    tools:context=".ui.map.views.ThermalView"
     android:background="@color/white">
     
     <FrameLayout
@@ -36,7 +36,7 @@
               android:scrollbarAlwaysDrawHorizontalTrack="false">
                 
                 <TextView
-                  android:id="@+id/PointID_name"
+                  android:id="@+id/tv_identifier"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   
@@ -60,7 +60,7 @@
                   app:layout_constraintStart_toEndOf="@id/requestMade_frame" />
                 
                 <TextView
-                  android:id="@+id/manifestation_label"
+                  android:id="@+id/tv_manifestationLabel"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   
@@ -73,11 +73,11 @@
                   app:layout_constraintEnd_toEndOf="parent"
                   
                   app:layout_constraintStart_toStartOf="parent"
-                  app:layout_constraintTop_toBottomOf="@id/PointID_name">
+                  app:layout_constraintTop_toBottomOf="@id/tv_identifier">
                 </TextView>
                 
                 <TextView
-                  android:id="@+id/manifestation"
+                  android:id="@+id/tv_manifestation"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   
@@ -90,7 +90,7 @@
                   app:layout_constraintEnd_toEndOf="parent"
                   
                   app:layout_constraintStart_toStartOf="parent"
-                  app:layout_constraintTop_toBottomOf="@id/manifestation_label">
+                  app:layout_constraintTop_toBottomOf="@id/tv_manifestationLabel">
                 </TextView>
                 
                 <TextView
@@ -107,17 +107,17 @@
                   app:layout_constraintEnd_toEndOf="parent"
                   
                   app:layout_constraintStart_toStartOf="parent"
-                  app:layout_constraintTop_toBottomOf="@id/manifestation">
+                  app:layout_constraintTop_toBottomOf="@id/tv_manifestation">
                 </TextView>
                 
                 <TextView
-                  android:id="@+id/temperature_value"
+                  android:id="@+id/tv_temperature"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   
                   android:layout_marginTop="10dp"
                   android:fontFamily="@font/poppins_regular"
-                  android:text="88 C"
+                  android:text="88 °C"
                   android:textColor="@color/black"
                   
                   android:textSize="50sp"
@@ -157,7 +157,7 @@
                     </TextView>
                     
                     <TextView
-                      android:id="@+id/province_text"
+                      android:id="@+id/tv_province"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       
@@ -183,7 +183,7 @@
                   app:layout_constraintStart_toStartOf="parent" />
                 
                 <LinearLayout
-                  android:id="@+id/requestInformation_frame"
+                  android:id="@+id/requests_info_section"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:gravity="center_horizontal"
@@ -212,7 +212,7 @@
                         </TextView>
                         
                         <TextView
-                          android:id="@+id/latitude_value"
+                          android:id="@+id/tv_latitude"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:layout_marginTop="5dp"
@@ -254,7 +254,7 @@
                         </TextView>
                         
                         <TextView
-                          android:id="@+id/longitude_value"
+                          android:id="@+id/tv_longitude"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:layout_marginTop="5dp"
@@ -292,7 +292,7 @@
                           style="?android:attr/buttonBarButtonStyle"
                           android:layout_width="140dp"
                           android:layout_height="160dp"
-                          android:id="@+id/chemistryAnalysisButton"
+                          android:id="@+id/btn_analysis"
                           android:layout_marginEnd="15dp"
                           android:backgroundTint="@color/geoterra_orange"
                           android:drawableTop="@drawable/expand_icon_white"

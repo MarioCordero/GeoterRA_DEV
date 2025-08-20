@@ -6,11 +6,11 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/fragment_requests"
-    tools:context=".ui.requests.RequestsFragment"
+    tools:context=".ui.requests.views.RequestsView"
     android:layout_gravity="center">
     
     <FrameLayout
-      android:id="@+id/form_container"
+      android:id="@+id/containerForm"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:visibility="gone"
@@ -29,7 +29,6 @@
             >
             
             <TextView
-              android:id="@+id/request_text"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_marginStart="16dp"
@@ -48,7 +47,7 @@
               android:layout_weight="1" />
             
             <Button
-              android:id="@+id/new_request_button"
+              android:id="@+id/btnCreateRequest"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:minWidth="150dp"
@@ -67,14 +66,14 @@
         </LinearLayout>
         
         <ScrollView
-          android:id="@+id/requestScrollView"
+          android:id="@+id/scrollSubmittedRequests"
           android:layout_width="match_parent"
           android:layout_height="0dp"
           android:layout_weight="1"
           android:layout_marginTop="25dp">
             
             <LinearLayout
-              android:id="@+id/sheetsLayout"
+              android:id="@+id/layoutSubmittedRequests"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:layout_marginStart="16dp"
