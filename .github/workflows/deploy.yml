@@ -34,10 +34,13 @@ jobs:
         run: |
             git config user.name "github-actions"
             git config user.email "actions@github.com"
-            
-            # Traer main
+
+            # Traer main y cambiar a ella
             git fetch origin main
             git checkout main
+
+            # Borrar todo en el repo
+            find . -mindepth 1 -exec rm -rf {} +
 
             # Copiar carpetas necesarias desde headerWeb
             cp -r Android ./Android
@@ -46,7 +49,7 @@ jobs:
             mkdir -p website
             cp -r website/dist ./website/
 
-            # Commit y push a main
+            # Commit y push
             git add .
             git commit -m "Update main from headerWeb [CI build]" || echo "No changes to commit"
             git push origin main
