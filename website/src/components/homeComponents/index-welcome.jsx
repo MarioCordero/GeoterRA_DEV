@@ -60,7 +60,7 @@ function IndexWelcome() {
                 Su objetivo es facilitar la tarea de decisiones en proyectos de energía geotérmica mediante la consulta
                 y gestión de datos geológicos validados. Los usuarios pueden registrar, editar y exportar información
                 desde el mapa. GeoterRA busca apoyar el desarrollo sostenible mediante el uso eficiente de datos
-                y tecnologías geoespaciales. Hola. Adios. Porfaa. Ja
+                y tecnologías geoespaciales. Hola. Adios. Porfaa. Ja, GOD
               </p>
             </div>
           </div>
