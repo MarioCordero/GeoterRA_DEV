@@ -146,7 +146,6 @@ export default function AppHeader() {
         </Button>
       );
     } else {
-      // For other items, use regular Link
       return (
         <Button
           key={item.key}
