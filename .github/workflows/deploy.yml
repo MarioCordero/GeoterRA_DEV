@@ -35,19 +35,23 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
 
-          # Traer main y cambiar a ella
+          # Traer main
           git fetch origin main
           git checkout main
 
-          # Borrar todo en main
-          find . -mindepth 1 -exec rm -rf {} + || true
+          # Crear carpeta temporal con contenido de headerWeb
+          mkdir -p /tmp/headerWeb
+          git --work-tree=/tmp/headerWeb checkout headerWeb -- .
+
+          # Borrar todo en main excepto .git
+          find . -mindepth 1 ! -name '.git' -exec rm -rf {} +
 
           # Copiar solo las carpetas necesarias
-          cp -r Android ./Android || true
-          cp -r API ./API || true
-          cp -r database ./database || true
+          cp -r /tmp/headerWeb/Android ./Android 2>/dev/null || true
+          cp -r /tmp/headerWeb/API ./API 2>/dev/null || true
+          cp -r /tmp/headerWeb/database ./database 2>/dev/null || true
           mkdir -p website
-          cp -r website/dist ./website/ || true
+          cp -r /tmp/headerWeb/website/dist ./website/ 2>/dev/null || true
 
           # Commit y push usando PAT
           git add .
