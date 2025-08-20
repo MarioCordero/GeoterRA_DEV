@@ -32,29 +32,29 @@ jobs:
 
       - name: Prepare main branch
         run: |
-            git config user.name "github-actions"
-            git config user.email "actions@github.com"
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
 
-            # Traer main y cambiar a ella
-            git fetch origin main
-            git checkout main
+          # Traer main y cambiar a ella
+          git fetch origin main
+          git checkout main
 
-            # Borrar todo en main, ignorando errores si no existe algo
-            find . -mindepth 1 -exec rm -rf {} + || true
+          # Borrar TODO en main (ignora errores si algo no existe)
+          rm -rf ./* || true
 
-            # Copiar carpetas necesarias desde headerWeb
-            cp -r Android ./Android
-            cp -r API ./API
-            cp -r database ./database
-            mkdir -p website
-            cp -r website/dist ./website/
+          # Copiar carpetas necesarias desde headerWeb
+          cp -r Android ./Android || true
+          cp -r API ./API || true
+          cp -r database ./database || true
+          mkdir -p website
+          cp -r website/dist ./website/ || true
 
-            # Commit y push
-            git add .
-            git commit -m "Update main from headerWeb [CI build]" || echo "No changes to commit"
-            git push origin main
+          # Commit y push
+          git add .
+          git commit -m "Rebuild main from headerWeb [CI build]" || echo "No changes to commit"
+          git push origin main
         env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Trigger server pull.sh
         run: |
