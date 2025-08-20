@@ -10,56 +10,68 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout la branch headerWeb
       - name: Checkout headerWeb
         uses: actions/checkout@v3
         with:
           ref: headerWeb
 
+      # 2. Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
 
+      # 3. Instalar dependencias
       - name: Install dependencies
         run: |
           cd website
           npm ci
 
+      # 4. Build del frontend
       - name: Build frontend
         run: |
           cd website
           npm run build
 
+      # 5. Preparar la rama main
       - name: Prepare main branch
         run: |
+          # Configurar identidad para los commits
           git config user.name "github-actions"
           git config user.email "actions@github.com"
 
-          # Traer main
+          # Traer la última versión de main
           git fetch origin main
           git checkout main
+
+          # Resetear main a estado limpio
+          git reset --hard origin/main
 
           # Crear carpeta temporal con contenido de headerWeb
           mkdir -p /tmp/headerWeb
           git --work-tree=/tmp/headerWeb checkout headerWeb -- .
 
-          # Borrar todo en main excepto .git
-          find . -mindepth 1 ! -name '.git' -exec rm -rf {} +
+          # Limpiar las carpetas que se van a reemplazar
+          rm -rf Android API database website
 
-          # Copiar solo las carpetas necesarias
+          # Copiar solo lo necesario
           cp -r /tmp/headerWeb/Android ./Android 2>/dev/null || true
           cp -r /tmp/headerWeb/API ./API 2>/dev/null || true
           cp -r /tmp/headerWeb/database ./database 2>/dev/null || true
           mkdir -p website
           cp -r /tmp/headerWeb/website/dist ./website/ 2>/dev/null || true
 
-          # Commit y push usando PAT
+          # Agregar cambios y hacer commit solo si hay algo nuevo
           git add .
-          git commit -m "Rebuild main from headerWeb [CI build]" || echo "No changes to commit"
-          git push https://${{ secrets.GH_PAT }}@github.com/MarioCordero/GeoterRA_DEV.git main
+          git diff-index --quiet HEAD || git commit -m "Rebuild main from headerWeb [CI build]"
+
+          # Push a main con PAT
+          git push https://${GH_PAT}@github.com/MarioCordero/GeoterRA_DEV.git main
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
 
+      # 6. Disparar pull.sh en el servidor
       - name: Trigger server pull.sh
         run: |
           curl -X POST http://163.178.171.105/pull.sh
