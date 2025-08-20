@@ -1,0 +1,67 @@
+name: Build and Update Main
+
+on:
+  push:
+    branches:
+      - headerWeb
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout headerWeb
+        uses: actions/checkout@v3
+        with:
+          ref: headerWeb
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          cd website
+          npm ci
+
+      - name: Build frontend
+        run: |
+          cd website
+          npm run build
+
+      - name: Prepare main branch
+        run: |
+            git config user.name "github-actions"
+            git config user.email "actions@github.com"
+            
+            # Traer main
+            git fetch origin main
+            git checkout main
+            
+            # Guardar deploy_pull.php temporalmente
+            cp deploy_pull.php /tmp/deploy_pull.php
+
+            # Borrar todo lo demás excepto deploy_pull.php
+            find . -mindepth 1 ! -name 'deploy_pull.php' -exec rm -rf {} +
+
+            # Copiar carpetas necesarias desde headerWeb
+            cp -r Android ./Android
+            cp -r API ./API
+            cp -r database ./database
+            mkdir -p website
+            cp -r website/dist ./website/
+
+            # Restaurar deploy_pull.php
+            mv /tmp/deploy_pull.php ./deploy_pull.php
+
+            # Commit y push a main
+            git add .
+            git commit -m "Update main from headerWeb [CI build]" || echo "No changes to commit"
+            git push origin main
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trigger server pull.sh
+        run: |
+          curl -X POST http://163.178.171.105/pull.sh
