@@ -71,7 +71,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginTop="10dp"
-      android:text="Condiciones del Campo"
+      android:text="Conductividad en Campo"
       android:textColor="@color/geoterra_light_gray"
       android:fontFamily="@font/poppins_semibold"
       android:textSize="22sp" />
@@ -124,7 +124,7 @@
       android:layout_height="wrap_content"
 
       android:layout_marginTop="10dp"
-      android:text="Condiciones Laboratorio"
+      android:text="Conductiidad en Laboratorio"
       android:textColor="@color/geoterra_light_gray"
       android:fontFamily="@font/poppins_semibold"
       android:textSize="22sp" />
