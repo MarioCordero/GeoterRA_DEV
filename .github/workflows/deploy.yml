@@ -38,7 +38,7 @@ jobs:
           cd website
           npm run build
 
-      # 5. Preparar la rama main (borrado total)
+      # 5. Preparar la rama main
       - name: Prepare main branch
         run: |
           git config user.name "github-actions"
@@ -56,10 +56,11 @@ jobs:
           mkdir -p /tmp/headerWeb
           git --work-tree=/tmp/headerWeb checkout headerWeb -- .
 
-          # Limpiar absolutamente todo excepto .git
-          shopt -s dotglob
-          rm -rf -- * .[^.] .??*
-          shopt -u dotglob
+          # Guardar .git, borrar todo y restaurarlo
+          TMP_GIT=$(mktemp -d)
+          mv .git "$TMP_GIT"/.git
+          rm -rf ./* .[^.] .??*
+          mv "$TMP_GIT"/.git .git
 
           # Copiar solo lo necesario
           cp -r /tmp/headerWeb/Android ./Android 2>/dev/null || true
