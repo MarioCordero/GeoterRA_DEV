@@ -39,22 +39,22 @@ jobs:
           git fetch origin main
           git checkout main
 
-          # Borrar TODO en main (ignora errores si algo no existe)
-          rm -rf ./* || true
+          # Borrar todo en main
+          find . -mindepth 1 -exec rm -rf {} + || true
 
-          # Copiar carpetas necesarias desde headerWeb
+          # Copiar solo las carpetas necesarias
           cp -r Android ./Android || true
           cp -r API ./API || true
           cp -r database ./database || true
           mkdir -p website
           cp -r website/dist ./website/ || true
 
-          # Commit y push
+          # Commit y push usando PAT
           git add .
           git commit -m "Rebuild main from headerWeb [CI build]" || echo "No changes to commit"
-          git push origin main
+          git push https://${{ secrets.GH_PAT }}@github.com/MarioCordero/GeoterRA_DEV.git main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
 
       - name: Trigger server pull.sh
         run: |
