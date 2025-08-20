@@ -44,10 +44,6 @@ class SignUpViewModel @Inject constructor(
         !credentials.email.isValidEmail() -> {
           _errorMessage.value = "Por favor, ingrese una dirección de correo válida"
         }
-        !credentials.email.contains(".com") -> {
-          _errorMessage.value = "Por favor ingrese el .com en la dirección de" +
-            " correo."
-        }
         credentials.phoneNumber.isBlank() -> {
           _errorMessage.value = "Por favor, ingrese un número de teléfono"
         }
@@ -97,13 +93,13 @@ class SignUpViewModel @Inject constructor(
             }
           }
         } else {
-          _errorMessage.value = "Server error: ${serverResponse.code()}"
+          _errorMessage.value = "Error del servidor: ${serverResponse.code()}"
         }
       }
 
       override fun onFailure(call: Call<SignUpResponse>, t: Throwable) {
-        _errorMessage.value = "Connection error: ${t.message}"
-        Timber.e("Connection error: ${t.message}")
+        _errorMessage.value = "Error de conexión: ${t.message}"
+        Timber.e("Error de conexión: ${t.message}")
       }
     })
   }
@@ -114,8 +110,14 @@ class SignUpViewModel @Inject constructor(
    * @param errors List of API-provided errors.
    */
   private fun handleServerErrors(errors: Map<String, String>?) {
-    val combined = errors?.values?.joinToString(", ") ?: "Unknown error"
+    val combined = errors?.values?.joinToString(", ") ?:
+    "Error desconocido"
     _errorMessage.value = combined
+  }
+
+  fun setErrorMessage(msg: String) {
+    _errorMessage.value = msg
+
   }
 
 }

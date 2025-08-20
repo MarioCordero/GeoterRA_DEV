@@ -35,23 +35,4 @@ abstract class PageViewModel (
     return android.util.Patterns.EMAIL_ADDRESS.matcher(this).matches()
   }
 
-  /**
-   * @brief Publishes error message to LiveData and logs it.
-   *
-   * Updates the base class's errorMessage LiveData to notify observers.
-   *
-   * @param message The error message string to publish.
-   */
-  protected fun postError(message: String) {
-    _errorMessage.postValue(message)
-    Timber.e(message)
-  }
-
-  /**
-   * @brief Clears any existing error message.
-   */
-  protected fun clearError() {
-    _errorMessage.postValue("")
-  }
-
 }

@@ -84,7 +84,7 @@ class MapViewModel @Inject constructor(
       object : LocationCallbackListener {
         override fun onLocationReady(location: Location) {
           val newGeoPoint = GeoPoint(location.latitude, location.longitude)
-          _userLocation.postValue(newGeoPoint)
+          _userLocation.value = newGeoPoint
           Timber.d("User location updated: $newGeoPoint")
 //          if (shouldUpdateLocation(_userLocation.value, newGeoPoint)) {
 //
@@ -147,19 +147,19 @@ class MapViewModel @Inject constructor(
                 thermals.addAll(it.points)
                 _thermalPoints.value = thermals
               } else -> {
-                postError("Server returned error or invalid response")
+              _errorMessage.value = "Servidor rechazó la petición: ${response
+                .code()}"
               }
             }
           }
 
           override fun onFailure(call: Call<ThermalPointResponse>, t: Throwable) {
-            postError("Network failure: ${t.localizedMessage}")
-            Timber.e(t, "API fetch failure")
+            _errorMessage.value = "Error de conexión: ${t.localizedMessage}"
           }
         })
       } catch (ex: Exception) {
-        postError("Exception fetching thermal points: ${ex.localizedMessage}")
-        Timber.e(ex, "Exception fetching thermal points")
+        _errorMessage.value = "Error de conexión desconcido: ${ex
+          .localizedMessage}"
       }
     }
   }

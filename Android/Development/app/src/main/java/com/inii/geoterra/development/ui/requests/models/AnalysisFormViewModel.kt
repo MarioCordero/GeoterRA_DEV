@@ -152,12 +152,12 @@ class AnalysisFormViewModel @Inject constructor(
           _toastMessage.value = "Lat: ${coordinates[0]}, Lon: ${coordinates[1]}"
           Timber.i("EXIF Location extracted and set.")
         } else {
-          _toastMessage.value = "Image has no location data"
+          _toastMessage.value = "La imagen no contiene coordenadas EXIF"
         }
       }
     } catch (e: IOException) {
       Timber.e(e, "Error reading EXIF metadata")
-      _toastMessage.value = "Error reading image metadata"
+      _toastMessage.value = "Error leyendo  la información EXIF"
     } finally {
       inputStream?.close()
     }
@@ -258,14 +258,14 @@ class AnalysisFormViewModel @Inject constructor(
         if (response.isSuccessful) {
           handleRequestResponse(response.body())
         } else {
-          _toastMessage.postValue("Error creating request")
-          Timber.e("Error creating request: ${response.code()}")
+          _toastMessage.postValue("Error creando la solicitud")
+          Timber.e("Error creando la solicitud: ${response.code()}")
         }
       }
 
       override fun onFailure(call: Call<RequestResponse>, t: Throwable) {
-        _toastMessage.postValue("Connection error: ${t.message}")
-        Timber.e(t, "Network failure")
+        _toastMessage.postValue("Error del servidor: ${t.message}")
+        Timber.e(t, "Error del servidor: ${t.message}")
       }
     })
   }
@@ -277,10 +277,10 @@ class AnalysisFormViewModel @Inject constructor(
     response?.let {
       if (it.errors.isEmpty()) {
         if (it.response == "Ok") {
-          _toastMessage.postValue("Request created successfully")
+          _toastMessage.postValue("Solicitud creada exitosamente")
           _formSubmitted.postValue(true)
         } else {
-          _toastMessage.postValue("Error creating request")
+          _toastMessage.postValue("Error creando la solicitud")
         }
       } else {
         handleServerErrors(it.errors)

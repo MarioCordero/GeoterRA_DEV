@@ -53,7 +53,8 @@ class LoginViewModel @Inject constructor(
         }
 
         trimmedPassword.length < 4 -> {
-          _errorMessage.value = "Por favor, ingresa una contraseña con al menos 8 carácteres."
+          _errorMessage.value = "Por favor, ingresa una contraseña con al " +
+            "menos 4 carácteres."
         }
 
         else -> {
@@ -77,7 +78,7 @@ class LoginViewModel @Inject constructor(
         }
 
         override fun onFailure(call: Call<SignInResponse>, t: Throwable) {
-          _errorMessage.value = "Connection error: ${t.message}"
+          _errorMessage.value = "Error de conexión: ${t.message}"
         }
       })
   }
@@ -95,7 +96,7 @@ class LoginViewModel @Inject constructor(
       when {
         serverResponse.errors.isNotEmpty() -> handleServerErrors(serverResponse.errors)
         serverResponse.response == "Ok" -> completeLoginFlow(credentials)
-        else -> _errorMessage.value = "Existing active session detected"
+        else -> _errorMessage.value = "Se detectó una sesión activa."
       }
     } ?: run {
       _errorMessage.value = "Error de autenticación: respuesta vacía"

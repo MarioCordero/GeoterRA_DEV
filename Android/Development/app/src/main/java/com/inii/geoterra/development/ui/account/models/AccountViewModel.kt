@@ -15,6 +15,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -55,15 +56,22 @@ class AccountViewModel @Inject constructor(
           if (body?.response == "Ok") {
             _userInfo.postValue(body.data)
           } else {
-            _errorMessage.postValue("Server error: ${body?.response}")
+            _errorMessage.value = String.format(
+              "Error del servidor: ${body?.response}"
+            )
+            Timber.e("Error del servidor: ${body?.response}")
           }
         } else {
-          _errorMessage.postValue("HTTP error: ${response.code()}")
+          _errorMessage.value = String.format("HTTP error: ${response.code()}")
+          Timber.e("HTTP error: ${response.code()}")
         }
       }
 
       override fun onFailure(call: Call<UserInfoResponse>, t: Throwable) {
-        _errorMessage.postValue("Connection failure: ${t.localizedMessage}")
+        _errorMessage.value = String.format(
+          "Fallo de conexión: ${t.localizedMessage}"
+        )
+        Timber.e("Fallo de conexión: ${t.localizedMessage}")
       }
     })
   }
