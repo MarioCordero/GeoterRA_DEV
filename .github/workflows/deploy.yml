@@ -38,12 +38,6 @@ jobs:
             # Traer main
             git fetch origin main
             git checkout main
-            
-            # Guardar deploy_pull.php temporalmente
-            cp deploy_pull.php /tmp/deploy_pull.php
-
-            # Borrar todo lo demás excepto deploy_pull.php
-            find . -mindepth 1 ! -name 'deploy_pull.php' -exec rm -rf {} +
 
             # Copiar carpetas necesarias desde headerWeb
             cp -r Android ./Android
@@ -51,9 +45,6 @@ jobs:
             cp -r database ./database
             mkdir -p website
             cp -r website/dist ./website/
-
-            # Restaurar deploy_pull.php
-            mv /tmp/deploy_pull.php ./deploy_pull.php
 
             # Commit y push a main
             git add .
