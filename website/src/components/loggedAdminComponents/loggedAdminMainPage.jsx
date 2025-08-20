@@ -23,7 +23,7 @@ const Dashboard = ({ user, loading, error }) => {
           padding: '2rem',
         }}
       >
-        Cargando...
+        Cargando....
       </div>
     );
   }

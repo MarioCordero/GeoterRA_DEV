@@ -39,8 +39,8 @@ jobs:
             git fetch origin main
             git checkout main
 
-            # Borrar todo en el repo
-            find . -mindepth 1 -exec rm -rf {} +
+            # Borrar todo en main, ignorando errores si no existe algo
+            find . -mindepth 1 -exec rm -rf {} + || true
 
             # Copiar carpetas necesarias desde headerWeb
             cp -r Android ./Android
