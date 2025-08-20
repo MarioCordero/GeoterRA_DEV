@@ -94,7 +94,8 @@ class AnalysisFormView : PageView<FragmentAnalysisFormBinding, AnalysisFormViewM
 
     // Date picker setup
     this.binding.etDate.setText(viewModel.dateInput.value)
-    this.binding.tilDate.setOnClickListener {
+
+    this.binding.etDate.setOnClickListener {
       showDatePicker()
     }
 

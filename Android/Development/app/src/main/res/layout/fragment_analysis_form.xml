@@ -59,8 +59,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/gray_rectangle_rounded2"
-        app:hintEnabled="false"
-        app:errorEnabled="true">
+        app:hintEnabled="false">
         
         <com.google.android.material.textfield.TextInputEditText
           android:id="@+id/etIdentifier"
@@ -108,7 +107,6 @@
         android:id="@+id/tilDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:errorEnabled="true"
         app:hintEnabled="false"
         android:background="@drawable/gray_rectangle_rounded2">
         
