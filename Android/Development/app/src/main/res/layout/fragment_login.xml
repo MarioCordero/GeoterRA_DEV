@@ -66,7 +66,7 @@
                   android:text="@string/app_name"
                   android:textAlignment="center"
                   android:fontFamily="@font/poppins_semibold"
-                  android:textColor="@color/black"
+                  android:textColor="@color/geoterra_deep_blue"
                   android:textSize="36sp"
                   />
                 
@@ -99,18 +99,25 @@
                       />
                 </LinearLayout>
                 
-                <EditText
-                  android:id="@+id/et_email"
+                <com.google.android.material.textfield.TextInputLayout
+                  android:id="@+id/til_email"
                   android:layout_width="match_parent"
-                  android:layout_height="50dp"
-                  android:autofillHints=""
+                  android:layout_height="wrap_content"
                   android:background="@drawable/gray_rectangle_rounded2"
-                  android:drawableRight="@drawable/baseline_account_circle_24"
-                  
-                  android:hint="Ingrese el correo"
-                  android:inputType="textEmailAddress"
-                  android:padding="14dp"
-                  android:textColor="@color/black" />
+                  app:hintEnabled="false">
+                    
+                    <com.google.android.material.textfield.TextInputEditText
+                      android:id="@+id/et_email"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:inputType="textEmailAddress"
+                      android:hint="@string/enter_email"
+                      android:fontFamily="@font/poppins_regular"
+                      android:textColor="@color/black"
+                      android:textSize="18sp"
+                      android:padding="14dp"
+                      android:background="@android:color/transparent"/>
+                </com.google.android.material.textfield.TextInputLayout>
                 
                 <LinearLayout
                   android:layout_width="wrap_content"
@@ -140,47 +147,28 @@
                       />
                 </LinearLayout>
                 
-                <EditText
-                  android:id="@+id/et_password"
+                
+                <com.google.android.material.textfield.TextInputLayout
+                  android:id="@+id/til_password"
                   android:layout_width="match_parent"
-                  android:layout_height="50dp"
-                  
-                  android:background="@drawable/gray_rectangle_rounded2"
-                  android:drawableRight="@drawable/baseline_lock_24"
-                  
-                  android:hint="Ingrese la contraseña"
-                  android:inputType="textPassword"
-                  android:padding="14dp"
-                  android:textColor="@color/black" />
-                
-                <LinearLayout
-                  android:id="@+id/lt_togglePassword"
-                  android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  >
+                  android:background="@drawable/gray_rectangle_rounded2"
+                  app:hintEnabled="false"
+                  app:passwordToggleEnabled="true">
                     
-                    <CheckBox
-                      android:id="@+id/cbox_togglePassword"
-                      android:layout_width="wrap_content"
+                    <com.google.android.material.textfield.TextInputEditText
+                      android:id="@+id/et_password"
+                      android:layout_width="match_parent"
                       android:layout_height="wrap_content"
-                      android:layout_marginStart="-15dp"
-                      >
-                    </CheckBox>
-                    
-                    <TextView
-                      android:id="@+id/tv_togglePassword"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      
-                      android:padding="11dp"
-                      android:text="Mostrar contraseña"
+                      android:inputType="textPassword"
+                      android:hint="@string/enter_password"
+                      android:fontFamily="@font/poppins_regular"
                       android:textColor="@color/black"
-                      android:fontFamily="@font/calibri_regular"
-                      android:textSize="12sp"
-                      >
-                    </TextView>
-                
-                </LinearLayout>
+                      android:textSize="18sp"
+                      android:padding="14dp"
+                      android:background="@android:color/transparent"/>
+                    
+                </com.google.android.material.textfield.TextInputLayout>
                 
                 <Button
                   android:id="@+id/btn_login"

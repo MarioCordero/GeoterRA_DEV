@@ -50,26 +50,23 @@ class SignUpView : PageView<FragmentSignUpBinding, SignUpViewModel>(
   override fun setUpListeners() {
     this.binding.apply {
       createAccountB.setOnClickListener {
+        if (this.etPassword.text.toString()
+          != this.etConfirmpassword.text.toString()) {
+          viewModel.setErrorMessage("Las contraseñas no coinciden")
+          return@setOnClickListener
+        }
         val credentials = SingUpCredentials(
           email = binding.etEmail.text.toString().trim(),
           password = binding.etPassword.text.toString().trim(),
-          firstName = binding.etFirstName.text.toString().trim(),
-          lastName = binding.etLastName.text.toString().trim(),
-          phoneNumber = binding.etPhoneNumber.text.toString().trim()
+          firstName = binding.etFirstname.text.toString().trim(),
+          lastName = binding.etLastname.text.toString().trim(),
+          phoneNumber = binding.etPhone.text.toString().trim()
         )
 
         // Delegate to ViewModel for validation and submission
         viewModel.validateAndCreateUser(credentials)
       }
 
-      ltTogglePassword.setOnClickListener {
-        binding.cboxTogglePassword.isChecked =
-          !binding.cboxTogglePassword.isChecked
-      }
-
-      cboxTogglePassword.setOnCheckedChangeListener { _, isChecked ->
-        updatePasswordVisibility(isChecked)
-      }
     }
   }
 
@@ -97,23 +94,10 @@ class SignUpView : PageView<FragmentSignUpBinding, SignUpViewModel>(
 
     viewModel.signUpSuccess.observe(viewLifecycleOwner, Observer { success ->
       if (success) {
-        showToast("Account successfully registered")
+        showToast("Cuenta creada exitosamente")
         listener?.onFragmentEvent("FINISHED")
       }
     })
-  }
-
-  // =============== UI INTERACTION METHODS ===============
-
-  private fun updatePasswordVisibility(showPassword: Boolean) {
-    val inputType = if (showPassword) {
-      InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-    } else {
-      InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-    }
-
-    binding.etPassword.inputType = inputType
-    binding.etPassword.setSelection(binding.etPassword.text.length)
   }
 
 }

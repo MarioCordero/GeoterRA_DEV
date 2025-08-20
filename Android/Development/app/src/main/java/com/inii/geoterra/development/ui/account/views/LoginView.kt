@@ -49,15 +49,6 @@ class LoginView : PageView<FragmentLoginBinding, LoginViewModel>(
   override fun setUpListeners() {
     this.binding.apply {
 
-      ltTogglePassword.setOnClickListener {
-        binding.cboxTogglePassword.isChecked =
-          !binding.cboxTogglePassword.isChecked
-      }
-
-      cboxTogglePassword.setOnCheckedChangeListener { _, isChecked ->
-        updatePasswordVisibility(isChecked)
-      }
-
       tvSignUp.setOnClickListener {
         showSignUpForm()
       }
@@ -142,22 +133,6 @@ class LoginView : PageView<FragmentLoginBinding, LoginViewModel>(
    */
   private fun onLoginSuccess() {
     this.listener?.onFragmentEvent("USER_LOGGED_IN")
-  }
-
-  // =============== UTILITY METHODS ===============
-  /**
-   * @brief Updates password field visibility state
-   * @param showPassword Flag indicating whether to display password text
-   */
-  private fun updatePasswordVisibility(showPassword: Boolean) {
-    val inputType = if (showPassword) {
-      InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-    } else {
-      InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-    }
-
-    binding.etPassword.inputType = inputType
-    binding.etPassword.setSelection(binding.etPassword.text.length)
   }
 
 }
