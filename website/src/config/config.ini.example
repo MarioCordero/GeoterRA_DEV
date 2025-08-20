@@ -1,7 +1,0 @@
-[database]
-host = localhost
-name = GeoterRA
-user = mario
-pass = 2003
-
-# Must be on geoterRA_dev/config.ini
