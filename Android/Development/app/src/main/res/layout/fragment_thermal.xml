@@ -81,56 +81,6 @@
                   android:textSize="60sp">
                 </TextView>
                 
-                <TextView
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  
-                  android:layout_marginTop="10dp"
-                  android:fontFamily="@font/poppins_regular"
-                  android:text="con la temperatura de"
-                  android:textColor="@color/black"
-                  
-                  android:textSize="22sp">
-                </TextView>
-                
-                <TextView
-                  android:id="@+id/tv_temperature"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  
-                  android:layout_marginTop="10dp"
-                  android:fontFamily="@font/poppins_regular"
-                  android:text="88 °C"
-                  android:textColor="@color/black"
-                  
-                  android:textSize="50sp">
-                </TextView>
-                
-                <TextView
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  
-                  android:layout_marginTop="10dp"
-                  android:fontFamily="@font/poppins_regular"
-                  android:text="un índice alcalíno de"
-                  android:textColor="@color/black"
-                  
-                  android:textSize="22sp">
-                </TextView>
-                
-                <TextView
-                  android:id="@+id/tv_ph"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  
-                  android:layout_marginTop="10dp"
-                  android:fontFamily="@font/poppins_regular"
-                  android:text="88 °C"
-                  android:textColor="@color/black"
-                  
-                  android:textSize="50sp">
-                </TextView>
-                
                 <View
                   android:layout_width="match_parent"
                   android:layout_height="1dp"
@@ -270,6 +220,126 @@
                   android:background="@color/geoterra_light_gray"
                   app:layout_constraintEnd_toEndOf="parent"
                   app:layout_constraintStart_toStartOf="parent" />
+                
+                <TextView
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  
+                  android:layout_marginTop="10dp"
+                  android:fontFamily="@font/poppins_bold"
+                  android:text="Temperatura"
+                  android:textColor="@color/black"
+                  android:gravity="center"
+                  
+                  android:textSize="22sp">
+                </TextView>
+                
+                <TextView
+                  android:id="@+id/tv_temperature"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  
+                  android:layout_marginTop="10dp"
+                  android:fontFamily="@font/poppins_regular"
+                  android:text="88 °C"
+                  android:textColor="@color/geoterra_orange"
+                  android:gravity="center"
+                  
+                  android:textSize="44sp">
+                </TextView>
+                
+                <View
+                  android:layout_width="match_parent"
+                  android:layout_height="1dp"
+                  android:background="@color/geoterra_light_gray"
+                  app:layout_constraintEnd_toStartOf="@id/requestsAccepted_frame"
+                  app:layout_constraintStart_toEndOf="@id/requestMade_frame" />
+                
+                <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:gravity="center_horizontal"
+                  android:orientation="horizontal">
+                    
+                    <LinearLayout
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:gravity="center"
+                      android:orientation="vertical"
+                      android:padding="10dp">
+                        
+                        <TextView
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:fontFamily="@font/poppins_bold"
+                          android:gravity="center"
+                          android:text="pH"
+                          android:textColor="@color/black"
+                          android:textSize="22sp">
+                        </TextView>
+                        
+                        <TextView
+                          android:id="@+id/tv_ph"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_marginTop="5dp"
+                          android:fontFamily="@font/poppins_regular"
+                          android:gravity="start"
+                          android:text="89"
+                          android:textColor="@color/black"
+                          android:textSize="22sp">
+                        </TextView>
+                    
+                    </LinearLayout>
+                    
+                    <View
+                      android:layout_width="1dp"
+                      android:layout_height="match_parent"
+                      android:background="@color/geoterra_light_gray"
+                      app:layout_constraintEnd_toStartOf="@id/requestsAccepted_frame"
+                      app:layout_constraintStart_toEndOf="@id/requestMade_frame" />
+                    
+                    <LinearLayout
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:gravity="center"
+                      android:orientation="vertical"
+                      android:padding="10dp">
+                        
+                        <TextView
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_weight="1"
+                          android:fontFamily="@font/poppins_bold"
+                          android:gravity="center"
+                          android:text="µS/cm"
+                          android:textColor="@color/black"
+                          android:textSize="22sp">
+                        </TextView>
+                        
+                        <TextView
+                          android:id="@+id/tv_conductivity"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_marginTop="5dp"
+                          android:layout_weight="1"
+                          android:fontFamily="@font/poppins_regular"
+                          android:gravity="start"
+                          android:text="10"
+                          android:textColor="@color/black"
+                          android:textSize="22sp">
+                        </TextView>
+                    </LinearLayout>
+                </LinearLayout>
+                
+                <View
+                  android:layout_width="match_parent"
+                  android:layout_height="1dp"
+                  android:background="@color/geoterra_light_gray"
+                  app:layout_constraintEnd_toStartOf="@id/requestsAccepted_frame"
+                  app:layout_constraintStart_toEndOf="@id/requestMade_frame" />
                 
                 <HorizontalScrollView
                   android:layout_width="match_parent"

@@ -139,5 +139,9 @@ class ThermalView : PageView<FragmentThermalBinding, ThermalViewModel>(
     this.binding.tvTemperature.text = "%.2f °C".format(
       point.temperature
     )
+
+    this.binding.tvPh.text = point.labPh.toString()
+
+    this.binding.tvConductivity.text = point.labCond.toString()
   }
 }
