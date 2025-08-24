@@ -1,9 +1,7 @@
-<<<<<<< HEAD
 Android/Development/java_pid30684.hprof
 API/.config.ini
 API/config.ini
 config.ini
-=======
 # Archivos y carpetas generadas
 /build
 /.gradle
@@ -33,4 +31,5 @@ secrets.defaults.properties
 
 # Configuración de VSCode (si usás)
 .vscode/
->>>>>>> Android
+.github/
+website/
