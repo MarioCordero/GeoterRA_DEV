@@ -40,7 +40,7 @@ class TerrainForm @JvmOverloads constructor(
       true
     ).apply {
       thermalSensationInput = findViewById(R.id.thermal_sensation_input)
-      conditionsInput = findViewById(R.id.conditions_input)
+      conditionsInput = findViewById(R.id.tv_conductivity)
     }
   }
 

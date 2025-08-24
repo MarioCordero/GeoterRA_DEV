@@ -81,22 +81,30 @@ class CustomInfoOnMarker : InfoWindow {
 
     // Coordinate display
     this.mView.findViewById<TextView>(
-      R.id.coordinates
-    ).text = "Latitud: %.7f\nLongitud: %.7f".format(
+      R.id.tv_coordinates
+    ).text = "%.7f°, %.7f°".format(
       position.latitude, position.longitude
     )
 
     // Thermal point specific UI
     this.temperature?.let { temp ->
-      this.mView.findViewById<TextView>(R.id.temperature).text =
-        "Temperatura: %.2f°C".format(temp)
+      this.mView.apply {
+        findViewById<TextView>(R.id.tv_temperature).text =
+          "$temp °C"
+        findViewById<TextView>(R.id.tv_region).text =
+          "Guanacaste"
+        findViewById<TextView>(R.id.tv_ph).text =
+          thermalPoint?.labPh?.toString()
+        findViewById<TextView>(R.id.tv_conductivity).text =
+          thermalPoint?.labCond.toString() + " μS/cm"
+        findViewById<TextView>(R.id.point_id).text =
+          "Análisis ID: ${marker.title}"
 
-      this.mView.findViewById<TextView>(R.id.point_id).text =
-        "Análisis ID: ${marker.title}"
-
-      this.mView.findViewById<TextView>(R.id.more_info).setOnClickListener {
-        handleMoreInfoClick(marker)
+        findViewById<TextView>(R.id.btn_more_info).setOnClickListener {
+          handleMoreInfoClick(marker)
+        }
       }
+
     } ?: run {
       // User position UI
       this.mView.findViewById<TextView>(R.id.user_position).text =

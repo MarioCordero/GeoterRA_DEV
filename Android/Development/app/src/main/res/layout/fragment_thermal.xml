@@ -45,11 +45,7 @@
                   android:text="Análisis: Campo geotérmico"
                   android:textColor="@color/geoterra_orange"
                   
-                  android:textSize="26sp"
-                  app:layout_constraintEnd_toEndOf="parent"
-                  
-                  app:layout_constraintStart_toStartOf="parent"
-                  app:layout_constraintTop_toTopOf="parent">
+                  android:textSize="26sp">
                 </TextView>
                 
                 <View
@@ -69,11 +65,7 @@
                   android:text="Manifestación de tipo"
                   android:textColor="@color/black"
                   
-                  android:textSize="22sp"
-                  app:layout_constraintEnd_toEndOf="parent"
-                  
-                  app:layout_constraintStart_toStartOf="parent"
-                  app:layout_constraintTop_toBottomOf="@id/tv_identifier">
+                  android:textSize="22sp">
                 </TextView>
                 
                 <TextView
@@ -86,15 +78,10 @@
                   android:text="Manantial"
                   android:textColor="@color/black"
                   
-                  android:textSize="60sp"
-                  app:layout_constraintEnd_toEndOf="parent"
-                  
-                  app:layout_constraintStart_toStartOf="parent"
-                  app:layout_constraintTop_toBottomOf="@id/tv_manifestationLabel">
+                  android:textSize="60sp">
                 </TextView>
                 
                 <TextView
-                  android:id="@+id/temperature_label"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   
@@ -103,11 +90,7 @@
                   android:text="con la temperatura de"
                   android:textColor="@color/black"
                   
-                  android:textSize="22sp"
-                  app:layout_constraintEnd_toEndOf="parent"
-                  
-                  app:layout_constraintStart_toStartOf="parent"
-                  app:layout_constraintTop_toBottomOf="@id/tv_manifestation">
+                  android:textSize="22sp">
                 </TextView>
                 
                 <TextView
@@ -120,11 +103,32 @@
                   android:text="88 °C"
                   android:textColor="@color/black"
                   
-                  android:textSize="50sp"
-                  app:layout_constraintEnd_toEndOf="parent"
+                  android:textSize="50sp">
+                </TextView>
+                
+                <TextView
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
                   
-                  app:layout_constraintStart_toStartOf="parent"
-                  app:layout_constraintTop_toBottomOf="@id/temperature_label">
+                  android:layout_marginTop="10dp"
+                  android:fontFamily="@font/poppins_regular"
+                  android:text="un índice alcalíno de"
+                  android:textColor="@color/black"
+                  
+                  android:textSize="22sp">
+                </TextView>
+                
+                <TextView
+                  android:id="@+id/tv_ph"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  
+                  android:layout_marginTop="10dp"
+                  android:fontFamily="@font/poppins_regular"
+                  android:text="88 °C"
+                  android:textColor="@color/black"
+                  
+                  android:textSize="50sp">
                 </TextView>
                 
                 <View
@@ -150,10 +154,7 @@
                       android:text="Provincia"
                       
                       android:textColor="@color/black"
-                      android:textSize="22sp"
-                      
-                      app:layout_constraintEnd_toEndOf="parent"
-                      app:layout_constraintStart_toStartOf="parent">
+                      android:textSize="22sp">
                     </TextView>
                     
                     <TextView
@@ -167,10 +168,7 @@
                       android:text="Guanacaste"
                       
                       android:textColor="@color/black"
-                      android:textSize="22sp"
-                      
-                      app:layout_constraintEnd_toEndOf="parent"
-                      app:layout_constraintStart_toStartOf="parent">
+                      android:textSize="22sp">
                     </TextView>
                 
                 </LinearLayout>
@@ -187,9 +185,7 @@
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:gravity="center_horizontal"
-                  android:orientation="horizontal"
-                  app:layout_constraintEnd_toEndOf="parent"
-                  app:layout_constraintStart_toStartOf="parent">
+                  android:orientation="horizontal">
                     
                     <LinearLayout
                       android:id="@+id/requestMade_frame"

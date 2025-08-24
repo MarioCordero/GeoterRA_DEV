@@ -97,10 +97,19 @@ class AccountView : PageView<FragmentAccountBinding, AccountViewModel>(
       binding.tvUsername.text = info.name
       binding.tvEmail.text = info.email
       binding.tvPhoneNumber.text = info.phone
+
     }
 
     viewModel.sessionStatus.observe(viewLifecycleOwner) { isActive ->
       // Optional: react to session changes
+    }
+
+    viewModel.requestsMade.observe(viewLifecycleOwner) { requestsMade ->
+      binding.tvRequestsMadeCount.text = requestsMade.toString()
+    }
+
+    viewModel.requestsAccepted.observe(viewLifecycleOwner) { requestsAccepted ->
+      binding.tvRequestsAcceptedCount.text = requestsAccepted.toString()
     }
 
     viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
