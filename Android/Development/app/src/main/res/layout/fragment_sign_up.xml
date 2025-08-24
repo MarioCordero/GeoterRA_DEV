@@ -6,166 +6,304 @@
     android:layout_height="match_parent"
     android:layout_gravity="center"
     android:background="@color/white"
-    tools:context=".fragments.SignUpFragment">
-
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="wrap_content"
-
-        android:layout_height="wrap_content"
-        android:background="@drawable/gray_rectangle_rounded2"
-        android:backgroundTint="@color/white"
-        android:orientation="vertical"
-        android:padding="24dp"
-
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5">
-
-        <TextView
-            android:id="@+id/loginText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textAlignment="center"
-            android:textColor="@color/black"
-            android:textSize="30sp"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/userEmail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:layout_marginTop="25dp"
-            android:padding="14dp"
-
-            android:background="@drawable/gray_rectangle_rounded2"
-            android:drawableEnd="@drawable/baseline_account_circle_24"
-
-            android:inputType="textEmailAddress"
-            android:autofillHints="emailAddress"
-            android:hint="@string/email"
-            android:textColor="@color/black" />
-
-        <EditText
-            android:id="@+id/userPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:layout_marginTop="15dp"
-            android:padding="14dp"
-
-            android:background="@drawable/gray_rectangle_rounded2"
-            android:drawableEnd="@drawable/baseline_lock_24"
-
-            android:inputType="textPassword"
-            android:autofillHints="password"
-            android:hint="@string/password"
-            android:textColor="@color/black" />
-
+    tools:context=".ui.account.views.SignUpView">
+    
+    <ScrollView
+      android:id="@+id/scrollView"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintBottom_toBottomOf="parent"
+        >
+        
         <LinearLayout
-            android:id="@+id/togglePasswordLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            >
+          android:id="@+id/linearLayout"
+          android:layout_width="wrap_content"
+          
+          android:layout_height="wrap_content"
+          android:background="@drawable/gray_rectangle_rounded2"
+          android:backgroundTint="@color/white"
+          android:orientation="vertical"
+          android:padding="24dp"
+          
+          android:visibility="visible"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent">
+            
             <TextView
-                android:id="@+id/txvTogglePassword"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                android:padding="8dp"
-                android:text="Show Password"
-                android:textColor="@color/black"
-                android:textSize="12sp"
-                >
-            </TextView>
-            <CheckBox
-                android:id="@+id/checkBoxTogglePassword"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="-15dp"
-                >
-            </CheckBox>
+              android:id="@+id/tv_geoterraName"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="@string/register"
+              android:textAlignment="center"
+              android:textColor="@color/geoterra_deep_blue"
+              android:textSize="30sp"
+              android:fontFamily="@font/poppins_semibold" />
+            
+            <LinearLayout
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="15dp"
+              >
+                
+                <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Nombre"
+                  android:textAlignment="center"
+                  android:fontFamily="@font/poppins_semibold"
+                  android:textColor="@color/geoterra_deep_blue"
+                  android:textSize="24sp"
+                  />
+                
+            </LinearLayout>
+            
+            <com.google.android.material.textfield.TextInputLayout
+              android:id="@+id/til_firstname"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/gray_rectangle_rounded2"
+              app:hintEnabled="false">
+                
+                <com.google.android.material.textfield.TextInputEditText
+                  android:id="@+id/et_firstname"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:inputType="textPersonName"
+                  android:hint="Ingrese su nombre(s)"
+                  android:fontFamily="@font/poppins_regular"
+                  android:textColor="@color/black"
+                  android:textSize="18sp"
+                  android:padding="14dp"
+                  android:background="@android:color/transparent"/>
+            
+            </com.google.android.material.textfield.TextInputLayout>
+            
+            <LinearLayout
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="15dp"
+              >
+                
+                <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Apellidos"
+                  android:textAlignment="center"
+                  android:fontFamily="@font/poppins_semibold"
+                  android:textColor="@color/geoterra_deep_blue"
+                  android:textSize="24sp"
+                  />
+            </LinearLayout>
+            
+            <com.google.android.material.textfield.TextInputLayout
+              android:id="@+id/til_lastname"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/gray_rectangle_rounded2"
+              app:hintEnabled="false">
+                
+                <com.google.android.material.textfield.TextInputEditText
+                  android:id="@+id/et_lastname"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:inputType="textPersonName"
+                  android:hint="@string/enter_lastname"
+                  android:fontFamily="@font/poppins_regular"
+                  android:textColor="@color/black"
+                  android:textSize="18sp"
+                  android:padding="14dp"
+                  android:background="@android:color/transparent"/>
+            
+            </com.google.android.material.textfield.TextInputLayout>
+            
+            <LinearLayout
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="15dp"
+              >
+                
+                <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Número de contacto"
+                  android:textAlignment="center"
+                  android:fontFamily="@font/poppins_semibold"
+                  android:textColor="@color/geoterra_deep_blue"
+                  android:textSize="24sp"
+                  />
+            </LinearLayout>
+            
+            <com.google.android.material.textfield.TextInputLayout
+              android:id="@+id/til_phone"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/gray_rectangle_rounded2"
+              app:hintEnabled="false">
+                
+                <com.google.android.material.textfield.TextInputEditText
+                  android:id="@+id/et_phone"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:inputType="phone"
+                  android:hint="@string/contact_number"
+                  android:fontFamily="@font/poppins_regular"
+                  android:textColor="@color/black"
+                  android:textSize="18sp"
+                  android:padding="14dp"
+                  android:background="@android:color/transparent"/>
+            
+            </com.google.android.material.textfield.TextInputLayout>
+            
+            <LinearLayout
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="15dp"
+              >
+                
+                <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Correo"
+                  android:textAlignment="center"
+                  android:fontFamily="@font/poppins_semibold"
+                  android:textColor="@color/geoterra_deep_blue"
+                  android:textSize="24sp"
+                  />
+            </LinearLayout>
+            
+            <com.google.android.material.textfield.TextInputLayout
+              android:id="@+id/til_email"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/gray_rectangle_rounded2"
+              app:hintEnabled="false">
+                
+                <com.google.android.material.textfield.TextInputEditText
+                  android:id="@+id/et_email"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:inputType="textEmailAddress"
+                  android:hint="@string/enter_email"
+                  android:fontFamily="@font/poppins_regular"
+                  android:textColor="@color/black"
+                  android:textSize="18sp"
+                  android:padding="14dp"
+                  android:background="@android:color/transparent"/>
+            
+            </com.google.android.material.textfield.TextInputLayout>
+            
+            <LinearLayout
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="15dp"
+              >
+                
+                <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Contraseña"
+                  android:textAlignment="center"
+                  android:fontFamily="@font/poppins_semibold"
+                  android:textColor="@color/geoterra_deep_blue"
+                  android:textSize="24sp"
+                  />
+            </LinearLayout>
+            
+            <com.google.android.material.textfield.TextInputLayout
+              android:id="@+id/til_password"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/gray_rectangle_rounded2"
+              app:hintEnabled="false"
+              app:passwordToggleEnabled="true">
+                
+                <com.google.android.material.textfield.TextInputEditText
+                  android:id="@+id/et_password"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:inputType="textPassword"
+                  android:hint="@string/enter_password"
+                  android:fontFamily="@font/poppins_regular"
+                  android:textColor="@color/black"
+                  android:textSize="18sp"
+                  android:padding="14dp"
+                  android:background="@android:color/transparent"/>
+            
+            </com.google.android.material.textfield.TextInputLayout>
+            
+            <LinearLayout
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="15dp"
+              >
+                
+                <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Confirmar contraseña"
+                  android:textAlignment="center"
+                  android:fontFamily="@font/poppins_semibold"
+                  android:textColor="@color/geoterra_deep_blue"
+                  android:textSize="24sp"
+                  />
+            </LinearLayout>
+            
+            <com.google.android.material.textfield.TextInputLayout
+              android:id="@+id/til_confirmpassword"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/gray_rectangle_rounded2"
+              app:hintEnabled="false"
+              app:passwordToggleEnabled="true">
+                
+                <com.google.android.material.textfield.TextInputEditText
+                  android:id="@+id/et_confirmpassword"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:inputType="textPassword"
+                  android:hint="@string/repeat_password"
+                  android:fontFamily="@font/poppins_regular"
+                  android:textColor="@color/black"
+                  android:textSize="18sp"
+                  android:padding="14dp"
+                  android:background="@android:color/transparent"/>
+            
+            </com.google.android.material.textfield.TextInputLayout>
+            
+            
+            <Button
+              android:id="@+id/createAccountB"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="30dp"
+              android:backgroundTint="@color/geoterra_orange"
+              android:text="@string/register"
+              android:fontFamily="@font/poppins_semibold"
+              android:textColor="@color/white"
+              android:textSize="18sp"
+              app:cornerRadius="5dp" />
+            
+            <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="2dp"
+              android:layout_marginTop="20dp"
+              android:background="@color/black" />
+            
+            <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="10dp"
+              android:fontFamily="@font/poppins_regular"
+              android:textColor="@color/black"
+              android:text="Instituto de Investigaciones en Ingeniería | REFORESTA"
+              android:textSize="12sp" />
+        
         </LinearLayout>
-
-        <EditText
-            android:id="@+id/userFirstName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:layout_marginTop="15dp"
-            android:padding="14dp"
-
-            android:background="@drawable/gray_rectangle_rounded2"
-            android:drawableEnd="@drawable/baseline_drive_file_rename_outline_24"
-
-            android:inputType="textPersonName"
-            android:autofillHints="personName"
-            android:hint="@string/name"
-            android:textColor="@color/black" />
-
-        <EditText
-            android:id="@+id/userLastName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:layout_marginTop="15dp"
-            android:padding="14dp"
-
-            android:background="@drawable/gray_rectangle_rounded2"
-            android:drawableEnd="@drawable/baseline_drive_file_rename_outline_24"
-
-            android:inputType="textPersonName"
-            android:autofillHints="personName"
-            android:hint="@string/lastname"
-            android:textColor="@color/black" />
-
-        <EditText
-            android:id="@+id/userPhoneNum"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:layout_marginTop="15dp"
-            android:padding="14dp"
-
-            android:background="@drawable/gray_rectangle_rounded2"
-            android:drawableEnd="@drawable/baseline_local_phone_24"
-
-            android:inputType="phone"
-            android:autofillHints="phone"
-            android:hint="@string/contact_number"
-
-            android:textColor="@color/black" />
-
-        <Button
-            android:id="@+id/createAccountB"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:backgroundTint="@color/black"
-            android:text="@string/create_account"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            app:cornerRadius="5dp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_marginTop="20dp"
-            android:background="@color/black" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="Instituto de Investigaciones en Ingeniería | REFORESTA"
-            android:textColor="@color/black"
-            android:textSize="12sp" />
-
-    </LinearLayout>
+        
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,8 +1,19 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.googleAndroidLibrariesMapsplatformSecretsGradlePlugin)
-    // alias(libs.plugins.kotlinParcelize)
+    alias(libs.plugins.kotlinParcelize)
+    alias(libs.plugins.kotlinKapt)
+    alias(libs.plugins.daggerHilt)
+}
+
+val localProperties = Properties().apply {
+    val localFile = rootProject.file("local.properties")
+    if (localFile.exists()) {
+        load(localFile.inputStream())
+    }
 }
 
 android {
@@ -22,23 +33,38 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            isShrinkResources = false
+
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+                "proguard-rules.pro")
+
+            buildConfigField("String", "API_BASE_URL",
+                             "\"${localProperties["API_BASE_URL"]}\"")
+        }
+
+        debug {
+            buildConfigField("String", "API_BASE_URL",
+                             "\"${localProperties["API_BASE_URL"]}\"")
         }
     }
 
 
-
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
-        freeCompilerArgs += "-Xparcelize"
+        jvmTarget = "17"
+    }
+
+    kotlin {
+        jvmToolchain(17)
+    }
+
+    hilt {
+        enableAggregatingTask = false
     }
 
     buildFeatures {
@@ -57,34 +83,33 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
-    implementation(libs.play.services)
-    //noinspection UseTomlInstead
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    //noinspection UseTomlInstead
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-    //noinspection UseTomlInstead
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    //noinspection UseTomlInstead
-    implementation("org.json:json:20240303")
-    implementation(libs.material.v150)
-    implementation(libs.play.services.location)
+    implementation(libs.androidx.junit.ktx)
+    implementation(libs.androidx.preference.ktx)
+    implementation(libs.androidx.exifinterface)
+    implementation(libs.timber)
 
+    implementation(
+        libs.hilt.android
+    )
+    implementation(libs.androidx.lifecycle.process)
+    implementation(libs.play.services.base.v1872)
+    implementation(libs.play.services.ads.identifier.v1820)
 
-    //noinspection UseTomlInstead
-    implementation("androidx.preference:preference-ktx:1.2.1")
-    //noinspection UseTomlInstead
-    implementation("org.osmdroid:osmdroid-android:6.1.18")
-    implementation("androidx.exifinterface:exifinterface:1.3.7")
-    implementation("androidx.exifinterface:exifinterface:1.3.7")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-    implementation("org.locationtech.proj4j:proj4j:1.1.0")
-    // implementation("org.jetbrains.kotlin:kotlin-android-extensions-runtime:<kotlin_version>")
+    kapt(libs.hilt.compiler)
 
-    implementation(libs.firebase.firestore)
+    implementation(libs.retrofit2.retrofit)
+    implementation(libs.squareup.converter.gson)
+    implementation(libs.okhttp)
+    implementation(libs.json)
+    implementation(libs.osmdroid.android)
+    implementation(libs.logging.interceptor)
+    implementation(libs.locationtech.proj4j)
 
+    testImplementation(libs.junit)
+    testImplementation(libs.retrofit2.retrofit)
+    testImplementation(libs.squareup.converter.gson)
 
-  testImplementation(libs.junit)
-
+    androidTestImplementation(libs.androidx.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
