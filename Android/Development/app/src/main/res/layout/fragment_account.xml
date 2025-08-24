@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/account_container"
+    tools:context=".ui.account.views.AccountView"
+    android:layout_gravity="center_horizontal"
+    android:padding="10dp"
+  
+  >
+    <LinearLayout
+        android:id="@+id/username_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        tools:ignore="UseCompoundDrawables">
+
+        <TextView
+            android:id="@+id/tv_username"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="10dp"
+            android:text=""
+            android:fontFamily="@font/poppins_semibold"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:gravity="start"
+            >
+        </TextView>
+
+        <ImageView
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="end"
+            android:src="@drawable/account_black_icon"
+            >
+        </ImageView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/phone_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/username_section"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        >
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="end"
+            android:src="@drawable/mobile_gray_icon"
+            >
+        </ImageView>
+
+        <TextView
+            android:id="@+id/tv_phone_number"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="5dp"
+            android:text=""
+            android:fontFamily="@font/poppins_semibold"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:gravity="start" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/email_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/phone_section"
+        app:layout_constraintBottom_toTopOf="@id/requests_info_section"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        >
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="end"
+            android:src="@drawable/mail_gray_icon"
+            >
+        </ImageView>
+
+        <TextView
+            android:id="@+id/tv_email"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="5dp"
+            android:text=""
+            android:fontFamily="@font/poppins_semibold"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:gravity="start"
+            >
+        </TextView>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/email_section"
+        app:layout_constraintBottom_toTopOf="@+id/requests_info_section"
+        android:background="@color/geoterra_light_gray"
+        />
+
+    <LinearLayout
+        android:id="@+id/requests_info_section"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/email_section"
+        app:layout_constraintBottom_toTopOf="@id/options_section"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        >
+
+        <LinearLayout
+            android:id="@+id/requestMade_frame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="10dp"
+            >
+
+            <TextView
+                android:id="@+id/tv_requests_made_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2"
+                android:fontFamily="@font/poppins_bold"
+                android:textColor="@color/geoterra_deep_blue"
+                android:textSize="20sp"
+                android:gravity="center"
+                >
+            </TextView>
+
+            <TextView
+                android:id="@+id/tv_requests_made_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Solicitudes realizadas"
+                android:fontFamily="@font/poppins_semibold"
+                android:textColor="@color/black"
+                android:textSize="11sp"
+                android:gravity="start"
+                >
+            </TextView>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toEndOf="@id/requestMade_frame"
+            app:layout_constraintEnd_toStartOf="@id/requestsAccepted_frame"
+            app:layout_constraintTop_toBottomOf="@+id/email_section"
+            app:layout_constraintBottom_toTopOf="@+id/options_section"
+            android:background="@color/geoterra_light_gray"
+            />
+
+        <LinearLayout
+            android:id="@+id/requestsAccepted_frame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="10dp"
+            >
+
+            <TextView
+                android:id="@+id/tv_requests_accepted_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="9"
+                android:fontFamily="@font/poppins_bold"
+                android:textColor="@color/geoterra_deep_blue"
+                android:textSize="20sp"
+                android:gravity="center"
+                >
+            </TextView>
+
+            <TextView
+                android:id="@+id/tv_requests_accepted_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="5dp"
+                android:text="Solicitudes aceptadas"
+                android:fontFamily="@font/poppins_semibold"
+                android:textColor="@color/black"
+                android:textSize="11sp"
+                android:gravity="start"
+                >
+            </TextView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/requests_info_section"
+        app:layout_constraintBottom_toTopOf="@+id/options_section"
+        android:background="@color/geoterra_light_gray"
+        />
+
+    <LinearLayout
+        android:id="@+id/options_section"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="top"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/logout_section"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/requests_info_section">
+        
+        <com.google.android.material.card.MaterialCardView
+          android:id="@+id/btn_settings"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:cardElevation="0dp"
+          app:cardBackgroundColor="@android:color/transparent"
+          app:strokeWidth="0dp"
+          android:clickable="true"
+          android:focusable="true">
+            
+            <TextView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:drawablePadding="10dp"
+              android:padding="6dp"
+              android:fontFamily="@font/poppins_semibold"
+              android:text="Ajustes"
+              android:textColor="@color/black"
+              android:textSize="18sp"
+              android:gravity="start|center_vertical"
+              app:drawableLeftCompat="@drawable/settings_deepblue_icon"
+              />
+        </com.google.android.material.card.MaterialCardView>
+        
+        <com.google.android.material.card.MaterialCardView
+          android:id="@+id/btn_edit_data"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:cardElevation="0dp"
+          app:cardBackgroundColor="@android:color/transparent"
+          app:strokeWidth="0dp"
+          android:clickable="true"
+          android:focusable="true">
+            
+            <TextView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:drawablePadding="10dp"
+              android:padding="6dp"
+              android:fontFamily="@font/poppins_semibold"
+              android:text="Editar datos personales"
+              android:textColor="@color/black"
+              
+              android:textSize="18sp"
+              app:drawableLeftCompat="@drawable/edit_pencil_deepblue_icon">
+            </TextView>
+            
+        </com.google.android.material.card.MaterialCardView>
+        
+        <com.google.android.material.card.MaterialCardView
+          android:id="@+id/btn_request_history"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:cardElevation="0dp"
+          app:cardBackgroundColor="@android:color/transparent"
+          app:strokeWidth="0dp"
+          android:clickable="true"
+          android:focusable="true">
+            
+            <TextView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:drawablePadding="10dp"
+              android:padding="6dp"
+              android:fontFamily="@font/poppins_semibold"
+              android:text="Mirar historial de solicitudes"
+              android:textColor="@color/black"
+              
+              android:textSize="18sp"
+              app:drawableStartCompat="@drawable/notebook_deepblue_icon">
+            </TextView>
+            
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/logout_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="vertical"
+        >
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/geoterra_light_gray"
+            />
+        
+        <com.google.android.material.card.MaterialCardView
+          android:id="@+id/btn_logout"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="20dp"
+          android:layout_marginBottom="20dp"
+          app:cardElevation="0dp"
+          app:cardBackgroundColor="@android:color/transparent"
+          app:strokeWidth="0dp"
+          android:clickable="true"
+          android:focusable="true">
+            
+            <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:padding="6dp"
+              android:gravity="center"
+              android:fontFamily="@font/poppins_semibold"
+              android:text="Cerrar Sesión"
+              android:textColor="@color/geoterra_orange"
+              android:textSize="18sp"
+              
+              app:drawableLeftCompat="@drawable/logout_orange_icon"
+              android:drawablePadding="10dp"
+              >
+            </TextView>
+          
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

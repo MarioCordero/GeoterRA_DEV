@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- custom_info_window_layout.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:background="@drawable/rounded_background"
+  android:gravity="center"
+  android:orientation="vertical"
+  android:padding="18dp">
+
+    <TextView
+        android:id="@+id/point_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18dp"
+      android:text="@string/name"
+        android:textColor="@color/geoterra_orange"
+
+        android:layout_marginBottom="5dp"
+        android:gravity="center"
+        android:fontFamily="@font/poppins_semibold"
+        >
+    </TextView>
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="1dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+    <LinearLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:gravity="center"
+      android:background="@drawable/white_rectangle_rounded2">
+        
+        <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:padding="5dp"
+          >
+            
+            <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Región: "
+              android:textColor="@android:color/black"
+              android:fontFamily="@font/calibri_bold"
+              android:textSize="16sp"
+              android:gravity="center"
+              >
+            </TextView>
+            
+            <TextView
+              android:id="@+id/tv_region"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:gravity="center"
+              android:text="AAAA"
+              android:textColor="@color/black"
+              android:fontFamily="@font/calibri_regular"
+              android:textSize="16sp" />
+        </LinearLayout>
+        
+        <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:padding="5dp"
+          >
+            
+            <TextView
+              android:id="@+id/tv_coordinates"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:background="@android:color/white"
+              android:gravity="center"
+              android:text="AAAA"
+              android:textColor="@color/black"
+              android:fontFamily="@font/calibri_regular"
+              android:textSize="16sp" />
+        </LinearLayout>
+    </LinearLayout>
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="1dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+    <LinearLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:gravity="center"
+      android:padding="5dp">
+        
+        <LinearLayout
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          android:orientation="vertical"
+          android:paddingHorizontal="5dp"
+          android:gravity="center"
+          >
+            
+            <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Temp"
+              android:textColor="@android:color/black"
+              android:fontFamily="@font/calibri_bold"
+              android:textSize="16sp"
+                >
+            </TextView>
+            
+            <TextView
+              android:id="@+id/tv_temperature"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="AAAA"
+              android:textColor="@color/geoterra_deep_blue"
+              android:fontFamily="@font/calibri_regular"
+              android:textSize="16sp" />
+        </LinearLayout>
+        
+        <LinearLayout
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          android:orientation="vertical"
+          android:gravity="center"
+          android:paddingHorizontal="5dp"
+          >
+            
+            <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="pH"
+              android:textColor="@android:color/black"
+              android:fontFamily="@font/calibri_bold"
+              android:textSize="16sp"
+              >
+            </TextView>
+            
+            <TextView
+              android:id="@+id/tv_ph"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@android:color/white"
+              android:gravity="center"
+              android:text="AAAA"
+              android:textColor="@color/geoterra_deep_blue"
+              android:fontFamily="@font/calibri_regular"
+              android:textSize="16sp" />
+        </LinearLayout>
+        
+        <LinearLayout
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          android:orientation="vertical"
+          android:paddingHorizontal="5dp"
+          android:gravity="center"
+          >
+            
+            <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Conductividad"
+              android:textColor="@android:color/black"
+              android:fontFamily="@font/calibri_bold"
+              android:textSize="16sp"
+              >
+            </TextView>
+            
+            <TextView
+              android:id="@+id/tv_conductivity"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@android:color/white"
+              android:text="AAAA"
+              android:textColor="@color/geoterra_deep_blue"
+              android:fontFamily="@font/calibri_regular"
+              android:textSize="16sp" />
+        </LinearLayout>
+    </LinearLayout>
+    
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="1dp"
+      android:background="@color/geoterra_light_gray"
+      />
+    
+    <Button
+      android:layout_marginTop="10dp"
+      android:id="@+id/btn_more_info"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:backgroundTint="@color/geoterra_orange"
+      android:text="Más detalles..."
+      android:fontFamily="@font/poppins_semibold"
+      android:textColor="@color/white"
+      android:textAllCaps="false"
+      android:textSize="18sp"
+      app:cornerRadius="5dp"
+      >
+    </Button>
+    
+    <!-- Otros elementos de la ventana de información (si los hay) -->
+
+</LinearLayout>

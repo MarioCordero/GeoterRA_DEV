@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frameLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="15dp"
+    android:background="@drawable/gray_rectangle_rounded2"
+    android:orientation="vertical"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.0"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/newRequestButton">
+    
+    <TextView
+      app:layout_constraintStart_toStartOf="parent"
+      android:id="@+id/coordenatesTxt"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:fontFamily="@font/poppins_regular"
+      android:text="Coordenadas: "
+      android:textSize="18sp"
+      app:layout_constraintTop_toTopOf="parent"
+      tools:layout_editor_absoluteX="172dp" />
+
+    <TextView
+        android:id="@+id/dateTxt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/poppins_regular"
+        app:layout_constraintTop_toBottomOf="@id/coordenatesTxt"
+        app:layout_constraintStart_toStartOf="@id/coordenatesTxt"
+        android:text="Fecha: "
+        android:textSize="18sp"/>
+
+    <TextView
+        android:id="@+id/typeTxt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/poppins_regular"
+        app:layout_constraintTop_toBottomOf="@id/dateTxt"
+        app:layout_constraintStart_toStartOf="@id/dateTxt"
+        android:text="Tipo: Terrestre"
+        android:textSize="18sp"/>
+
+    <TextView
+        android:id="@+id/stateTxt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/poppins_regular"
+        app:layout_constraintTop_toBottomOf="@id/typeTxt"
+        app:layout_constraintStart_toStartOf="@id/typeTxt"
+        android:text="Estado: "
+        android:textSize="18sp"/>
+
+    <Button
+        android:id="@+id/contact_us"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+
+        android:layout_marginTop="20dp"
+
+        android:backgroundTint="@color/geoterra_orange"
+        android:drawableTint="@color/white"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="Editar"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        app:cornerRadius="5dp"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/repeat_request"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:backgroundTint="@color/geoterra_deep_blue"
+        android:drawableStart="@drawable/baseline_cached_24"
+
+        android:text="Eliminar"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:cornerRadius="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</LinearLayout>
