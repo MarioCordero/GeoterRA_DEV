@@ -56,7 +56,7 @@ function IndexWelcome() {
           <div className="mb-8 sm:mb-10 md:mb-12 max-w-4xl mx-auto lg:mx-0">
             <div className="bg-white/30 backdrop-blur-md p-4 sm:p-5 md:p-6 lg:p-8 rounded-lg border-l-4 border-geoterra-orange shadow-lg">
               <p className="text-black text-xs sm:text-base md:text-lg leading-relaxed poppins">
-                GeoterRA es una aplicación web y móvil que permite visualizar puntos geográficos en un mapa interactivo.
+                GeoterRA es una aplicación web y móvil que hice yo que permite visualizar puntos geográficos en un mapa interactivo.
                 Su objetivo es facilitar la tarea de decisiones en proyectos de energía geotérmica mediante la consulta
                 y gestión de datos geológicos validados. Los usuarios pueden registrar, editar y exportar información
                 desde el mapa. GeoterRA busca apoyar el desarrollo sostenible mediante el uso eficiente de datos
