@@ -1,0 +1,6 @@
+<!-- res/color/color_state_list.xml -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@android:color/black" android:state_pressed="true"/>
+    <item android:color="@android:color/darker_gray" android:state_enabled="false"/>
+    <item android:color="@android:color/black"/>
+</selector>

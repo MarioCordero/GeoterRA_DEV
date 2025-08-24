@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- Color cuando está "presionado" (checked) -->
+  <item android:color="@color/geoterra_orange" android:state_checked="true"/>
+  
+  <!-- Color cuando está liberado -->
+  <item android:color="@color/geoterra_light_orange"/>
+</selector>
