@@ -27,3 +27,5 @@ secrets.defaults.properties
 
 # Configuración de VSCode (si usás)
 .vscode/
+.github/
+website/
