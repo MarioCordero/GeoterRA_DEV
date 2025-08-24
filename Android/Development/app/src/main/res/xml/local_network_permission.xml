@@ -4,4 +4,6 @@
         <domain includeSubdomains="true">10.0.2.2</domain>
         <domain includeSubdomains="true">163.178.171.105</domain>
     </domain-config>
+    // Delete on deploy, it is insecure
+    <base-config cleartextTrafficPermitted="true" />
 </network-security-config>
