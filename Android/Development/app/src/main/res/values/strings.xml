@@ -1,0 +1,26 @@
+<resources>
+    <string name="title_activity_menu">MenuActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_maps">Maps</string>
+    <string name="account">Account</string>
+    <string name="navigation_account" />
+
+    <string name="home">Home</string>
+    <string name="map">Map</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="textview">TextView</string>
+    <string name="email">Email</string>
+    <string name="app_name">GeoterRa</string>
+    <string name="password">Contraseña</string>
+    <string name="name">Nombre</string>
+    <string name="lastname">Apellidos</string>
+    <string name="contact_number">Número de contacto</string>
+    <string name="create_account">Crear cuenta</string>
+    <string name="about_us">Acerca de nosotros</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>
