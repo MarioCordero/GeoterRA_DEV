@@ -1,0 +1,44 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    
+    <!-- Base application theme -->
+    <style name="Theme.Development" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color -->
+        <item name="colorPrimary">@color/black</item>
+        <item name="colorPrimaryVariant">@color/geoterra_orange</item>
+        <item name="colorOnPrimary">@color/white</item>
+        
+        <!-- Secondary brand color -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        
+        <!-- Surface and background colors -->
+        <item name="colorSurface">@color/white</item>           <!-- background of dialogs -->
+        <item name="colorOnSurface">@color/black</item>         <!-- text/buttons on dialogs -->
+        <item name="android:colorBackground">@color/white</item> <!-- general background -->
+        
+        <!-- Status bar color -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        
+        <!-- Override button styles globally for dialogs -->
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.Development.Button.Text.Positive</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.Development.Button.Text.Negative</item>
+    </style>
+    
+    <!-- Positive button style -->
+    <style name="Widget.Development.Button.Text.Positive" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/purple_500</item>
+        <!-- Puedes agregar más atributos aquí, ej. fontFamily, textSize -->
+    </style>
+    
+    <!-- Negative button style -->
+    <style name="Widget.Development.Button.Text.Negative" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/teal_700</item>
+    </style>
+    
+    <!-- Opcional: Estilo base para botones de texto si quieres reutilizar -->
+    <style name="Widget.Development.Button.Text" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/purple_500</item>
+    </style>
+
+</resources>
