@@ -96,12 +96,12 @@ export default function Register() {
         // Show success popup instead of navigating
         setShowSuccessModal(true);
       } else {
-        // Handle registration error (show message, etc.)
-        // Debug
-        // console.log("=== REGISTRATION ERROR ===");
-        // console.log("Error message:", data.message);
-        // console.log("Errors array:", data.errors);
-        alert(data.message || "Error en el registro");
+        // Show specific error if available
+        if (data.errors && data.errors.email_used) {
+          alert(data.errors.email_used);
+        } else {
+          alert(data.message || "Error en el registro");
+        }
       }
     } catch (err) {
       // Debug
