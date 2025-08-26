@@ -676,7 +676,6 @@ const AdminRequestsManager = () => {
           </div>
         </Form>
       </Modal>
-      
       <Divider />
     </div>
   );
