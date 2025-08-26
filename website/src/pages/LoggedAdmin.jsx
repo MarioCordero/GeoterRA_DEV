@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SidebarLayout from '../components/loggedAdminComponents/loggedAdminSidebar';
 import LoggedHeader from '../components/loggedHeader';
 import Footer from '../components/Footer';
@@ -48,6 +48,23 @@ const PerfilPlaceholder = () => (
 
 const LoggedAdmin = () => {
   const [selectedKey, setSelectedKey] = useState('1');
+  const [collapsed, setCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      if (mobile) {
+        setCollapsed(true);
+      }
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   let content;
   if (selectedKey === '1') content = <DashboardPlaceholder />;
@@ -59,9 +76,22 @@ const LoggedAdmin = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <LoggedHeader />
-      <div className="flex flex-1 pt-16"> 
-        <SidebarLayout selectedKey={selectedKey} setSelectedKey={setSelectedKey} />
-        <div className="flex-1 flex flex-col overflow-auto">
+      <div className="flex flex-1 pt-16">
+        <SidebarLayout
+          selectedKey={selectedKey}
+          setSelectedKey={setSelectedKey}
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+          isMobile={isMobile}
+        />
+        <div
+          className="flex-1 flex flex-col overflow-auto"
+          style={{
+            marginLeft: isMobile ? 0 : (collapsed ? '80px' : '220px'),
+            transition: 'margin-left 0.3s ease',
+            marginBottom: isMobile ? '60px' : 0,
+          }}
+        >
           {content}
         </div>
       </div>
