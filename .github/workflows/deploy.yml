@@ -50,6 +50,7 @@ jobs:
           # Traer la última versión de main
           git fetch origin main
           git checkout main
+          git clean -fdx
           git reset --hard origin/main
 
           # Crear carpeta temporal con contenido de headerWeb
