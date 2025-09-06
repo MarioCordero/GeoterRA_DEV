@@ -336,13 +336,9 @@ export default function MapComponent() {
                         <div style={{ fontWeight: "bold", color: "#e74c3c" }}>{point.temp}°C</div>
                         <div style={{ fontSize: "9px", color: "#7f8c8d" }}>Temperatura</div>
                       </div>
-                      <div style={{ textAlign: "center" }}>
-                        <div style={{ fontWeight: "bold", color: "#27ae60" }}>{point.pH_campo}</div>
-                        <div style={{ fontSize: "9px", color: "#7f8c8d" }}>pH Campo</div>
-                      </div>
-                      <div style={{ textAlign: "center" }}>
-                        <div style={{ fontWeight: "bold", color: "#3498db" }}>{point.cond_campo}</div>
-                        <div style={{ fontSize: "9px", color: "#7f8c8d" }}>Conductividad</div>
+                      {/* TODO: LINDAL */}
+                      <div>
+                        <h1>Aqui va LINDAL</h1>
                       </div>
                     </div>
                     
@@ -378,28 +374,6 @@ export default function MapComponent() {
               </Marker>
             );
           })}
-          
-          {/* User session indicator at top left corner */}
-          {userSession && (
-            <div
-              style={{
-                position: "absolute",
-                top: "20px",
-                left: sidebarOpen ? "290px" : "60px",
-                zIndex: 1000,
-                backgroundColor: userSession.status === 'logged_in' ? "rgba(46, 204, 113, 0.9)" : "rgba(231, 76, 60, 0.9)",
-                borderRadius: "20px",
-                padding: "8px 16px",
-                color: "white",
-                fontSize: "12px",
-                fontWeight: "500",
-                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.2)",
-                transition: "all 0.3s ease",
-              }}
-            >
-              {userSession.status === 'logged_in' ? `👤 ${userSession.user}` : '🔒 No autenticado'}
-            </div>
-          )}
 
           {/* Fullscreen button at top right */}
           <div
@@ -432,21 +406,22 @@ export default function MapComponent() {
               {fullscreen ? <><FaCompress /> Salir de pantalla completa</> : <><FaExpand /> Pantalla completa</>}
             </button>
           </div>
+          {/* Fullscreen button at top right */}
 
-          {/* Regions sidebar with checkboxes */}
+          {/* SIDEBAR */}
           <div
+          // Sidebar container
             style={{
               position: "absolute",
-              top: "20px",
-              left: sidebarOpen ? "20px" : "0",
+              top: "0px",
               zIndex: 1000,
               backgroundColor: "rgba(255, 255, 255, 0.9)",
-              borderRadius: "8px",
+              borderRadius: "0px 8px 8px 0px",
               boxShadow: "0 2px 10px rgba(0, 0, 0, 0.2)",
               transition: "all 0.3s ease",
               overflow: "hidden",
               width: sidebarOpen ? "250px" : "40px",
-              height: sidebarOpen ? "calc(100% - 40px)" : "40px",
+              height: sidebarOpen ? "100%" : "40px",
             }}
           >
             <button
@@ -594,6 +569,7 @@ export default function MapComponent() {
               </div>
             )}
           </div>
+          {/* SIDEBAR */}
         </MapContainer>
       </div>
     </div>
