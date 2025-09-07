@@ -198,10 +198,11 @@ export default function MapComponent() {
   }, [selectedRegions]);
 
   const toggleRegion = (region) => {
+    console.log("Toggling region:", region);
     setSelectedRegions(prev => 
       prev.includes(region)
-        ? prev.filter(r => r !== region) // Remove if already selected
-        : [...prev, region] // Add if not selected
+        ? prev.filter(r => r !== region)
+        : [...prev, region]
     );
   };
 
@@ -468,35 +469,43 @@ export default function MapComponent() {
                     
                     return (
                       <div 
-                        key={reg}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          padding: "8px 0",
-                          cursor: "pointer",
-                          borderRadius: "4px",
-                          backgroundColor: isSelected ? "#f0f8ff" : "transparent",
-                          transition: "background-color 0.2s ease",
-                        }}
-                        onClick={() => toggleRegion(reg)}
-                        onMouseEnter={(e) => {
-                          if (!isSelected) e.target.style.backgroundColor = "#f5f5f5";
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!isSelected) e.target.style.backgroundColor = "transparent";
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => toggleRegion(reg)}
-                          style={{
-                            marginRight: "10px",
-                            cursor: "pointer",
-                            width: "16px",
-                            height: "16px",
-                          }}
-                        />
+  key={reg}
+  style={{
+    display: "flex",
+    alignItems: "center",
+    padding: "8px 0",
+    cursor: "pointer",
+    borderRadius: "4px",
+    backgroundColor: isSelected ? "#f0f8ff" : "transparent",
+    transition: "background-color 0.2s ease",
+  }}
+  onClick={e => {
+    // Only toggle if not clicking the checkbox itself
+    if (e.target.type !== "checkbox") {
+      toggleRegion(reg);
+    }
+  }}
+  onMouseEnter={(e) => {
+    if (!isSelected) e.target.style.backgroundColor = "#f5f5f5";
+  }}
+  onMouseLeave={(e) => {
+    if (!isSelected) e.target.style.backgroundColor = "transparent";
+  }}
+>
+  <input
+    type="checkbox"
+    checked={isSelected}
+    onChange={e => {
+      // Only toggle from checkbox
+      toggleRegion(reg);
+    }}
+    style={{
+      marginRight: "10px",
+      cursor: "pointer",
+      width: "16px",
+      height: "16px",
+    }}
+  />
                         <FaMapMarkerAlt style={{ 
                           color: isSelected ? "#2a5bd6" : "#666",
                           marginRight: "8px"
