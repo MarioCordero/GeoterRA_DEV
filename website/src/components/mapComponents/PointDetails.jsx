@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaDownload, FaShare, FaPrint, FaMapMarkerAlt, FaFlask, FaThermometerHalf, FaFileCsv } from 'react-icons/fa';
-import { generatePointPDF, exportToCSV, formatPointForSharing } from './exportUtils';
 import { buildApiUrl } from '../../config/apiConf';
 import PiperDiagram from './PiperDiagram';
 
@@ -64,14 +63,6 @@ export default function PointDetails() {
       setLoading(false);
     }
   }, [pointId, pointData, location.state]);
-
-  const handleExportPDF = async () => {
-    try {
-      await generatePointPDF(pointData);
-    } catch (error) {
-      alert('Error al generar PDF: ' + error.message);
-    }
-  };
 
   const handlePrint = () => {
     window.print();
@@ -186,21 +177,7 @@ export default function PointDetails() {
             alignItems: 'center',
             gap: '5px'
           }}>
-            <FaPrint /> Imprimir
-          </button>
-
-          <button onClick={handleExportPDF} style={{
-            padding: '10px 15px',
-            backgroundColor: '#e74c3c',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px'
-          }}>
-            <FaDownload /> Exportar PDF
+            <FaPrint /> Imprimir / Exportar PDF
           </button>
 
         </div>
