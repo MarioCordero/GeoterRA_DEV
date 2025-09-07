@@ -5,7 +5,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { FaExpand, FaCompress, FaChevronRight, FaChevronLeft, FaMapMarkerAlt } from "react-icons/fa";
 import { buildApiUrl } from '../../config/apiConf';
-
+import LindalDiagram from './LindalDiagram';
 
 // Fix Leaflet's default icon issue
 delete L.Icon.Default.prototype._getIconUrl;
@@ -346,57 +346,50 @@ export default function MapComponent() {
                 key={`${point.region}-${idx}`}
                 position={[lat, lng]}
               >
-                <Popup maxWidth={280}>
-                  <div style={{ minWidth: "200px" }}>
-                    <h4 style={{ margin: "0 0 8px 0", color: "#2c3e50", borderBottom: "2px solid #3498db", paddingBottom: "4px", fontSize: "16px" }}>
+                <Popup maxWidth={400} minWidth={320}>
+                  {/* POINT POP UP INFO */}
+                  <div className="w-full max-w-[380px] min-w-0 overflow-x-hidden m-2 p-2">
+                    <h4 className="mb-2 text-[16px] text-[#2c3e50] border-b-2 border-[#3498db] pb-1 font-semibold">
                       {point.id || "Punto"}
                     </h4>
                     
-                    <div style={{ marginBottom: "8px" }}>
-                      <div style={{ fontSize: "12px", color: "#7f8c8d", marginBottom: "4px" }}>
+                    <div className="mb-2">
+                      <div className="text-[12px] text-gray-500 mb-1">
                         <strong>📍 {point.region}</strong>
                       </div>
-                      <div style={{ fontSize: "11px", color: "#95a5a6" }}>
+                      <div className="text-[11px] text-gray-400">
                         {lat.toFixed(4)}°, {lng.toFixed(4)}°
                       </div>
                     </div>
                     
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", fontSize: "11px", marginBottom: "12px", padding: "8px", backgroundColor: "#f8f9fa", borderRadius: "4px" }}>
-                      <div style={{ textAlign: "center" }}>
-                        <div style={{ fontWeight: "bold", color: "#e74c3c" }}>{point.temp}°C</div>
-                        <div style={{ fontSize: "9px", color: "#7f8c8d" }}>Temperatura</div>
+                    <div className="flex flex-col gap-3 text-[11px] mb-3 p-2 bg-gray-50 rounded">
+                      {/* Temperature info */}
+                      <div className="text-center mb-2">
+                        <div className="font-bold text-red-500">{point.temp}°C</div>
+                        <div className="text-[9px] text-gray-500">Temperatura</div>
                       </div>
-                      {/* TODO: LINDAL */}
-                      <div>
-                        <h1>Aqui va LINDAL</h1>
+                      {/* Lindal Diagram info */}
+                      <div className="text-center mb-2">
+                        <div className="text-[10px] text-blue-700 mb-0.5">
+                          Lindal: usos según temperatura
+                        </div>
+                        <div className="max-w-[120px] mx-auto">
+                          <LindalDiagram temperature={point.temp} />
+                        </div>
+                        <div className="text-[9px] text-gray-500">
+                          El diagrama de Lindal muestra los posibles usos del recurso geotérmico según la temperatura.
+                        </div>
                       </div>
                     </div>
                     
-                    <button
-                      onClick={handleViewDetails}
-                      style={{
-                        width: "100%",
-                        padding: "8px 12px",
-                        backgroundColor: "#3498db",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "6px",
-                        fontSize: "12px",
-                        fontWeight: "500",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "6px",
-                        transition: "background-color 0.2s ease"
-                      }}
-                      onMouseEnter={(e) => e.target.style.backgroundColor = "#2980b9"}
-                      onMouseLeave={(e) => e.target.style.backgroundColor = "#3498db"}
-                    >
-                      📊 Ver Detalles Completos
-                    </button>
+<button
+  onClick={handleViewDetails}
+  className="w-full py-2 px-3 bg-red hover:bg-blue-700 text-white rounded-md text-[12px] font-medium flex items-center justify-center gap-1 cursor-pointer transition-colors"
+>
+  📊 Ver Detalles Completos
+</button> 
                     
-                    <div style={{ fontSize: "9px", color: "#bdc3c7", textAlign: "center", marginTop: "4px" }}>
+                    <div className="text-[9px] text-gray-300 text-center mt-1">
                       Análisis completo • Exportar PDF • Más opciones
                     </div>
                   </div>
