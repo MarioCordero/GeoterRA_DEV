@@ -3,6 +3,7 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaDownload, FaShare, FaPrint, FaMapMarkerAlt, FaFlask, FaThermometerHalf, FaFileCsv } from 'react-icons/fa';
 import { generatePointPDF, exportToCSV, formatPointForSharing } from './exportUtils';
 import { buildApiUrl } from '../../config/apiConf';
+import PiperDiagram from './PiperDiagram';
 
 // Function to fetch single point data (if needed to refresh or get additional data)
 const fetchPointData = async (pointId, region) => {
@@ -72,31 +73,6 @@ export default function PointDetails() {
     }
   };
 
-  const handleExportCSV = async () => {
-    try {
-      await exportToCSV([pointData], `punto_${pointData.id}`);
-    } catch (error) {
-      alert('Error al exportar CSV: ' + error.message);
-    }
-  };
-
-  const handleShare = () => {
-    const shareText = formatPointForSharing(pointData);
-    
-    if (navigator.share) {
-      // Use native sharing if available
-      navigator.share({
-        title: `Punto Geotérmico ${pointData.id}`,
-        text: shareText,
-        url: window.location.href
-      });
-    } else {
-      // Fallback to clipboard
-      navigator.clipboard.writeText(shareText + '\n\nVer más: ' + window.location.href);
-      alert('Información copiada al portapapeles!');
-    }
-  };
-
   const handlePrint = () => {
     window.print();
   };
@@ -138,6 +114,19 @@ export default function PointDetails() {
       </div>
     );
   }
+
+  // Piper Diagram data preparation
+  const piperData = pointData
+    ? {
+        Ca: pointData["Ca+"] || 0,
+        Mg: pointData["MG+"] || 0,
+        Na: pointData.Na || 0,
+        K: pointData.K || 0,
+        Cl: pointData.Cl || 0,
+        SO4: pointData.SO4 || 0,
+        HCO3: pointData.HCO3 || 0,
+      }
+    : null;
 
   return (
     <div style={{ 
@@ -183,33 +172,9 @@ export default function PointDetails() {
           </div>
         </div>
         
+        {/* Button part */}
         <div style={{ display: 'flex', gap: '10px' }}>
-          <button onClick={handleShare} style={{
-            padding: '10px 15px',
-            backgroundColor: '#3498db',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px'
-          }}>
-            <FaShare /> Compartir
-          </button>
-          <button onClick={handleExportCSV} style={{
-            padding: '10px 15px',
-            backgroundColor: '#27ae60',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px'
-          }}>
-            <FaFileCsv /> CSV
-          </button>
+
           <button onClick={handlePrint} style={{
             padding: '10px 15px',
             backgroundColor: '#9b59b6',
@@ -223,6 +188,7 @@ export default function PointDetails() {
           }}>
             <FaPrint /> Imprimir
           </button>
+
           <button onClick={handleExportPDF} style={{
             padding: '10px 15px',
             backgroundColor: '#e74c3c',
@@ -236,7 +202,9 @@ export default function PointDetails() {
           }}>
             <FaDownload /> Exportar PDF
           </button>
+
         </div>
+
       </div>
 
       {/* Main Content */}
@@ -416,6 +384,43 @@ export default function PointDetails() {
             </div>
           </div>
         </div>
+
+        {/* Piper Diagram */}
+        <div
+          style={{
+            marginTop: "30px",
+            marginBottom: "30px",
+            padding: "25px",
+            backgroundColor: "#fff",
+            borderRadius: "10px",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+            border: "1px solid #ecf0f1",
+            width: "100%",
+            height: "100%", // or any fixed height you want for the diagram area
+            minHeight: "320px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gridColumn: 'span 2'
+          }}
+        >
+          <h2 style={{ color: "#2980b9", marginBottom: "20px" }}>
+            📊 Diagrama de Piper
+          </h2>
+          <div style={{ flex: 1, width: "100%", height: "100%" }}>
+            {piperData ? (
+              <PiperDiagram data={piperData} />
+            ) : (
+              <div style={{ color: "#888" }}>
+                No hay datos suficientes para mostrar el diagrama de Piper.
+              </div>
+            )}
+          </div>
+          <div style={{ fontSize: "13px", color: "#888", marginTop: "10px" }}>
+            El diagrama de Piper permite visualizar la composición iónica principal del agua.
+          </div>
+        </div>
+
       </div>
 
       {/* Footer */}
