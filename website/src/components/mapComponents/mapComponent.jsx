@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { useNavigate } from "react-router-dom";
 import L from "leaflet";
@@ -116,6 +116,7 @@ export default function MapComponent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [userSession, setUserSession] = useState(null);
+  const mapContainerRef = useRef(null);
 
   // Check user session on mount
   useEffect(() => {
@@ -246,9 +247,37 @@ export default function MapComponent() {
         boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
       };
 
+  // Fullscreen handler
+  const handleFullscreen = () => {
+    if (!fullscreen) {
+      if (mapContainerRef.current.requestFullscreen) {
+        mapContainerRef.current.requestFullscreen();
+      }
+    } else {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      }
+    }
+    setFullscreen(f => !f);
+  };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setFullscreen(false);
+      } else {
+        setFullscreen(true);
+      }
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
+
   return (
     <div>
-      <div style={mapStyle}>
+      <div ref={mapContainerRef} style={mapStyle}>
         <MapContainer 
           center={[9.9366, -84.0442]} 
           zoom={10} 
@@ -389,7 +418,7 @@ export default function MapComponent() {
             }}
           >
             <button 
-              onClick={() => setFullscreen((f) => !f)}
+              onClick={handleFullscreen}
               style={{
                 padding: "8px 12px",
                 borderRadius: "4px",
@@ -404,7 +433,7 @@ export default function MapComponent() {
                 gap: "6px"
               }}
             >
-              {fullscreen ? <><FaCompress /> Salir de pantalla completa</> : <><FaExpand /> Pantalla completa</>}
+                {fullscreen ? <><FaCompress /> Salir de pantalla completa</> : <><FaExpand /> Pantalla completa</>}
             </button>
           </div>
           {/* Fullscreen button at top right */}
@@ -469,43 +498,43 @@ export default function MapComponent() {
                     
                     return (
                       <div 
-  key={reg}
-  style={{
-    display: "flex",
-    alignItems: "center",
-    padding: "8px 0",
-    cursor: "pointer",
-    borderRadius: "4px",
-    backgroundColor: isSelected ? "#f0f8ff" : "transparent",
-    transition: "background-color 0.2s ease",
-  }}
-  onClick={e => {
-    // Only toggle if not clicking the checkbox itself
-    if (e.target.type !== "checkbox") {
-      toggleRegion(reg);
-    }
-  }}
-  onMouseEnter={(e) => {
-    if (!isSelected) e.target.style.backgroundColor = "#f5f5f5";
-  }}
-  onMouseLeave={(e) => {
-    if (!isSelected) e.target.style.backgroundColor = "transparent";
-  }}
->
-  <input
-    type="checkbox"
-    checked={isSelected}
-    onChange={e => {
-      // Only toggle from checkbox
-      toggleRegion(reg);
-    }}
-    style={{
-      marginRight: "10px",
-      cursor: "pointer",
-      width: "16px",
-      height: "16px",
-    }}
-  />
+                        key={reg}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          padding: "8px 0",
+                          cursor: "pointer",
+                          borderRadius: "4px",
+                          backgroundColor: isSelected ? "#f0f8ff" : "transparent",
+                          transition: "background-color 0.2s ease",
+                        }}
+                        onClick={e => {
+                          // Only toggle if not clicking the checkbox itself
+                          if (e.target.type !== "checkbox") {
+                            toggleRegion(reg);
+                          }
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isSelected) e.target.style.backgroundColor = "#f5f5f5";
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isSelected) e.target.style.backgroundColor = "transparent";
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={e => {
+                            // Only toggle from checkbox
+                            toggleRegion(reg);
+                          }}
+                          style={{
+                            marginRight: "10px",
+                            cursor: "pointer",
+                            width: "16px",
+                            height: "16px",
+                          }}
+                        />
                         <FaMapMarkerAlt style={{ 
                           color: isSelected ? "#2a5bd6" : "#666",
                           marginRight: "8px"
