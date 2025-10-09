@@ -6,6 +6,10 @@ import "leaflet/dist/leaflet.css";
 import dayjs from "dayjs";
 import { buildApiUrl } from '../../config/apiConf';
 
+// Common components
+import PhoneInput from '../common/PhoneInput';
+
+
 const defaultPosition = [9.93333, -84.08333]; // Example: San José, Costa Rica
 const FORM_CACHE_KEY = "addPointFormCache";
 
@@ -315,9 +319,10 @@ const AddPointModal = ({ onRequestAdded }) => {
           <Form.Item label="Nombre del punto" name="pointId" rules={[{ required: true }]}>
             <Input placeholder="Ingrese el ID del punto" />
           </Form.Item>
-          <Form.Item label="Número de contacto" name="contactNumber" rules={[{ required: true }]}>
-            <Input placeholder="Ingrese un número de contacto" />
-          </Form.Item>
+
+          {/* Number of the contact */}
+          <PhoneInput form={form} />
+          
           <Form.Item label="Fecha" name="fecha" rules={[{ required: true }]}>
             <DatePicker style={{ width: "100%" }} />
           </Form.Item>
