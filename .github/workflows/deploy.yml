@@ -46,22 +46,6 @@ jobs:
           cd website
           npm run build
 
-      - name: Validate Android build files
-        run: |
-          if [ -d "Android/Development" ]; then
-            echo "✅ Android project structure is valid"
-            if [ ! -f "Android/Development/build.gradle.kts" ]; then
-              echo "❌ Android build.gradle.kts not found"
-              exit 1
-            fi
-            if [ ! -f "Android/Development/app/build.gradle.kts" ]; then
-              echo "❌ Android app build.gradle.kts not found"
-              exit 1
-            fi
-          else
-            echo "⚠️ Android directory not found"
-          fi
-
       - name: Validate API structure
         run: |
           if [ -d "API" ]; then
@@ -98,7 +82,6 @@ jobs:
             const body = "🔍 **PR Validation Results**\n\n" +
               "**Frontend Build**: ✅ Passed\n" +
               "**Code Linting**: ✅ Passed\n\n" +
-              "**Android Structure**: ✅ Validated\n" +
               "**API Structure**: ✅ Validated\n" +
               "**Database Schema**: ✅ Validated\n\n" +
               "This PR is ready for review and merge! 🚀";
@@ -116,30 +99,6 @@ jobs:
                 issue_number: context.issue.number,
                 body
               });
-            }
-
-**Frontend Build**: ✅ Passed
-**Code Linting**: ✅ Passed  
-**Android Structure**: ✅ Validated
-**API Structure**: ✅ Validated
-**Database Schema**: ✅ Validated
-
-This PR is ready for review and merge! 🚀`;
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body
-              });
-            }
 
   build-and-deploy:
     name: Prepare main (keep only API, database, website/dist, workflows) & Deploy
@@ -182,7 +141,7 @@ This PR is ready for review and merge! 🚀`;
             cp "$TMP_BACKUP"/workflows/deploy.yml .github/workflows/deploy.yml
           fi
 
-      - name: Copy API, database and website/dist from headerWeb
+      - name: Copy API, database, website/dist from headerWeb
         run: |
           set -euxo pipefail
           HDR=/tmp/headerWeb-content
