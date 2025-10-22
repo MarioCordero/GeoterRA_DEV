@@ -271,15 +271,15 @@ const SidebarLayout = ({ selectedKey, setSelectedKey, collapsed, setCollapsed, i
             background: 'transparent',
             flex: 1,
           }}
-          items={menuItems.map(item => ({
-            ...item,
-            style: {
-              margin: '8px 0',
-              fontSize: '16px',
-              fontWeight: selectedKey === item.key ? 'bold' : 'normal',
-              color: selectedKey === item.key ? '#1890ff' : '#333',
-            }
-          }))}
+            items={menuItems.map(({ shortLabel, ...rest }) => ({
+              ...rest,
+              style: {
+                margin: '8px 0',
+                fontSize: '16px',
+                fontWeight: selectedKey === rest.key ? 'bold' : 'normal',
+                color: selectedKey === rest.key ? '#1890ff' : '#333',
+              }
+            }))}
           inlineCollapsed={collapsed}
         />
 

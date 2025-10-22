@@ -5,7 +5,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { FaExpand, FaCompress, FaChevronRight, FaChevronLeft, FaMapMarkerAlt } from "react-icons/fa";
 import { buildApiUrl } from '../../config/apiConf';
-import LindalDiagram from './LindalDiagram';
+// import LindalDiagram from './LindalDiagram';
 
 // Fix Leaflet's default icon issue
 delete L.Icon.Default.prototype._getIconUrl;
