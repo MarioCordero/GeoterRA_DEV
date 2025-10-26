@@ -32,3 +32,4 @@ website/
 *.json
 /Android/Development/app/release
 /Android/Development/.idea
+/Android/Development/gradle
