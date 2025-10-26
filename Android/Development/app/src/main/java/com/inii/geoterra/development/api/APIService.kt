@@ -115,14 +115,15 @@ data class AnalysisRequestPayload(
 
 /**
  * @brief API response for submitted service requests
- * @property status Status of the operation (success or error)
+ * @property response Status of the operation (success or error)
  * @property data List of processed requests
  * @property errors Validation errors if any
  */
 data class RequestsSubmittedResponse(
-  @SerializedName("response") val status : String,
+  @SerializedName("response") val response : String,
+  @SerializedName("message") val message : String,
   @SerializedName("data") val data : List<AnalysisRequest>,
-  @SerializedName("errors") val errors : List<Error>
+  @SerializedName("errors") val errors : List<String>
 )
 
 data class AnalysisRequest(
