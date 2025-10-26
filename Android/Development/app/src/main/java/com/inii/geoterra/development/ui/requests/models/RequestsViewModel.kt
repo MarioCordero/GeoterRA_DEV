@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -47,16 +48,32 @@ class RequestsViewModel @Inject constructor(
           response: Response<RequestsSubmittedResponse>
         ) {
           if (response.isSuccessful) {
-            _submittedRequests.postValue(response.body()?.data ?: emptyList())
+            val body = response.body()
+            when (body?.response) {
+              "Ok" -> {
+                _submittedRequests.postValue(
+                  response.body()?.data ?: emptyList()
+                )
+              }
+              "Error" -> {
+                _submittedRequests.postValue(
+                  response.body()?.data ?: emptyList()
+                )
+                _errorMessage.postValue("Error cargando las solicitudes: ${body.message}")
+                Timber.e("API error: ${body.message}")
+              }
+            }
           } else {
-            _errorMessage.postValue("Failed to load requests: ${response.code()}")
-            Log.e("RequestsViewModel", "Response error: ${response.code()}")
+            _errorMessage.postValue("Error al cargar las solicitudes: ${response.code
+              ()}")
+            Timber.e("Response error: ${response.code()}")
           }
         }
 
-        override fun onFailure(call: Call<RequestsSubmittedResponse>, t: Throwable) {
+        override fun onFailure(call: Call<RequestsSubmittedResponse>
+          , t: Throwable) {
           _errorMessage.postValue("Error loading requests: ${t.message}")
-          Log.e("RequestsViewModel", "API call failed", t)
+          Timber.e(t, "API call failed")
         }
       })
   }
