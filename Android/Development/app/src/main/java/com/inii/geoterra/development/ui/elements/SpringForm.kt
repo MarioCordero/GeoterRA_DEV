@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import com.google.android.material.textfield.TextInputEditText
 import com.inii.geoterra.development.R
+import com.inii.geoterra.development.databinding.ViewSpringFormBinding
 
 /**
  * A custom LinearLayout view representing a form for capturing spring-related information.
@@ -26,35 +27,25 @@ class SpringForm @JvmOverloads constructor(
   defStyle: Int = 0
 ) : LinearLayout(context, attrs, defStyle) {
 
-  private val thermalSensationInput: TextInputEditText
-  private val bubblesInput: TextInputEditText
+  private val binding : ViewSpringFormBinding = ViewSpringFormBinding.inflate(
+    LayoutInflater.from(context), this, true
+  )
 
   init {
     orientation = VERTICAL
-    val binding = LayoutInflater.from(context).inflate(
-      R.layout.view_spring_form,
-      this,
-      true
-    )
-
-    this.thermalSensationInput = binding.findViewById(
-      R.id.thermal_sensation_input
-    )
-
-    this.bubblesInput = binding.findViewById(R.id.bubbling_input)
   }
 
   fun getThermalSensation() : Int {
-    if (this.thermalSensationInput.text.toString().isEmpty()) {
+    if (this.binding.etThermalSensation.text.toString().isEmpty()) {
       return -2000
     }
-    return thermalSensationInput.text.toString().toInt()
+    return this.binding.etThermalSensation.text.toString().toInt()
   }
 
   fun getBubbling(): Int {
-    if (this.bubblesInput.text.toString().isEmpty()) {
+    if (this.binding.etBubbles.text.toString().isEmpty()) {
       return 0
     }
-    return bubblesInput.text.toString().toInt()
+    return this.binding.etBubbles.text.toString().toInt()
   }
 }
