@@ -40,7 +40,7 @@
     android:background="@drawable/gray_rectangle_rounded2">
     
     <com.google.android.material.textfield.TextInputEditText
-      android:id="@+id/thermal_sensation_input"
+      android:id="@+id/et_thermal_sensation"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:fontFamily="@font/poppins_regular"
@@ -85,7 +85,7 @@
     android:background="@drawable/gray_rectangle_rounded2">
     
     <com.google.android.material.textfield.TextInputEditText
-      android:id="@+id/bubbling_input"
+      android:id="@+id/et_bubbles"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:fontFamily="@font/poppins_regular"
