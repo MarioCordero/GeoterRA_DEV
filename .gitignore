@@ -29,3 +29,5 @@ secrets.defaults.properties
 .vscode/
 .github/
 website/
+*.json
+/Android/Development/app/release
