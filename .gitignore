@@ -31,3 +31,4 @@ secrets.defaults.properties
 website/
 *.json
 /Android/Development/app/release
+/Android/Development/.idea
