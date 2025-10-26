@@ -77,6 +77,7 @@ android {
 dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation("com.github.AnyChart:AnyChart-Android:1.1.2")
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.lifecycle.livedata.ktx)
