@@ -1,11 +1,119 @@
 # Archivos y carpetas generadas
-/build
-/.gradle
-/local.properties
-/.idea
+# =========================================
+# 🔧 ANDROID / KOTLIN .GITIGNORE TEMPLATE
+# =========================================
+
+# --- Gradle build cache and outputs ---
+.gradle/
+build/
+**/build/
+out/
+captures/
+
+# --- Local configuration files ---
+local.properties
+.gradle/
+gradle-app.setting
+.gradle-build-cache/
+
+# --- Android Studio configuration (user-specific) ---
+.idea/
 *.iml
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/libraries/
+.idea/misc.xml
+.idea/caches/
+.idea/modules.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+.idea/deploymentTargetDropDown.xml
+
+# --- Log files ---
+*.log
+
+# --- Keystore files (never commit secrets) ---
+*.jks
+*.keystore
+*.pem
+*.key
+*.p12
+
+# --- Generated files by Android Studio ---
 *.apk
 *.ap_
+*.aab
+*.dex
+*.class
+
+# --- ProGuard / R8 ---
+proguard/
+*.mapping
+*.dump
+*.seeds
+*.usage
+*.log
+
+# --- Gradle wrapper ---
+# The wrapper JAR and properties are needed for consistent builds,
+# but avoid committing temporary Gradle caches.
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# --- Environment-specific ---
+*.swp
+*.swo
+*.tmp
+*.temp
+*~
+.DS_Store
+Thumbs.db
+
+# --- IntelliJ IDEA cache directories ---
+.idea/sonarlint/
+.idea/httpRequests/
+.idea/shelf/
+.idea/other.xml
+
+# --- Kotlin-specific build outputs ---
+*.kotlin_module
+*.kotlin_metadata
+*.kotlin_builtins
+
+# --- Generated JNI / CMake outputs ---
+cmake-build-*/
+
+# --- Test outputs ---
+/test-results/
+/coverage/
+/reports/
+
+# --- Jetpack Compose compiler caches ---
+**/.compose-cache/
+**/.kotlin/compose-cache/
+
+# --- Miscellaneous ---
+*.hprof
+*.orig
+*.rej
+
+# --- Firebase / Google Services secrets ---
+google-services.json
+GoogleService-Info.plist
+app/google-services.json
+**/google-services.json
+
+# --- NDK / C++ build outputs ---
+obj/
+libs/
+
+# --- Lint and analysis reports ---
+lint/
+lint-results.*
+lint-report.*
+
+# --- Custom build output directories ---
 /out
 /captures
 
@@ -30,7 +138,3 @@ secrets.defaults.properties
 .github/
 website/
 *.json
-/Android/Development/app/release
-/Android/Development/.idea
-/Android/Development/gradle
-/Android/Development/gradle
