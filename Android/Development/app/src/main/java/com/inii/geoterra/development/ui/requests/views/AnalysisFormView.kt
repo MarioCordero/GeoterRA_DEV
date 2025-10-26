@@ -70,9 +70,10 @@ class AnalysisFormView : PageView<FragmentAnalysisFormBinding, AnalysisFormViewM
     binding.toggleGroupTerrainType.addOnButtonCheckedListener { _,
       checkedId, isChecked ->
       if (isChecked) {
+        Timber.d("Terrain type checked: $checkedId")
         when (checkedId) {
           this.binding.btnTerrainLand.id -> showForm(0)
-          this.binding.btnTerrainLand.id -> showForm(1)
+          this.binding.btnTerrainSpring.id -> showForm(1)
         }
       }
     }
@@ -115,10 +116,9 @@ class AnalysisFormView : PageView<FragmentAnalysisFormBinding, AnalysisFormViewM
 
   private fun showForm(index: Int) {
     val viewSwitcher = binding.viewSwitcherForm
-    if (index >= 0 && index < viewSwitcher.childCount) {
-      while (viewSwitcher.displayedChild != index) {
-        viewSwitcher.showNext()
-      }
+    if (index in 0 until viewSwitcher.childCount) {
+      viewSwitcher.displayedChild = index
+      viewSwitcher.requestLayout()
     }
   }
 
