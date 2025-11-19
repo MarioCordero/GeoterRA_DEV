@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Modal, Button, Form, Input, Radio, DatePicker, Upload, message, Spin } from "antd";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import { useNavigate } from 'react-router-dom';
+import { FullscreenOutlined, EnvironmentOutlined, LoadingOutlined } from "@ant-design/icons";
 import "leaflet/dist/leaflet.css";
 import dayjs from "dayjs";
 import { buildApiUrl } from '../../config/apiConf';
@@ -9,6 +10,48 @@ import PhoneInput from './PhoneInput';
 
 const defaultPosition = [9.93333, -84.08333];
 const FORM_CACHE_KEY = "addPointFormCache";
+
+// Session token management functions
+const getSessionToken = () => {
+  // Updated to match the actual key used in your app
+  const localToken = localStorage.getItem('geoterra_session_token');
+  const sessionToken = sessionStorage.getItem('geoterra_session_token');
+  const token = localToken || sessionToken;
+  
+  console.log('🔍 Token search results:', {
+    localStorage: localToken,
+    sessionStorage: sessionToken,
+    finalToken: token
+  });
+  
+  return token;
+};
+
+const clearSessionToken = () => {
+  localStorage.removeItem('geoterra_session_token');
+  sessionStorage.removeItem('geoterra_session_token');
+  console.log('🗑️ Session tokens cleared');
+};
+
+const setSessionToken = (token) => {
+  localStorage.setItem('geoterra_session_token', token);
+  console.log('💾 Session token stored:', token);
+};
+
+// Build headers for API requests
+const buildHeaders = () => {
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+  
+  const token = getSessionToken();
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+    headers['X-Session-Token'] = token;
+  }
+  
+  return headers;
+};
 
 function LocationMarker({ setLatLng }) {
   const [position, setPosition] = useState(null);
@@ -23,6 +66,22 @@ function LocationMarker({ setLatLng }) {
   return position === null ? null : <Marker position={position} />;
 }
 
+// Component to handle map resize
+function MapResizeHandler() {
+  const map = useMap();
+  
+  useEffect(() => {
+    // Invalidate map size when component mounts
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [map]);
+  
+  return null;
+}
+
 const AddPointModal = ({ 
   onRequestAdded,
   isAdmin = false,
@@ -34,28 +93,115 @@ const AddPointModal = ({
   const [loading, setLoading] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
   const [sessionLoading, setSessionLoading] = useState(false);
+  const [mapFullscreen, setMapFullscreen] = useState(false);
+  const [gettingLocation, setGettingLocation] = useState(false);
   const navigate = useNavigate();
+  
+  // Use refs to prevent duplicate calls - better implementation
+  const locationRequestRef = useRef(null); // Store the actual request ID
+  const sessionLoadedRef = useRef(false);
+  const componentMountedRef = useRef(true);
 
-  // Session token management functions (only used when useTokenAuth is true)
-  const getSessionToken = () => {
-    return useTokenAuth ? localStorage.getItem('geoterra_session_token') : null;
-  };
-
-  const clearSessionToken = () => {
-    if (useTokenAuth) {
-      localStorage.removeItem('geoterra_session_token');
+  // Improved geolocation function with better cancellation
+  const getCurrentLocation = () => {
+    // Prevent duplicate calls
+    if (locationRequestRef.current !== null || gettingLocation) {
+      console.log('Location request already in progress, skipping...');
+      return Promise.reject(new Error('Location request already in progress'));
     }
-  };
 
-  const buildHeaders = () => {
-    const headers = {};
-    if (useTokenAuth) {
-      const token = getSessionToken();
-      if (token) {
-        headers['X-Session-Token'] = token;
-      }
+    if (!navigator.geolocation) {
+      message.error('La geolocalización no está soportada en este navegador');
+      return Promise.reject(new Error('Geolocation not supported'));
     }
-    return headers;
+
+    return new Promise((resolve, reject) => {
+      const requestId = Date.now(); // Unique ID for this request
+      locationRequestRef.current = requestId;
+      setGettingLocation(true);
+      
+      console.log('Starting geolocation request...');
+      
+      const timeoutId = setTimeout(() => {
+        if (locationRequestRef.current === requestId && componentMountedRef.current) {
+          console.log('Geolocation timeout reached');
+          locationRequestRef.current = null;
+          setGettingLocation(false);
+          reject(new Error('Geolocation timeout'));
+        }
+      }, 15000);
+      
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          clearTimeout(timeoutId);
+          
+          // Check if this request is still valid and component is mounted
+          if (locationRequestRef.current !== requestId) {
+            console.log('Geolocation cancelled, ignoring result');
+            return;
+          }
+          
+          if (!componentMountedRef.current) {
+            console.log('Component unmounted, ignoring geolocation result');
+            return;
+          }
+          
+          console.log('Geolocation success:', position);
+          
+          const { latitude, longitude } = position.coords;
+          const newLatLng = { lat: latitude, lng: longitude };
+          setLatLng(newLatLng);
+          
+          message.success('Ubicación actual obtenida correctamente');
+          setGettingLocation(false);
+          locationRequestRef.current = null;
+          resolve(newLatLng);
+        },
+        (error) => {
+          clearTimeout(timeoutId);
+          
+          // Only process error if this request is still valid
+          if (locationRequestRef.current !== requestId) {
+            console.log('Geolocation error ignored - request was cancelled');
+            return;
+          }
+          
+          if (!componentMountedRef.current) {
+            console.log('Component unmounted, ignoring geolocation error');
+            return;
+          }
+          
+          console.log('Geolocation error:', error);
+          
+          let errorMessage = 'Error al obtener la ubicación';
+          
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = 'Permiso de ubicación denegado. Por favor, permite el acceso a la ubicación.';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = 'Información de ubicación no disponible.';
+              break;
+            case error.TIMEOUT:
+              errorMessage = 'Tiempo de espera agotado al obtener la ubicación.';
+              break;
+            default:
+              errorMessage = 'Error desconocido al obtener la ubicación.';
+              break;
+          }
+          
+          message.error(errorMessage);
+          setGettingLocation(false);
+          locationRequestRef.current = null;
+          reject(error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000
+        }
+      );
+    });
   };
 
   // Unified session management function
@@ -63,44 +209,75 @@ const AddPointModal = ({
     try {
       setSessionLoading(true);
       
+      const token = getSessionToken();
+      console.log('🔑 Token check in getUserSession:', token);
+      
       // For token-based auth, check token existence first
       if (useTokenAuth) {
-        const token = getSessionToken();
         if (!token) {
-          console.log("No session token found");
+          console.log("❌ No session token found");
           return null;
         }
+        console.log("✅ Token found for token-based auth:", token);
       }
+
+      // Build headers for the request
+      const headers = useTokenAuth ? buildHeaders() : {
+        'Content-Type': 'application/json'
+      };
+
+      console.log('📤 Making session check request with headers:', headers);
 
       const response = await fetch(buildApiUrl("check_session.php"), {
         method: "GET",
         credentials: "include",
-        headers: buildHeaders(),
+        headers,
       });
       
+      if (!response.ok) {
+        console.error('❌ Session check response not OK:', response.status, response.statusText);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
       const apiResponse = await response.json();
+      console.log('📥 Session check API response:', apiResponse);
       
       if (apiResponse.response === 'Ok' && 
           apiResponse.data && 
           apiResponse.data.status === 'logged_in') {
         
+        console.log('✅ Session is active, checking user data:', apiResponse.data);
+        
         // If admin privileges are required, verify them
         if (isAdmin) {
           const userData = apiResponse.data;
-          if (userData.user_type === 'admin' || userData.is_admin === true || userData.admin === true) {
-            return userData.user;
+          console.log('🔍 Checking admin privileges for user:', userData);
+          
+          if (userData.user_type === 'admin' || 
+              userData.is_admin === true || 
+              userData.admin === true ||
+              userData.role === 'admin') {
+            console.log('✅ Admin privileges confirmed');
+            return userData.user || userData.email || userData.username;
           } else {
-            console.log("User is not admin, redirecting...");
+            console.log("❌ User is not admin, redirecting...");
             message.error("No tienes privilegios de administrador");
             navigate('/Logged');
             return null;
           }
         } else {
           // Regular user session
-          return apiResponse.data.user;
+          const userIdentifier = apiResponse.data.user || apiResponse.data.email || apiResponse.data.username;
+          console.log('✅ Regular user session confirmed:', userIdentifier);
+          return userIdentifier;
         }
       } else {
-        console.log('Session is not active');
+        console.log('❌ Session is not active or invalid response:', {
+          response: apiResponse.response,
+          data: apiResponse.data,
+          status: apiResponse.data?.status
+        });
+        
         if (useTokenAuth) {
           clearSessionToken();
           navigate('/Login');
@@ -108,7 +285,7 @@ const AddPointModal = ({
         return null;
       }
     } catch (error) {
-      console.error("Error checking session:", error);
+      console.error("❌ Error checking session:", error);
       if (useTokenAuth) {
         clearSessionToken();
         navigate('/Login');
@@ -119,17 +296,51 @@ const AddPointModal = ({
     }
   };
 
-  // Get user email when component mounts
+  // Get user email when component mounts - prevent duplicate calls with better debugging
   useEffect(() => {
+    if (sessionLoadedRef.current || !componentMountedRef.current) {
+      console.log('⏭️ Skipping session load:', {
+        sessionLoaded: sessionLoadedRef.current,
+        componentMounted: componentMountedRef.current
+      });
+      return;
+    }
+    
     const loadUserEmail = async () => {
-      const email = await getUserSession();
-      setUserEmail(email);
-      console.log(`${isAdmin ? 'Admin' : 'User'} email loaded:`, email);
+      if (sessionLoading) {
+        console.log('⏳ Session already loading, skipping...');
+        return;
+      }
+      
+      console.log('🔄 Starting session load...');
+      sessionLoadedRef.current = true;
+      
+      try {
+        const email = await getUserSession();
+        if (componentMountedRef.current) {
+          setUserEmail(email);
+          console.log(`✅ ${isAdmin ? 'Admin' : 'User'} email loaded:`, email);
+        }
+      } catch (error) {
+        console.error('❌ Error loading user session:', error);
+        if (componentMountedRef.current) {
+          sessionLoadedRef.current = false; // Allow retry on error
+        }
+      }
     };
     
     loadUserEmail();
-  }, []);
+  }, []); // Empty dependency array
 
+  // Debug token on component mount
+  useEffect(() => {
+    console.log('🚀 AddPointModal mounted with props:', {
+      isAdmin,
+      useTokenAuth,
+      currentToken: getSessionToken()
+    });
+  }, [isAdmin, useTokenAuth]);
+  
   // Load cached form data when modal opens
   useEffect(() => {
     if (visible) {
@@ -144,6 +355,27 @@ const AddPointModal = ({
       }
     }
   }, [visible, form]);
+
+  // Reset refs when modal closes
+  useEffect(() => {
+    if (!visible && !mapFullscreen) {
+      if (locationRequestRef.current !== null) {
+        console.log('Modal closed - cancelling location request');
+        locationRequestRef.current = null;
+        setGettingLocation(false);
+      }
+    }
+  }, [visible, mapFullscreen]);
+
+  // Component unmount cleanup
+  useEffect(() => {
+    componentMountedRef.current = true;
+    return () => {
+      componentMountedRef.current = false;
+      sessionLoadedRef.current = false;
+      locationRequestRef.current = null;
+    };
+  }, []);
 
   // Save form data to cache on change
   const handleValuesChange = (_, allValues) => {
@@ -190,9 +422,19 @@ const AddPointModal = ({
         formData.append("foto", values.foto[0].originFileObj);
       }
 
+      // Build headers for FormData request (don't set Content-Type for FormData)
+      const headers = {};
+      if (useTokenAuth) {
+        const token = getSessionToken();
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+          headers['X-Session-Token'] = token;
+        }
+      }
+
       const response = await fetch(buildApiUrl("request.inc.php"), {
         method: "POST",
-        headers: buildHeaders(),
+        headers,
         body: formData,
         credentials: "include",
       });
@@ -236,7 +478,19 @@ const AddPointModal = ({
   };
 
   const handleCancel = () => {
+    // Cancel any ongoing location request
+    if (locationRequestRef.current !== null) {
+      console.log('Cancelling ongoing location request');
+      locationRequestRef.current = null;
+      setGettingLocation(false);
+    }
+    
     setVisible(false);
+    setMapFullscreen(false);
+  };
+
+  const toggleMapFullscreen = () => {
+    setMapFullscreen(!mapFullscreen);
   };
 
   // Update lat/lng in form and cache when map is clicked
@@ -304,9 +558,11 @@ const AddPointModal = ({
       <Button type="primary" onClick={() => setVisible(true)}>
         Agregar punto
       </Button>
+      
+      {/* Main Modal */}
       <Modal
         title={`Formulario de solicitud de puntos${isAdmin ? ' (Admin)' : ''}`}
-        open={visible}
+        open={visible && !mapFullscreen}
         onOk={handleOk}
         onCancel={handleCancel}
         width={700}
@@ -337,7 +593,6 @@ const AddPointModal = ({
             <Input placeholder="Ingrese el ID del punto" />
           </Form.Item>
 
-          {/* Conditionally use PhoneInput for admin or regular Input for users */}
           <PhoneInput form={form} name="contactNumber" required={true} />
           
           <Form.Item label="Fecha" name="fecha" rules={[{ required: true }]}>
@@ -370,39 +625,178 @@ const AddPointModal = ({
               <Button>Seleccionar archivo</Button>
             </Upload>
           </Form.Item>
+          
+          {/* Map Section with Fullscreen and Current Location Buttons */}
           <Form.Item label="Lugar en GPS">
-            <div style={{ height: 250, marginBottom: 8 }}>
-              <MapContainer center={defaultPosition} zoom={8} style={{ height: "100%", width: "100%" }}>
-                <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            <div style={{ position: 'relative' }}>
+              <div style={{ height: 300, marginBottom: 8, border: '1px solid #d9d9d9', borderRadius: '6px', overflow: 'hidden' }}>
+                <MapContainer 
+                  center={latLng.lat ? [latLng.lat, latLng.lng] : defaultPosition} 
+                  zoom={latLng.lat ? 15 : 8} 
+                  style={{ height: "100%", width: "100%" }}
+                  key={`map-${latLng.lat}-${latLng.lng}`}
+                >
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  <LocationMarker setLatLng={setLatLng} />
+                  <MapResizeHandler />
+                </MapContainer>
+              </div>
+              
+              {/* Map Control Buttons with fixed styling */}
+              <div style={{
+                position: 'absolute',
+                top: 10,
+                right: 10,
+                zIndex: 1000,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8
+              }}>
+                {/* Current Location Button - Fixed CSS conflict */}
+                <Button
+                  type="primary"
+                  icon={gettingLocation ? <LoadingOutlined /> : <EnvironmentOutlined />}
+                  onClick={() => {
+                    getCurrentLocation().catch(err => {
+                      console.error('Location request failed:', err.message);
+                    });
+                  }}
+                  loading={gettingLocation}
+                  disabled={gettingLocation}
+                  style={{
+                    backgroundColor: gettingLocation ? '#ffc107' : '#34d399',
+                    borderColor: gettingLocation ? '#ffc107' : '#34d399',
+                  }}
+                  size="small"
+                  title={gettingLocation ? "Obteniendo ubicación..." : "Obtener ubicación actual"}
                 />
-                <LocationMarker setLatLng={setLatLng} />
-              </MapContainer>
+                
+                {/* Fullscreen Button */}
+                <Button
+                  type="primary"
+                  icon={<FullscreenOutlined />}
+                  onClick={toggleMapFullscreen}
+                  style={{
+                    backgroundColor: '#1890ff',
+                    borderColor: '#1890ff',
+                  }}
+                  size="small"
+                  title="Pantalla completa"
+                />
+              </div>
             </div>
-            <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-              <Input
-                placeholder="Latitud"
-                value={latLng.lat || ""}
-                readOnly
-                style={{ width: "50%" }}
-              />
-              <Input
-                placeholder="Longitud"
-                value={latLng.lng || ""}
-                readOnly
-                style={{ width: "50%" }}
-              />
-            </div>
+            
+            {/* Location Status */}
+            {latLng.lat && latLng.lng && (
+              <div style={{ 
+                marginTop: 8, 
+                padding: 8, 
+                backgroundColor: '#f6ffed', 
+                border: '1px solid #b7eb8f', 
+                borderRadius: 4,
+                fontSize: '12px',
+                color: '#389e0d'
+              }}>
+                📍 Ubicación seleccionada: {latLng.lat.toFixed(6)}, {latLng.lng.toFixed(6)}
+              </div>
+            )}
           </Form.Item>
         </Form>
+        
         {loading && (
           <div style={{ textAlign: "center", marginTop: 16 }}>
             <Spin />
           </div>
         )}
       </Modal>
+
+      {/* Fullscreen Map Modal */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>Seleccionar ubicación en el mapa</span>
+            <div>
+              {latLng.lat && latLng.lng && (
+                <span style={{ fontSize: '12px', color: '#666', marginRight: '16px' }}>
+                  Lat: {latLng.lat.toFixed(6)}, Lng: {latLng.lng.toFixed(6)}
+                </span>
+              )}
+            </div>
+          </div>
+        }
+        open={mapFullscreen}
+        onCancel={() => setMapFullscreen(false)}
+        width="95vw"
+        centered
+        footer={[
+          <Button key="close" onClick={() => setMapFullscreen(false)}>
+            Cerrar
+          </Button>,
+          <Button 
+            key="confirm" 
+            type="primary" 
+            onClick={() => setMapFullscreen(false)}
+            disabled={!latLng.lat || !latLng.lng}
+          >
+            Confirmar ubicación
+          </Button>,
+        ]}
+        styles={{
+          body: { 
+            height: '80vh', 
+            padding: 0,
+            overflow: 'hidden'
+          }
+        }}
+      >
+        <div style={{ height: '100%', width: '100%', position: 'relative' }}>
+          <MapContainer 
+            center={latLng.lat ? [latLng.lat, latLng.lng] : defaultPosition} 
+            zoom={latLng.lat ? 15 : 8}
+            style={{ height: "100%", width: "100%" }}
+            key={`fullscreen-map-${mapFullscreen}-${Date.now()}`}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+            <LocationMarker setLatLng={setLatLng} />
+            <MapResizeHandler />
+          </MapContainer>
+          
+          {/* Fixed Fullscreen Location Button */}
+          <Button
+            type="primary"
+            icon={gettingLocation ? <LoadingOutlined /> : <EnvironmentOutlined />}
+            onClick={() => {
+              getCurrentLocation().catch(err => {
+                console.error('Fullscreen location request failed:', err.message);
+              });
+            }}
+            loading={gettingLocation}
+            disabled={gettingLocation}
+            style={{
+              position: 'absolute',
+              top: 10,
+              right: 10,
+              zIndex: 1000,
+              backgroundColor: gettingLocation ? '#ffc107' : '#34d399',
+              borderColor: gettingLocation ? '#ffc107' : '#34d399',
+            }}
+            size="small"
+          >
+            {gettingLocation ? 'Obteniendo...' : 'Mi ubicación'}
+          </Button>
+        </div>
+      </Modal>
     </>
   );
 };
+
+// Export the utility functions for use in other components if needed
+export { getSessionToken, setSessionToken, clearSessionToken, buildHeaders };
 
 export default AddPointModal;
