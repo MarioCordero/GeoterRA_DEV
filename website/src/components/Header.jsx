@@ -89,8 +89,8 @@ export default function AppHeader() {
   };
 
   return (
-    <header className="fixed top-0 left-0 z-[1000] bg-white w-full h-16 shadow-md">
-      <div className="flex items-center justify-between h-full px-4 p-10">
+    <header className="fixed top-0 left-0 z-[1000] bg-white w-full  shadow-md">
+      <div className="flex items-center justify-between h-full p-5">
         
         {/* Logo */}
         <div className="flex items-center h-full">
