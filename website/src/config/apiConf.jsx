@@ -1,12 +1,12 @@
 // API Configuration for Complete Virtual Host Setup
 const API_CONFIG = {
   // Switch between 'local' and 'production' for development
-  environment: 'production',
+  environment: 'local', // Changed to 'local' since you're using proxy
   
   baseUrls: {
     production: 'http://163.178.171.105/API',
-    // Direct calls to your virtual host (no proxy needed)
-    local: 'http://geoterra.com/API'
+    // Use relative path for local development with Vite proxy
+    local: '/API'
   }
 };
 
@@ -18,8 +18,14 @@ export const getApiBaseUrl = () => {
 // Helper function to build full API endpoint URLs
 export const buildApiUrl = (endpoint) => {
   const baseUrl = getApiBaseUrl();
-  // Ensure no double slashes
-  return `${baseUrl}/${endpoint}`.replace(/\/+/g, '/').replace(':/', '://');
+  
+  // Handle relative paths (local development with proxy)
+  if (baseUrl.startsWith('/')) {
+    return `${baseUrl}/${endpoint}`.replace(/\/+/g, '/');
+  }
+  
+  // Handle absolute URLs (production)
+  return `${baseUrl}/${endpoint}`.replace(/([^:]\/)\/+/g, '$1');
 };
 
 // Debug function to log current configuration
@@ -30,5 +36,21 @@ export const debugApiConfig = () => {
     exampleUrl: buildApiUrl('login.inc.php')
   });
 };
+
+// Auto-detect environment based on hostname (optional enhancement)
+export const autoDetectEnvironment = () => {
+  const hostname = window.location.hostname;
+  
+  if (hostname === 'localhost' || hostname === 'geoterra.com') {
+    API_CONFIG.environment = 'local';
+  } else {
+    API_CONFIG.environment = 'production';
+  }
+  
+  console.log(`🔄 Auto-detected environment: ${API_CONFIG.environment}`);
+};
+
+// Call this in your app initialization if you want auto-detection
+// autoDetectEnvironment();
 
 export default API_CONFIG;
