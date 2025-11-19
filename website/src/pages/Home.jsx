@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import WelcomeSection from '../components/homeComponents/index-welcome';
 import AboutUsSection from '../components/homeComponents/index-about-us';
 import HowWorksSection from '../components/homeComponents/index-how-works';
@@ -11,6 +12,7 @@ import { buildApiUrl } from '../config/apiConf';
 const Home = () => {
   const [isLogged, setIsLogged] = useState(false);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
   // Session token management functions (same as in loginForm)
   const getSessionToken = () => {
@@ -26,18 +28,28 @@ const Home = () => {
     return headers;
   };
 
+  // Smooth scroll function
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const headerHeight = 64; // Header height (h-16 = 64px)
+      const elementPosition = element.offsetTop - headerHeight;
+      
+      window.scrollTo({
+        top: elementPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   useEffect(() => {
     // Check session on mount with token support
     const checkSession = async () => {
       try {
         setLoading(true);
-        // DEBUG
-        // console.log("Checking session with token...");
         
         // Check if we have a token first
         const token = getSessionToken();
-        // DEBUG
-        // console.log("Session token present:", !!token);
 
         const response = await fetch(buildApiUrl("check_session.php"), {
           method: "GET",
@@ -46,18 +58,12 @@ const Home = () => {
         });
         
         const apiResponse = await response.json();
-        // DEBUG
-        // console.log("Session check response:", apiResponse);
 
         if (apiResponse.response === 'Ok' && 
             apiResponse.data && 
             apiResponse.data.status === 'logged_in') {
-          // DEBUG
-          // console.log('✅ Session is active for user:', apiResponse.data.user);
           setIsLogged(true);
         } else {
-          // DEBUG
-          // console.log('❌ Session is not active');
           setIsLogged(false);
           // Optionally clear invalid token
           if (token) {
@@ -78,6 +84,17 @@ const Home = () => {
     
     checkSession();
   }, []);
+
+  // Handle hash-based navigation after page loads
+  useEffect(() => {
+    if (!loading && location.hash) {
+      const hash = location.hash.replace('#', '');
+      // Wait a bit longer for all components to render
+      setTimeout(() => {
+        scrollToSection(hash);
+      }, 300);
+    }
+  }, [loading, location.hash]);
 
   // Show loading state while checking session
   if (loading) {
@@ -100,9 +117,21 @@ const Home = () => {
 
       <div className="index-container Montserrat-Regular">
         <WelcomeSection />
-        <AboutUsSection />
-        <HowWorksSection />
-        <ContactUsSection />
+        
+        {/* About Us Section with ID */}
+        <section id="about-us">
+          <AboutUsSection />
+        </section>
+        
+        {/* How Works Section with ID */}
+        <section id="how-works">
+          <HowWorksSection />
+        </section>
+        
+        {/* Contact Us Section with ID */}
+        <section id="contact-us">
+          <ContactUsSection />
+        </section>
       </div>
 
       <Footer />
