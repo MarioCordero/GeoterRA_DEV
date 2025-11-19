@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Typography, Divider, Spin, Alert, Tag, Button, Card, Row, Col } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
-import AddPointModal from './loggedAddPointModal';
+import AddPointModal from '../common/AddPointModal';
 import { useNavigate } from 'react-router-dom';
 import '../../colorModule.css';
 import '../../fontsModule.css';
@@ -423,24 +423,7 @@ const Requests = () => {
           Mis Solicitudes ({requests.length})
         </Title>
         
-        <AddPointModal 
-          onRequestAdded={refreshRequests}
-          trigger={
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              className="bg-geoterra-orange"
-              size={isMobile ? "middle" : "large"}
-              style={{
-                borderRadius: '8px',
-                fontWeight: 'bold',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}
-            >
-              {isMobile ? "Agregar" : "Agregar Punto"}
-            </Button>
-          }
-        />
+        <AddPointModal {...props} isAdmin={false} useTokenAuth={false} />
       </div>
       
       <Divider style={{ margin: '16px 0' }} />

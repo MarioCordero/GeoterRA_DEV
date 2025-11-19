@@ -153,14 +153,14 @@ const LoggedMainPage = () => {
             });
           }
         } else {
-          console.log('Session is not active:', sessionData.message);
+          // console.log('Session is not active:', sessionData.message);
           setError('Sesión no activa. Por favor, inicia sesión nuevamente.');
           
           // Optional: Redirect to login page
           // window.location.href = '/login';
         }
       } catch (err) {
-        console.error('Session initialization failed:', err);
+        // console.error('Session initialization failed:', err);
         setError(`Error al verificar la sesión: ${err.message}`);
       } finally {
         setLoading(false);

@@ -1,21 +1,257 @@
-import React from "react";
-import { Form, Input } from "antd";
+import React, { useState, useCallback } from "react";
+import { Form, Input, Select } from "antd";
+import { DownOutlined } from "@ant-design/icons";
 
-const PhoneInput = ({ form }) => (
-  <Form.Item
-    label="Número de contacto"
-    name="contactNumber"
-    rules={[
-      { required: true, message: "Por favor ingrese un número de contacto" },
-      { pattern: /^[0-9+\s()-]{8,20}$/, message: "Ingrese un número válido" }
-    ]}
-  >
-    <Input
-      placeholder="Ej: +506 8888 8888"
-      maxLength={20}
-      autoComplete="tel"
-    />
-  </Form.Item>
-);
+const { Option } = Select;
+
+// Country data with validation patterns
+const countries = [
+  {
+    code: "CR",
+    name: "Costa Rica",
+    dialCode: "+506",
+    flag: "🇨🇷",
+    pattern: /^[0-9]{8}$/,
+    placeholder: "8888 8888",
+    minLength: 8,
+    maxLength: 8
+  },
+  {
+    code: "US",
+    name: "United States",
+    dialCode: "+1",
+    flag: "🇺🇸",
+    pattern: /^[0-9]{10}$/,
+    placeholder: "(555) 123-4567",
+    minLength: 10,
+    maxLength: 10
+  },
+  {
+    code: "MX",
+    name: "Mexico",
+    dialCode: "+52",
+    flag: "🇲🇽",
+    pattern: /^[0-9]{10}$/,
+    placeholder: "55 1234 5678",
+    minLength: 10,
+    maxLength: 10
+  },
+  {
+    code: "ES",
+    name: "Spain",
+    dialCode: "+34",
+    flag: "🇪🇸",
+    pattern: /^[0-9]{9}$/,
+    placeholder: "612 345 678",
+    minLength: 9,
+    maxLength: 9
+  },
+  {
+    code: "AR",
+    name: "Argentina",
+    dialCode: "+54",
+    flag: "🇦🇷",
+    pattern: /^[0-9]{10}$/,
+    placeholder: "11 1234 5678",
+    minLength: 10,
+    maxLength: 10
+  },
+  {
+    code: "CO",
+    name: "Colombia",
+    dialCode: "+57",
+    flag: "🇨🇴",
+    pattern: /^[0-9]{10}$/,
+    placeholder: "300 123 4567",
+    minLength: 10,
+    maxLength: 10
+  },
+  {
+    code: "PE",
+    name: "Peru",
+    dialCode: "+51",
+    flag: "🇵🇪",
+    pattern: /^[0-9]{9}$/,
+    placeholder: "987 654 321",
+    minLength: 9,
+    maxLength: 9
+  },
+  {
+    code: "CL",
+    name: "Chile",
+    dialCode: "+56",
+    flag: "🇨🇱",
+    pattern: /^[0-9]{9}$/,
+    placeholder: "9 8765 4321",
+    minLength: 9,
+    maxLength: 9
+  },
+];
+
+const PhoneInput = ({ form, name = "contactNumber", required = true }) => {
+  const [selectedCountry, setSelectedCountry] = useState(countries[0]);
+
+  // Format phone number based on country
+  const formatPhoneNumber = (value, country) => {
+    const cleaned = value.replace(/\D/g, "");
+    
+    switch (country.code) {
+      case "CR":
+        return cleaned.replace(/(\d{4})(\d{4})/, "$1 $2");
+      case "US":
+        return cleaned.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3");
+      case "MX":
+        return cleaned.replace(/(\d{2})(\d{4})(\d{4})/, "$1 $2 $3");
+      case "ES":
+        return cleaned.replace(/(\d{3})(\d{3})(\d{3})/, "$1 $2 $3");
+      case "AR":
+        return cleaned.replace(/(\d{2})(\d{4})(\d{4})/, "$1 $2 $3");
+      case "CO":
+        return cleaned.replace(/(\d{3})(\d{3})(\d{4})/, "$1 $2 $3");
+      case "PE":
+        return cleaned.replace(/(\d{3})(\d{3})(\d{3})/, "$1 $2 $3");
+      case "CL":
+        return cleaned.replace(/(\d{1})(\d{4})(\d{4})/, "$1 $2 $3");
+      default:
+        return cleaned;
+    }
+  };
+
+  // Validate phone number
+  const validatePhone = useCallback((_, value) => {
+    if (!required && !value) return Promise.resolve();
+    if (required && !value) return Promise.reject(new Error("Por favor ingrese un número de contacto"));
+    
+    // Extract only the number part (remove dial code and formatting)
+    const phoneOnly = value ? value.replace(selectedCountry.dialCode, "").trim() : "";
+    const cleaned = phoneOnly.replace(/\D/g, "");
+    
+    if (cleaned.length < selectedCountry.minLength) {
+      return Promise.reject(new Error(`El número debe tener ${selectedCountry.minLength} dígitos`));
+    }
+    
+    if (cleaned.length > selectedCountry.maxLength) {
+      return Promise.reject(new Error(`El número no puede tener más de ${selectedCountry.maxLength} dígitos`));
+    }
+    
+    if (!selectedCountry.pattern.test(cleaned)) {
+      return Promise.reject(new Error(`Formato de número inválido para ${selectedCountry.name}`));
+    }
+    
+    return Promise.resolve();
+  }, [selectedCountry, required]);
+
+  // Custom input component that combines flag, selector, and input
+  const PhoneInputComponent = ({ value, onChange }) => {
+    // Handle country selection
+    const handleCountryChange = (countryCode) => {
+      const country = countries.find(c => c.code === countryCode);
+      setSelectedCountry(country);
+      
+      // Reset to just dial code when country changes
+      onChange(country.dialCode);
+    };
+
+    // Handle phone number input - only allow numbers and formatting
+    const handlePhoneChange = (e) => {
+      let inputValue = e.target.value;
+      
+      // If user deleted the dial code, add it back
+      if (!inputValue.startsWith(selectedCountry.dialCode)) {
+        inputValue = selectedCountry.dialCode + " " + inputValue.replace(/[^\d]/g, "");
+      }
+      
+      // Extract phone number part and clean it (only numbers)
+      const phoneOnly = inputValue.replace(selectedCountry.dialCode, "").trim();
+      const cleaned = phoneOnly.replace(/\D/g, "");
+      
+      // Limit to max length and only allow numbers
+      if (cleaned.length <= selectedCountry.maxLength) {
+        const formatted = formatPhoneNumber(cleaned, selectedCountry);
+        const fullNumber = cleaned.length > 0 
+          ? selectedCountry.dialCode + " " + formatted 
+          : selectedCountry.dialCode;
+        
+        onChange(fullNumber);
+      }
+    };
+
+    // Prevent non-numeric input
+    const handleKeyPress = (e) => {
+      // Allow backspace, delete, arrow keys, etc.
+      if (e.key === 'Backspace' || e.key === 'Delete' || e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'Tab') {
+        return;
+      }
+      
+      // Only allow numbers
+      if (!/[0-9]/.test(e.key)) {
+        e.preventDefault();
+      }
+    };
+
+    return (
+      <div style={{ display: 'flex', width: '100%' }}>
+        {/* Country Flag */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          padding: '4px 12px',
+          backgroundColor: '#f5f5f5',
+          border: '1px solid #d9d9d9',
+          borderRight: 0,
+          borderRadius: '6px 0 0 6px'
+        }}>
+          <span style={{ fontSize: '18px' }}>{selectedCountry.flag}</span>
+        </div>
+        
+        {/* Country Selector */}
+        <Select
+          value={selectedCountry.code}
+          onChange={handleCountryChange}
+          style={{ width: 80, borderRadius: 0 }}
+          popupMatchSelectWidth={false}
+          suffixIcon={<DownOutlined style={{ color: '#999' }} />}
+        >
+          {countries.map((country) => (
+            <Option key={country.code} value={country.code}>
+              <span style={{ fontSize: '12px', color: '#666' }}>{country.dialCode}</span>
+            </Option>
+          ))}
+        </Select>
+        
+        {/* Phone Number Input */}
+        <Input
+          value={value || selectedCountry.dialCode}
+          onChange={handlePhoneChange}
+          onKeyDown={handleKeyPress}
+          placeholder={`${selectedCountry.dialCode} ${selectedCountry.placeholder}`}
+          style={{ 
+            flex: 1, 
+            borderRadius: 0, 
+            borderTopRightRadius: '6px', 
+            borderBottomRightRadius: '6px' 
+          }}
+        />
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <Form.Item
+        label="Número de contacto"
+        name={name}
+        rules={[{ validator: validatePhone }]}
+        className="mb-4"
+      >
+        <PhoneInputComponent />
+      </Form.Item>
+      
+      <div className="mt-1 text-xs text-gray-500" style={{ marginTop: '-16px', marginBottom: '16px' }}>
+        Formato: {selectedCountry.dialCode} {selectedCountry.placeholder}
+      </div>
+    </>
+  );
+};
 
 export default PhoneInput;

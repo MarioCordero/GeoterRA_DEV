@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Typography, Divider, Spin, Alert, Tag } from 'antd';
-import { useNavigate } from 'react-router-dom'; // Add this import
-import AdminAddPointModal from './loggedAdminAddPointModal';
+import { useNavigate } from 'react-router-dom';
+// import AdminAddPointModal from './loggedAdminAddPointModal';
+import AddPointModal from '../common/AddPointModal'; 
 import '../../colorModule.css';
 import '../../fontsModule.css';
 import { buildApiUrl } from '../../config/apiConf';
@@ -308,7 +309,11 @@ const Requests = () => {
         Mis Solicitudes ({requests.length})
       </Title>
       <div style={{ marginBottom: '16px', textAlign: 'right' }}>
-        <AdminAddPointModal onRequestAdded={refreshRequests} />
+        <AddPointModal 
+          onRequestAdded={refreshRequests} 
+          isAdmin={true} 
+          useTokenAuth={true} 
+        />      
       </div>
       <Divider />
       
