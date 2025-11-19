@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import { Layout, Button, Drawer } from 'antd';
-import { MenuOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Drawer } from 'antd';
+import { MenuOutlined, CloseOutlined } from '@ant-design/icons';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/images/GeoterRA-Logo-Color.svg';
 import '../colorModule.css';
 import '../fontsModule.css';
 
-const { Header } = Layout;
-
 export default function AppHeader() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const navItems = [
-    { key: 'about', path: '/#about-us', label: 'Acerca de nosotros' },
-    { key: 'how', path: '/#how-works', label: 'Cómo funciona' },
-    { key: 'contact', path: '/#contact-us', label: 'Contacto' },
-    { key: 'map', path: '/map', label: 'Mapa' },
-    { key: 'login', path: '/login', label: 'Iniciar Sesión' },
+    { key: 'about', path: '/#about-us', label: 'Acerca de nosotros', sectionId: 'about-us' },
+    { key: 'how', path: '/#how-works', label: 'Cómo funciona', sectionId: 'how-works' },
+    { key: 'contact', path: '/#contact-us', label: 'Contacto', sectionId: 'contact-us' },
+    { key: 'map', path: '/map', label: 'Mapa', sectionId: null },
+    { key: 'login', path: '/login', label: 'Iniciar Sesión', sectionId: null },
   ];
 
   const showDrawer = () => {
@@ -27,136 +27,152 @@ export default function AppHeader() {
     setDrawerOpen(false);
   };
 
+  // Smooth scroll function
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const headerHeight = 64; // Header height (h-16 = 64px)
+      const elementPosition = element.offsetTop - headerHeight;
+      
+      window.scrollTo({
+        top: elementPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Handle hash-based navigation on page load and hash changes
+  useEffect(() => {
+    const handleHashNavigation = () => {
+      const hash = location.hash.replace('#', '');
+      if (hash && location.pathname === '/') {
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+          scrollToSection(hash);
+        }, 100);
+      }
+    };
+
+    // Handle initial load with hash
+    handleHashNavigation();
+
+    // Handle hash changes (back/forward browser navigation)
+    window.addEventListener('hashchange', handleHashNavigation);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashNavigation);
+    };
+  }, [location.hash, location.pathname]);
+
+  // Handle navigation with smooth scroll
+  const handleNavigation = (item, closeMobile = false) => {
+    if (closeMobile) {
+      onClose();
+    }
+
+    // If it's a section link (has sectionId)
+    if (item.sectionId) {
+      // If we're already on the home page, just scroll
+      if (location.pathname === '/') {
+        // Update URL hash
+        window.history.pushState(null, null, `#${item.sectionId}`);
+        scrollToSection(item.sectionId);
+      } else {
+        // Navigate to home first, then scroll
+        navigate(`/#${item.sectionId}`);
+        // The useEffect will handle the scrolling after navigation
+      }
+    } else {
+      // Regular navigation for non-section links
+      navigate(item.path);
+    }
+  };
+
   return (
-    <Header
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        zIndex: 1000,
-        background: '#fff',
-        padding: '0 16px',
-        boxShadow: '0 2px 8px #f0f1f2',
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        height: '64px',
-      }}
-    >
-      {/* Logo */}
-      <div style={{ height: '100%', display: 'flex', alignItems: 'center' }}>
-        <Link to="/">
-          <img 
-            src={logo} 
-            alt="GeoTerRA Logo" 
-            style={{ 
-              height: '40px',
-              maxWidth: '150px',
-              objectFit: 'contain'
-            }} 
-          />
-        </Link>
-      </div>
-
-      {/* Desktop Navigation */}
-      <div 
-        className="desktop-menu" 
-        style={{ 
-          display: 'flex', 
-          gap: '16px'
-        }}
-      >
-        {navItems.map((item) => (
-          <Button
-            key={item.key}
-            type="text"
-            className={item.key === 'login' ? 'bg-geoterra-orange poppins-bold text-blanco font-bold!' : 'poppins text-geoterra-blue'}
-            style={{ 
-              transition: 'transform 0.2s',
-              whiteSpace: 'nowrap'
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
-          >
-            <Link to={item.path} style={{ textDecoration: 'none' }}>
-              {item.label}
-            </Link>
-          </Button>
-        ))}
-      </div>
-
-      {/* Mobile Menu Button */}
-      <Button
-        className="mobile-menu-button"
-        type="text"
-        icon={<MenuOutlined />}
-        onClick={showDrawer}
-        style={{
-          display: 'none',
-          fontSize: '18px',
-          color: '#1890ff'
-        }}
-      />
-
-      {/* Mobile Drawer */}
-      <Drawer
-        placement="right"
-        onClose={onClose}
-        open={drawerOpen}
-        title={
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <Link to="/" onClick={onClose}>
-              <img 
-                src={logo} 
-                alt="GeoTerRA Logo" 
-                style={{ height: '40px', maxWidth: '120px', objectFit: 'contain' }} 
-              />
-            </Link>
-          </div>
-        }
-        width={280}
-        styles={{ body: { padding: '20px' } }}
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {navItems.map((item) => (
-            <Button
-              key={item.key}
-              type="text"
-              className={item.key === 'login' ? 'bg-geoterra-orange poppins-bold text-blanco' : 'poppins text-geoterra-blue'}
-              block
-              size="large"
-              style={{ 
-                marginBottom: '8px',
-                textAlign: 'left',
-                height: '48px',
-                borderRadius: '8px'
-              }}
-              onClick={onClose}
-            >
-              <Link to={item.path} style={{ textDecoration: 'none', width: '100%', display: 'block' }}>
-                {item.label}
-              </Link>
-            </Button>
-          ))}
+    <header className="fixed top-0 left-0 z-[1000] bg-white w-full  shadow-md">
+      <div className="flex items-center justify-between h-full p-5">
+        
+        {/* Logo */}
+        <div className="flex items-center h-full">
+          <Link to="/" className="flex items-center">
+            <img
+              src={logo} 
+              alt="GeoTerRA Logo" 
+              className="h-9 object-contain" 
+            />
+          </Link>
         </div>
-      </Drawer>
 
-      <style jsx="true">{`
-        @media (max-width: 768px) {
-          .desktop-menu {
-            display: none !important;
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-4">
+          {navItems.map((item) => (
+            <button
+              key={item.key}
+              onClick={() => handleNavigation(item)}
+              className={`
+                px-4 py-2 rounded-md transition-all duration-200 transform hover:-translate-y-0.5 whitespace-nowrap cursor-pointer
+                ${item.key === 'login' 
+                  ? 'bg-geoterra-orange text-white poppins-bold font-bold hover:bg-orange-600' 
+                  : 'text-geoterra-blue poppins hover:text-blue-700 hover:bg-blue-50'
+                }
+              `}
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
+
+        {/* Mobile Menu Button */}
+        <button
+          className="md:hidden p-2 text-geoterra-blue hover:text-blue-700 transition-colors"
+          onClick={showDrawer}
+          aria-label="Open menu"
+        >
+          <MenuOutlined className="text-lg" />
+        </button>
+
+        {/* Mobile Drawer */}
+        <Drawer
+          placement="right"
+          onClose={onClose}
+          open={drawerOpen}
+          title={
+            <div className="flex items-center justify-between">
+              <Link to="/" onClick={onClose} className="flex items-center">
+                <img 
+                  src={logo} 
+                  alt="GeoTerRA Logo" 
+                  className="h-10 max-w-[120px] object-contain" 
+                />
+              </Link>
+            </div>
           }
-          .mobile-menu-button {
-            display: flex !important;
-          }
-        }
-        @media (min-width: 769px) {
-          .mobile-menu-button {
-            display: none !important;
-          }
-        }
-      `}</style>
-    </Header>
+          width={280}
+          styles={{ 
+            body: { padding: '20px' },
+            header: { borderBottom: '1px solid #f0f0f0' }
+          }}
+          closeIcon={<CloseOutlined className="text-gray-600" />}
+        >
+          <nav className="flex flex-col gap-3">
+            {navItems.map((item) => (
+              <button
+                key={item.key}
+                onClick={() => handleNavigation(item, true)}
+                className={`
+                  block w-full px-4 py-3 rounded-lg text-left transition-all duration-200 cursor-pointer
+                  ${item.key === 'login' 
+                    ? 'bg-geoterra-orange text-white poppins-bold hover:bg-orange-600' 
+                    : 'text-geoterra-blue poppins hover:text-blue-700 hover:bg-blue-50'
+                  }
+                `}
+              >
+                {item.label}
+              </button>
+            ))}
+          </nav>
+        </Drawer>
+      </div>
+    </header>
   );
 }

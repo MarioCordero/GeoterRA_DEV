@@ -25,12 +25,12 @@ document.getElementById("login_form").addEventListener("submit", function (event
           checkSession();
 
         } else {
-          console.error('Server error:', xhr.responseText);
+          // console.error('Server error:', xhr.responseText);
           credentialError()
         }
       }
       catch {
-        console.log(xhr.responseText)
+        // console.log(xhr.responseText)
       }
     }
   };

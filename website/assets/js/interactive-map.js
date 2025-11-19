@@ -17,7 +17,7 @@ function centerMapOnUserLocation() {
                 .bindPopup('Ubicación actual')
                 .openPopup();
         }, error => {
-            console.error("Error al obtener la ubicación del usuario:", error);
+            // console.error("Error al obtener la ubicación del usuario:", error);
             alert("No se pudo obtener la ubicación.");
         });
     } else {
@@ -190,7 +190,7 @@ for (let region in regions) {
         // Update the markers on the map
         updateMarkers();
 
-        console.log(regionActive);
+        // console.log(regionActive);
     };
 
     // onRemove event, when the layer is unchecked
@@ -208,7 +208,7 @@ for (let region in regions) {
         // Update the markers on the map
         updateMarkers();
 
-        console.log(regionActive);
+        // console.log(regionActive);
     };
 }
 

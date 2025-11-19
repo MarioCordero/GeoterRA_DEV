@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaDownload, FaShare, FaPrint, FaMapMarkerAlt, FaFlask, FaThermometerHalf, FaFileCsv } from 'react-icons/fa';
 import { buildApiUrl } from '../../config/apiConf';
-import PiperDiagram from './PiperDiagram';
+// import PiperDiagram from './PiperDiagram';
 
 // Function to fetch single point data (if needed to refresh or get additional data)
 const fetchPointData = async (pointId, region) => {

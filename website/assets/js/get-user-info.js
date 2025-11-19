@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Llamar a la función auxiliar para mostrar las solicitudes
                     displayUserRequests(response['solicitudes mostras']);
                 } else {
-                    console.log("Error: no hay solicitudes");
+                    // console.log("Error: no hay solicitudes");
                 }
             }
         };

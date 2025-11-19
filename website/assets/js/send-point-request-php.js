@@ -30,7 +30,7 @@ document.getElementById("add-point-form").addEventListener("submit", function (e
 				openModal(modal, overlay);
 
             }else {
-                console.log(response.status);
+                // console.log(response.status);
                 // Inject errors into the modal
                 let errorObject = response.errors;
                 let errorMessages = '<h2>Error</h2>'; // Start by adding the header
@@ -50,7 +50,7 @@ document.getElementById("add-point-form").addEventListener("submit", function (e
 
 				// Inject the error messages into the modal
 				modalMessage.innerHTML = errorMessages; // Use innerHTML for multiple errors
-				console.log(errorObject);
+				// console.log(errorObject);
 				openModal(modal, overlay);
             }
         }

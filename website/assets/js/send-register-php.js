@@ -15,7 +15,7 @@ document.getElementById("reg-form").addEventListener("submit",function(event) {
 			} else {
 
 				document.getElementById("result").innerHTML = "";
-				console.log(errorObject);
+				// console.log(errorObject);
 				Object.keys(errorObject).forEach(key => {
 					let value = errorObject[key];
 					document.getElementById("result").innerHTML += value + "<br>";

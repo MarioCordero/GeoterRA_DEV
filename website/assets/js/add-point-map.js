@@ -27,7 +27,7 @@ function centerMapOnUserLocation() {
                 updateCoordinates({ lat: latitude, lng: longitude });
             },
             error => {
-                console.error("Error al obtener la ubicación del usuario:", error);
+                // console.error("Error al obtener la ubicación del usuario:", error);
                 alert("No se pudo obtener la ubicación.");
             }
         );

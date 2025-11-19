@@ -86,22 +86,148 @@ const checkUserSession = async () => {
 
 function CenterOnUser() {
   const map = useMap();
+  
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          map.setView([position.coords.latitude, position.coords.longitude], 17);
-          L.marker([position.coords.latitude, position.coords.longitude])
-            .addTo(map)
-            .bindPopup("Ubicación actual")
-            .openPopup();
-        },
-        () => {
-          alert("No se pudo obtener la ubicación.");
-        }
-      );
+    // Check if control already exists to prevent duplicates
+    const existingControls = document.querySelectorAll('.custom-location-control');
+    if (existingControls.length > 0) {
+      return;
     }
+
+    // Add a manual location button
+    const LocationControl = L.Control.extend({
+      onAdd: function(map) {
+        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom custom-location-control');
+        container.className += ' bg-white w-10 h-10 cursor-pointer flex items-center justify-center hover:bg-gray-50';
+        container.innerHTML = '<span style="font-size: 16px;">📍</span>';
+        container.title = 'Ir a mi ubicación';
+        
+        container.onclick = function() {
+          if (navigator.geolocation) {
+            container.innerHTML = '<span style="font-size: 16px;">⏳</span>';
+            container.style.pointerEvents = 'none';
+            
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                map.setView([position.coords.latitude, position.coords.longitude], 17);
+                
+                // Clear any existing location markers first
+                map.eachLayer(layer => {
+                  if (layer.options && layer.options.isLocationMarker) {
+                    map.removeLayer(layer);
+                  }
+                });
+                
+                // Create a custom icon to avoid the default Leaflet pin
+                const customIcon = L.divIcon({
+                  className: 'custom-location-marker',
+                  html: '<div style="background-color: #ff4444; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
+                  iconSize: [20, 20],
+                  iconAnchor: [10, 10]
+                });
+                
+                L.marker([position.coords.latitude, position.coords.longitude], { 
+                  icon: customIcon,
+                  isLocationMarker: true
+                })
+                  .addTo(map)
+                  .bindPopup("📍 Tu ubicación actual")
+                  .openPopup();
+                
+                container.innerHTML = '<span style="font-size: 16px;">📍</span>';
+                container.style.pointerEvents = 'auto';
+              },
+              (error) => {
+                console.error("Geolocation error:", error);
+                container.innerHTML = '<span style="font-size: 16px;">📍</span>';
+                container.style.pointerEvents = 'auto';
+                
+                let errorMessage = "No se pudo obtener tu ubicación.";
+                if (error.code === 1) {
+                  errorMessage = "Acceso denegado. Habilita la ubicación en tu navegador.";
+                }
+                
+                L.popup()
+                  .setLatLng([9.9366, -84.0442])
+                  .setContent(`⚠️ ${errorMessage}`)
+                  .openOn(map);
+              },
+              {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 60000
+              }
+            );
+          }
+        };
+        
+        return container;
+      }
+    });
+    
+    const control = new LocationControl({ position: 'topright' }).addTo(map);
+    
+    // Cleanup function to remove the control
+    return () => {
+      try {
+        map.removeControl(control);
+      } catch (e) {
+        // Control might already be removed
+      }
+    };
   }, [map]);
+  
+  return null;
+}
+
+// Add this new component for the fullscreen button
+function FullscreenControl({ fullscreen, handleFullscreen }) {
+  const map = useMap();
+  
+  useEffect(() => {
+    // Check if control already exists to prevent duplicates
+    const existingControls = document.querySelectorAll('.custom-fullscreen-control');
+    if (existingControls.length > 0) {
+      return;
+    }
+
+    const FullscreenControlButton = L.Control.extend({
+      onAdd: function(map) {
+        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom custom-fullscreen-control');
+        container.className += ' bg-white w-10 h-10 cursor-pointer flex items-center justify-center mt-2 hover:bg-gray-50';
+        container.innerHTML = `<span style="font-size: 16px;">${fullscreen ? '🔲' : '⛶'}</span>`;
+        container.title = fullscreen ? 'Salir de pantalla completa' : 'Pantalla completa';
+        
+        container.onclick = function() {
+          handleFullscreen();
+        };
+        
+        return container;
+      }
+    });
+    
+    const control = new FullscreenControlButton({ position: 'topright' }).addTo(map);
+    
+    // Update button icon when fullscreen state changes
+    const updateButton = () => {
+      const button = control.getContainer();
+      if (button) {
+        button.innerHTML = `<span style="font-size: 16px;">${fullscreen ? '🔲' : '⛶'}</span>`;
+        button.title = fullscreen ? 'Salir de pantalla completa' : 'Pantalla completa';
+      }
+    };
+    
+    updateButton();
+    
+    return () => {
+      try {
+        map.removeControl(control);
+      } catch (e) {
+        // Control might already be removed
+      }
+    };
+  }, [map, fullscreen, handleFullscreen]);
+  
   return null;
 }
 
@@ -118,83 +244,128 @@ export default function MapComponent() {
   const [userSession, setUserSession] = useState(null);
   const mapContainerRef = useRef(null);
 
-  // Check user session on mount
+  // Check user session on mount - prevent double execution
   useEffect(() => {
+    let isMounted = true;
+    
     const initializeSession = async () => {
-      const session = await checkUserSession();
-      setUserSession(session);
+      if (isMounted) {
+        const session = await checkUserSession();
+        if (isMounted) {
+          setUserSession(session);
+        }
+      }
     };
+    
     initializeSession();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // Fetch regions on mount
+  // Fetch regions on mount - prevent double execution
   useEffect(() => {
+    let isMounted = true;
+    
     const loadRegions = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const regionsData = await fetchRegions();
-        setRegions(regionsData);
-        
-        // Auto-select first region if available
-        if (regionsData.length > 0) {
-          setSelectedRegions([regionsData[0]]);
+      if (isMounted) {
+        try {
+          setLoading(true);
+          setError(null);
+          const regionsData = await fetchRegions();
+          
+          if (isMounted) {
+            setRegions(regionsData);
+            
+            // Auto-select first region if available
+            if (regionsData.length > 0) {
+              setSelectedRegions([regionsData[0]]);
+            }
+          }
+        } catch (err) {
+          if (isMounted) {
+            setError("Failed to load regions");
+            console.error("Error loading regions:", err);
+          }
+        } finally {
+          if (isMounted) {
+            setLoading(false);
+          }
         }
-      } catch (err) {
-        setError("Failed to load regions");
-        console.error("Error loading regions:", err);
-      } finally {
-        setLoading(false);
       }
     };
     
     loadRegions();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // Fetch points when selected regions change
+  // Fetch points when selected regions change - prevent double execution
   useEffect(() => {
+    let isMounted = true;
+    
     const fetchDataForRegions = async () => {
+      if (!isMounted) return;
+      
       if (selectedRegions.length === 0) {
-        setVisiblePoints([]);
+        if (isMounted) {
+          setVisiblePoints([]);
+        }
         return;
       }
 
-      setLoading(true);
-      setError(null);
+      if (isMounted) {
+        setLoading(true);
+        setError(null);
+      }
+      
       const newPoints = { ...allPoints };
       let hasNewData = false;
       const errors = [];
 
       // Fetch data for newly selected regions that we don't have yet
       for (const region of selectedRegions) {
-        if (!allPoints[region]) {
+        if (!allPoints[region] && isMounted) {
           try {
             const points = await fetchPoints(region);
-            newPoints[region] = points;
-            hasNewData = true;
+            if (isMounted) {
+              newPoints[region] = points;
+              hasNewData = true;
+            }
           } catch (error) {
-            console.error(`Error fetching data for ${region}:`, error);
-            errors.push(`Failed to load data for ${region}: ${error.message}`);
+            if (isMounted) {
+              console.error(`Error fetching data for ${region}:`, error);
+              errors.push(`Failed to load data for ${region}: ${error.message}`);
+            }
           }
         }
       }
 
-      if (hasNewData) {
-        setAllPoints(newPoints);
-      }
+      if (isMounted) {
+        if (hasNewData) {
+          setAllPoints(newPoints);
+        }
 
-      // Update visible points
-      const pointsToShow = selectedRegions.flatMap(region => newPoints[region] || []);
-      setVisiblePoints(pointsToShow);
-      
-      if (errors.length > 0) {
-        setError(errors.join('; '));
+        // Update visible points
+        const pointsToShow = selectedRegions.flatMap(region => newPoints[region] || []);
+        setVisiblePoints(pointsToShow);
+        
+        if (errors.length > 0) {
+          setError(errors.join('; '));
+        }
+        
+        setLoading(false);
       }
-      
-      setLoading(false);
     };
 
     fetchDataForRegions();
+    
+    return () => {
+      isMounted = false;
+    };
     // eslint-disable-next-line
   }, [selectedRegions]);
 
@@ -229,24 +400,6 @@ export default function MapComponent() {
     }
   };
 
-  const mapStyle = fullscreen
-    ? {
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100vw",
-        height: "100vh",
-        zIndex: 9999,
-        marginTop: 0,
-      }
-    : {
-        height: "600px",
-        width: "90%",
-        display: "block",
-        margin: "10svh auto",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
-      };
-
   // Fullscreen handler
   const handleFullscreen = () => {
     if (!fullscreen) {
@@ -277,11 +430,19 @@ export default function MapComponent() {
 
   return (
     <div>
-      <div ref={mapContainerRef} style={mapStyle}>
+      <div 
+        ref={mapContainerRef} 
+        className={`
+          ${fullscreen 
+            ? 'fixed top-0 left-0 w-screen h-screen z-[9999] mt-0' 
+            : 'h-[600px] w-[90%] block mx-auto my-[10vh] shadow-lg'
+          }
+        `}
+      >
         <MapContainer 
           center={[9.9366, -84.0442]} 
           zoom={10} 
-          style={{ height: "100%", width: "100%", position: "relative", zIndex: 1 }} 
+          className="h-full w-full relative z-[1]"
           zoomControl={false}
         >
           <TileLayer
@@ -289,39 +450,16 @@ export default function MapComponent() {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           <CenterOnUser />
+          <FullscreenControl fullscreen={fullscreen} handleFullscreen={handleFullscreen} />
           
           {error && (
-            <div style={{
-              position: "absolute",
-              top: "80px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              zIndex: 1000,
-              backgroundColor: "rgba(255,255,255,0.95)",
-              padding: "10px 20px",
-              borderRadius: "8px",
-              boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
-              border: "1px solid #ff6b6b",
-              color: "#d63031",
-              maxWidth: "80%",
-              textAlign: "center",
-            }}>
+            <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-[1000] bg-white/95 px-5 py-2.5 rounded-lg shadow-lg border border-red-300 text-red-600 max-w-[80%] text-center">
               <strong>Error:</strong> {error}
             </div>
           )}
 
           {loading && (
-            <div style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              zIndex: 1000,
-              backgroundColor: "rgba(255,255,255,0.9)",
-              padding: "10px 20px",
-              borderRadius: "8px",
-              boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
-            }}>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] bg-white/90 px-5 py-2.5 rounded-lg shadow-lg">
               Cargando datos...
             </div>
           )}
@@ -382,12 +520,12 @@ export default function MapComponent() {
                       </div>
                     </div>
                     
-<button
-  onClick={handleViewDetails}
-  className="w-full py-2 px-3 bg-red hover:bg-blue-700 text-white rounded-md text-[12px] font-medium flex items-center justify-center gap-1 cursor-pointer transition-colors"
->
-  📊 Ver Detalles Completos
-</button> 
+                    <button
+                      onClick={handleViewDetails}
+                      className="w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-[12px] font-medium flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                    >
+                      📊 Ver Detalles Completos
+                    </button> 
                     
                     <div className="text-[9px] text-gray-300 text-center mt-1">
                       Análisis completo • Exportar PDF • Más opciones
@@ -398,93 +536,34 @@ export default function MapComponent() {
             );
           })}
 
-          {/* Fullscreen button at top right */}
-          <div
-            style={{
-              position: "absolute",
-              top: "20px",
-              right: "20px",
-              zIndex: 1000,
-              backgroundColor: "rgba(255, 255, 255, 0.8)",
-              borderRadius: "8px",
-              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.2)",
-            }}
-          >
-            <button 
-              onClick={handleFullscreen}
-              style={{
-                padding: "8px 12px",
-                borderRadius: "4px",
-                border: "none",
-                backgroundColor: "#4a7dff",
-                color: "white",
-                cursor: "pointer",
-                fontSize: "14px",
-                fontWeight: "500",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px"
-              }}
-            >
-                {fullscreen ? <><FaCompress /> Salir de pantalla completa</> : <><FaExpand /> Pantalla completa</>}
-            </button>
-          </div>
-          {/* Fullscreen button at top right */}
-
           {/* SIDEBAR */}
-          <div
-          // Sidebar container
-            style={{
-              position: "absolute",
-              top: "0px",
-              zIndex: 1000,
-              backgroundColor: "rgba(255, 255, 255, 0.9)",
-              borderRadius: "0px 8px 8px 0px",
-              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.2)",
-              transition: "all 0.3s ease",
-              overflow: "hidden",
-              width: sidebarOpen ? "250px" : "40px",
-              height: sidebarOpen ? "100%" : "40px",
-            }}
-          >
+          <div className={`
+            absolute top-0 z-[1000] bg-white/90 rounded-r-lg shadow-lg transition-all duration-300 overflow-hidden
+            ${sidebarOpen ? 'w-[250px] h-full' : 'w-10 h-10'}
+          `}>
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              style={{
-                padding: "8px 12px",
-                border: "none",
-                backgroundColor: "#4a7dff",
-                color: "white",
-                cursor: "pointer",
-                width: "100%",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
+              className="w-full px-3 py-2 border-0 bg-blue-600 text-white cursor-pointer flex justify-center items-center"
             >
               {sidebarOpen ? <FaChevronLeft /> : <FaChevronRight />}
             </button>
 
             {sidebarOpen && (
-              <div style={{ padding: "10px" }}>
-                <h3 style={{ margin: "0 0 10px 0", color: "#333", fontSize: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
+              <div className="p-2.5">
+                <h3 className="m-0 mb-2.5 text-gray-800 text-base flex items-center gap-2">
                   🗺️ Regiones 
-                  <span style={{ fontSize: "12px", color: "#666", fontWeight: "normal" }}>
+                  <span className="text-xs text-gray-600 font-normal">
                     ({selectedRegions.length} seleccionadas)
                   </span>
                 </h3>
                 
                 {regions.length === 0 && !loading && (
-                  <div style={{ 
-                    padding: "20px", 
-                    textAlign: "center", 
-                    color: "#666",
-                    fontSize: "14px"
-                  }}>
+                  <div className="p-5 text-center text-gray-600 text-sm">
                     No se encontraron regiones disponibles
                   </div>
                 )}
                 
-                <div style={{ maxHeight: "calc(100% - 50px)", overflowY: "auto" }}>
+                <div className="max-h-[calc(100%-50px)] overflow-y-auto">
                   {Array.isArray(regions) && regions.map((reg) => {
                     const pointCount = allPoints[reg] ? allPoints[reg].length : 0;
                     const isSelected = selectedRegions.includes(reg);
@@ -492,26 +571,15 @@ export default function MapComponent() {
                     return (
                       <div 
                         key={reg}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          padding: "8px 0",
-                          cursor: "pointer",
-                          borderRadius: "4px",
-                          backgroundColor: isSelected ? "#f0f8ff" : "transparent",
-                          transition: "background-color 0.2s ease",
-                        }}
+                        className={`
+                          flex items-center py-2 cursor-pointer rounded transition-colors duration-200
+                          ${isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'}
+                        `}
                         onClick={e => {
                           // Only toggle if not clicking the checkbox itself
                           if (e.target.type !== "checkbox") {
                             toggleRegion(reg);
                           }
-                        }}
-                        onMouseEnter={(e) => {
-                          if (!isSelected) e.target.style.backgroundColor = "#f5f5f5";
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!isSelected) e.target.style.backgroundColor = "transparent";
                         }}
                       >
                         <input
@@ -521,31 +589,18 @@ export default function MapComponent() {
                             // Only toggle from checkbox
                             toggleRegion(reg);
                           }}
-                          style={{
-                            marginRight: "10px",
-                            cursor: "pointer",
-                            width: "16px",
-                            height: "16px",
-                          }}
+                          className="mr-2.5 cursor-pointer w-4 h-4"
                         />
-                        <FaMapMarkerAlt style={{ 
-                          color: isSelected ? "#2a5bd6" : "#666",
-                          marginRight: "8px"
-                        }} />
-                        <div style={{ flex: 1 }}>
-                          <div style={{ 
-                            color: isSelected ? "#2a5bd6" : "#333",
-                            fontWeight: isSelected ? "600" : "400",
-                            fontSize: "14px"
-                          }}>
+                        <FaMapMarkerAlt className={`mr-2 ${isSelected ? 'text-blue-600' : 'text-gray-600'}`} />
+                        <div className="flex-1">
+                          <div className={`
+                            text-sm
+                            ${isSelected ? 'text-blue-600 font-semibold' : 'text-gray-800 font-normal'}
+                          `}>
                             {reg}
                           </div>
                           {pointCount > 0 && (
-                            <div style={{ 
-                              fontSize: "11px", 
-                              color: "#888",
-                              marginTop: "2px"
-                            }}>
+                            <div className="text-xs text-gray-500 mt-0.5">
                               {pointCount} punto{pointCount !== 1 ? 's' : ''}
                             </div>
                           )}
@@ -555,42 +610,18 @@ export default function MapComponent() {
                   })}
                   
                   {selectedRegions.length > 0 && (
-                    <div style={{
-                      marginTop: "15px",
-                      padding: "10px",
-                      backgroundColor: "#f8f9fa",
-                      borderRadius: "6px",
-                      fontSize: "12px",
-                      color: "#666"
-                    }}>
-                      <div style={{ marginBottom: "8px" }}>
+                    <div className="mt-4 p-2.5 bg-gray-50 rounded text-xs text-gray-600">
+                      <div className="mb-2">
                         <strong>Total de puntos visibles:</strong> {visiblePoints.length}
                       </div>
                       
                       <button
                         onClick={refreshData}
                         disabled={loading}
-                        style={{
-                          padding: "6px 12px",
-                          borderRadius: "4px",
-                          border: "1px solid #ddd",
-                          backgroundColor: "#fff",
-                          color: "#666",
-                          cursor: loading ? "not-allowed" : "pointer",
-                          fontSize: "11px",
-                          width: "100%",
-                          transition: "all 0.2s ease"
-                        }}
-                        onMouseEnter={(e) => {
-                          if (!loading) {
-                            e.target.style.backgroundColor = "#f0f0f0";
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!loading) {
-                            e.target.style.backgroundColor = "#fff";
-                          }
-                        }}
+                        className={`
+                          w-full px-3 py-1.5 rounded border border-gray-300 bg-white text-gray-600 text-xs transition-all duration-200
+                          ${loading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-gray-100'}
+                        `}
                       >
                         {loading ? "🔄 Actualizando..." : "🔄 Actualizar datos"}
                       </button>
