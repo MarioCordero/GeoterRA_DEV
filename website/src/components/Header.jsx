@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { Layout, Button, Drawer } from 'antd';
-import { MenuOutlined } from '@ant-design/icons';
+import { Drawer } from 'antd';
+import { MenuOutlined, CloseOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import logo from '../assets/images/GeoterRA-Logo-Color.svg';
 import '../colorModule.css';
 import '../fontsModule.css';
-
-const { Header } = Layout;
 
 export default function AppHeader() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -28,135 +26,91 @@ export default function AppHeader() {
   };
 
   return (
-    <Header
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        zIndex: 1000,
-        background: '#fff',
-        padding: '0 16px',
-        boxShadow: '0 2px 8px #f0f1f2',
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        height: '64px',
-      }}
-    >
-      {/* Logo */}
-      <div style={{ height: '100%', display: 'flex', alignItems: 'center' }}>
-        <Link to="/">
-          <img 
-            src={logo} 
-            alt="GeoTerRA Logo" 
-            style={{ 
-              height: '40px',
-              maxWidth: '150px',
-              objectFit: 'contain'
-            }} 
-          />
-        </Link>
-      </div>
+    <header className="fixed top-0 left-0 z-[1000] bg-white w-full h-16 shadow-md p-10">
+      <div className="flex items-center justify-between h-full px-4">
+        
+        {/* Logo */}
+        <div className="flex items-center h-full">
+          <Link to="/" className="flex items-center">
+            <img 
+              src={logo} 
+              alt="GeoTerRA Logo" 
+              className="h-9 object-contain" 
+            />
+          </Link>
+        </div>
 
-      {/* Desktop Navigation */}
-      <div 
-        className="desktop-menu" 
-        style={{ 
-          display: 'flex', 
-          gap: '16px'
-        }}
-      >
-        {navItems.map((item) => (
-          <Button
-            key={item.key}
-            type="text"
-            className={item.key === 'login' ? 'bg-geoterra-orange poppins-bold text-blanco font-bold!' : 'poppins text-geoterra-blue'}
-            style={{ 
-              transition: 'transform 0.2s',
-              whiteSpace: 'nowrap'
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
-          >
-            <Link to={item.path} style={{ textDecoration: 'none' }}>
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-4">
+          {navItems.map((item) => (
+            <Link
+              key={item.key}
+              to={item.path}
+              className={`
+                px-4 py-2 rounded-md transition-all duration-200 transform hover:-translate-y-0.5 whitespace-nowrap
+                ${item.key === 'login' 
+                  ? 'bg-geoterra-orange text-white poppins-bold font-bold hover:bg-orange-600' 
+                  : 'text-geoterra-blue poppins hover:text-blue-700 hover:bg-blue-50'
+                }
+              `}
+            >
               {item.label}
             </Link>
-          </Button>
-        ))}
-      </div>
+          ))}
+        </nav>
 
-      {/* Mobile Menu Button */}
-      <Button
-        className="mobile-menu-button"
-        type="text"
-        icon={<MenuOutlined />}
-        onClick={showDrawer}
-        style={{
-          display: 'none',
-          fontSize: '18px',
-          color: '#1890ff'
-        }}
-      />
+        {/* Mobile Menu Button */}
+        <button
+          className="md:hidden p-2 text-geoterra-blue hover:text-blue-700 transition-colors"
+          onClick={showDrawer}
+          aria-label="Open menu"
+        >
+          <MenuOutlined className="text-lg" />
+        </button>
 
-      {/* Mobile Drawer */}
-      <Drawer
-        placement="right"
-        onClose={onClose}
-        open={drawerOpen}
-        title={
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <Link to="/" onClick={onClose}>
-              <img 
-                src={logo} 
-                alt="GeoTerRA Logo" 
-                style={{ height: '40px', maxWidth: '120px', objectFit: 'contain' }} 
-              />
-            </Link>
-          </div>
-        }
-        width={280}
-        styles={{ body: { padding: '20px' } }}
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {navItems.map((item) => (
-            <Button
-              key={item.key}
-              type="text"
-              className={item.key === 'login' ? 'bg-geoterra-orange poppins-bold text-blanco' : 'poppins text-geoterra-blue'}
-              block
-              size="large"
-              style={{ 
-                marginBottom: '8px',
-                textAlign: 'left',
-                height: '48px',
-                borderRadius: '8px'
-              }}
-              onClick={onClose}
-            >
-              <Link to={item.path} style={{ textDecoration: 'none', width: '100%', display: 'block' }}>
+        {/* Mobile Drawer */}
+        <Drawer
+          placement="right"
+          onClose={onClose}
+          open={drawerOpen}
+          title={
+            <div className="flex items-center justify-between">
+              <Link to="/" onClick={onClose} className="flex items-center">
+                <img 
+                  src={logo} 
+                  alt="GeoTerRA Logo" 
+                  className="h-10 max-w-[120px] object-contain" 
+                />
+              </Link>
+            </div>
+          }
+          width={280}
+          styles={{ 
+            body: { padding: '20px' },
+            header: { borderBottom: '1px solid #f0f0f0' }
+          }}
+          closeIcon={<CloseOutlined className="text-gray-600" />}
+        >
+          <nav className="flex flex-col gap-3">
+            {navItems.map((item) => (
+              <Link
+                key={item.key}
+                to={item.path}
+                onClick={onClose}
+                className={`
+                  block w-full px-4 py-3 rounded-lg text-left transition-all duration-200
+                  ${item.key === 'login' 
+                    ? 'bg-geoterra-orange text-white poppins-bold hover:bg-orange-600' 
+                    : 'text-geoterra-blue poppins hover:text-blue-700 hover:bg-blue-50'
+                  }
+                `}
+              >
                 {item.label}
               </Link>
-            </Button>
-          ))}
-        </div>
-      </Drawer>
-
-      <style jsx="true">{`
-        @media (max-width: 768px) {
-          .desktop-menu {
-            display: none !important;
-          }
-          .mobile-menu-button {
-            display: flex !important;
-          }
-        }
-        @media (min-width: 769px) {
-          .mobile-menu-button {
-            display: none !important;
-          }
-        }
-      `}</style>
-    </Header>
+            ))}
+          </nav>
+        </Drawer>
+      </div>
+    </header>
   );
 }

@@ -1,8 +1,21 @@
-import React from 'react';
+import React, {useState} from 'react';
 import FondoContactUs from "../../assets/images/trabajo-campo2.jpeg";
+import NotImplementedModal from '../common/NotImplementedModal';
 import '../../fontsModule.css';
 
+
 function IndexContactUs() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <div className="relative py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 bg-gray-50 min-h-screen">
       
@@ -41,7 +54,7 @@ function IndexContactUs() {
 
         {/* Contact Form */}
         <div className="bg-white/90 backdrop-blur-sm p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 rounded-lg shadow-xl border border-white/20 poppins">
-          <form className="space-y-4 sm:space-y-5 md:space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 md:space-y-6">
 
             {/* Name and Email Fields */}
             <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
@@ -96,7 +109,6 @@ function IndexContactUs() {
               <textarea
                 id="message"
                 rows="4"
-                className="sm:rows-5 md:rows-6"
                 placeholder="Escriba un mensaje para nosotros"
                 className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-geoterra-blue rounded-md focus:outline-none focus:ring-2 focus:ring-geoterra-blue focus:border-transparent resize-vertical min-h-[100px] sm:min-h-[120px] md:min-h-[140px] transition-all duration-200 text-sm sm:text-base"
                 required
@@ -149,6 +161,7 @@ function IndexContactUs() {
           </div>
         </div>
       </div>
+      <NotImplementedModal isOpen={isModalOpen} onClose={closeModal} />
     </div>
   );
 }
