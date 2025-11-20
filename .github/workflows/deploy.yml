@@ -1,28 +1,31 @@
-name: GeoterRA CI/CD Pipeline
+name: Force Deploy From PR
 
 on:
   pull_request:
     branches: [ main ]
-    types: [ opened, synchronize, reopened ]
-  push:
-    branches: [ main ]
+    types: [ opened, synchronize, reopened, labeled ]
 
 permissions:
   contents: write
   pull-requests: read
-  checks: write
 
 jobs:
-  validate:
-    name: Validate & Test
+  force-deploy:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+
+    # SOLO si el PR viene de headerWeb y va hacia main
+    if: >
+      github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.head.ref == 'headerWeb'
+
     steps:
-      - name: Checkout PR branch
+      - name: Checkout PR branch (headerWeb)
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
+
+      # ---------------- FRONTEND BUILD ----------------
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -36,138 +39,58 @@ jobs:
           cd website
           npm ci
 
-      - name: Lint frontend code
-        run: |
-          cd website
-          npm run lint
-
       - name: Build frontend
         run: |
           cd website
           npm run build
 
-      - name: Validate API structure
-        run: |
-          if [ -d "API" ]; then
-            echo "✅ API directory exists"
-            if [ ! -f "API/dbhandler.inc.php" ]; then
-              echo "❌ Database handler not found"
-              exit 1
-            fi
-          else
-            echo "❌ API directory not found"
-            exit 1
-          fi
+      # ---------------- CHECKOUT MAIN ----------------
 
-      - name: Validate database files
-        run: |
-          if [ -f "database/GeoterRA.sql" ]; then
-            echo "✅ Database schema file exists"
-          else
-            echo "❌ Database schema file not found"
-            exit 1
-          fi
-
-      - name: Comment PR status
-        uses: actions/github-script@v7
-        if: always()
-        with:
-          script: |
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-            const botComment = comments.find(c => c.user.type === 'Bot' && c.body.includes('🔍 PR Validation'));
-            const body = "✅ **PR Validation Results**\n\n" +
-              "**Frontend Build**: ✅ Passed\n" +
-              "**Code Linting**: ✅ Passed\n" +
-              "**API Structure**: ✅ Validated\n" +
-              "**Database Schema**: ✅ Validated\n\n" +
-              "Ready for review and merge! 🚀";
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body
-              });
-            }
-
-  build-and-deploy:
-    name: Deploy to main & Server
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    steps:
       - name: Checkout main
         uses: actions/checkout@v4
         with:
           ref: main
+          path: main-branch
           token: ${{ secrets.GH_PAT }}
           fetch-depth: 0
 
-      - name: Fetch headerWeb content
+      # ---------------- PREPARE DEPLOY ----------------
+
+      - name: Prepare deployment artifacts
         run: |
-          git fetch origin headerWeb:refs/remotes/origin/headerWeb || true
-          mkdir -p /tmp/headerWeb-content
-          git --work-tree=/tmp/headerWeb-content checkout origin/headerWeb -- . 2>/dev/null || true
+          mkdir -p deploy/API
+          mkdir -p deploy/database
+          mkdir -p deploy/website/dist
 
-      - name: Update files from headerWeb
+          cp -r API/*.php deploy/API/
+          cp -r database/* deploy/database/
+          cp -r website/dist/* deploy/website/dist/
+
+      - name: Remove forbidden files
         run: |
-          set -euxo pipefail
-          HDR=/tmp/headerWeb-content
+          cd deploy/API
+          rm -f "(DELETE)"*.php 2>/dev/null || true
 
-          # Copy website (complete)
-          if [ -d "$HDR/website" ]; then
-            rm -rf website
-            cp -r "$HDR"/website ./website
-            echo "✅ website updated"
-          fi
-
-          # Copy API
-          if [ -d "$HDR/API" ]; then
-            rm -rf API
-            cp -r "$HDR"/API ./API
-            echo "✅ API updated"
-          fi
-
-          # Copy database
-          if [ -d "$HDR/database" ]; then
-            rm -rf database
-            cp -r "$HDR"/database ./database
-            echo "✅ database updated"
-          fi
-
-      - name: Commit and push
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+      # Sync deploy folder → main branch
+      - name: Sync deploy files into main
         run: |
-          set -euxo pipefail
+          rsync -av --delete deploy/API/ main-branch/API/
+          rsync -av --delete deploy/database/ main-branch/database/
+          rsync -av --delete deploy/website/dist/ main-branch/website/dist/
+
+      # ---------------- COMMIT & PUSH ----------------
+
+      - name: Commit and push changes to main
+        run: |
+          cd main-branch
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
           git add -A
-          if git diff --staged --quiet; then
-            echo "📝 No changes to commit"
-          else
-            COMMIT_MSG="🚀 Deploy from headerWeb - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
-            git commit -m "$COMMIT_MSG" || true
-            git push "https://${GH_PAT}@github.com/${{ github.repository }}.git" main
-            echo "✅ main updated"
+
+          if git diff --cached --quiet; then
+            echo "⚠️ No changes to deploy"
+            exit 0
           fi
 
-      - name: Trigger server deployment
-        run: |
-          echo "🌐 Triggering server deployment..."
-          curl -X POST --max-time 30 --retry 3 --retry-delay 5 \
-            http://163.178.171.105/pull.sh || echo "⚠️ Server trigger warning"
-
-      - name: Deployment summary
-        run: |
-          echo "## 🚀 Deployment Complete" >> $GITHUB_STEP_SUMMARY
-          echo "**Branch**: main" >> $GITHUB_STEP_SUMMARY
-          echo "**Timestamp**: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          git commit -m "🚀 Auto-deploy from headerWeb PR"
+          git push "https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git" main
