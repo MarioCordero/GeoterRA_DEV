@@ -64,13 +64,14 @@ jobs:
           cd website
           npm run build
 
-      # ---------------- CHECKOUT MAIN ----------------
+      # ---------------- CHECKOUT MAIN (CON PAT) ----------------
       - name: Checkout main branch
         uses: actions/checkout@v4
         with:
           ref: main
           path: main-branch
           fetch-depth: 0
+          token: ${{ secrets.GH_PAT }}   # 👈 usa tu PAT para el remote
 
       # ---------------- PREPARAR ARTEFACTOS ----------------
       - name: Prepare deployment artifacts
@@ -79,7 +80,6 @@ jobs:
           mkdir -p deploy/database
           mkdir -p deploy/website/dist
 
-          # Copiar solo si existen, para evitar errores tontos
           if [ -d "API" ]; then
             cp -r API/*.php deploy/API/ || true
           fi
@@ -88,7 +88,6 @@ jobs:
             cp -r database/* deploy/database/ || true
           fi
 
-          # Usamos el build generado en website/dist
           if [ -d "website/dist" ]; then
             cp -r website/dist/* deploy/website/dist/ || true
           fi
@@ -100,12 +99,7 @@ jobs:
             rm -f "(DELETE)"*.php 2>/dev/null || true
           fi
 
-      # ---------------- SYNC A LA CARPETA main ----------------
-      # Resultado esperado en raíz de main:
-      # .
-      # ├── API
-      # ├── database
-      # └── website
+      # ---------------- SYNC HACIA main-branch ----------------
       - name: Sync deploy folders into main
         run: |
           if [ -d "deploy/API" ]; then
@@ -123,12 +117,12 @@ jobs:
             rsync -av --delete deploy/website/dist/ main-branch/website/dist/
           fi
 
-      # ---------------- COMMIT & PUSH A main ----------------
+      # ---------------- COMMIT & PUSH CON PAT ----------------
       - name: Commit and push changes to main
         run: |
           cd main-branch
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "MarioCordero (CI)"
+          git config user.email "ci+${{ github.repository_owner }}@users.noreply.github.com"
           git add -A
 
           if git diff --cached --quiet; then
@@ -137,7 +131,9 @@ jobs:
           fi
 
           git commit -m "🚀 Auto-deploy from ${{ env.SOURCE_BRANCH }}"
-          git push
+
+          # Push usando tu PAT (identidad de tu usuario)
+          git push "https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git" HEAD:main
 
       # ---------------- TRIGGER REMOTE DEPLOY ----------------
       - name: Trigger remote deploy
