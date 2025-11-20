@@ -371,9 +371,8 @@ const AddPointModal = ({
       const formData = new FormData();
       formData.append("pointId", values.pointId);
       formData.append("email", currentUserEmail);
-      // TODO: REVISARRR
+      // TODO: REVIEW, SUPPORT MULTIPLE COUNTRY NUMBERS, ONLY WORKS FOR CR FOR NOW
       const phoneDigitsOnly = values.contactNumber.replace(/\D/g, '');
-      // Remove first 3 digits (country code) if length is greater than 8
       const phoneNumber = phoneDigitsOnly.length > 8 
         ? phoneDigitsOnly.slice(3) 
         : phoneDigitsOnly;
@@ -386,8 +385,6 @@ const AddPointModal = ({
       formData.append("direccion", values.direccion || "");
       formData.append("lat", latLng.lat || "");
       formData.append("lng", latLng.lng || "");
-      
-      console.log(`${isAdmin ? 'Admin' : 'User'} email being sent:`, currentUserEmail);
 
       // Handle file upload
       if (values.foto && values.foto.length > 0) {
@@ -584,12 +581,7 @@ const AddPointModal = ({
           form={form}
           onValuesChange={handleValuesChange}
         >
-          <Form.Item label="Nombre del punto" name="pointId" rules={[{ required: true }]}>
-            <Input placeholder="Ingrese el ID del punto" />
-          </Form.Item>
-
           <PhoneInput form={form} name="contactNumber" required={true} />
-          
           <Form.Item label="Fecha" name="fecha" rules={[{ required: true }]}>
             <DatePicker style={{ width: "100%" }} />
           </Form.Item>
