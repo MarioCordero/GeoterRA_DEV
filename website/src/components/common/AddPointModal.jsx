@@ -13,11 +13,9 @@ const FORM_CACHE_KEY = "addPointFormCache";
 
 // Session token management functions
 const getSessionToken = () => {
-  // Updated to match the actual key used in your app
   const localToken = localStorage.getItem('geoterra_session_token');
   const sessionToken = sessionStorage.getItem('geoterra_session_token');
   const token = localToken || sessionToken;
-  
   return token;
 };
 
@@ -35,27 +33,21 @@ const buildHeaders = () => {
   const headers = {
     'Content-Type': 'application/json',
   };
-  
   const token = getSessionToken();
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
     headers['X-Session-Token'] = token;
   }
-  
   return headers;
 };
 
-// Updated LocationMarker component with persistent marker
 function LocationMarker({ setLatLng, latLng }) {
   const [position, setPosition] = useState(null);
-
-  // Update position when latLng prop changes (from manual input or geolocation)
   useEffect(() => {
     if (latLng && latLng.lat && latLng.lng) {
       setPosition([latLng.lat, latLng.lng]);
     }
   }, [latLng]);
-
   useMapEvents({
     click(e) {
       const newPosition = [e.latlng.lat, e.latlng.lng];
@@ -63,23 +55,17 @@ function LocationMarker({ setLatLng, latLng }) {
       setLatLng(e.latlng);
     },
   });
-
   return position === null ? null : <Marker position={position} />;
 }
 
-// Component to handle map resize
 function MapResizeHandler() {
-  const map = useMap();
-  
+  const map = useMap(); 
   useEffect(() => {
-    // Invalidate map size when component mounts
     const timer = setTimeout(() => {
       map.invalidateSize();
     }, 100);
-    
     return () => clearTimeout(timer);
   }, [map]);
-  
   return null;
 }
 
@@ -88,6 +74,7 @@ const AddPointModal = ({
   isAdmin = false,
   useTokenAuth = false 
 }) => {
+
   const [visible, setVisible] = useState(false);
   const [latLng, setLatLng] = useState({});
   const [form] = Form.useForm();
@@ -99,19 +86,13 @@ const AddPointModal = ({
   const navigate = useNavigate();
   const [manualLat, setManualLat] = useState('');
   const [manualLng, setManualLng] = useState('');
-  
-  // Use refs to prevent duplicate calls - better implementation
-  const locationRequestRef = useRef(null); // Store the actual request ID
+  const locationRequestRef = useRef(null);
   const sessionLoadedRef = useRef(false);
   const componentMountedRef = useRef(true);
-
-  // Function to handle manual coordinate input
   const handleManualCoordinateChange = () => {
     const lat = parseFloat(manualLat);
     const lng = parseFloat(manualLng);
-    
     if (!isNaN(lat) && !isNaN(lng)) {
-      // Validate coordinate ranges
       if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
         setLatLng({ lat, lng });
         message.success('Coordenadas establecidas correctamente');
@@ -121,7 +102,6 @@ const AddPointModal = ({
     }
   };
 
-  // Update manual inputs when latLng changes (from map click or geolocation)
   useEffect(() => {
     if (latLng.lat && latLng.lng) {
       setManualLat(latLng.lat.toFixed(6));
@@ -133,7 +113,6 @@ const AddPointModal = ({
     }
   }, [latLng, form]);
 
-  // Load cached coordinates into manual inputs
   useEffect(() => {
     if (visible) {
       const cached = localStorage.getItem(FORM_CACHE_KEY);
@@ -152,7 +131,6 @@ const AddPointModal = ({
     }
   }, [visible, form]);
 
-  // Improved geolocation function with better cancellation
   const getCurrentLocation = () => {
     // Prevent duplicate calls
     if (locationRequestRef.current !== null || gettingLocation) {
@@ -241,20 +219,16 @@ const AddPointModal = ({
     });
   };
 
-  // Unified session management function
   const getUserSession = async () => {
     try {
       setSessionLoading(true);
       const token = getSessionToken();
-      
-      // For token-based auth, check token existence first
       if (useTokenAuth) {
         if (!token) {
           return null;
         }
       }
 
-      // Build headers for the request
       const headers = useTokenAuth ? buildHeaders() : {
         'Content-Type': 'application/json'
       };
@@ -269,9 +243,7 @@ const AddPointModal = ({
         console.error('❌ Session check response not OK:', response.status, response.statusText);
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-      
-      const apiResponse = await response.json();
-      
+      const apiResponse = await response.json();      
       if (apiResponse.response === 'Ok' && 
           apiResponse.data && 
           apiResponse.data.status === 'logged_in') {
@@ -311,7 +283,6 @@ const AddPointModal = ({
     }
   };
 
-  // Get user email when component mounts - prevent duplicate calls
   useEffect(() => {
     if (sessionLoadedRef.current || !componentMountedRef.current) {
       return;
@@ -330,15 +301,14 @@ const AddPointModal = ({
         }
       } catch (error) {
         if (componentMountedRef.current) {
-          sessionLoadedRef.current = false; // Allow retry on error
+          sessionLoadedRef.current = false;
         }
       }
     };
     
     loadUserEmail();
-  }, []); // Empty dependency array
+  }, []);
   
-  // Load cached form data when modal opens
   useEffect(() => {
     if (visible) {
       const cached = localStorage.getItem(FORM_CACHE_KEY);
@@ -353,7 +323,6 @@ const AddPointModal = ({
     }
   }, [visible, form]);
 
-  // Reset refs when modal closes
   useEffect(() => {
     if (!visible && !mapFullscreen) {
       if (locationRequestRef.current !== null) {
@@ -364,7 +333,6 @@ const AddPointModal = ({
     }
   }, [visible, mapFullscreen]);
 
-  // Component unmount cleanup
   useEffect(() => {
     componentMountedRef.current = true;
     return () => {
@@ -374,7 +342,6 @@ const AddPointModal = ({
     };
   }, []);
 
-  // Save form data to cache on change
   const handleValuesChange = (_, allValues) => {
     const cache = { ...allValues };
     if (cache.fecha && typeof cache.fecha !== "string") {
