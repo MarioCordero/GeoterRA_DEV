@@ -1,6 +1,10 @@
 name: Test PR wiring
 
 on:
+  # Para poder lanzarlo a mano desde la pestaña Actions
+  workflow_dispatch:
+
+  # Para que se dispare cuando haya PRs contra main
   pull_request:
     branches: [ main ]
     types: [ opened, synchronize, reopened ]
@@ -10,9 +14,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Print PR info
+      - name: Print basic info
         run: |
-          echo "✅ Workflow disparado por un PR"
-          echo "Base ref: ${{ github.event.pull_request.base.ref }}"
-          echo "Head ref: ${{ github.event.pull_request.head.ref }}"
-          echo "Title: ${{ github.event.pull_request.title }}"
+          echo "✅ Workflow disparado"
+          echo "Event: ${{ github.event_name }}"
+          echo "Base ref: ${{ github.event.pull_request.base.ref || 'N/A' }}"
+          echo "Head ref: ${{ github.event.pull_request.head.ref || 'N/A' }}"
