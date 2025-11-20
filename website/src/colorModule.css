@@ -84,3 +84,55 @@
 .text-celeste3 { color: var(--celeste3) !important; }
 .text-celeste4 { color: var(--celeste4) !important; }
 .text-rojo { color: var(--rojo) !important; }
+
+/* Phone Input Custom Styles */
+.phone-input-select .ant-select-selector {
+  border-radius: 0 !important;
+  border: 1px solid #d1d5db !important;
+  border-left: none !important;
+  border-right: none !important;
+  height: 40px !important;
+  padding: 0 8px !important;
+  display: flex;
+  align-items: center;
+  background-color: #f9fafb !important;
+}
+
+.phone-input-select .ant-select-selection-item {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.phone-input-select:hover .ant-select-selector {
+  border-color: #b3b3b3 !important;
+  border-left: none !important;
+  border-right: none !important;
+}
+
+.phone-input-select.ant-select-focused .ant-select-selector {
+  border-color: #40a9ff !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+  border-left: none !important;
+  border-right: none !important;
+}
+
+/* Remove border radius from dropdown */
+.ant-select-dropdown {
+  border-radius: 4px !important;
+}
+
+/* Phone Number Input */
+.phone-input-number {
+  border-radius: 0 6px 6px 0 !important;
+  border-left: none !important;
+}
+
+.phone-input-number:focus {
+  border-color: #40a9ff !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+}
+
+.phone-input-number:hover {
+  border-color: #b3b3b3 !important;
+}

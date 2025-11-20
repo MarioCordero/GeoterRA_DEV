@@ -5,52 +5,13 @@ import '../../fontsModule.css';
 import { buildApiUrl } from '../../config/apiConf';
 
 const Dashboard = ({ user }) => (
-  <div
-    style={{
-      width: '100%',
-      maxWidth: '800px',
-      minHeight: '400px',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: 'clamp(1.2rem, 4vw, 1.5rem)',
-      color: '#222',
-      background: '#f5f5f5',
-      borderRadius: '8px',
-      margin: '2rem auto',
-      padding: 'clamp(1rem, 4vw, 2rem)',
-      boxSizing: 'border-box',
-    }}
-  >
-    <div 
-      style={{ 
-        marginBottom: '1.5rem', 
-        fontSize: 'clamp(1.5rem, 5vw, 2rem)', 
-        fontWeight: 'bold',
-        textAlign: 'center',
-        wordBreak: 'break-word'
-      }}
-    >
+  <div className="w-full max-w-3xl min-h-96 flex flex-col items-center justify-center text-2xl text-gray-900 bg-gray-100 rounded-lg m-8 p-8">
+    <div className="mb-6 text-4xl font-bold text-center break-words">
       ¡Bienvenido, {user?.name || 'Usuario'}!
     </div>
-    <div 
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        textAlign: 'center',
-        gap: '0.5rem'
-      }}
-    >
-      <span style={{ fontWeight: 'bold' }}>Puntos solicitados:</span>
-      <span 
-        style={{ 
-          color: '#fa8c16', 
-          fontSize: 'clamp(1.4rem, 5vw, 1.8rem)',
-          fontWeight: 'bold'
-        }}
-      >
+    <div className="flex flex-col items-center text-center gap-2">
+      <span className="font-bold">Puntos solicitados:</span>
+      <span className="text-amber-500 text-2xl md:text-3xl font-semibold">
         {user?.requestedPoints ?? 0}
       </span>
     </div>
@@ -154,14 +115,8 @@ const LoggedMainPage = () => {
   // Show loading while verifying session
   if (loading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '400px',
-        padding: '1rem'
-      }}>
-        <p style={{ fontSize: 'clamp(1rem, 3vw, 1.2rem)' }}>
+      <div className="flex justify-center items-center min-h-96 p-4">
+        <p className="text-lg md:text-xl">
           Verificando sesión...
         </p>
       </div>
@@ -171,17 +126,8 @@ const LoggedMainPage = () => {
   // Only render dashboard if user is properly logged in
   if (!isLogged) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '400px',
-        padding: '1rem'
-      }}>
-        <p style={{ 
-          fontSize: 'clamp(1rem, 3vw, 1.2rem)',
-          textAlign: 'center' 
-        }}>
+      <div className="flex justify-center items-center min-h-96 p-4">
+        <p className="text-lg md:text-xl text-center">
           Acceso no autorizado
         </p>
       </div>
