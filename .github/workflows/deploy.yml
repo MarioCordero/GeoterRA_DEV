@@ -41,7 +41,7 @@ jobs:
           cd website
           npm run lint
 
-      - name: Build frontend (test)
+      - name: Build frontend
         run: |
           cd website
           npm run build
@@ -78,13 +78,13 @@ jobs:
               repo: context.repo.repo,
               issue_number: context.issue.number,
             });
-            const botComment = comments.find(c => c.user.type === 'Bot' && c.body.includes('🔍 PR Validation Results'));
-            const body = "🔍 **PR Validation Results**\n\n" +
+            const botComment = comments.find(c => c.user.type === 'Bot' && c.body.includes('🔍 PR Validation'));
+            const body = "✅ **PR Validation Results**\n\n" +
               "**Frontend Build**: ✅ Passed\n" +
-              "**Code Linting**: ✅ Passed\n\n" +
+              "**Code Linting**: ✅ Passed\n" +
               "**API Structure**: ✅ Validated\n" +
               "**Database Schema**: ✅ Validated\n\n" +
-              "This PR is ready for review and merge! 🚀";
+              "Ready for review and merge! 🚀";
             if (botComment) {
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
@@ -99,9 +99,10 @@ jobs:
                 issue_number: context.issue.number,
                 body
               });
+            }
 
   build-and-deploy:
-    name: Prepare main (keep only API, database, website/dist, workflows) & Deploy
+    name: Deploy to main & Server
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
@@ -118,60 +119,33 @@ jobs:
           mkdir -p /tmp/headerWeb-content
           git --work-tree=/tmp/headerWeb-content checkout origin/headerWeb -- . 2>/dev/null || true
 
-      - name: Backup .git and workflow, clean repo, restore workflow
-        run: |
-          set -euxo pipefail
-
-          # Backup .git and current deploy workflow
-          TMP_BACKUP=$(mktemp -d)
-          cp -r .git "$TMP_BACKUP"/
-          mkdir -p "$TMP_BACKUP"/workflows
-          if [ -f ".github/workflows/deploy.yml" ]; then
-            cp .github/workflows/deploy.yml "$TMP_BACKUP"/workflows/deploy.yml
-          fi
-
-          # Remove all files from working tree (keep TMP_BACKUP)
-          git rm -rf . || true
-          rm -rf ./* .[^.]* .??* 2>/dev/null || true
-
-          # Restore .git and (later) workflow file
-          cp -r "$TMP_BACKUP"/.git ./
-          mkdir -p .github/workflows
-          if [ -f "$TMP_BACKUP"/workflows/deploy.yml ]; then
-            cp "$TMP_BACKUP"/workflows/deploy.yml .github/workflows/deploy.yml
-          fi
-
-      - name: Copy API, database, website/dist from headerWeb
+      - name: Update files from headerWeb
         run: |
           set -euxo pipefail
           HDR=/tmp/headerWeb-content
 
+          # Copy website (complete)
+          if [ -d "$HDR/website" ]; then
+            rm -rf website
+            cp -r "$HDR"/website ./website
+            echo "✅ website updated"
+          fi
+
           # Copy API
           if [ -d "$HDR/API" ]; then
+            rm -rf API
             cp -r "$HDR"/API ./API
-            echo "✅ API copied"
-          else
-            echo "⚠️ API not found in headerWeb"
+            echo "✅ API updated"
           fi
 
           # Copy database
           if [ -d "$HDR/database" ]; then
+            rm -rf database
             cp -r "$HDR"/database ./database
-            echo "✅ database copied"
-          else
-            echo "⚠️ database not found in headerWeb"
+            echo "✅ database updated"
           fi
 
-          # Copy website/dist into website/dist
-          if [ -d "$HDR/website/dist" ]; then
-            mkdir -p website
-            cp -r "$HDR"/website/dist ./website/dist
-            echo "✅ website/dist copied"
-          else
-            echo "⚠️ website/dist not found in headerWeb"
-          fi
-
-      - name: Commit and push minimal main
+      - name: Commit and push
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
@@ -180,36 +154,20 @@ jobs:
           if git diff --staged --quiet; then
             echo "📝 No changes to commit"
           else
-            COMMIT_MSG="🥷 Sync minimal main from headerWeb - $(date -u +'%Y-%m-%d %H:%M:%S UTC') - SHA:${GITHUB_SHA:0:8}"
+            COMMIT_MSG="🚀 Deploy from headerWeb - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
             git commit -m "$COMMIT_MSG" || true
             git push "https://${GH_PAT}@github.com/${{ github.repository }}.git" main
-            echo "✅ main updated with minimal files"
+            echo "✅ main updated"
           fi
 
       - name: Trigger server deployment
         run: |
           echo "🌐 Triggering server deployment..."
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
-            --max-time 30 \
-            --retry 3 \
-            --retry-delay 5 \
-            http://163.178.171.105/pull.sh)
-          if [ "$HTTP_STATUS" -eq 200 ]; then
-            echo "✅ Server deployment triggered successfully"
-          else
-            echo "⚠️ Server deployment trigger returned status: $HTTP_STATUS"
-          fi
+          curl -X POST --max-time 30 --retry 3 --retry-delay 5 \
+            http://163.178.171.105/pull.sh || echo "⚠️ Server trigger warning"
 
-      - name: Create deployment summary
+      - name: Deployment summary
         run: |
-          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Branch**: \`main\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit**: \`${GITHUB_SHA:0:8}\`" >> $GITHUB_STEP_SUMMARY
+          echo "## 🚀 Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch**: main" >> $GITHUB_STEP_SUMMARY
           echo "**Timestamp**: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 📦 Final main contains:" >> $GITHUB_STEP_SUMMARY
-          echo "- .github/workflows/deploy.yml" >> $GITHUB_STEP_SUMMARY
-          echo "- API/" >> $GITHUB_STEP_SUMMARY
-          echo "- database/" >> $GITHUB_STEP_SUMMARY
-          echo "- website/dist/" >> $GITHUB_STEP_SUMMARY
