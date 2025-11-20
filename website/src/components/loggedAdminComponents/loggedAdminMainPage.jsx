@@ -1,28 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import "../../colorModule.css";
 import '../../fontsModule.css';
-
 import { buildApiUrl } from '../../config/apiConf';
-
 
 const Dashboard = ({ user, loading, error }) => {
   if (loading) {
     return (
-      <div
-        style={{
-          width: '100%',
-          minHeight: '400px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '1.5rem',
-          color: '#666',
-          background: '#f5f5f5',
-          borderRadius: '8px',
-          margin: '2rem 0',
-          padding: '2rem',
-        }}
-      >
+      <div className="w-full min-h-96 flex items-center justify-center text-2xl text-gray-600 bg-gray-100 rounded-lg m-8 p-8">
         Cargando....
       </div>
     );
@@ -30,55 +14,25 @@ const Dashboard = ({ user, loading, error }) => {
 
   if (error) {
     return (
-      <div
-        style={{
-          width: '100%',
-          minHeight: '400px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '1.5rem',
-          color: '#ff4d4f',
-          background: '#fff2f0',
-          border: '1px solid #ffccc7',
-          borderRadius: '8px',
-          margin: '2rem 0',
-          padding: '2rem',
-        }}
-      >
+      <div className="w-full min-h-96 flex items-center justify-center text-2xl text-red-600 bg-red-50 border border-red-200 rounded-lg m-8 p-8">
         Error: {error}
       </div>
     );
   }
 
   return (
-    <div
-      style={{
-        width: '100%',
-        minHeight: '400px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '1.5rem',
-        color: '#222',
-        background: '#f5f5f5',
-        borderRadius: '8px',
-        margin: '2rem 0',
-        padding: '2rem',
-      }}
-    >
-      <div style={{ marginBottom: '1.5rem', fontSize: '2rem', fontWeight: 'bold' }}>
+    <div className="w-full min-h-96 flex flex-col items-center justify-center text-2xl text-gray-900 bg-gray-100 rounded-lg m-8 p-8">
+      <div className="mb-6 text-4xl font-bold">
         ¡Bienvenido, {user?.name || 'Usuario'}!
       </div>
-      <div>
-        <span style={{ fontWeight: 'bold' }}>Puntos solicitados:</span>{' '}
-        <span style={{ color: '#fa8c16', fontSize: '1.8rem' }}>
+      <div className="flex gap-2">
+        <span className="font-bold">Puntos solicitados:</span>
+        <span className="text-amber-500 text-3xl font-semibold">
           {user?.requestedPoints ?? 0}
         </span>
       </div>
       {user?.isAdmin && (
-        <div style={{ marginTop: '1rem', padding: '0.5rem', background: '#e6f7ff', borderRadius: '4px', color: '#1890ff' }}>
+        <div className="mt-4 px-4 py-2 bg-blue-100 rounded text-blue-600 font-semibold">
           Panel de Administrador
         </div>
       )}
@@ -98,7 +52,7 @@ const LoggedMainPage = () => {
         setError(null);
 
         // Check session first
-        const response = await fetch(buildApiUrl("check_session.php"), {
+        const sessionResponse = await fetch(buildApiUrl("check_session.php"), {
           credentials: 'include',
           method: 'GET',
           headers: {
@@ -153,14 +107,9 @@ const LoggedMainPage = () => {
             });
           }
         } else {
-          // console.log('Session is not active:', sessionData.message);
           setError('Sesión no activa. Por favor, inicia sesión nuevamente.');
-          
-          // Optional: Redirect to login page
-          // window.location.href = '/login';
         }
       } catch (err) {
-        // console.error('Session initialization failed:', err);
         setError(`Error al verificar la sesión: ${err.message}`);
       } finally {
         setLoading(false);

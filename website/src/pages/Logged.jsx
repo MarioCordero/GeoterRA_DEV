@@ -4,7 +4,7 @@ import LoggedMainPage from '../components/loggedComponents/loggedMainPage';
 import LoggedHeader from '../components/loggedHeader';
 import Footer from '../components/Footer';
 // Import other pages as needed
-import Solicitudes from '../components/loggedComponents/loggedRequests';
+import Requests from '../components/common/UserRequests';
 
 const DashboardPlaceholder = () => (
   <div
@@ -70,7 +70,7 @@ const Logged = () => {
   let content;
   if (selectedKey === '1') content = <LoggedMainPage />;
   else if (selectedKey === '2') content = <PerfilPlaceholder />;
-  else if (selectedKey === '3') content = <Solicitudes />;
+  else if (selectedKey === '3') content = <Requests />;
   else content = <DashboardPlaceholder />;
 
   return (

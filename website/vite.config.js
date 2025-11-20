@@ -1,4 +1,3 @@
-// vite.config.js - Optimal for complete virtual host
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'   
@@ -10,9 +9,10 @@ export default defineConfig({
   ],
   server: {
     host: 'geoterra.com',
+    port: 5173,
     proxy: {
       '/API': {
-        target: 'http://163.178.171.105',
+        target: 'http://geoterra.com',
         changeOrigin: true,
         secure: false,
         configure: (proxy, _options) => {

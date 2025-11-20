@@ -4,7 +4,7 @@ import LoggedHeader from '../components/loggedHeader';
 import Footer from '../components/Footer';
 
 import AdminRequestsManager from '../components/loggedAdminComponents/loggedAdminRequestsManager';
-import AdminSolicitudes from '../components/loggedAdminComponents/loggedAdminRequests';
+import AdminRequests from '../components/common/UserRequests';
 
 const DashboardPlaceholder = () => (
   <div
@@ -68,7 +68,7 @@ const LoggedAdmin = () => {
 
   let content;
   if (selectedKey === '1') content = <DashboardPlaceholder />;
-  else if (selectedKey === '2') content = <AdminSolicitudes />;
+  else if (selectedKey === '2') content = <AdminRequests />;
   else if (selectedKey === '3') content = <AdminRequestsManager />;
   else if (selectedKey === '4') content = <PerfilPlaceholder />;
   else content = <DashboardPlaceholder />;

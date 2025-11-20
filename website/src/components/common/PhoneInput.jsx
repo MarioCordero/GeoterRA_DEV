@@ -1,6 +1,8 @@
 import React, { useState, useCallback } from "react";
 import { Form, Input, Select } from "antd";
 import { DownOutlined } from "@ant-design/icons";
+import "../../colorModule.css";
+import '../../fontsModule.css';
 
 const { Option } = Select;
 
@@ -123,8 +125,7 @@ const PhoneInput = ({ form, name = "contactNumber", required = true }) => {
     if (required && !value) return Promise.reject(new Error("Por favor ingrese un número de contacto"));
     
     // Extract only the number part (remove dial code and formatting)
-    const phoneOnly = value ? value.replace(selectedCountry.dialCode, "").trim() : "";
-    const cleaned = phoneOnly.replace(/\D/g, "");
+    const cleaned = value ? value.replace(/\D/g, "") : "";
     
     if (cleaned.length < selectedCountry.minLength) {
       return Promise.reject(new Error(`El número debe tener ${selectedCountry.minLength} dígitos`));
@@ -148,31 +149,21 @@ const PhoneInput = ({ form, name = "contactNumber", required = true }) => {
       const country = countries.find(c => c.code === countryCode);
       setSelectedCountry(country);
       
-      // Reset to just dial code when country changes
-      onChange(country.dialCode);
+      // Reset to empty when country changes
+      onChange("");
     };
 
     // Handle phone number input - only allow numbers and formatting
     const handlePhoneChange = (e) => {
       let inputValue = e.target.value;
       
-      // If user deleted the dial code, add it back
-      if (!inputValue.startsWith(selectedCountry.dialCode)) {
-        inputValue = selectedCountry.dialCode + " " + inputValue.replace(/[^\d]/g, "");
-      }
-      
-      // Extract phone number part and clean it (only numbers)
-      const phoneOnly = inputValue.replace(selectedCountry.dialCode, "").trim();
-      const cleaned = phoneOnly.replace(/\D/g, "");
+      // Extract only numbers
+      const cleaned = inputValue.replace(/\D/g, "");
       
       // Limit to max length and only allow numbers
       if (cleaned.length <= selectedCountry.maxLength) {
         const formatted = formatPhoneNumber(cleaned, selectedCountry);
-        const fullNumber = cleaned.length > 0 
-          ? selectedCountry.dialCode + " " + formatted 
-          : selectedCountry.dialCode;
-        
-        onChange(fullNumber);
+        onChange(formatted);
       }
     };
 
@@ -182,54 +173,48 @@ const PhoneInput = ({ form, name = "contactNumber", required = true }) => {
       if (e.key === 'Backspace' || e.key === 'Delete' || e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'Tab') {
         return;
       }
-      
-      // Only allow numbers
+  
       if (!/[0-9]/.test(e.key)) {
         e.preventDefault();
       }
     };
 
     return (
-      <div style={{ display: 'flex', width: '100%' }}>
+      <div className="flex w-full items-center gap-0">
         {/* Country Flag */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          padding: '4px 12px',
-          backgroundColor: '#f5f5f5',
-          border: '1px solid #d9d9d9',
-          borderRight: 0,
-          borderRadius: '6px 0 0 6px'
-        }}>
-          <span style={{ fontSize: '18px' }}>{selectedCountry.flag}</span>
+        <div className="flex items-center justify-center w-12 h-10 px-3 bg-gray-100 border border-gray-300 border-r-0 rounded-l-md">
+          <span className="text-lg">{selectedCountry.flag}</span>
         </div>
         
-        {/* Country Selector */}
+        {/* Country Selector - Extension/Code */}
         <Select
           value={selectedCountry.code}
           onChange={handleCountryChange}
-          style={{ width: 80, borderRadius: 0 }}
           popupMatchSelectWidth={false}
-          suffixIcon={<DownOutlined style={{ color: '#999' }} />}
+          suffixIcon={<DownOutlined className="text-gray-400 text-xs" />}
+          className="phone-input-select"
+          style={{
+            width: '100px',
+            height: '40px',
+          }}
         >
           {countries.map((country) => (
             <Option key={country.code} value={country.code}>
-              <span style={{ fontSize: '12px', color: '#666' }}>{country.dialCode}</span>
+              <span className="text-xs text-gray-600">{country.dialCode}</span>
             </Option>
           ))}
         </Select>
         
         {/* Phone Number Input */}
         <Input
-          value={value || selectedCountry.dialCode}
+          value={value || ""}
           onChange={handlePhoneChange}
           onKeyDown={handleKeyPress}
-          placeholder={`${selectedCountry.dialCode} ${selectedCountry.placeholder}`}
+          placeholder={selectedCountry.placeholder}
+          className="phone-input-number h-10"
           style={{ 
-            flex: 1, 
-            borderRadius: 0, 
-            borderTopRightRadius: '6px', 
-            borderBottomRightRadius: '6px' 
+            borderLeftWidth: 0,
+            borderRadius: '0 6px 6px 0'
           }}
         />
       </div>
@@ -247,7 +232,7 @@ const PhoneInput = ({ form, name = "contactNumber", required = true }) => {
         <PhoneInputComponent />
       </Form.Item>
       
-      <div className="mt-1 text-xs text-gray-500" style={{ marginTop: '-16px', marginBottom: '16px' }}>
+      <div className="text-xs text-gray-500 -mt-4 mb-4">
         Formato: {selectedCountry.dialCode} {selectedCountry.placeholder}
       </div>
     </>
