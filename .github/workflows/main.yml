@@ -13,9 +13,7 @@ jobs:
   force-deploy:
     runs-on: ubuntu-latest
 
-    if: >
-      github.event.pull_request.base.ref == 'main' &&
-      github.event.pull_request.head.ref == 'headerWeb'
+    if: github.event.pull_request.base.ref == 'main'
 
     steps:
       - name: Checkout PR branch (headerWeb)
