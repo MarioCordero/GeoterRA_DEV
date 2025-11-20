@@ -23,6 +23,6 @@ secrets.defaults.properties
 /.kts_cache
 # Configuración de VSCode (si usás)
 .vscode/
-.github/
+# .github/
 website/node_modules/*
 config.ini
