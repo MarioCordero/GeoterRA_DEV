@@ -26,3 +26,4 @@ secrets.defaults.properties
 # .github/
 website/node_modules/*
 config.ini
+website/node_modules/*
