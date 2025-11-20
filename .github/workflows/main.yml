@@ -13,7 +13,6 @@ jobs:
   force-deploy:
     runs-on: ubuntu-latest
 
-    # SOLO si el PR viene de headerWeb y va hacia main
     if: >
       github.event.pull_request.base.ref == 'main' &&
       github.event.pull_request.head.ref == 'headerWeb'
@@ -24,8 +23,6 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
-
-      # ---------------- FRONTEND BUILD ----------------
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -44,16 +41,12 @@ jobs:
           cd website
           npm run build
 
-      # ---------------- CHECKOUT MAIN ----------------
-
       - name: Checkout main
         uses: actions/checkout@v4
         with:
           ref: main
           path: main-branch
           fetch-depth: 0
-
-      # ---------------- PREPARE DEPLOY ----------------
 
       - name: Prepare deployment artifacts
         run: |
@@ -70,14 +63,11 @@ jobs:
           cd deploy/API
           rm -f "(DELETE)"*.php 2>/dev/null || true
 
-      # Sync deploy folder → main branch
       - name: Sync deploy files into main
         run: |
           rsync -av --delete deploy/API/ main-branch/API/
           rsync -av --delete deploy/database/ main-branch/database/
           rsync -av --delete deploy/website/dist/ main-branch/website/dist/
-
-      # ---------------- COMMIT & PUSH ----------------
 
       - name: Commit and push changes to main
         run: |
@@ -85,3 +75,15 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
+
+          if git diff --cached --quiet; then
+            echo "⚠️ No changes to deploy"
+            exit 0
+          fi
+
+          git commit -m "🚀 Auto-deploy from headerWeb PR"
+          git push
+
+      - name: Trigger remote deploy
+        run: |
+          curl -X GET "http://163.178.171.105/pull.sh"
