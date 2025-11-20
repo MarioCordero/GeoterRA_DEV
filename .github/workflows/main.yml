@@ -2,8 +2,11 @@ name: Force Deploy From PR
 
 on:
   pull_request:
-    branches: [ main ]
-    types: [ opened, synchronize, reopened, labeled ]
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
 
 permissions:
   contents: write
@@ -13,12 +16,19 @@ jobs:
   force-deploy:
     runs-on: ubuntu-latest
 
+    # Solo corre si el PR es desde headerWeb hacia main
+    if: >
+      github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.head.ref == 'headerWeb'
+
     steps:
       - name: Checkout PR branch (headerWeb)
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
+
+      # ---------------- FRONTEND BUILD ----------------
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -37,6 +47,8 @@ jobs:
           cd website
           npm run build
 
+      # ---------------- CHECKOUT MAIN ----------------
+
       - name: Checkout main
         uses: actions/checkout@v4
         with:
@@ -44,26 +56,48 @@ jobs:
           path: main-branch
           fetch-depth: 0
 
+      # ---------------- PREPARE DEPLOY ----------------
+
       - name: Prepare deployment artifacts
         run: |
           mkdir -p deploy/API
           mkdir -p deploy/database
           mkdir -p deploy/website/dist
 
-          cp -r API/*.php deploy/API/
-          cp -r database/* deploy/database/
-          cp -r website/dist/* deploy/website/dist/
+          # Copia solo si existen las rutas, para evitar errores
+          if [ -d "API" ]; then
+            cp -r API/*.php deploy/API/ || true
+          fi
+
+          if [ -d "database" ]; then
+            cp -r database/* deploy/database/ || true
+          fi
+
+          if [ -d "website/dist" ]; then
+            cp -r website/dist/* deploy/website/dist/ || true
+          fi
 
       - name: Remove forbidden files
         run: |
-          cd deploy/API
-          rm -f "(DELETE)"*.php 2>/dev/null || true
+          if [ -d "deploy/API" ]; then
+            cd deploy/API
+            rm -f "(DELETE)"*.php 2>/dev/null || true
+          fi
 
+      # Sync deploy folder → main branch
       - name: Sync deploy files into main
         run: |
-          rsync -av --delete deploy/API/ main-branch/API/
-          rsync -av --delete deploy/database/ main-branch/database/
-          rsync -av --delete deploy/website/dist/ main-branch/website/dist/
+          if [ -d "deploy/API" ]; then
+            rsync -av --delete deploy/API/ main-branch/API/
+          fi
+          if [ -d "deploy/database" ]; then
+            rsync -av --delete deploy/database/ main-branch/database/
+          fi
+          if [ -d "deploy/website/dist" ]; then
+            rsync -av --delete deploy/website/dist/ main-branch/website/dist/
+          fi
+
+      # ---------------- COMMIT & PUSH ----------------
 
       - name: Commit and push changes to main
         run: |
@@ -79,6 +113,8 @@ jobs:
 
           git commit -m "🚀 Auto-deploy from headerWeb PR"
           git push
+
+      # ---------------- TRIGGER REMOTE DEPLOY ----------------
 
       - name: Trigger remote deploy
         run: |
