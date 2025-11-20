@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 name: PR Debug
+=======
+name: Test PR wiring
+>>>>>>> headerWeb
 
 on:
   pull_request:
@@ -6,10 +10,15 @@ on:
       - opened
       - synchronize
       - reopened
+<<<<<<< HEAD
+=======
+      - labeled
+>>>>>>> headerWeb
 
   workflow_dispatch:
 
 jobs:
+<<<<<<< HEAD
   debug:
     runs-on: ubuntu-latest
 
@@ -22,3 +31,16 @@ jobs:
           echo "base.ref:   ${{ github.event.pull_request.base.ref || 'N/A' }}"
           echo "head.ref:   ${{ github.event.pull_request.head.ref || 'N/A' }}"
           echo "title:      ${{ github.event.pull_request.title || 'N/A' }}"
+=======
+  show-info:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print basic info
+        run: |
+          echo "✅ Workflow disparado"
+          echo "Event: ${{ github.event_name }}"
+          echo "Base:  ${{ github.event.pull_request.base.ref || 'N/A' }}"
+          echo "Head:  ${{ github.event.pull_request.head.ref || 'N/A' }}"
+          echo "Title: ${{ github.event.pull_request.title || 'N/A' }}"
+>>>>>>> headerWeb

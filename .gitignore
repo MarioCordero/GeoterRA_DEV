@@ -1,0 +1,28 @@
+# Archivos y carpetas generadas
+/build
+/.gradle
+/local.properties
+Android/.idea/*
+*.iml
+*.apk
+*.ap_
+/out
+/captures
+# Archivos del entorno
+.env
+*.keystore
+*.jks
+*.log
+*.lock
+*.tmp
+*.swp
+# Secretos y configuraciones locales
+secrets.properties
+secrets.defaults.properties
+# Cache de Kotlin DSL
+/.kts_cache
+# Configuración de VSCode (si usás)
+.vscode/
+# .github/
+website/node_modules/*
+config.ini
