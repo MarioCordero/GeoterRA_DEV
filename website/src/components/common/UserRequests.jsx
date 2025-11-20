@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import '../../colorModule.css';
 import '../../fontsModule.css';
 import { buildApiUrl } from '../../config/apiConf';
+import NotImplementedModal from './NotImplementedModal';
 
 const RequestsTable = ({ isAdmin = false }) => {
   const [requests, setRequests] = useState([]);
@@ -13,6 +14,7 @@ const RequestsTable = ({ isAdmin = false }) => {
   const [error, setError] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   // Check if screen is mobile size
@@ -185,27 +187,16 @@ const RequestsTable = ({ isAdmin = false }) => {
   };
 
   // Enhanced delete function with token
-  const handleDelete = async (record) => {
-    try {
-      const currentEmail = await getUserSession();
-      if (!currentEmail) {
-        setError("Sesión expirada");
-        return;
-      }
-
-      console.log('Eliminar:', record);
-    } catch (error) {
-      console.error("Error deleting request:", error);
-      setError("Error al eliminar la solicitud");
-    }
+  const handleDelete = (record) => {
+    setIsModalOpen(true);
   };
 
   const handleView = (record) => {
-    console.log('Ver detalles:', record);
+    setIsModalOpen(true);
   };
 
   const handleEdit = (record) => {
-    console.log('Editar:', record);
+    setIsModalOpen(true);
   };
 
   // Format data for the table
@@ -310,94 +301,102 @@ const RequestsTable = ({ isAdmin = false }) => {
   }
 
   return (
-    <div className="w-full p-4 md:p-6">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold">
-          Mis Solicitudes ({requests.length})
-        </h1>
-        
-        <AddPointModal 
-          onRequestAdded={refreshRequests}
-          isAdmin={isAdmin} 
-          useTokenAuth={isAdmin}
-        />
-      </div>
-      
-      <hr className="my-4" />
-      
-      {/* Content Section */}
-      {requests.length === 0 ? (
-        <div className="text-center p-8 md:p-10 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-          <p className="text-gray-600 mb-2">No tienes solicitudes registradas</p>
-          <p className="text-gray-400 text-sm">
-            Utiliza el botón "Agregar Punto" para crear tu primera solicitud
-          </p>
+    <>
+      <div className="w-full p-4 md:p-6">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold">
+            Mis Solicitudes ({requests.length})
+          </h1>
+          
+          <AddPointModal 
+            onRequestAdded={refreshRequests}
+            isAdmin={isAdmin} 
+            useTokenAuth={isAdmin}
+          />
         </div>
-      ) : (
-        <>
-          {/* Mobile View - Cards */}
-          {isMobile ? (
-            <div>
-              {dataSource.map((request) => (
-                <MobileRequestCard key={request.key} request={request} />
-              ))}
-            </div>
-          ) : (
-            /* Desktop View - Table */
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-gray-100 border-b-2 border-gray-300">
-                    <th className="p-3 text-left font-semibold">ID del Punto</th>
-                    <th className="p-3 text-left font-semibold">Fecha solicitud</th>
-                    <th className="p-3 text-left font-semibold">Estado</th>
-                    <th className="p-3 text-left font-semibold">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dataSource.map((request) => (
-                    <tr key={request.key} className="border-b border-gray-200 hover:bg-gray-50">
-                      <td className="p-3">{request.id}</td>
-                      <td className="p-3">{request.fecha}</td>
-                      <td className="p-3">
-                        <Tag color="orange">Pendiente</Tag>
-                      </td>
-                      <td className="p-3">
-                        <div className="flex gap-2">
-                          <Button
-                            size="small"
-                            type="primary"
-                            danger
-                            icon={<DeleteOutlined />}
-                            onClick={() => handleDelete(request)}
-                          />
-                          <Button
-                            size="small"
-                            type="primary"
-                            icon={<EyeOutlined />}
-                            onClick={() => handleView(request)}
-                          />
-                          <Button
-                            size="small"
-                            type="primary"
-                            icon={<EditOutlined />}
-                            className="bg-green-500 border-green-500"
-                            onClick={() => handleEdit(request)}
-                          />
-                        </div>
-                      </td>
+        
+        <hr className="my-4" />
+        
+        {/* Content Section */}
+        {requests.length === 0 ? (
+          <div className="text-center p-8 md:p-10 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+            <p className="text-gray-600 mb-2">No tienes solicitudes registradas</p>
+            <p className="text-gray-400 text-sm">
+              Utiliza el botón "Agregar Punto" para crear tu primera solicitud
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Mobile View - Cards */}
+            {isMobile ? (
+              <div>
+                {dataSource.map((request) => (
+                  <MobileRequestCard key={request.key} request={request} />
+                ))}
+              </div>
+            ) : (
+              /* Desktop View - Table */
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-gray-100 border-b-2 border-gray-300">
+                      <th className="p-3 text-left font-semibold">ID del Punto</th>
+                      <th className="p-3 text-left font-semibold">Fecha solicitud</th>
+                      <th className="p-3 text-left font-semibold">Estado</th>
+                      <th className="p-3 text-left font-semibold">Acciones</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </>
-      )}
-      
-      <hr className="my-4" />
-    </div>
+                  </thead>
+                  <tbody>
+                    {dataSource.map((request) => (
+                      <tr key={request.key} className="border-b border-gray-200 hover:bg-gray-50">
+                        <td className="p-3">{request.id}</td>
+                        <td className="p-3">{request.fecha}</td>
+                        <td className="p-3">
+                          <Tag color="orange">Pendiente</Tag>
+                        </td>
+                        <td className="p-3">
+                          <div className="flex gap-2">
+                            <Button
+                              size="small"
+                              type="primary"
+                              danger
+                              icon={<DeleteOutlined />}
+                              onClick={() => handleDelete(request)}
+                            />
+                            <Button
+                              size="small"
+                              type="primary"
+                              icon={<EyeOutlined />}
+                              onClick={() => handleView(request)}
+                            />
+                            <Button
+                              size="small"
+                              type="primary"
+                              icon={<EditOutlined />}
+                              className="bg-green-500 border-green-500"
+                              onClick={() => handleEdit(request)}
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
+        )}
+        
+        <hr className="my-4" />
+      </div>
+
+      {/* NotImplemented Modal */}
+      <NotImplementedModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
+    </>
   );
 };
 
