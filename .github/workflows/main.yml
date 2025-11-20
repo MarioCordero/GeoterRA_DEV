@@ -1,0 +1,96 @@
+name: Force Deploy From PR
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize, reopened, labeled ]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  force-deploy:
+    runs-on: ubuntu-latest
+
+    # SOLO si el PR viene de headerWeb y va hacia main
+    if: >
+      github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.head.ref == 'headerWeb'
+
+    steps:
+      - name: Checkout PR branch (headerWeb)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      # ---------------- FRONTEND BUILD ----------------
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: website/package-lock.json
+
+      - name: Install frontend dependencies
+        run: |
+          cd website
+          npm ci
+
+      - name: Build frontend
+        run: |
+          cd website
+          npm run build
+
+      # ---------------- CHECKOUT MAIN ----------------
+
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main-branch
+          token: ${{ secrets.GH_PAT }}
+          fetch-depth: 0
+
+      # ---------------- PREPARE DEPLOY ----------------
+
+      - name: Prepare deployment artifacts
+        run: |
+          mkdir -p deploy/API
+          mkdir -p deploy/database
+          mkdir -p deploy/website/dist
+
+          cp -r API/*.php deploy/API/
+          cp -r database/* deploy/database/
+          cp -r website/dist/* deploy/website/dist/
+
+      - name: Remove forbidden files
+        run: |
+          cd deploy/API
+          rm -f "(DELETE)"*.php 2>/dev/null || true
+
+      # Sync deploy folder → main branch
+      - name: Sync deploy files into main
+        run: |
+          rsync -av --delete deploy/API/ main-branch/API/
+          rsync -av --delete deploy/database/ main-branch/database/
+          rsync -av --delete deploy/website/dist/ main-branch/website/dist/
+
+      # ---------------- COMMIT & PUSH ----------------
+
+      - name: Commit and push changes to main
+        run: |
+          cd main-branch
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "⚠️ No changes to deploy"
+            exit 0
+          fi
+
+          git commit -m "🚀 Auto-deploy from headerWeb PR"
+          git push "https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git" main
