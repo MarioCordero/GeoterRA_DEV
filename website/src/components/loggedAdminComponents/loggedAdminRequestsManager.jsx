@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Typography, Divider, Spin, Alert, Modal, Descriptions, Form, Input, InputNumber, Select, message } from 'antd';
+import { Spin, Tag, Button, Modal, Descriptions, Form, Input, InputNumber, message } from 'antd';
+import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import '../../colorModule.css';
 import '../../fontsModule.css';
 import { buildApiUrl } from '../../config/apiConf';
-
-const { Title } = Typography;
-const { Option } = Select;
+import NotImplementedModal from '../common/NotImplementedModal';
 
 const AdminRequestsManager = () => {
   const [requests, setRequests] = useState([]);
@@ -16,8 +15,22 @@ const AdminRequestsManager = () => {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [reviewForm] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isNotImplementedOpen, setIsNotImplementedOpen] = useState(false);
 
-  // Session token management functions (add these)
+  // Check if screen is mobile size
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  // Session token management functions
   const getSessionToken = () => {
     return localStorage.getItem('geoterra_session_token');
   };
@@ -37,17 +50,12 @@ const AdminRequestsManager = () => {
       const response = await fetch(buildApiUrl("check_session.php"), {
         method: "GET",
         credentials: "include",
-        headers: buildHeaders(),  // ← ADD TOKEN HEADERS HERE
+        headers: buildHeaders(),
       });
       
       const apiResponse = await response.json();
       
-      // DEBUG: Log the full response to see the structure
-      // console.log("Admin Session API Response:", apiResponse);
-      
-      // Check if session is active and user is logged in
       if (apiResponse.response === 'Ok' && apiResponse.data.status === 'logged_in') {
-        // Verify if user is admin
         if (apiResponse.data.is_admin) {
           return apiResponse.data.user;
         } else {
@@ -69,7 +77,7 @@ const AdminRequestsManager = () => {
       const response = await fetch(buildApiUrl("get_all_requests.inc.php"), {
         method: "GET",
         credentials: "include",
-        headers: buildHeaders(),  // ← ADD TOKEN HEADERS HERE
+        headers: buildHeaders(),
       });
       
       if (!response.ok) {
@@ -99,7 +107,7 @@ const AdminRequestsManager = () => {
         method: "POST",
         body: formData,
         credentials: "include",
-        headers: buildHeaders(),  // ← ADD TOKEN HEADERS HERE
+        headers: buildHeaders(),
       });
       
       if (!response.ok) {
@@ -122,10 +130,6 @@ const AdminRequestsManager = () => {
   // Function to submit approved point to puntos_estudiados table
   const submitApprovedPoint = async (pointData) => {
     try {
-      // DEBUG
-      // console.log("Submitting point data:", pointData);
-      
-      // Validate required fields before sending
       const requiredFields = ['id', 'region', 'coord_x', 'coord_y'];
       for (const field of requiredFields) {
         if (!pointData[field]) {
@@ -133,7 +137,6 @@ const AdminRequestsManager = () => {
         }
       }
 
-      // Clean and validate coordinates
       const coordX = parseFloat(pointData.coord_x);
       const coordY = parseFloat(pointData.coord_y);
       
@@ -143,7 +146,6 @@ const AdminRequestsManager = () => {
 
       const formData = new FormData();
       
-      // Map form fields to expected API fields with proper validation
       const fieldMapping = {
         'id': String(pointData.id).trim(),
         'region': String(pointData.region).trim(),
@@ -168,10 +170,8 @@ const AdminRequestsManager = () => {
         'MG+': pointData['MG+'] ? parseFloat(pointData['MG+']) : null
       };
 
-      // Append all fields to FormData, only if they have valid values
       Object.entries(fieldMapping).forEach(([key, value]) => {
         if (value !== null && value !== undefined && value !== '') {
-          // For numeric fields, ensure they're valid numbers
           if (typeof value === 'number' && isNaN(value)) {
             console.warn(`Skipping invalid numeric value for ${key}:`, value);
             return;
@@ -180,20 +180,13 @@ const AdminRequestsManager = () => {
         }
       });
 
-      // DEBUG
-      // console.log("FormData entries:");
-      for (let [key, value] of formData.entries()) {
-        console.log(`${key}: ${value} (${typeof value})`);
-      }
-
       const response = await fetch(buildApiUrl("add_approved_point.inc.php"), {
         method: "POST",
         body: formData,
         credentials: "include",
-        headers: buildHeaders(),  // ← ADD TOKEN HEADERS HERE
+        headers: buildHeaders(),
       });
       
-      // Check if response is ok
       if (!response.ok) {
         const errorText = await response.text();
         console.error("HTTP Error Response:", errorText);
@@ -201,8 +194,6 @@ const AdminRequestsManager = () => {
       }
       
       const responseText = await response.text();
-      // DEBUG
-      // console.log("Raw API Response:", responseText); // Debug log
       
       let result;
       try {
@@ -213,18 +204,13 @@ const AdminRequestsManager = () => {
         throw new Error("Respuesta inválida del servidor");
       }
       
-      // DEBUG
-      // console.log("Parsed API Response:", result); // Debug log
-      
       if (result.response === "Ok") {
         return true;
       } else {
-        // Provide more detailed error information
         const errorMessage = result.message || "Failed to add approved point";
         const errors = result.errors || [];
-        const debug = result.debug || {};
         
-        console.error("API Error Details:", { errorMessage, errors, debug });
+        console.error("API Error Details:", { errorMessage, errors });
         
         if (errors.length > 0) {
           throw new Error(`${errorMessage}. Detalles: ${errors.join(", ")}`);
@@ -283,20 +269,24 @@ const AdminRequestsManager = () => {
     setViewModalVisible(true);
   };
 
+  // Handle delete
+  const handleDelete = (record) => {
+    setIsNotImplementedOpen(true);
+  };
+
   // Handle review and accept
   const handleReviewAccept = (record) => {
     setSelectedRequest(record);
-    // Pre-fill form with available data from the request
     reviewForm.setFieldsValue({
-      id: record.id.replace('SOLI-', 'POINT-'), // Convert SOLI-0001 to POINT-0001
+      id: record.id.replace('SOLI-', 'POINT-'),
       region: record.region || '',
       coord_x: record.coord_x || '',
       coord_y: record.coord_y || '',
-      temp: record.sens_termica === '3' ? 40 : record.sens_termica === '2' ? 25 : 15, // Estimate based on thermal sensation
+      temp: record.sens_termica === '3' ? 40 : record.sens_termica === '2' ? 25 : 15,
       pH_campo: record.pH_campo || 7.0,
       cond_campo: record.cond_campo || 500,
-      pH_lab: record.pH_campo || 7.0, // Use field pH as initial value
-      cond_lab: record.cond_campo || 500, // Use field conductivity as initial value
+      pH_lab: record.pH_campo || 7.0,
+      cond_lab: record.cond_campo || 500,
       Cl: 10,
       'Ca+': 20,
       HCO3: 30,
@@ -317,12 +307,9 @@ const AdminRequestsManager = () => {
   const handleSubmitApproval = async () => {
     try {
       const values = await reviewForm.validateFields();
-      // DEBUG
-      // console.log("Form values before submission:", values); // Debug log
       
       setSubmitting(true);
 
-      // Validate required numeric fields
       const requiredNumericFields = ['coord_x', 'coord_y', 'temp', 'pH_campo', 'cond_campo', 'pH_lab', 'cond_lab', 'Cl', 'Ca+', 'HCO3', 'SO4', 'Si', 'Na', 'K', 'MG+'];
       
       for (const field of requiredNumericFields) {
@@ -331,11 +318,9 @@ const AdminRequestsManager = () => {
         }
       }
 
-      // First, submit the approved point
       await submitApprovedPoint(values);
       
-      // If successful, delete the request from solicitudes table
-      const requestId = selectedRequest.key; // This should be the id_soli
+      const requestId = selectedRequest.key;
       await deleteRequest(requestId);
       
       message.success('Punto aprobado, agregado exitosamente y solicitud eliminada');
@@ -343,13 +328,9 @@ const AdminRequestsManager = () => {
       reviewForm.resetFields();
       setSelectedRequest(null);
       
-      // Refresh the requests list
       await refreshRequests();
       
     } catch (error) {
-      // DEBUG
-      // console.error("Error in handleSubmitApproval:", error); // Debug log
-      
       if (error.errorFields) {
         message.error('Por favor complete todos los campos requeridos');
       } else {
@@ -379,165 +360,200 @@ const AdminRequestsManager = () => {
     cond_campo: request.cond_campo,
   }));
 
-  // Table columns for admin view
-  const columns = [
-    {
-      title: 'ID del punto',
-      dataIndex: 'id',
-      key: 'id',
-      width: '40%',
-    },
-    {
-      title: 'Fecha solicitud',
-      dataIndex: 'fecha',
-      key: 'fecha',
-      width: '30%',
-    },
-    {
-      title: 'Opciones',
-      key: 'opciones',
-      width: '30%',
-      render: (_, record) => (
-        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-          <button 
-            style={{
-              padding: '6px 12px',
-              backgroundColor: '#1890ff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '12px'
-            }}
-            onClick={() => handleViewDetails(record)}
-          >
-            Ver
-          </button>
-          <button 
-            style={{
-              padding: '6px 12px',
-              backgroundColor: '#52c41a',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '12px'
-            }}
-            onClick={() => handleReviewAccept(record)}
-          >
-            Revisar y Aceptar
-          </button>
+  // Mobile card component
+  const MobileRequestCard = ({ request }) => (
+    <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+      <div className="flex justify-between items-center mb-3">
+        <p className="font-semibold text-sm">{request.id}</p>
+        <Tag color="blue">Pendiente Revisión</Tag>
+      </div>
+      
+      <p className="text-xs text-gray-500 mb-3">Fecha: {request.fecha}</p>
+      <p className="text-xs text-gray-500 mb-2">Email: {request.email}</p>
+      
+      {request.region && (
+        <div className="mb-2">
+          <p className="text-sm"><strong>Región:</strong> {request.region}</p>
         </div>
-      ),
-    },
-  ];
+      )}
+      
+      {request.propietario && (
+        <div className="mb-2">
+          <p className="text-sm"><strong>Propietario:</strong> {request.propietario}</p>
+        </div>
+      )}
+      
+      {request.direccion && (
+        <div className="mb-3">
+          <p className="text-sm"><strong>Dirección:</strong> {request.direccion}</p>
+        </div>
+      )}
+      
+      <div className="flex gap-2 justify-end">
+        <Button
+          size="small"
+          type="primary"
+          danger
+          icon={<DeleteOutlined />}
+          onClick={() => handleDelete(request)}
+        />
+        <Button
+          size="small"
+          type="primary"
+          icon={<EyeOutlined />}
+          onClick={() => handleViewDetails(request)}
+        />
+        <Button
+          size="small"
+          type="primary"
+          className="bg-green-500 border-green-500"
+          onClick={() => handleReviewAccept(request)}
+        >
+          Revisar
+        </Button>
+      </div>
+    </div>
+  );
 
   if (loading) {
     return (
-      <div style={{ padding: '24px', textAlign: 'center' }}>
+      <div className="flex flex-col items-center justify-center min-h-96 p-6">
         <Spin size="large" />
-        <p style={{ marginTop: '16px' }}>Cargando todas las solicitudes...</p>
+        <p className="mt-4 text-sm md:text-base">Cargando todas las solicitudes...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div style={{ padding: '24px' }}>
-        <Alert
-          message="Error"
-          description={error}
-          type="error"
-          showIcon
-          action={
-            <button 
-              onClick={refreshRequests}
-              style={{
-                padding: '4px 8px',
-                backgroundColor: '#1890ff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Reintentar
-            </button>
-          }
-        />
+      <div className="p-4 md:p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="font-semibold text-red-800">Error</p>
+          <p className="text-red-700 text-sm">{error}</p>
+          <Button 
+            type="primary"
+            size="small"
+            onClick={refreshRequests}
+            className="mt-3"
+          >
+            Reintentar
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: '24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <Title level={2} style={{ margin: 0 }}>
-          Gestión de Solicitudes ({requests.length})
-        </Title>
-        <button 
-          onClick={refreshRequests}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#1890ff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
-        >
-          🔄 Actualizar
-        </button>
-      </div>
-      
-      <Divider />
-      
-      {requests.length === 0 ? (
-        <div style={{ 
-          textAlign: 'center', 
-          padding: '40px',
-          color: '#666'
-        }}>
-          <p style={{ fontSize: '16px' }}>No hay solicitudes en el sistema</p>
+    <>
+      <div className="w-full p-4 md:p-6">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold">
+            Gestión de Solicitudes ({requests.length})
+          </h1>
+          
+          <Button 
+            type="primary"
+            onClick={refreshRequests}
+            className="w-full md:w-auto"
+          >
+            🔄 Actualizar
+          </Button>
         </div>
-      ) : (
-        <Table
-          dataSource={dataSource}
-          columns={columns}
-          pagination={{
-            pageSize: 10,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total, range) => 
-              `${range[0]}-${range[1]} de ${total} solicitudes`,
-          }}
-          bordered
-          scroll={{ x: 1400 }}
-          style={{ marginTop: '16px' }}
-          size="small"
-        />
-      )}
-      
+        
+        <hr className="my-4" />
+        
+        {/* Content Section */}
+        {requests.length === 0 ? (
+          <div className="text-center p-8 md:p-10 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+            <p className="text-gray-600 mb-2">No hay solicitudes en el sistema</p>
+            <p className="text-gray-400 text-sm">
+              Cuando los usuarios creen nuevas solicitudes, aparecerán aquí
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Mobile View - Cards */}
+            {isMobile ? (
+              <div>
+                {dataSource.map((request) => (
+                  <MobileRequestCard key={request.key} request={request} />
+                ))}
+              </div>
+            ) : (
+              /* Desktop View - Table */
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-gray-100 border-b-2 border-gray-300">
+                      <th className="p-3 text-left font-semibold">ID del Punto</th>
+                      <th className="p-3 text-left font-semibold">Fecha</th>
+                      <th className="p-3 text-left font-semibold">Email</th>
+                      <th className="p-3 text-left font-semibold">Estado</th>
+                      <th className="p-3 text-left font-semibold">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dataSource.map((request) => (
+                      <tr key={request.key} className="border-b border-gray-200 hover:bg-gray-50">
+                        <td className="p-3">{request.id}</td>
+                        <td className="p-3">{request.fecha}</td>
+                        <td className="p-3 text-sm">{request.email}</td>
+                        <td className="p-3">
+                          <Tag color="blue">Pendiente</Tag>
+                        </td>
+                        <td className="p-3">
+                          <div className="flex gap-2">
+                            <Button
+                              size="small"
+                              type="primary"
+                              danger
+                              icon={<DeleteOutlined />}
+                              onClick={() => handleDelete(request)}
+                              title="Eliminar solicitud"
+                            />
+                            <Button
+                              size="small"
+                              type="primary"
+                              icon={<EyeOutlined />}
+                              onClick={() => handleViewDetails(request)}
+                              title="Ver detalles"
+                            />
+                            <Button
+                              size="small"
+                              type="primary"
+                              className="bg-green-500 border-green-500"
+                              onClick={() => handleReviewAccept(request)}
+                              title="Revisar y aprobar"
+                            >
+                              Revisar
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
+        )}
+        
+        <hr className="my-4" />
+      </div>
+
       {/* View Details Modal */}
       <Modal
         title={`Detalles de la Solicitud ${selectedRequest?.id}`}
         open={viewModalVisible}
         onCancel={() => setViewModalVisible(false)}
         footer={[
-          <button 
+          <Button 
             key="close"
             onClick={() => setViewModalVisible(false)}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#d9d9d9',
-              color: '#000',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
           >
             Cerrar
-          </button>
+          </Button>
         ]}
         width={700}
       >
@@ -570,37 +586,21 @@ const AdminRequestsManager = () => {
         open={reviewModalVisible}
         onCancel={() => setReviewModalVisible(false)}
         footer={[
-          <button 
+          <Button 
             key="cancel"
             onClick={() => setReviewModalVisible(false)}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#d9d9d9',
-              color: '#000',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              marginRight: '8px'
-            }}
           >
             Cancelar
-          </button>,
-          <button 
+          </Button>,
+          <Button 
             key="approve"
+            type="primary"
             onClick={handleSubmitApproval}
-            disabled={submitting}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#52c41a',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: submitting ? 'not-allowed' : 'pointer',
-              opacity: submitting ? 0.6 : 1
-            }}
+            loading={submitting}
+            className="bg-green-500"
           >
             {submitting ? 'Aprobando...' : 'Aprobar y Agregar'}
-          </button>
+          </Button>
         ]}
         width={800}
       >
@@ -609,7 +609,7 @@ const AdminRequestsManager = () => {
           layout="vertical"
           scrollToFirstError
         >
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Form.Item label="ID del Punto" name="id" rules={[{ required: true, message: 'ID requerido' }]}>
               <Input placeholder="Ej: POINT-0001" />
             </Form.Item>
@@ -676,8 +676,13 @@ const AdminRequestsManager = () => {
           </div>
         </Form>
       </Modal>
-      <Divider />
-    </div>
+
+      {/* NotImplemented Modal */}
+      <NotImplementedModal 
+        isOpen={isNotImplementedOpen} 
+        onClose={() => setIsNotImplementedOpen(false)} 
+      />
+    </>
   );
 };
 
