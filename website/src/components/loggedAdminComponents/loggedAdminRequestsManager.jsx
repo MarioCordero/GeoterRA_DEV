@@ -555,28 +555,103 @@ const AdminRequestsManager = () => {
             Cerrar
           </Button>
         ]}
-        width={700}
+        width={isMobile ? '95%' : 700}
+        centered
+        styles={{
+          body: {
+            maxHeight: isMobile ? 'calc(100vh - 200px)' : 'calc(100vh - 100px)',
+            overflowY: 'auto'
+          }
+        }}
       >
         {selectedRequest && (
-          <Descriptions bordered column={2} size="small">
-            <Descriptions.Item label="ID Solicitud">{selectedRequest.id}</Descriptions.Item>
-            <Descriptions.Item label="Email Usuario">{selectedRequest.email}</Descriptions.Item>
-            <Descriptions.Item label="Fecha">{selectedRequest.fecha}</Descriptions.Item>
-            <Descriptions.Item label="Región">{selectedRequest.region}</Descriptions.Item>
-            <Descriptions.Item label="Propietario">{selectedRequest.propietario}</Descriptions.Item>
-            <Descriptions.Item label="Teléfono">{selectedRequest.num_telefono}</Descriptions.Item>
-            <Descriptions.Item label="Coordenada X">{selectedRequest.coord_x}</Descriptions.Item>
-            <Descriptions.Item label="Coordenada Y">{selectedRequest.coord_y}</Descriptions.Item>
-            <Descriptions.Item label="Dirección" span={2}>{selectedRequest.direccion}</Descriptions.Item>
-            <Descriptions.Item label="Uso Actual">{selectedRequest.uso_actual}</Descriptions.Item>
-            <Descriptions.Item label="Sensación Térmica">
-              {selectedRequest.sens_termica === '1' ? 'Frío' : 
-               selectedRequest.sens_termica === '2' ? 'Tibio' : 'Caliente'}
-            </Descriptions.Item>
-            <Descriptions.Item label="Burbujeo">{selectedRequest.burbujeo ? 'Sí' : 'No'}</Descriptions.Item>
-            <Descriptions.Item label="pH Campo">{selectedRequest.pH_campo || 'No medido'}</Descriptions.Item>
-            <Descriptions.Item label="Conductividad Campo">{selectedRequest.cond_campo || 'No medida'}</Descriptions.Item>
-          </Descriptions>
+          <div className="space-y-4">
+            {/* Header Info */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4 border-b border-gray-200">
+              <div>
+                <p className="text-xs text-gray-500 uppercase">ID Solicitud</p>
+                <p className="text-lg font-bold text-gray-800">{selectedRequest.id}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 uppercase">Email Usuario</p>
+                <p className="text-sm text-gray-700 break-all">{selectedRequest.email}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 uppercase">Fecha</p>
+                <p className="text-sm text-gray-700">{selectedRequest.fecha}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 uppercase">Teléfono</p>
+                <p className="text-sm text-gray-700">{selectedRequest.num_telefono || 'No disponible'}</p>
+              </div>
+            </div>
+
+            {/* Ubicación */}
+            <div>
+              <h3 className="font-semibold text-gray-800 mb-3 text-base">📍 Ubicación</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div>
+                  <p className="text-xs text-gray-500">Región</p>
+                  <p className="font-semibold text-gray-800">{selectedRequest.region}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Propietario</p>
+                  <p className="font-semibold text-gray-800">{selectedRequest.propietario || 'No especificado'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Coordenada X</p>
+                  <p className="font-semibold text-gray-800">{selectedRequest.coord_x}°</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Coordenada Y</p>
+                  <p className="font-semibold text-gray-800">{selectedRequest.coord_y}°</p>
+                </div>
+              </div>
+              <div className="mt-3 p-3 bg-gray-100 rounded-lg">
+                <p className="text-xs text-gray-500 mb-2">Dirección</p>
+                <p className="text-sm text-gray-700">{selectedRequest.direccion || 'No especificada'}</p>
+              </div>
+            </div>
+
+            {/* Características */}
+            <div>
+              <h3 className="font-semibold text-gray-800 mb-3 text-base">🌡️ Características</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                  <p className="text-xs text-gray-500">Uso Actual</p>
+                  <p className="font-semibold text-green-700">{selectedRequest.uso_actual || 'No especificado'}</p>
+                </div>
+                <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                  <p className="text-xs text-gray-500">Sensación Térmica</p>
+                  <p className="font-semibold text-orange-700">
+                    {selectedRequest.sens_termica === '1' ? '❄️ Frío' : 
+                    selectedRequest.sens_termica === '2' ? '🌡️ Tibio' : '🔥 Caliente'}
+                  </p>
+                </div>
+                <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                  <p className="text-xs text-gray-500">Burbujeo</p>
+                  <p className="font-semibold text-purple-700">
+                    {selectedRequest.burbujeo ? '✅ Sí' : '❌ No'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Mediciones */}
+            <div>
+              <h3 className="font-semibold text-gray-800 mb-3 text-base">🧪 Mediciones</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="p-3 bg-red-50 rounded-lg border border-red-200">
+                  <p className="text-xs text-gray-500">pH Campo</p>
+                  <p className="font-semibold text-red-700">{selectedRequest.pH_campo || 'No medido'}</p>
+                </div>
+                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <p className="text-xs text-gray-500">Conductividad Campo</p>
+                  <p className="font-semibold text-blue-700">{selectedRequest.cond_campo || 'No medida'} μS/cm</p>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </Modal>
 
@@ -602,7 +677,14 @@ const AdminRequestsManager = () => {
             {submitting ? 'Aprobando...' : 'Aprobar y Agregar'}
           </Button>
         ]}
-        width={800}
+        width={isMobile ? '95%' : 800}
+        centered
+        styles={{
+          body: {
+            maxHeight: isMobile ? 'calc(100vh - 200px)' : 'calc(100vh - 100px)',
+            overflowY: 'auto'
+          }
+        }}
       >
         <Form
           form={reviewForm}
