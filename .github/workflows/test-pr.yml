@@ -1,0 +1,24 @@
+name: Test PR wiring
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+
+  workflow_dispatch:
+
+jobs:
+  show-info:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print basic info
+        run: |
+          echo "✅ Workflow disparado"
+          echo "Event: ${{ github.event_name }}"
+          echo "Base:  ${{ github.event.pull_request.base.ref || 'N/A' }}"
+          echo "Head:  ${{ github.event.pull_request.head.ref || 'N/A' }}"
+          echo "Title: ${{ github.event.pull_request.title || 'N/A' }}"
