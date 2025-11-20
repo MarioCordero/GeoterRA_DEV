@@ -1,4 +1,4 @@
-name: Test PR wiring
+name: PR Debug
 
 on:
   pull_request:
@@ -6,19 +6,19 @@ on:
       - opened
       - synchronize
       - reopened
-      - labeled
 
   workflow_dispatch:
 
 jobs:
-  show-info:
+  debug:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Print basic info
+      - name: Print event info
         run: |
-          echo "✅ Workflow disparado"
-          echo "Event: ${{ github.event_name }}"
-          echo "Base:  ${{ github.event.pull_request.base.ref || 'N/A' }}"
-          echo "Head:  ${{ github.event.pull_request.head.ref || 'N/A' }}"
-          echo "Title: ${{ github.event.pull_request.title || 'N/A' }}"
+          echo "✅ PR Debug workflow disparado"
+          echo "event_name: ${{ github.event_name }}"
+          echo "ref:        ${{ github.ref }}"
+          echo "base.ref:   ${{ github.event.pull_request.base.ref || 'N/A' }}"
+          echo "head.ref:   ${{ github.event.pull_request.head.ref || 'N/A' }}"
+          echo "title:      ${{ github.event.pull_request.title || 'N/A' }}"
