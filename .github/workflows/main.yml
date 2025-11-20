@@ -1,0 +1,145 @@
+name: Force Deploy (PR + Manual)
+
+on:
+  # 1) Automático: PRs hacia main
+  pull_request:
+    branches: [ main ]
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+
+  # 2) Manual desde Actions
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  force-deploy:
+    runs-on: ubuntu-latest
+
+    # Ejecutar si:
+    # - Es workflow_dispatch (manual), o
+    # - Es PR headerWeb -> main
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.base.ref == 'main' &&
+       github.event.pull_request.head.ref == 'headerWeb')
+
+    steps:
+      # ---------------- DETERMINAR RAMA ORIGEN ----------------
+      - name: Set source branch
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "SOURCE_BRANCH=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
+          else
+            # Para ejecución manual usamos headerWeb por defecto
+            echo "SOURCE_BRANCH=headerWeb" >> $GITHUB_ENV
+          fi
+
+      # ---------------- CHECKOUT RAMA ORIGEN ----------------
+      - name: Checkout source branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_BRANCH }}
+          fetch-depth: 0
+
+      # ---------------- BUILD FRONTEND ----------------
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install frontend dependencies
+        run: |
+          cd website
+          npm install
+
+      - name: Build frontend
+        run: |
+          cd website
+          npm run build
+
+      # ---------------- CHECKOUT MAIN ----------------
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main-branch
+          fetch-depth: 0
+
+      # ---------------- PREPARAR ARTEFACTOS ----------------
+      - name: Prepare deployment artifacts
+        run: |
+          mkdir -p deploy/API
+          mkdir -p deploy/database
+          mkdir -p deploy/website/dist
+
+          # Copiar solo si existen, para evitar errores tontos
+          if [ -d "API" ]; then
+            cp -r API/*.php deploy/API/ || true
+          fi
+
+          if [ -d "database" ]; then
+            cp -r database/* deploy/database/ || true
+          fi
+
+          # Usamos el build generado en website/dist
+          if [ -d "website/dist" ]; then
+            cp -r website/dist/* deploy/website/dist/ || true
+          fi
+
+      - name: Remove forbidden files
+        run: |
+          if [ -d "deploy/API" ]; then
+            cd deploy/API
+            rm -f "(DELETE)"*.php 2>/dev/null || true
+          fi
+
+      # ---------------- SYNC A LA CARPETA main ----------------
+      # Resultado esperado en raíz de main:
+      # .
+      # ├── API
+      # ├── database
+      # └── website
+      - name: Sync deploy folders into main
+        run: |
+          if [ -d "deploy/API" ]; then
+            mkdir -p main-branch/API
+            rsync -av --delete deploy/API/ main-branch/API/
+          fi
+
+          if [ -d "deploy/database" ]; then
+            mkdir -p main-branch/database
+            rsync -av --delete deploy/database/ main-branch/database/
+          fi
+
+          if [ -d "deploy/website/dist" ]; then
+            mkdir -p main-branch/website/dist
+            rsync -av --delete deploy/website/dist/ main-branch/website/dist/
+          fi
+
+      # ---------------- COMMIT & PUSH A main ----------------
+      - name: Commit and push changes to main
+        run: |
+          cd main-branch
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "⚠️ No changes to deploy"
+            exit 0
+          fi
+
+          git commit -m "🚀 Auto-deploy from ${{ env.SOURCE_BRANCH }}"
+          git push
+
+      # ---------------- TRIGGER REMOTE DEPLOY ----------------
+      - name: Trigger remote deploy
+        run: |
+          curl -X GET "http://163.178.171.105/pull.sh"
