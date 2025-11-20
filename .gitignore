@@ -2,13 +2,12 @@
 /build
 /.gradle
 /local.properties
-Android/.idea/
+Android/.idea/*
 *.iml
 *.apk
 *.ap_
 /out
 /captures
-
 # Archivos del entorno
 .env
 *.keystore
@@ -17,16 +16,13 @@ Android/.idea/
 *.lock
 *.tmp
 *.swp
-
 # Secretos y configuraciones locales
 secrets.properties
 secrets.defaults.properties
-
 # Cache de Kotlin DSL
 /.kts_cache
-
 # Configuración de VSCode (si usás)
 .vscode/
 .github/
-
 website/node_modules/*
+config.ini
