@@ -1,79 +1,57 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Form, Input } from "antd";
+import PhoneInput from "../common/PhoneInput";
 import "../../colorModule.css";
-import '../../fontsModule.css';
-import { buildApiUrl } from '../../config/apiConf';
+import "../../fontsModule.css";
+import { buildApiUrl } from "../../config/apiConf";
 
 export default function Register() {
-
   const navigate = useNavigate();
+  const [form] = Form.useForm();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-    password: '',
-    confirm_password: '',
-    phone_num: ''
-  });
 
   // Freeze/unfreeze scroll when modal opens/closes
   useEffect(() => {
     if (showSuccessModal) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
 
-    // Cleanup function to reset overflow when component unmounts
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [showSuccessModal]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    
-    // Allow multiple names in first_name field (letters, spaces, and common name characters)
-    if (name === 'first_name') {
-      // Allow letters, spaces, hyphens, and apostrophes for compound names
-      const nameRegex = /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-']*$/;
-      if (!nameRegex.test(value)) {
-        return; // Don't update if invalid characters
-      }
-    }
-
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleFinish = async (values) => {
     // Debug: Print current form state
     console.log("=== FORM DATA DEBUG ===");
-    console.log("Raw form data:", formData);
+    console.log("Raw form values:", values);
 
-    // Trim and clean the first name before sending
-    const cleanFirstName = formData.first_name.trim().replace(/\s+/g, ' ');
+    // Trim and clean names before sending
+    const cleanFirstName = (values.first_name || "").trim().replace(/\s+/g, " ");
+    const cleanLastName = (values.last_name || "").trim().replace(/\s+/g, " ");
+    const cleanEmail = (values.email || "").trim();
 
-    // Debug: Show cleaned first name
+    // Extract only digits from phone (PhoneInput stores formatted string)
+    const phoneDigits = (values.phone_num || "").replace(/\D/g, "");
+
+    // Debug: Show cleaned values
     console.log("Cleaned first_name:", cleanFirstName);
 
-    const form = new FormData();
-    form.append("first_name", cleanFirstName);
-    form.append("last_name", formData.last_name);
-    form.append("email", formData.email);
-    form.append("password", formData.password);
-    form.append("confirm_password", formData.confirm_password);
-    form.append("phone_num", formData.phone_num);
+    const formPayload = new FormData();
+    formPayload.append("first_name", cleanFirstName);
+    formPayload.append("last_name", cleanLastName);
+    formPayload.append("email", cleanEmail);
+    formPayload.append("password", values.password);
+    formPayload.append("confirm_password", values.confirm_password);
+    formPayload.append("phone_num", phoneDigits);
 
     // Debug: Print FormData as JSON-like object
     console.log("=== FORM DATA BEING SENT ===");
     const formDataObject = {};
-    for (let [key, value] of form.entries()) {
+    for (let [key, value] of formPayload.entries()) {
       formDataObject[key] = value;
     }
     console.log("FormData as object:", formDataObject);
@@ -82,21 +60,14 @@ export default function Register() {
     try {
       const response = await fetch(buildApiUrl("register.inc.php"), {
         method: "POST",
-        body: form,
+        body: formPayload,
       });
 
       const data = await response.json();
 
-      // Debug: Print API response
-      // console.log("=== API RESPONSE ===");
-      // console.log("API response:", data);
-      // console.log("Response as JSON:", JSON.stringify(data, null, 2));
-
       if (data.response === "Ok") {
-        // Show success popup instead of navigating
         setShowSuccessModal(true);
       } else {
-        // Show specific error if available
         if (data.errors && data.errors.email_used) {
           alert(data.errors.email_used);
         } else {
@@ -104,50 +75,56 @@ export default function Register() {
         }
       }
     } catch (err) {
-      // Debug
-      // console.log("=== FETCH ERROR ===");
-      // console.log("API response:", err);
-      // console.log("Error details:", err.message);
       alert("Error de conexión");
     }
   };
 
   const handleModalClose = () => {
     setShowSuccessModal(false);
-    // Redirect to login page
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-grow flex items-center justify-center px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-12 bg-gris">
-        
         {/* Form Container */}
         <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl bg-white p-4 sm:p-6 md:p-8 lg:p-10 rounded-lg shadow-lg sm:shadow-xl mt-16 sm:mt-20">
-          
           {/* Title */}
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl poppins-bold text-center mb-4 sm:mb-6 md:mb-7 text-geoterra-blue">
             Registrarse
           </h1>
 
-          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 md:space-y-5">
-            
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleFinish}
+            autoComplete="off"
+            className="space-y-3 sm:space-y-4 md:space-y-5"
+          >
             {/* Name and Last Name - Two columns on larger screens */}
             <div className="flex flex-col md:flex-row md:space-x-4 space-y-3 md:space-y-0">
               <div className="flex-1">
                 <label className="block poppins-bold mb-1 sm:mb-2 text-sm sm:text-base text-geoterra-blue">
                   Nombre(s)
                 </label>
-                <input
+                <Form.Item
                   name="first_name"
-                  type="text"
-                  placeholder="Ingrese su(s) nombre(s)"
-                  required
-                  value={formData.first_name}
-                  onChange={handleInputChange}
-                  className="w-full poppins-light px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-geoterra-blue focus:border-transparent transition-all duration-200 text-sm sm:text-base"
-                  title="Puede ingresar uno o varios nombres (ej: Mario Gabriel)"
-                />
+                  rules={[
+                    { required: true, message: "Ingrese su(s) nombre(s)" },
+                    {
+                      pattern: /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-']*$/,
+                      message:
+                        "Solo se permiten letras, espacios, guiones y apóstrofes",
+                    },
+                  ]}
+                  className="mb-0"
+                >
+                  <Input
+                    placeholder="Ingrese su(s) nombre(s)"
+                    className="poppins-light px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-geoterra-blue focus:border-transparent transition-all duration-200 text-sm sm:text-base"
+                    title="Puede ingresar uno o varios nombres (ej: Mario Gabriel)"
+                  />
+                </Form.Item>
                 <small className="text-xs text-gray-500 mt-1">
                   Puede ingresar varios nombres separados por espacio
                 </small>
@@ -157,15 +134,16 @@ export default function Register() {
                 <label className="block poppins-bold mb-1 sm:mb-2 text-sm sm:text-base text-geoterra-blue">
                   Apellido(s)
                 </label>
-                <input
+                <Form.Item
                   name="last_name"
-                  type="text"
-                  placeholder="Ingrese su(s) apellido(s)"
-                  required
-                  value={formData.last_name}
-                  onChange={handleInputChange}
-                  className="w-full poppins-light px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-geoterra-blue focus:border-transparent transition-all duration-200 text-sm sm:text-base"
-                />
+                  rules={[{ required: true, message: "Ingrese su(s) apellido(s)" }]}
+                  className="mb-0"
+                >
+                  <Input
+                    placeholder="Ingrese su(s) apellido(s)"
+                    className="poppins-light px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-geoterra-blue focus:border-transparent transition-all duration-200 text-sm sm:text-base"
+                  />
+                </Form.Item>
               </div>
             </div>
 
@@ -174,31 +152,26 @@ export default function Register() {
               <label className="block poppins-bold mb-1 sm:mb-2 text-sm sm:text-base text-geoterra-blue">
                 Correo electrónico
               </label>
-              <input
+              <Form.Item
                 name="email"
-                type="email"
-                placeholder="Ingrese su correo electrónico"
-                required
-                value={formData.email}
-                onChange={handleInputChange}
-                className="w-full poppins-light px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-geoterra-blue focus:border-transparent transition-all duration-200 text-sm sm:text-base"
-              />
+                rules={[
+                  { required: true, message: "Ingrese su correo electrónico" },
+                  { type: "email", message: "Ingrese un correo válido" },
+                ]}
+                className="mb-0"
+              >
+                <Input
+                  type="email"
+                  placeholder="Ingrese su correo electrónico"
+                  className="poppins-light px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-geoterra-blue focus:border-transparent transition-all duration-200 text-sm sm:text-base"
+                />
+              </Form.Item>
             </div>
 
-            {/* Phone */}
+            {/* Phone using PhoneInput component */}
             <div>
-              <label className="block poppins-bold mb-1 sm:mb-2 text-sm sm:text-base text-geoterra-blue">
-                Teléfono
-              </label>
-              <input
-                name="phone_num"
-                type="tel"
-                placeholder="Ingrese su número de teléfono"
-                required
-                value={formData.phone_num}
-                onChange={handleInputChange}
-                className="w-full poppins-light px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-geoterra-blue focus:border-transparent transition-all duration-200 text-sm sm:text-base"
-              />
+              {/* PhoneInput renders its own label */}
+              <PhoneInput form={form} name="phone_num" required={true} />
             </div>
 
             {/* Password Fields - Two columns on larger screens */}
@@ -207,39 +180,59 @@ export default function Register() {
                 <label className="block poppins-bold mb-1 sm:mb-2 text-sm sm:text-base text-geoterra-blue">
                   Contraseña
                 </label>
-                <input
+                <Form.Item
                   name="password"
-                  type="password"
-                  placeholder="Ingrese una contraseña"
-                  required
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className="w-full poppins-light px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-geoterra-blue focus:border-transparent transition-all duration-200 text-sm sm:text-base"
-                />
+                  rules={[{ required: true, message: "Ingrese una contraseña" }]}
+                  className="mb-0 "
+                >
+                  <Input.Password
+                    placeholder="Ingrese una contraseña"
+                    className="poppins-light px-3 sm:px-4 py-2 sm:py-3 focus:outline-none focus:ring-2 focus:ring-geoterra-blue focus:border-transparent transition-all duration-200 text-sm sm:text-base"
+                  />
+                </Form.Item>
               </div>
 
               <div className="flex-1">
                 <label className="block poppins-bold mb-1 sm:mb-2 text-sm sm:text-base text-geoterra-blue">
                   Confirmar contraseña
                 </label>
-                <input
+                <Form.Item
                   name="confirm_password"
-                  type="password"
-                  placeholder="Confirme su contraseña"
-                  required
-                  value={formData.confirm_password}
-                  onChange={handleInputChange}
-                  className="w-full poppins-light px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-geoterra-blue focus:border-transparent transition-all duration-200 text-sm sm:text-base"
-                />
+                  dependencies={["password"]}
+                  rules={[
+                    { required: true, message: "Confirme su contraseña" },
+                    ({ getFieldValue }) => ({
+                      validator(_, value) {
+                        if (!value || getFieldValue("password") === value) {
+                          return Promise.resolve();
+                        }
+                        return Promise.reject(
+                          new Error("Las contraseñas no coinciden")
+                        );
+                      },
+                    }),
+                  ]}
+                  className="mb-0 "
+                >
+                  <Input.Password
+                    placeholder="Confirme su contraseña"
+                    className="poppins-light px-3 sm:px-4 py-2 sm:py-3 focus:outline-none focus:ring-2 focus:ring-geoterra-blue focus:border-transparent transition-all duration-200 text-sm sm:text-base"
+                  />
+                </Form.Item>
               </div>
             </div>
 
             {/* Terms and Privacy - Mobile only */}
             <div className="md:hidden text-xs text-gray-600 leading-relaxed pt-2">
-              Al registrarse, acepta nuestros{' '}
-              <span className="text-geoterra-blue cursor-pointer hover:underline">términos de servicio</span>{' '}
-              y{' '}
-              <span className="text-geoterra-blue cursor-pointer hover:underline">política de privacidad</span>.
+              Al registrarse, acepta nuestros{" "}
+              <span className="text-geoterra-blue cursor-pointer hover:underline">
+                términos de servicio
+              </span>{" "}
+              y{" "}
+              <span className="text-geoterra-blue cursor-pointer hover:underline">
+                política de privacidad
+              </span>
+              .
             </div>
 
             {/* Submit Button */}
@@ -254,26 +247,31 @@ export default function Register() {
 
             {/* Terms and Privacy - Desktop */}
             <div className="hidden md:block text-sm text-gray-600 text-center leading-relaxed pt-4">
-              Al registrarse, acepta nuestros{' '}
-              <span className="text-geoterra-blue cursor-pointer hover:underline">términos de servicio</span>{' '}
-              y{' '}
-              <span className="text-geoterra-blue cursor-pointer hover:underline">política de privacidad</span>.
+              Al registrarse, acepta nuestros{" "}
+              <span className="text-geoterra-blue cursor-pointer hover:underline">
+                términos de servicio
+              </span>{" "}
+              y{" "}
+              <span className="text-geoterra-blue cursor-pointer hover:underline">
+                política de privacidad
+              </span>
+              .
             </div>
 
             {/* Login Link */}
             <div className="text-center pt-4 sm:pt-6">
               <p className="text-sm sm:text-base text-gray-600 poppins">
-                ¿Ya tienes una cuenta?{' '}
+                ¿Ya tienes una cuenta?{" "}
                 <button
                   type="button"
-                  onClick={() => navigate('/login')}
+                  onClick={() => navigate("/login")}
                   className="text-geoterra-blue hover:text-orange-600 font-semibold hover:underline transition-colors duration-200"
                 >
                   Iniciar Sesión
                 </button>
               </p>
             </div>
-          </form>
+          </Form>
         </div>
       </main>
 
@@ -283,8 +281,18 @@ export default function Register() {
           <div className="bg-white rounded-lg p-8 sm:p-12 max-w-lg w-full mx-6 shadow-2xl">
             <div className="text-center">
               <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
-                <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                <svg
+                  className="h-8 w-8 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
                 </svg>
               </div>
               <h3 className="text-2xl sm:text-3xl poppins-bold text-geoterra-blue mb-4">
