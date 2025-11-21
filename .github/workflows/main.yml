@@ -90,9 +90,9 @@ jobs:
             cp -r database/* deploy/database/ || true
           fi
 
-          # website/dist (incluye index.html, .htaccess, assets, etc.)
+          # website/dist (incluye .htaccess, index.html, assets, dotfiles, todo)
           if [ -d "website/dist" ]; then
-            cp -r website/dist/* deploy/website/dist/ || true
+            rsync -av website/dist/ deploy/website/dist/
           fi
 
       - name: Remove forbidden files
