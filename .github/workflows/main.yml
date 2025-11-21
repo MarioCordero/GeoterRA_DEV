@@ -102,6 +102,7 @@ jobs:
       # ---------------- SYNC HACIA main-branch ----------------
       - name: Sync deploy folders into main
         run: |
+          # API y database: SÍ borramos lo viejo (tiene sentido)
           if [ -d "deploy/API" ]; then
             mkdir -p main-branch/API
             rsync -av --delete deploy/API/ main-branch/API/
@@ -112,9 +113,10 @@ jobs:
             rsync -av --delete deploy/database/ main-branch/database/
           fi
 
+          # website/dist: NO borramos, así no desaparecen .htaccess ni assets viejos
           if [ -d "deploy/website/dist" ]; then
             mkdir -p main-branch/website/dist
-            rsync -av --delete deploy/website/dist/ main-branch/website/dist/
+            rsync -av deploy/website/dist/ main-branch/website/dist/
           fi
 
       # ---------------- COMMIT & PUSH CON PAT ----------------
