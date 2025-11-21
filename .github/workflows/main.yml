@@ -41,14 +41,14 @@ jobs:
             echo "SOURCE_BRANCH=headerWeb" >> $GITHUB_ENV
           fi
 
-      # ---------------- CHECKOUT RAMA ORIGEN ----------------
+      # ---------------- CHECKOUT RAMA ORIGEN (headerWeb) ----------------
       - name: Checkout source branch
         uses: actions/checkout@v4
         with:
           ref: ${{ env.SOURCE_BRANCH }}
           fetch-depth: 0
 
-      # ---------------- BUILD FRONTEND ----------------
+      # ---------------- BUILD FRONTEND EN headerWeb ----------------
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -71,7 +71,7 @@ jobs:
           ref: main
           path: main-branch
           fetch-depth: 0
-          token: ${{ secrets.GH_PAT }}   # 👈 usa tu PAT para el remote
+          token: ${{ secrets.GH_PAT }}   # usa tu PAT para el remote
 
       # ---------------- PREPARAR ARTEFACTOS ----------------
       - name: Prepare deployment artifacts
@@ -80,14 +80,17 @@ jobs:
           mkdir -p deploy/database
           mkdir -p deploy/website/dist
 
+          # API
           if [ -d "API" ]; then
             cp -r API/*.php deploy/API/ || true
           fi
 
+          # database
           if [ -d "database" ]; then
             cp -r database/* deploy/database/ || true
           fi
 
+          # website/dist (incluye index.html, .htaccess, assets, etc.)
           if [ -d "website/dist" ]; then
             cp -r website/dist/* deploy/website/dist/ || true
           fi
@@ -102,7 +105,7 @@ jobs:
       # ---------------- SYNC HACIA main-branch ----------------
       - name: Sync deploy folders into main
         run: |
-          # API y database: SÍ borramos lo viejo (tiene sentido)
+          # API y database: reemplazo completo
           if [ -d "deploy/API" ]; then
             mkdir -p main-branch/API
             rsync -av --delete deploy/API/ main-branch/API/
@@ -113,9 +116,10 @@ jobs:
             rsync -av --delete deploy/database/ main-branch/database/
           fi
 
-          # website/dist: NO borramos, así no desaparecen .htaccess ni assets viejos
+          # website/dist: BORRAR TODO y copiar lo nuevo del build
           if [ -d "deploy/website/dist" ]; then
             mkdir -p main-branch/website/dist
+            rm -rf main-branch/website/dist/*           # limpia dist por completo
             rsync -av deploy/website/dist/ main-branch/website/dist/
           fi
 
