@@ -123,6 +123,23 @@ jobs:
             rsync -av deploy/website/dist/ main-branch/website/dist/
           fi
 
+      # ---------------- FORZAR .htaccess EN dist ----------------
+      - name: Ensure .htaccess in dist
+        run: |
+          mkdir -p main-branch/website/dist
+
+          # Prioridad: si existe en website/dist, úsalo
+          if [ -f "website/dist/.htaccess" ]; then
+            echo "Found website/dist/.htaccess, copying to main-branch..."
+            cp website/dist/.htaccess main-branch/website/dist/.htaccess
+          # Si no, intenta website/.htaccess
+          elif [ -f "website/.htaccess" ]; then
+            echo "Found website/.htaccess, copying to main-branch/dist..."
+            cp website/.htaccess main-branch/website/dist/.htaccess
+          else
+            echo "⚠️ No .htaccess found in website/dist or website/"
+          fi
+
       # ---------------- COMMIT & PUSH CON PAT ----------------
       - name: Commit and push changes to main
         run: |
