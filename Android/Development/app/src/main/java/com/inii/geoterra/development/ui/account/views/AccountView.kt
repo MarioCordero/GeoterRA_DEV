@@ -41,14 +41,9 @@ class AccountView : PageView<FragmentAccountBinding, AccountViewModel>(
    * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
    */
   override fun onCreatePage(savedInstanceState: Bundle?) {
-    viewModel.checkSessionStatus()
 
-    this.viewModel.setOnSessionStateChangeListener { isActive ->
-      if (isActive) {
-        this.viewModel.fetchUserInformation()
-      }
-    }
   }
+
 
   /**
    * @brief Sets all the listeners related to the View.
@@ -91,15 +86,18 @@ class AccountView : PageView<FragmentAccountBinding, AccountViewModel>(
   }
 
   override fun observeViewModel() {
+    viewModel.sessionActive.observe(viewLifecycleOwner) { isActive ->
+      if (!isActive) {
+        navigateToLogin()
+      }
+    }
+
     viewModel.userInfo.observe(viewLifecycleOwner) { info ->
+      info ?: return@observe
+
       binding.tvUsername.text = info.name
       binding.tvEmail.text = info.email
       binding.tvPhoneNumber.text = info.phone
-
-    }
-
-    viewModel.sessionStatus.observe(viewLifecycleOwner) { isActive ->
-      // Optional: react to session changes
     }
 
     viewModel.requestsMade.observe(viewLifecycleOwner) { requestsMade ->
@@ -127,12 +125,15 @@ class AccountView : PageView<FragmentAccountBinding, AccountViewModel>(
       .setCancelable(false)
       .setPositiveButton("Sí") { dialog, _ ->
         SessionManager.endSession()
-        this.listener?.onPageEvent("USER_LOGGED_OUT")
         dialog.dismiss()
       }
       .setNegativeButton("No") { dialog, _ ->
         dialog.dismiss()
       }
       .show()
+  }
+
+  private fun navigateToLogin() {
+    listener?.onPageEvent("USER_LOGGED_OUT")
   }
 }

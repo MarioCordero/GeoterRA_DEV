@@ -132,9 +132,10 @@ abstract class PageView<VB : ViewBinding, VM : PageViewModel>(
   /**
    * @brief Cleans up ViewBinding reference during destruction
    */
-  final override fun onDestroyView() {
+  override fun onDestroyView() {
     super.onDestroyView()
     this._binding = null
+    this.listener = null
   }
 
   /**

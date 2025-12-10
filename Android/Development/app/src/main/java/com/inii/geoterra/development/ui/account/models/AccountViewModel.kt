@@ -36,72 +36,101 @@ class AccountViewModel @Inject constructor(
 ) : PageViewModel(app) {
 
   /** LiveData holding user account details */
-  private val _userInfo = MutableLiveData<UserInformation>()
-  val userInfo: LiveData<UserInformation> get() = _userInfo
+  private val _userInfo = MutableLiveData<UserInformation?>()
+  val userInfo : MutableLiveData<UserInformation?> get() = _userInfo
 
   /** LiveData holding number of requests made by the user */
   private val _requestsMade = MutableLiveData<Int>()
-  val requestsMade: LiveData<Int> get() = _requestsMade
+  val requestsMade : LiveData<Int> get() = _requestsMade
 
   /** LiveData holding number of requests made by the user accepted */
   private val _requestsAccepted = MutableLiveData<Int>()
-  val requestsAccepted: LiveData<Int> get() = _requestsAccepted
+  val requestsAccepted : LiveData<Int> get() = _requestsAccepted
 
-  /** LiveData used to notify about session status */
-  private val _sessionStatus = MutableLiveData<Boolean>()
-  val sessionStatus: LiveData<Boolean> get() = _sessionStatus
+  /**
+   * Session state observed from SessionManager.
+   * This is the SINGLE source of truth.
+   */
+  val sessionActive : LiveData<Boolean> = SessionManager.sessionActive
+
+  init {
+    observeSessionState()
+  }
+
+  /**
+   * Observes session changes and triggers business logic.
+   */
+  private fun observeSessionState() {
+    sessionActive.observeForever { isActive ->
+      if (isActive) {
+        fetchUserInformation()
+      } else {
+        clearUserData()
+      }
+    }
+  }
+
+  /**
+   * Clears all user-related data on logout.
+   */
+  private fun clearUserData() {
+    _userInfo.postValue(null)
+    _requestsMade.postValue(0)
+    _requestsAccepted.postValue(0)
+  }
 
   /**
    * @brief Triggers retrieval of user information using stored session tv_email
    */
-  fun fetchUserInformation() {
-    // Retrieve the user's email from the session manager.
+  fun fetchUserInformation() { // Retrieve the user's email from the session manager.
     val email = SessionManager.getUserEmail() ?: return
 
     // Asynchronously request user info using Retrofit
     this.API.apply {
       getUserInfo(email).enqueue(object : Callback<UserInfoResponse> {
-        override fun onResponse(call: Call<UserInfoResponse>,
-          response: Response<UserInfoResponse>) {
+        override fun onResponse(call : Call<UserInfoResponse>,
+          response : Response<UserInfoResponse>
+        ) {
           if (response.isSuccessful) {
             val body = response.body()
             if (body?.response == "Ok") {
               _userInfo.postValue(body.data)
             } else {
-              _errorMessage.value = String.format(
-                "Error del servidor: ${body?.response}"
-              )
+              _errorMessage.value =
+                String.format("Error del servidor: ${body?.response}")
               Timber.e("Error del servidor: ${body?.response}")
             }
           } else {
-            _errorMessage.value = String.format("HTTP error: ${response.code()}")
+            _errorMessage.value =
+              String.format("HTTP error: ${response.code()}")
             Timber.e("HTTP error: ${response.code()}")
           }
         }
 
-        override fun onFailure(call: Call<UserInfoResponse>, t: Throwable) {
-          _errorMessage.value = String.format(
-            "Fallo de conexión: ${t.localizedMessage}"
-          )
+        override fun onFailure(call : Call<UserInfoResponse>, t : Throwable) {
+          _errorMessage.value =
+            String.format("Fallo de conexión: ${t.localizedMessage}")
           Timber.e("Fallo de conexión: ${t.localizedMessage}")
         }
       })
 
-      getSubmittedRequests(email)
-        .enqueue(object : Callback<RequestsSubmittedResponse> {
-          override fun onResponse(
-            call: Call<RequestsSubmittedResponse>,
-            response: Response<RequestsSubmittedResponse>
+      getSubmittedRequests(email).enqueue(object :
+                                            Callback<RequestsSubmittedResponse> {
+          override fun onResponse(call : Call<RequestsSubmittedResponse>,
+            response : Response<RequestsSubmittedResponse>
           ) {
             if (response.isSuccessful) {
               obtainRequestInfo(response.body()?.data ?: emptyList())
             } else {
-              _errorMessage.postValue("Failed to load requests: ${response.code()}")
+              _errorMessage.postValue(
+                "Failed to load requests: ${response.code()}")
               Timber.e("Response error: ${response.code()}")
             }
           }
 
-          override fun onFailure(call: Call<RequestsSubmittedResponse>, t: Throwable) {
+          override fun onFailure(call : Call<RequestsSubmittedResponse>,
+            t : Throwable
+          ) {
             _errorMessage.postValue("Error loading requests: ${t.message}")
             Timber.e(t, "API call failed")
           }
@@ -109,41 +138,8 @@ class AccountViewModel @Inject constructor(
     }
   }
 
-  fun obtainRequestInfo(list : List<AnalysisRequest>) {
+  private fun obtainRequestInfo(list : List<AnalysisRequest>) {
     _requestsMade.postValue(list.size)
-
-    var accepted = 0
-//    for (request in list) {
-//      if (request.) {
-//        accepted ++
-//      }
-//    }
-    _requestsAccepted.postValue(accepted)
-  }
-
-  fun setOnSessionStateChangeListener(listener: (isActive: Boolean) -> Unit) {
-    SessionManager.setOnSessionStateChangeListener(listener)
-  }
-
-  /**
-   * @brief Checks the current session state against the backend
-   */
-  fun checkSessionStatus() {
-    if (SessionManager.getUserEmail() == null) {
-      _sessionStatus.postValue(false)
-      return
-    } else {
-      _sessionStatus.postValue(true)
-    }
-//    this.API.checkSession().enqueue(object : Callback<CheckSessionResponse> {
-//      override fun onResponse(call: Call<CheckSessionResponse>,
-//        response: Response<CheckSessionResponse>) {
-//        _sessionStatus.postValue(response.body()?.status == "logged_in")
-//      }
-//
-//      override fun onFailure(call: Call<CheckSessionResponse>, t: Throwable) {
-//        Log.e("SessionCheck", "Failed to check session: ${t.localizedMessage}")
-//      }
-//    })
+    _requestsAccepted.postValue(0) // Ajustar cuando exista criterio
   }
 }

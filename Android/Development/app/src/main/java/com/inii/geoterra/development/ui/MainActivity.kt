@@ -32,6 +32,7 @@ import org.osmdroid.util.GeoPoint
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -186,15 +187,16 @@ class MainActivity : AppCompatActivity(), PageListener {
   override fun onPageEvent(event: String, data: Any?) {
     when (event) {
       "USER_LOGGED_IN" -> {
-        Log.i("onFragmentEvent", event)
+        Timber.tag("onPageEvent").i(event)
         this.showFragment(this.accountView)
       }
       "USER_LOGGED_OUT" -> {
-        Log.i("onFragmentEvent", event)
+        Timber.tag("onPageEvent").i(event)
+        this.requestsFragment.onParentEvent(event, data)
         this.showFragment(this.loginView)
       }
       "FINISHED" -> {
-        Log.i("onFragmentEvent", event)
+        Timber.tag("onPageEvent").i(event)
         this.supportFragmentManager.popBackStack()
       }
     }

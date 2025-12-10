@@ -29,6 +29,16 @@ class RequestsViewModel @Inject constructor(
   /** Public observable LiveData for the UI */
   val submittedRequests: LiveData<List<AnalysisRequest>> get() = _submittedRequests
 
+
+  val sessionActive: LiveData<Boolean> =
+    SessionManager.sessionActive
+
+  fun reloadIfSessionActive() {
+    if (SessionManager.isSessionActive()) {
+      fetchSubmittedRequests()
+    }
+  }
+
   /**
    * Loads the submitted requests for the current authenticated user.
    * Triggers API call and updates LiveData accordingly.
@@ -77,9 +87,5 @@ class RequestsViewModel @Inject constructor(
           Timber.e(t, "API call failed")
         }
       })
-  }
-
-  fun setOnSessionStateChangeListener(listener: (isActive: Boolean) -> Unit) {
-    SessionManager.setOnSessionStateChangeListener(listener)
   }
 }

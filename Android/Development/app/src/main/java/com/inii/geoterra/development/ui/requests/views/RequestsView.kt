@@ -20,7 +20,9 @@ import com.inii.geoterra.development.ui.requests.models.RequestsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.util.GeoPoint
 import androidx.core.graphics.createBitmap
+import androidx.lifecycle.LiveData
 import com.inii.geoterra.development.R
+import timber.log.Timber
 
 /**
  * Fragment for displaying and managing user-submitted analysis requests.
@@ -51,16 +53,20 @@ class RequestsView : PageView<FragmentRequestsBinding, RequestsViewModel>(
 
   }
 
+  override fun onDestroyView() {
+    super.onDestroyView()
+  }
+
   override fun onPageViewCreated(view : View, savedInstanceState : Bundle?) {
-    this.viewModel.setOnSessionStateChangeListener { isActive ->
-      if (isActive) {
-        this.viewModel.fetchSubmittedRequests()
-      } else {
-        if (this.binding.layoutSubmittedRequests.size != 0) {
-          this.binding.layoutSubmittedRequests.removeAllViews()
-        }
-      }
-    }
+//    this.viewModel.setOnSessionStateChangeListener { isActive ->
+//      if (isActive) {
+//        this.viewModel.fetchSubmittedRequests()
+//      } else {
+//        if (this.binding.layoutSubmittedRequests.size != 0) {
+//          this.binding.layoutSubmittedRequests.removeAllViews()
+//        }
+//      }
+//    }
   }
 
   override fun onShow() {
@@ -75,6 +81,14 @@ class RequestsView : PageView<FragmentRequestsBinding, RequestsViewModel>(
 
     this.viewModel.submittedRequests.observe(viewLifecycleOwner) {
       this.drawSubmittedRequests()
+    }
+
+    this.viewModel.sessionActive.observe(viewLifecycleOwner) { isActive ->
+      if (isActive) {
+        viewModel.reloadIfSessionActive()
+      } else {
+        binding.layoutSubmittedRequests.removeAllViews()
+      }
     }
   }
 
@@ -131,11 +145,11 @@ class RequestsView : PageView<FragmentRequestsBinding, RequestsViewModel>(
    * @param data Optional data associated with the event
    */
   override fun onPageEvent(event: String, data: Any?) {
-    Log.i("FragmentEvent", "Event: $event, Data: $data")
+    Timber.tag("PageEvent").i("Event: $event, Data: $data")
     when (event) {
       "FORM_FINISHED" -> {
         // Handle form submission completion
-        Log.i("FragmentEvent", "FORM_FINISHED, $data")
+        Timber.tag("PageEvent").i("FORM_FINISHED, $data")
         this.binding.containerForm.visibility = View.GONE
         this.childFragmentManager.popBackStack()
 
@@ -144,7 +158,18 @@ class RequestsView : PageView<FragmentRequestsBinding, RequestsViewModel>(
     }
   }
 
-  fun drawSubmittedRequests() {
+  override fun onParentEvent(event: String, data: Any?) {
+    Timber.tag("PageEvent").i("Event: $event, Data: $data")
+    when (event) {
+      "USER_LOGGED_OUT" -> {
+        Timber.tag("PageEvent").i("USER_LOGGED_OUT, $data")
+        this.viewModel.fetchSubmittedRequests()
+        this.drawSubmittedRequests()
+      }
+    }
+  }
+
+  private fun drawSubmittedRequests() {
 
     val requests = this.viewModel.submittedRequests.value
     this.binding.layoutSubmittedRequests.removeAllViews()

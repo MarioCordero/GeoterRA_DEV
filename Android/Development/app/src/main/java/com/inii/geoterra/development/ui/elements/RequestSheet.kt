@@ -89,11 +89,11 @@ class RequestSheet @JvmOverloads constructor(
 
     et_type.text = type
 
-    et_latitude.text = "%.7f".format(
+    et_latitude.text = "%.4f".format(
       latitude
     )
 
-    et_longitude.text = "%.7f".format(
+    et_longitude.text = "%.4f".format(
       longitude
     )
 

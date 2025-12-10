@@ -16,6 +16,7 @@ import com.inii.geoterra.development.managers.SessionManager
 import com.inii.geoterra.development.ui.map.views.MapView
 import com.inii.geoterra.development.ui.requests.views.AnalysisFormView
 import dagger.hilt.android.lifecycle.HiltViewModel
+import okhttp3.internal.format
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -91,7 +92,12 @@ class AnalysisFormViewModel @Inject constructor(
         analysisRequestPayload.latitude = "${userLocation.latitude}"
         analysisRequestPayload.longitude = "${userLocation.longitude}"
         analysisRequestPayload.coordinates = "${userLocation.latitude}, ${userLocation.longitude}"
-        _toastMessage.value = "Lat ${userLocation.latitude}, Lon ${userLocation.longitude}"
+        _toastMessage.value = String.format(
+          Locale.US,
+          "Lat %.4f, Lon %.4f",
+          userLocation.latitude,
+          userLocation.longitude
+        )
         Timber.i("Coordinates set to payload: $analysisRequestPayload")
         return
       }
