@@ -1,19 +1,16 @@
 package com.inii.geoterra.development.ui.account.views
 
 import android.os.Bundle
-import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.inii.geoterra.development.api.SingUpCredentials
 import com.inii.geoterra.development.databinding.FragmentSignUpBinding
 import com.inii.geoterra.development.interfaces.PageView
 import com.inii.geoterra.development.ui.account.models.SignUpViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 /**
  * @brief Fragment handling user registration flow
@@ -95,7 +92,7 @@ class SignUpView : PageView<FragmentSignUpBinding, SignUpViewModel>(
     viewModel.signUpSuccess.observe(viewLifecycleOwner, Observer { success ->
       if (success) {
         showToast("Cuenta creada exitosamente")
-        listener?.onFragmentEvent("FINISHED")
+        listener?.onPageEvent("FINISHED")
       }
     })
   }

@@ -1,12 +1,9 @@
 package com.inii.geoterra.development.ui.account.views
 
 import android.os.Bundle
-import android.text.InputType
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.inii.geoterra.development.databinding.FragmentLoginBinding
@@ -116,7 +113,7 @@ class LoginView : PageView<FragmentLoginBinding, LoginViewModel>(
    * @param event Name of the event
    * @param data Optional data associated with the event
    */
-  override fun onFragmentEvent(event: String, data: Any?) {
+  override fun onPageEvent(event: String, data: Any?) {
     Timber.i("Event: $event")
     when (event) {
       "FINISHED" -> {
@@ -132,7 +129,7 @@ class LoginView : PageView<FragmentLoginBinding, LoginViewModel>(
    * @brief Notifies host component about successful login
    */
   private fun onLoginSuccess() {
-    this.listener?.onFragmentEvent("USER_LOGGED_IN")
+    this.listener?.onPageEvent("USER_LOGGED_IN")
   }
 
 }

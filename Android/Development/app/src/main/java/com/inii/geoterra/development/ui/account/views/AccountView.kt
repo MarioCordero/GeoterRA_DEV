@@ -5,14 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.inii.geoterra.development.databinding.FragmentAccountBinding
 import com.inii.geoterra.development.interfaces.PageView
 import com.inii.geoterra.development.managers.SessionManager
 import com.inii.geoterra.development.ui.account.models.AccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 /**
  * @brief Fragment for displaying and managing user account information.
@@ -129,7 +127,7 @@ class AccountView : PageView<FragmentAccountBinding, AccountViewModel>(
       .setCancelable(false)
       .setPositiveButton("Sí") { dialog, _ ->
         SessionManager.endSession()
-        this.listener?.onFragmentEvent("USER_LOGGED_OUT")
+        this.listener?.onPageEvent("USER_LOGGED_OUT")
         dialog.dismiss()
       }
       .setNegativeButton("No") { dialog, _ ->

@@ -92,7 +92,7 @@ class ThermalView : PageView<FragmentThermalBinding, ThermalViewModel>(
    * @param event Name of the event
    * @param data Optional data associated with the event
    */
-  override fun onFragmentEvent(event: String, data: Any?) {
+  override fun onPageEvent(event: String, data: Any?) {
     Timber.i("Event: $event")
     when (event) {
       "FINISHED" -> {
