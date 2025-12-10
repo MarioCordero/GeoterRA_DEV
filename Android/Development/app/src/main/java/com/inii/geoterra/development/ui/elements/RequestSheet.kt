@@ -2,9 +2,11 @@ package com.inii.geoterra.development.ui.elements
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.inii.geoterra.development.R
@@ -24,54 +26,78 @@ class RequestSheet @JvmOverloads constructor(
   context: Context,
   attrs: AttributeSet? = null,
   defStyleAttr: Int = 0,
+  photoBitmap: Bitmap,
+  name: String,
+  type : String,
+  region: String,
   latitude: Double,
   longitude: Double,
   date: String,
   state: String
 ) : LinearLayout(context, attrs, defStyleAttr) {
-  // =============== VIEW BINDING ===============
-  // Inflate the layout for this custom view
-  /** @brief Container for fragment's view elements */
-  private var binding: View = LayoutInflater.from(context).inflate(
+
+  private val binding: View = LayoutInflater.from(context).inflate(
     R.layout.view_request_sheet,
     this,
     true
   )
-  // =============== VIEW COMPONENTS ===============
-  // Initialize views after inflation
-  /** @brief Display for latitude/longitude values */
-  private val coordinates: TextView =
-    this.binding.findViewById(R.id.coordenatesTxt)
 
-  /** @brief Request submission timestamp */
-  private val dateView: TextView = findViewById(R.id.dateTxt)
+  private val typeImage: ImageView =
+    binding.findViewById(R.id.typeImage)
 
-  /** @brief Current request status */
-  private val stateView: TextView = findViewById(R.id.stateTxt)
+  private val et_name: TextView =
+    binding.findViewById(R.id.tv_name)
+
+  private val et_type: TextView =
+    binding.findViewById(R.id.tv_type)
+
+  private val et_region: TextView =
+    binding.findViewById(R.id.tv_region)
+
+  private val et_latitude: TextView =
+    binding.findViewById(R.id.tv_latitude)
+
+  private val et_longitude: TextView =
+    binding.findViewById(R.id.tv_longitude)
+
+  private val dateView: TextView =
+    binding.findViewById(R.id.tv_date)
+
+  private val stateView: TextView =
+    binding.findViewById(R.id.tv_state)
 
   init {
-    setupView(latitude, longitude, date, state)
+    setupView(photoBitmap, name, type, region, latitude, longitude, date, state)
   }
 
-  // =============== Setter ===============
-  /**
-   * @brief Updates display with request information
-   * @param latitude Geographic coordinate value
-   * @param longitude Geographic coordinate value
-   * @param date Request submission timestamp (formatted string)
-   * @param state Current processing status description
-   *
-   * Formats coordinates to 7 decimal places (~1cm precision) and updates
-   * all text displays. Triggers UI refresh.
-   */
   @SuppressLint("SetTextI18n")
-  fun setupView(latitude: Double, longitude: Double, date: String,
+  private fun setupView(
+    photoBitmap: Bitmap,
+    name: String,
+    type: String,
+    region: String,
+    latitude: Double,
+    longitude: Double,
+    date: String,
     state: String) {
-    coordinates.text = "Latitud: %.7f\nLongitud: %.7f".format(
-      latitude,
+
+    // Set ONLY the PNG/JPG drawable image
+    typeImage.setImageBitmap(photoBitmap)
+
+    et_name.text = name
+    et_region.text = region
+
+    et_type.text = type
+
+    et_latitude.text = "%.7f".format(
+      latitude
+    )
+
+    et_longitude.text = "%.7f".format(
       longitude
     )
-    this.dateView.text = "Fecha: $date"
-    this.stateView.text = "Estado: $state"
+
+    dateView.text = date
+    stateView.text = state
   }
 }

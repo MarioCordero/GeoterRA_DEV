@@ -17,7 +17,7 @@ import timber.log.Timber
  * @brief Base fragment class for handling page navigation and lifecycle events.
  *
  * Provides common functionality for fragment management including:
- * - Parent/Activity communication via [FragmentListener].
+ * - Parent/Activity communication via [PageListener].
  * - Child fragment cleanup during [onHide].
  * - Robust back press handling via [OnBackPressedCallback].
  * - Visibility state hooks ([onShow], [onHide]).
@@ -46,7 +46,7 @@ abstract class PageView<VB : ViewBinding, VM : PageViewModel>(
    * Used with ViewModelProvider to initialize the [viewModel] instance.
    */
   private val viewModelClass: Class<VM>
-) : Fragment(), FragmentListener {
+) : Fragment(), PageListener {
 
   /** ViewBinding instance (accessible only between onCreateView and onDestroyView) */
   private var _binding: VB? = null
@@ -67,7 +67,7 @@ abstract class PageView<VB : ViewBinding, VM : PageViewModel>(
   }
 
   /** @brief Listener reference for fragment-to-host communication */
-  protected var listener: FragmentListener? = null
+  protected var listener: PageListener? = null
 
   /** @brief Callback for handling back press events */
   private lateinit var onBackPressedCallback: OnBackPressedCallback
@@ -94,10 +94,10 @@ abstract class PageView<VB : ViewBinding, VM : PageViewModel>(
   }
 
   /**
-   * @brief Establishes FragmentListener connection during attachment
-   * @param context Host context implementing FragmentListener
+   * @brief Establishes PageListener connection during attachment
+   * @param context Host context implementing PageListener
    *
-   * Automatically connects to parent fragment or activity implementing FragmentListener.
+   * Automatically connects to parent fragment or activity implementing PageListener.
    * Priority order: Parent Fragment > Host Activity
    */
   override fun onAttach(context: Context) {
@@ -105,10 +105,10 @@ abstract class PageView<VB : ViewBinding, VM : PageViewModel>(
 //    (parentFragment as? PageView)?.onPause()
 
     val parent = parentFragment
-    if (parent is FragmentListener) {
+    if (parent is PageListener) {
       this.listener = parent
       Timber.i("Connected to parent fragment.")
-    } else if (context is FragmentListener) {
+    } else if (context is PageListener) {
       this.listener = context
       Timber.i(
         "PageView",
@@ -117,12 +117,12 @@ abstract class PageView<VB : ViewBinding, VM : PageViewModel>(
     } else {
       Timber.w(
         "PageView",
-        "Neither parent fragment nor activity implements FragmentListener")
+        "Neither parent fragment nor activity implements PageListener")
     }
   }
 
   /**
-   * @brief Cleans up FragmentListener reference during detachment
+   * @brief Cleans up PageListener reference during detachment
    */
   override fun onDetach() {
     super.onDetach()
@@ -250,7 +250,7 @@ abstract class PageView<VB : ViewBinding, VM : PageViewModel>(
    * Called when fragment becomes visible. Override to implement
    * view updates or data refresh Timbering.
    */
-  fun onShow() {}
+  open fun onShow() {}
 
   /**
    * @brief Sets up all the event listeners for the View.
@@ -450,8 +450,16 @@ abstract class PageView<VB : ViewBinding, VM : PageViewModel>(
    * @brief Timbers network-related errors with standardized tag
    * @param error Detailed error message for debugging
    */
-  protected fun TimberNetworkError(error: String) {
+  protected fun timberNetworkError(error: String) {
     Timber.i("NetworkError", error)
+  }
+
+  /**
+   * @brief Timbers network-related errors with standardized tag
+   * @param message Detailed message for debugging
+   */
+  protected fun timberDebug(message: String) {
+    Timber.d("Debug", message)
   }
 
   /**

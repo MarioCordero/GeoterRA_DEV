@@ -1,93 +1,398 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frameLayout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="15dp"
-    android:background="@drawable/gray_rectangle_rounded2"
-    android:orientation="vertical"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintHorizontal_bias="0.0"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/newRequestButton">
+<androidx.cardview.widget.CardView
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:layout_margin="12dp"
+  app:cardCornerRadius="15dp"
+  app:cardElevation="6dp"
+  app:strokeWidth="4dp"
+  app:strokeColor="@color/black">
     
-    <TextView
-      app:layout_constraintStart_toStartOf="parent"
-      android:id="@+id/coordenatesTxt"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:fontFamily="@font/poppins_regular"
-      android:text="Coordenadas: "
-      android:textSize="18sp"
-      app:layout_constraintTop_toTopOf="parent"
-      tools:layout_editor_absoluteX="172dp" />
+    <LinearLayout
+      android:orientation="vertical"
+      android:padding="16dp"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content">
+        
+        <!-- Imagen -->
+        <ImageView
+          android:id="@+id/typeImage"
+          android:layout_width="match_parent"
+          android:layout_height="180dp"
+          android:scaleType="centerCrop"
+          android:clipToOutline="true"
+          android:foregroundGravity="center"
+          android:background="@drawable/rounded_background"
+          android:contentDescription="Imagen del tipo de punto" />
+        
+        <!-- SECCIÓN DE PROPIEDADES -->
+        <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="14dp"
+          android:gravity="center"
+          android:orientation="vertical">
+            
+            <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+              android:padding="5dp"
+              android:gravity="center">
+                
+                <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:textSize="18dp"
+                  android:text="ID: "
+                  android:textColor="@color/black"
+                  
+                  android:gravity="center"
+                  android:fontFamily="@font/poppins_semibold"
+                  >
+                </TextView>
+                
+                <TextView
+                  android:id="@+id/tv_name"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:textSize="18dp"
+                  android:text="@string/name"
+                  android:textColor="@color/geoterra_orange"
+                  
+                  android:gravity="center"
+                  android:fontFamily="@font/poppins_semibold"
+                  >
+                </TextView>
+                
+                
+            </LinearLayout>
+            
+            <View
+              android:layout_width="match_parent"
+              android:layout_height="1dp"
+              android:background="@color/geoterra_light_gray"
+              />
+            
+            <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/white_rectangle_rounded2"
+              android:gravity="center_horizontal"
+              android:orientation="horizontal">
+                
+                <LinearLayout
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:gravity="center_horizontal"
+                  android:orientation="vertical"
+                  android:layout_weight="1"
+                  android:padding="5dp">
+                    
+                    <TextView
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:fontFamily="@font/calibri_bold"
+                      android:gravity="center"
+                      android:text="Tipo"
+                      android:textColor="@android:color/black"
+                      android:textSize="16sp">
+                    </TextView>
+                    
+                    <TextView
+                      android:id="@+id/tv_type"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:fontFamily="@font/calibri_regular"
+                      android:gravity="center"
+                      android:text="AAAA"
+                      android:textColor="@color/black"
+                      android:textSize="16sp" />
+                </LinearLayout>
+                
+                <View
+                  android:layout_width="1dp"
+                  android:layout_height="match_parent"
+                  android:background="@color/geoterra_light_gray" />
+                
+                <LinearLayout
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:gravity="center"
+                  android:orientation="vertical"
+                  android:layout_weight="1"
+                  
+                  android:padding="5dp">
+                    
+                    <TextView
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:fontFamily="@font/calibri_bold"
+                      android:gravity="center"
+                      android:text="Fecha"
+                      android:textColor="@android:color/black"
+                      android:textSize="16sp">
+                    </TextView>
+                    
+                    <TextView
+                      android:id="@+id/tv_date"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:fontFamily="@font/calibri_regular"
+                      android:gravity="center"
+                      android:text="AAAA"
+                      android:textColor="@color/black"
+                      android:textSize="16sp" />
+                </LinearLayout>
+            
+            </LinearLayout>
+            
+            <View
+              android:layout_width="match_parent"
+              android:layout_height="1dp"
+              android:background="@color/geoterra_light_gray"
+              />
+            
+            <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+              android:gravity="center">
+                
+                <LinearLayout
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:orientation="vertical"
+                  android:padding="5dp"
+                  android:layout_weight="1"
+                  android:gravity="center"
+                  >
+                    
+                    <TextView
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="Región"
+                      android:textColor="@android:color/black"
+                      android:fontFamily="@font/calibri_bold"
+                      android:textSize="16sp"
+                      >
+                    </TextView>
+                    
+                    <TextView
+                      android:id="@+id/tv_region"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="AAAA"
+                      android:textColor="@color/geoterra_deep_blue"
+                      android:fontFamily="@font/calibri_regular"
+                      android:gravity="center"
+                      android:textSize="16sp" />
+                </LinearLayout>
+                
+                <View
+                  android:layout_width="1dp"
+                  android:layout_height="match_parent"
+                  android:background="@color/geoterra_light_gray" />
+                
+                <LinearLayout
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:orientation="vertical"
+                  android:layout_weight="1"
+                  android:padding="5dp"
+                  android:gravity="center"
+                  >
+                    
+                    <TextView
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="Latitud"
+                      android:textColor="@android:color/black"
+                      android:fontFamily="@font/calibri_bold"
+                      android:textSize="16sp"
+                      >
+                    </TextView>
+                    
+                    <TextView
+                      android:id="@+id/tv_latitude"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="AAAA"
+                      android:textColor="@color/geoterra_deep_blue"
+                      android:fontFamily="@font/calibri_regular"
+                      android:gravity="center"
+                      android:textSize="16sp" />
+                </LinearLayout>
+                
+                <LinearLayout
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:orientation="vertical"
+                  android:layout_weight="1"
+                  android:gravity="center"
+                  android:padding="5dp"
+                  >
+                    
+                    <TextView
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="Longitud"
+                      android:textColor="@android:color/black"
+                      android:fontFamily="@font/calibri_bold"
+                      android:textSize="16sp"
+                      >
+                    </TextView>
+                    
+                    <TextView
+                      android:id="@+id/tv_longitude"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:background="@android:color/white"
+                      android:gravity="center"
+                      android:text="AAAA"
+                      android:textColor="@color/geoterra_deep_blue"
+                      android:fontFamily="@font/calibri_regular"
+                      android:textSize="16sp" />
+                </LinearLayout>
+            </LinearLayout>
+            
+            <View
+              android:layout_width="match_parent"
+              android:layout_height="1dp"
+              android:background="@color/geoterra_light_gray"
+              />
+            
+            <LinearLayout
+              android:layout_width="wrap_content"
+              android:layout_height="match_parent"
+              android:orientation="horizontal"
+              android:padding="5dp"
+              android:gravity="center"
+              >
+                
+                <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Estado actual: "
+                  android:textColor="@android:color/black"
+                  android:fontFamily="@font/calibri_bold"
+                  android:textSize="16sp"
+                  >
+                </TextView>
+                
+                <TextView
+                  android:id="@+id/tv_state"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="AAAA"
+                  android:textColor="@color/geoterra_orange"
+                  android:fontFamily="@font/poppins_semibold"
+                  android:gravity="center"
+                  android:textSize="16sp" />
+            </LinearLayout>
+            
+<!--            <View-->
+<!--              android:layout_width="match_parent"-->
+<!--              android:layout_height="1dp"-->
+<!--              android:background="@color/geoterra_light_gray"-->
+<!--              />-->
+            
+<!--            <TextView-->
+<!--              android:id="@+id/coordenatesTxt"-->
+<!--              android:text="Lat: &#45;&#45; Long: &#45;&#45;"-->
+<!--              android:layout_height="wrap_content"-->
+<!--              android:layout_width="wrap_content"-->
+<!--              android:textSize="14sp"-->
+<!--              android:textColor="#1A1A1A"-->
+<!--              android:fontFamily="@font/poppins_bold"-->
+<!--              android:layout_marginBottom="2dp" />-->
+<!--            -->
+<!--            <TextView-->
+<!--              android:id="@+id/dateTxt"-->
+<!--              android:text="Fecha: &#45;&#45;"-->
+<!--              android:layout_height="wrap_content"-->
+<!--              android:layout_width="match_parent"-->
+<!--              android:textSize="13sp"-->
+<!--              android:textColor="@color/black"-->
+<!--              android:fontFamily="@font/poppins_bold"-->
+<!--              android:layout_marginBottom="6dp"/>-->
+<!--            -->
+<!--            <LinearLayout-->
+<!--              android:layout_width="wrap_content"-->
+<!--              android:layout_height="wrap_content"-->
+<!--              android:orientation="horizontal"-->
+<!--              android:gravity="center_vertical"-->
+<!--              android:padding="4dp">-->
+<!--                -->
+<!--                <ImageView-->
+<!--                  android:layout_width="16dp"-->
+<!--                  android:layout_height="16dp"-->
+<!--                  android:src="@drawable/baseline_article_24"-->
+<!--                  app:tint="@color/geoterra_deep_blue" />-->
+<!--                -->
+<!--                <TextView-->
+<!--                  android:id="@+id/stateTxt"-->
+<!--                  android:layout_width="wrap_content"-->
+<!--                  android:layout_height="wrap_content"-->
+<!--                  android:layout_marginStart="6dp"-->
+<!--                  android:text="Estado: Aceptado"-->
+<!--                  android:textSize="12sp"-->
+<!--                  android:textColor="@color/geoterra_deep_blue"-->
+<!--                  android:fontFamily="@font/poppins_bold"/>-->
+<!--            </LinearLayout>-->
 
-    <TextView
-        android:id="@+id/dateTxt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/poppins_regular"
-        app:layout_constraintTop_toBottomOf="@id/coordenatesTxt"
-        app:layout_constraintStart_toStartOf="@id/coordenatesTxt"
-        android:text="Fecha: "
-        android:textSize="18sp"/>
+        </LinearLayout>
+        
+        <!-- BOTONES -->
+        <LinearLayout
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:gravity="center_horizontal"
+          android:layout_marginTop="14dp">
+            
+            <com.google.android.material.button.MaterialButton
+              android:id="@+id/btn_show"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Ver"
+              android:textSize="14sp"
+              android:textColor="@color/black"
+              android:fontFamily="@font/poppins_semibold"
+              app:backgroundTint="@color/white"
+              app:strokeColor="@color/geoterra_light_gray"
+              app:strokeWidth="1dp"
+              app:cornerRadius="5dp" />
+            
+            <com.google.android.material.button.MaterialButton
+              android:id="@+id/btn_display"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginStart="12dp"
+              android:text="Editar"
+              android:textSize="14sp"
+              android:textColor="@color/black"
+              android:fontFamily="@font/poppins_semibold"
+              app:backgroundTint="@color/white"
+              app:strokeColor="@color/geoterra_light_gray"
+              app:strokeWidth="1dp"
+              app:cornerRadius="5dp" />
+            
+            <com.google.android.material.button.MaterialButton
+              android:id="@+id/btn_delete"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginStart="12dp"
+              android:text="Borrar"
+              android:textColor="@color/white"
+              android:textSize="14sp"
+              android:fontFamily="@font/poppins_semibold"
+              app:cornerRadius="5dp"
+              android:backgroundTint="@color/red" />
+        
+        </LinearLayout>
+    </LinearLayout>
 
-    <TextView
-        android:id="@+id/typeTxt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/poppins_regular"
-        app:layout_constraintTop_toBottomOf="@id/dateTxt"
-        app:layout_constraintStart_toStartOf="@id/dateTxt"
-        android:text="Tipo: Terrestre"
-        android:textSize="18sp"/>
-
-    <TextView
-        android:id="@+id/stateTxt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/poppins_regular"
-        app:layout_constraintTop_toBottomOf="@id/typeTxt"
-        app:layout_constraintStart_toStartOf="@id/typeTxt"
-        android:text="Estado: "
-        android:textSize="18sp"/>
-
-    <Button
-        android:id="@+id/contact_us"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-
-        android:layout_marginTop="20dp"
-
-        android:backgroundTint="@color/geoterra_orange"
-        android:drawableTint="@color/white"
-        android:fontFamily="@font/poppins_semibold"
-        android:text="Editar"
-        android:textSize="16sp"
-        android:textColor="@color/white"
-        app:cornerRadius="5dp"
-
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/repeat_request"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-
-        android:layout_marginTop="5dp"
-        android:fontFamily="@font/poppins_semibold"
-        android:backgroundTint="@color/geoterra_deep_blue"
-        android:drawableStart="@drawable/baseline_cached_24"
-
-        android:text="Eliminar"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        app:cornerRadius="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-</LinearLayout>
+</androidx.cardview.widget.CardView>

@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import com.inii.geoterra.development.databinding.FragmentAnalysisFormBinding
-import com.inii.geoterra.development.device.FragmentPermissionRequester
 import com.inii.geoterra.development.interfaces.PageView
 import com.inii.geoterra.development.ui.elements.SpringForm
 import com.inii.geoterra.development.ui.elements.TerrainForm
@@ -145,38 +144,33 @@ class AnalysisFormView : PageView<FragmentAnalysisFormBinding, AnalysisFormViewM
   }
 
   override fun observeViewModel() {
-    viewModel.dateInput.observe(viewLifecycleOwner)
-    { date ->
+    viewModel.dateInput.observe(viewLifecycleOwner) { date ->
       binding.etDate.setText(date)
     }
 
-    viewModel.identifierError.observe(viewLifecycleOwner)
-    { error ->
+    viewModel.identifierError.observe(viewLifecycleOwner) { error ->
       binding.tilIdentifier.error = error
     }
 
-    viewModel.dateError.observe(viewLifecycleOwner)
-    { error ->
+    viewModel.dateError.observe(viewLifecycleOwner) { error ->
       binding.tilDate.error = error
     }
 
-    viewModel.toastMessage.observe(viewLifecycleOwner)
-    { message ->
+    viewModel.toastMessage.observe(viewLifecycleOwner) { message ->
       message?.let {
         Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
 //        this.viewModel.clearToast()
       }
     }
 
-    viewModel.formSubmitted.observe(viewLifecycleOwner)
-    { submitted ->
+    viewModel.formSubmitted.observe(viewLifecycleOwner) { submitted ->
       if (submitted == true) {
-        listener?.onFragmentEvent("FORM_FINISHED", true)
+        listener?.onPageEvent("FORM_FINISHED", true)
       }
     }
 
-    viewModel.galleryPermissionRequired.observe(viewLifecycleOwner)
-    { required ->
+    viewModel.galleryPermissionRequired.observe(viewLifecycleOwner) {
+      required ->
       if (required == true) { // Request permission here, or notify user
         this.viewModel.initGalleryService(this)
       }

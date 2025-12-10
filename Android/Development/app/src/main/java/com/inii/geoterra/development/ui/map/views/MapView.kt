@@ -1,6 +1,9 @@
 package com.inii.geoterra.development.ui.map.views
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Point
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +30,14 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import timber.log.Timber
+import androidx.core.graphics.createBitmap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import okhttp3.internal.wait
+import org.osmdroid.tileprovider.MapTileProviderBasic
+import org.osmdroid.views.Projection
+import org.osmdroid.views.drawing.MapSnapshot
 
 /**
  * Fragment for displaying an interactive map with thermal points and user location.
@@ -173,7 +184,7 @@ class MapView : PageView<FragmentMapBinding, MapViewModel>(
    * for a Fragment, or `onCreate` for an Activity).
    */
   private fun initializeMapView() {
-    mapView = this.binding.MapView
+    this.mapView = this.binding.MapView
     this.applyMapSettings()
   }
 
@@ -255,7 +266,7 @@ class MapView : PageView<FragmentMapBinding, MapViewModel>(
    * @param event Name of the event
    * @param data Optional data associated with the event
    */
-  override fun onFragmentEvent(event: String, data: Any?) {
+  override fun onPageEvent(event: String, data: Any?) {
     Timber.i("Event: $event")
     when (event) {
       "FINISHED" -> {
@@ -461,6 +472,29 @@ class MapView : PageView<FragmentMapBinding, MapViewModel>(
       })
     }
   }
+
+  /**
+   * Verifica si los tiles alrededor del punto están cargados
+   */
+  private fun areTilesLoadedAround(center: GeoPoint, regionSizePx: Int): Boolean {
+    val projection = mapView.projection
+    val centerPoint = projection.toPixels(center, null)
+
+    // Verificar varios puntos alrededor del área de interés
+    val checkPoints = listOf(
+      centerPoint,
+      Point(centerPoint.x - regionSizePx/2, centerPoint.y - regionSizePx/2),
+      Point(centerPoint.x + regionSizePx/2, centerPoint.y + regionSizePx/2)
+    )
+
+    return checkPoints.all { point ->
+      val geoPoint = projection.fromPixels(point.x, point.y)
+      // OSMdroid no tiene API directa para verificar carga de tiles,
+      // pero podemos verificar si el mapa parece estar renderizado
+      true // Por ahora asumimos que está cargado después del delay
+    }
+  }
+
 
   /**
    * Handles permission request results for location services.

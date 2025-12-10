@@ -10,7 +10,6 @@ import com.inii.geoterra.development.api.ThermalPoint
 import com.inii.geoterra.development.databinding.FragmentAnalysisBinding
 import com.inii.geoterra.development.interfaces.PageView
 import com.inii.geoterra.development.ui.map.models.AnalysisViewModel
-import com.inii.geoterra.development.ui.map.views.ThermalView.Companion
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -127,7 +126,7 @@ class AnalysisView : PageView<FragmentAnalysisBinding, AnalysisViewModel>(
    * @return true if the event is consumed by this fragment
    */
   override fun handleBackPress(): Boolean {
-    listener?.onFragmentEvent("FINISHED")
+    listener?.onPageEvent("FINISHED")
     return true
   }
 

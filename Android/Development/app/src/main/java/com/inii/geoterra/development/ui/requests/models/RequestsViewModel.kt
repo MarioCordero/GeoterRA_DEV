@@ -59,7 +59,8 @@ class RequestsViewModel @Inject constructor(
                 _submittedRequests.postValue(
                   response.body()?.data ?: emptyList()
                 )
-                _errorMessage.postValue("Error cargando las solicitudes: ${body.message}")
+                _errorMessage.postValue(
+                  "Error cargando las solicitudes: ${body.message}")
                 Timber.e("API error: ${body.message}")
               }
             }

@@ -140,6 +140,8 @@ data class AnalysisRequest(
   @SerializedName("burbujeo") val bubbles : Int,
   @SerializedName("ph_campo") val fieldPh : Double,
   @SerializedName("cond_campo") val fieldCond : Int,
+  @SerializedName("type") val type : String = "Manantial",
+  @SerializedName("id_soli") val id : String = "---"
 )
 
 /**

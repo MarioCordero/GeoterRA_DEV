@@ -1,5 +1,7 @@
 package com.inii.geoterra.development.ui.requests.views
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,6 +18,9 @@ import com.inii.geoterra.development.managers.SessionManager
 import com.inii.geoterra.development.ui.elements.RequestSheet
 import com.inii.geoterra.development.ui.requests.models.RequestsViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import org.osmdroid.util.GeoPoint
+import androidx.core.graphics.createBitmap
+import com.inii.geoterra.development.R
 
 /**
  * Fragment for displaying and managing user-submitted analysis requests.
@@ -47,7 +52,6 @@ class RequestsView : PageView<FragmentRequestsBinding, RequestsViewModel>(
   }
 
   override fun onPageViewCreated(view : View, savedInstanceState : Bundle?) {
-
     this.viewModel.setOnSessionStateChangeListener { isActive ->
       if (isActive) {
         this.viewModel.fetchSubmittedRequests()
@@ -59,13 +63,18 @@ class RequestsView : PageView<FragmentRequestsBinding, RequestsViewModel>(
     }
   }
 
+  override fun onShow() {
+    super.onShow()
+    this.drawSubmittedRequests()
+  }
+
   override fun observeViewModel() {
     this.viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
       this.showToast(error, Toast.LENGTH_SHORT)
     }
 
-    this.viewModel.submittedRequests.observe(viewLifecycleOwner) { requests ->
-      this.drawSubmittedRequests(requests)
+    this.viewModel.submittedRequests.observe(viewLifecycleOwner) {
+      this.drawSubmittedRequests()
     }
   }
 
@@ -121,7 +130,7 @@ class RequestsView : PageView<FragmentRequestsBinding, RequestsViewModel>(
    * @param event Name of the event
    * @param data Optional data associated with the event
    */
-  override fun onFragmentEvent(event: String, data: Any?) {
+  override fun onPageEvent(event: String, data: Any?) {
     Log.i("FragmentEvent", "Event: $event, Data: $data")
     when (event) {
       "FORM_FINISHED" -> {
@@ -135,39 +144,47 @@ class RequestsView : PageView<FragmentRequestsBinding, RequestsViewModel>(
     }
   }
 
-  /**
-   * Updates UI with current list of submitted requests.
-   *
-   * Steps:
-   * 1. Clears existing views
-   * 2. Iterates through submitted requests
-   * 3. Creates request sheet for each request
-   * 4. Adds visual spacer between requests
-   * 5. Adds all components to layout
-   */
-  private fun drawSubmittedRequests(summitedRequests : List<AnalysisRequest>?) {
-    // Remove all existing views
+  fun drawSubmittedRequests() {
+
+    val requests = this.viewModel.submittedRequests.value
     this.binding.layoutSubmittedRequests.removeAllViews()
 
-    summitedRequests?.forEachIndexed { index, request ->
-      // Create visual representation for request
-      val requestSheet = RequestSheet(
+    requests?.forEachIndexed { index, request ->
+
+      // 1. Elegir imagen desde drawable
+      val photo = when (request.type) {
+        "Manantial" -> BitmapFactory.decodeResource(
+          resources, R.drawable.hotspring_image
+        )
+        "fumarole" -> BitmapFactory.decodeResource(
+          resources, R.drawable.fumaroles_image
+        )
+        else -> BitmapFactory.decodeResource(
+          resources, R.drawable.hotspring_image
+        )
+      }
+
+      // TODO: Eliminar el type escrito cuando se implemente en backend..
+
+      // 2. Crear RequestSheet SOLO con esa imagen
+      val sheet = RequestSheet(
         context = requireContext(),
+        photoBitmap = photo,
+        name = "SOLI-00${request.id}",
+        type = "Manantial",
+        region = request.region,
         latitude = request.latitude,
         longitude = request.longitude,
         date = request.date,
-        state = "accepted" // Should come from API response
+        state = "Pendiente"
       )
 
-      // Add to layout
-      this.binding.layoutSubmittedRequests.addView(requestSheet)
+      this.binding.layoutSubmittedRequests.addView(sheet)
 
-      // Add spacer between requests (except after last)
-      if (index < summitedRequests.size - 1) {
-        addRequestSpacer()
+      if (index < requests.size - 1) {
+        this.addRequestSpacer()
       }
     }
-
   }
 
   /**

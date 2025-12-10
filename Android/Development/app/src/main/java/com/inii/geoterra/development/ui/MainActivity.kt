@@ -8,13 +8,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.inii.geoterra.development.Geoterra
 import com.inii.geoterra.development.ui.map.views.MapView
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.ui.requests.views.RequestsView
 import com.inii.geoterra.development.ui.account.views.AccountView
-import com.inii.geoterra.development.interfaces.FragmentListener
+import com.inii.geoterra.development.interfaces.PageListener
 import com.inii.geoterra.development.api.CheckSessionResponse
 import com.inii.geoterra.development.api.RetrofitClient
 import com.inii.geoterra.development.databinding.ActivityMainBinding
@@ -24,13 +25,17 @@ import com.inii.geoterra.development.managers.SessionManager
 import com.inii.geoterra.development.ui.account.views.LoginView
 import com.inii.geoterra.development.ui.home.views.HomeView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.osmdroid.util.GeoPoint
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), FragmentListener {
+class MainActivity : AppCompatActivity(), PageListener {
   @Inject
   lateinit var app: Geoterra
 
@@ -178,7 +183,7 @@ class MainActivity : AppCompatActivity(), FragmentListener {
       .commit()
   }
 
-  override fun onFragmentEvent(event: String, data: Any?) {
+  override fun onPageEvent(event: String, data: Any?) {
     when (event) {
       "USER_LOGGED_IN" -> {
         Log.i("onFragmentEvent", event)
@@ -189,8 +194,19 @@ class MainActivity : AppCompatActivity(), FragmentListener {
         this.showFragment(this.loginView)
       }
       "FINISHED" -> {
+        Log.i("onFragmentEvent", event)
         this.supportFragmentManager.popBackStack()
       }
+    }
+  }
+
+  override fun onPageRequestDataAsync(event : String,
+    data : Any?,
+    callback : (Any?) -> Unit
+  ) {
+    super.onPageRequestDataAsync(event, data, callback)
+    when (event) {
+
     }
   }
 
