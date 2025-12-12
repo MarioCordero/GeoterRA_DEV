@@ -25,4 +25,5 @@ secrets.defaults.properties
 .vscode/
 # .github/
 website/node_modules/*
+website/node_modules
 config.ini

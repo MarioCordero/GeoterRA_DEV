@@ -1,173 +1,292 @@
-import React from 'react';
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import React, { useMemo, useState } from 'react';
+import { BarChart2, Info, X } from 'lucide-react';
+
+const CONFIG = {
+  viewBoxW: 1000,  
+  viewBoxH: 750,   
+  side: 300,       
+  margin: 60,      
+  gap: 15,
+  gridSteps: 5,
+  colors: {
+    grid: "#e5e7eb",
+    border: "#4b5563",
+    text: "#6b7280",
+    cation: "#3b82f6",
+    anion: "#10b981",
+    diamond: "#ef4444"
+  }
+};
 
 const PiperDiagram = ({ data }) => {
-  if (!data) {
-    return <div className="text-center text-gray-500">No hay datos para mostrar el diagrama</div>;
-  }
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  // --- GEOMETRÍA ---
+  const triH = CONFIG.side * (Math.sqrt(3) / 2);
+  
+  const origins = {
+    cation: { x: CONFIG.margin, y: CONFIG.viewBoxH - CONFIG.margin },
+    anion: { x: CONFIG.viewBoxW - CONFIG.margin - CONFIG.side, y: CONFIG.viewBoxH - CONFIG.margin },
+  };
 
-  // Calcular proporciones de cationes (%)
-  const totalCations = (data.Ca || 0) + (data.Mg || 0) + (data.Na || 0) + (data.K || 0);
-  const Ca_percent = totalCations > 0 ? ((data.Ca || 0) / totalCations) * 100 : 0;
-  const Mg_percent = totalCations > 0 ? ((data.Mg || 0) / totalCations) * 100 : 0;
-  const Na_K_percent = totalCations > 0 ? (((data.Na || 0) + (data.K || 0)) / totalCations) * 100 : 0;
+  // Centro del Rombo
+  const diamondCenterY = origins.cation.y - triH - CONFIG.gap - (triH / 3);
+  const diamondCenterX = CONFIG.viewBoxW / 2;
 
-  // Calcular proporciones de aniones (%)
-  const totalAnions = (data.Cl || 0) + (data.SO4 || 0) + (data.HCO3 || 0);
-  const Cl_percent = totalAnions > 0 ? ((data.Cl || 0) / totalAnions) * 100 : 0;
-  const SO4_percent = totalAnions > 0 ? ((data.SO4 || 0) / totalAnions) * 100 : 0;
-  const HCO3_percent = totalAnions > 0 ? ((data.HCO3 || 0) / totalAnions) * 100 : 0;
+  // Coordenadas del Rombo
+  const diamondPath = useMemo(() => {
+    const cx = diamondCenterX;
+    const cy = diamondCenterY;
+    const hHalf = triH * 1.1;      // Más alargado verticalmente
+    const sHalf = CONFIG.side / 1.9; // Un poco más estrecho horizontalmente
+    // Top, Right, Bottom, Left
+    return `M ${cx} ${cy - hHalf} L ${cx + sHalf} ${cy} L ${cx} ${cy + hHalf} L ${cx - sHalf} ${cy} Z`;
+  }, [diamondCenterX, diamondCenterY, triH]);
 
-  // Convertir a coordenadas trilineales para el gráfico
-  // Eje X: Na+K (0) a Mg (100)
-  // Eje Y: Ca (0) a Cl (100)
-  const piperX = Na_K_percent;
-  const piperY = Ca_percent;
+  // --- LÓGICA DE DATOS ---
+  const { points, percentages } = useMemo(() => {
+    if (!data) return { points: null, percentages: {} };
+    const safe = (v) => v || 0;
+    
+    const sumCat = safe(data.Ca) + safe(data.Mg) + safe(data.Na) + safe(data.K);
+    const sumAn = safe(data.Cl) + safe(data.SO4) + safe(data.HCO3);
+    const p = {
+      Ca: sumCat ? (safe(data.Ca) / sumCat) * 100 : 0,
+      Mg: sumCat ? (safe(data.Mg) / sumCat) * 100 : 0,
+      NaK: sumCat ? ((safe(data.Na) + safe(data.K)) / sumCat) * 100 : 0,
+      Cl: sumAn ? (safe(data.Cl) / sumAn) * 100 : 0,
+      SO4: sumAn ? (safe(data.SO4) / sumAn) * 100 : 0,
+      HCO3: sumAn ? (safe(data.HCO3) / sumAn) * 100 : 0,
+    };
 
-  // Datos para mostrar
-  const chartData = [
-    {
-      x: piperX,
-      y: piperY,
-      name: 'Composición Iónica'
+    const cxLocal = (p.NaK + 0.5 * p.Mg) / 100 * CONFIG.side;
+    const cyLocal = (p.Mg) / 100 * triH;
+    const catPt = { x: origins.cation.x + cxLocal, y: origins.cation.y - cyLocal };
+
+    const axLocal = (p.Cl + 0.5 * p.SO4) / 100 * CONFIG.side;
+    const ayLocal = (p.SO4) / 100 * triH;
+    const anPt = { x: origins.anion.x + axLocal, y: origins.anion.y - ayLocal };
+
+    const m = Math.sqrt(3); 
+    const b1 = catPt.y - (-m * catPt.x);
+    const b2 = anPt.y - (m * anPt.x);
+    const dx = (b1 - b2) / (2 * m);
+    const dy = -m * dx + b1;
+
+    return { percentages: p, points: { cation: catPt, anion: anPt, diamond: { x: dx, y: dy } } };
+  }, [data, triH]);
+
+  const renderClippedGrid = (angle) => {
+    const lines = [];
+    const stepSize = triH / CONFIG.gridSteps;
+    
+    for (let i = 1; i < CONFIG.gridSteps; i++) {
+        const yOffset = (i * stepSize) - (triH / 2);
+        lines.push(
+            <line 
+                key={`grid-${angle}-${i}`} 
+                x1={-CONFIG.side} y1={yOffset} 
+                x2={CONFIG.side} y2={yOffset} 
+                stroke={CONFIG.colors.grid} 
+                strokeWidth="1" 
+            />
+        );
     }
-  ];
+    
+    return (
+        <g transform={`rotate(${angle}, ${diamondCenterX}, ${diamondCenterY}) translate(${diamondCenterX}, ${diamondCenterY})`}>
+            {lines}
+        </g>
+    );
+  };
+
+  const SVGContent = () => (
+    <>
+      <svg width="0" height="0" className="absolute">
+        <defs>
+          <clipPath id="diamond-clip">
+             <path d={diamondPath} />
+          </clipPath>
+        </defs>
+      </svg>
+
+      <svg viewBox={`0 0 ${CONFIG.viewBoxW} ${CONFIG.viewBoxH}`} className="w-full h-auto max-w-[1000px]">
+        
+        {/* 1. TRIÁNGULO CATIONES */}
+        <g transform={`translate(${origins.cation.x}, ${origins.cation.y})`}>
+            {Array.from({length: 5}).map((_, i) => {
+                const f = (i+1)/5;
+                return (
+                    <g key={i}>
+                        <line x1={(CONFIG.side/2)*f} y1={-triH*f} x2={CONFIG.side-(CONFIG.side/2)*f} y2={-triH*f} stroke={CONFIG.colors.grid} />
+                        <line x1={CONFIG.side*f} y1={0} x2={(CONFIG.side/2)*(1+f)} y2={-triH*(1-f)} stroke={CONFIG.colors.grid} />
+                        <line x1={CONFIG.side*(1-f)} y1={0} x2={(CONFIG.side/2)*(1-f)} y2={-triH*(1-f)} stroke={CONFIG.colors.grid} />
+                    </g>
+                )
+            })}
+            <polygon points={`0,0 ${CONFIG.side},0 ${CONFIG.side/2},${-triH}`} fill="none" stroke={CONFIG.colors.border} strokeWidth="1.5"/>
+            
+            <text x={CONFIG.side/2} y={25} textAnchor="middle" fontSize="12" fill="#374151" fontWeight="bold">Ca</text>
+            <text x={-15} y={0} textAnchor="end" fontSize="12" fill="#374151" fontWeight="bold">Mg</text>
+            <text x={CONFIG.side+15} y={0} textAnchor="start" fontSize="12" fill="#374151" fontWeight="bold">Na+K</text>
+            
+            {[0, 20, 40, 60, 80, 100].map((num) => (
+                <text key={`base-${num}`} x={num/100 * CONFIG.side} y={20} textAnchor="middle" fontSize="10" fill="#9ca3af">
+                    {num}
+                </text>
+            ))}
+            
+            {[0, 20, 40, 60, 80, 100].map((num) => {
+                const ratio = num / 100;
+                const x = (CONFIG.side / 2) * ratio;
+                const y = -triH * ratio;
+                return (
+                    <text key={`left-${num}`} x={x - 18} y={y + 5} textAnchor="end" fontSize="10" fill="#9ca3af" transform={`rotate(-60, ${x - 18}, ${y + 5})`}>
+                        {num}
+                    </text>
+                );
+            })}
+            
+            {[0, 20, 40, 60, 80, 100].map((num) => {
+                const ratio = num / 100;
+                const x = CONFIG.side - (CONFIG.side / 2) * ratio;
+                const y = -triH * ratio;
+                return (
+                    <text key={`right-${num}`} x={x + 18} y={y + 5} textAnchor="start" fontSize="10" fill="#9ca3af" transform={`rotate(60, ${x + 18}, ${y + 5})`}>
+                        {num}
+                    </text>
+                );
+            })}
+        </g>
+
+        {/* 2. TRIÁNGULO ANIONES */}
+        <g transform={`translate(${origins.anion.x}, ${origins.anion.y})`}>
+            {Array.from({length: 5}).map((_, i) => {
+                const f = (i+1)/5;
+                return (
+                    <g key={i}>
+                        <line x1={(CONFIG.side/2)*f} y1={-triH*f} x2={CONFIG.side-(CONFIG.side/2)*f} y2={-triH*f} stroke={CONFIG.colors.grid} />
+                        <line x1={CONFIG.side*f} y1={0} x2={(CONFIG.side/2)*(1+f)} y2={-triH*(1-f)} stroke={CONFIG.colors.grid} />
+                        <line x1={CONFIG.side*(1-f)} y1={0} x2={(CONFIG.side/2)*(1-f)} y2={-triH*(1-f)} stroke={CONFIG.colors.grid} />
+                    </g>
+                )
+            })}
+            <polygon points={`0,0 ${CONFIG.side},0 ${CONFIG.side/2},${-triH}`} fill="none" stroke={CONFIG.colors.border} strokeWidth="1.5"/>
+            
+            <text x={CONFIG.side/2} y={25} textAnchor="middle" fontSize="14" fill="#374151" fontWeight="bold">Cl</text>
+            <text x={-15} y={0} textAnchor="end" fontSize="14" fill="#374151" fontWeight="bold">HCO3</text>
+            <text x={CONFIG.side+15} y={0} textAnchor="start" fontSize="14" fill="#374151" fontWeight="bold">SO4</text>
+            
+            {[0, 20, 40, 60, 80, 100].map((num) => (
+                <text key={`base-${num}`} x={num/100 * CONFIG.side} y={20} textAnchor="middle" fontSize="10" fill="#9ca3af">
+                    {num}
+                </text>
+            ))}
+            
+            {[0, 20, 40, 60, 80, 100].map((num) => {
+                const ratio = num / 100;
+                const x = (CONFIG.side / 2) * ratio;
+                const y = -triH * ratio;
+                return (
+                    <text key={`left-${num}`} x={x - 18} y={y + 5} textAnchor="end" fontSize="10" fill="#9ca3af" transform={`rotate(-60, ${x - 18}, ${y + 5})`}>
+                        {num}
+                    </text>
+                );
+            })}
+            
+            {[0, 20, 40, 60, 80, 100].map((num) => {
+                const ratio = num / 100;
+                const x = CONFIG.side - (CONFIG.side / 2) * ratio;
+                const y = -triH * ratio;
+                return (
+                    <text key={`right-${num}`} x={x + 18} y={y + 5} textAnchor="start" fontSize="10" fill="#9ca3af" transform={`rotate(60, ${x + 18}, ${y + 5})`}>
+                        {num}
+                    </text>
+                );
+            })}
+        </g>
+
+        {/* 3. ROMBO CENTRAL */}
+        <g>
+            <g clipPath="url(#diamond-clip)">
+                {renderClippedGrid(60)}
+                {renderClippedGrid(-60)}
+            </g>
+            
+            <path d={diamondPath} fill="none" stroke={CONFIG.colors.border} strokeWidth="1.5" />
+            
+            <text x={diamondCenterX - CONFIG.side/2 - 10} y={diamondCenterY} textAnchor="end" fontSize="11" fontWeight="bold" fill="#374151" transform={`rotate(-60, ${diamondCenterX - CONFIG.side/2 - 10}, ${diamondCenterY})`}>SO4 + Cl</text>
+            <text x={diamondCenterX + CONFIG.side/2 + 10} y={diamondCenterY} textAnchor="start" fontSize="11" fontWeight="bold" fill="#374151" transform={`rotate(60, ${diamondCenterX + CONFIG.side/2 + 10}, ${diamondCenterY})`}>Ca + Mg</text>
+        </g>
+
+        {/* 4. PUNTOS */}
+        {points && (
+            <>
+                <line x1={points.cation.x} y1={points.cation.y} x2={points.diamond.x} y2={points.diamond.y} stroke={CONFIG.colors.cation} strokeDasharray="4" opacity="0.5" />
+                <line x1={points.anion.x} y1={points.anion.y} x2={points.diamond.x} y2={points.diamond.y} stroke={CONFIG.colors.anion} strokeDasharray="4" opacity="0.5" />
+                
+                <circle cx={points.cation.x} cy={points.cation.y} r="5" fill={CONFIG.colors.cation} stroke="white" strokeWidth="1"/>
+                <circle cx={points.anion.x} cy={points.anion.y} r="5" fill={CONFIG.colors.anion} stroke="white" strokeWidth="1"/>
+                <circle cx={points.diamond.x} cy={points.diamond.y} r="6" fill={CONFIG.colors.diamond} stroke="white" strokeWidth="2"/>
+            </>
+        )}
+      </svg>
+    </>
+  );
+
+  if (!data) return <div className="p-8 text-gray-500">Cargando...</div>;
 
   return (
-    <div className="w-full h-full p-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        
-        {/* Gráfico de Piper */}
-        <div className="bg-white rounded-lg shadow-md p-4">
-          <h3 className="text-lg font-semibold mb-4 text-center">Diagrama Trilineal</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <ScatterChart margin={{ top: 20, right: 20, bottom: 60, left: 60 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis 
-                type="number" 
-                dataKey="x" 
-                name="Na+K ↔ Mg" 
-                domain={[0, 100]}
-                label={{ value: 'Na+K ← → Mg', position: 'bottom', offset: 10 }}
-              />
-              <YAxis 
-                type="number" 
-                dataKey="y" 
-                name="Ca ↔ Cl" 
-                domain={[0, 100]}
-                label={{ value: 'Ca ← → Cl', angle: -90, position: 'insideLeft', offset: 10 }}
-              />
-              <Tooltip 
-                cursor={{ strokeDasharray: '3 3' }}
-                contentStyle={{ backgroundColor: 'rgba(255,255,255,0.95)', border: '1px solid #ccc', borderRadius: '5px' }}
-              />
-              <Scatter 
-                name="Punto" 
-                data={chartData} 
-                fill="#e74c3c" 
-                shape="circle"
-              />
-            </ScatterChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Información de Composición */}
-        <div className="space-y-4">
-          <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-            <h3 className="text-lg font-semibold text-blue-900 mb-3">Cationes (%)</h3>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Calcio (Ca²⁺)</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-24 h-4 bg-gray-200 rounded overflow-hidden">
-                    <div 
-                      className="h-full bg-blue-500" 
-                      style={{ width: `${Ca_percent}%` }}
-                    />
-                  </div>
-                  <span className="text-sm font-semibold w-12 text-right">{Ca_percent.toFixed(1)}%</span>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Magnesio (Mg²⁺)</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-24 h-4 bg-gray-200 rounded overflow-hidden">
-                    <div 
-                      className="h-full bg-green-500" 
-                      style={{ width: `${Mg_percent}%` }}
-                    />
-                  </div>
-                  <span className="text-sm font-semibold w-12 text-right">{Mg_percent.toFixed(1)}%</span>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Sodio + Potasio (Na⁺ + K⁺)</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-24 h-4 bg-gray-200 rounded overflow-hidden">
-                    <div 
-                      className="h-full bg-orange-500" 
-                      style={{ width: `${Na_K_percent}%` }}
-                    />
-                  </div>
-                  <span className="text-sm font-semibold w-12 text-right">{Na_K_percent.toFixed(1)}%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-            <h3 className="text-lg font-semibold text-green-900 mb-3">Aniones (%)</h3>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Cloruro (Cl⁻)</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-24 h-4 bg-gray-200 rounded overflow-hidden">
-                    <div 
-                      className="h-full bg-red-500" 
-                      style={{ width: `${Cl_percent}%` }}
-                    />
-                  </div>
-                  <span className="text-sm font-semibold w-12 text-right">{Cl_percent.toFixed(1)}%</span>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Sulfato (SO₄²⁻)</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-24 h-4 bg-gray-200 rounded overflow-hidden">
-                    <div 
-                      className="h-full bg-yellow-500" 
-                      style={{ width: `${SO4_percent}%` }}
-                    />
-                  </div>
-                  <span className="text-sm font-semibold w-12 text-right">{SO4_percent.toFixed(1)}%</span>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Bicarbonato (HCO₃⁻)</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-24 h-4 bg-gray-200 rounded overflow-hidden">
-                    <div 
-                      className="h-full bg-purple-500" 
-                      style={{ width: `${HCO3_percent}%` }}
-                    />
-                  </div>
-                  <span className="text-sm font-semibold w-12 text-right">{HCO3_percent.toFixed(1)}%</span>
-                </div>
-              </div>
+    <>
+      {/* VISTA NORMAL */}
+      <div 
+        className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 w-full cursor-pointer hover:shadow-lg hover:border-blue-300 transition-all"
+        onClick={() => setIsExpanded(true)}
+      >
+        <div className="flex justify-center bg-gray-50/50 rounded-xl border border-gray-100 py-6 group">
+          <div className="relative w-full">
+            <SVGContent />
+            {/* Indicador visual de click */}
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/5 rounded-lg">
+              <span className="text-blue-600 font-semibold text-sm">Haz click para ampliar</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Interpretación */}
-      <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <h3 className="font-semibold text-gray-800 mb-2">📋 Interpretación</h3>
-        <p className="text-sm text-gray-700">
-          El diagrama de Piper es una representación gráfica de la composición iónica del agua.
-          La posición del punto indica el tipo de agua según la clasificación de Piper.
-        </p>
-      </div>
-    </div>
+      {/* MODAL EXPANDIDO */}
+      {isExpanded && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setIsExpanded(false)}>
+          <div 
+            className="bg-white rounded-xl shadow-2xl w-full h-full max-w-6xl max-h-[95vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Encabezado del Modal */}
+            <div className="flex justify-between items-center p-6 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-800">Diagrama de Piper - Vista Ampliada</h2>
+              <button
+                onClick={() => setIsExpanded(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition"
+              >
+                <X className="w-6 h-6 text-gray-600" />
+              </button>
+            </div>
+
+            {/* Contenido del Modal */}
+            <div className="flex-1 overflow-auto flex items-center justify-center p-6 bg-gray-50">
+              <div className="w-full">
+                <SVGContent />
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 border-t border-gray-200 text-center text-sm text-gray-500">
+              Presiona Esc o haz click fuera para cerrar
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
