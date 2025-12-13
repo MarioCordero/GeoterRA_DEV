@@ -6,8 +6,8 @@ const CONFIG = {
   viewBoxH: 750,
   side: 300,
   margin: 60,
-  triangleGapX: 30,
-  gap: 15,
+  triangleGapX: 60,
+  gap: 0,
   gridSteps: 5,
   colors: {
     grid: "#e5e7eb",
@@ -32,7 +32,7 @@ const PiperDiagram = ({ data }) => {
   };
 
   // Centro del Rombo
-  const diamondCenterY = origins.cation.y - triH - CONFIG.gap - (triH / 3);
+  const diamondCenterY = origins.cation.y - triH - CONFIG.gap - (triH / 2.3);
   const diamondCenterX = CONFIG.viewBoxW / 2;
 
   // Coordenadas del Rombo
@@ -40,7 +40,7 @@ const PiperDiagram = ({ data }) => {
     const cx = diamondCenterX;
     const cy = diamondCenterY;
     const hHalf = triH * 1.1;
-    const sHalf = CONFIG.side / 1.9;
+    const sHalf = CONFIG.side / 1.8;
     // Top, Right, Bottom, Left
     return `M ${cx} ${cy - hHalf} L ${cx + sHalf} ${cy} L ${cx} ${cy + hHalf} L ${cx - sHalf} ${cy} Z`;
   }, [diamondCenterX, diamondCenterY, triH]);
