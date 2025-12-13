@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { BarChart2, Info, X } from 'lucide-react';
+import { X } from 'lucide-react';
 
 const CONFIG = {
   viewBoxW: 1000,
@@ -21,7 +21,6 @@ const CONFIG = {
 
 const PiperDiagram = ({ data }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [showDebugLines, setShowDebugLines] = useState(false);
 
   // --- GEOMETRÍA ---
   const triH = CONFIG.side * (Math.sqrt(3) / 2);
@@ -41,7 +40,6 @@ const PiperDiagram = ({ data }) => {
     const cy = diamondCenterY;
     const hHalf = triH * 1.1;
     const sHalf = CONFIG.side / 1.8;
-    // Top, Right, Bottom, Left
     return `M ${cx} ${cy - hHalf} L ${cx + sHalf} ${cy} L ${cx} ${cy + hHalf} L ${cx - sHalf} ${cy} Z`;
   }, [diamondCenterX, diamondCenterY, triH]);
 
@@ -79,17 +77,23 @@ const PiperDiagram = ({ data }) => {
   }, [data, triH]);
 
   useEffect(() => {
-    console.log('=== PORCENTAJES PIPER DIAGRAM ===');
-    console.log('CATIONES:');
-    console.log(`  Ca: ${percentages.Ca?.toFixed(2)}%`);
-    console.log(`  Mg: ${percentages.Mg?.toFixed(2)}%`);
-    console.log(`  Na+K: ${percentages.NaK?.toFixed(2)}%`);
-    console.log('ANIONES:');
-    console.log(`  Cl: ${percentages.Cl?.toFixed(2)}%`);
-    console.log(`  SO4: ${percentages.SO4?.toFixed(2)}%`);
-    console.log(`  HCO3: ${percentages.HCO3?.toFixed(2)}%`);
-    console.log('================================');
-  }, [percentages]);
+      console.log('=== PORCENTAJES PIPER DIAGRAM ===');
+      console.log('CATIONES:');
+      console.log(`  Ca: ${percentages.Ca?.toFixed(2)}%`);
+      console.log(`  Mg: ${percentages.Mg?.toFixed(2)}%`);
+      console.log(`  Na+K: ${percentages.NaK?.toFixed(2)}%`);
+      console.log('ANIONES:');
+      console.log(`  Cl: ${percentages.Cl?.toFixed(2)}%`);
+      console.log(`  SO4: ${percentages.SO4?.toFixed(2)}%`);
+      console.log(`  HCO3: ${percentages.HCO3?.toFixed(2)}%`);
+      console.log('PUNTOS:');
+      if (points) {
+        console.log(`  Cation: (${points.cation.x.toFixed(0)}, ${points.cation.y.toFixed(0)})`);
+        console.log(`  Anion: (${points.anion.x.toFixed(0)}, ${points.anion.y.toFixed(0)})`);
+        console.log(`  Diamond: (${points.diamond.x.toFixed(0)}, ${points.diamond.y.toFixed(0)})`);
+      }
+      console.log('================================');
+    }, [percentages, points]);
 
   const renderClippedGrid = (angle) => {
     const lines = [];
@@ -126,83 +130,6 @@ const PiperDiagram = ({ data }) => {
       </svg>
 
       <svg viewBox={`0 0 ${CONFIG.viewBoxW} ${CONFIG.viewBoxH}`} className="w-full h-auto max-w-[1000px]">
-        {/* LÍNEAS DE DEPURACIÓN */}
-        {showDebugLines && (
-          <>
-            {/* Línea horizontal de los origenes de triángulos */}
-            <line x1={0} y1={origins.cation.y} x2={CONFIG.viewBoxW} y2={origins.cation.y} stroke="red" strokeWidth="2" strokeDasharray="5" opacity="0.5" />
-            <text x={10} y={origins.cation.y - 10} fontSize="12" fill="red" fontWeight="bold">
-              y: {origins.cation.y.toFixed(0)}
-            </text>
-
-            {/* Línea vertical del centro del rombo */}
-            <line x1={diamondCenterX} y1={0} x2={diamondCenterX} y2={CONFIG.viewBoxH} stroke="blue" strokeWidth="2" strokeDasharray="5" opacity="0.5" />
-            <text x={diamondCenterX + 10} y={20} fontSize="12" fill="blue" fontWeight="bold">
-              x: {diamondCenterX.toFixed(0)}
-            </text>
-
-            {/* Línea horizontal del centro del rombo */}
-            <line x1={0} y1={diamondCenterY} x2={CONFIG.viewBoxW} y2={diamondCenterY} stroke="green" strokeWidth="2" strokeDasharray="5" opacity="0.5" />
-            <text x={10} y={diamondCenterY - 10} fontSize="12" fill="green" fontWeight="bold">
-              y: {diamondCenterY.toFixed(0)}
-            </text>
-
-            {/* Punto origen triángulo cationes */}
-            <circle cx={origins.cation.x} cy={origins.cation.y} r="8" fill="red" opacity="0.7" />
-            <text x={origins.cation.x + 15} y={origins.cation.y} fontSize="11" fill="red" fontWeight="bold">
-              Cat ({origins.cation.x.toFixed(0)}, {origins.cation.y.toFixed(0)})
-            </text>
-
-            {/* Punto origen triángulo aniones */}
-            <circle cx={origins.anion.x} cy={origins.anion.y} r="8" fill="orange" opacity="0.7" />
-            <text x={origins.anion.x - 200} y={origins.anion.y - 15} fontSize="11" fill="orange" fontWeight="bold">
-              Anion ({origins.anion.x.toFixed(0)}, {origins.anion.y.toFixed(0)})
-            </text>
-
-            {/* Punto centro rombo */}
-            <circle cx={diamondCenterX} cy={diamondCenterY} r="8" fill="blue" opacity="0.7" />
-            <text x={diamondCenterX + 15} y={diamondCenterY - 20} fontSize="11" fill="blue" fontWeight="bold">
-              Diamond ({diamondCenterX.toFixed(0)}, {diamondCenterY.toFixed(0)})
-            </text>
-
-            {/* Mostrar triH */}
-            <text x={20} y={100} fontSize="12" fill="purple" fontWeight="bold">
-              triH: {triH.toFixed(2)}
-            </text>
-
-            {/* Mostrar CONFIG */}
-            <text x={20} y={120} fontSize="11" fill="purple" fontWeight="normal">
-              side: {CONFIG.side}, margin: {CONFIG.margin}, gap: {CONFIG.gap}
-            </text>
-
-            {/* LÍNEAS DIAGONALES DE PROYECCIÓN */}
-            {/* Esquina Top-Left del rombo a esquina inferior-izquierda del triángulo cationes */}
-            <line 
-              x1={origins.cation.x}
-              y1={origins.cation.y}
-
-              x2={origins.cation.x + (CONFIG.side / 2) * 4}
-              y2={origins.cation.y - triH * 4}
-              stroke="cyan" 
-              strokeWidth="2" 
-              strokeDasharray="5" 
-              opacity="0.6" 
-            />
-
-            {/* Esquina Top-Right del rombo a esquina inferior-derecha del triángulo aniones */}
-            <line 
-              x1={origins.anion.x + CONFIG.side} 
-              y1={origins.anion.y} 
-              x2={origins.anion.x + CONFIG.side - (CONFIG.side / 2) * 4}
-              y2={origins.anion.y - triH * 4}
-              stroke="cyan" 
-              strokeWidth="2" 
-              strokeDasharray="5" 
-              opacity="0.6" 
-            />
-          </>
-        )}
-
         {/* 1. TRIÁNGULO CATIONES */}
         <g transform={`translate(${origins.cation.x}, ${origins.cation.y})`}>
           {Array.from({ length: 5 }).map((_, i) => {
@@ -320,7 +247,7 @@ const PiperDiagram = ({ data }) => {
           {[100, 80, 60, 40, 20, 0].map((num) => {
             const ratio = (100 - num) / 100;
             const hHalf = triH * 1.1;
-            const sHalf = CONFIG.side / 1.9;
+            const sHalf = CONFIG.side / 1.8;
 
             const x = diamondCenterX - (sHalf * ratio);
             const y = (diamondCenterY - hHalf) + (hHalf * ratio);
@@ -336,7 +263,7 @@ const PiperDiagram = ({ data }) => {
           {[100, 80, 60, 40, 20, 0].map((num) => {
             const ratio = (100 - num) / 100;
             const hHalf = triH * 1.1;
-            const sHalf = CONFIG.side / 1.9;
+            const sHalf = CONFIG.side / 1.8;
 
             const x = diamondCenterX + (sHalf * ratio);
             const y = (diamondCenterY - hHalf) + (hHalf * ratio);
@@ -352,7 +279,7 @@ const PiperDiagram = ({ data }) => {
           {[0, 20, 40, 60, 80, 100].map((num) => {
             const ratio = (100 - num) / 100;
             const hHalf = triH * 1.1;
-            const sHalf = CONFIG.side / 1.9;
+            const sHalf = CONFIG.side / 1.8;
 
             const x = diamondCenterX - (sHalf * ratio);
             const y = (diamondCenterY + hHalf) - (hHalf * ratio);
@@ -368,7 +295,7 @@ const PiperDiagram = ({ data }) => {
           {[0, 20, 40, 60, 80, 100].map((num) => {
             const ratio = (100 - num) / 100;
             const hHalf = triH * 1.1;
-            const sHalf = CONFIG.side / 1.9;
+            const sHalf = CONFIG.side / 1.8;
 
             const x = diamondCenterX + (sHalf * ratio);
             const y = (diamondCenterY + hHalf) - (hHalf * ratio);
@@ -400,14 +327,6 @@ const PiperDiagram = ({ data }) => {
 
   return (
     <>
-      {/* BOTÓN DEBUG */}
-      <button
-        onClick={() => setShowDebugLines(!showDebugLines)}
-        className="mb-4 px-4 py-2 bg-purple-500 text-white rounded-lg text-sm font-bold hover:bg-purple-600 transition"
-      >
-        {showDebugLines ? '❌ Ocultar Debug' : '👁️ Mostrar Debug'}
-      </button>
-
       {/* VISTA NORMAL */}
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 w-full cursor-pointer hover:shadow-lg hover:border-blue-300 transition-all" onClick={() => setIsExpanded(true)}>
         <div className="flex justify-center bg-gray-50/50 rounded-xl border border-gray-100 py-6 group">
