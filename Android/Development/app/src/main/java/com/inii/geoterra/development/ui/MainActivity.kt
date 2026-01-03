@@ -16,8 +16,8 @@ import com.inii.geoterra.development.R
 import com.inii.geoterra.development.ui.requests.views.RequestsView
 import com.inii.geoterra.development.ui.account.views.AccountView
 import com.inii.geoterra.development.interfaces.PageListener
-import com.inii.geoterra.development.api.CheckSessionResponse
 import com.inii.geoterra.development.api.RetrofitClient
+import com.inii.geoterra.development.api.authentication.models.SessionStatus
 import com.inii.geoterra.development.databinding.ActivityMainBinding
 import com.inii.geoterra.development.device.ActivityPermissionRequester
 import com.inii.geoterra.development.interfaces.PageView
@@ -214,10 +214,10 @@ class MainActivity : AppCompatActivity(), PageListener {
 
   private fun checkSession() {
     val apiService = RetrofitClient.getAPIService()
-    val call = apiService.checkSession()
-    call.enqueue(object : Callback<CheckSessionResponse> {
-      override fun onResponse(call : Call<CheckSessionResponse>,
-                              response : Response<CheckSessionResponse>) {
+    val call = apiService.validateSession()
+    call.enqueue(object : Callback<SessionStatus> {
+      override fun onResponse(call : Call<SessionStatus>,
+                              response : Response<SessionStatus>) {
         if (response.isSuccessful) {
           val userData = response.body()
           if (userData != null) {
@@ -234,7 +234,7 @@ class MainActivity : AppCompatActivity(), PageListener {
         }
       }
 
-      override fun onFailure(call : Call<CheckSessionResponse>, t : Throwable) {
+      override fun onFailure(call : Call<SessionStatus>, t : Throwable) {
         //Log.i("Error check", "Error en la consulta de session, $t")
       }
     })

@@ -5,15 +5,13 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.inii.geoterra.development.Geoterra
-import com.inii.geoterra.development.api.AnalysisRequest
-import com.inii.geoterra.development.api.CheckSessionResponse
-import com.inii.geoterra.development.api.RequestsSubmittedResponse
-import com.inii.geoterra.development.api.UserInfoResponse
-import com.inii.geoterra.development.api.UserInformation
+import com.inii.geoterra.development.api.authentication.models.UserProfile
+import com.inii.geoterra.development.api.authentication.models.UserProfileResponse
+import com.inii.geoterra.development.api.requests.models.AnalysisRequest
+import com.inii.geoterra.development.api.requests.models.UserRequestsResponse
 import com.inii.geoterra.development.interfaces.PageViewModel
 import com.inii.geoterra.development.managers.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -36,8 +34,8 @@ class AccountViewModel @Inject constructor(
 ) : PageViewModel(app) {
 
   /** LiveData holding user account details */
-  private val _userInfo = MutableLiveData<UserInformation?>()
-  val userInfo : MutableLiveData<UserInformation?> get() = _userInfo
+  private val _userInfo = MutableLiveData<UserProfile?>()
+  val userInfo : MutableLiveData<UserProfile?> get() = _userInfo
 
   /** LiveData holding number of requests made by the user */
   private val _requestsMade = MutableLiveData<Int>()
@@ -86,10 +84,9 @@ class AccountViewModel @Inject constructor(
     val email = SessionManager.getUserEmail() ?: return
 
     // Asynchronously request user info using Retrofit
-    this.API.apply {
-      getUserInfo(email).enqueue(object : Callback<UserInfoResponse> {
-        override fun onResponse(call : Call<UserInfoResponse>,
-          response : Response<UserInfoResponse>
+    this.API.apply { fetchUserProfile(email).enqueue(object : Callback<UserProfileResponse> {
+        override fun onResponse(call : Call<UserProfileResponse>,
+          response : Response<UserProfileResponse>
         ) {
           if (response.isSuccessful) {
             val body = response.body()
@@ -107,34 +104,35 @@ class AccountViewModel @Inject constructor(
           }
         }
 
-        override fun onFailure(call : Call<UserInfoResponse>, t : Throwable) {
+        override fun onFailure(call : Call<UserProfileResponse>, t : Throwable) {
           _errorMessage.value =
             String.format("Fallo de conexión: ${t.localizedMessage}")
           Timber.e("Fallo de conexión: ${t.localizedMessage}")
         }
       })
 
-      getSubmittedRequests(email).enqueue(object :
-                                            Callback<RequestsSubmittedResponse> {
-          override fun onResponse(call : Call<RequestsSubmittedResponse>,
-            response : Response<RequestsSubmittedResponse>
-          ) {
-            if (response.isSuccessful) {
-              obtainRequestInfo(response.body()?.data ?: emptyList())
-            } else {
-              _errorMessage.postValue(
-                "Failed to load requests: ${response.code()}")
-              Timber.e("Response error: ${response.code()}")
-            }
+      fetchUserRequests(email).enqueue(object : Callback<UserRequestsResponse> {
+        override fun onResponse(call : Call<UserRequestsResponse>,
+                                response : Response<UserRequestsResponse>
+        ) {
+          if (response.isSuccessful) {
+            obtainRequestInfo(response.body()?.data ?: emptyList())
+          } else {
+            _errorMessage.postValue(
+              "Carga de solicitudes fallida: " +
+                      "${response.code()}")
+            Timber.e("Response error: ${response.code()}")
           }
+        }
 
-          override fun onFailure(call : Call<RequestsSubmittedResponse>,
-            t : Throwable
-          ) {
-            _errorMessage.postValue("Error loading requests: ${t.message}")
-            Timber.e(t, "API call failed")
-          }
-        })
+        override fun onFailure(call : Call<UserRequestsResponse>,
+                               t : Throwable
+        ) {
+          _errorMessage.postValue("Error obteniendo las solicitudes del " +
+                  "servidor: ${t.message}")
+          Timber.e(t, "API call failed")
+        }
+      })
     }
   }
 

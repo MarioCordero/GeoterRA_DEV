@@ -1,19 +1,16 @@
 package com.inii.geoterra.development.ui.map.views
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
-import com.inii.geoterra.development.api.ThermalPoint
+import com.inii.geoterra.development.api.geospatial.models.ThermalPoint
 import com.inii.geoterra.development.databinding.FragmentThermalBinding
 import com.inii.geoterra.development.device.CoordinateConverter
 import com.inii.geoterra.development.interfaces.PageView
-import com.inii.geoterra.development.ui.map.models.AnalysisViewModel
-import com.inii.geoterra.development.ui.map.models.ThermalViewModel
+import com.inii.geoterra.development.ui.map.models.ThermalManifestationViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import org.osmdroid.util.GeoPoint
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -24,9 +21,9 @@ import javax.inject.Inject
  * and chemical composition. Provides navigation back to the map view.
  */
 @AndroidEntryPoint
-class ThermalView : PageView<FragmentThermalBinding, ThermalViewModel>(
+class ThermalManifestationView : PageView<FragmentThermalBinding, ThermalManifestationViewModel>(
   FragmentThermalBinding::inflate,
-  ThermalViewModel::class.java
+  ThermalManifestationViewModel::class.java
 ) {
 
   companion object {
@@ -39,21 +36,21 @@ class ThermalView : PageView<FragmentThermalBinding, ThermalViewModel>(
      * @param selectedThermal Thermal data to display
      * @return Configured fragment instance
      */
-    fun newInstance(selectedThermal: ThermalPoint) = ThermalView().apply {
+    fun newInstance(selectedThermal: ThermalPoint) = ThermalManifestationView().apply {
       arguments = Bundle().apply {
-        putSerializable(ARG_PARAM1, selectedThermal)
+        putParcelable(ARG_PARAM1, selectedThermal)
       }
     }
   }
 
   @Inject
   /** Dependency injected factory instance */
-  lateinit var assistedFactory : ThermalViewModel.Factory
+  lateinit var assistedFactory : ThermalManifestationViewModel.Factory
 
   /** ViewModelFactory instance (subclasses use it directly) */
   override val viewModelFactory: ViewModelProvider.Factory
     get() = createAssistedViewModelFactory {
-      val thermal = requireArguments().getSerializable(ARG_PARAM1) as ThermalPoint
+      val thermal = requireArguments().getParcelable<ThermalPoint>(ARG_PARAM1)!!
       assistedFactory.create(thermal)
     }
 
@@ -113,7 +110,7 @@ class ThermalView : PageView<FragmentThermalBinding, ThermalViewModel>(
     Timber.i("Preparing fragment")
     this.binding.fragmentContainer.visibility = View.VISIBLE
 
-    val analysisPage = AnalysisView.newInstance(pointValue)
+    val analysisPage = ManifestationMenuView.newInstance(pointValue)
     this.childFragmentManager.beginTransaction()
       .replace(this.binding.fragmentContainer.id, analysisPage)
       .addToBackStack(null)

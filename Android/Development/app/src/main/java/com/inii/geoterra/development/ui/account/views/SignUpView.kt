@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import com.inii.geoterra.development.api.SingUpCredentials
+import com.inii.geoterra.development.api.authentication.models.SignUpCredentials
 import com.inii.geoterra.development.databinding.FragmentSignUpBinding
 import com.inii.geoterra.development.interfaces.PageView
 import com.inii.geoterra.development.ui.account.models.SignUpViewModel
@@ -52,7 +52,7 @@ class SignUpView : PageView<FragmentSignUpBinding, SignUpViewModel>(
           viewModel.setErrorMessage("Las contraseñas no coinciden")
           return@setOnClickListener
         }
-        val credentials = SingUpCredentials(
+        val credentials = SignUpCredentials(
           email = binding.etEmail.text.toString().trim(),
           password = binding.etPassword.text.toString().trim(),
           firstName = binding.etFirstname.text.toString().trim(),

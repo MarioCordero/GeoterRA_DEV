@@ -10,32 +10,23 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.inii.geoterra.development.R
+import com.inii.geoterra.development.api.requests.models.AnalysisRequest
 
 /**
- * @brief Custom bottom sheet component for displaying service request details
+ * @brief Custom UI component that renders an AnalysisRequest in a visual sheet.
  *
- * Shows geographic coordinates, request date, status, and provides action buttons.
- * Manages following UI components:
- * @property locationImage Preview of geographic location
- * @property coordinates Display for latitude/longitude values
- * @property date Request submission timestamp
- * @property state Current request status
- * // Removed contactButton and repeatRequestButton as they are not initialized
+ * This view is responsible ONLY for displaying data.
+ * All business logic must be handled externally (ViewModel).
  */
 class RequestSheet @JvmOverloads constructor(
   context: Context,
   attrs: AttributeSet? = null,
   defStyleAttr: Int = 0,
-  photoBitmap: Bitmap,
-  name: String,
-  type : String,
-  region: String,
-  latitude: Double,
-  longitude: Double,
-  date: String,
-  state: String
+  private val request: AnalysisRequest,
+  private val photoBitmap: Bitmap
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
+  /** Inflated root view */
   private val binding: View = LayoutInflater.from(context).inflate(
     R.layout.view_request_sheet,
     this,
@@ -45,59 +36,84 @@ class RequestSheet @JvmOverloads constructor(
   private val typeImage: ImageView =
     binding.findViewById(R.id.typeImage)
 
-  private val et_name: TextView =
+  private val tvName: TextView =
     binding.findViewById(R.id.tv_name)
 
-  private val et_type: TextView =
+  private val tvType: TextView =
     binding.findViewById(R.id.tv_type)
 
-  private val et_region: TextView =
+  private val tvRegion: TextView =
     binding.findViewById(R.id.tv_region)
 
-  private val et_latitude: TextView =
+  private val tvLatitude: TextView =
     binding.findViewById(R.id.tv_latitude)
 
-  private val et_longitude: TextView =
+  private val tvLongitude: TextView =
     binding.findViewById(R.id.tv_longitude)
 
-  private val dateView: TextView =
+  private val tvDate: TextView =
     binding.findViewById(R.id.tv_date)
 
-  private val stateView: TextView =
+  private val tvState: TextView =
     binding.findViewById(R.id.tv_state)
 
+  // Agrega botones para las acciones
+  private val btnView: TextView = binding.findViewById(R.id.btn_show)
+  private val btnEdit: TextView = binding.findViewById(R.id.btn_edit)
+  private val btnDelete: TextView = binding.findViewById(R.id.btn_delete)
+
+  // Listener para manejar acciones
+  var onActionListener: ((String, AnalysisRequest) -> Unit)? = null
+
   init {
-    setupView(photoBitmap, name, type, region, latitude, longitude, date, state)
+    bindRequest(request)
+    setupClickListeners()
   }
 
+  /**
+   * @brief Binds an AnalysisRequest to the UI components.
+   *
+   * @param request Domain model containing all request information
+   */
   @SuppressLint("SetTextI18n")
-  private fun setupView(
-    photoBitmap: Bitmap,
-    name: String,
-    type: String,
-    region: String,
-    latitude: Double,
-    longitude: Double,
-    date: String,
-    state: String) {
-
-    // Set ONLY the PNG/JPG drawable image
+  private fun bindRequest(request: AnalysisRequest) {
+    // Set image representing the request type
     typeImage.setImageBitmap(photoBitmap)
 
-    et_name.text = name
-    et_region.text = region
+    // Display request identifier
+    tvName.text = "SOLI-${request.id}"
 
-    et_type.text = type
+    // Display request attributes
+    tvType.text = request.type.name
+    tvRegion.text = request.region
 
-    et_latitude.text = "%.4f".format(
-      latitude
-    )
+    // Format coordinates with fixed precision
+    tvLatitude.text = "%.4f".format(request.latitude)
+    tvLongitude.text = "%.4f".format(request.longitude)
 
-    et_longitude.text = "%.4f".format(
-      longitude
-    )
+    // Date and state
+    tvDate.text = request.date
+    // TODO: REMOVE AND ADD THE STATE FIELD.
+    tvState.text = "Pendiente"
+  }
 
-    dateView.text = date
-    stateView.text = state
+  /**
+   * @brief Sets up click listeners for action buttons
+   */
+  private fun setupClickListeners() {
+    // Acción: Ver detalles
+    btnView.setOnClickListener {
+      onActionListener?.invoke("VIEW", request)
+    }
+
+    // Acción: Editar
+    btnEdit.setOnClickListener {
+      onActionListener?.invoke("EDIT", request)
+    }
+
+    // Acción: Eliminar
+    btnDelete.setOnClickListener {
+      onActionListener?.invoke("DELETE", request)
+    }
   }
 }

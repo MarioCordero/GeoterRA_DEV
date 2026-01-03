@@ -456,6 +456,14 @@ abstract class PageView<VB : ViewBinding, VM : PageViewModel>(
   }
 
   /**
+   * @brief Timbers
+   * @param error Detailed error message for debugging
+   */
+  protected fun timberInfo(error: String) {
+    Timber.i("NetworkError", error)
+  }
+
+  /**
    * @brief Timbers network-related errors with standardized tag
    * @param message Detailed message for debugging
    */

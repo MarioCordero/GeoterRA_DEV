@@ -1,8 +1,6 @@
 package com.inii.geoterra.development.ui.map.views
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.Point
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,7 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.interfaces.MessageListener
-import com.inii.geoterra.development.api.ThermalPoint
+import com.inii.geoterra.development.api.geospatial.models.ThermalPoint
 import com.inii.geoterra.development.databinding.FragmentMapBinding
 import com.inii.geoterra.development.device.CoordinateConverter.convertCRT05toWGS84
 import com.inii.geoterra.development.interfaces.PageView
@@ -30,14 +28,6 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import timber.log.Timber
-import androidx.core.graphics.createBitmap
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
-import okhttp3.internal.wait
-import org.osmdroid.tileprovider.MapTileProviderBasic
-import org.osmdroid.views.Projection
-import org.osmdroid.views.drawing.MapSnapshot
 
 /**
  * Fragment for displaying an interactive map with thermal points and user location.
@@ -297,7 +287,7 @@ class MapView : PageView<FragmentMapBinding, MapViewModel>(
     this.viewModel.stopLocationUpdates()
     this.binding.fragmentContainer.visibility = View.VISIBLE
 
-    val thermalFragment = ThermalView.newInstance(thermal)
+    val thermalFragment = ThermalManifestationView.newInstance(thermal)
     this.childFragmentManager.beginTransaction()
       .replace(R.id.fragment_container, thermalFragment)
       .addToBackStack(null)

@@ -6,37 +6,36 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
-import com.inii.geoterra.development.api.ThermalPoint
+import com.inii.geoterra.development.api.geospatial.models.ThermalPoint
 import com.inii.geoterra.development.databinding.FragmentAnalysisBinding
 import com.inii.geoterra.development.interfaces.PageView
-import com.inii.geoterra.development.ui.map.models.AnalysisViewModel
+import com.inii.geoterra.development.ui.map.models.ManifestationMenuViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 /**
  * @brief Fragment displaying detailed information about a thermal point
  *
- * Connects with [AnalysisViewModel] to observe and present the data.
+ * Connects with [ManifestationMenuViewModel] to observe and present the data.
  * All UI rendering is done reactively via LiveData observers.
  *
  * @property binding View binding instance for this fragment
  * @property viewModel ViewModel instance injected by the generic base class
  */
 @AndroidEntryPoint
-class AnalysisView : PageView<FragmentAnalysisBinding, AnalysisViewModel>(
+class ManifestationMenuView : PageView<FragmentAnalysisBinding, ManifestationMenuViewModel>(
   FragmentAnalysisBinding::inflate,
-  AnalysisViewModel::class.java
+  ManifestationMenuViewModel::class.java
 ) {
 
   @Inject
   /** Dependency injected factory instance */
-  lateinit var assistedFactory : AnalysisViewModel.Factory
+  lateinit var assistedFactory : ManifestationMenuViewModel.Factory
 
   /** ViewModelFactory instance to be used by the ViewModel */
   override val viewModelFactory: ViewModelProvider.Factory
     get() = createAssistedViewModelFactory {
-      val thermal = requireArguments().getSerializable(ARG_PARAM1) as
-        ThermalPoint
+      val thermal = requireArguments().getParcelable<ThermalPoint>(ARG_PARAM1)!!
       assistedFactory.create(thermal)
     }
 
@@ -53,9 +52,9 @@ class AnalysisView : PageView<FragmentAnalysisBinding, AnalysisViewModel>(
      * @param selectedThermal Thermal data to display
      * @return Configured fragment instance
      */
-    fun newInstance(selectedThermal: ThermalPoint) = AnalysisView().apply {
+    fun newInstance(selectedThermal: ThermalPoint) = ManifestationMenuView().apply {
       arguments = Bundle().apply {
-        putSerializable(ARG_PARAM1, selectedThermal)
+        putParcelable(ARG_PARAM1, selectedThermal)
       }
     }
   }
@@ -73,7 +72,7 @@ class AnalysisView : PageView<FragmentAnalysisBinding, AnalysisViewModel>(
   override fun onCreatePageView(inflater : LayoutInflater,
     container : ViewGroup?
   ) : View {
-    val thermal = requireArguments().getSerializable(ARG_PARAM1) as ThermalPoint
+    val thermal = requireArguments().getParcelable<ThermalPoint>(ARG_PARAM1)!!
     this.drawThermalData(thermal)
     return binding.root
   }

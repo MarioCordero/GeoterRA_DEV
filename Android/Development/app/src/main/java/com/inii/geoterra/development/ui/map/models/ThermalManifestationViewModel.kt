@@ -1,27 +1,24 @@
 package com.inii.geoterra.development.ui.map.models
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.inii.geoterra.development.Geoterra
-import com.inii.geoterra.development.api.ThermalPoint
+import com.inii.geoterra.development.api.geospatial.models.ThermalPoint
 import com.inii.geoterra.development.interfaces.PageViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import org.osmdroid.util.GeoPoint
 
-class ThermalViewModel @AssistedInject constructor(
+class ThermalManifestationViewModel @AssistedInject constructor(
   private val app : Geoterra,
   @Assisted private val _thermal: ThermalPoint
 ) : PageViewModel(app) {
 
-  @AssistedFactory
+    @AssistedFactory
   /** Interface for assisted injection factory */
   interface Factory {
-    fun create(selectedThermal: ThermalPoint): ThermalViewModel
+    fun create(selectedThermal: ThermalPoint): ThermalManifestationViewModel
   }
 
   /** LiveData holding the thermal point assigned to this ViewModel */

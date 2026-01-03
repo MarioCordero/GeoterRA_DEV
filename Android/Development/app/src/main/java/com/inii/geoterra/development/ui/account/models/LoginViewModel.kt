@@ -1,17 +1,15 @@
 package com.inii.geoterra.development.ui.account.models
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.inii.geoterra.development.Geoterra
-import com.inii.geoterra.development.api.Error
-import com.inii.geoterra.development.api.SignInCredentials
-import com.inii.geoterra.development.api.SignInResponse
+import com.inii.geoterra.development.api.authentication.models.SignInCredentials
+import com.inii.geoterra.development.api.authentication.models.SignInResponse
+import com.inii.geoterra.development.api.common.models.ApiError
 import com.inii.geoterra.development.interfaces.PageViewModel
 import com.inii.geoterra.development.managers.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -71,7 +69,7 @@ class LoginViewModel @Inject constructor(
    * @param credentials Data class containing tv_email and password
    */
   private fun sendCredentialsAsForm(credentials: SignInCredentials) {
-    this.API.signIn(credentials.email, credentials.password)
+    this.API.authenticateUser(credentials.email, credentials.password)
       .enqueue(object : Callback<SignInResponse> {
         override fun onResponse(call: Call<SignInResponse>, response: Response<SignInResponse>) {
           handleSignInResponse(response, credentials)
@@ -107,7 +105,7 @@ class LoginViewModel @Inject constructor(
    * @brief Updates error message LiveData with first server-reported error.
    * @param errors List of Error objects
    */
-  private fun handleServerErrors(errors: List<Error>) {
+  private fun handleServerErrors(errors: List<ApiError>) {
     if (errors.isNotEmpty()) {
       _errorMessage.value = errors.first().message
     }

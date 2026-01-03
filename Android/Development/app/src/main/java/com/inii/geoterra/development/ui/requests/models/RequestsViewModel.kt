@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.inii.geoterra.development.Geoterra
-import com.inii.geoterra.development.api.AnalysisRequest
-import com.inii.geoterra.development.api.RequestsSubmittedResponse
+import com.inii.geoterra.development.api.requests.models.AnalysisRequest
+import com.inii.geoterra.development.api.requests.models.UserRequestsResponse
 import com.inii.geoterra.development.interfaces.PageViewModel
 import com.inii.geoterra.development.managers.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +29,6 @@ class RequestsViewModel @Inject constructor(
   /** Public observable LiveData for the UI */
   val submittedRequests: LiveData<List<AnalysisRequest>> get() = _submittedRequests
 
-
   val sessionActive: LiveData<Boolean> =
     SessionManager.sessionActive
 
@@ -51,38 +50,31 @@ class RequestsViewModel @Inject constructor(
       return
     }
 
-    this.API.getSubmittedRequests(userEmail)
-      .enqueue(object : Callback<RequestsSubmittedResponse> {
+    this.API.fetchUserRequests(userEmail)
+      .enqueue(object : Callback<UserRequestsResponse> {
         override fun onResponse(
-          call: Call<RequestsSubmittedResponse>,
-          response: Response<RequestsSubmittedResponse>
+          call: Call<UserRequestsResponse>,
+          response: Response<UserRequestsResponse>
         ) {
           if (response.isSuccessful) {
             val body = response.body()
             when (body?.response) {
               "Ok" -> {
-                _submittedRequests.postValue(
-                  response.body()?.data ?: emptyList()
-                )
+                _submittedRequests.postValue(response.body()?.data ?: emptyList())
               }
               "Error" -> {
-                _submittedRequests.postValue(
-                  response.body()?.data ?: emptyList()
-                )
-                _errorMessage.postValue(
-                  "Error cargando las solicitudes: ${body.message}")
+                _submittedRequests.postValue(response.body()?.data ?: emptyList())
+                _errorMessage.postValue("Error cargando las solicitudes: ${body.message}")
                 Timber.e("API error: ${body.message}")
               }
             }
           } else {
-            _errorMessage.postValue("Error al cargar las solicitudes: ${response.code
-              ()}")
+            _errorMessage.postValue("Error al cargar las solicitudes: ${response.code()}")
             Timber.e("Response error: ${response.code()}")
           }
         }
 
-        override fun onFailure(call: Call<RequestsSubmittedResponse>
-          , t: Throwable) {
+        override fun onFailure(call: Call<UserRequestsResponse>, t: Throwable) {
           _errorMessage.postValue("Error loading requests: ${t.message}")
           Timber.e(t, "API call failed")
         }
