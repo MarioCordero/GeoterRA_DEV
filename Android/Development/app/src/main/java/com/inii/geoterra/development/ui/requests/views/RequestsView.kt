@@ -130,7 +130,7 @@ class RequestsView : PageView<FragmentRequestsBinding, RequestsViewModel>(
     binding.layoutSubmittedRequests.removeAllViews()
     requestSheets.clear()
 
-    requests.forEachIndexed { index, request ->
+    requests.forEachIndexed { _, request ->
       // Select image based on request type
       val photo = when (request.type.name) {
         "Manantial" -> BitmapFactory.decodeResource(
@@ -164,9 +164,9 @@ class RequestsView : PageView<FragmentRequestsBinding, RequestsViewModel>(
 
       binding.layoutSubmittedRequests.addView(sheet)
 
-      if (index < requests.lastIndex) {
-        addRequestSpacer()
-      }
+//      if (index < requests.lastIndex) {
+//        addRequestSpacer()
+//      }
     }
   }
 

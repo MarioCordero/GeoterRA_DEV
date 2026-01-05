@@ -1,220 +1,184 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_home"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/fragment_home"
-    tools:context=".ui.home.views.HomeView"
+    android:layout_gravity="center"
     android:orientation="vertical"
-    android:layout_gravity="center">
-    
+    android:background="@color/white"
+    tools:context=".ui.home.views.HomeView">
+
     <FrameLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:padding="10dp"
-      android:background="@color/white"
-      android:elevation="5dp">
-        
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:elevation="5dp"
+        android:padding="10dp">
+
         <ImageView
-          android:layout_width="200dp"
-          android:layout_height="34dp"
-          android:background="@drawable/geoterra_logo_color"
-          android:contentDescription="PROYECT_LOGO">
+            android:layout_width="200dp"
+            android:layout_height="34dp"
+            android:background="@drawable/geoterra_logo_color"
+            android:contentDescription="PROYECT_LOGO">
         </ImageView>
     </FrameLayout>
-    
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
 
         android:layout_marginBottom="10dp"
 
-        app:layout_constraintTop_toTopOf="parent"
+        android:scrollbars="none"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:scrollbars="none">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
 
-            android:orientation="vertical"
-            android:backgroundTint="@color/white">
-            
-            <FrameLayout
-              android:layout_width="match_parent"
-              android:layout_height="600dp">
-                
-                <!-- BACKGROUND IMAGE -->
+            android:backgroundTint="@color/white"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="15dp">
+
                 <ImageView
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  android:src="@drawable/rocklake"
-                  android:scaleType="centerCrop" />
-                
-                <!-- OVERLAY (optional dark filter) -->
-                <View
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  android:background="#20000000" />
-                
-                <!-- CONTENT -->
-                <androidx.constraintlayout.widget.ConstraintLayout
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  android:padding="15dp">
-                    
-                    <ImageView
-                      android:id="@+id/planet_figure"
-                      android:layout_width="120dp"
-                      android:layout_height="120dp"
-                      android:layout_marginTop="30dp"
-                      android:scaleType="centerCrop"
-                      android:src="@drawable/geoterra_planet"
-                      app:layout_constraintStart_toStartOf="parent"
-                      app:layout_constraintTop_toTopOf="parent" />
-                    
-                    <TextView
-                      android:id="@+id/tv_first_phrase"
-                      android:layout_width="0dp"
-                      android:layout_height="wrap_content"
-                      android:layout_marginStart="15dp"
-                      android:fontFamily="@font/poppins_bold"
-                      android:lineBreakStyle="normal"
-                      android:text="Navegando el potencial geotérmico hacia un futuro renovable."
-                      android:textColor="@android:color/black"
-                      android:textSize="22sp"
-                      app:layout_constraintBottom_toBottomOf="@id/planet_figure"
-                      app:layout_constraintEnd_toEndOf="parent"
-                      app:layout_constraintStart_toEndOf="@id/planet_figure"
-                      app:layout_constraintTop_toTopOf="@id/planet_figure" />
-                    
-                    <com.google.android.material.card.MaterialCardView
-                      android:layout_width="0dp"
-                      android:layout_height="wrap_content"
-                      
-                      android:layout_marginTop="25dp"
-                      app:cardBackgroundColor="@android:color/transparent"
-                      app:cardCornerRadius="8dp"
-                      app:cardElevation="8dp"
-                      
-                      app:layout_constraintEnd_toEndOf="parent"
-                      app:layout_constraintStart_toStartOf="@id/planet_figure"
-                      app:layout_constraintTop_toBottomOf="@id/tv_first_phrase">
-                        
+                    android:id="@+id/planet_figure"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/geoterra_planet"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_first_phrase"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:fontFamily="@font/poppins_bold"
+                    android:lineBreakStyle="normal"
+                    android:text="Navegando el potencial geotérmico hacia un futuro renovable."
+                    android:textColor="@android:color/black"
+                    android:textSize="22sp">
+                </TextView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    app:cardElevation="8dp"
+                    app:cardCornerRadius="15dp"
+                    style="@style/CarouselElevatedCardView">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <!-- BACKGROUND IMAGE -->
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="220dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/rocks" />
+
+
                         <LinearLayout
-                          android:layout_width="match_parent"
-                          android:layout_height="wrap_content"
-                          android:background="@drawable/bg_glass_card"
-                          android:padding="18dp">
-                            
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="15dp">
+
                             <TextView
-                              android:id="@+id/tv_second_phrase"
-                              android:layout_width="match_parent"
-                              android:layout_height="wrap_content"
-                              android:fontFamily="@font/poppins_regular"
-                              android:text="GeoterRA es una aplicación web y móvil que permite visualizar puntos geográficos en un mapa interactivo. Su objetivo es facilitar la tarea de decisiones en proyectos de energía geotérmica mediante la consulta y gestión de datos geológicos validados. Los usuarios pueden registrar, editar y exportar información desde el mapa. GeoterRA busca apoyar el desarrollo sostenible mediante el uso eficiente de datos y tecnologías geoespaciales."
-                              android:textColor="@android:color/black"
-                              android:textSize="14sp" />
-                        
+                                android:id="@+id/et_whatIsGeoterra"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/poppins_bold"
+                                android:text="¿Qué es Geoterra?"
+                                android:textColor="@color/black"
+                                android:textSize="30sp">
+
+                            </TextView>
+
+                            <TextView
+                                android:id="@+id/tv_second_phrase"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:text="@string/GeoterRa_descriptionText"
+                                style="@style/ParagrahpText">
+                            </TextView>
+
                         </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </FrameLayout>
-            
-            <FrameLayout
-              android:layout_width="match_parent"
-              android:layout_height="600dp"
-              android:background="@color/white">
-                
-                <!-- BACKGROUND IMAGE -->
-<!--                <ImageView-->
-<!--                  android:layout_width="match_parent"-->
-<!--                  android:layout_height="match_parent"-->
-<!--                  android:background="@drawable/geoterra_logo_color"-->
-<!--                  android:scaleType="centerCrop" />-->
-                
-                <!-- CONTENT -->
-                <androidx.constraintlayout.widget.ConstraintLayout
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  android:padding="15dp">
-                    
-                    <TextView
-                      android:id="@+id/tv_how_it_works"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:layout_marginStart="15dp"
-                      android:fontFamily="@font/poppins_bold"
-                      android:lineBreakStyle="normal"
-                      android:text="Cómo funciona"
-                      android:textColor="@android:color/black"
-                      android:textSize="22sp"
-                      app:layout_constraintTop_toTopOf="parent"
-                      app:layout_constraintEnd_toEndOf="parent"
-                      app:layout_constraintStart_toStartOf="parent"/>
-                    
-                    <ImageView
-                      android:id="@+id/planet_figure_2"
-                      android:layout_width="120dp"
-                      android:layout_height="120dp"
-                      android:layout_marginTop="30dp"
-                      android:scaleType="centerCrop"
-                      android:src="@drawable/geoterra_planet"
-                      app:layout_constraintStart_toStartOf="parent"
-                      app:layout_constraintEnd_toEndOf="parent"
-                      app:layout_constraintTop_toBottomOf="@id/tv_how_it_works"/>
-                    
-                    <com.google.android.material.card.MaterialCardView
-                      android:layout_width="0dp"
-                      android:layout_height="wrap_content"
-                      
-                      android:layout_marginTop="25dp"
-                      app:cardBackgroundColor="@android:color/white"
-                      app:cardCornerRadius="8dp"
-                      app:cardElevation="12dp"
-                      
-                      app:layout_constraintEnd_toEndOf="parent"
-                      app:layout_constraintStart_toStartOf="parent"
-                      app:layout_constraintTop_toBottomOf="@id/planet_figure_2">
-                        
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/CarouselElevatedCardView">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <!-- BACKGROUND IMAGE -->
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="220dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/fumaroles_image" />
+
+
                         <LinearLayout
-                          android:layout_width="match_parent"
-                          android:layout_height="wrap_content"
-                          android:background="@drawable/bg_glass_card"
-                          android:elevation="10dp"
-                          android:orientation="vertical"
-                          android:paddingHorizontal="10dp"
-                          >
-                            
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="15dp">
+
                             <TextView
-                              android:layout_width="match_parent"
-                              android:layout_height="wrap_content"
-                              android:fontFamily="@font/poppins_semibold"
-                              android:text="Recolección de datos"
-                              android:gravity="center"
-                              android:textColor="@android:color/black"
-                              android:textSize="14sp" />
-                            
+                                android:id="@+id/tv_how_it_works"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/poppins_bold"
+                                android:text="Cómo funciona"
+                                android:textColor="@android:color/black"
+                                android:textSize="30sp" />
+
                             <TextView
-                              android:layout_marginTop="15dp"
-                              android:layout_width="match_parent"
-                              android:layout_height="wrap_content"
-                              android:fontFamily="@font/poppins_regular"
-                              android:text="GeoterRA comienza con la recolección integral de datos geológicos de diversas fuentes. Expertos realizan estudios de campo para obtener información esencial."
-                              android:gravity="center"
-                              android:textColor="@android:color/black"
-                              android:textSize="14sp" />
-                        
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="15dp"
+                                android:text="GeoterRA comienza con la recolección integral de datos geológicos de diversas fuentes. Expertos realizan estudios de campo para obtener información esencial."
+                                style="@style/ParagrahpText" />
+
                         </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-                    
-                </androidx.constraintlayout.widget.ConstraintLayout>
-                
-            </FrameLayout>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 

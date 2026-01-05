@@ -1,113 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_requests"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/fragment_requests"
-    tools:context=".ui.requests.views.RequestsView"
-    android:layout_gravity="center">
-    
+    android:layout_gravity="center"
+    tools:context=".ui.requests.views.RequestsView">
+
     <FrameLayout
-      android:id="@+id/containerForm"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:visibility="gone"
-      android:elevation="10dp" />
-    
+        android:id="@+id/containerForm"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="10dp"
+        android:visibility="gone" />
+
     <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:orientation="vertical"
-        >
-        
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
         <LinearLayout
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:orientation="horizontal"
-            >
-            
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
             <TextView
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_marginStart="16dp"
-              android:layout_marginTop="20dp"
-              android:clickable="false"
-              android:text="Solicitudes"
-              android:textColor="@color/geoterra_deep_blue"
-              android:fontFamily="@font/poppins_semibold"
-              android:textSize="20sp"
-              android:visibility="visible"
-              />
-            
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="20dp"
+                android:clickable="false"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="Solicitudes"
+                android:textColor="@color/geoterra_deep_blue"
+                android:textSize="20sp"
+                android:visibility="visible" />
+
             <Space
-              android:layout_width="0dp"
-              android:layout_height="0dp"
-              android:layout_weight="1" />
-            
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
             <Button
-              android:id="@+id/btnCreateRequest"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:minWidth="150dp"
-              android:minHeight="45dp"
-              android:layout_marginTop="20dp"
-              android:layout_marginEnd="16dp"
-              android:backgroundTint="@color/geoterra_orange"
-              android:text="Crear solicitud"
-              android:fontFamily="@font/poppins_semibold"
-              android:textAllCaps="false"
-              android:textColor="@color/white"
-              android:textSize="18sp"
-              app:cornerRadius="5dp"
-              />
-            
+                android:id="@+id/btnCreateRequest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="16dp"
+                android:backgroundTint="@color/geoterra_orange"
+                android:fontFamily="@font/poppins_semibold"
+                android:minWidth="150dp"
+                android:minHeight="45dp"
+                android:text="Crear solicitud"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:cornerRadius="5dp" />
+
         </LinearLayout>
-        
+
         <ScrollView
-          android:id="@+id/scrollSubmittedRequests"
-          android:layout_width="match_parent"
-          android:layout_height="0dp"
-          android:layout_weight="1"
-          android:layout_gravity="center_horizontal"
-          android:layout_marginTop="25dp">
-            
+            android:id="@+id/scrollSubmittedRequests"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1">
+
             <LinearLayout
-              android:id="@+id/layoutSubmittedRequests"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:layout_marginStart="16dp"
-              android:layout_marginEnd="16dp"
-              
-              android:layout_marginBottom="100dp"
-              android:orientation="vertical"
-              android:gravity="center_horizontal"
-              android:layout_gravity="center_horizontal"
-              />
+                android:id="@+id/layoutSubmittedRequests"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:layout_marginBottom="100dp"
+                android:orientation="vertical" />
         </ScrollView>
-        
+
     </LinearLayout>
-
-<!--    <FrameLayout-->
-<!--        android:id="@+id/formFrame"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="0dp"-->
-
-<!--        android:layout_marginStart="16dp"-->
-<!--        android:layout_marginEnd="16dp"-->
-<!--        android:layout_marginTop="20dp"-->
-<!--        android:layout_marginBottom="20dp"-->
-
-<!--        android:background="@drawable/gray_rectangle_rounded2"-->
-<!--        android:visibility="invisible"-->
-
-<!--        app:layout_constraintWidth_min="360dp"-->
-<!--        app:layout_constraintHeight_min="510dp"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent">-->
-<!--    </FrameLayout>-->
 
 </FrameLayout>
