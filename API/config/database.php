@@ -6,23 +6,7 @@ declare(strict_types=1);
  * Loads credentials from a config.ini file located outside the public scope.
  */
 
-// Load .env file if exists
-$envFile = __DIR__ . '/../../.env';
-if (file_exists($envFile)) {
-  $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-  foreach ($lines as $line) {
-    if (str_starts_with(trim($line), '#')) continue;
-    if (!str_contains($line, '=')) continue;
-    [$key, $value] = explode('=', $line, 2);
-    $_ENV[trim($key)] = trim($value);
-  }
-}
-
-$env = $_ENV['APP_ENV'] ?? getenv('APP_ENV') ?: 'development';
-
-$configPath = $env === 'production'
-  ? realpath(__DIR__ . '/../../../') . '/config.ini'
-  : __DIR__ . '/config.ini';
+$configPath = dirname(__DIR__, 2) . '/config.ini';
 
 if (!file_exists($configPath)) {
   throw new RuntimeException('Database configuration file not found.');
@@ -40,7 +24,7 @@ $host = $db['host'] ?? 'localhost';
 $port = $db['port'] ?? '3306';
 $name = $db['name'] ?? '';
 $user = $db['user'] ?? '';
-$password = $db['pass'] ?? '';
+$password = $db['password'] ?? '';
 $charset = $db['charset'] ?? 'utf8mb4';
 
 if ($name === '' || $user === '') {
