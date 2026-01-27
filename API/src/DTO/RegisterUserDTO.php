@@ -2,9 +2,6 @@
 declare(strict_types=1);
 
 namespace DTO;
-use Http\ErrorType;
-use Http\ApiException;
-
 
 final class RegisterUserDTO
 {
@@ -27,59 +24,35 @@ final class RegisterUserDTO
     );
   }
 
-  /**
+    /**
    * Validates the registration data.
+   *
+   * @param RegisterUserDTO $dto Registration data to validate
+   *
+   * @throws RuntimeException If any validation rule fails
    */
-  public function validate(): void
+  public function validate(RegisterUserDTO $dto): void
   {
-    if ($this->firstName === '') {
-      throw new ApiException(ErrorType::missingField('name'), 422);
+    if (empty($dto->firstName)) {
+      throw new RuntimeException('First name is required');
     }
-
-    if ($this->lastName === '') {
-      throw new ApiException(ErrorType::missingField('lastname'), 422);
+    if (empty($dto->lastName)) {
+      throw new RuntimeException('Last name is required');
     }
-
-    if ($this->email === '') {
-      throw new ApiException(ErrorType::missingField('email'), 422);
+    if (empty($dto->email)) {
+      throw new RuntimeException('Email is required');
     }
-
-    if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
-      throw new ApiException(ErrorType::invalidEmail(), 422);
+    if (!filter_var($dto->email, FILTER_VALIDATE_EMAIL)) {
+      throw new RuntimeException('Email is invalid');
     }
-
-    if ($this->password === '') {
-      throw new ApiException(ErrorType::missingField('password'), 422);
+    if (empty($dto->password)) {
+      throw new RuntimeException('Password is required');
     }
-
-    if (strlen($this->password) < 8) {
-      throw new ApiException(ErrorType::weakPassword(), 422);
+    if (strlen($dto->password) < 8) {
+      throw new RuntimeException('Password must be at least 8 characters long');
     }
-
-    // Validate minimum password length.
-    if (strlen($this->password) < 8) {
-      throw new ApiException(ErrorType::weakPassword(), 422);
-    }
-
-    
-    // Password complexity validation. 
-    $passwordPattern = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,64}$/';
-
-    if (!preg_match($passwordPattern, $this->password)) {
-      throw new ApiException(ErrorType::weakPassword(), 422);
-    }
-
-    // Prevent the password from containing the email address for better security.
-    if (stripos($this->password, $this->email) !== false) {
-      throw new ApiException(ErrorType::weakPassword(), 422);
-    }
-
-    if ($this->phoneNumber !== null && !preg_match('/^\d{8,15}$/', $this->phoneNumber)) {
-      throw new ApiException(
-        ErrorType::invalidField('phone_number'),
-        422
-      );
+    if ($dto->phoneNumber !== null && !preg_match('/^\d{8,15}$/', $dto->phoneNumber)) {
+      throw new RuntimeException('Phone number is invalid');
     }
   }
 }
-?>
