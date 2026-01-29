@@ -5,37 +5,72 @@ declare(strict_types=1);
 namespace Controllers;
 
 use DTO\AllowedRegions;
+use Services\RegisteredManifestationService;
+use Services\AuthService;
 use DTO\RegisteredManifestationDTO;
+use Http\Response;
 use Http\ErrorType;
 use Http\ApiException;
-use Http\Response;
-use Http\Request;
-use Services\RegisteredManifestationService;
 
 /**
  * Controller for Registered Geothermal Manifestations endpoints
  */
 final class RegisteredManifestationController
 {
-  private RegisteredManifestationService $service;
-  public function __construct(private \pdo $pdo) 
-  {
-    $this->service = new RegisteredManifestationService($this->pdo);
-  }
+  public function __construct(
+    private RegisteredManifestationService $service,
+    private AuthService $authService
+  ) {}
 
   /**
-   * POST /registered-manifestations
-   * Creates a new registered manifestation (admin only)
+   * PUT /registered-manifestations
    */
-  public function store(): void
+  public function __invoke(): void
   {
     try {
-      $body = Request::parseJsonRequest();
+      // ===============================
+      // Authorization
+      // ===============================
+      $headers = getallheaders();
+      $token = trim(str_replace('Bearer ', '', $headers['Authorization'] ?? ''));
+
+      if (!$token) {
+        Response::error(ErrorType::missingAuthToken(), 401);
+        return;
+      }
+
+      $session = $this->authService->validateToken($token);
+      if (!$session) {
+        Response::error(ErrorType::invalidToken(), 401);
+        return;
+      }
+
+      $userId = (int) $session['user_id'];
+
+      // ===============================
+      // Body parsing
+      // ===============================
+      $body = json_decode(file_get_contents('php://input'), true);
+      if (!is_array($body)) {
+        Response::error(ErrorType::invalidJson(), 400);
+        return;
+      }
+
+      // ===============================
+      // DTO + business logic
+      // ===============================
       $dto = RegisteredManifestationDTO::fromArray($body);
-      $this->service->create($dto);
-      Response::success(data: ['success' => true ],meta: null,status: 201);
+      $this->service->create($dto, $userId);
+
+      Response::success(
+        data: ['id' => $dto->id],
+        meta: null,
+        status: 201
+      );
+
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
+
     } catch (\Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
@@ -48,43 +83,46 @@ final class RegisteredManifestationController
   public function index(): void
   {
     try {
-      $region = isset($_GET['region']) ? trim((string) $_GET['region']) : '';
-      $manifestations = $this->service->getAllByRegion($region);
-      Response::success(data: $manifestations);
-    } catch (ApiException $e) {
-      Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
-      Response::error(ErrorType::internal($e->getMessage()), 500);
-    }
-  }
+      // ===============================
+      // Authorization
+      // ===============================
+      $headers = getallheaders();
+      $token = trim(str_replace('Bearer ', '', $headers['Authorization'] ?? ''));
 
-  /**
-   * PUT /registered-manifestations/{id}
-   */
-  public function update(string $id): void
-  {
-    try {
-      $body = Request::parseJsonRequest();
-      $dto = RegisteredManifestationDTO::fromArray($body);
-      $this->service->update($dto, $id);
-      Response::success(data: ['id' => $id],meta: ['updated' => true]);
+      if (!$token) {
+        Response::error(ErrorType::missingAuthToken(), 401);
+        return;
+      }
+
+      $session = $this->authService->validateToken($token);
+      if (!$session) {
+        Response::error(ErrorType::invalidToken(), 401);
+        return;
+      }
+
+      // ===============================
+      // Query parameter parsing
+      // ===============================
+      $region = isset($_GET['region']) ? trim((string) $_GET['region']) : '';
+
+      if (!AllowedRegions::isValid($region)) {
+        Response::error(
+          ErrorType::invalidRegion(region: $region),
+          422
+        );
+        return;
+      }
+
+      // ===============================
+      // Fetch data
+      // ===============================
+      $manifestations = $this->service->getAllByRegion($region);
+
+      Response::success(data: $manifestations);
+
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
-      Response::error(ErrorType::internal($e->getMessage()), 500);
-    }
-  }
-  
-  /**
-   * DELETE /registered-manifestations/{id}
-   */
-  public function delete(string $id): void
-  {
-    try {
-      $this->service->delete($id);
-      Response::success(data: null,meta: ['deleted' => true]);
-    } catch (ApiException $e) {
-      Response::error($e->getError(), $e->getHttpStatus());
+
     } catch (\Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
