@@ -17,27 +17,40 @@ final class Response
     self::send([
       'data' => $data,
       'meta' => $meta,
-      'error' => null
+      'errors' => []
     ], $status);
   }
 
   /**
    * Send an error JSON response.
    *
-   * @param string $message Human-readable error message
-   * @param int $code Internal error code or HTTP status
+   * @param ErrorType|array|string $errors One error, many errors, or legacy string
+   * @param int $status HTTP status code (used for legacy string or fallback)
    * @param array|null $meta Additional metadata (optional)
    */
-  public static function error(string $message, int $code = 400, ?array $meta = null): void
+  public static function error(ErrorType|array|string $errors, int $status = 400, ?array $meta = null): void
   {
+    $list = [];
+
+    if ($errors instanceof ErrorType) {
+      $list = [$errors];
+    } elseif (is_array($errors)) {
+      foreach ($errors as $err) {
+        if ($err instanceof ErrorType) {
+          $list[] = $err;
+        } elseif (is_string($err)) {
+          $list[] = ErrorType::from('BAD_REQUEST', $err);
+        }
+      }
+    } elseif (is_string($errors)) {
+      $list = [ErrorType::from('BAD_REQUEST', $errors)];
+    }
+
     self::send([
       'data' => null,
       'meta' => $meta,
-      'error' => [
-        'code' => $code,
-        'message' => $message
-      ],
-    ], $code);
+      'errors' => $list,
+    ], $status);
   }
 
   /**
@@ -54,3 +67,4 @@ final class Response
     exit;
   }
 }
+?>
