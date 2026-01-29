@@ -13,8 +13,8 @@ use Http\ErrorType;
 final class RegisteredManifestationDTO
 {
   public function __construct(
-    public string $name,
-    public int $region_id,
+    public string $id,
+    public string $region,
     public float $latitude,
     public float $longitude,
     public ?string $description,
@@ -43,9 +43,13 @@ final class RegisteredManifestationDTO
    * Validate domain rules
    */
   public function validate(): void
-  { 
-    if (trim($this->name) === '') {
-      throw new ApiException(ErrorType::invalidField('name'));
+  {
+    if (trim($this->id) === '') {
+      throw new ApiException(ErrorType::invalidField('id'));
+    }
+
+    if ($this->region !== 'all' && !AllowedRegions::isValid($this->region)) {
+      throw new ApiException(ErrorType::invalidRegion(region: $this->region), 422);
     }
 
     if ($this->latitude < -90 || $this->latitude > 90) {
@@ -62,13 +66,12 @@ final class RegisteredManifestationDTO
    */
   public static function fromArray(array $data): self
   {
-
     // Required fields presence checks
-    if (!array_key_exists('name', $data) || trim((string) $data['name']) === '') {
-      throw new ApiException(ErrorType::missingField('name'), 422);
+    if (!array_key_exists('id', $data) || trim((string) $data['id']) === '') {
+      throw new ApiException(ErrorType::missingField('id'), 422);
     }
-    if (!array_key_exists('region_id', $data) || !is_numeric($data['region_id'])) {
-      throw new ApiException(ErrorType::missingField('region_id'), 422);
+    if (!array_key_exists('region', $data) || trim((string) $data['region']) === '') {
+      throw new ApiException(ErrorType::missingField('region'), 422);
     }
     if (!array_key_exists('latitude', $data)) {
       throw new ApiException(ErrorType::missingField('latitude'), 422);
@@ -78,8 +81,8 @@ final class RegisteredManifestationDTO
     }
 
     return new self(
-      trim((string) $data['name']),
-      (int) $data['region_id'],
+      (string) $data['id'],
+      (string) $data['region'],
       (float) $data['latitude'],
       (float) $data['longitude'],
       $data['description'] ?? null,
