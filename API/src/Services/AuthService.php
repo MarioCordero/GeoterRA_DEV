@@ -66,6 +66,32 @@ final class AuthService
   }
 
   /**
+   * Logout the current user by revoking the session token.
+   *
+   * @throws ApiException if token is invalid or already revoked
+   */
+  public function logout(string $token): void
+  {
+    // Validate token existence first
+    $session = $this->repository->findSessionByToken($token);
+
+    if (!$session) {
+      throw new ApiException(
+        ErrorType::invalidToken()
+      );
+    }
+
+    // Revoke session
+    $revoked = $this->repository->revokeSessionByToken($token);
+
+    if (!$revoked) {
+      throw new ApiException(
+        ErrorType::sessionAlreadyRevoked()
+      );
+    }
+  }
+
+  /**
    * Validate if a token is active and return the session
    */
   public function validateToken(string $token): ?array
