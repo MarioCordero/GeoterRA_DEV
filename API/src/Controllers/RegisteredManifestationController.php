@@ -25,7 +25,7 @@ final class RegisteredManifestationController
   /**
    * PUT /registered-manifestations
    */
-  public function __invoke(): void
+  public function store(): void
   {
     try {
       // ===============================
