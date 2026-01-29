@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace Services;
 
 use DTO\LoginUserDTO;
+use Http\ApiException;
 use Repositories\UserRepository;
-use RuntimeException;
+use Http\ErrorType;
+use Services\PasswordService;
 
 final class AuthService
 {
@@ -14,14 +16,23 @@ final class AuthService
   /**
    * Attempt to login a user.
    *
-   * @throws RuntimeException if credentials invalid
+   * @throws ApiException if credentials invalid
    */
   public function login(LoginUserDTO $dto): array
   {
     $user = $this->repository->findByEmail($dto->email);
 
-    if (!$user || !PasswordService::verify($dto->password, $user['password_hash'])) {
-      throw new RuntimeException('Invalid credentials');
+    if (!$user) {
+      throw new ApiException(
+        ErrorType::invalidCredentials()
+      );
+    }
+
+    // Verify password
+    if (!PasswordService::verify($dto->password, $user['password_hash'])) {
+      throw new ApiException(
+        ErrorType::invalidCredentials()
+      );
     }
 
     // Check if there is an active session
@@ -62,3 +73,4 @@ final class AuthService
     return $this->repository->findSessionByToken($token);
   }
 }
+?>

@@ -2,6 +2,9 @@
 declare(strict_types=1);
 
 namespace DTO;
+use Http\ErrorType;
+use Http\ApiException;
+
 
 final class RegisterUserDTO
 {
@@ -24,35 +27,41 @@ final class RegisterUserDTO
     );
   }
 
-    /**
+  /**
    * Validates the registration data.
-   *
-   * @param RegisterUserDTO $dto Registration data to validate
-   *
-   * @throws RuntimeException If any validation rule fails
    */
-  public function validate(RegisterUserDTO $dto): void
+  public function validate(): void
   {
-    if (empty($dto->firstName)) {
-      throw new RuntimeException('First name is required');
+    if ($this->firstName === '') {
+      throw new ApiException(ErrorType::missingField('name'), 422);
     }
-    if (empty($dto->lastName)) {
-      throw new RuntimeException('Last name is required');
+
+    if ($this->lastName === '') {
+      throw new ApiException(ErrorType::missingField('lastname'), 422);
     }
-    if (empty($dto->email)) {
-      throw new RuntimeException('Email is required');
+
+    if ($this->email === '') {
+      throw new ApiException(ErrorType::missingField('email'), 422);
     }
-    if (!filter_var($dto->email, FILTER_VALIDATE_EMAIL)) {
-      throw new RuntimeException('Email is invalid');
+
+    if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+      throw new ApiException(ErrorType::invalidEmail(), 422);
     }
-    if (empty($dto->password)) {
-      throw new RuntimeException('Password is required');
+
+    if ($this->password === '') {
+      throw new ApiException(ErrorType::missingField('password'), 422);
     }
-    if (strlen($dto->password) < 8) {
-      throw new RuntimeException('Password must be at least 8 characters long');
+
+    if (strlen($this->password) < 8) {
+      throw new ApiException(ErrorType::weakPassword(), 422);
     }
-    if ($dto->phoneNumber !== null && !preg_match('/^\d{8,15}$/', $dto->phoneNumber)) {
-      throw new RuntimeException('Phone number is invalid');
+
+    if ($this->phoneNumber !== null && !preg_match('/^\d{8,15}$/', $this->phoneNumber)) {
+      throw new ApiException(
+        ErrorType::invalidField('phone_number', 'Phone number is invalid'),
+        422
+      );
     }
   }
 }
+?>
