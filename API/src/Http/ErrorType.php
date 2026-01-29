@@ -99,6 +99,15 @@ final class ErrorType implements JsonSerializable
 		return new self('INVALID_TOKEN', 'Authorization token is invalid or expired');
 	}
 
+	public static function sessionAlreadyRevoked(): self
+	{
+		return new self('SESSION_ALREADY_REVOKED', 'The session has already been revoked');
+	}
+
+	public static function logoutFailed(): self
+	{
+		return new self('LOGOUT_FAILED', 'Unable to logout user');
+	}
 	/**
 	 * Unauthorized access to a resource.
 	 */
@@ -145,6 +154,38 @@ final class ErrorType implements JsonSerializable
       'Failed to create registered manifestation'
     );
   }
+
+	public static function analysisRequestNotFound(): self
+	{
+		return new self(
+			'ANALYSIS_REQUEST_NOT_FOUND',
+			'Analysis request not found'
+		);
+	}
+
+	public static function analysisRequestForbidden(): self
+	{
+		return new self(
+			'ANALYSIS_REQUEST_FORBIDDEN',
+			'You do not have permission to modify this analysis request'
+		);
+	}
+
+	public static function analysisRequestUpdateFailed(): self
+	{
+		return new self(
+			'ANALYSIS_REQUEST_UPDATE_FAILED',
+			'Failed to update analysis request'
+		);
+	}
+
+	public static function analysisRequestDeleteFailed(): self
+	{
+		return new self(
+			'ANALYSIS_REQUEST_DELETE_FAILED',
+			'Failed to delete analysis request'
+		);
+	}
 
 	/**
 	 * Forbidden access to a resource.

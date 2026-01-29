@@ -16,7 +16,7 @@ final class UserController
   /**
    * Get user info by token
    */
-  public function __invoke(): void
+  public function show(): void
   {
     try {
       $headers = getallheaders();
@@ -42,7 +42,7 @@ final class UserController
     } catch (ApiException $e) {
       Response::error($e->getError(), 404);
     } catch (\Throwable $e) {
-      Response::error('Internal server error', 500, ['detail' => $e->getMessage()]);
+      Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 }
