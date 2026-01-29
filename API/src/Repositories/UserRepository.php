@@ -62,6 +62,25 @@ final class UserRepository
     ]);
   }
 
+  /**
+   * Revoke an active session by token
+   */
+  public function revokeSessionByToken(string $token): bool
+  {
+    $stmt = $this->db->prepare(
+      'UPDATE sessions
+      SET revoked_at = NOW()
+      WHERE token_hash = :token
+        AND revoked_at IS NULL
+        AND expires_at > NOW()'
+    );
+
+    $stmt->execute(['token' => $token]);
+
+    // rowCount tells us if a session was actually revoked
+    return $stmt->rowCount() > 0;
+  }
+
   public function findActiveSessionByUserId(int $userId): ?array
   {
     $stmt = $this->db->prepare(
@@ -93,3 +112,4 @@ final class UserRepository
     return $user ?: null;
   }
 }
+?>

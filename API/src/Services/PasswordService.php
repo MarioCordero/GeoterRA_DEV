@@ -18,3 +18,4 @@ final class PasswordService
     return password_verify($password, $hash);
   }
 }
+?>

@@ -28,16 +28,16 @@ final class LoginUserDTO
   public function validate(): void
   {
     if ($this->email === '') {
-      throw new ApiException(ErrorType::missingField('email')->jsonSerialize()['message']);
+      throw new ApiException(ErrorType::missingField('email'));
     }
     if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
-      throw new ApiException(ErrorType::invalidEmail()->jsonSerialize()['message']);
+      throw new ApiException(ErrorType::invalidEmail());
     }
     if ($this->password === '') {
-      throw new ApiException(ErrorType::missingField('password')->jsonSerialize()['message']);
+      throw new ApiException(ErrorType::missingField('password'));
     }
     if (strlen($this->password) < 8) {
-      throw new ApiException(ErrorType::weakPassword()->jsonSerialize()['message']);
+      throw new ApiException(ErrorType::weakPassword());
     }
   }
 }
