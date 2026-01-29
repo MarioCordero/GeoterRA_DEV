@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace Services;
 
 use DTO\RegisterUserDTO;
+use Http\ApiException;
 use Repositories\UserRepository;
-use RuntimeException;
+use Http\ErrorType;
+use Services\PasswordService;
 
 /**
  * Handles business logic related to users.
@@ -30,14 +32,17 @@ final class UserService
    *
    * @param RegisterUserDTO $dto Validated registration data
    *
-   * @throws RuntimeException If email is already registered
+   * @throws ApiException If email is already registered
    *
    * @return int Newly created user ID
    */
   public function register(RegisterUserDTO $dto): array
   {
     if ($this->repository->emailExists($dto->email)) {
-      throw new RuntimeException('Email already registered');
+      // Use ErrorType to standardize error messaging
+      throw new ApiException(
+        ErrorType::emailAlreadyInUse()
+      );
     }
 
     $hash = PasswordService::hash($dto->password);
@@ -52,7 +57,7 @@ final class UserService
 
     return [
       'data' => [
-      'user_id' => $userId
+        'user_id' => $userId
       ],
       'meta' => [
         'new_user' => true
@@ -65,14 +70,16 @@ final class UserService
    *
    * @param int $userId
    * @return array
-   * @throws RuntimeException if user not found
+   * @throws ApiException if user not found
    */
   public function getUserById(int $userId): array
   {
     $user = $this->repository->findById($userId);
 
     if (!$user) {
-      throw new RuntimeException('User not found');
+      throw new ApiException(
+        ErrorType::notFound('User')
+      );
     }
 
     return [
@@ -81,3 +88,4 @@ final class UserService
     ];
   }
 }
+?>

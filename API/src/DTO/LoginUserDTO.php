@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 namespace DTO;
 
-/**
- * DTO for login requests
- */
+use Http\ErrorType;
+use Http\ApiException;
+
+
 final class LoginUserDTO
 {
   public function __construct(
@@ -13,9 +14,6 @@ final class LoginUserDTO
     public string $password
   ) {}
 
-  /**
-   * Creates DTO from request array
-   */
   public static function fromArray(array $data): self
   {
     return new self(
@@ -26,22 +24,21 @@ final class LoginUserDTO
 
   /**
    * Validates the login request.
-   *
-   * @throws \RuntimeException if any validation rule fails
    */
   public function validate(): void
   {
     if ($this->email === '') {
-      throw new \RuntimeException('Email is required');
+      throw new ApiException(ErrorType::missingField('email')->jsonSerialize()['message']);
     }
     if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
-      throw new \RuntimeException('Email is invalid');
+      throw new ApiException(ErrorType::invalidEmail()->jsonSerialize()['message']);
     }
     if ($this->password === '') {
-      throw new \RuntimeException('Password is required');
+      throw new ApiException(ErrorType::missingField('password')->jsonSerialize()['message']);
     }
     if (strlen($this->password) < 8) {
-      throw new \RuntimeException('Password must be at least 8 characters long');
+      throw new ApiException(ErrorType::weakPassword()->jsonSerialize()['message']);
     }
   }
 }
+?>

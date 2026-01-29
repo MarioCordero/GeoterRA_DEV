@@ -5,9 +5,10 @@ namespace Controllers;
 
 use Services\UserService;
 use DTO\RegisterUserDTO;
+use Http\ApiException;
 use Http\Request;
 use Http\Response;
-use RuntimeException;
+use Http\ErrorType;
 
 /**
  * Handles user registration HTTP requests.
@@ -27,8 +28,18 @@ final class RegisterController
   public function __invoke(): void
   {
     try {
-      $dto = RegisterUserDTO::fromArray(Request::json());
-      $dto->validate($dto);
+      $data = Request::json();
+      if ($data === null) {
+        Response::error(ErrorType::invalidJson(), 400);
+      }
+
+      $dto = RegisterUserDTO::fromArray($data);
+
+      try {
+        $dto->validate();
+      } catch (ApiException $e) {
+        Response::error($e->getError(), 422);
+      }
 
       // Delegate business logic to the service layer
       $result = $this->service->register($dto);
@@ -39,10 +50,12 @@ final class RegisterController
         201
       );
 
-    } catch (RuntimeException $e) {
-      Response::error($e->getMessage(), 409);
+    } catch (ApiException $e) {
+      // Email ya registrado
+      Response::error($e->getError(), 409);
     } catch (\Throwable $e) {
-      Response::error('Internal server error', 500, ['detail' => $e->getMessage()]);
+      Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 }
+?>
