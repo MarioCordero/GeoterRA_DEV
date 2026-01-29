@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 use Http\Response;
 use Http\ErrorType;
-use Controllers\RegisterController;
 use Repositories\UserRepository;
 use Services\UserService;
-use Controllers\LoginController;
 use Controllers\UserController;
+use Controllers\AuthController;
 
 use Controllers\AnalysisRequestController;
 use Repositories\AnalysisRequestRepository;
@@ -77,29 +76,37 @@ $path = rtrim('/' . ltrim($path, '/'), '/');
 /**
  * Routes
  */
-if ($method === 'POST' && $path === '/register') {
+if ($method === 'POST' && $path === '/auth/register') {
   $repository = new UserRepository($db);
   $service = new UserService($repository);
-  $controller = new RegisterController($service);
-  $controller();
+  $controller = new AuthController(new AuthService($repository), $service);
+  $controller->register();
   return;
 }
 
-if ($method === 'POST' && $path === '/login') {
+if ($method === 'POST' && $path === '/auth/login') {
   $repository = new UserRepository($db);
   $authService = new AuthService($repository);
-  $controller = new LoginController($authService);
-  $controller();
+  $controller = new AuthController($authService, new UserService($repository));
+  $controller->login();
   return;
 }
 
-if ($method === 'GET' && $path === '/user') {
+if ($method === 'POST' && $path === '/auth/logout') {
+  $repository = new UserRepository($db);
+  $authService = new AuthService($repository);
+  $controller = new AuthController($authService, new UserService($repository));
+  $controller->logout();
+  return;
+}
+
+if ($method === 'GET' && $path === '/users/me') {
   $repository = new UserRepository($db);
   $userService = new UserService($repository);
   $authService = new AuthService($repository);
 
   $controller = new UserController($userService, $authService);
-  $controller();
+  $controller->show();
   return;
 }
 
@@ -110,11 +117,24 @@ if ($path === '/analysis-request') {
   $controller = new AnalysisRequestController($service, $authService);
 
   if ($method === 'POST') {
-    $controller();
+    $controller->store();
   }
 
   if ($method === 'GET') {
     $controller->index();
+  }
+
+  if (preg_match('#^/analysis-request/(\d+)$#', $path, $matches)) {
+    $id = (int) $matches[1];
+      if ($method === 'PUT') {
+      $controller->update($id);
+      return;
+    }
+
+    if ($method === 'DELETE') {
+      $controller->delete($id);
+      return;
+    }
   }
 
   return;

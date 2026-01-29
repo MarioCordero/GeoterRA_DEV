@@ -5,7 +5,7 @@
 # Endpoint: POST /api/public/login
 # ============================================================
 
-API_URL="http://localhost/api/public/login"
+API_URL="http://localhost/api/public/auth/login"
 HEADER="Content-Type: application/json"
 
 # ------------------------------------------------------------
