@@ -77,6 +77,81 @@ final class AnalysisRequestRepository
 	}
 
 	/**
+	 * Finds an analysis request by ID and creator.
+	 */
+	public function findByIdAndUser(int $id, int $userId): ?array
+	{
+		$stmt = $this->pdo->prepare(
+			'SELECT id FROM analysis_requests WHERE id = :id AND created_by = :user_id'
+		);
+
+		$stmt->execute([
+			':id' => $id,
+			':user_id' => $userId
+		]);
+
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+		return $result ?: null;
+	}
+
+	/**
+	 * Updates an analysis request owned by a user.
+	 */
+	public function update(
+		int $id,
+		int $userId,
+		AnalysisRequestDTO $dto
+	): void {
+		$sql = '
+			UPDATE analysis_requests SET
+				region = :region,
+				email = :email,
+				owner_contact_number = :owner_contact_number,
+				owner_name = :owner_name,
+				temperature_sensation = :temperature_sensation,
+				bubbles = :bubbles,
+				details = :details,
+				current_usage = :current_usage,
+				latitude = :latitude,
+				longitude = :longitude,
+				updated_at = NOW()
+			WHERE id = :id AND created_by = :user_id
+		';
+
+		$stmt = $this->pdo->prepare($sql);
+		$stmt->execute([
+			':region' => $dto->region,
+			':email' => $dto->email,
+			':owner_contact_number' => $dto->owner_contact_number,
+			':owner_name' => $dto->owner_name,
+			':temperature_sensation' => $dto->temperature_sensation,
+			':bubbles' => $dto->bubbles ? 1 : 0,
+			':details' => $dto->details,
+			':current_usage' => $dto->current_usage,
+			':latitude' => $dto->latitude,
+			':longitude' => $dto->longitude,
+			':id' => $id,
+			':user_id' => $userId
+		]);
+	}
+
+	/**
+	 * Deletes an analysis request owned by a user.
+	 */
+	public function delete(int $id, int $userId): void
+	{
+		$stmt = $this->pdo->prepare(
+			'DELETE FROM analysis_requests WHERE id = :id AND created_by = :user_id'
+		);
+
+		$stmt->execute([
+			':id' => $id,
+			':user_id' => $userId
+		]);
+	}
+
+	/**
 	 * Returns all analysis requests created by a specific user.
 	 * Excludes sensitive/internal columns.
 	 *

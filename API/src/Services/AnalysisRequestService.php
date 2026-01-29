@@ -63,6 +63,79 @@ final class AnalysisRequestService
     }
   }
 
+  /**
+ * Updates an existing analysis request.
+ */
+public function update(
+  int $id,
+  AnalysisRequestDTO $dto,
+  int $userId
+): void {
+  $dto->validate();
+
+  try {
+    $this->pdo->beginTransaction();
+
+    $existing = $this->repository->findByIdAndUser($id, $userId);
+
+    if (!$existing) {
+      throw new ApiException(
+        ErrorType::analysisRequestNotFound(),
+        404
+      );
+    }
+
+    $this->repository->update($id, $userId, $dto);
+
+    $this->pdo->commit();
+
+  } catch (ApiException $e) {
+    $this->pdo->rollBack();
+    throw $e;
+
+  } catch (\Throwable $e) {
+    $this->pdo->rollBack();
+    throw new ApiException(
+      ErrorType::analysisRequestUpdateFailed(),
+      500
+    );
+  }
+}
+
+  /**
+   * Deletes an analysis request.
+   */
+  public function delete(int $id, int $userId): void
+  {
+    try {
+      $this->pdo->beginTransaction();
+
+      $existing = $this->repository->findByIdAndUser($id, $userId);
+
+      if (!$existing) {
+        throw new ApiException(
+          ErrorType::analysisRequestNotFound(),
+          404
+        );
+      }
+
+      $this->repository->delete($id, $userId);
+
+      $this->pdo->commit();
+
+    } catch (ApiException $e) {
+      $this->pdo->rollBack();
+      throw $e;
+
+    } catch (\Throwable $e) {
+      $this->pdo->rollBack();
+      throw new ApiException(
+        ErrorType::analysisRequestDeleteFailed(),
+        500
+      );
+    }
+  }
+
     /**
    * Returns all analysis requests for an authenticated user.
    *

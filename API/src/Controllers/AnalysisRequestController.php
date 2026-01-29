@@ -24,7 +24,7 @@ final class AnalysisRequestController
   /**
    * Endpoint POST /analysis-request
    */
-  public function __invoke(): void
+  public function store(): void
   {
     try {
       $headers = getallheaders();
@@ -106,6 +106,82 @@ final class AnalysisRequestController
         ErrorType::internal($e->getMessage()),
         500
       );
+    }
+  }
+
+  /**
+   * PUT /analysis-request/{id}
+   */
+  public function update(int $id): void
+  {
+    try {
+      $headers = getallheaders();
+      $token = trim(str_replace('Bearer ', '', $headers['Authorization'] ?? ''));
+
+      if (!$token) {
+        Response::error(ErrorType::missingAuthToken(), 401);
+        return;
+      }
+
+      $session = $this->authService->validateToken($token);
+      if (!$session) {
+        Response::error(ErrorType::invalidToken(), 401);
+        return;
+      }
+
+      $userId = (int) $session['user_id'];
+
+      $body = json_decode(file_get_contents('php://input'), true);
+      if (!is_array($body)) {
+        Response::error(ErrorType::invalidJson(), 400);
+        return;
+      }
+
+      $dto = AnalysisRequestDTO::fromArray($body);
+
+      $this->service->update($id, $dto, $userId);
+
+      Response::success(['message' => 'Analysis request updated successfully']);
+
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getCode());
+
+    } catch (\Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
+
+  /**
+   * DELETE /analysis-request/{id}
+   */
+  public function delete(int $id): void
+  {
+    try {
+      $headers = getallheaders();
+      $token = trim(str_replace('Bearer ', '', $headers['Authorization'] ?? ''));
+
+      if (!$token) {
+        Response::error(ErrorType::missingAuthToken(), 401);
+        return;
+      }
+
+      $session = $this->authService->validateToken($token);
+      if (!$session) {
+        Response::error(ErrorType::invalidToken(), 401);
+        return;
+      }
+
+      $userId = (int) $session['user_id'];
+
+      $this->service->delete($id, $userId);
+
+      Response::success(['message' => 'Analysis request deleted successfully']);
+
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getCode());
+
+    } catch (\Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 }

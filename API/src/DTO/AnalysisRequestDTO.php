@@ -77,7 +77,7 @@ final class AnalysisRequestDTO
 	{
 		if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
 			throw new ApiException(
-				ErrorType::invalidField('email', 'Email is invalid'),
+				ErrorType::invalidField('email'),
 				422
 			);
 		}
