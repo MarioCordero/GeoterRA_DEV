@@ -20,7 +20,13 @@ final class RegisteredManifestationRepository
    */
   public function existsById(string $id): bool
   {
-    $stmt = $this->db->prepare('SELECT 1 FROM registered_geothermal_manifestations WHERE id = :id LIMIT 1');
+    $stmt = $this->db->prepare(
+      'SELECT 1 
+      FROM registered_geothermal_manifestations 
+      WHERE id = :id 
+        AND deleted_at IS NULL
+      LIMIT 1'
+    );
     $stmt->execute([':id' => $id]);
     return (bool) $stmt->fetchColumn();
   }
@@ -31,7 +37,13 @@ final class RegisteredManifestationRepository
    */
   public function existsByName(string $name): bool
   {
-    $stmt = $this->db->prepare('SELECT 1 FROM registered_geothermal_manifestations WHERE name = :name LIMIT 1');
+    $stmt = $this->db->prepare(
+      'SELECT 1 
+      FROM registered_geothermal_manifestations 
+      WHERE name = :name 
+        AND deleted_at IS NULL
+      LIMIT 1'
+    );
     $stmt->execute([':name' => $name]);
     return (bool) $stmt->fetchColumn();
   }
@@ -122,7 +134,7 @@ final class RegisteredManifestationRepository
 
     $stmt = $this->db->prepare($sql);
 
-    $stmt->execute([
+    return $stmt->execute([
       'id'=> $id,
       'name' => $dto->name,
       'region' => $dto->region,
@@ -149,7 +161,6 @@ final class RegisteredManifestationRepository
       'modified_by' => $userId
     ]);
 
-    return $stmt->rowCount() === 1;
   }
 
   public function softDelete(string $id, string $userId): bool
@@ -175,13 +186,45 @@ final class RegisteredManifestationRepository
 
 
   /**
-   * Fetch all manifestations
+   * Fetch all active manifestations (excluding soft-deleted ones)
    */
   public function getAll(): array
   {
-    return $this->db
-      ->query('SELECT * FROM registered_geothermal_manifestations')
-      ->fetchAll(PDO::FETCH_ASSOC);
+    $sql = <<<SQL
+    SELECT
+      id,
+      name,
+      region,
+      latitude,
+      longitude,
+      description,
+      temperature,
+      field_pH,
+      field_conductivity,
+      lab_pH,
+      lab_conductivity,
+      cl,
+      ca,
+      hco3,
+      so4,
+      fe,
+      si,
+      b,
+      li,
+      f,
+      na,
+      k,
+      mg,
+      created_at,
+      created_by,
+      modified_at,
+      modified_by
+    FROM registered_geothermal_manifestations
+    WHERE deleted_at IS NULL
+    SQL;
+
+    $stmt = $this->db->query($sql);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
   /**
@@ -223,6 +266,7 @@ final class RegisteredManifestationRepository
       modified_by
     FROM registered_geothermal_manifestations
     WHERE region = :region
+      AND deleted_at IS NULL
     SQL;
 
     // Prepare the statement to enable safe parameter binding
