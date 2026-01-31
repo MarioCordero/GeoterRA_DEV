@@ -12,6 +12,7 @@ use Controllers\AnalysisRequestController;
 use Repositories\AnalysisRequestRepository;
 use Services\AnalysisRequestService;
 use Services\AuthService;
+use Repositories\AuthRepository;
 
 use Services\RegisteredManifestationService;
 use Repositories\RegisteredManifestationRepository;
@@ -73,59 +74,86 @@ if (str_starts_with($path, $basePath)) {
 }
 $path = rtrim('/' . ltrim($path, '/'), '/');
 
+$userRepository = new UserRepository($db);
+$authRepository = new AuthRepository($db);
+
+
 /**
  * Routes
  */
+
+if ($method === 'POST' && $path === '/auth/refresh') {
+  $userService = new UserService($userRepository);
+  $authService = new AuthService($authRepository, $userRepository);
+  $controller = new AuthController($authService, $userService);
+  $controller->refresh();
+  return;
+}
+
 if ($method === 'POST' && $path === '/auth/register') {
-  $repository = new UserRepository($db);
-  $service = new UserService($repository);
-  $controller = new AuthController(new AuthService($repository), $service);
+  $userService = new UserService($userRepository);
+  $authService = new AuthService($authRepository, $userRepository);
+  $controller = new AuthController($authService, $userService);
   $controller->register();
   return;
 }
 
 if ($method === 'POST' && $path === '/auth/login') {
-  $repository = new UserRepository($db);
-  $authService = new AuthService($repository);
-  $controller = new AuthController($authService, new UserService($repository));
+  $userService = new UserService($userRepository);
+  $authService = new AuthService($authRepository, $userRepository);
+  $controller = new AuthController($authService, $userService);
   $controller->login();
   return;
 }
 
 if ($method === 'POST' && $path === '/auth/logout') {
-  $repository = new UserRepository($db);
-  $authService = new AuthService($repository);
-  $controller = new AuthController($authService, new UserService($repository));
+  $userService = new UserService($userRepository);
+  $authService = new AuthService($authRepository, $userRepository);
+  $controller = new AuthController($authService, $userService);
   $controller->logout();
   return;
 }
 
-if ($method === 'GET' && $path === '/users/me') {
-  $repository = new UserRepository($db);
-  $userService = new UserService($repository);
-  $authService = new AuthService($repository);
-
+if ($path === '/users/me') {
+  $userService = new UserService($userRepository);
+  $authService = new AuthService($authRepository, $userRepository);
   $controller = new UserController($userService, $authService);
-  $controller->show();
+
+  if ($method === 'GET') {
+    $controller->show();
+    return;
+  }
+
+  if ($method === 'PUT') {
+    $controller->update();
+    return;
+  }
+
+  if ($method === 'DELETE') {
+    $controller->delete();
+    return;
+  }
   return;
 }
 
 if ($path === '/analysis-request') {
   $repository = new AnalysisRequestRepository($db);
   $service = new AnalysisRequestService($repository, $db);
-  $authService = new AuthService(new UserRepository($db));
+  $authService = new AuthService($authRepository, $userRepository);
   $controller = new AnalysisRequestController($service, $authService);
 
   if ($method === 'POST') {
     $controller->store();
+    return;
   }
 
   if ($method === 'GET') {
     $controller->index();
+    return;
   }
 
-  if (preg_match('#^/analysis-request/(\d+)$#', $path, $matches)) {
-    $id = (int) $matches[1];
+  if (preg_match('#^/analysis-request/([0-9A-HJKMNP-TV-Z]{26})$#', $path, $matches)) {
+    $id = (string) $matches[1];
       if ($method === 'PUT') {
       $controller->update($id);
       return;
@@ -140,22 +168,37 @@ if ($path === '/analysis-request') {
   return;
 }
 
-if ($path === '/registered-manifestations') {
+if (str_starts_with($path, '/registered-manifestations')) {
+
   $repository = new RegisteredManifestationRepository($db);
   $service = new RegisteredManifestationService($repository);
-  $authService = new AuthService(new UserRepository($db));
+  $authService = new AuthService($authRepository, $userRepository);
   $controller = new RegisteredManifestationController($service, $authService);
 
-  if ($method === 'PUT') {
-    $controller();
+  if ($method === 'POST' && $path === '/registered-manifestations') {
+    $controller->store();
+    return;
   }
 
-  if ($method === 'GET') {
+  if ($method === 'GET' && $path === '/registered-manifestations') {
     $controller->index();
+    return;
   }
-  return;
-}
 
+  if (preg_match('#^/registered-manifestations/([0-9A-HJKMNP-TV-Z]{26})$#i', $path, $matches)) {
+    $id = (string) $matches[1];
+
+    if ($method === 'PUT') {
+      $controller->update($id);
+      return;
+    }
+
+    if ($method === 'DELETE') {
+      $controller->delete($id);
+      return;
+    }
+  }
+}
 
 /**
  * Fallback
