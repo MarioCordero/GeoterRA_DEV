@@ -6,6 +6,8 @@ namespace Repositories;
 
 use PDO;
 use DTO\AnalysisRequestDTO;
+use DTO\Ulid;
+
 
 final class AnalysisRequestRepository
 {
@@ -16,10 +18,11 @@ final class AnalysisRequestRepository
 	/**
 	 * Creates a new analysis request and returns its generated ID.
 	 */
-	public function create(AnalysisRequestDTO $dto, int $userId): int
+	public function create(AnalysisRequestDTO $dto, string $userId): string
 	{    // Generate business-readable name AFTER insert
     $sql = "
       INSERT INTO analysis_requests (
+				id,
         name,
         region,
         email,
@@ -33,6 +36,7 @@ final class AnalysisRequestRepository
         longitude,
         created_by
       ) VALUES (
+			 	:id,
         :name,
         :region,
         :email,
@@ -48,9 +52,14 @@ final class AnalysisRequestRepository
       )
     ";
 
+		$requestId = Ulid::generate();
+		// Generate business identifier using the real ID
+		$generatedName = 'SOLI-' . substr($requestId, 0, 3);
+
     $stmt = $this->pdo->prepare($sql);
     $stmt->execute([
-      ':name' => null, // Temporary, updated after ID generation
+      ':id' => $requestId,
+      ':name' => $generatedName,
       ':region' => $dto->region,
       ':email' => $dto->email,
       ':owner_contact_number' => $dto->owner_contact_number,
@@ -64,22 +73,13 @@ final class AnalysisRequestRepository
       ':created_by' => $userId
     ]);
 
-    // Get AUTO_INCREMENT value safely
-    $id = (int) $this->pdo->lastInsertId();
-
-    // Generate business identifier using the real ID
-    $generatedName = 'SOLI-' . $id;
-
-    // Update name once ID exists
-    $this->updateName($id, $generatedName);
-
-    return $id;
+    return $requestId;
 	}
 
 	/**
 	 * Finds an analysis request by ID and creator.
 	 */
-	public function findByIdAndUser(int $id, int $userId): ?array
+	public function findByIdAndUser(string $id, string $userId): ?array
 	{
 		$stmt = $this->pdo->prepare(
 			'SELECT id FROM analysis_requests WHERE id = :id AND created_by = :user_id'
@@ -99,8 +99,8 @@ final class AnalysisRequestRepository
 	 * Updates an analysis request owned by a user.
 	 */
 	public function update(
-		int $id,
-		int $userId,
+		string $id,
+		string $userId,
 		AnalysisRequestDTO $dto
 	): void {
 		$sql = '
@@ -139,7 +139,7 @@ final class AnalysisRequestRepository
 	/**
 	 * Deletes an analysis request owned by a user.
 	 */
-	public function delete(int $id, int $userId): void
+	public function delete(string $id, string $userId): void
 	{
 		$stmt = $this->pdo->prepare(
 			'DELETE FROM analysis_requests WHERE id = :id AND created_by = :user_id'
@@ -155,10 +155,10 @@ final class AnalysisRequestRepository
 	 * Returns all analysis requests created by a specific user.
 	 * Excludes sensitive/internal columns.
 	 *
-	 * @param int $userId
+	 * @param string $userId
 	 * @return array
 	 */
-	public function findAllByUser(int $userId): array
+	public function findAllByUser(string $userId): array
 	{
 		$sql = "
 			SELECT
@@ -191,7 +191,7 @@ final class AnalysisRequestRepository
 	/**
 	 * Updates the generated name for the request.
 	 */
-	public function updateName(int $id, string $name): void
+	public function updateName(string $id, string $name): void
 	{
 		$stmt = $this->pdo->prepare(
 			"UPDATE analysis_requests SET name = :name WHERE id = :id"

@@ -34,6 +34,7 @@ final class AnalysisRequestDTO
 	 */
 	public static function fromArray(array $data): self
 	{
+
 		if (!isset($data['region']) || trim((string) $data['region']) === '') {
 			throw new ApiException(ErrorType::missingField('region'), 422);
 		}
