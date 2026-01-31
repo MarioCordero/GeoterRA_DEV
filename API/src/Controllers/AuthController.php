@@ -5,8 +5,8 @@ namespace Controllers;
 
 use Services\AuthService;
 use Services\UserService;
-use DTO\RegisterUserDTO;
 use DTO\LoginUserDTO;
+use DTO\RegisterUserDTO;
 use Http\ApiException;
 use Http\Request;
 use Http\Response;
@@ -26,18 +26,57 @@ final class AuthController
   ) {}
 
   /**
+   * POST /auth/refresh
+   * Rotates refresh token and issues new access credentials.
+   */
+  public function refresh(): void
+  {
+    try {
+      $body = Request::parseJsonRequest();
+
+      if (empty($body['refresh_token'])) {
+        throw new ApiException(
+          ErrorType::missingField('refresh_token'),
+          400
+        );
+      }
+
+      $result = $this->authService->refreshTokens(
+        $body['refresh_token']
+      );
+
+      Response::success(
+        $result['data'],
+        $result['meta'],
+        200
+      );
+
+    } catch (ApiException $e) {
+      Response::error(
+        $e->getError(),
+        $e->getCode()
+      );
+
+    } catch (\Throwable $e) {
+      Response::error(
+        ErrorType::internal($e->getMessage()),
+        500
+      );
+    }
+  }
+
+  /**
    * POST /register
    * Creates a new user account.
    */
   public function register(): void
   {
     try {
-      $data = $this->parseJsonRequest();
+      $data = Request::parseJsonRequest();
 
       $dto = RegisterUserDTO::fromArray($data);
-      $this->validateDto($dto);
 
-      $result = $this->userService->register($dto);
+      $result = $this->userService->registerUser($dto);
 
       Response::success(
         $result['data'],
@@ -62,10 +101,9 @@ final class AuthController
   public function login(): void
   {
     try {
-      $data = $this->parseJsonRequest();
+      $data = Request::parseJsonRequest();
 
       $dto = LoginUserDTO::fromArray($data);
-      $this->validateDto($dto);
 
       $result = $this->authService->login($dto);
 
@@ -131,39 +169,4 @@ final class AuthController
     }
   }
 
-  /**
-   * Parses and validates JSON request body.
-   *
-   * @return array<string, mixed>
-   */
-  private function parseJsonRequest(): array
-  {
-    $data = Request::json();
-
-    if ($data === null) {
-      Response::error(
-        ErrorType::invalidJson(),
-        400
-      );
-    }
-
-    return $data;
-  }
-
-  /**
-   * Validates a DTO instance.
-   *
-   * @param object $dto
-   */
-  private function validateDto(object $dto): void
-  {
-    try {
-      $dto->validate();
-    } catch (ApiException $e) {
-      Response::error(
-        $e->getError(),
-        422
-      );
-    }
-  }
 }
