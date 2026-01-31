@@ -32,6 +32,7 @@ PASSWORD="StrongPassword123!"
 # ------------------------------------------------------------
 ACCESS_TOKEN=""
 MANIFESTATION_ID=""
+MANIFESTATION_NAME="Test Manifestation 0112"
 REGION="Guanacaste"
 
 # ------------------------------------------------------------
@@ -75,7 +76,7 @@ create_manifestation() {
     -H "$JSON_HEADER" \
     -H "Authorization: Bearer $ACCESS_TOKEN" \
     -d "{
-      \"name\": \"Test Manifestation 99\",
+      \"name\": \"$MANIFESTATION_NAME\",
       \"region\": \"$REGION\",
       \"latitude\": 10.123456,
       \"longitude\": -85.654321,
@@ -141,7 +142,7 @@ update_manifestation() {
     -H "$JSON_HEADER" \
     -H "Authorization: Bearer $ACCESS_TOKEN" \
     -d "{
-      \"name\": \"Test Manifestation 002 - Updated\",
+      \"name\": \"$MANIFESTATION_NAME - Updated\",
       \"region\": \"$REGION\",
       \"latitude\": 10.555555,
       \"longitude\": -85.111111
@@ -172,7 +173,7 @@ duplicate_manifestation() {
     -H "$JSON_HEADER" \
     -H "Authorization: Bearer $ACCESS_TOKEN" \
     -d "{
-      \"name\": \"Test Manifestation 002 - Updated\",
+      \"name\": \"$MANIFESTATION_NAME - Updated\",
       \"region\": \"$REGION\",
       \"latitude\": 10.0,
       \"longitude\": -85.0
@@ -182,7 +183,7 @@ duplicate_manifestation() {
 
   ERROR_CODE=$(echo "$RESPONSE" | jq -r '.errors[0].code')
 
-  if [ "$ERROR_CODE" != "CONFLICT" ]; then
+  if [ "$ERROR_CODE" != "CONFLICT_ERROR" ]; then
     echo "⚠️ Expected conflict error, but got something else"
   else
     echo "✅ Duplicate prevention works"
