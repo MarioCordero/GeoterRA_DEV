@@ -9,6 +9,9 @@ use Services\RegisteredManifestationService;
 use Services\AuthService;
 use DTO\RegisteredManifestationDTO;
 use Http\Response;
+use Http\Request;
+use DTO\AllowedUserRoles;
+
 use Http\ErrorType;
 use Http\ApiException;
 
@@ -23,7 +26,7 @@ final class RegisteredManifestationController
   ) {}
 
   /**
-   * PUT /registered-manifestations
+   * POST /registered-manifestations
    */
   public function store(): void
   {
@@ -31,30 +34,23 @@ final class RegisteredManifestationController
       // ===============================
       // Authorization
       // ===============================
-      $headers = getallheaders();
-      $token = trim(str_replace('Bearer ', '', $headers['Authorization'] ?? ''));
+      $auth = $this->authService->requireAuth();
 
-      if (!$token) {
-        Response::error(ErrorType::missingAuthToken(), 401);
+      $userId = (string) $auth['user_id'];
+
+      $user = $this->authService->findUserById($userId);
+      $userRole = (string)$user['role'];
+
+      if ($userRole !== AllowedUserRoles::ADMIN) {
+        Response::error(ErrorType::forbidden(), 403);
         return;
-      }
 
-      $session = $this->authService->validateToken($token);
-      if (!$session) {
-        Response::error(ErrorType::invalidToken(), 401);
-        return;
       }
-
-      $userId = (int) $session['user_id'];
 
       // ===============================
       // Body parsing
       // ===============================
-      $body = json_decode(file_get_contents('php://input'), true);
-      if (!is_array($body)) {
-        Response::error(ErrorType::invalidJson(), 400);
-        return;
-      }
+      $body = Request::parseJsonRequest();
 
       // ===============================
       // DTO + business logic
@@ -63,7 +59,7 @@ final class RegisteredManifestationController
       $this->service->create($dto, $userId);
 
       Response::success(
-        data: ['id' => $dto->id],
+        data: ['success' => true ],
         meta: null,
         status: 201
       );
@@ -86,19 +82,7 @@ final class RegisteredManifestationController
       // ===============================
       // Authorization
       // ===============================
-      $headers = getallheaders();
-      $token = trim(str_replace('Bearer ', '', $headers['Authorization'] ?? ''));
-
-      if (!$token) {
-        Response::error(ErrorType::missingAuthToken(), 401);
-        return;
-      }
-
-      $session = $this->authService->validateToken($token);
-      if (!$session) {
-        Response::error(ErrorType::invalidToken(), 401);
-        return;
-      }
+      $auth = $this->authService->requireAuth();
 
       // ===============================
       // Query parameter parsing
@@ -127,4 +111,84 @@ final class RegisteredManifestationController
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
+
+  /**
+   * PUT /registered-manifestations/{id}
+   */
+  public function update(string $id): void
+  {
+    try {
+      // ---------------------------------
+      // Authorization
+      // ---------------------------------
+      $auth = $this->authService->requireAuth();
+
+      $userId = (string) $auth['user_id'];
+      $user = $this->authService->findUserById($userId);
+
+      if ($user['role'] !== AllowedUserRoles::ADMIN) {
+        Response::error(ErrorType::forbidden(), 403);
+        return;
+      }
+
+      // ---------------------------------
+      // Body parsing
+      // ---------------------------------
+      $body = Request::parseJsonRequest();
+
+      $dto = RegisteredManifestationDTO::fromArray($body);
+
+      // ---------------------------------
+      // Business logic
+      // ---------------------------------
+      $this->service->update($dto, $id, $userId);
+
+      Response::success(
+        data: ['id' => $id],
+        meta: ['updated' => true]
+      );
+
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getHttpStatus());
+    } catch (\Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
+  
+  /**
+   * DELETE /registered-manifestations/{id}
+   */
+  public function delete(string $id): void
+  {
+    try {
+      // ---------------------------------
+      // Authorization
+      // ---------------------------------
+      $auth = $this->authService->requireAuth();
+
+      $userId = (string) $auth['user_id'];
+      $user = $this->authService->findUserById($userId);
+
+      if ($user['role'] !== AllowedUserRoles::ADMIN) {
+        Response::error(ErrorType::forbidden(), 403);
+        return;
+      }
+
+      // ---------------------------------
+      // Business logic
+      // ---------------------------------
+      $this->service->delete($id, $userId);
+
+      Response::success(
+        data: null,
+        meta: ['deleted' => true]
+      );
+
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getHttpStatus());
+    } catch (\Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
+
 }

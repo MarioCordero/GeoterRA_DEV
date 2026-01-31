@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Services;
 
-use AllowDynamicProperties;
 use DTO\AllowedRegions;
 use DTO\RegisteredManifestationDTO;
 use Repositories\RegisteredManifestationRepository;
@@ -23,15 +22,15 @@ final class RegisteredManifestationService
   /**
    * Create a new manifestation
    */
-  public function create(RegisteredManifestationDTO $dto, int $userId): void
+  public function create(RegisteredManifestationDTO $dto,  string $userId): void
   {
     // Domain validation
     $dto->validate();
 
     // Prevent duplicate primary key violations (409 Conflict)
-    if ($this->repository->existsById($dto->id)) {
+    if ($this->repository->existsByName($dto->name)) {
       throw new ApiException(
-        ErrorType::conflict("Registered manifestation id '{$dto->id}' already exists"),
+        ErrorType::conflict("Registered manifestation name '{$dto->name}' already exists"),
         409
       );
     }
@@ -40,6 +39,50 @@ final class RegisteredManifestationService
     if (!$created) {
       throw new ApiException(
         ErrorType::manifestationCreateFailed()
+      );
+    }
+  }
+
+  /**
+   * Update an existing manifestation
+   */
+  public function update(RegisteredManifestationDTO $dto, string $id, string $userId): void
+  {
+    $dto->validate();
+
+    if (!$this->repository->existsById($id)) {
+      throw new ApiException(
+        ErrorType::notFound('Registered manifestation'),
+        404
+      );
+    }
+
+    $updated = $this->repository->update($dto, $id,   $userId);
+
+    if (!$updated) {
+      throw new ApiException(
+        ErrorType::manifestationUpdateFailed()
+      );
+    }
+  }
+
+  /**
+   * Soft delete a manifestation
+   */
+  public function delete(string $id, string $userId): void
+  {
+    if (!$this->repository->existsById($id)) {
+      throw new ApiException(
+        ErrorType::notFound('Registered manifestation'),
+        404
+      );
+    }
+
+    $deleted = $this->repository->softDelete($id, $userId);
+
+    if (!$deleted) {
+      throw new ApiException(
+        ErrorType::manifestationDeleteFailed()
       );
     }
   }
