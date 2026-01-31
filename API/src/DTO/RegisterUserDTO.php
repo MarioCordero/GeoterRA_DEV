@@ -58,7 +58,7 @@ final class RegisterUserDTO
 
     if ($this->phoneNumber !== null && !preg_match('/^\d{8,15}$/', $this->phoneNumber)) {
       throw new ApiException(
-        ErrorType::invalidField('phone_number', 'Phone number is invalid'),
+        ErrorType::invalidField('phone_number'),
         422
       );
     }
