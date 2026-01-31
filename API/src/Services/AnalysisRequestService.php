@@ -24,11 +24,11 @@ final class AnalysisRequestService
    * Creates a new analysis request
    *
    * @param AnalysisRequestDTO $dto
-   * @param int $userId
+   * @param string $userId
    *
    * @throws ApiException
    */
-  public function create(AnalysisRequestDTO $dto, int $userId): void
+  public function create(AnalysisRequestDTO $dto, string $userId): void
   {
     // Validate DTO business rules
     $dto->validate();
@@ -67,9 +67,9 @@ final class AnalysisRequestService
  * Updates an existing analysis request.
  */
 public function update(
-  int $id,
+  string $id,
   AnalysisRequestDTO $dto,
-  int $userId
+  string $userId
 ): void {
   $dto->validate();
 
@@ -105,7 +105,7 @@ public function update(
   /**
    * Deletes an analysis request.
    */
-  public function delete(int $id, int $userId): void
+  public function delete(string $id, string $userId): void
   {
     try {
       $this->pdo->beginTransaction();
@@ -139,10 +139,10 @@ public function update(
     /**
    * Returns all analysis requests for an authenticated user.
    *
-   * @param int $userId
+   * @param string $userId
    * @return array
    */
-  public function getAllByUser(int $userId): array
+  public function getAllByUser(string $userId): array
   {
     return $this->repository->findAllByUser($userId);
   }
