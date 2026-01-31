@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Controllers;
 
+use DTO\AllowedUserRoles;
 use Services\AnalysisRequestService;
 use DTO\AnalysisRequestDTO;
 use Http\Response;
+use Http\Request;
+
 use Services\AuthService;
 USE Http\ApiException;
 use Http\ErrorType;
@@ -27,34 +30,13 @@ final class AnalysisRequestController
   public function store(): void
   {
     try {
-      $headers = getallheaders();
-      $token = $headers['Authorization'] ?? '';
-      $token = str_replace('Bearer ', '', $token);
-      $token = trim($token);
+      $auth = $this->authService->requireAuth();
 
-      if (!$token) {
-        Response::error(ErrorType::missingAuthToken(), 401);
-        return;
-      }
-
-      $session = $this->authService->validateToken($token);
-
-      if (!$session) {
-        Response::error(ErrorType::invalidToken(), 401);
-        return;
-      }
-
-      $userId = (int)$session['user_id'];
+      $userId = (string)$auth['user_id'];
 
       // Obtén JSON del body
-      $body = json_decode(file_get_contents('php://input'), true);
-      if (!$body) {
-        Response::error(ErrorType::invalidJson(), 400);
-        return;
-      }
-
+      $body = Request::parseJsonRequest();
       $dto = AnalysisRequestDTO::fromArray($body);
-
       $this->service->create($dto, $userId);
 
       Response::success(['message' => 'Analysis request created successfully'], [], 201);
@@ -73,25 +55,9 @@ final class AnalysisRequestController
   public function index(): void
   {
     try {
-      // Extract Authorization header
-      $headers = getallheaders();
-      $token = $headers['Authorization'] ?? '';
-      $token = str_replace('Bearer ', '', $token);
-      $token = trim($token);
+      $auth = $this->authService->requireAuth();
 
-      if (!$token) {
-        Response::error(ErrorType::missingAuthToken(), 401);
-        return;
-      }
-
-      // Validate token
-      $session = $this->authService->validateToken($token);
-      if (!$session) {
-        Response::error(ErrorType::invalidToken(), 401);
-        return;
-      }
-
-      $userId = (int) $session['user_id'];
+      $userId = (string) $auth['user_id'];
 
       // Fetch user requests
       $requests = $this->service->getAllByUser($userId);
@@ -112,30 +78,13 @@ final class AnalysisRequestController
   /**
    * PUT /analysis-request/{id}
    */
-  public function update(int $id): void
+  public function update(string $id): void
   {
     try {
-      $headers = getallheaders();
-      $token = trim(str_replace('Bearer ', '', $headers['Authorization'] ?? ''));
+      $auth = $this->authService->requireAuth();
+      $userId = (string) $auth['user_id'];
 
-      if (!$token) {
-        Response::error(ErrorType::missingAuthToken(), 401);
-        return;
-      }
-
-      $session = $this->authService->validateToken($token);
-      if (!$session) {
-        Response::error(ErrorType::invalidToken(), 401);
-        return;
-      }
-
-      $userId = (int) $session['user_id'];
-
-      $body = json_decode(file_get_contents('php://input'), true);
-      if (!is_array($body)) {
-        Response::error(ErrorType::invalidJson(), 400);
-        return;
-      }
+      $body = Request::parseJsonRequest();
 
       $dto = AnalysisRequestDTO::fromArray($body);
 
@@ -154,24 +103,11 @@ final class AnalysisRequestController
   /**
    * DELETE /analysis-request/{id}
    */
-  public function delete(int $id): void
+  public function delete(string $id): void
   {
     try {
-      $headers = getallheaders();
-      $token = trim(str_replace('Bearer ', '', $headers['Authorization'] ?? ''));
-
-      if (!$token) {
-        Response::error(ErrorType::missingAuthToken(), 401);
-        return;
-      }
-
-      $session = $this->authService->validateToken($token);
-      if (!$session) {
-        Response::error(ErrorType::invalidToken(), 401);
-        return;
-      }
-
-      $userId = (int) $session['user_id'];
+      $auth = $this->authService->requireAuth();
+      $userId = (string) $auth['user_id'];
 
       $this->service->delete($id, $userId);
 
