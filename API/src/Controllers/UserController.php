@@ -5,13 +5,73 @@ namespace Controllers;
 
 use Services\UserService;
 use Http\Response;
+use Http\Request;
 use Http\ErrorType;
 use Services\AuthService;
 USE Http\ApiException;
+use DTO\UpdateUserDTO;
+use DTO\RegisterUserDTO;
 
 final class UserController
 {
   public function __construct(private UserService $userService, private AuthService $authService) {}
+
+  /**
+   * PUT /users/me
+   */
+  public function update(): void
+  {
+    try {
+      $auth = $this->authService->requireAuth();
+
+
+      $body = Request::parseJsonRequest();
+
+      $dto = UpdateUserDTO::fromArray($body);
+
+      $this->userService->updateUser(
+        (string) $auth['user_id'],
+        $dto
+      );
+
+      Response::success(
+        ['message' => 'User profile updated successfully'],
+        null,
+        200
+      );
+
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getHttpStatus());
+    } catch (\Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
+
+  /**
+   * DELETE /users/me
+   */
+  public function delete(): void
+  {
+    try {
+      $auth = $this->authService->requireAuth();
+
+
+      $this->userService->deleteUser(
+        (string) $auth['user_id']
+      );
+
+      Response::success(
+        ['message' => 'User account deleted successfully'],
+        null,
+        200
+      );
+
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getCode());
+    } catch (\Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
 
   /**
    * Get user info by token
@@ -19,24 +79,10 @@ final class UserController
   public function show(): void
   {
     try {
-      $headers = getallheaders();
-      $token = $headers['Authorization'] ?? '';
-      $token = str_replace('Bearer ', '', $token);
-      $token = trim($token);
+      $auth = $this->authService->requireAuth();
 
-      if (!$token) {
-        Response::error(ErrorType::missingAuthToken(), 401);
-      }
 
-      // Find session by token
-      $session = $this->authService->validateToken($token);
-
-      if (!$session) {
-        Response::error(ErrorType::invalidToken(), 401);
-      }
-
-      $result = $this->userService->getUserById((int)$session['user_id']);
-
+      $result = $this->userService->getUserById((string)$auth['user_id']);
       Response::success($result['data'], $result['meta'], 200);
 
     } catch (ApiException $e) {
@@ -45,5 +91,6 @@ final class UserController
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
+
 }
 ?>
