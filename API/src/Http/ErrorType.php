@@ -83,6 +83,30 @@ final class ErrorType implements JsonSerializable
 		return new self('INVALID_CREDENTIALS', 'Incorrect email or password');
 	}
 
+	public static function userUpdateFailed(): self
+{
+  return new self(
+    'USER_UPDATE_FAILED',
+    'Failed to update user information'
+  );
+}
+
+	public static function userDeleteFailed(): self
+	{
+		return new self(
+			'USER_DELETE_FAILED',
+			'Failed to delete user account'
+		);
+	}
+
+	public static function userAlreadyDeleted(): self
+	{
+		return new self(
+			'USER_ALREADY_DELETED',
+			'User account is already deleted'
+		);
+	}
+
 	/**
 	 * Missing authentication token in headers.
 	 */
@@ -97,6 +121,11 @@ final class ErrorType implements JsonSerializable
 	public static function invalidToken(): self
 	{
 		return new self('INVALID_TOKEN', 'Authorization token is invalid or expired');
+	}
+
+	public static function unknownToken(): self
+	{
+		return new self('UNKNOWN_TOKEN', 'The provided token is not recognized');
 	}
 
 	public static function sessionAlreadyRevoked(): self
@@ -184,6 +213,22 @@ final class ErrorType implements JsonSerializable
 		return new self(
 			'ANALYSIS_REQUEST_DELETE_FAILED',
 			'Failed to delete analysis request'
+		);
+	}
+
+	public static function manifestationUpdateFailed(): self
+	{
+		return new self(
+			'MANIFESTATION_UPDATE_FAILED',
+			'Failed to update registered manifestation'
+		);
+	}
+
+	public static function manifestationDeleteFailed(): self
+	{
+		return new self(
+			'MANIFESTATION_DELETE_FAILED',
+			'Failed to delete registered manifestation'
 		);
 	}
 

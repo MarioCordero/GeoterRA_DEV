@@ -5,7 +5,7 @@ namespace Http;
 
 final class Request
 {
-  public static function json(): ?array
+  private static function json(): ?array
   {
     $raw = file_get_contents('php://input');
     if (!$raw)
@@ -13,6 +13,25 @@ final class Request
 
     $data = json_decode($raw, true);
     return is_array($data) ? $data : null;
+  }
+
+  /**
+   * Parses and validates JSON request body.
+   *
+   * @return array<string, mixed>s
+   */
+  public static function parseJsonRequest(): array
+  {
+    $data = Request::json();
+
+    if ($data === null) {
+      Response::error(
+        ErrorType::invalidJson(),
+        400
+      );
+    }
+
+    return $data;
   }
 }
 ?>
