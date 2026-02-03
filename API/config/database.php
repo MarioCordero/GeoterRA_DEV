@@ -6,7 +6,7 @@ declare(strict_types=1);
  * Loads credentials from a config.ini file located outside the public scope.
  */
 
-$configPath = dirname(__DIR__, 2) . '/config.ini';
+$configPath = dirname(__DIR__, 0) . '/config.ini';
 
 if (!file_exists($configPath)) {
   throw new RuntimeException('Database configuration file not found.');
