@@ -24,6 +24,30 @@ Capas transversales:
 - Response → Contrato de salida HTTP uniforme
 - ErrorType / ApiException → Modelo de error tipado y consistente
 
+### RESTful: Convenciones y Diseño
+
+La API sigue principios REST sencillos y explícitos:
+
+- Recursos en plural y con kebab-case: `analysis-requests`, `registered-manifestations`, `users`, `sessions`.
+- Rutas por recurso y método:
+  - `GET /recurso` → listar (paginado/filtrado)
+  - `GET /recurso/{id}` → obtener detalle
+  - `POST /recurso` → crear
+  - `PUT /recurso/{id}` → reemplazar/actualizar total (idempotente)
+  - `PATCH /recurso/{id}` → actualizar parcial (idempotente en intentos)
+  - `DELETE /recurso/{id}` → eliminar (idempotente)
+- Filtros y paginación vía query params comunes:
+  - `?page=1&limit=50` (paginación)
+  - `?sort=campo:asc|desc` (orden)
+  - `?filter[campo]=valor` (filtros simples por campo)
+- Códigos HTTP típicos:
+  - 200 éxito (lecturas), 201 creado (POST), 204 sin contenido (DELETE/PUT sin cuerpo)
+  - 400 petición inválida (sintaxis), 401 no autenticado, 403 prohibido
+  - 404 no encontrado, 409 conflicto, 422 validación, 500 error interno
+- Idempotencia: `PUT`, `PATCH` y `DELETE` deben tolerar reintentos sin efectos colaterales adicionales.
+- Metadatos: el campo `meta` de `Response` puede incluir `page`, `limit`, `total`, etc.
+- Versionado: actualmente no se versiona en la URL; ante cambios incompatibles se evaluará `Accept`/`Content-Type` o prefijos `/v1`.
+
 ## Convenciones por Capa
 
 ### Controllers
@@ -162,6 +186,39 @@ Notas:
 - `AuthService` centraliza la validación y la creación de sesión en login.
 - Los controllers no validan tokens por su cuenta, delegan a `AuthService`.
 
+### Modelo de Sesión con Access/Refresh Tokens
+
+Se utilizan dos tokens opacos (no-JWT) gestionados por `AuthService` y persistidos (en hash) en la base de datos:
+
+- Access Token: vida corta (p. ej., 10–30 minutos). Se envía en `Authorization: Bearer <access_token>` y habilita acceso a endpoints protegidos.
+- Refresh Token: vida más larga (p. ej., 7–30 días). Solo para obtener nuevos `access_token` sin credenciales completas.
+
+Flujos principales:
+
+1) Login
+  - Credenciales → `AuthService` crea sesión y retorna `access_token` + `refresh_token`.
+  - Se recomienda almacenar el refresh token en almacenamiento seguro del cliente.
+
+2) Acceso a recursos
+  - En cada request autenticado: `Authorization: Bearer <access_token>`.
+  - `AuthService::validateToken()` verifica expiración/validez y retorna contexto de sesión (`user_id`, etc.).
+
+3) Refresh
+  - Cuando expira el `access_token`, el cliente invoca el endpoint de refresh con `Authorization: Bearer <refresh_token>`.
+  - `AuthService` valida el refresh token y rota: emite nuevo `access_token` y opcionalmente un nuevo `refresh_token`, invalidando el anterior.
+  - Reutilización fraudulenta de refresh token debe invalidar la sesión asociada y responder 401.
+
+4) Logout / Revocación
+  - Invalida la(s) sesión(es) activas del usuario y revoca tokens asociados.
+
+Seguridad y prácticas:
+
+- Persistir tokens en hash en BD; nunca almacenar el valor en claro.
+- Forzar TLS (HTTPS) en cliente/servidor.
+- Evitar enviar tokens en body; usar exclusivamente el header `Authorization`.
+- Opcional: asociar sesión a `user-agent`/IP para señales adicionales.
+- Manejo de errores estándar: `missingAuthToken`, `invalidToken`, y, si corresponde, `tokenExpired` (422/401 según caso de negocio).
+
 Flujo típico:
 ```
 Authorization: Bearer <token>
@@ -199,6 +256,13 @@ if ($method === 'POST' && $path === '/analysis-request') {
 }
 ```
 
+### Convenciones RESTful en el Router
+
+- Cada ruta combina verbo HTTP + path de recurso.
+- Paths usan kebab-case y plural cuando aplica: `/registered-manifestations`, `/analysis-requests`, `/users/me`.
+- Autenticación obligatoria se maneja en el Controller delegando a `AuthService`.
+- Rutas de mantenimiento de sesión (login/refresh/logout) existen pero sus contratos se documentan por separado.
+
 ## Agregar un Nuevo Endpoint
 
 1) Declarar la ruta en `public/index.php` con método y path.
@@ -223,6 +287,51 @@ if ($method === 'POST' && $path === '/my-endpoint') {
 }
 ```
 
+### Pasos: desde un Service existente
+
+1) Identificar el `Service` que ya expone la lógica requerida.
+2) Crear/actualizar el `Controller` para el recurso:
+  - Extraer headers y token (`Authorization: Bearer ...`).
+  - Parsear body JSON → `DTO::fromArray()`.
+  - `DTO->validate()` y delegar al `Service`.
+  - Traducir resultado a `Response::success()`; capturar `ApiException` y responder `Response::error()`.
+3) Wire en `public/index.php` la nueva ruta/método al Controller.
+4) Añadir pruebas (scripts en `tests/`) para los casos de éxito y error.
+5) Documentar en el MD de contratos/errores específico (separado de este documento).
+
+### Pasos: desde la creación de una tabla (nuevo módulo)
+
+1) Modelo de datos
+  - Diseñar la tabla (DDL) con claves primarias, índices y restricciones.
+  - Ejecutar el SQL en el entorno (no hay sistema de migraciones integrado; conservar el DDL en documentación/operativa).
+
+2) Repository
+  - Crear `src/Repositories/NuevoRecursoRepository.php`.
+  - Implementar métodos CRUD con PDO y SQL parametrizado (`prepare`/`execute`).
+
+3) DTO
+  - Crear `src/DTO/NuevoRecursoDTO.php` con `fromArray(array $data): self` y `validate(): void`.
+
+4) Service
+  - Crear `src/Services/NuevoRecursoService.php` que orquesta reglas de negocio y llama al Repository.
+
+5) Controller
+  - Crear `src/Controllers/NuevoRecursoController.php` con métodos `index`/`store`/`update`/`destroy` o `__invoke`.
+  - Manejar autenticación vía `AuthService` si aplica.
+
+6) Router
+  - Declarar rutas en `public/index.php` según verbos HTTP y paths RESTful.
+
+7) Errores y contratos
+  - Añadir métodos en `Http\ErrorType` para casos semánticos del nuevo módulo.
+  - Documentar contratos de request/response en el MD dedicado (no en este archivo).
+
+8) Pruebas
+  - Añadir scripts en `tests/` que cubran creación, listado, actualización, borrado y errores.
+
+9) Observabilidad
+  - Usar el log de depuración en `/tmp/debug_api.log` cuando sea útil durante el desarrollo.
+
 ## Convenciones y Utilidades
 
 - Namespaces y autoload: `src/` como base; `namespace` corresponde con la ruta relativa.
@@ -244,6 +353,17 @@ if ($method === 'POST' && $path === '/my-endpoint') {
   5. Responder `201` con `{ data: { id }, errors: [] }`.
 
 - Persistencia: `RegisteredManifestationRepository::create()` usa prepared statements con PDO.
+
+## Endpoints Existentes (enunciados)
+
+Este documento no detalla contratos/respuestas/errores por endpoint. Se enumeran módulos presentes y sus endpoints principales para referencia:
+
+- `analysis-requests`: creación y lectura de solicitudes de análisis.
+- `registered-manifestations`: creación y listado de manifestaciones geotérmicas del usuario.
+- `users`: lectura de información del usuario autenticado (`/users/me`).
+- `auth`: login, refresh y logout.
+
+La especificación detallada de contratos (request/response), tipos y errores se trabajará en un MD dedicado.
 
 ## Estándares de Código
 
