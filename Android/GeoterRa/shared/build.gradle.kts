@@ -1,3 +1,4 @@
+import org.gradle.api.JavaVersion
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -6,22 +7,30 @@ plugins {
 }
 
 kotlin {
+
+    /**
+     * Android target configuration for Kotlin Multiplatform
+     */
     androidTarget {
         compilations.all {
             compileTaskProvider.configure {
                 compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_1_8)
+                    // JVM bytecode version for Android compilation
+                    jvmTarget.set(JvmTarget.JVM_17)
                 }
             }
         }
     }
-    
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach {
-        it.binaries.framework {
+
+    /**
+     * iOS targets
+     */
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
+    targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget> {
+        binaries.framework {
             baseName = "shared"
             isStatic = true
         }
@@ -29,7 +38,9 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            //put your multiplatform dependencies here
+            implementation(libs.kotlinx.coroutines.core)
+
+            // Multiplatform shared dependencies
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -37,14 +48,29 @@ kotlin {
     }
 }
 
+/**
+ * Enforce Java toolchain for Android compilation
+ */
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 android {
     namespace = "ucr.ac.cr.inii.geoterra"
     compileSdk = 35
+
     defaultConfig {
         minSdk = 24
     }
+
+    /**
+     * Java toolchain compatibility
+     */
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
+
 }
