@@ -1,9 +1,11 @@
+rootProject.name = "GeoterRA"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 pluginManagement {
     repositories {
         google()
-        gradlePluginPortal()
         mavenCentral()
+        gradlePluginPortal()
     }
 }
 
@@ -14,6 +16,4 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "GeoterRa"
-include(":androidApp")
-include(":shared")
+include(":composeApp")
