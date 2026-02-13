@@ -1,45 +1,72 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.login
 
-// LoginViewModel.kt
-import cafe.adriel.voyager.core.model.ScreenModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import ucr.ac.cr.inii.geoterra.data.model.remote.LoginRequest
+import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepository
 import ucr.ac.cr.inii.geoterra.presentation.auth.AuthViewModel
+import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
-class LoginViewModel(private val authViewModel: AuthViewModel) : ScreenModel {    private val _state = MutableStateFlow(LoginState())
-    val state = _state.asStateFlow()
+/**
+ * Updated ViewModel to handle real API authentication.
+ * @param authRepository Handles the HTTP calls to /auth/login
+ * @param authViewModel Handles the global app session state
+ */
+class LoginViewModel(
+    private val authRepository: AuthRepository,
+    private val authViewModel: AuthViewModel
+) : BaseScreenModel<LoginState>(LoginState()) {
 
     fun onEmailChanged(newValue: String) {
-        _state.update { it.copy(email = newValue, emailError = null) }
+        updateState { it.copy(email = newValue, emailError = null) }
     }
 
     fun onPasswordChanged(newValue: String) {
-        _state.update { it.copy(password = newValue, passwordError = null) }
+        updateState { it.copy(password = newValue, passwordError = null) }
     }
 
     fun togglePasswordVisibility() {
-        _state.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
+        updateState { it.copy(isPasswordVisible = !it.isPasswordVisible) }
     }
 
     fun login() {
-        val email = _state.value.email
-        val password = _state.value.password
+        val email = state.value.email
+        val password = state.value.password
 
-        // Validaciones básicas
-        val emailErr = if (!email.contains("@")) "Correo inválido" else null
-        val passErr = if (password.length < 6) "Mínimo 6 caracteres" else null
-
-        if (emailErr != null || passErr != null) {
-            _state.update { it.copy(emailError = emailErr, passwordError = passErr) }
+        // 1. Validaciones básicas
+        if (email.isBlank() || !email.contains("@")) {
+            updateState { it.copy(emailError = "Please enter a valid email") }
+            return
+        }
+        if (password.length < 8) {
+            updateState { it.copy(passwordError = "Password must be at least 8 characters") }
             return
         }
 
-        if (state.value.email.isNotEmpty() && state.value.password.isNotEmpty()) {
-            authViewModel.loginSuccess() // ¡Esto disparará el cambio de pantalla!
-        }
+        // 2. Estado de carga
+        updateState { it.copy(isLoading = true, passwordError = null, snackbarMessage = null) }
 
-//        // Aquí iría la lógica de Network a futuro
-//        _state.update { it.copy(isLoading = true) }
+        // 3. Una sola corrutina
+        screenModelScope.launch {
+            authRepository.login(LoginRequest(email, password))
+                .onSuccess {
+                    authViewModel.loginSuccess()
+                    updateState { it.copy(isLoading = false) }
+                }
+                .onFailure { error ->
+                    updateState {
+                        it.copy(
+                            isLoading = false,
+                            passwordError = error.message, // Texto bajo el campo
+                            snackbarMessage = error.message // Mensaje flotante
+                        )
+                    }
+                }
+        }
+    }
+
+    fun dismissSnackbar() {
+        updateState { it.copy(snackbarMessage = null) }
     }
 }

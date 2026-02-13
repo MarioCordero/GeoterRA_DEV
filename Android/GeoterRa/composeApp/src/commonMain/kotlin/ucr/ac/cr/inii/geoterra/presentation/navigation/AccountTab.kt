@@ -35,7 +35,8 @@ object AccountTab : Tab {
                     onEmailChanged = loginViewModel::onEmailChanged,
                     onPasswordChanged = loginViewModel::onPasswordChanged,
                     onLoginClick = loginViewModel::login,
-                    onTogglePassword = loginViewModel::togglePasswordVisibility
+                    onTogglePassword = loginViewModel::togglePasswordVisibility,
+                    onDismissSnackbar = loginViewModel::dismissSnackbar
                 )
             }
         }

@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.serialization)
 }
 
 kotlin {
@@ -33,8 +34,6 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.koin.android)
-            // La preview se queda aquí porque solo Android sabe renderizarla
-            implementation(libs.compose.uiToolingPreview)
         }
 
         // --- Dependencias de iOS ---
@@ -44,6 +43,10 @@ kotlin {
 
         // --- Dependencias COMPARTIDAS (Aquí no debe haber nada exclusivo de Android) ---
         commonMain.dependencies {
+            // Persistencia de datos
+            implementation(libs.settings)
+            implementation(libs.kotlinx.serialization.json)
+
             // Compose Core
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -66,6 +69,7 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.logging)
+            implementation(libs.ktor.client.auth)
 
             // Voyager (Navegación)
             implementation(libs.voyager.navigator)
@@ -74,10 +78,25 @@ kotlin {
             implementation(libs.voyager.bottomSheetNavigator)
             implementation(libs.voyager.transitions)
             implementation(libs.voyager.koin)
+
+            implementation(libs.ktor.client.cio)
+
         }
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+        }
+    }
+    sourceSets.all {
+        languageSettings.optIn("kotlin.ExperimentalMultiplatform")
+    }
+
+    // Para quitar el warning específico de expect/actual:
+    targets.configureEach {
+        compilations.configureEach {
+            compileTaskProvider.get().compilerOptions {
+                freeCompilerArgs.add("-Xexpect-actual-classes")
+            }
         }
     }
 }
@@ -111,9 +130,4 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-}
-
-dependencies {
-    // Solo para el Inspector de diseño de Android Studio
-    debugImplementation(libs.compose.uiTooling)
 }

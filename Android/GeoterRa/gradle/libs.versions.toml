@@ -1,6 +1,6 @@
 [versions]
-agp = "8.5.2"
-kotlin = "2.0.21"
+agp = "8.6.0"
+kotlin = "2.1.0"
 composeMultiplatform = "1.7.0"
 
 # Configuración de SDKs (35 es el estándar actual estable para AGP 8.5)
@@ -13,28 +13,30 @@ androidx-activity = "1.9.3"
 androidx-appcompat = "1.7.0"
 androidx-core = "1.13.1"
 androidx-lifecycle = "2.8.4"
-androidx-testExt = "1.2.1"
-androidx-espresso = "3.6.1"
 
 # Terceros (Versiones estables y compatibles entre sí)
-koin = "4.0.0"
-ktor = "2.3.12"
-voyager = "1.1.0-beta02"
+koin = "4.1.1"
+ktor = "3.2.1"
+voyager = "1.0.0"
 coroutines = "1.8.1"
 kotlinx-datetime = "0.6.0"
 kotlinx-serialization-json = "1.7.1"
 kmplog = "0.6.1"
 junit = "4.13.2"
 
+# Persistencia de datos
+settings-multiplatform = "1.3.0"
+
 [libraries]
+# Persisntecia de datos
+settings = {module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "settings-multiplatform"}
+
 # Compose Multiplatform Core
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "composeMultiplatform" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "composeMultiplatform" }
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "composeMultiplatform" }
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "composeMultiplatform" }
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
-compose-uiTooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "composeMultiplatform" }
-compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
 compose-material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "composeMultiplatform" }
 
 # Voyager
@@ -57,7 +59,11 @@ ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negoti
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-plugins = { module = "io.ktor:ktor-client-plugins", version.ref = "ktor" }
+
 
 # AndroidX Core
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
@@ -71,9 +77,11 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kmplog = { module = "io.github.kdroidfilter:kmplog", version.ref = "kmplog" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

@@ -7,5 +7,6 @@ data class LoginState(
     val emailError: String? = null,
     val passwordError: String? = null,
     val isLoading: Boolean = false,
-    val isPasswordVisible: Boolean = false
+    val isPasswordVisible: Boolean = false,
+    val snackbarMessage: String? = null
 )
