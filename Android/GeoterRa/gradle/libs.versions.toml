@@ -1,7 +1,7 @@
 [versions]
 agp = "8.6.0"
-kotlin = "2.1.0"
-composeMultiplatform = "1.7.0"
+kotlin = "2.1.21"
+composeMultiplatform = "1.7.1"
 
 # Configuración de SDKs (35 es el estándar actual estable para AGP 8.5)
 android-compileSdk = "35"

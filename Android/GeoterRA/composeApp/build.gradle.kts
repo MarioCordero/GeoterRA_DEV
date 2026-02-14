@@ -43,6 +43,11 @@ kotlin {
 
         // --- Dependencias COMPARTIDAS (Aquí no debe haber nada exclusivo de Android) ---
         commonMain.dependencies {
+            // Compose
+            implementation(libs.compose.material3)
+            implementation(libs.compose.material.icons.extended)
+
+
             // Persistencia de datos
             implementation(libs.settings)
             implementation(libs.kotlinx.serialization.json)
@@ -50,9 +55,7 @@ kotlin {
             // Compose Core
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material3)
             implementation(compose.ui)
-            implementation(libs.compose.material.icons.extended)
             implementation(compose.components.resources) // Para tus iconos SVG personalizados
 
             // Utilidades y Logs

@@ -18,12 +18,16 @@ import ucr.ac.cr.inii.geoterra.core.network.ApiEnvelope
 import ucr.ac.cr.inii.geoterra.core.network.NetworkConfig
 import ucr.ac.cr.inii.geoterra.core.network.TokenManager
 import ucr.ac.cr.inii.geoterra.data.model.remote.LoginResponse
+import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenRequest
+import ucr.ac.cr.inii.geoterra.presentation.auth.AuthEventBus
 
 val networkModule = module {
+    single { AuthEventBus() }
     single { TokenManager(get()) }
 
     // Especifica el tipo <HttpClient> explícitamente
     single<HttpClient> {
+        val authEventBus = get<AuthEventBus>()
         // Usamos get() directamente en la configuración para evitar confusiones de scope
         HttpClient {
             install(HttpTimeout) {
@@ -40,7 +44,16 @@ val networkModule = module {
             }
 
             install(Logging) {
-                level = LogLevel.ALL // Te recomiendo ALL para debuggear ahora
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        // "KtorClient" es el tag que buscarás en el Logcat
+                        println("KtorClient: $message")
+                    }
+                }
+
+                // 2. Mantén el nivel en ALL para ver headers y cuerpos
+                level = LogLevel.ALL
+
             }
 
             install(Auth) {
@@ -60,18 +73,27 @@ val networkModule = module {
                         try {
                             // IMPORTANTE: Para el refresh usa un cliente nuevo o el "this"
                             // para evitar loops infinitos si falla el refresh.
-                            val response = client.post("${NetworkConfig.BASE_URL}auth/refresh") {
+                            val response = this.client.post("auth/refresh") {
                                 markAsRefreshTokenRequest()
                                 contentType(ContentType.Application.Json)
-                                setBody(mapOf("refresh_token" to refreshToken))
+                                setBody(RefreshAccessTokenRequest(refreshToken))
                             }.body<ApiEnvelope<LoginResponse>>()
 
-                            response.data?.let {
-                                tokenManager.saveTokens(it.access_token, it.refresh_token)
-                                BearerTokens(it.access_token, it.refresh_token)
-                            }
+                            val data = response.data ?: return@refreshTokens null
+
+                            tokenManager.saveTokens(
+                                data.access_token,
+                                data.refresh_token
+                            )
+
+                            BearerTokens(
+                                data.access_token,
+                                data.refresh_token
+                            )
+
                         } catch (e: Exception) {
                             tokenManager.clearTokens()
+                            authEventBus.emitUnauthorized()
                             null
                         }
                     }

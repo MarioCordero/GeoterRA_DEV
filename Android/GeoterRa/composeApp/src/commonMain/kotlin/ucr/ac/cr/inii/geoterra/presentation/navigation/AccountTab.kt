@@ -10,10 +10,15 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import androidx.compose.runtime.getValue
 import ucr.ac.cr.inii.geoterra.presentation.auth.AuthViewModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountContent
+import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountScreen
+import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginContent
+import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginScreen
 import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginViewModel
 
 object AccountTab : Tab {
+
     @Composable
     override fun Content() {
         // Inyectamos el estado global de autenticación
@@ -22,22 +27,9 @@ object AccountTab : Tab {
 
         Crossfade(targetState = isLoggedIn) { authenticated ->
             if (authenticated) {
-                // Si está logueado, mostramos su perfil
-//                ProfileScreenContent()
+                AccountScreen().Content()
             } else {
-                // Si no, mostramos la pantalla de Login dentro de la pestaña
-                // Usamos el LoginScreen que ya creamos
-                val loginViewModel = koinInject<LoginViewModel>()
-                val state by loginViewModel.state.collectAsState()
-
-                LoginContent(
-                    state = state,
-                    onEmailChanged = loginViewModel::onEmailChanged,
-                    onPasswordChanged = loginViewModel::onPasswordChanged,
-                    onLoginClick = loginViewModel::login,
-                    onTogglePassword = loginViewModel::togglePasswordVisibility,
-                    onDismissSnackbar = loginViewModel::dismissSnackbar
-                )
+                LoginScreen().Content()
             }
         }
     }
