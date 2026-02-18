@@ -45,6 +45,6 @@ private val LightColors = lightColorScheme(
 @Composable
 fun App() {
     MaterialTheme(colorScheme = LightColors) {
-        MainScreen() // Siempre entramos aquí
+        Navigator(screen = MainScreen())
     }
 }

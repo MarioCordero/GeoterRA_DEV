@@ -26,7 +26,7 @@ object AccountTab : Tab {
         val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
 
         Crossfade(targetState = isLoggedIn) { authenticated ->
-            if (authenticated) {
+            if (authenticated == true) {
                 AccountScreen().Content()
             } else {
                 LoginScreen().Content()

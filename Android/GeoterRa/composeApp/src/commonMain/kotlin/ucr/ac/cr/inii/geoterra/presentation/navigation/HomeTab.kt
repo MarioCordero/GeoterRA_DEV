@@ -21,7 +21,6 @@ internal object HomeTab : Tab {
 
     @Composable
     override fun Content() {
-        // Aquí llamarás a tu Screen real
         HomeScreen().Content()
     }
 }

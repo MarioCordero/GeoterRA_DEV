@@ -11,12 +11,15 @@ class AuthViewModel(
     private val authRepository: AuthRepository,
     private val authEventBus: AuthEventBus
 ) : ScreenModel {
-    private val _isLoggedIn = MutableStateFlow(authRepository.isUserLoggedIn())
+    private val _isLoggedIn = MutableStateFlow<Boolean?>(null)
     val isLoggedIn = _isLoggedIn.asStateFlow()
 
     init {
-        // Escuchamos globalmente si el cliente de red detecta sesión expirada
+        // Coroutine scope for the ViewModel
         screenModelScope.launch {
+            // Check if the user is logged in when the ViewModel is created
+            _isLoggedIn.value = authRepository.isUserLoggedIn()
+            // Subscribe to unauthorized events
             authEventBus.unauthorizedEvents.collect {
                 _isLoggedIn.value = false
             }

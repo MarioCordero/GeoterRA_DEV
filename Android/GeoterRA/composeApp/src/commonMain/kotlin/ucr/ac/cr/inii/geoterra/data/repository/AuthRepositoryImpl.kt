@@ -2,7 +2,7 @@ package ucr.ac.cr.inii.geoterra.data.repository
 
 import io.ktor.client.*
 import io.ktor.client.call.*
-import io.ktor.client.plugins.auth.providers.BearerTokens
+import io.ktor.client.plugins.auth.authProvider
 import io.ktor.client.request.*
 import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.statement.bodyAsText
@@ -12,7 +12,6 @@ import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import ucr.ac.cr.inii.geoterra.core.network.ApiEnvelope
 import ucr.ac.cr.inii.geoterra.core.network.ErrorMapper
-import ucr.ac.cr.inii.geoterra.core.network.NetworkConfig
 import ucr.ac.cr.inii.geoterra.core.network.TokenManager
 import ucr.ac.cr.inii.geoterra.data.model.remote.LoginRequest
 import ucr.ac.cr.inii.geoterra.data.model.remote.LoginResponse
@@ -24,6 +23,16 @@ class AuthRepositoryImpl(
     private val client: HttpClient,
     private val tokenManager: TokenManager
 ) : AuthRepository {
+
+    fun invalidateAuthTokens() {
+
+        val authProvider = client.authProvider<BearerAuthProvider>()
+
+        requireNotNull(authProvider)
+
+        authProvider.clearToken()
+    }
+
 
     override suspend fun login(request: LoginRequest): Result<Unit> {
         return try {
@@ -43,6 +52,7 @@ class AuthRepositoryImpl(
                 val envelope = response.body<ApiEnvelope<LoginResponse>>()
                 if (envelope.data != null) {
                     tokenManager.saveTokens(envelope.data.access_token, envelope.data.refresh_token)
+                    invalidateAuthTokens()
                     return Result.success(Unit)
                 }
             }
@@ -65,9 +75,11 @@ class AuthRepositoryImpl(
         return try {
             client.post("auth/logout")
             tokenManager.clearTokens()
+            invalidateAuthTokens()
             Result.success(Unit)
         } catch (e: Exception) {
-            tokenManager.clearTokens() // Always clear tokens locally
+            tokenManager.clearTokens()
+            invalidateAuthTokens()
             Result.success(Unit)
         }
     }
@@ -102,5 +114,5 @@ class AuthRepositoryImpl(
     }
 
 
-    override fun isUserLoggedIn(): Boolean = tokenManager.getAccessToken() != null
+    override suspend fun isUserLoggedIn(): Boolean = tokenManager.getAccessToken() != null
 }

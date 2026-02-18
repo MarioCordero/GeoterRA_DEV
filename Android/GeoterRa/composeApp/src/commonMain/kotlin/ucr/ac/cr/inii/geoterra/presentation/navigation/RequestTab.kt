@@ -2,11 +2,14 @@ package ucr.ac.cr.inii.geoterra.presentation.navigation
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import cafe.adriel.voyager.transitions.SlideTransition
 import geoterra.composeapp.generated.resources.Res
 import geoterra.composeapp.generated.resources.ic_contract
 import org.jetbrains.compose.resources.painterResource
+import ucr.ac.cr.inii.geoterra.presentation.screens.request.RequestsScreen
 
 internal object RequestTab : Tab {
     override val options: TabOptions
@@ -18,7 +21,6 @@ internal object RequestTab : Tab {
 
     @Composable
     override fun Content() {
-        // Aquí llamarás a tu Screen real
-        Text("Contenido de Inicio")
+        Navigator(RequestsScreen())
     }
 }

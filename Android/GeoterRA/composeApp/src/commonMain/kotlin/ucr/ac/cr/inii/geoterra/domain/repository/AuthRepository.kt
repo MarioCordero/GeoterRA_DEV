@@ -8,5 +8,5 @@ interface AuthRepository {
 
     suspend fun refreshAccessToken(): Result<Unit>
     
-    fun isUserLoggedIn(): Boolean
+    suspend fun isUserLoggedIn(): Boolean
 }

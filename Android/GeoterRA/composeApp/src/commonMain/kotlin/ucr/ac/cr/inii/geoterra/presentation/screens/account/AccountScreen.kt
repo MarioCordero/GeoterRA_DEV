@@ -16,11 +16,20 @@ class AccountScreen : Screen {
 
         val accountViewModel = koinInject<AccountViewModel>()
         val accountState by accountViewModel.state.collectAsState()
-
         AccountContent(
             state = accountState,
-            onLogoutClick = accountViewModel::logout,
-            onRefresh = accountViewModel::refresh
+            onLogoutClick = {
+                accountViewModel.logout()
+                // navigator.popUntilRoot() // Opcional: limpiar stack
+            },
+            onDeleteAccountClick = {
+                // Aquí podrías llamar a accountViewModel.deleteAccount()
+
+            },
+            onEditClick = {
+                // Navegar a pantalla de edición: navigator.push(EditProfileScreen())
+            },
+            onRefresh = accountViewModel::loadUserProfile
         )
     }
 }
