@@ -1,6 +1,6 @@
 [versions]
 agp = "8.6.0"
-kotlin = "2.1.21"
+kotlin = "2.2.0"
 composeMultiplatform = "1.7.1"
 
 # Configuración de SDKs (35 es el estándar actual estable para AGP 8.5)
@@ -14,9 +14,9 @@ androidx-appcompat = "1.7.0"
 androidx-core = "1.13.1"
 androidx-lifecycle = "2.8.4"
 
-# Terceros (Versiones estables y compatibles entre sí)
+# Terceros (Versionesu7u estables y compatibles entre sí)
 koin = "4.1.1"
-ktor = "3.2.1"
+ktor = "3.0.1"
 voyager = "1.0.0"
 coroutines = "1.8.1"
 kotlinx-datetime = "0.6.0"
