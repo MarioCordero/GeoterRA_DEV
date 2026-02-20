@@ -162,6 +162,7 @@ final class AnalysisRequestRepository
 	{
 		$sql = "
 			SELECT
+					id,
 					name,
 					region,
 					email,
@@ -174,7 +175,8 @@ final class AnalysisRequestRepository
 					latitude,
 					longitude,
 					state,
-					created_at
+					created_at,
+					created_by
 			FROM analysis_requests
 			WHERE created_by = :user_id
 			ORDER BY created_at DESC

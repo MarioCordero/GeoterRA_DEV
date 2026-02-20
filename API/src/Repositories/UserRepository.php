@@ -124,5 +124,17 @@ final class UserRepository
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     return $user ?: null;
   }
+
+
+  /**
+   * Find a user by ID
+   */
+  public function findActiveUserById(string $userId): ?array
+  {
+    $stmt = $this->db->prepare('SELECT user_id, first_name, last_name, email, phone_number, role, is_active, is_verified, created_at FROM users WHERE user_id = :uid AND deleted_at IS NULL AND is_active = 1 LIMIT 1');
+    $stmt->execute(['uid' => $userId]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $user ?: null;
+  }
 }
 ?>

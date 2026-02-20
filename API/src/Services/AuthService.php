@@ -34,35 +34,32 @@ final class AuthService
     $accessToken = bin2hex(random_bytes(32));
     $refreshToken = bin2hex(random_bytes(64));
 
-    $accessHash = hash('sha256', $accessToken);
-    $refreshHash = hash('sha256', $refreshToken);
-
-    $accessExpires = date('Y-m-d H:i:s', time() + 900);
-    $refreshExpires = date('Y-m-d H:i:s', time() + 3600 * 24 * 30);
+    $accessExpires = 3600 + 1800;
+    $refreshExpires = 3600 * 24 * 30;
 
     $this->authRepository->upsertAccessToken(
       $userId,
-      $accessHash,
+      $accessToken,
       $accessExpires
     );
 
     $this->authRepository->upsertRefreshToken(
       $userId,
-      $refreshHash,
+      $refreshToken,
       $refreshExpires
     );
 
-    return [
+    $tokens_info =  [
       'data' => [
         'access_token' => $accessToken,
-        'refresh_token' => $refreshToken,
-        'access_expires_at' => $accessExpires,
-        'refresh_expires_at' => $refreshExpires
+        'refresh_token' => $refreshToken
       ],
       'meta' => [
         'token_type' => 'Bearer'
       ]
     ];
+
+    return $tokens_info;
   }
 
   /**
@@ -70,48 +67,50 @@ final class AuthService
    *
    * @throws ApiException if refresh token is invalid or expired
    */
-  public function refreshTokens(string $rawRefreshToken): array
-  {
+  public function refreshTokens(string $rawRefreshToken): array {
     $stored = $this->authRepository->findValidRefreshToken($rawRefreshToken);
 
     if (!$stored) {
-      throw new ApiException(ErrorType::invalidToken(), 401);
+      throw new ApiException(ErrorType::invalidRefreshToken(), 401);
     }
 
-    $userId = (string) $stored['user_id'];
+    $newAccessToken = bin2hex(random_bytes(32));
+    $newRefreshToken = bin2hex(random_bytes(64));
 
-    $newAccess = bin2hex(random_bytes(32));
-    $newRefresh = bin2hex(random_bytes(64));
+    $this->authRepository->beginTransaction();
 
-    $accessHash = hash('sha256', $newAccess);
-    $refreshHash = hash('sha256', $newRefresh);
-
-    $accessExpires = date('Y-m-d H:i:s', time() + 900);
-    $refreshExpires = date('Y-m-d H:i:s', time() + 3600 * 24 * 30);
-
-    $this->authRepository->upsertAccessToken(
-      $userId,
-      $accessHash,
-      $accessExpires
+    // 🔒 Invalida SOLO el refresh usado
+    $this->authRepository->deleteUserTokens(
+      (string) $stored['user_id']
     );
 
-    $this->authRepository->upsertRefreshToken(
-      $userId,
-      $refreshHash,
-      $refreshExpires
+    // 🔁 Reemplaza access token
+    $access = $this->authRepository->upsertAccessToken(
+      $stored['user_id'],
+      $newAccessToken,
+      3600 + 1800
     );
 
-    return [
+    // 🔁 Inserta nuevo refresh token
+    $refresh = $this->authRepository->upsertRefreshToken(
+      $stored['user_id'],
+      $newRefreshToken,
+      3600 * 24 * 30
+    );
+
+    $this->authRepository->commit();
+
+    $tokens_info = [
       'data' => [
-        'access_token' => $newAccess,
-        'refresh_token' => $newRefresh,
-        'access_expires_at' => $accessExpires,
-        'refresh_expires_at' => $refreshExpires
+        'access_token' => $newAccessToken,
+        'access_expires_at' => $access['expires_at'],
+        'refresh_token' => $newRefreshToken,
+        'refresh_expires_at'=> $refresh['expires_at']
       ],
-      'meta' => [
-        'rotated' => true
-      ]
+      'meta' => ['rotated' => true]
     ];
+
+    return $tokens_info;
   }
 
   /**
@@ -121,13 +120,7 @@ final class AuthService
    */
   public function logout(string $rawAccessToken): void
   {
-    $hash = hash('sha256', $rawAccessToken);
-
-    $token = $this->authRepository->findValidAccessToken($hash);
-
-    if (!$token) {
-      throw new ApiException(ErrorType::invalidToken(), 401);
-    }
+    $token = $this->validateAccessToken($rawAccessToken);
 
     $this->authRepository->deleteUserTokens(
       (string) $token['user_id']
@@ -140,25 +133,11 @@ final class AuthService
    *
    * @throws ApiException if token is invalid or expired
    */
-  public function authenticate(string $rawAccessToken): array
+  private function authenticate(string $rawAccessToken): array
   {
-    $token = $this->authRepository->findValidAccessToken($rawAccessToken);
+    $token = $this->validateAccessToken($rawAccessToken);
 
-    if (!$token) {
-      throw new ApiException(
-        ErrorType::invalidToken()
-      );
-    }
-
-    $user = $this->userRepository->findById(
-      (string) $token['user_id']
-    );
-
-    if (!$user) {
-      throw new ApiException(
-        ErrorType::invalidToken()
-      );
-    }
+    $user = $this->findUserById($token['user_id']);
 
     return [
       'user_id' => (string) $user['user_id'],
@@ -169,11 +148,14 @@ final class AuthService
   public function requireAuth(): array
   {
     $headers = getallheaders();
-    $authorization = $headers['Authorization'] ?? '';
+    $authorization =
+      $headers['Authorization']
+      ?? $_SERVER['HTTP_AUTHORIZATION']
+      ?? '';
 
     if (!str_starts_with($authorization, 'Bearer ')) {
       throw new ApiException(
-        ErrorType::missingAuthToken()
+        ErrorType::missingAuthToken(), 401
       );
     }
 
@@ -181,24 +163,26 @@ final class AuthService
 
     if ($token === '') {
       throw new ApiException(
-        ErrorType::missingAuthToken()
+        ErrorType::missingAuthToken(), 401
       );
     }
 
-    return $this->authenticate($token);
+    $user = $this->authenticate($token);
+
+    return $user;
   }
+
   /**
    * Validate an access token.
    */
   public function validateAccessToken(string $rawToken): array
   {
-    $tokenHash = hash('sha256', $rawToken);
-
-    $token = $this->authRepository->findValidAccessToken($tokenHash);
+    
+    $token = $this->authRepository->findValidAccessToken($rawToken);
 
     if (!$token) {
       throw new ApiException(
-        ErrorType::invalidToken(),
+        ErrorType::invalidAccessToken(),
         401
       );
     }
@@ -210,8 +194,15 @@ final class AuthService
    * Find user by ID
    */
   public function findUserById(string $userId): ?array
- {
-    return $this->userRepository->findById($userId);
+  {     
+    $user = $this->userRepository->findById($userId);
+    if (!$user) {
+      throw new ApiException(
+        ErrorType::notFound("user"),
+        404
+      );
+    }
+    return $user;
   }
 }
 ?>

@@ -118,12 +118,17 @@ final class ErrorType implements JsonSerializable
 	/**
 	 * Token provided is invalid or expired.
 	 */
-	public static function invalidToken(): self
+	public static function invalidAccessToken(): self
 	{
-		return new self('INVALID_TOKEN', 'Authorization token is invalid or expired');
+		return new self('INVALID_ACCESS_TOKEN', 'Authorization token is invalid or expired');
 	}
 
-	public static function unknownToken(): self
+	public static function invalidRefreshToken(): self
+	{
+		return new self('INVALID_REFRESH_TOKEN', 'Refresh token is invalid or expired');
+	}
+
+	public static function unknownAccessToken(): self
 	{
 		return new self('UNKNOWN_TOKEN', 'The provided token is not recognized');
 	}

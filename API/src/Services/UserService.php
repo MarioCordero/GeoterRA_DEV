@@ -115,13 +115,13 @@ final class UserService
    * @return array
    * @throws ApiException if user not found
    */
-  public function getUserById(string $userId): array
+  public function getUserById(string $userId, bool $activeOnly): array
   {
-    $user = $this->repository->findById($userId);
+    $user = $activeOnly ? $this->repository->findActiveUserById($userId) : $this->repository->findById($userId);
 
     if (!$user) {
       throw new ApiException(
-        ErrorType::notFound('User')
+        ErrorType::notFound('User'),
       );
     }
 

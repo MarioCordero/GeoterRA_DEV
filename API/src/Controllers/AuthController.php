@@ -54,7 +54,7 @@ final class AuthController
     } catch (ApiException $e) {
       Response::error(
         $e->getError(),
-        $e->getCode()
+        401
       );
 
     } catch (\Throwable $e) {
@@ -114,7 +114,7 @@ final class AuthController
       );
 
     } catch (ApiException $e) {
-      Response::error($e->getError(), 401);
+      Response::error($e->getError(), $e->getHttpStatus());
     } catch (\Throwable $e) {
       Response::error(
         ErrorType::internal($e->getMessage()),
@@ -145,7 +145,7 @@ final class AuthController
       }
 
       // ===============================
-      // Logout process
+      // Logout process 
       // ===============================
       $this->authService->logout($token);
 
@@ -158,7 +158,7 @@ final class AuthController
     } catch (ApiException $e) {
       Response::error(
         $e->getError(),
-        401
+        $e->getHttpStatus()
       );
 
     } catch (\Throwable $e) {

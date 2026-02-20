@@ -28,7 +28,7 @@ final class Response
    * @param int $status HTTP status code (used for legacy string or fallback)
    * @param array|null $meta Additional metadata (optional)
    */
-  public static function error(ErrorType|array|string $errors, int $status = 400, ?array $meta = null): void
+  public static function error(ErrorType|array|string $errors, int $status = 401, ?array $meta = null): void
   {
     $list = [];
 
