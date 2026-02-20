@@ -24,7 +24,6 @@ final class UserController
     try {
       $auth = $this->authService->requireAuth();
 
-
       $body = Request::parseJsonRequest();
 
       $dto = UpdateUserDTO::fromArray($body);
@@ -67,7 +66,7 @@ final class UserController
       );
 
     } catch (ApiException $e) {
-      Response::error($e->getError(), $e->getCode());
+      Response::error($e->getError(), $e->getHttpStatus());
     } catch (\Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
@@ -81,12 +80,11 @@ final class UserController
     try {
       $auth = $this->authService->requireAuth();
 
-
-      $result = $this->userService->getUserById((string)$auth['user_id']);
+      $result = $this->userService->getUserById((string)$auth['user_id'], true);
       Response::success($result['data'], $result['meta'], 200);
 
     } catch (ApiException $e) {
-      Response::error($e->getError(), 404);
+      Response::error($e->getError(), status: $e->getHttpStatus());
     } catch (\Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
