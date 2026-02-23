@@ -12,17 +12,17 @@ import ucr.ac.cr.inii.geoterra.core.di.platformSettingsModule
  * Koin MUST be initialized here.
  */
 class MainApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-
-        // Usamos la función compartida pero pasamos el contexto de Android
-        startKoin {
-            androidContext(this@MainApplication)
-            modules(
-                appModule,
-                networkModule,
-                platformSettingsModule
-            )
-        }
+  override fun onCreate() {
+    super.onCreate()
+    
+    // Usamos la función compartida pero pasamos el contexto de Android
+    startKoin {
+      androidContext(this@MainApplication)
+      modules(
+        appModule,
+        networkModule,
+        platformSettingsModule
+      )
     }
+  }
 }

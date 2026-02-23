@@ -6,9 +6,9 @@ import com.russhwolf.settings.SharedPreferencesSettings
 import org.koin.dsl.module
 
 actual val platformSettingsModule = module {
-    single<Settings> {
-        val context: Context = get()
-        val sharedPrefs = context.getSharedPreferences("geoterra_secure_prefs", Context.MODE_PRIVATE)
-        SharedPreferencesSettings(sharedPrefs)
-    }
+  single<Settings> {
+    val context: Context = get()
+    val sharedPrefs = context.getSharedPreferences("geoterra_secure_prefs", Context.MODE_PRIVATE)
+    SharedPreferencesSettings(sharedPrefs)
+  }
 }

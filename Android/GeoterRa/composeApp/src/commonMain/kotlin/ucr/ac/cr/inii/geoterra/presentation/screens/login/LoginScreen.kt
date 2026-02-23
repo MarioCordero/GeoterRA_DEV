@@ -21,22 +21,22 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeViewModel
  * Voyager Screen for the Login screen.
  */
 class LoginScreen : Screen {
-
-    @Composable
-    override fun Content() {
-        // Inyectamos el ViewModel correcto para esta pantalla
-        val viewModel: LoginViewModel = koinInject()
-        // Observamos el estado del login
-        val state by viewModel.state.collectAsState()
-
-        // Llamamos al componente UI (LoginContent)
-        LoginContent(
-            state = state,
-            onEmailChanged = viewModel::onEmailChanged,
-            onPasswordChanged = viewModel::onPasswordChanged,
-            onLoginClick = viewModel::login,
-            onTogglePassword = viewModel::togglePasswordVisibility,
-            onDismissSnackbar = viewModel::dismissSnackbar
-        )
-    }
+  
+  @Composable
+  override fun Content() {
+    // Inyectamos el ViewModel correcto para esta pantalla
+    val viewModel: LoginViewModel = koinInject()
+    // Observamos el estado del login
+    val state by viewModel.state.collectAsState()
+    
+    // Llamamos al componente UI (LoginContent)
+    LoginContent(
+      state = state,
+      onEmailChanged = viewModel::onEmailChanged,
+      onPasswordChanged = viewModel::onPasswordChanged,
+      onLoginClick = viewModel::login,
+      onTogglePassword = viewModel::togglePasswordVisibility,
+      onDismissSnackbar = viewModel::dismissSnackbar
+    )
+  }
 }

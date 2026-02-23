@@ -61,74 +61,84 @@ import ucr.ac.cr.inii.geoterra.presentation.components.account.ProfileHeaderCard
 
 @Composable
 fun AccountContent(
-    state: AccountState,
-    onLogoutClick: () -> Unit,
-    onDeleteAccountClick: () -> Unit,
-    onEditClick: () -> Unit,
-    onRefresh: () -> Unit
+  state: AccountState,
+  onLogoutClick: () -> Unit,
+  onDeleteAccountClick: () -> Unit,
+  onEditClick: () -> Unit,
+  onRefresh: () -> Unit
 ) {
-    var showLogoutDialog by remember { mutableStateOf(false) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
-
-    Scaffold(
-        topBar = {
-            Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)) {
-                Text(
-                    text = "Mi Perfil",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1A237E) // Azul GeoTerra
-                )
-            }
-        }
-    ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            if (state.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            } else if (state.user != null) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    // Tarjeta de información principal
-                    item {
-                        ProfileHeaderCard(state.user)
-                    }
-
-                    // Sección de Información de Contacto
-                    item {
-                        Column {
-                            InfoTile(Icons.Default.Email, "Correo electrónico", state.user.email)
-                            InfoTile(Icons.Default.Phone, "Teléfono", state.user.phone_number ?: "No asignado")
-                            InfoTile(Icons.Default.Badge, "Rol de usuario", state.user.role)
-                        }
-                    }
-
-                    // Menú de Opciones
-                    item {
-                        Text("Configuración", style = MaterialTheme.typography.labelLarge, color = Color.Gray)
-                        Spacer(Modifier.height(8.dp))
-                        ActionMenuItem(Icons.Default.Edit, "Editar información personal", onClick = onEditClick)
-                        ActionMenuItem(Icons.Default.History, "Historial de solicitudes", onClick = { /* Historial */ })
-                        ActionMenuItem(Icons.Default.Refresh, "Refrescar datos", onClick = onRefresh)
-                    }
-
-                    // Acciones de Cuenta (Peligro)
-                    item {
-                        Spacer(Modifier.height(16.dp))
-                        HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
-                        Spacer(Modifier.height(16.dp))
-
-                        DangerActionItem(Icons.AutoMirrored.Filled.Logout, "Cerrar sesión", onClick = { showLogoutDialog = true })
-                        DangerActionItem(Icons.Default.DeleteForever, "Eliminar cuenta", isCritical = true, onClick = { showDeleteDialog = true })
-                    }
-                }
-            } else if (state.error != null) {
-//                ErrorView(state.error, onRefresh)
-            }
-        }
+  var showLogoutDialog by remember { mutableStateOf(false) }
+  var showDeleteDialog by remember { mutableStateOf(false) }
+  
+  Scaffold(
+    topBar = {
+      Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)) {
+        Text(
+          text = "Mi Perfil",
+          style = MaterialTheme.typography.headlineMedium,
+          fontWeight = FontWeight.Bold,
+          color = Color(0xFF1A237E) // Azul GeoTerra
+        )
+      }
     }
+  ) { paddingValues ->
+    Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+      if (state.isLoading) {
+        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+      } else if (state.user != null) {
+        LazyColumn(
+          modifier = Modifier.fillMaxSize(),
+          contentPadding = PaddingValues(20.dp),
+          verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+          // Tarjeta de información principal
+          item {
+            ProfileHeaderCard(state.user)
+          }
+          
+          // Sección de Información de Contacto
+          item {
+            Column {
+              InfoTile(Icons.Default.Email, "Correo electrónico", state.user.email)
+              InfoTile(Icons.Default.Phone, "Teléfono", state.user.phone_number ?: "No asignado")
+              InfoTile(Icons.Default.Badge, "Rol de usuario", state.user.role)
+            }
+          }
+          
+          // Menú de Opciones
+          item {
+            Text("Configuración", style = MaterialTheme.typography.labelLarge, color = Color.Gray)
+            Spacer(Modifier.height(8.dp))
+            ActionMenuItem(Icons.Default.Edit, "Editar información personal", onClick = onEditClick)
+            ActionMenuItem(
+              Icons.Default.History,
+              "Historial de solicitudes",
+              onClick = { /* Historial */ })
+            ActionMenuItem(Icons.Default.Refresh, "Refrescar datos", onClick = onRefresh)
+          }
+          
+          // Acciones de Cuenta (Peligro)
+          item {
+            Spacer(Modifier.height(16.dp))
+            HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+            Spacer(Modifier.height(16.dp))
+            
+            DangerActionItem(
+              Icons.AutoMirrored.Filled.Logout,
+              "Cerrar sesión",
+              onClick = { showLogoutDialog = true })
+            DangerActionItem(
+              Icons.Default.DeleteForever,
+              "Eliminar cuenta",
+              isCritical = true,
+              onClick = { showDeleteDialog = true })
+          }
+        }
+      } else if (state.error != null) {
+//                ErrorView(state.error, onRefresh)
+      }
+    }
+  }
 
 //    // Diálogos de Confirmación
 //    if (showLogoutDialog) {

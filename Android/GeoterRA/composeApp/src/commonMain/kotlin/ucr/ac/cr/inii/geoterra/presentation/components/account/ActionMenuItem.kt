@@ -23,13 +23,16 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ActionMenuItem(icon: ImageVector, title: String, onClick: () -> Unit) {
-    Surface(onClick = onClick, shape = RoundedCornerShape(12.dp), color = Color.Transparent) {
-        Row(modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp, horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, contentDescription = null, modifier = Modifier.size(22.dp))
-            Spacer(Modifier.width(16.dp))
-            Text(title, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-            Spacer(Modifier.weight(1f))
-            Icon(Icons.Default.ChevronRight, contentDescription = null, modifier = Modifier.size(16.dp))
-        }
+  Surface(onClick = onClick, shape = RoundedCornerShape(12.dp), color = Color.Transparent) {
+    Row(
+      modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp, horizontal = 4.dp),
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Icon(icon, contentDescription = null, modifier = Modifier.size(22.dp))
+      Spacer(Modifier.width(16.dp))
+      Text(title, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+      Spacer(Modifier.weight(1f))
+      Icon(Icons.Default.ChevronRight, contentDescription = null, modifier = Modifier.size(16.dp))
     }
+  }
 }

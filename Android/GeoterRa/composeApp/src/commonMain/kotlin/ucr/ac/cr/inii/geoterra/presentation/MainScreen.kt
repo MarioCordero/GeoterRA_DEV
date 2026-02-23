@@ -21,35 +21,35 @@ import ucr.ac.cr.inii.geoterra.presentation.navigation.MapTab
 import ucr.ac.cr.inii.geoterra.presentation.navigation.RequestTab
 
 class MainScreen() : Screen {
-    @Composable
-    override fun Content() {
-        TabNavigator(HomeTab) { tabNavigator ->
-            Scaffold(
-                bottomBar = {
-                    NavigationBar {
-                        TabNavigationItem(HomeTab)
-                        TabNavigationItem(MapTab)
-                        TabNavigationItem(RequestTab)
-                        TabNavigationItem(AccountTab)
-                    }
-                }
-            ) { padding ->
-                Box(Modifier.padding(padding)) {
-                    CurrentTab()
-                }
-            }
+  @Composable
+  override fun Content() {
+    TabNavigator(HomeTab) { tabNavigator ->
+      Scaffold(
+        bottomBar = {
+          NavigationBar {
+            TabNavigationItem(HomeTab)
+            TabNavigationItem(MapTab)
+            TabNavigationItem(RequestTab)
+            TabNavigationItem(AccountTab)
+          }
         }
+      ) { padding ->
+        Box(Modifier.padding(padding)) {
+          CurrentTab()
+        }
+      }
     }
-
+  }
+  
 }
 
 @Composable
 private fun RowScope.TabNavigationItem(tab: Tab) {
-    val tabNavigator = LocalTabNavigator.current
-    NavigationBarItem(
-        selected = tabNavigator.current.key == tab.key,
-        onClick = { tabNavigator.current = tab },
-        label = { Text(tab.options.title) },
-        icon = { Icon(painter = tab.options.icon!!, contentDescription = tab.options.title) }
-    )
+  val tabNavigator = LocalTabNavigator.current
+  NavigationBarItem(
+    selected = tabNavigator.current.key == tab.key,
+    onClick = { tabNavigator.current = tab },
+    label = { Text(tab.options.title) },
+    icon = { Icon(painter = tab.options.icon!!, contentDescription = tab.options.title) }
+  )
 }

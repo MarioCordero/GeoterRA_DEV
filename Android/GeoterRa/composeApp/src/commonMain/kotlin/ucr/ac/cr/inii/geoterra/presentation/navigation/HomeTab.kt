@@ -12,15 +12,15 @@ import org.jetbrains.compose.resources.painterResource
 import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeScreen
 
 internal object HomeTab : Tab {
-    override val options: TabOptions
-        @Composable
-        get() {
-            val icon = painterResource(Res.drawable.ic_home)
-            return TabOptions(index = 0u, title = "Inicio", icon)
-        }
-
+  override val options: TabOptions
     @Composable
-    override fun Content() {
-        HomeScreen().Content()
+    get() {
+      val icon = painterResource(Res.drawable.ic_home)
+      return TabOptions(index = 0u, title = "Inicio", icon)
     }
+  
+  @Composable
+  override fun Content() {
+    HomeScreen().Content()
+  }
 }

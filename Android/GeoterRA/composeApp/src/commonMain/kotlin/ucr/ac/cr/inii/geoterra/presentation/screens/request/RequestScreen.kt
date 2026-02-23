@@ -21,46 +21,46 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisDetailS
 import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisFormScreen
 
 class RequestsScreen : Screen {
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    override fun Content() {
-        val viewModel = koinInject<RequestViewModel>()
-        val state by viewModel.state.collectAsState()
-        val navigator = LocalNavigator.currentOrThrow
-
-        var selectedRequest by remember { mutableStateOf<AnalysisRequestRemote?>(null) }
-        val sheetState = rememberModalBottomSheetState()
-
-        if (selectedRequest != null) {
-            ModalBottomSheet(
-                onDismissRequest = { selectedRequest = null },
-                sheetState = sheetState,
-                containerColor = Color.White
-            ) {
-                AnalysisDetailSheet(request = selectedRequest!!)
-            }
-        }
-
-        Scaffold(
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navigator.push(AnalysisFormScreen()) },
-                    containerColor = Color(0xFFF57C00),
-                    contentColor = Color.White
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Crear")
-                }
-            }
-        ) { padding ->
-            RequestsContent(
-                modifier = Modifier.padding(padding),
-                state = state,
-                onCreateRequest = { navigator.push(AnalysisFormScreen()) },
-                onView = { request -> selectedRequest = request },
-                onEdit = { request -> navigator.push(AnalysisFormScreen(request)) },
-                onDelete = { request -> viewModel.deleteRequest(request.id) },
-                onRefresh = viewModel::fetchSubmittedRequests
-            )
-        }
+  @OptIn(ExperimentalMaterial3Api::class)
+  @Composable
+  override fun Content() {
+    val viewModel = koinInject<RequestViewModel>()
+    val state by viewModel.state.collectAsState()
+    val navigator = LocalNavigator.currentOrThrow
+    
+    var selectedRequest by remember { mutableStateOf<AnalysisRequestRemote?>(null) }
+    val sheetState = rememberModalBottomSheetState()
+    
+    if (selectedRequest != null) {
+      ModalBottomSheet(
+        onDismissRequest = { selectedRequest = null },
+        sheetState = sheetState,
+        containerColor = Color.White
+      ) {
+        AnalysisDetailSheet(request = selectedRequest!!)
+      }
     }
+    
+    Scaffold(
+      floatingActionButton = {
+        FloatingActionButton(
+          onClick = { navigator.push(AnalysisFormScreen()) },
+          containerColor = Color(0xFFF57C00),
+          contentColor = Color.White
+        ) {
+          Icon(Icons.Default.Add, contentDescription = "Crear")
+        }
+      }
+    ) { padding ->
+      RequestsContent(
+        modifier = Modifier.padding(padding),
+        state = state,
+        onCreateRequest = { navigator.push(AnalysisFormScreen()) },
+        onView = { request -> selectedRequest = request },
+        onEdit = { request -> navigator.push(AnalysisFormScreen(request)) },
+        onDelete = { request -> viewModel.deleteRequest(request.id) },
+        onRefresh = viewModel::fetchSubmittedRequests
+      )
+    }
+  }
 }

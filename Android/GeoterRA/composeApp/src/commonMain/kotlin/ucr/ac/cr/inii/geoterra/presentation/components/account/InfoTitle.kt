@@ -20,12 +20,15 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun InfoTile(icon: ImageVector, label: String, value: String) {
-    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-        Icon(icon, contentDescription = null, tint = Color(0xFF1A237E), modifier = Modifier.size(24.dp))
-        Spacer(Modifier.width(16.dp))
-        Column {
-            Text(label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-            Text(value, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
-        }
+  Row(
+    modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+    verticalAlignment = Alignment.CenterVertically
+  ) {
+    Icon(icon, contentDescription = null, tint = Color(0xFF1A237E), modifier = Modifier.size(24.dp))
+    Spacer(Modifier.width(16.dp))
+    Column {
+      Text(label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+      Text(value, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
     }
+  }
 }

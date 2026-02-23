@@ -10,14 +10,14 @@ import kotlinx.coroutines.flow.asStateFlow
  * Does not depend on Android lifecycle.
  */
 class HomeViewModel {
-
-    private val _state = MutableStateFlow(HomeState())
-    val state: StateFlow<HomeState> = _state.asStateFlow()
-
-    /**
-     * Example event handler.
-     */
-    fun onCardSelected() {
-        // Business logic goes here
-    }
+  
+  private val _state = MutableStateFlow(HomeState())
+  val state: StateFlow<HomeState> = _state.asStateFlow()
+  
+  /**
+   * Example event handler.
+   */
+  fun onCardSelected() {
+    // Business logic goes here
+  }
 }

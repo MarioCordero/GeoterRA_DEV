@@ -12,15 +12,15 @@ import org.jetbrains.compose.resources.painterResource
 import ucr.ac.cr.inii.geoterra.presentation.screens.request.RequestsScreen
 
 internal object RequestTab : Tab {
-    override val options: TabOptions
-        @Composable
-        get() {
-            val icon = painterResource(Res.drawable.ic_contract)
-            return TabOptions(index = 0u, title = "Solicitudes", icon)
-        }
-
+  override val options: TabOptions
     @Composable
-    override fun Content() {
-        Navigator(RequestsScreen())
+    get() {
+      val icon = painterResource(Res.drawable.ic_contract)
+      return TabOptions(index = 0u, title = "Solicitudes", icon)
     }
+  
+  @Composable
+  override fun Content() {
+    Navigator(RequestsScreen())
+  }
 }

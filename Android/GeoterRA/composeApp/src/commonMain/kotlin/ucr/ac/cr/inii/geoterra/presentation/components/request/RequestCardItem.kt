@@ -33,106 +33,106 @@ import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
 
 @Composable
 fun RequestCardItem(
-    request: AnalysisRequestRemote,
-    onView: () -> Unit,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit
+  request: AnalysisRequestRemote,
+  onView: () -> Unit,
+  onEdit: () -> Unit,
+  onDelete: () -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            // Header con ID y Nombre
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = request.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1A237E)
-                    )
+  Card(
+    modifier = Modifier.fillMaxWidth(),
+    shape = RoundedCornerShape(16.dp),
+    elevation = CardDefaults.cardElevation(4.dp),
+    colors = CardDefaults.cardColors(containerColor = Color.White)
+  ) {
+    Column(modifier = Modifier.padding(16.dp)) {
+      // Header con ID y Nombre
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(modifier = Modifier.weight(1f)) {
+          Text(
+            text = request.name,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1A237E)
+          )
 //                    Text("ID: ${request.id}", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-                }
-                StatusBadge("Pendiente") // Estado mockeado ya que no está en el remote actual
-            }
-
-            HorizontalDivider(Modifier.padding(vertical = 12.dp), thickness = 0.5.dp)
-
-            // Grid de Datos Técnicos
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                RequestInfoRow(
-                    label1 = "Región", value1 = request.region,
-                    label2 = "Uso", value2 = request.current_usage ?: "N/A"
-                )
-                RequestInfoRow(
-                    label1 = "Latitud", value1 = request.latitude.toString(),
-                    label2 = "Longitud", value2 = request.longitude.toString()
-                )
-            }
-
-            // Acciones
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                SecondaryButton(text = "Ver", onClick = onView, modifier = Modifier.weight(1f))
-                SecondaryButton(text = "Editar", onClick = onEdit, modifier = Modifier.weight(1f))
-                PrimaryButton(
-                    text = "Borrar",
-                    onClick = onDelete,
-                    color = Color(0xFFD32F2F),
-                    modifier = Modifier.weight(1f)
-                )
-            }
         }
+        StatusBadge("Pendiente") // Estado mockeado ya que no está en el remote actual
+      }
+      
+      HorizontalDivider(Modifier.padding(vertical = 12.dp), thickness = 0.5.dp)
+      
+      // Grid de Datos Técnicos
+      Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        RequestInfoRow(
+          label1 = "Región", value1 = request.region,
+          label2 = "Uso", value2 = request.current_usage ?: "N/A"
+        )
+        RequestInfoRow(
+          label1 = "Latitud", value1 = request.latitude.toString(),
+          label2 = "Longitud", value2 = request.longitude.toString()
+        )
+      }
+      
+      // Acciones
+      Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+      ) {
+        SecondaryButton(text = "Ver", onClick = onView, modifier = Modifier.weight(1f))
+        SecondaryButton(text = "Editar", onClick = onEdit, modifier = Modifier.weight(1f))
+        PrimaryButton(
+          text = "Borrar",
+          onClick = onDelete,
+          color = Color(0xFFD32F2F),
+          modifier = Modifier.weight(1f)
+        )
+      }
     }
+  }
 }
 
 @Composable
 fun RequestInfoRow(label1: String, value1: String, label2: String, value2: String) {
-    Row(Modifier.fillMaxWidth()) {
-        InfoBlock(label1, value1, Modifier.weight(1f))
-        InfoBlock(label2, value2, Modifier.weight(1f))
-    }
+  Row(Modifier.fillMaxWidth()) {
+    InfoBlock(label1, value1, Modifier.weight(1f))
+    InfoBlock(label2, value2, Modifier.weight(1f))
+  }
 }
 
 @Composable
 fun InfoBlock(label: String, value: String, modifier: Modifier) {
-    Column(modifier = modifier) {
-        Text(label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-        Text(
-            value,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
+  Column(modifier = modifier) {
+    Text(label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+    Text(
+      value,
+      style = MaterialTheme.typography.bodyMedium,
+      fontWeight = FontWeight.SemiBold,
+      maxLines = 1,
+      overflow = TextOverflow.Ellipsis
+    )
+  }
 }
 
 @Composable
 fun SecondaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    OutlinedButton(
-        onClick = onClick,
-        modifier = modifier,
-        shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(1.dp, Color.LightGray)
-    ) {
-        Text(text, color = Color.Black, style = MaterialTheme.typography.bodySmall)
-    }
+  OutlinedButton(
+    onClick = onClick,
+    modifier = modifier,
+    shape = RoundedCornerShape(8.dp),
+    border = BorderStroke(1.dp, Color.LightGray)
+  ) {
+    Text(text, color = Color.Black, style = MaterialTheme.typography.bodySmall)
+  }
 }
 
 @Composable
 fun PrimaryButton(text: String, onClick: () -> Unit, color: Color, modifier: Modifier = Modifier) {
-    Button(
-        onClick = onClick,
-        modifier = modifier,
-        colors = ButtonDefaults.buttonColors(containerColor = color),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Text(text, color = Color.White, style = MaterialTheme.typography.bodySmall)
-    }
+  Button(
+    onClick = onClick,
+    modifier = modifier,
+    colors = ButtonDefaults.buttonColors(containerColor = color),
+    shape = RoundedCornerShape(8.dp)
+  ) {
+    Text(text, color = Color.White, style = MaterialTheme.typography.bodySmall)
+  }
 }

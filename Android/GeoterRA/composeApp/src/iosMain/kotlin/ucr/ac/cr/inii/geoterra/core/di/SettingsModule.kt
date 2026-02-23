@@ -6,8 +6,8 @@ import platform.Foundation.NSUserDefaults
 import org.koin.dsl.module
 
 actual val platformSettingsModule = module {
-    single<Settings> {
-        val userDefaults = NSUserDefaults.standardUserDefaults
-        NSUserDefaultsSettings(userDefaults)
-    }
+  single<Settings> {
+    val userDefaults = NSUserDefaults.standardUserDefaults
+    NSUserDefaultsSettings(userDefaults)
+  }
 }

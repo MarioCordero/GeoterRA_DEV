@@ -18,13 +18,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun DangerActionItem(icon: ImageVector, title: String, isCritical: Boolean = false, onClick: () -> Unit) {
-    val color = if (isCritical) Color.Red else Color(0xFFE64A19) // Naranja GeoTerra
-    TextButton(onClick = onClick, modifier = Modifier.fillMaxWidth(), contentPadding = PaddingValues(0.dp)) {
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, contentDescription = null, tint = color)
-            Spacer(Modifier.width(12.dp))
-            Text(title, color = color, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-        }
+fun DangerActionItem(
+  icon: ImageVector,
+  title: String,
+  isCritical: Boolean = false,
+  onClick: () -> Unit
+) {
+  val color = if (isCritical) Color.Red else Color(0xFFE64A19) // Naranja GeoTerra
+  TextButton(
+    onClick = onClick,
+    modifier = Modifier.fillMaxWidth(),
+    contentPadding = PaddingValues(0.dp)
+  ) {
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+      Icon(icon, contentDescription = null, tint = color)
+      Spacer(Modifier.width(12.dp))
+      Text(
+        title,
+        color = color,
+        style = MaterialTheme.typography.bodyLarge,
+        fontWeight = FontWeight.Bold
+      )
     }
+  }
 }

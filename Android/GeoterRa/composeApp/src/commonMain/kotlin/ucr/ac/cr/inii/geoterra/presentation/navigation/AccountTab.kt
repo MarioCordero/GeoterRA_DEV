@@ -1,4 +1,5 @@
 package ucr.ac.cr.inii.geoterra.presentation.navigation
+
 import androidx.compose.animation.Crossfade
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -18,27 +19,27 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginScreen
 import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginViewModel
 
 object AccountTab : Tab {
-
-    @Composable
-    override fun Content() {
-        // Inyectamos el estado global de autenticación
-        val authViewModel = koinInject<AuthViewModel>()
-        val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
-
-        Crossfade(targetState = isLoggedIn) { authenticated ->
-            if (authenticated == true) {
-                AccountScreen().Content()
-            } else {
-                LoginScreen().Content()
-            }
-        }
+  
+  @Composable
+  override fun Content() {
+    // Inyectamos el estado global de autenticación
+    val authViewModel = koinInject<AuthViewModel>()
+    val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
+    
+    Crossfade(targetState = isLoggedIn) { authenticated ->
+      if (authenticated == true) {
+        AccountScreen().Content()
+      } else {
+        LoginScreen().Content()
+      }
     }
-
-    override val options: TabOptions
-        @Composable
-        get() = TabOptions(
-            index = 3u,
-            title = "Cuenta",
-            icon = painterResource(Res.drawable.ic_account)
-        )
+  }
+  
+  override val options: TabOptions
+    @Composable
+    get() = TabOptions(
+      index = 3u,
+      title = "Cuenta",
+      icon = painterResource(Res.drawable.ic_account)
+    )
 }

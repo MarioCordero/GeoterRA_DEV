@@ -14,59 +14,59 @@ import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
  * @param authViewModel Handles the global app session state
  */
 class LoginViewModel(
-    private val authRepository: AuthRepository,
-    private val authViewModel: AuthViewModel
+  private val authRepository: AuthRepository,
+  private val authViewModel: AuthViewModel
 ) : BaseScreenModel<LoginState>(LoginState()) {
-
-    fun onEmailChanged(newValue: String) {
-        updateState { it.copy(email = newValue, emailError = null) }
+  
+  fun onEmailChanged(newValue: String) {
+    updateState { it.copy(email = newValue, emailError = null) }
+  }
+  
+  fun onPasswordChanged(newValue: String) {
+    updateState { it.copy(password = newValue, passwordError = null) }
+  }
+  
+  fun togglePasswordVisibility() {
+    updateState { it.copy(isPasswordVisible = !it.isPasswordVisible) }
+  }
+  
+  fun login() {
+    val email = state.value.email
+    val password = state.value.password
+    
+    // 1. Validaciones básicas
+    if (email.isBlank() || !email.contains("@")) {
+      updateState { it.copy(emailError = "Please enter a valid email") }
+      return
     }
-
-    fun onPasswordChanged(newValue: String) {
-        updateState { it.copy(password = newValue, passwordError = null) }
+    if (password.length < 8) {
+      updateState { it.copy(passwordError = "Password must be at least 8 characters") }
+      return
     }
-
-    fun togglePasswordVisibility() {
-        updateState { it.copy(isPasswordVisible = !it.isPasswordVisible) }
-    }
-
-    fun login() {
-        val email = state.value.email
-        val password = state.value.password
-
-        // 1. Validaciones básicas
-        if (email.isBlank() || !email.contains("@")) {
-            updateState { it.copy(emailError = "Please enter a valid email") }
-            return
+    
+    // 2. Estado de carga
+    updateState { it.copy(isLoading = true, passwordError = null, snackbarMessage = null) }
+    
+    // 3. Una sola corrutina
+    screenModelScope.launch {
+      authRepository.login(LoginRequest(email, password))
+        .onSuccess {
+          authViewModel.loginSuccess()
+          updateState { it.copy(isLoading = false) }
         }
-        if (password.length < 8) {
-            updateState { it.copy(passwordError = "Password must be at least 8 characters") }
-            return
-        }
-
-        // 2. Estado de carga
-        updateState { it.copy(isLoading = true, passwordError = null, snackbarMessage = null) }
-
-        // 3. Una sola corrutina
-        screenModelScope.launch {
-            authRepository.login(LoginRequest(email, password))
-                .onSuccess {
-                    authViewModel.loginSuccess()
-                    updateState { it.copy(isLoading = false) }
-                }
-                .onFailure { error ->
-                    updateState {
-                        it.copy(
-                            isLoading = false,
-                            passwordError = error.message, // Texto bajo el campo
-                            snackbarMessage = error.message // Mensaje flotante
-                        )
-                    }
-                }
+        .onFailure { error ->
+          updateState {
+            it.copy(
+              isLoading = false,
+              passwordError = error.message, // Texto bajo el campo
+              snackbarMessage = error.message // Mensaje flotante
+            )
+          }
         }
     }
-
-    fun dismissSnackbar() {
-        updateState { it.copy(snackbarMessage = null) }
-    }
+  }
+  
+  fun dismissSnackbar() {
+    updateState { it.copy(snackbarMessage = null) }
+  }
 }

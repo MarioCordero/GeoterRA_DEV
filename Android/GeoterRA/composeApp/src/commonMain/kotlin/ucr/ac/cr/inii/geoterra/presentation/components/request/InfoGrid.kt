@@ -15,22 +15,22 @@ import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
 
 @Composable
 private fun InfoGrid(request: AnalysisRequestRemote) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Row(Modifier.fillMaxWidth()) {
-            InfoItem("Fecha", request.created_at, Modifier.weight(1f))
-            InfoItem("Región", request.region, Modifier.weight(1f))
-        }
-        Row(Modifier.fillMaxWidth()) {
-            InfoItem("Latitud", request.latitude.toString(), Modifier.weight(1f))
-            InfoItem("Longitud", request.longitude.toString(), Modifier.weight(1f))
-        }
+  Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    Row(Modifier.fillMaxWidth()) {
+      InfoItem("Fecha", request.created_at, Modifier.weight(1f))
+      InfoItem("Región", request.region, Modifier.weight(1f))
     }
+    Row(Modifier.fillMaxWidth()) {
+      InfoItem("Latitud", request.latitude.toString(), Modifier.weight(1f))
+      InfoItem("Longitud", request.longitude.toString(), Modifier.weight(1f))
+    }
+  }
 }
 
 @Composable
 private fun InfoItem(label: String, value: String, modifier: Modifier) {
-    Column(modifier = modifier) {
-        Text(label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-        Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-    }
+  Column(modifier = modifier) {
+    Text(label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+    Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+  }
 }

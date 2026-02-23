@@ -7,13 +7,13 @@ import org.koin.core.module.Module
  * Initializes Koin for non-Android platforms.
  */
 fun initKoin(additionalModules: List<Module> = emptyList()) {
-    startKoin {
-        modules(
-            listOf(
-                appModule,
-                networkModule,
-                platformSettingsModule
-            ) + additionalModules
-        )
-    }
+  startKoin {
+    modules(
+      listOf(
+        appModule,
+        networkModule,
+        platformSettingsModule
+      ) + additionalModules
+    )
+  }
 }

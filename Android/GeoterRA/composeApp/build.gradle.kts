@@ -46,8 +46,9 @@ kotlin {
             // Compose
             implementation(libs.compose.material3)
             implementation(libs.compose.material.icons.extended)
-
-
+            implementation(libs.maplibre.compose)
+            implementation(libs.mapCompose)
+            
             // Persistencia de datos
             implementation(libs.settings)
             implementation(libs.kotlinx.serialization.json)
@@ -56,7 +57,7 @@ kotlin {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.ui)
-            implementation(compose.components.resources) // Para tus iconos SVG personalizados
+            implementation(compose.components.resources)
 
             // Utilidades y Logs
             implementation(libs.kmplog)
@@ -83,7 +84,6 @@ kotlin {
             implementation(libs.voyager.koin)
 
             implementation(libs.ktor.client.cio)
-
         }
 
         commonTest.dependencies {
@@ -136,4 +136,12 @@ android {
 }
 
 compose {
+}
+
+configurations.all {
+    resolutionStrategy {
+        force("androidx.activity:activity:1.9.3")
+        force("androidx.activity:activity-ktx:1.9.3")
+        force("androidx.activity:activity-compose:1.9.3")
+    }
 }
