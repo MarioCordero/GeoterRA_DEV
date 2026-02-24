@@ -20,8 +20,11 @@ import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.expressions.dsl.feature
 import org.maplibre.compose.expressions.dsl.format
 import org.maplibre.compose.expressions.dsl.image
+import org.maplibre.compose.expressions.dsl.interpolate
+import org.maplibre.compose.expressions.dsl.linear
 import org.maplibre.compose.expressions.dsl.offset
 import org.maplibre.compose.expressions.dsl.span
+import org.maplibre.compose.expressions.dsl.zoom
 import org.maplibre.compose.expressions.value.SymbolAnchor
 import org.maplibre.compose.layers.SymbolLayer
 import org.maplibre.compose.map.MaplibreMap
@@ -36,6 +39,7 @@ import org.maplibre.spatialk.geojson.Position
 import org.maplibre.spatialk.geojson.toJson
 import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
 import ucr.ac.cr.inii.geoterra.data.model.remote.toGeoJsonString
+import kotlin.collections.mapOf
 
 
 @Composable
@@ -88,15 +92,17 @@ fun MapContent(
         id = "manifestations-layer",
         source = manifestationSource,
         iconImage = image(markerIcon),
-        textField =
-          format(
-            span(image("railway")),
-            span(" "),
-            span(feature["STNCODE"].asString(), textSize = const(1.2f.em)),
-          ),
-        textFont = const(listOf("Noto Sans Regular")),
-        textColor = const(MaterialTheme.colorScheme.onBackground),
-        textOffset = offset(0.em, 0.6.em),
+        iconSize = interpolate(
+          linear(),
+          zoom(),
+          5f to const(4f),
+            10f to const(3f),
+            18f to const(2.5f)
+        ),
+
+        iconAllowOverlap = const(true),
+        iconIgnorePlacement = const(true),
+        iconAnchor = const(SymbolAnchor.Bottom),
         onClick = { features ->
           val name = features.firstOrNull()?.properties?.get("name")
           println("Click en: $name")
