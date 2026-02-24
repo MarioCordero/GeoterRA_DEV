@@ -8,26 +8,25 @@ import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
 import org.koin.compose.koinInject
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeViewModel
 
-// Pasamos el objeto opcional para saber si editamos o creamos
-data class AnalysisFormScreen(val requestToEdit: AnalysisRequestRemote? = null) : Screen {
+data class AnalysisFormScreen(
+  val requestToEdit: AnalysisRequestRemote? = null
+) : Screen {
   
   @Composable
   override fun Content() {
     val navigator = LocalNavigator.currentOrThrow
-    // Inyectamos el ViewModel pasando la data inicial si existe
-    val viewModel =
-      koinInject<AnalysisFormViewModel> { org.koin.core.parameter.parametersOf(requestToEdit) }
+    val viewModel: AnalysisFormViewModel = koinInject()
     val state by viewModel.state.collectAsState()
     
     if (state.isSuccess) {
-      navigator.pop() // Volver atrás al terminar con éxito
+      navigator.pop()
     }
     
     AnalysisFormContent(
       state = state,
-      onEvent = viewModel::onEvent,
-      onCancel = { navigator.pop() }
+      onEvent = viewModel::onEvent
     )
   }
 }

@@ -34,6 +34,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.koin.android)
+            implementation(libs.kotlinx.coroutines.android)
         }
 
         // --- Dependencias de iOS ---

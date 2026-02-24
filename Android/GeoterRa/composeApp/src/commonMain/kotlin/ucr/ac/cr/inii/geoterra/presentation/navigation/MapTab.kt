@@ -21,8 +21,6 @@ internal object MapTab : Tab {
   
   @Composable
   override fun Content() {
-    Navigator(MapScreen()) { navigator ->
-      SlideTransition(navigator)
-    }
+    Navigator(MapScreen())
   }
 }

@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.analysisform
+package ucr.ac.cr.inii.geoterra.presentation.components.analysisform
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

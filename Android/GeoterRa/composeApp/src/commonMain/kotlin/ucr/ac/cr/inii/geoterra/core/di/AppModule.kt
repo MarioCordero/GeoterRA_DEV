@@ -6,6 +6,8 @@ import ucr.ac.cr.inii.geoterra.data.repository.AnalysisRequestRepositoryImpl
 import ucr.ac.cr.inii.geoterra.data.repository.AuthRepositoryImpl
 import ucr.ac.cr.inii.geoterra.data.repository.ManifestationRepositoryImp
 import ucr.ac.cr.inii.geoterra.data.repository.UserRepositoryImpl
+import ucr.ac.cr.inii.geoterra.domain.location.LocationProvider
+import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
 import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepository
 import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepository
 import ucr.ac.cr.inii.geoterra.domain.repository.ManifestationsRepository
@@ -15,13 +17,15 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisFormViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginViewModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.manifestation.ManifestationDetailViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.map.MapViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.request.RequestViewModel
 
 val appModule = module {
   // ViewModels (ScreenModels)
   factory { HomeViewModel() }
-  factory { MapViewModel(get()) }
+  factory { MapViewModel(get(), get(), get()) }
+  factory { ManifestationDetailViewModel(get()) }
   factory { AccountViewModel(get(), get()) }
   factory { LoginViewModel(get(), get()) }
   factory { RequestViewModel(get()) }

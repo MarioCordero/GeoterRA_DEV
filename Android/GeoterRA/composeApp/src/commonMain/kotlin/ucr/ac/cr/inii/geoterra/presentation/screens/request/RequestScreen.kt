@@ -17,7 +17,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.koin.compose.koinInject
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
-import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisDetailSheet
+import ucr.ac.cr.inii.geoterra.presentation.components.analysisform.AnalysisDetailSheet
 import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisFormScreen
 
 class RequestsScreen : Screen {

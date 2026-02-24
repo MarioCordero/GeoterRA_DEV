@@ -7,45 +7,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
+import ucr.ac.cr.inii.geoterra.domain.location.LocationProvider
+import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
 import ucr.ac.cr.inii.geoterra.domain.repository.ManifestationsRepository
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 class MapViewModel(
-  private val manifestationsRepository: ManifestationsRepository
+  private val manifestationsRepository: ManifestationsRepository,
+  private val locationProvider: LocationProvider,
+  private val permissionManager: PermissionManager
 ) : BaseScreenModel<MapState>(MapState()) {
   
   init {
     loadMapMarkers()
   }
-//
-//  fun loadMapMarkers() {
-//    screenModelScope.launch {
-//      _state.update { it.copy(isLoading = true) }
-//      try {
-//        // Suponiendo que tu repositorio obtiene marcadores de una API
-//        val response = manifestationsRepository.getManifestations("all")
-//          .onSuccess { data ->
-//            _state.update { it.copy(isLoading = false, markers = data) }
-//          }
-//          .onFailure { exception ->
-//            _state.update { it.copy(isLoading = false, error = exception.message) }
-//          }
-//        if (response.isSuccess)
-//        _state.update {
-//          it.copy(isLoading = false, markers = response.getOrThrow())
-//        }
-//      } catch (e: Exception) {
-//        _state.update {
-//          it.copy(isLoading = false, error = "Error al cargar los marcadores")
-//        }
-//      }
-//    }
-//  }
-//
-//  fun onMarkerSelected(manifestationID: String) {
-//    _state.update { it.copy(selectedManifestation = this.state.value.markers.find { it.id == manifestationID }) }
-//  }
   
   fun loadMapMarkers() {
     screenModelScope.launch {
@@ -64,6 +39,36 @@ class MapViewModel(
   fun onMarkerSelected(manifestationID: String) {
     _state.update { s ->
       s.copy(selectedManifestation = s.markers.find { it.id == manifestationID })
+    }
+  }
+  
+  private fun observeUserLocation() {
+    
+    screenModelScope.launch {
+      locationProvider.observeLocation()
+        .collect { location ->
+          println("Latitud: ${location.latitude}, Longitud: ${location.longitude}")
+          _state.update {
+            it.copy(userLocation = location)
+          }
+        }
+    }
+  }
+  
+  suspend fun requestLocationIfNeeded() {
+    if (!permissionManager.hasLocationPermission()) {
+      
+      val granted = permissionManager.requestLocationPermission()
+      
+      if (granted) {
+        observeUserLocation()
+      } else {
+        _state.update {
+          it.copy(error = "Permiso de ubicación denegado")
+        }
+      }
+    } else {
+      observeUserLocation()
     }
   }
 }
