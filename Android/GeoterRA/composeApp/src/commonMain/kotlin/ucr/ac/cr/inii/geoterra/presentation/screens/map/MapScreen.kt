@@ -8,7 +8,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.koin.compose.koinInject
-import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
 import ucr.ac.cr.inii.geoterra.presentation.screens.manifestation.ManifestationDetailScreen
 
 class MapScreen(
@@ -26,8 +25,9 @@ class MapScreen(
     
     MapContent(
       state = state,
-      onMarkerClick = viewModel::onMarkerSelected,
-      onDismissPanel = { viewModel.onMarkerSelected("") },
+      onManifestationMarkerClick = viewModel::onManifestationMarkerSelected,
+      onUserMarkerClick = viewModel::onUserMarkerSelected,
+      onDismissPanel = { viewModel.onManifestationMarkerSelected("") },
       onDetailsClick = { manifestation ->
         navigator.push(ManifestationDetailScreen(manifestation))
       }

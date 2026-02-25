@@ -85,22 +85,22 @@ fun ManifestationInfoPanel(
         horizontalArrangement = Arrangement.SpaceBetween
       ) {
         InfoBadge(
-          label = "Temp",
+          label = "Temperatura",
           value = "${manifestation.temperature ?: "--"}°C",
           icon = Icons.Default.Thermostat,
-          color = Color(0xFFFF5722) // Naranja GeoTerra
+          color = Color(0xFFFF5722)
         )
         InfoBadge(
           label = "pH",
           value = "${manifestation.field_pH ?: "--"}",
           icon = Icons.Default.WaterDrop,
-          color = Color(0x2196F3) // Azul profundo
+          color = Color(0x2196F6)
         )
         InfoBadge(
-          label = "Cond.",
+          label = "Conductividad",
           value = "${manifestation.field_conductivity ?: "--"}",
           icon = Icons.Default.Info,
-          color = Color(0xFF4CAF50) // Verde éxito
+          color = Color(0xFF4CAF50)
         )
       }
       

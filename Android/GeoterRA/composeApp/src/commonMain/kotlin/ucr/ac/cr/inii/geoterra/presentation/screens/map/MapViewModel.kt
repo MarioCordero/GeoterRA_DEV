@@ -3,8 +3,6 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.map
 // en src/commonMain/kotlin/.../map/presentation/MapViewModel.kt
 
 import cafe.adriel.voyager.core.model.screenModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.domain.location.LocationProvider
@@ -36,14 +34,17 @@ class MapViewModel(
     }
   }
   
-  fun onMarkerSelected(manifestationID: String) {
+  fun onUserMarkerSelected() {
+    _state.update { it.copy(selectedManifestation = null, isUserLocationSelected = true) }
+  }
+  
+  fun onManifestationMarkerSelected(manifestationID: String) {
     _state.update { s ->
-      s.copy(selectedManifestation = s.markers.find { it.id == manifestationID })
+      s.copy(isUserLocationSelected = false, selectedManifestation = s.markers.find { it.id == manifestationID })
     }
   }
   
   private fun observeUserLocation() {
-    
     screenModelScope.launch {
       locationProvider.observeLocation()
         .collect { location ->

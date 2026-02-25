@@ -9,6 +9,7 @@ data class MapState(
   val markers: List<ManifestationRemote> = emptyList(),
   val userLocation: UserLocation? = null,
   val selectedManifestation: ManifestationRemote? = null,
+  val isUserLocationSelected: Boolean = false,
   val isLoading: Boolean = false,
   val error: String? = null
 )
