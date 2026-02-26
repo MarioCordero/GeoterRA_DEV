@@ -1,1 +1,3 @@
 website/node_modules/*
+API/config/config.ini
+.vscode
