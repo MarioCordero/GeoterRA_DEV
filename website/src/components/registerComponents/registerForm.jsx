@@ -4,7 +4,7 @@ import { Form, Input } from "antd";
 import PhoneInput from "../common/PhoneInput";
 import "../../colorModule.css";
 import "../../fontsModule.css";
-import { buildApiUrl } from "../../config/apiConf";
+import { buildApiUrl, getAuthEndpoints } from "../../config/apiConf";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -25,10 +25,6 @@ export default function Register() {
   }, [showSuccessModal]);
 
   const handleFinish = async (values) => {
-    // Debug: Print current form state
-    console.log("=== FORM DATA DEBUG ===");
-    console.log("Raw form values:", values);
-
     // Trim and clean names before sending
     const cleanFirstName = (values.first_name || "").trim().replace(/\s+/g, " ");
     const cleanLastName = (values.last_name || "").trim().replace(/\s+/g, " ");
@@ -37,48 +33,35 @@ export default function Register() {
     // Extract only digits from phone (PhoneInput stores formatted string)
     const phoneDigits = (values.phone_num || "").replace(/\D/g, "");
 
-    // Debug: Show cleaned values
-    console.log("Cleaned first_name:", cleanFirstName);
-
-    const formPayload = new FormData();
-    formPayload.append("first_name", cleanFirstName);
-    formPayload.append("last_name", cleanLastName);
-    formPayload.append("email", cleanEmail);
-    formPayload.append("password", values.password);
-    formPayload.append("confirm_password", values.confirm_password);
-    formPayload.append("phone_num", phoneDigits);
-
-    // Debug: Print FormData as JSON-like object
-    console.log("=== FORM DATA BEING SENT ===");
-    const formDataObject = {};
-    for (let [key, value] of formPayload.entries()) {
-      formDataObject[key] = value;
-    }
-    console.log("FormData as object:", formDataObject);
-    console.log("FormData as JSON:", JSON.stringify(formDataObject, null, 2));
+    const payload = {
+      name: cleanFirstName,
+      lastname: cleanLastName,
+      email: cleanEmail,
+      phone_number: phoneDigits || null,
+      password: values.password,
+    };
 
     try {
-      const response = await fetch(buildApiUrl("register.inc.php"), {
+      const response = await fetch(getAuthEndpoints().register, {
         method: "POST",
-        body: formPayload,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
 
-      if (data.response === "Ok") {
+      if (response.ok && data?.data) {
         setShowSuccessModal(true);
+      } else if (data?.errors?.length) {
+        alert(data.errors[0].message);
       } else {
-        if (data.errors && data.errors.email_used) {
-          alert(data.errors.email_used);
-        } else {
-          alert(data.message || "Error en el registro");
-        }
+        alert("Error en el registro");
       }
     } catch (err) {
       alert("Error de conexión");
     }
   };
-
+  
   const handleModalClose = () => {
     setShowSuccessModal(false);
     navigate("/login");
