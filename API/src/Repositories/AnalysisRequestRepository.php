@@ -20,60 +20,59 @@ final class AnalysisRequestRepository
 	 */
 	public function create(AnalysisRequestDTO $dto, string $userId): string
 	{    // Generate business-readable name AFTER insert
-    $sql = "
-      INSERT INTO analysis_requests (
-				id,
-        name,
-        region,
-        email,
-        owner_contact_number,
-        owner_name,
-        temperature_sensation,
-        bubbles,
-        details,
-        current_usage,
-        latitude,
-        longitude,
-        created_by
-      ) VALUES (
-			 	:id,
-        :name,
-        :region,
-        :email,
-        :owner_contact_number,
-        :owner_name,
-        :temperature_sensation,
-        :bubbles,
-        :details,
-        :current_usage,
-        :latitude,
-        :longitude,
-        :created_by
-      )
-    ";
+ 		$maxAttempts = 5; // Límite de reintentos para evitar bucles infinitos
+    $attempts = 0;
+    $requestId = Ulid::generate();
 
-		$requestId = Ulid::generate();
-		// Generate business identifier using the real ID
-		$generatedName = 'SOLI-' . substr($requestId, 0, 3);
+    while ($attempts < $maxAttempts) {
+			try {
+				$suffix = strtoupper(substr($requestId, -5));
+				$generatedName = 'SOLI-' . $suffix;
 
-    $stmt = $this->pdo->prepare($sql);
-    $stmt->execute([
-      ':id' => $requestId,
-      ':name' => $generatedName,
-      ':region' => $dto->region,
-      ':email' => $dto->email,
-      ':owner_contact_number' => $dto->owner_contact_number,
-      ':owner_name' => $dto->owner_name,
-      ':temperature_sensation' => $dto->temperature_sensation,
-      ':bubbles' => $dto->bubbles ? 1 : 0,
-      ':details' => $dto->details,
-      ':current_usage' => $dto->current_usage,
-      ':latitude' => $dto->latitude,
-      ':longitude' => $dto->longitude,
-      ':created_by' => $userId
-    ]);
+				$sql = "
+					INSERT INTO analysis_requests (
+						id, name, region, email, owner_contact_number, owner_name,
+						temperature_sensation, bubbles, details, current_usage,
+						latitude, longitude, created_by
+					) VALUES (
+						:id, :name, :region, :email, :owner_contact_number, :owner_name,
+						:temperature_sensation, :bubbles, :details, :current_usage,
+						:latitude, :longitude, :created_by
+					)
+				";
 
-    return $requestId;
+				$stmt = $this->pdo->prepare($sql);
+				$stmt->execute([
+						':id' => $requestId,
+						':name' => $generatedName,
+						':region' => $dto->region,
+						':email' => $dto->email,
+						':owner_contact_number' => $dto->owner_contact_number,
+						':owner_name' => $dto->owner_name,
+						':temperature_sensation' => $dto->temperature_sensation,
+						':bubbles' => $dto->bubbles ? 1 : 0,
+						':details' => $dto->details,
+						':current_usage' => $dto->current_usage,
+						':latitude' => $dto->latitude,
+						':longitude' => $dto->longitude,
+						':created_by' => $userId
+				]);
+
+				return $requestId;
+
+			} catch (\PDOException $e) {
+				if ($e->getCode() == '23000' || str_contains($e->getMessage(), 'Duplicate entry')) {
+					$attempts++;
+					// newUlid 
+					$requestId = Ulid::generate();
+					continue; 
+				}
+				
+				throw $e;
+			}
+    }
+
+    throw new \Exception("No se pudo generar un nombre único tras $maxAttempts intentos.");
 	}
 
 	/**

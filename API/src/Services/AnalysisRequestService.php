@@ -57,7 +57,7 @@ final class AnalysisRequestService
     } catch (\Throwable $e) {
       $this->pdo->rollBack();
       throw new ApiException(
-        ErrorType::internal('Failed to create analysis request'),
+        ErrorType::internal('Failed to create analysis request: ' . $e->getMessage()),
         500
       );
     }
@@ -96,7 +96,7 @@ public function update(
   } catch (\Throwable $e) {
     $this->pdo->rollBack();
     throw new ApiException(
-      ErrorType::analysisRequestUpdateFailed(),
+      ErrorType::internal('Failed to update analysis request: ' . $e->getMessage()),
       500
     );
   }
@@ -130,7 +130,7 @@ public function update(
     } catch (\Throwable $e) {
       $this->pdo->rollBack();
       throw new ApiException(
-        ErrorType::analysisRequestDeleteFailed(),
+        ErrorType::internal('Failed to delete analysis request: ' . $e->getMessage()),
         500
       );
     }
