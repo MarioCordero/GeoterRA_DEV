@@ -9,6 +9,7 @@ const Map = () => {
   const { isLogged, loading } = useSession();
 
   if (loading) {
+    // TODO MAKE A GEOTERRA LOADER COMPONENT 
     return (
       <div style={{ 
         minHeight: '100vh', 
