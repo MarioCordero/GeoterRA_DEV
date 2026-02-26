@@ -26,4 +26,6 @@ secrets.defaults.properties
 # .github/
 website/node_modules/*
 website/node_modules
-config.ini
+API/.DS_Store
+.DS_Store
+API/config/config.ini
