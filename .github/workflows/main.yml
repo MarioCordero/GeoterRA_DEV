@@ -1,54 +1,31 @@
-name: Force Deploy (PR + Manual)
+name: Force Deploy (Manual)
 
 on:
-  # 1) Automático: PRs hacia main
-  pull_request:
-    branches: [ main ]
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - labeled
-
-  # 2) Manual desde Actions
+  # Manual desde Actions
   workflow_dispatch:
 
 permissions:
   contents: write
-  pull-requests: read
 
 jobs:
   force-deploy:
     runs-on: ubuntu-latest
 
-    # Ejecutar si:
-    # - Es workflow_dispatch (manual), o
-    # - Es PR headerWeb -> main
-    if: >
-      github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'pull_request' &&
-       github.event.pull_request.base.ref == 'main' &&
-       github.event.pull_request.head.ref == 'headerWeb')
-
     steps:
       # ---------------- DETERMINAR RAMA ORIGEN ----------------
       - name: Set source branch
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            echo "SOURCE_BRANCH=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
-          else
-            # Para ejecución manual usamos headerWeb por defecto
-            echo "SOURCE_BRANCH=headerWeb" >> $GITHUB_ENV
-          fi
+          # Para ejecución manual usamos headerWeb por defecto
+          echo "SOURCE_BRANCH=headerWeb" >> $GITHUB_ENV
 
-      # ---------------- CHECKOUT RAMA ORIGEN ----------------
+      # ---------------- CHECKOUT RAMA ORIGEN (headerWeb) ----------------
       - name: Checkout source branch
         uses: actions/checkout@v4
         with:
           ref: ${{ env.SOURCE_BRANCH }}
           fetch-depth: 0
 
-      # ---------------- BUILD FRONTEND ----------------
+      # ---------------- BUILD FRONTEND EN headerWeb ----------------
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -64,13 +41,14 @@ jobs:
           cd website
           npm run build
 
-      # ---------------- CHECKOUT MAIN ----------------
+      # ---------------- CHECKOUT MAIN (CON PAT) ----------------
       - name: Checkout main branch
         uses: actions/checkout@v4
         with:
           ref: main
           path: main-branch
           fetch-depth: 0
+          token: ${{ secrets.GH_PAT }}   # usa tu PAT para el remote
 
       # ---------------- PREPARAR ARTEFACTOS ----------------
       - name: Prepare deployment artifacts
@@ -79,18 +57,19 @@ jobs:
           mkdir -p deploy/database
           mkdir -p deploy/website/dist
 
-          # Copiar solo si existen, para evitar errores tontos
+          # API - copy all folders
           if [ -d "API" ]; then
-            cp -r API/*.php deploy/API/ || true
+            cp -r API/* deploy/API/ || true
           fi
 
+          # database
           if [ -d "database" ]; then
             cp -r database/* deploy/database/ || true
           fi
 
-          # Usamos el build generado en website/dist
+          # website/dist (incluye .htaccess, index.html, assets, dotfiles, todo)
           if [ -d "website/dist" ]; then
-            cp -r website/dist/* deploy/website/dist/ || true
+            rsync -av website/dist/ deploy/website/dist/
           fi
 
       - name: Remove forbidden files
@@ -100,17 +79,15 @@ jobs:
             rm -f "(DELETE)"*.php 2>/dev/null || true
           fi
 
-      # ---------------- SYNC A LA CARPETA main ----------------
-      # Resultado esperado en raíz de main:
-      # .
-      # ├── API
-      # ├── database
-      # └── website
+      # ---------------- SYNC HACIA main-branch ----------------
       - name: Sync deploy folders into main
         run: |
+          # API y database: reemplazo completo
           if [ -d "deploy/API" ]; then
             mkdir -p main-branch/API
-            rsync -av --delete deploy/API/ main-branch/API/
+            rsync -av --delete \
+              --exclude 'config/config.ini' \
+              deploy/API/ main-branch/API/
           fi
 
           if [ -d "deploy/database" ]; then
@@ -118,17 +95,36 @@ jobs:
             rsync -av --delete deploy/database/ main-branch/database/
           fi
 
+          # website/dist: BORRAR TODO y copiar lo nuevo del build
           if [ -d "deploy/website/dist" ]; then
             mkdir -p main-branch/website/dist
-            rsync -av --delete deploy/website/dist/ main-branch/website/dist/
+            rm -rf main-branch/website/dist/*           # limpia dist por completo
+            rsync -av deploy/website/dist/ main-branch/website/dist/
           fi
 
-      # ---------------- COMMIT & PUSH A main ----------------
+      # ---------------- FORZAR .htaccess EN dist ----------------
+      - name: Ensure .htaccess in dist
+        run: |
+          mkdir -p main-branch/website/dist
+
+          # Prioridad: si existe en website/dist, úsalo
+          if [ -f "website/dist/.htaccess" ]; then
+            echo "Found website/dist/.htaccess, copying to main-branch..."
+            cp website/dist/.htaccess main-branch/website/dist/.htaccess
+          # Si no, intenta website/.htaccess
+          elif [ -f "website/.htaccess" ]; then
+            echo "Found website/.htaccess, copying to main-branch/dist..."
+            cp website/.htaccess main-branch/website/dist/.htaccess
+          else
+            echo "⚠️ No .htaccess found in website/dist or website/"
+          fi
+
+      # ---------------- COMMIT & PUSH CON PAT ----------------
       - name: Commit and push changes to main
         run: |
           cd main-branch
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "MarioCordero (CI)"
+          git config user.email "ci+${{ github.repository_owner }}@users.noreply.github.com"
           git add -A
 
           if git diff --cached --quiet; then
@@ -137,7 +133,9 @@ jobs:
           fi
 
           git commit -m "🚀 Auto-deploy from ${{ env.SOURCE_BRANCH }}"
-          git push
+
+          # Push usando tu PAT (identidad de tu usuario)
+          git push "https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git" HEAD:main
 
       # ---------------- TRIGGER REMOTE DEPLOY ----------------
       - name: Trigger remote deploy
