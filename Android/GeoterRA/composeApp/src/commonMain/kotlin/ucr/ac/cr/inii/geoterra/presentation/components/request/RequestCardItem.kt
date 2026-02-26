@@ -5,18 +5,27 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SegmentedButtonDefaults.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,7 +38,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.DataBox
 
 @Composable
 fun RequestCardItem(
@@ -39,100 +50,101 @@ fun RequestCardItem(
   onDelete: () -> Unit
 ) {
   Card(
-    modifier = Modifier.fillMaxWidth(),
-    shape = RoundedCornerShape(16.dp),
-    elevation = CardDefaults.cardElevation(4.dp),
-    colors = CardDefaults.cardColors(containerColor = Color.White)
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(horizontal = 4.dp),
+    shape = RoundedCornerShape(24.dp),
+    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
   ) {
-    Column(modifier = Modifier.padding(16.dp)) {
-      // Header con ID y Nombre
-      Row(verticalAlignment = Alignment.CenterVertically) {
+    Column(modifier = Modifier.padding(20.dp)) {
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+      ) {
         Column(modifier = Modifier.weight(1f)) {
           Text(
             text = request.name,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF1A237E)
+            style = MaterialTheme.typography.titleLarge.copy(
+              fontWeight = FontWeight.ExtraBold,
+              letterSpacing = (-0.5).sp
+            ),
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
           )
-//                    Text("ID: ${request.id}", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+          Text(
+            text = "Enviado: ${request.created_at.take(10)}",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurface
+          )
         }
-        StatusBadge("Pendiente") // Estado mockeado ya que no está en el remote actual
+        StatusBadge(request.state)
       }
       
-      HorizontalDivider(Modifier.padding(vertical = 12.dp), thickness = 0.5.dp)
-      
-      // Grid de Datos Técnicos
-      Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        RequestInfoRow(
-          label1 = "Región", value1 = request.region,
-          label2 = "Uso", value2 = request.current_usage ?: "N/A"
-        )
-        RequestInfoRow(
-          label1 = "Latitud", value1 = request.latitude.toString(),
-          label2 = "Longitud", value2 = request.longitude.toString()
-        )
-      }
-      
-      // Acciones
+      Spacer(modifier = Modifier.height(16.dp))
       Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
       ) {
-        SecondaryButton(text = "Ver", onClick = onView, modifier = Modifier.weight(1f))
-        SecondaryButton(text = "Editar", onClick = onEdit, modifier = Modifier.weight(1f))
-        PrimaryButton(
-          text = "Borrar",
-          onClick = onDelete,
-          color = Color(0xFFD32F2F),
-          modifier = Modifier.weight(1f)
+        DataBox(
+          label = "Región",
+          value = request.region,
+          modifier = Modifier.weight(1.1f),
+          color = MaterialTheme.colorScheme.surfaceVariant
         )
+        DataBox(
+          label = "Coordenadas",
+          value = "${request.latitude.take(7)}, ${request.longitude.take(7)}",
+          modifier = Modifier.weight(1.4f),
+          color = MaterialTheme.colorScheme.surfaceVariant
+        )
+      }
+      
+      Spacer(modifier = Modifier.height(20.dp))
+      
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        Button(
+          onClick = onView,
+          modifier = Modifier.weight(1f).height(44.dp),
+          shape = RoundedCornerShape(12.dp),
+          colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+        ) {
+          Text("Detalles", style = MaterialTheme.typography.labelLarge)
+        }
+        
+        OutlinedButton(
+          onClick = onEdit,
+          modifier = Modifier.weight(1f).height(44.dp),
+          shape = RoundedCornerShape(12.dp),
+          border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+        ) {
+          Text(
+            "Editar",
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.secondary
+          )
+        }
+        
+        OutlinedButton(
+          onClick = onDelete,
+          modifier = Modifier.weight(1f).height(44.dp),
+          shape = RoundedCornerShape(12.dp),
+          border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+        ) {
+          Text(
+            "Eliminar",
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.error
+          )
+        }
       }
     }
-  }
-}
-
-@Composable
-fun RequestInfoRow(label1: String, value1: String, label2: String, value2: String) {
-  Row(Modifier.fillMaxWidth()) {
-    InfoBlock(label1, value1, Modifier.weight(1f))
-    InfoBlock(label2, value2, Modifier.weight(1f))
-  }
-}
-
-@Composable
-fun InfoBlock(label: String, value: String, modifier: Modifier) {
-  Column(modifier = modifier) {
-    Text(label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-    Text(
-      value,
-      style = MaterialTheme.typography.bodyMedium,
-      fontWeight = FontWeight.SemiBold,
-      maxLines = 1,
-      overflow = TextOverflow.Ellipsis
-    )
-  }
-}
-
-@Composable
-fun SecondaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
-  OutlinedButton(
-    onClick = onClick,
-    modifier = modifier,
-    shape = RoundedCornerShape(8.dp),
-    border = BorderStroke(1.dp, Color.LightGray)
-  ) {
-    Text(text, color = Color.Black, style = MaterialTheme.typography.bodySmall)
-  }
-}
-
-@Composable
-fun PrimaryButton(text: String, onClick: () -> Unit, color: Color, modifier: Modifier = Modifier) {
-  Button(
-    onClick = onClick,
-    modifier = modifier,
-    colors = ButtonDefaults.buttonColors(containerColor = color),
-    shape = RoundedCornerShape(8.dp)
-  ) {
-    Text(text, color = Color.White, style = MaterialTheme.typography.bodySmall)
   }
 }

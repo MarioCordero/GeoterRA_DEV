@@ -22,7 +22,6 @@ object AccountTab : Tab {
   
   @Composable
   override fun Content() {
-    // Inyectamos el estado global de autenticación
     val authViewModel = koinInject<AuthViewModel>()
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
     

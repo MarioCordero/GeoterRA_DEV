@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -23,12 +26,16 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -46,6 +53,10 @@ import geoterra.composeapp.generated.resources.Res
 import geoterra.composeapp.generated.resources.logo_GeoterRA
 import geoterra.composeapp.generated.resources.rocks
 import org.jetbrains.compose.resources.painterResource
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.CustomTextField
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.FormSection
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.PasswordField
+import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisFormEvent
 
 
 @Composable
@@ -55,7 +66,7 @@ fun LoginContent(
   onPasswordChanged: (String) -> Unit,
   onLoginClick: () -> Unit,
   onTogglePassword: () -> Unit,
-  onDismissSnackbar: () -> Unit, // Add this param
+  onDismissSnackbar: () -> Unit,
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   
@@ -78,18 +89,17 @@ fun LoginContent(
         modifier = Modifier.fillMaxSize()
       )
       
-      // Filtro oscuro para resaltar el formulario
       Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)))
       
       Column(
         modifier = Modifier
           .fillMaxSize()
           .padding(24.dp)
-          .imePadding(), // Evita que el teclado tape los campos
+          .imePadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
       ) {
-        // Logo GeoterRA
+
         Image(
           painter = painterResource(Res.drawable.logo_GeoterRA),
           contentDescription = "Logo",
@@ -98,56 +108,34 @@ fun LoginContent(
         
         Card(
           shape = RoundedCornerShape(28.dp),
-          colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.95f)),
+          colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
           elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
           Column(
             modifier = Modifier.padding(28.dp),
             horizontalAlignment = Alignment.CenterHorizontally
           ) {
-            Text(
-              text = "Iniciar Sesión",
-              style = MaterialTheme.typography.headlineSmall,
-              fontWeight = FontWeight.ExtraBold,
-              color = Color(0xFF1B5E20) // Verde oscuro temático
-            )
             
-            Spacer(modifier = Modifier.height(20.dp))
-            
-            // Campo de Email
-            OutlinedTextField(
-              value = state.email,
-              onValueChange = onEmailChanged,
-              label = { Text("Correo") },
-              isError = state.emailError != null,
-              supportingText = { state.emailError?.let { Text(it) } },
-              modifier = Modifier.fillMaxWidth(),
-              shape = RoundedCornerShape(12.dp),
-              singleLine = true
-            )
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            // Campo de Contraseña
-            OutlinedTextField(
-              value = state.password,
-              onValueChange = onPasswordChanged,
-              label = { Text("Contraseña") },
-              isError = state.passwordError != null,
-              supportingText = { state.passwordError?.let { Text(it) } },
-              modifier = Modifier.fillMaxWidth(),
-              shape = RoundedCornerShape(12.dp),
-              singleLine = true,
-              visualTransformation = if (state.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-              trailingIcon = {
-                IconButton(onClick = onTogglePassword) {
-                  Icon(
-                    imageVector = if (state.isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                    contentDescription = null
-                  )
-                }
-              }
-            )
+            FormSection(title = "Iniciar Sesión", icon = Icons.Default.Info) {
+              CustomTextField(
+                value = state.email,
+                onValueChange = onEmailChanged,
+                label = "Correo Electrónico",
+                keyboardType = KeyboardType.Email,
+                isError = state.emailError != null,
+                errorMessage = state.emailError
+              )
+
+              PasswordField(
+                value = state.password,
+                onValueChange = onPasswordChanged,
+                label = "Contraseña",
+                isVisible = state.isPasswordVisible,
+                onToggleVisibility = onTogglePassword,
+                isError = state.passwordError != null,
+                errorMessage = state.passwordError
+              )
+            }
             
             Spacer(modifier = Modifier.height(24.dp))
             

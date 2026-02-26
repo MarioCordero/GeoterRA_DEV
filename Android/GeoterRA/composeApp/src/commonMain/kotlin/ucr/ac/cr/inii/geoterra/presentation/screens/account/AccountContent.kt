@@ -1,47 +1,28 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.account
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,14 +31,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import ucr.ac.cr.inii.geoterra.presentation.components.account.ActionMenuItem
-import ucr.ac.cr.inii.geoterra.presentation.components.account.DangerActionItem
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.ActionMenuItem
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.DangerActionItem
 import ucr.ac.cr.inii.geoterra.presentation.components.account.InfoTile
 import ucr.ac.cr.inii.geoterra.presentation.components.account.ProfileHeaderCard
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.ConfirmDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.StatusDialog
 
 @Composable
 fun AccountContent(
@@ -91,12 +72,10 @@ fun AccountContent(
           contentPadding = PaddingValues(20.dp),
           verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-          // Tarjeta de información principal
           item {
             ProfileHeaderCard(state.user)
           }
           
-          // Sección de Información de Contacto
           item {
             Column {
               InfoTile(Icons.Default.Email, "Correo electrónico", state.user.email)
@@ -105,7 +84,6 @@ fun AccountContent(
             }
           }
           
-          // Menú de Opciones
           item {
             Text("Configuración", style = MaterialTheme.typography.labelLarge, color = Color.Gray)
             Spacer(Modifier.height(8.dp))
@@ -135,16 +113,29 @@ fun AccountContent(
           }
         }
       } else if (state.error != null) {
-//                ErrorView(state.error, onRefresh)
+//        StatusDialog(state.error, onRefresh)
       }
     }
   }
-
-//    // Diálogos de Confirmación
-//    if (showLogoutDialog) {
-//        SimpleConfirmDialog("¿Cerrar sesión?", "¿Estás seguro de que deseas salir?", "Salir", onConfirm = onLogoutClick, onDismiss = { showLogoutDialog = false })
-//    }
-//    if (showDeleteDialog) {
-//        SimpleConfirmDialog("¿Eliminar cuenta?", "Esta acción es irreversible. Se borrarán todos tus datos.", "Eliminar", isDanger = true, onConfirm = onDeleteAccountClick, onDismiss = { showDeleteDialog = false })
-//    }
+  
+  if (showLogoutDialog) {
+    ConfirmDialog(
+      title = "¿Cerrar sesión?",
+      message = "Tu sesión actual finalizará. Deberás ingresar tus credenciales la próxima vez.",
+      confirmText = "Salir",
+      onConfirm = onLogoutClick,
+      onDismiss = { showLogoutDialog = false }
+    )
+  }
+  
+  if (showDeleteDialog) {
+    ConfirmDialog(
+      title = "¿Eliminar cuenta?",
+      message = "Esta acción es irreversible. Se borrarán todas tus solicitudes y datos de campo permanentemente.",
+      confirmText = "Eliminar permanentemente",
+      isDanger = true, // Esto pondrá los acentos en rojo
+      onConfirm = onDeleteAccountClick,
+      onDismiss = { showDeleteDialog = false }
+    )
+  }
 }

@@ -4,12 +4,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.tab.CurrentTab
@@ -41,13 +42,19 @@ class MainScreen() : Screen {
       }
     }
   }
-  
 }
 
 @Composable
 private fun RowScope.TabNavigationItem(tab: Tab) {
   val tabNavigator = LocalTabNavigator.current
   NavigationBarItem(
+    colors = NavigationBarItemDefaults.colors(
+      selectedIconColor = MaterialTheme.colorScheme.secondary,
+      selectedTextColor = MaterialTheme.colorScheme.secondary,
+      indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+      unselectedIconColor = MaterialTheme.colorScheme.outline,
+      unselectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+    ),
     selected = tabNavigator.current.key == tab.key,
     onClick = { tabNavigator.current = tab },
     label = { Text(tab.options.title) },

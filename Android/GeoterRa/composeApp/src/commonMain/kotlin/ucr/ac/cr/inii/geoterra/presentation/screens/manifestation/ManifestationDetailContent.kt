@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,20 +25,18 @@ import androidx.compose.material.icons.filled.Terrain
 import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.DataBox
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.SectionHeader
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.ActionCard
+import ucr.ac.cr.inii.geoterra.presentation.components.manifestation.ChemicalRow
 
 @Composable
 fun ManifestationDetailContent(
@@ -128,23 +124,6 @@ fun ManifestationDetailContent(
 }
 
 @Composable
-fun SectionHeader(title: String, icon: ImageVector) {
-  Row(
-    verticalAlignment = Alignment.CenterVertically,
-    modifier = Modifier.padding(bottom = 12.dp)
-  ) {
-    Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
-    Spacer(Modifier.width(8.dp))
-    Text(
-      text = title.uppercase(),
-      style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 1.2.sp),
-      fontWeight = FontWeight.Bold,
-      color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
-  }
-}
-
-@Composable
 fun ChemicalGroupCard(
   title: String,
   color: Color,
@@ -170,69 +149,4 @@ fun ChemicalGroupCard(
       }
     }
   }
-}
-
-@Composable
-fun ActionCard(label: String, icon: ImageVector, color: Color, onClick: () -> Unit) {
-  Card(
-    onClick = onClick,
-    modifier = Modifier.size(width = 110.dp, height = 120.dp),
-    shape = RoundedCornerShape(20.dp),
-    colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.15f))
-  ) {
-    Column(
-      modifier = Modifier.fillMaxSize(),
-      verticalArrangement = Arrangement.Center,
-      horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-      Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(32.dp))
-      Spacer(modifier = Modifier.height(8.dp))
-      Text(label, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = color)
-    }
-  }
-}
-
-@Composable
-fun DataBox(modifier: Modifier, label: String, value: String, icon: ImageVector, color: Color) {
-  Surface(
-    modifier = modifier,
-    shape = RoundedCornerShape(16.dp),
-    color = MaterialTheme.colorScheme.surface,
-    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-  ) {
-    Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-      Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(24.dp))
-      Spacer(modifier = Modifier.width(12.dp))
-      Column {
-        Text(label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-        Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black)
-      }
-    }
-  }
-}
-
-@Composable
-fun ChemicalRow(label: String, value: Float?) {
-  Row(
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(vertical = 8.dp),
-    horizontalArrangement = Arrangement.SpaceBetween,
-    verticalAlignment = Alignment.CenterVertically
-  ) {
-    Text(
-      label,
-      style = MaterialTheme.typography.bodyMedium,
-      color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
-    Text(
-      text = if (value != null) "$value mg/L" else "N/D",
-      style = MaterialTheme.typography.bodyLarge.copy(
-        fontWeight = FontWeight.SemiBold,
-        fontFeatureSettings = "tnum" // Fuentes monoespaciadas para números
-      ),
-      color = if (value != null) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline
-    )
-  }
-  HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 }

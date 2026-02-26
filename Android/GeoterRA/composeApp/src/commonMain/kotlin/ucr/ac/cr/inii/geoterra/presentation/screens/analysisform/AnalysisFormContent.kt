@@ -18,6 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.CustomTextField
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.FormSection
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,7 +36,6 @@ fun AnalysisFormContent(
       .padding(20.dp),
     verticalArrangement = Arrangement.spacedBy(20.dp)
   ) {
-    // --- SECCIÓN: INFORMACIÓN GENERAL ---
     FormSection(title = "Información General", icon = Icons.Default.Info) {
       CustomTextField(
         value = state.region,
@@ -75,7 +76,7 @@ fun AnalysisFormContent(
       )
     }
     
-    // --- SECCIÓN: OBSERVACIONES ---
+    // --- SECESSION: OBSERVACIONES ---
     FormSection(title = "Observaciones de Campo", icon = Icons.Default.Visibility) {
       CustomTextField(
         value = state.temperatureSensation,
@@ -108,7 +109,7 @@ fun AnalysisFormContent(
         label = "Detalles adicionales",
         icon = Icons.Default.Description,
         singleLine = false,
-        minLines = 3
+        minLines = 2
       )
     }
     
@@ -134,7 +135,7 @@ fun AnalysisFormContent(
     
     if (state.error != null) {
       Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFEBEE)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
         modifier = Modifier.fillMaxWidth()
       ) {
         Text(
@@ -154,7 +155,7 @@ fun AnalysisFormContent(
         .fillMaxWidth()
         .height(56.dp),
       shape = RoundedCornerShape(12.dp),
-      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF57C00)),
+      colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
       enabled = !state.isLoading
     ) {
       if (state.isLoading) {
@@ -164,66 +165,4 @@ fun AnalysisFormContent(
       }
     }
   }
-}
-
-// --- COMPONENTES AUXILIARES PARA LIMPIEZA VISUAL ---
-
-@Composable
-fun FormSection(title: String, icon: ImageVector, content: @Composable ColumnScope.() -> Unit) {
-  Column(modifier = Modifier.fillMaxWidth()) {
-    Row(
-      verticalAlignment = Alignment.CenterVertically,
-      modifier = Modifier.padding(bottom = 8.dp)
-    ) {
-      Icon(
-        icon,
-        contentDescription = null,
-        tint = Color(0xFFF57C00),
-        modifier = Modifier.size(20.dp)
-      )
-      Spacer(Modifier.width(8.dp))
-      Text(text = title, fontWeight = FontWeight.Bold, color = Color(0xFF1A237E), fontSize = 16.sp)
-    }
-    Card(
-      modifier = Modifier.fillMaxWidth(),
-      colors = CardDefaults.cardColors(containerColor = Color.White),
-      elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-      shape = RoundedCornerShape(16.dp)
-    ) {
-      Column(
-        modifier = Modifier.padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-      ) {
-        content()
-      }
-    }
-  }
-}
-
-@Composable
-fun CustomTextField(
-  value: String,
-  onValueChange: (String) -> Unit,
-  label: String,
-  icon: ImageVector? = null,
-  modifier: Modifier = Modifier,
-  keyboardType: KeyboardType = KeyboardType.Text,
-  singleLine: Boolean = true,
-  minLines: Int = 1
-) {
-  OutlinedTextField(
-    value = value,
-    onValueChange = onValueChange,
-    label = { Text(label) },
-    leadingIcon = icon?.let { { Icon(it, contentDescription = null, tint = Color.Gray) } },
-    modifier = modifier.fillMaxWidth(),
-    shape = RoundedCornerShape(12.dp),
-    keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-    singleLine = singleLine,
-    minLines = minLines,
-    colors = OutlinedTextFieldDefaults.colors(
-      focusedBorderColor = Color(0xFFF57C00),
-      focusedLabelColor = Color(0xFFF57C00)
-    )
-  )
 }

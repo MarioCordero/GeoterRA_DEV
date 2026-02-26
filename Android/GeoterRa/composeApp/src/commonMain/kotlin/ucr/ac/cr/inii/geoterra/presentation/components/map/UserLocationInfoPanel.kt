@@ -36,7 +36,7 @@ fun UserLocationInfoPanel(
     shape = RoundedCornerShape(28.dp),
     elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
     colors = CardDefaults.cardColors(
-      containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
+      containerColor = MaterialTheme.colorScheme.primaryContainer
     )
   ) {
     Row(
@@ -67,7 +67,7 @@ fun UserLocationInfoPanel(
         Text(
           text = "Lat: ${latitude}, Long: ${longitude}",
           style = MaterialTheme.typography.bodyMedium,
-          color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+          color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.95f)
         )
       }
     }

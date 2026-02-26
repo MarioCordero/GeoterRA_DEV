@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.InfoBadge
 
 @Composable
 fun ManifestationInfoPanel(
@@ -32,7 +33,7 @@ fun ManifestationInfoPanel(
     shape = RoundedCornerShape(28.dp),
     elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
     colors = CardDefaults.cardColors(
-      containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
+      containerColor = MaterialTheme.colorScheme.primaryContainer
     )
   ) {
     Column(
@@ -43,12 +44,19 @@ fun ManifestationInfoPanel(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
       ) {
-        Icon(
-          imageVector = Icons.Default.LocationOn,
-          contentDescription = null,
-          tint = MaterialTheme.colorScheme.primary,
-          modifier = Modifier.size(24.dp)
-        )
+        Box(
+          modifier = Modifier
+            .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
+            .padding(8.dp)
+        ) {
+          Icon(
+            imageVector = Icons.Default.LocationOn,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.size(24.dp)
+          )
+        }
+        
         Spacer(Modifier.width(8.dp))
         Column {
           Text(
@@ -61,13 +69,13 @@ fun ManifestationInfoPanel(
           )
           Text(
             text = manifestation.region,
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
           )
           Text(
             text = "Lat: ${manifestation.latitude}, Lon: ${manifestation.longitude}",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = Modifier.padding(top = 2.dp)
           )
         }
@@ -94,7 +102,7 @@ fun ManifestationInfoPanel(
           label = "pH",
           value = "${manifestation.field_pH ?: "--"}",
           icon = Icons.Default.WaterDrop,
-          color = Color(0x2196F6)
+          color = Color(0xff2196f6)
         )
         InfoBadge(
           label = "Conductividad",
@@ -124,38 +132,5 @@ fun ManifestationInfoPanel(
         )
       }
     }
-  }
-}
-
-@Composable
-fun InfoBadge(
-  label: String,
-  value: String,
-  icon: ImageVector,
-  color: Color
-) {
-  Column(horizontalAlignment = Alignment.CenterHorizontally) {
-    Box(
-      modifier = Modifier
-        .background(color.copy(alpha = 0.1f), RoundedCornerShape(12.dp))
-        .padding(8.dp)
-    ) {
-      Icon(
-        imageVector = icon,
-        contentDescription = null,
-        tint = color,
-        modifier = Modifier.size(20.dp)
-      )
-    }
-    Text(
-      text = value,
-      style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-      modifier = Modifier.padding(top = 4.dp)
-    )
-    Text(
-      text = label,
-      style = MaterialTheme.typography.labelSmall,
-      color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
   }
 }

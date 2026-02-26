@@ -26,6 +26,7 @@ import geoterra.composeapp.generated.resources.ic_geoterra_planet
 import geoterra.composeapp.generated.resources.logo_GeoterRA
 import geoterra.composeapp.generated.resources.rocks
 import org.jetbrains.compose.resources.painterResource
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.StepItem
 
 /**
  * Pure UI composable for Home screen.
@@ -93,7 +94,7 @@ fun HomeContent(
         text = state.description,
         style = MaterialTheme.typography.bodyLarge,
         lineHeight = 28.sp,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
+        color = MaterialTheme.colorScheme.onSurface
       )
       Spacer(modifier = Modifier.height(24.dp))
       Button(
@@ -178,24 +179,4 @@ fun SectionTitle(title: String) {
     fontWeight = FontWeight.ExtraBold,
     color = MaterialTheme.colorScheme.primary
   )
-}
-
-@Composable
-fun StepItem(number: Int, title: String, desc: String) {
-  Row(
-    modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
-    verticalAlignment = Alignment.Top
-  ) {
-    Text(
-      text = number.toString(),
-      fontSize = 40.sp,
-      fontWeight = FontWeight.Black,
-      color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-      modifier = Modifier.width(40.dp)
-    )
-    Column {
-      Text(text = title, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
-      Text(text = desc, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-    }
-  }
 }

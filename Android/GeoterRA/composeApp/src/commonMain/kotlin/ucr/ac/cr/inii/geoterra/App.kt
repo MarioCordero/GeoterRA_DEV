@@ -27,16 +27,7 @@ import org.koin.compose.koinInject
 import ucr.ac.cr.inii.geoterra.presentation.MainScreen
 import ucr.ac.cr.inii.geoterra.presentation.auth.AuthViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginScreen
-
-// Definición de colores
-private val LightColors = lightColorScheme(
-  primary = Color(0xFF006400),    // Un verde bosque (ejemplo para GeoterRA)
-  onPrimary = Color.White,
-  surface = Color.White,          // Fondo de Cards, Menús, etc.
-  background = Color.White,       // Fondo principal de la pantalla
-  onSurface = Color(0xFF1C1B1F),  // Texto sobre fondo blanco
-  onBackground = Color(0xFF1C1B1F)
-)
+import ucr.ac.cr.inii.geoterra.themes.GeoterraTheme
 
 /**
  * Root composable for all platforms.
@@ -44,7 +35,7 @@ private val LightColors = lightColorScheme(
  */
 @Composable
 fun App() {
-  MaterialTheme(colorScheme = LightColors) {
+  GeoterraTheme{
     Navigator(screen = MainScreen())
   }
 }

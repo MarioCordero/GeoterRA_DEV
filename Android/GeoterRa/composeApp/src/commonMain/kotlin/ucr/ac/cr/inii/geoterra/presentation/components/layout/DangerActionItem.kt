@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.components.account
+package ucr.ac.cr.inii.geoterra.presentation.components.layout
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
