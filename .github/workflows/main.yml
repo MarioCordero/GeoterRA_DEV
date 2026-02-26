@@ -1,45 +1,22 @@
-name: Force Deploy (PR + Manual)
+name: Force Deploy (Manual)
 
 on:
-  # 1) Automático: PRs hacia main
-  pull_request:
-    branches: [ main ]
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - labeled
-
-  # 2) Manual desde Actions
+  # Manual desde Actions
   workflow_dispatch:
 
 permissions:
   contents: write
-  pull-requests: read
 
 jobs:
   force-deploy:
     runs-on: ubuntu-latest
 
-    # Ejecutar si:
-    # - Es workflow_dispatch (manual), o
-    # - Es PR headerWeb -> main
-    if: >
-      github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'pull_request' &&
-       github.event.pull_request.base.ref == 'main' &&
-       github.event.pull_request.head.ref == 'headerWeb')
-
     steps:
       # ---------------- DETERMINAR RAMA ORIGEN ----------------
       - name: Set source branch
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            echo "SOURCE_BRANCH=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
-          else
-            # Para ejecución manual usamos headerWeb por defecto
-            echo "SOURCE_BRANCH=headerWeb" >> $GITHUB_ENV
-          fi
+          # Para ejecución manual usamos headerWeb por defecto
+          echo "SOURCE_BRANCH=headerWeb" >> $GITHUB_ENV
 
       # ---------------- CHECKOUT RAMA ORIGEN (headerWeb) ----------------
       - name: Checkout source branch
@@ -80,9 +57,9 @@ jobs:
           mkdir -p deploy/database
           mkdir -p deploy/website/dist
 
-          # API
+          # API - copy all folders
           if [ -d "API" ]; then
-            cp -r API/*.php deploy/API/ || true
+            cp -r API/* deploy/API/ || true
           fi
 
           # database
@@ -108,7 +85,9 @@ jobs:
           # API y database: reemplazo completo
           if [ -d "deploy/API" ]; then
             mkdir -p main-branch/API
-            rsync -av --delete deploy/API/ main-branch/API/
+            rsync -av --delete \
+              --exclude 'config/config.ini' \
+              deploy/API/ main-branch/API/
           fi
 
           if [ -d "deploy/database" ]; then
