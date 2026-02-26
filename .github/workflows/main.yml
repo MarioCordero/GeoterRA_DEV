@@ -85,7 +85,9 @@ jobs:
           # API y database: reemplazo completo
           if [ -d "deploy/API" ]; then
             mkdir -p main-branch/API
-            rsync -av --delete deploy/API/ main-branch/API/
+            rsync -av --delete \
+              --exclude 'config/config.ini' \
+              deploy/API/ main-branch/API/
           fi
 
           if [ -d "deploy/database" ]; then
