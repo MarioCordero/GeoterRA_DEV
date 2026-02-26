@@ -1,8 +1,8 @@
 import React from 'react';
 import MapContainer from '../components/mapComponents/mapComponent';
-import LoggedHeader from '../components/loggedHeader';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import LoggedHeader from '../components/common/loggedHeader';
+import Header from '../components/common/Header';
+import Footer from '../components/common/Footer';
 import { useSession } from '../hooks/useSession';
 
 const Map = () => {

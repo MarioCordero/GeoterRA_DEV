@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SidebarLayout from '../components/loggedAdminComponents/loggedAdminSidebar';
-import LoggedHeader from '../components/loggedHeader';
-import Footer from '../components/Footer';
+import LoggedHeader from '../components/common/loggedHeader';
+import Footer from '../components/common/Footer';
 
 import AdminRequestsManager from '../components/loggedAdminComponents/loggedAdminRequestsManager';
 import AdminRequests from '../components/common/UserRequests';

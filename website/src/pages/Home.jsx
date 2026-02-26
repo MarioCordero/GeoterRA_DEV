@@ -4,9 +4,9 @@ import WelcomeSection from '../components/homeComponents/index-welcome';
 import AboutUsSection from '../components/homeComponents/index-about-us';
 import HowWorksSection from '../components/homeComponents/index-how-works';
 import ContactUsSection from '../components/homeComponents/index-contact-us';
-import LoggedHeader from '../components/loggedHeader';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import LoggedHeader from '../components/common/loggedHeader';
+import Header from '../components/common/Header';
+import Footer from '../components/common/Footer';
 import { useSession } from '../hooks/useSession';
 
 const Home = () => {

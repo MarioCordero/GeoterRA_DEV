@@ -2,98 +2,45 @@ import React, { useState } from 'react';
 import { Layout, Button, Drawer } from 'antd';
 import { MenuOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '../assets/images/GeoterRA-Logo-Color.svg';
-import '../colorModule.css';
-import '../fontsModule.css';
-import { buildApiUrl } from '../config/apiConf';
+import logo from '../../assets/images/GeoterRA-Logo-Color.svg';
+import '../../colorModule.css';
+import '../../fontsModule.css';
+import { useSession } from '../../hooks/useSession';
 
 const { Header } = Layout;
 
 export default function AppHeader() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
-
-  // Session token management functions
-  const getSessionToken = () => {
-    return localStorage.getItem('geoterra_session_token');
-  };
-
-  const clearSessionToken = () => {
-    localStorage.removeItem('geoterra_session_token');
-  };
-
-  const buildHeaders = () => {
-    const headers = {};
-    const token = getSessionToken();
-    if (token) {
-      headers['X-Session-Token'] = token;
-    }
-    return headers;
-  };
+  const { isLogged, user, logout: sessionLogout, checkSession } = useSession();
 
   // Function to check session before navigating to profile
   const handleProfileClick = async (e) => {
-    e.preventDefault(); // Prevent default link behavior
+    e.preventDefault();
     
     try {
-      // console.log("Checking session before profile access...");
-      
-      // Check if token exists first
-      const token = getSessionToken();
-      // console.log("Session token present:", !!token);
-
-      const response = await fetch(buildApiUrl("check_session.php"), {
-        method: "GET",
-        credentials: "include",
-        headers: buildHeaders(), // Include session token
-      });
-      
-      const apiResponse = await response.json();
-      // console.log("Session check response:", apiResponse);
-      
-      // Check if API response is successful
-      if (apiResponse.response === 'Ok' && 
-          apiResponse.data && 
-          apiResponse.data.status === 'logged_in') {
-        // console.log('✅ Session is active - checking user type');
-        
-        const userData = apiResponse.data;
-        
-        // Check if user is admin
-        if (userData.user_type === 'admin' || userData.is_admin === true || userData.admin === true) {
-          // console.log('User is admin - redirecting to admin panel');
+      await checkSession();
+      if (isLogged && user) {
+        if (user.role === 'admin' || user.user_type === 'admin' || user.is_admin === true || user.admin === true) {
           navigate('/LoggedAdmin');
         } else {
-          // console.log('User is regular user - redirecting to user profile');
           navigate('/Logged');
         }
       } else {
-        // console.log('❌ Session is not active - clearing token and redirecting to login');
-        clearSessionToken(); // Clear invalid token
         navigate('/Login');
       }
     } catch (err) {
       console.error("Session check failed:", err);
-      // console.log('Session check failed - clearing token and redirecting to login');
-      clearSessionToken(); // Clear token on error
       navigate('/Login');
     }
   };
 
-  // Enhanced logout function
   const handleLogout = async () => {
     try {
-      // Call logout endpoint if you have one
-      await fetch(buildApiUrl("logout.php"), {
-        method: "POST",
-        credentials: "include",
-        headers: buildHeaders(),
-      });
-      // console.log("Logout API called successfully");
+      await sessionLogout();
+      navigate("/");
     } catch (error) {
       console.error("Error during logout:", error);
-    } finally {
-      clearSessionToken(); // Always clear token
       navigate("/");
     }
   };
@@ -116,7 +63,6 @@ export default function AppHeader() {
 
   const renderNavButton = (item) => {
     if (item.isLogout) {
-      // Special handling for logout button
       return (
         <Button
           key={item.key}
@@ -131,7 +77,6 @@ export default function AppHeader() {
         </Button>
       );
     } else if (item.requiresAuth) {
-      // For "Mi Perfil", use click handler instead of Link
       return (
         <Button
           key={item.key}

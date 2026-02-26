@@ -1,6 +1,6 @@
 import React from "react";
-import '../colorModule.css';
-import '../fontsModule.css';
+import '../../colorModule.css';
+import '../../fontsModule.css';
 
 export default function Footer() {
   return (
