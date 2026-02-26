@@ -722,3 +722,10 @@ El sistema utiliza **ErrorType** y **ApiException** para manejo consistente de e
 - ⚠️ **Base de Datos**: Los repositorios son la única forma de acceder a datos
 
 </dd>
+
+- init.php             → Cambia si cambia configuración PHP
+- ErrorHandler.php     → Cambia si cambia manejo de errores
+- RequestParser.php    → Cambia si cambia el formato de requests
+- routes.php           → Cambia si añades/quitas rutas
+- SimpleRouter.php     → Cambia si cambia lógica de routing
+- index.php           → Casi NUNCA cambia
