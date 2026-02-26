@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSession } from "../../hooks/useSession";
+import { auth, users } from '../../config/apiConf';
 import loginImage from "../../assets/images/login-background.png";
 import "../../colorModule.css";
 import '../../fontsModule.css';
-import { buildApiUrl } from '../../config/apiConf';
 
 function Login() {
   const navigate = useNavigate();
@@ -89,54 +90,52 @@ function Login() {
     setErrorMsg("");
     setLoading(true);
 
-    const formData = new FormData();
-    formData.append("email", email);
-    formData.append("password", password);
-
     try {
-      const response = await fetch(buildApiUrl("login.inc.php"), {
-        method: "POST",
-        body: formData,
-        credentials: "include",
+      const response = await fetch(auth.login(), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
       });
 
       const data = await response.json();
 
-      if (data.response === "Ok") {
-        // Store session token from login response
-        if (data.data && data.data.session_token) {
-          console.log("🎯 Storing session token:", data.data.session_token);
-          setSessionToken(data.data.session_token);
-        } else {
-          console.warn("⚠️ No session token in login response!");
-        }
-
-        // Check session after login
-        const sessionData = await checkSessionStatus();
-
-        // Login successful, now get user info to check role
-        const userInfo = await getUserInfo(email);
+      if (response.ok && data.data && data.data.access_token) {
+        setTokens(data.data.access_token, data.data.refresh_token);
         
-        if (userInfo) {
-          // Check user role and redirect accordingly
-          if (userInfo.rol === "admin") {
-            navigate("/LoggedAdmin"); 
+        console.log('✅ Login successful, tokens stored');
+
+        const userResponse = await fetch(users.me(), {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${data.data.access_token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          
+          if (userData.data && userData.data.role === 'admin') {
+            navigate('/LoggedAdmin');
           } else {
-            navigate("/Logged");
+            navigate('/Logged');
           }
         } else {
-          // If we can't get user info, default to regular user page
-          console.log("Could not get user info, defaulting to regular user page");
-          navigate("/Logged");
+          navigate('/Logged');
         }
       } else {
-        setErrorMsg(data.message || "Credenciales incorrectas");
+        setErrorMsg(data.message || data.errors?.[0] || 'Credenciales incorrectas');
         setEmail("");
         setPassword("");
       }
     } catch (err) {
-      console.error("Login request failed:", err);
-      setErrorMsg("Error de conexión");
+      console.error('Login request failed:', err);
+      setErrorMsg('Error de conexión');
       setEmail("");
       setPassword("");
     } finally {

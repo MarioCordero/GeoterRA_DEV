@@ -4,7 +4,7 @@ import { Form, Input } from "antd";
 import PhoneInput from "../common/PhoneInput";
 import "../../colorModule.css";
 import "../../fontsModule.css";
-import { buildApiUrl, getAuthEndpoints } from "../../config/apiConf";
+import { auth } from "../../config/apiConf";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ export default function Register() {
     };
 
     try {
-      const response = await fetch(getAuthEndpoints().register, {
+      const response = await fetch(auth.register(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -53,11 +53,12 @@ export default function Register() {
       if (response.ok && data?.data) {
         setShowSuccessModal(true);
       } else if (data?.errors?.length) {
-        alert(data.errors[0].message);
+        alert(data.errors[0].message || data.errors[0]);
       } else {
         alert("Error en el registro");
       }
     } catch (err) {
+      console.error('Registration error:', err);
       alert("Error de conexión");
     }
   };
