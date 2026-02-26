@@ -57,9 +57,9 @@ jobs:
           mkdir -p deploy/database
           mkdir -p deploy/website/dist
 
-          # API
+          # API - copy all folders
           if [ -d "API" ]; then
-            cp -r API/*.php deploy/API/ || true
+            cp -r API/* deploy/API/ || true
           fi
 
           # database
