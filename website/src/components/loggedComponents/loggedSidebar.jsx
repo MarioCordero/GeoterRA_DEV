@@ -11,48 +11,58 @@ import {
 } from "@ant-design/icons";
 import '../../fontsModule.css';
 import '../../colorModule.css';
-import { buildApiUrl } from '../../config/apiConf';
+import { useSession } from '../../hooks/useSession';
+import { auth } from '../../config/apiConf';
 
 const { Sider } = Layout;
 
 const SidebarLayout = ({ selectedKey, setSelectedKey, collapsed, setCollapsed, isMobile }) => {
   const navigate = useNavigate();
+  const { logout: sessionLogout, buildHeaders } = useSession();
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
   const handleLogout = async () => {
     try {
       setLoggingOut(true);
-      console.log("Starting logout process...");
-      localStorage.removeItem('geoterra_session_token');
 
-      const response = await fetch(buildApiUrl("logout.php"), {
+      // Call the logout endpoint WITH the Authorization header
+      const response = await fetch(auth.logout(), {
         method: "POST",
         credentials: "include",
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: buildHeaders(),
       });
 
-      const data = await response.json();
-
       if (response.ok) {
-        console.log("Logout successful, redirecting to login");
+        await sessionLogout();
         setLogoutModalVisible(false);
-        navigate("/Login");
+        navigate("/");
       } else {
-        console.error("Logout failed:", data);
+        console.error("Logout failed on server, status:", response.status);
+        const data = await response.json();
+        
+        await sessionLogout();
+        
         Modal.error({
-          title: 'Error al cerrar sesión',
-          content: data.message || "Error desconocido",
+          title: 'Sesión cerrada',
+          content: data.message || "Tu sesión ha sido cerrada",
         });
+        
+        setLogoutModalVisible(false);
+        navigate("/");
       }
     } catch (err) {
       console.error("Logout error:", err);
+      
+      await sessionLogout();
+      
       Modal.error({
         title: 'Error de conexión',
-        content: err.message,
+        content: 'Tu sesión ha sido cerrada localmente',
       });
+      
+      setLogoutModalVisible(false);
+      navigate("/");
     } finally {
       setLoggingOut(false);
     }
@@ -66,30 +76,66 @@ const SidebarLayout = ({ selectedKey, setSelectedKey, collapsed, setCollapsed, i
     setLogoutModalVisible(false);
   };
 
-  const menuItems = [
+  const baseMenuItems = [
     { 
       key: '1', 
       icon: <DashboardOutlined style={{ fontSize: '18px' }} />, 
       label: 'Dashboard',
-      shortLabel: 'Inicio'
     },
     { 
       key: '3', 
       icon: <FileTextOutlined style={{ fontSize: '18px' }} />, 
       label: 'Solicitudes',
-      shortLabel: 'Solicitudes'
     },
     { 
       key: '2', 
       icon: <UserOutlined style={{ fontSize: '18px' }} />, 
       label: 'Perfil',
-      shortLabel: 'Perfil'
     },
+  ];
+
+  // Mobile items with shortLabel
+  const mobileMenuItems = [
+    { ...baseMenuItems[0], shortLabel: 'Inicio' },
+    { ...baseMenuItems[2], shortLabel: 'Solicitudes' },
+    { ...baseMenuItems[1], shortLabel: 'Perfil' },
   ];
 
   const handleMenuClick = (e) => {
     setSelectedKey(e.key);
   };
+
+  // Logout Confirmation Modal Component
+  const LogoutModal = () => (
+    <Modal
+      title={
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <ExclamationCircleOutlined style={{ color: '#faad14' }} />
+          Confirmar cierre de sesión
+        </div>
+      }
+      open={logoutModalVisible}
+      onOk={handleLogout}
+      onCancel={handleLogoutCancel}
+      okText="Sí, cerrar sesión"
+      cancelText="Cancelar"
+      okButtonProps={{
+        danger: true,
+        loading: loggingOut,
+        className: 'bg-geoterra-orange'
+      }}
+      cancelButtonProps={{
+        disabled: loggingOut
+      }}
+      closable={!loggingOut}
+      maskClosable={!loggingOut}
+      centered
+    >
+      <p style={{ margin: '16px 0', fontSize: '16px' }}>
+        ¿Estás seguro de que quieres cerrar sesión?
+      </p>
+    </Modal>
+  );
 
   // Mobile Bottom Navigation
   if (isMobile) {
@@ -111,7 +157,7 @@ const SidebarLayout = ({ selectedKey, setSelectedKey, collapsed, setCollapsed, i
           height: '60px',
           padding: '0 1rem',
         }}>
-          {menuItems.map((item) => (
+          {mobileMenuItems.map((item) => (
             <Button
               key={item.key}
               type="text"
@@ -177,35 +223,7 @@ const SidebarLayout = ({ selectedKey, setSelectedKey, collapsed, setCollapsed, i
           </Button>
         </div>
 
-        {/* Logout Confirmation Modal */}
-        <Modal
-          title={
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <ExclamationCircleOutlined style={{ color: '#faad14' }} />
-              Confirmar cierre de sesión
-            </div>
-          }
-          open={logoutModalVisible}
-          onOk={handleLogout}
-          onCancel={handleLogoutCancel}
-          okText="Sí, cerrar sesión"
-          cancelText="Cancelar"
-          okButtonProps={{
-            danger: true,
-            loading: loggingOut,
-            className: 'bg-geoterra-orange'
-          }}
-          cancelButtonProps={{
-            disabled: loggingOut
-          }}
-          closable={!loggingOut}
-          maskClosable={!loggingOut}
-          centered
-        >
-          <p style={{ margin: '16px 0', fontSize: '16px' }}>
-            ¿Estás seguro de que quieres cerrar sesión?
-          </p>
-        </Modal>
+        <LogoutModal />
       </>
     );
   }
@@ -237,7 +255,7 @@ const SidebarLayout = ({ selectedKey, setSelectedKey, collapsed, setCollapsed, i
           padding: '1rem', 
           textAlign: collapsed ? 'center' : 'right',
           borderBottom: '1px solid #f0f0f0',
-          marginTop: '64px' // Account for header
+          marginTop: '64px'
         }}>
           <Button
             type="text"
@@ -264,7 +282,7 @@ const SidebarLayout = ({ selectedKey, setSelectedKey, collapsed, setCollapsed, i
             background: 'transparent',
             flex: 1,
           }}
-          items={menuItems.map(item => ({
+          items={baseMenuItems.map(item => ({
             ...item,
             style: {
               margin: '8px 0',
@@ -287,6 +305,7 @@ const SidebarLayout = ({ selectedKey, setSelectedKey, collapsed, setCollapsed, i
             danger
             block
             onClick={showLogoutConfirm}
+            loading={loggingOut}
             icon={<LogoutOutlined />}
             className="bg-geoterra-orange"
             style={{
@@ -305,35 +324,7 @@ const SidebarLayout = ({ selectedKey, setSelectedKey, collapsed, setCollapsed, i
         </div>
       </Sider>
 
-      {/* Logout Confirmation Modal */}
-      <Modal
-        title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <ExclamationCircleOutlined style={{ color: '#faad14' }} />
-            Confirmar cierre de sesión
-          </div>
-        }
-        open={logoutModalVisible}
-        onOk={handleLogout}
-        onCancel={handleLogoutCancel}
-        okText="Sí, cerrar sesión"
-        cancelText="Cancelar"
-        okButtonProps={{
-          danger: true,
-          loading: loggingOut,
-          className: 'bg-geoterra-orange'
-        }}
-        cancelButtonProps={{
-          disabled: loggingOut
-        }}
-        closable={!loggingOut}
-        maskClosable={!loggingOut}
-        centered
-      >
-        <p style={{ margin: '16px 0', fontSize: '16px' }}>
-          ¿Estás seguro de que quieres cerrar sesión?
-        </p>
-      </Modal>
+      <LogoutModal />
     </>
   );
 };

@@ -5,6 +5,7 @@ export const useSession = () => {
   const [isLogged, setIsLogged] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // Token management
   const getAccessToken = () => {
@@ -141,17 +142,29 @@ export const useSession = () => {
 
   // Logout
   const logout = async () => {
+    if (isLoggingOut) {
+      console.log('Logout already in progress...');
+      return;
+    }
+
     try {
-      await fetch(auth.logout(), {
+      setIsLoggingOut(true);
+      
+      const response = await fetch(auth.logout(), {
         method: 'POST',
         headers: buildHeaders(),
       });
+
+      if (!response.ok) {
+        console.warn('Server logout failed:', response.status);
+      }
     } catch (err) {
       console.error('Logout request failed:', err);
     } finally {
       clearTokens();
       setIsLogged(false);
       setUser(null);
+      setIsLoggingOut(false);
     }
   };
 
