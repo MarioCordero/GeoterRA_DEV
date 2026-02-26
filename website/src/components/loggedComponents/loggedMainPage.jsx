@@ -25,7 +25,6 @@ const LoggedMainPage = () => {
   const [user, setUser] = useState({ name: '', requestedPoints: 0 });
   const [dataLoading, setDataLoading] = useState(false);
 
-  // Fetch additional user data if needed
   const fetchUserData = async () => {
     try {
       setDataLoading(true);
@@ -56,25 +55,18 @@ const LoggedMainPage = () => {
     }
   };
 
-  // Fetch user data when session is verified and user is logged in
   useEffect(() => {
     if (!loading && isLogged && sessionUser) {
-      // Use session user data directly
       setUser({
         name: sessionUser.name || sessionUser.email || 'Usuario',
         requestedPoints: sessionUser.requestedPoints || 0,
       });
-      
-      // Optionally fetch fresh data from /users/me
-      // fetchUserData();
     } else if (!loading && !isLogged) {
-      // Session is invalid - redirect to login
       console.log('❌ Session invalid, redirecting to login');
       navigate('/');
     }
   }, [loading, isLogged, sessionUser, navigate]);
 
-  // Show loading while verifying session
   if (loading || dataLoading) {
     return (
       <div className="flex justify-center items-center min-h-96 p-4">
@@ -85,7 +77,6 @@ const LoggedMainPage = () => {
     );
   }
 
-  // Only render dashboard if user is properly logged in
   if (!isLogged) {
     return (
       <div className="flex justify-center items-center min-h-96 p-4">
