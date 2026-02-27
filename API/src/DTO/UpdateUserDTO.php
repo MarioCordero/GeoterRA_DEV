@@ -12,6 +12,7 @@ use Http\ErrorType;
 final class UpdateUserDTO
 {
   public function __construct(
+    public string $userId,
     public string $firstName,
     public string $lastName,
     public string $email,
@@ -21,6 +22,7 @@ final class UpdateUserDTO
   public static function fromArray(array $data): self
   {
     return new self(
+      $data['user_id'] ?? '',
       trim($data['name'] ?? ''),
       trim($data['lastname'] ?? ''),
       trim($data['email'] ?? ''),
