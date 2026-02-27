@@ -24,7 +24,7 @@ final class AnalysisRequestService
   ) {
     $authRepository = new \Repositories\AuthRepository($this->pdo);
     $userRepository = new \Repositories\UserRepository($this->pdo);
-    $this->authService = new AuthService($authRepository, $userRepository);
+    $this->authService = new AuthService($this->pdo);
   }
 
   /**
