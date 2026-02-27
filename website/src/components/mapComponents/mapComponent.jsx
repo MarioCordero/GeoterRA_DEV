@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { FaExpand, FaCompress, FaChevronRight, FaChevronLeft, FaMapMarkerAlt } from "react-icons/fa";
-import { buildApiUrl } from '../../config/apiConf';
+import { registeredManifestations } from '../../config/apiConf';
+import { useSession } from '../../hooks/useSession';
 import LindalDiagram from './LindalDiagram';
 
 // Fix Leaflet's default icon issue
@@ -15,13 +16,12 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png",
 });
 
-// Function to fetch points for a specific region
-const fetchPoints = async (region) => {
+// Function to fetch all registered manifestations (points)
+const fetchAllManifestations = async (buildHeaders) => {
   try {
-    const response = await fetch(buildApiUrl("map_data.inc.php"), {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `region=${encodeURIComponent(region)}`,
+    const response = await fetch(registeredManifestations.index(), {
+      method: "GET",
+      headers: buildHeaders(),
     });
     
     if (!response.ok) {
@@ -30,58 +30,39 @@ const fetchPoints = async (region) => {
     
     const result = await response.json();
     
+    console.log('API Response:', result);
+    
     // Handle the API response structure
-    if (result.response === "Ok") {
-      return result.data || [];
+    if (result.errors && result.errors.length === 0 && result.data) {
+      // ✅ Filter out soft-deleted records
+      const activeManifestations = (result.data || []).filter(item => {
+        return item.deleted_at === null || item.deleted_at === undefined;
+      });
+      
+      console.log(`✅ Loaded ${activeManifestations.length} active manifestations (${result.data.length - activeManifestations.length} deleted)`);
+      
+      return activeManifestations;
     } else {
-      console.error(`API Error for region ${region}:`, result.message, result.errors);
-      throw new Error(result.message || "Failed to fetch points");
+      console.error("API Error fetching manifestations:", result.errors);
+      throw new Error(result.errors?.[0]?.message || "Failed to fetch manifestations");
     }
   } catch (error) {
-    console.error(`Error fetching points for region ${region}:`, error);
+    console.error("Error fetching manifestations:", error);
     throw error;
   }
 };
 
-// Function to fetch regions
-const fetchRegions = async () => {
-  try {
-    const response = await fetch(buildApiUrl("get_regions.inc.php"));
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+// Function to get unique regions from manifestations
+const getRegionsFromManifestations = (manifestations) => {
+  const regions = new Set();
+  manifestations.forEach(point => {
+    if (point.region) {
+      // Replace underscores with spaces for display
+      const displayRegion = point.region.replace(/_/g, ' ');
+      regions.add(displayRegion);
     }
-    
-    const result = await response.json();
-    
-    // Handle the API response structure
-    if (result.response === "Ok") {
-      return result.data || [];
-    } else {
-      console.error("API Error fetching regions:", result.message, result.errors);
-      return [];
-    }
-  } catch (error) {
-    console.error("Error fetching regions:", error);
-    return [];
-  }
-};
-
-// Function to check user session
-const checkUserSession = async () => {
-  try {
-    const response = await fetch(buildApiUrl("check_session.php"));
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const result = await response.json();
-    return result;
-  } catch (error) {
-    console.error("Error checking session:", error);
-    return { status: 'not_logged_in' };
-  }
+  });
+  return Array.from(regions).sort();
 };
 
 function CenterOnUser() {
@@ -233,141 +214,81 @@ function FullscreenControl({ fullscreen, handleFullscreen }) {
 
 export default function MapComponent() {
   const navigate = useNavigate();
-  const [allPoints, setAllPoints] = useState({}); // Stores points by region
-  const [visiblePoints, setVisiblePoints] = useState([]); // Points to display
+  const { isLogged, buildHeaders } = useSession();
+  const [allManifestations, setAllManifestations] = useState([]); // All fetched manifestations
+  const [visiblePoints, setVisiblePoints] = useState([]); // Points to display based on selected regions
   const [selectedRegions, setSelectedRegions] = useState([]);
   const [regions, setRegions] = useState([]);
   const [fullscreen, setFullscreen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [userSession, setUserSession] = useState(null);
   const mapContainerRef = useRef(null);
 
-  // Check user session on mount - prevent double execution
+  // Fetch all manifestations on mount - prevent double execution
   useEffect(() => {
     let isMounted = true;
     
-    const initializeSession = async () => {
-      if (isMounted) {
-        const session = await checkUserSession();
-        if (isMounted) {
-          setUserSession(session);
-        }
-      }
-    };
-    
-    initializeSession();
-    
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // Fetch regions on mount - prevent double execution
-  useEffect(() => {
-    let isMounted = true;
-    
-    const loadRegions = async () => {
-      if (isMounted) {
-        try {
-          setLoading(true);
-          setError(null);
-          const regionsData = await fetchRegions();
-          
-          if (isMounted) {
-            setRegions(regionsData);
-            
-            // Auto-select first region if available
-            if (regionsData.length > 0) {
-              setSelectedRegions([regionsData[0]]);
-            }
-          }
-        } catch (err) {
-          if (isMounted) {
-            setError("Failed to load regions");
-            console.error("Error loading regions:", err);
-          }
-        } finally {
-          if (isMounted) {
-            setLoading(false);
-          }
-        }
-      }
-    };
-    
-    loadRegions();
-    
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // Fetch points when selected regions change - prevent double execution
-  useEffect(() => {
-    let isMounted = true;
-    
-    const fetchDataForRegions = async () => {
+    const loadManifestations = async () => {
       if (!isMounted) return;
       
-      if (selectedRegions.length === 0) {
-        if (isMounted) {
-          setVisiblePoints([]);
-        }
-        return;
-      }
-
-      if (isMounted) {
+      try {
         setLoading(true);
         setError(null);
-      }
-      
-      const newPoints = { ...allPoints };
-      let hasNewData = false;
-      const errors = [];
-
-      // Fetch data for newly selected regions that we don't have yet
-      for (const region of selectedRegions) {
-        if (!allPoints[region] && isMounted) {
-          try {
-            const points = await fetchPoints(region);
-            if (isMounted) {
-              newPoints[region] = points;
-              hasNewData = true;
-            }
-          } catch (error) {
-            if (isMounted) {
-              console.error(`Error fetching data for ${region}:`, error);
-              errors.push(`Failed to load data for ${region}: ${error.message}`);
-            }
+        
+        const manifestations = await fetchAllManifestations(buildHeaders);
+        
+        if (isMounted) {
+          setAllManifestations(manifestations);
+          
+          // Extract unique regions
+          const uniqueRegions = getRegionsFromManifestations(manifestations);
+          setRegions(uniqueRegions);
+          
+          console.log('Available regions:', uniqueRegions);
+          
+          // Auto-select first region if available
+          if (uniqueRegions.length > 0) {
+            setSelectedRegions([uniqueRegions[0]]);
           }
         }
-      }
-
-      if (isMounted) {
-        if (hasNewData) {
-          setAllPoints(newPoints);
+      } catch (err) {
+        if (isMounted) {
+          setError("Failed to load manifestations");
+          console.error("Error loading manifestations:", err);
         }
-
-        // Update visible points
-        const pointsToShow = selectedRegions.flatMap(region => newPoints[region] || []);
-        setVisiblePoints(pointsToShow);
-        
-        if (errors.length > 0) {
-          setError(errors.join('; '));
+      } finally {
+        if (isMounted) {
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
     };
-
-    fetchDataForRegions();
+    
+    loadManifestations();
     
     return () => {
       isMounted = false;
     };
-    // eslint-disable-next-line
-  }, [selectedRegions]);
+  }, [buildHeaders]);
+
+  // Update visible points when selected regions change
+  useEffect(() => {
+    if (selectedRegions.length === 0) {
+      setVisiblePoints([]);
+      return;
+    }
+
+    // Filter manifestations by selected regions (handle underscore vs space)
+    const filteredPoints = allManifestations.filter(point => {
+      const pointRegionDisplay = point.region.replace(/_/g, ' ');
+      return selectedRegions.includes(pointRegionDisplay);
+    });
+    
+    console.log(`Selected regions: ${selectedRegions.join(', ')}`);
+    console.log(`Visible points: ${filteredPoints.length}`);
+    
+    setVisiblePoints(filteredPoints);
+  }, [selectedRegions, allManifestations]);
 
   const toggleRegion = (region) => {
     console.log("Toggling region:", region);
@@ -379,19 +300,22 @@ export default function MapComponent() {
   };
 
   const refreshData = async () => {
-    setAllPoints({});
-    setVisiblePoints([]);
     setError(null);
     
-    // Reload regions
     try {
       setLoading(true);
-      const regionsData = await fetchRegions();
-      setRegions(regionsData);
+      const manifestations = await fetchAllManifestations(buildHeaders);
+      setAllManifestations(manifestations);
+      
+      // Update regions
+      const uniqueRegions = getRegionsFromManifestations(manifestations);
+      setRegions(uniqueRegions);
       
       // Keep current selections if they still exist
-      const validSelections = selectedRegions.filter(region => regionsData.includes(region));
+      const validSelections = selectedRegions.filter(region => uniqueRegions.includes(region));
       setSelectedRegions(validSelections);
+      
+      console.log('✅ Data refreshed successfully');
     } catch (err) {
       setError("Failed to refresh data");
       console.error("Error refreshing data:", err);
@@ -465,9 +389,14 @@ export default function MapComponent() {
           )}
 
           {visiblePoints.map((point, idx) => {
-            const lat = parseFloat(point.coord_y);
-            const lng = parseFloat(point.coord_x);
-            if (isNaN(lat) || isNaN(lng)) return null; // Skip invalid points
+            const lat = parseFloat(point.latitude);
+            const lng = parseFloat(point.longitude);
+            
+            // ✅ Skip invalid coordinates
+            if (isNaN(lat) || isNaN(lng)) {
+              console.warn(`Invalid coordinates for point ${point.id}:`, point);
+              return null;
+            }
             
             const handleViewDetails = () => {
               // Navigate to point details page using React Router
@@ -479,46 +408,58 @@ export default function MapComponent() {
               });
             };
             
+            // ✅ Parse temperature and handle null values
+            const temperature = point.temperature ? parseFloat(point.temperature) : null;
+            const displayRegion = point.region.replace(/_/g, ' ');
+            
             return (
               <Marker
-                key={`${point.region}-${idx}`}
+                key={`${point.id}-${idx}`}
                 position={[lat, lng]}
               >
                 <Popup maxWidth={400} minWidth={320}>
                   {/* POINT POP UP INFO */}
                   <div className="w-full max-w-[380px] min-w-0 overflow-x-hidden m-2 p-2">
                     <h4 className="mb-2 text-[16px] text-[#2c3e50] border-b-2 border-[#3498db] pb-1 font-semibold">
-                      {point.id || "Punto"}
+                      {point.name || point.id || "Punto"}
                     </h4>
                     
                     <div className="mb-2">
                       <div className="text-[12px] text-gray-500 mb-1">
-                        <strong>📍 {point.region}</strong>
+                        <strong>📍 {displayRegion}</strong>
                       </div>
                       <div className="text-[11px] text-gray-400">
                         {lat.toFixed(4)}°, {lng.toFixed(4)}°
                       </div>
                     </div>
                     
-                    <div className="flex flex-col gap-3 text-[11px] mb-3 p-2 bg-gray-50 rounded">
-                      {/* Temperature info */}
-                      <div className="text-center mb-2">
-                        <div className="font-bold text-red-500">{point.temp}°C</div>
-                        <div className="text-[9px] text-gray-500">Temperatura</div>
+                    {temperature !== null ? (
+                      <div className="flex flex-col gap-3 text-[11px] mb-3 p-2 bg-gray-50 rounded">
+                        {/* Temperature info */}
+                        <div className="text-center mb-2">
+                          <div className="font-bold text-red-500">{temperature.toFixed(2)}°C</div>
+                          <div className="text-[9px] text-gray-500">Temperatura</div>
+                        </div>
+                        {/* Lindal Diagram info */}
+                        <div className="text-center mb-2">
+                          <div className="text-[10px] text-blue-700 mb-0.5">
+                            Lindal: usos según temperatura
+                          </div>
+                          <div className="max-w-[120px] mx-auto">
+                            <LindalDiagram temperature={temperature} />
+                          </div>
+                          <div className="text-[9px] text-gray-500">
+                            El diagrama de Lindal muestra los posibles usos del recurso geotérmico según la temperatura.
+                          </div>
+                        </div>
                       </div>
-                      {/* Lindal Diagram info */}
-                      <div className="text-center mb-2">
-                        <div className="text-[10px] text-blue-700 mb-0.5">
-                          Lindal: usos según temperatura
-                        </div>
-                        <div className="max-w-[120px] mx-auto">
-                          <LindalDiagram temperature={point.temp} />
-                        </div>
-                        <div className="text-[9px] text-gray-500">
-                          El diagrama de Lindal muestra los posibles usos del recurso geotérmico según la temperatura.
+                    ) : (
+                      <div className="mb-3 p-2 bg-yellow-50 rounded text-center">
+                        <div className="text-[11px] text-yellow-700">
+                          ⚠️ Datos de temperatura no disponibles
                         </div>
                       </div>
-                    </div>
+                    )}
                     
                     <button
                       onClick={handleViewDetails}
@@ -565,7 +506,10 @@ export default function MapComponent() {
                 
                 <div className="max-h-[calc(100%-50px)] overflow-y-auto">
                   {Array.isArray(regions) && regions.map((reg) => {
-                    const pointCount = allPoints[reg] ? allPoints[reg].length : 0;
+                    const pointCount = allManifestations.filter(p => {
+                      const displayRegion = p.region.replace(/_/g, ' ');
+                      return displayRegion === reg;
+                    }).length;
                     const isSelected = selectedRegions.includes(reg);
                     
                     return (
