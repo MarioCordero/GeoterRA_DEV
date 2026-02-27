@@ -64,6 +64,7 @@ class SimpleRouter
     private function createController(string $name)
     {
         $controllerClass = "\\Controllers\\{$name}";
+        // Results in: \Controllers\UserController
         return new $controllerClass($this->db);
     }
 }
