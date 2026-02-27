@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.transitions.SlideTransition
 import org.koin.compose.KoinApplication
 import org.jetbrains.compose.resources.painterResource
 

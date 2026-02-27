@@ -16,6 +16,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material.icons.filled.Explore
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -41,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.DataBox
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.InfoChip
 
 @Composable
 fun RequestCardItem(
@@ -84,22 +87,33 @@ fun RequestCardItem(
       }
       
       Spacer(modifier = Modifier.height(16.dp))
+      InfoChip(
+        icon = Icons.Default.LocationOn, // Necesitas importar Icons.Default.LocationOn
+        label = "Región",
+        value = request.region,
+        modifier = Modifier.fillMaxWidth()
+      )
+
+      Spacer(modifier = Modifier.height(8.dp))
+
+      // Fila de Coordenadas (Dividida para mejor lectura)
       Row(
-        modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
       ) {
-        DataBox(
-          label = "Región",
-          value = request.region,
-          modifier = Modifier.weight(1.1f),
-          color = MaterialTheme.colorScheme.surfaceVariant
+        InfoChip(
+          icon = Icons.Default.Explore,
+          label = "Latitud",
+          value = request.latitude.take(8),
+          modifier = Modifier.weight(1f),
+          iconColor = MaterialTheme.colorScheme.secondary
         )
-        DataBox(
-          label = "Coordenadas",
-          value = "${request.latitude.take(7)}, ${request.longitude.take(7)}",
-          modifier = Modifier.weight(1.4f),
-          color = MaterialTheme.colorScheme.surfaceVariant
+        InfoChip(
+          icon = Icons.Default.Explore,
+          label = "Longitud",
+          value = request.longitude.take(8),
+          modifier = Modifier.weight(1f),
+          iconColor = MaterialTheme.colorScheme.secondary
         )
       }
       

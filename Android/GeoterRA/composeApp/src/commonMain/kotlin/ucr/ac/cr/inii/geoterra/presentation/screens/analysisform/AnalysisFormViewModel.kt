@@ -4,15 +4,22 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestFormRemote
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
+import ucr.ac.cr.inii.geoterra.domain.camera.CameraManager
+import ucr.ac.cr.inii.geoterra.domain.location.LocationProvider
+import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
 import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepository
 
 class AnalysisFormViewModel(
   private val repository: AnalysisRequestRepository,
-  private val initialRequest: AnalysisRequestRemote? = null
+  private val initialRequest: AnalysisRequestRemote? = null,
+  private val cameraManager: CameraManager,
+  private val locationProvider: LocationProvider,
+  private val permissionManager: PermissionManager
 ) : ScreenModel {
   
   private val _state = MutableStateFlow(
@@ -45,6 +52,31 @@ class AnalysisFormViewModel(
       is AnalysisFormEvent.LonChanged -> _state.update { it.copy(longitude = event.value) }
       is AnalysisFormEvent.DetailsChanged -> _state.update { it.copy(details = event.value) }
       is AnalysisFormEvent.Submit -> submitForm()
+      is AnalysisFormEvent.UseCurrentLocation -> fetchCurrentLocation()
+      is AnalysisFormEvent.TakePhoto -> takePhoto()
+      is AnalysisFormEvent.PhotoCaptured -> processPhoto(event.bytes)
+    }
+  }
+
+  private fun fetchCurrentLocation() {
+    screenModelScope.launch {
+      if (permissionManager.requestLocationPermission()) {
+        _state.update { it.copy(isLoading = true) }
+        val location = locationProvider.observeLocation().firstOrNull()
+        if (location != null) {
+          _state.update {
+            it.copy(
+              latitude = location.latitude.toString(),
+              longitude = location.longitude.toString(),
+              isLoading = false
+            )
+          }
+        } else {
+          _state.update { it.copy(error = "No se obtuvo señal GPS", isLoading = false) }
+        }
+      } else {
+        _state.update { it.copy(error = "Permiso de ubicación denegado por el usuario") }
+      }
     }
   }
   
@@ -76,6 +108,34 @@ class AnalysisFormViewModel(
       }.onFailure { e ->
         _state.update { it.copy(error = e.message, isLoading = false) }
       }
+    }
+  }
+
+  private fun takePhoto() {
+    screenModelScope.launch {
+      if (permissionManager.requestCameraPermission()) {
+        val result = cameraManager.takePhotoWithLocation()
+        result?.let { (bytes, location) ->
+          // Priorizamos la ubicación incrustada en la captura
+          _state.update { it.copy(
+            latitude = location?.latitude?.toString() ?: it.latitude,
+            longitude = location?.longitude?.toString() ?: it.longitude
+          )}
+          // Aquí podrías guardar los bytes de la foto si tu backend lo requiere
+        }
+      }
+    }
+  }
+
+  private fun processPhoto(bytes: ByteArray) {
+    val location = cameraManager.extractLocationFromCache(bytes)
+    if (location != null) {
+      _state.update { it.copy(
+        latitude = location.latitude.toString(),
+        longitude = location.longitude.toString()
+      )}
+    } else {
+      _state.update { it.copy(error = "La imagen no contiene metadatos GPS") }
     }
   }
 }

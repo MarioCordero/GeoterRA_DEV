@@ -21,6 +21,10 @@ internal object RequestTab : Tab {
   
   @Composable
   override fun Content() {
-    Navigator(RequestsScreen())
+    Navigator(RequestsScreen()) { navigator ->
+      SlideTransition(navigator) { screen ->
+        screen.Content()
+      }
+    }
   }
 }

@@ -1,7 +1,5 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.map
 
-// en src/commonMain/kotlin/.../map/presentation/MapViewModel.kt
-
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch

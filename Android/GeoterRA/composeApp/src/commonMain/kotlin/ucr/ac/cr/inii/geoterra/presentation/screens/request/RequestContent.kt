@@ -16,11 +16,9 @@ import ucr.ac.cr.inii.geoterra.presentation.components.request.RequestCardItem
 fun RequestsContent(
   state: RequestState,
   modifier: Modifier = Modifier,
-  onCreateRequest: () -> Unit,
   onView: (AnalysisRequestRemote) -> Unit,
   onEdit: (AnalysisRequestRemote) -> Unit,
-  onDelete: (AnalysisRequestRemote) -> Unit,
-  onRefresh: () -> Unit
+  onDelete: (AnalysisRequestRemote) -> Unit
 ) {
   Column(modifier = modifier.fillMaxSize()) {
     Text(

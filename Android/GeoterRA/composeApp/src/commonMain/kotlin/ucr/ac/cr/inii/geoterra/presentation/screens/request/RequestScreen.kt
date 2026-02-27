@@ -32,7 +32,7 @@ class RequestsScreen : Screen {
     
     var selectedRequest by remember { mutableStateOf<AnalysisRequestRemote?>(null) }
     val sheetState = rememberModalBottomSheetState()
-    
+
     if (selectedRequest != null) {
       ModalBottomSheet(
         onDismissRequest = { selectedRequest = null },
@@ -59,11 +59,9 @@ class RequestsScreen : Screen {
       RequestsContent(
         modifier = Modifier.padding(padding),
         state = state,
-        onCreateRequest = { navigator.push(AnalysisFormScreen()) },
         onView = { request -> selectedRequest = request },
         onEdit = { request -> navigator.push(AnalysisFormScreen(request)) },
         onDelete = { request -> viewModel.deleteRequest(request.id) },
-        onRefresh = viewModel::fetchSubmittedRequests
       )
     }
   }

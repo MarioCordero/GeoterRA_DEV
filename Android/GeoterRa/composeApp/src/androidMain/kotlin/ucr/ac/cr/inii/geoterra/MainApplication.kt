@@ -25,13 +25,8 @@ class MainApplication : Application() {
       factory<LocationProvider> {
         AndroidLocationProvider(androidContext())
       }
-      
-//      factory<PermissionManager> {
-//        AndroidPermissionManager(androidContext())
-//      }
     }
     
-    // Usamos la función compartida pero pasamos el contexto de Android
     startKoin {
       androidContext(this@MainApplication)
       modules(

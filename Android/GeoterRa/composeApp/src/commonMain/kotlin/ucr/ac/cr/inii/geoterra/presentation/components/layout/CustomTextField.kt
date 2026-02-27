@@ -25,7 +25,8 @@ fun CustomTextField(
   modifier: Modifier = Modifier,
   keyboardType: KeyboardType = KeyboardType.Text,
   singleLine: Boolean = true,
-  minLines: Int = 1
+  minLines: Int = 1,
+  readOnly: Boolean = false
 ) {
   OutlinedTextField(
     value = value,
@@ -39,6 +40,7 @@ fun CustomTextField(
     keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
     singleLine = singleLine,
     minLines = minLines,
+    readOnly = readOnly,
     colors = OutlinedTextFieldDefaults.colors(
       focusedBorderColor = MaterialTheme.colorScheme.primary,
       errorBorderColor = MaterialTheme.colorScheme.error

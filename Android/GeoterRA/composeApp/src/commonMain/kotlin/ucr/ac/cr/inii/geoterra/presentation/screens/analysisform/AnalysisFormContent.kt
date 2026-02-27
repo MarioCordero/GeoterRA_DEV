@@ -112,24 +112,74 @@ fun AnalysisFormContent(
         minLines = 2
       )
     }
-    
-    // --- SECCIÓN: COORDENADAS ---
+//
+//    // --- SECCIÓN: COORDENADAS ---
+//    FormSection(title = "Ubicación Geográfica", icon = Icons.Default.Map) {
+//      Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+//        CustomTextField(
+//          value = state.latitude,
+//          onValueChange = { onEvent(AnalysisFormEvent.LatChanged(it)) },
+//          label = "Latitud",
+//          modifier = Modifier.weight(1f),
+//          keyboardType = KeyboardType.Number
+//        )
+//        CustomTextField(
+//          value = state.longitude,
+//          onValueChange = { onEvent(AnalysisFormEvent.LonChanged(it)) },
+//          label = "Longitud",
+//          modifier = Modifier.weight(1f),
+//          keyboardType = KeyboardType.Number
+//        )
+//      }
+//    }
+
     FormSection(title = "Ubicación Geográfica", icon = Icons.Default.Map) {
-      Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        CustomTextField(
-          value = state.latitude,
-          onValueChange = { onEvent(AnalysisFormEvent.LatChanged(it)) },
-          label = "Latitud",
-          modifier = Modifier.weight(1f),
-          keyboardType = KeyboardType.Number
-        )
-        CustomTextField(
-          value = state.longitude,
-          onValueChange = { onEvent(AnalysisFormEvent.LonChanged(it)) },
-          label = "Longitud",
-          modifier = Modifier.weight(1f),
-          keyboardType = KeyboardType.Number
-        )
+      Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+          CustomTextField(
+            value = state.latitude,
+            onValueChange = { onEvent(AnalysisFormEvent.LatChanged(it)) },
+            label = "Latitud",
+            modifier = Modifier.weight(1f),
+            keyboardType = KeyboardType.Number,
+            readOnly = true // Opcional: para que usen los botones
+          )
+          CustomTextField(
+            value = state.longitude,
+            onValueChange = { onEvent(AnalysisFormEvent.LonChanged(it)) },
+            label = "Longitud",
+            modifier = Modifier.weight(1f),
+            keyboardType = KeyboardType.Number,
+            readOnly = true
+          )
+        }
+
+        // Botones de Acción
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+          OutlinedButton(
+            onClick = { onEvent(AnalysisFormEvent.UseCurrentLocation) },
+            modifier = Modifier.weight(1f),
+            shape = RoundedCornerShape(8.dp)
+          ) {
+            Icon(Icons.Default.MyLocation, contentDescription = null)
+            Spacer(Modifier.width(4.dp))
+            Text("GPS Actual", style = MaterialTheme.typography.labelSmall)
+          }
+
+          Button(
+            onClick = { onEvent(AnalysisFormEvent.TakePhoto) },
+            modifier = Modifier.weight(1f),
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF455A64))
+          ) {
+            Icon(Icons.Default.CameraAlt, contentDescription = null)
+            Spacer(Modifier.width(4.dp))
+            Text("Tomar Foto", style = MaterialTheme.typography.labelSmall)
+          }
+        }
       }
     }
     

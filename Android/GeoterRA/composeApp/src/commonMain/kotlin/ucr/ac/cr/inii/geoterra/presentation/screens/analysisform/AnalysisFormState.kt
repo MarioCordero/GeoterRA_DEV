@@ -29,4 +29,23 @@ sealed class AnalysisFormEvent {
   data class LonChanged(val value: String) : AnalysisFormEvent()
   data class DetailsChanged(val value: String) : AnalysisFormEvent()
   object Submit : AnalysisFormEvent()
+  object UseCurrentLocation : AnalysisFormEvent()
+  data class PhotoCaptured(val bytes: ByteArray) : AnalysisFormEvent() {
+    override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (other == null || this::class != other::class) return false
+
+      other as PhotoCaptured
+
+      if (!bytes.contentEquals(other.bytes)) return false
+
+      return true
+    }
+
+    override fun hashCode(): Int {
+      return bytes.contentHashCode()
+    }
+  }
+
+  object TakePhoto : AnalysisFormEvent()
 }
