@@ -168,19 +168,6 @@ final class ErrorType implements JsonSerializable
 		);
   }
 
-  // public static function allowedRegions(): self
-  // {
-  //   return [
-  //     'Guanacaste',
-  //     'Alajuela',
-  //     'San José',
-  //     'Puntarenas',
-  //     'Cartago',
-  //     'Heredia',
-  //     'Limón'
-  //   ];
-  // }
-
   public static function manifestationCreateFailed(): self
   {
     return new self(
@@ -279,5 +266,19 @@ final class ErrorType implements JsonSerializable
 			'message' => $this->message,
 		];
 	}
+
+	/**
+     * Get HTTP status code for this error type.
+     */
+    public function getStatusCode(): int
+    {
+        return match($this->code) {
+            'NOT_FOUND' => 404,
+            'UNAUTHORIZED_ACCESS', 'INVALID_ACCESS_TOKEN' => 401,
+            'FORBIDDEN_ACCESS' => 403,
+            'INVALID_JSON', 'INVALID_FIELD', 'MISSING_FIELD' => 400,
+            'CONFLICT_ERROR' => 409,
+            default => 500,
+        };
+    }
 }
-?>
