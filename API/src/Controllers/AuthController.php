@@ -19,9 +19,11 @@ use Services\AuthService;
  */
 final class AuthController
 {
-  public function __construct(
-    private AuthService $authService
-  ) {}
+  private AuthService $authService;
+  public function __construct(private \PDO $pdo)
+  {
+    $this->authService = new AuthService($this->pdo);
+  }
 
   /**
    * POST /auth/refresh
