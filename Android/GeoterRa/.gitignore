@@ -17,3 +17,42 @@ captures
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 node_modules/
+
+# -----------------------------
+# Android / Gradle
+# -----------------------------
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+captures/
+
+# -----------------------------
+# Kotlin Multiplatform
+# -----------------------------
+**/build/
+
+# -----------------------------
+# iOS / Xcode
+# -----------------------------
+DerivedData/
+*.xcworkspace
+!default.xcworkspace
+*.xcuserdata
+*.xcuserstate
+
+# CocoaPods
+Pods/
+iosApp/Pods/
+Podfile.lock
+
+# -----------------------------
+# macOS
+# -----------------------------
+.DS_Store
+
+# -----------------------------
+# Logs
+# -----------------------------
+*.log

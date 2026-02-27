@@ -1,9 +1,10 @@
 [versions]
 agp = "8.6.0"
-kotlin = "2.2.20"
+kotlin = "2.2.21"
 composeMultiplatform = "1.7.1"
 mapLibre = "0.12.1"
 mapcompose = "0.12.0"
+stately = "2.1.0"
 
 # Configuración de SDKs (35 es el estándar actual estable para AGP 8.5)
 android-compileSdk = "35"
@@ -30,6 +31,8 @@ junit = "4.13.2"
 settings-multiplatform = "1.3.0"
 
 [libraries]
+stately-common = { module = "co.touchlab:stately-common", version.ref = "stately" }
+
 # MapLibre
 maplibre-compose = { module = "org.maplibre.compose:maplibre-compose", version.ref = "mapLibre" }
 mapCompose = {module = "ovh.plrapps:mapcompose-mp", version.ref = "mapcompose"}
@@ -87,6 +90,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 
 [plugins]
+kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

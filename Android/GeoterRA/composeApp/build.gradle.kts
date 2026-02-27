@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.serialization)
+    alias(libs.plugins.kotlinCocoapods)
 }
 
 kotlin {
@@ -18,13 +19,23 @@ kotlin {
         }
     }
 
-    listOf(
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach {
-        it.binaries.framework {
-            baseName = "ComposeApp"
+    iosArm64()
+    iosSimulatorArm64()
+
+    cocoapods {
+        summary = "GeoterRA Shared Module"
+        homepage = "https://github.com/tu-usuario/proyecto"
+        ios.deploymentTarget = "15.0"
+        version = "1.0.0"
+
+        framework {
+            baseName = "Shared"
             isStatic = true
+        }
+
+        pod("MapLibre") {
+            version = "6.17.1"
+            extraOpts += listOf("-compiler-option", "-fmodules")
         }
     }
 
@@ -44,6 +55,7 @@ kotlin {
 
         // --- Dependencias COMPARTIDAS (Aquí no debe haber nada exclusivo de Android) ---
         commonMain.dependencies {
+            implementation(libs.stately.common)
             // Compose
             implementation(libs.compose.material3)
             implementation(libs.compose.material.icons.extended)
@@ -58,7 +70,7 @@ kotlin {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.ui)
-            implementation(compose.components.resources)
+            api(compose.components.resources)
 
             // Utilidades y Logs
             implementation(libs.kmplog)
@@ -75,6 +87,7 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.client.auth)
+            implementation(libs.ktor.client.cio)
 
             // Voyager (Navegación)
             implementation(libs.voyager.navigator)
@@ -84,7 +97,6 @@ kotlin {
             implementation(libs.voyager.transitions)
             implementation(libs.voyager.koin)
 
-            implementation(libs.ktor.client.cio)
         }
 
         commonTest.dependencies {
