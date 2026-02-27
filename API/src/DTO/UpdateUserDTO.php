@@ -19,15 +19,23 @@ final class UpdateUserDTO
     public ?string $phoneNumber
   ) {}
 
-  public static function fromArray(array $data): self
+  public static function fromArray(array $data, string $userId = ''): self
   {
     return new self(
-      $data['user_id'] ?? '',
-      trim($data['name'] ?? ''),
-      trim($data['lastname'] ?? ''),
+      $userId,
+      trim($data['firstName'] ?? $data['name'] ?? ''),
+      trim($data['lastName'] ?? $data['lastname'] ?? ''),
       trim($data['email'] ?? ''),
-      $data['phone_number'] ?? null
+      $data['phoneNumber'] ?? $data['phone_number'] ?? null
     );
+  }
+
+  /**
+   * Set the user ID for the DTO
+   */
+  public function setUserId(string $userId): void
+  {
+    $this->userId = $userId;
   }
 
   /**
