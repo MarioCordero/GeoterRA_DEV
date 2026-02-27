@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Controllers;
 
 use DTO\LoginUserDTO;
-use DTO\RegisterUserDTO;
 use Http\ApiException;
 use Http\Request;
 use Http\Response;
