@@ -67,7 +67,8 @@ final class UserRepository
       UPDATE users
       SET
         deleted_at = NOW(),
-        deleted_by = :deleted_by
+        deleted_by = :deleted_by,
+        is_active = 0
       WHERE user_id = :user_id
         AND deleted_at IS NULL
         AND is_active = 1
