@@ -3,29 +3,26 @@ declare(strict_types=1);
 
 namespace Services;
 
+use PDO;
 use DTO\RegisterUserDTO;
+use DTO\UpdateUserDTO;
 use Http\ApiException;
-use Repositories\UserRepository;
 use Http\ErrorType;
 use Services\PasswordService;
-use DTO\UpdateUserDTO;
+use Services\AuthService;
+use Repositories\UserRepository;
 
 /**
- * Handles business logic related to users.
+ * Business logic for User
  */
 final class UserService
 {
-  /**
-   * Repository used to interact with the persistence layer.
-   */
   private UserRepository $repository;
-
-  /**
-   * @param UserRepository $repository User persistence abstraction
-   */
-  public function __construct(UserRepository $repository)
+  private AuthService $authService;
+  public function __construct(private PDO $pdo) 
   {
-    $this->repository = $repository;
+    $this->repository = new UserRepository($this->pdo);
+    $this->authService = new AuthService($this->pdo);
   }
 
     /**
@@ -40,24 +37,11 @@ final class UserService
     public function registerUser(RegisterUserDTO $dto): array
     {
       $dto->validate();
-
       if ($this->repository->emailExists($dto->email)) {
-        // Use ErrorType to standardize error messaging
-        throw new ApiException(
-          ErrorType::emailAlreadyInUse()
-        );
+        throw new ApiException(ErrorType::emailAlreadyInUse());
       }
-
       $hash = PasswordService::hash($dto->password);
-
-      $userId = $this->repository->create(
-        $dto->firstName,
-        $dto->lastName,
-        $dto->email,
-        $dto->phoneNumber,
-        $hash
-      );
-
+      $userId = $this->repository->create($dto, $hash);
       return [
         'data' => [
           'user_id' => $userId
@@ -68,25 +52,24 @@ final class UserService
       ];
     }
 
-    public function updateUser(string $userId, UpdateUserDTO $dto): void
-  {
-    $dto->validate();
-
-    $updated = $this->repository->updateUser(
-      $userId,
-      $dto->firstName,
-      $dto->lastName,
-      $dto->email,
-      $dto->phoneNumber
-    );
-
-    if (!$updated) {
-      throw new ApiException(
-        ErrorType::userUpdateFailed(),
-        500
-      );
+    /**
+     * Updates user profile information.
+     *
+     * @param UpdateUserDTO $dto Validated update data
+     *
+     * @throws ApiException If update fails
+     */
+    public function updateUser(UpdateUserDTO $dto): void
+    {
+      $auth = $this->authService->requireAuth();
+      $userId = $auth['user_id'];
+      $dto->setUserId($userId);
+      $dto->validate();
+      $updated = $this->repository->update($dto);
+      if (!$updated) {
+        throw new ApiException(ErrorType::userUpdateFailed(), 500);
+      }
     }
-  }
 
   /**
    * Deletes a user by their ID.
@@ -95,16 +78,13 @@ final class UserService
    *
    * @throws ApiException If deletion fails
    */
-  public function deleteUser(string $userId): void
+  public function deleteCurrentUser(): void
   {
-
+    $auth = $this->authService->requireAuth();
+    $userId = $auth['user_id'];
     $deleted = $this->repository->deleteUser($userId);
-
     if (!$deleted) {
-      throw new ApiException(
-        ErrorType::userDeleteFailed(),
-        500
-      );
+      throw new ApiException(ErrorType::userDeleteFailed(),500);
     }
   }
 
@@ -115,20 +95,17 @@ final class UserService
    * @return array
    * @throws ApiException if user not found
    */
-  public function getUserById(string $userId, bool $activeOnly): array
+  public function getCurrentUser(): array
   {
-    $user = $activeOnly ? $this->repository->findActiveUserById($userId) : $this->repository->findById($userId);
-
+    $auth = $this->authService->requireAuth();
+    $userId = (string) $auth['user_id'];
+    $user = $this->repository->findActiveUserById($userId);
     if (!$user) {
-      throw new ApiException(
-        ErrorType::notFound('User'),
-      );
+      throw new ApiException(ErrorType::notFound('User'),404);
     }
-
     return [
       'data' => $user,
       'meta' => null
     ];
   }
 }
-?>
