@@ -3,55 +3,42 @@ declare(strict_types=1);
 
 namespace Repositories;
 
-use DTO\Ulid;
 use PDO;
-
+use DTO\Ulid;
+use DTO\RegisterUserDTO;
+use DTO\UpdateUserDTO;
 
 final class UserRepository
 {
   public function __construct(private PDO $db) {}
 
-  public function create(
-    string $firstName,
-    string $lastName,
-    string $email,
-    ?string $phoneNumber,
-    string $passwordHash
-  ): string {
+  public function create(RegisterUserDTO $dto, string $passwordHash): string
+  {
     $stmt = $this->db->prepare(
       'INSERT INTO users 
       (user_id, first_name, last_name, email, phone_number, password_hash, role,  created_at)
       VALUES (:id, :fn, :ln, :email, :phone, :hash, :role, NOW())'
     );
-
     $user_id = Ulid::generate();
-
     $stmt->execute([
       ':id' => $user_id,
-      'fn' => $firstName,
-      'ln' => $lastName,
-      'email' => $email,
-      'phone' => $phoneNumber,
-      'hash' => $passwordHash,
-      'role' => 'user'
+      ':fn' => $dto->firstName,
+      ':ln' => $dto->lastName,
+      ':email' => $dto->email,
+      ':phone' => $dto->phoneNumber,
+      ':hash' => $passwordHash,
+      ':role' => 'user'
     ]);
-
     return $user_id;
   }
 
   /**
    * Updates user profile information.
    */
-  public function updateUser(
-    string $userId,
-    string $firstName,
-    string $lastName,
-    string $email,
-    ?string $phoneNumber
-  ): bool {
+  public function update(UpdateUserDTO $dto): bool
+  {
     $stmt = $this->db->prepare(
-      '
-      UPDATE users SET
+      'UPDATE users SET
         first_name = :first_name,
         last_name = :last_name,
         email = :email,
@@ -59,16 +46,15 @@ final class UserRepository
         updated_at = NOW()
       WHERE user_id = :user_id
         AND deleted_at IS NULL
-        AND is_active = 1
-      '
+        AND is_active = 1'
     );
 
     return $stmt->execute([
-      ':first_name' => $firstName,
-      ':last_name' => $lastName,
-      ':email' => $email,
-      ':phone_number' => $phoneNumber,
-      ':user_id' => $userId
+      ':first_name' => $dto->firstName,
+      ':last_name' => $dto->lastName,
+      ':email' => $dto->email,
+      ':phone_number' => $dto->phoneNumber,
+      ':user_id' => $dto->userId
     ]);
   }
 
