@@ -1,16 +1,16 @@
 <?php
+// src/Controllers/AuthController.php
 declare(strict_types=1);
 
 namespace Controllers;
 
-use Services\AuthService;
-use Services\UserService;
 use DTO\LoginUserDTO;
 use DTO\RegisterUserDTO;
 use Http\ApiException;
 use Http\Request;
 use Http\Response;
 use Http\ErrorType;
+use Services\AuthService;
 
 /**
  * Handles authentication-related operations.
@@ -21,8 +21,7 @@ use Http\ErrorType;
 final class AuthController
 {
   public function __construct(
-    private AuthService $authService,
-    private UserService $userService
+    private AuthService $authService
   ) {}
 
   /**
@@ -33,64 +32,16 @@ final class AuthController
   {
     try {
       $body = Request::parseJsonRequest();
-
       if (empty($body['refresh_token'])) {
-        throw new ApiException(
-          ErrorType::missingField('refresh_token'),
-          400
-        );
+        throw new ApiException(ErrorType::missingField('refresh_token'),400);
       }
-
-      $result = $this->authService->refreshTokens(
-        $body['refresh_token']
-      );
-
-      Response::success(
-        $result['data'],
-        $result['meta'],
-        200
-      );
+      $result = $this->authService->refreshTokens($body['refresh_token']);
+      Response::success($result['data'], $result['meta'], 200);
 
     } catch (ApiException $e) {
-      Response::error(
-        $e->getError(),
-        401
-      );
-
+      Response::error($e->getError(), $e->getCode());
     } catch (\Throwable $e) {
-      Response::error(
-        ErrorType::internal($e->getMessage()),
-        500
-      );
-    }
-  }
-
-  /**
-   * POST /register
-   * Creates a new user account.
-   */
-  public function register(): void
-  {
-    try {
-      $data = Request::parseJsonRequest();
-
-      $dto = RegisterUserDTO::fromArray($data);
-
-      $result = $this->userService->registerUser($dto);
-
-      Response::success(
-        $result['data'],
-        $result['meta'],
-        201
-      );
-
-    } catch (ApiException $e) {
-      Response::error($e->getError(), 409);
-    } catch (\Throwable $e) {
-      Response::error(
-        ErrorType::internal($e->getMessage()),
-        500
-      );
+      Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
@@ -102,24 +53,13 @@ final class AuthController
   {
     try {
       $data = Request::parseJsonRequest();
-
       $dto = LoginUserDTO::fromArray($data);
-
       $result = $this->authService->login($dto);
-
-      Response::success(
-        $result['data'],
-        $result['meta'],
-        200
-      );
-
+      Response::success($result['data'], $result['meta'], 200);
     } catch (ApiException $e) {
-      Response::error($e->getError(), $e->getHttpStatus());
+      Response::error($e->getError(), $e->getCode());
     } catch (\Throwable $e) {
-      Response::error(
-        ErrorType::internal($e->getMessage()),
-        500
-      );
+      Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
@@ -130,43 +70,12 @@ final class AuthController
   public function logout(): void
   {
     try {
-      // ===============================
-      // Authorization
-      // ===============================
-      $headers = getallheaders();
-      $token = trim(str_replace('Bearer ', '', $headers['Authorization'] ?? ''));
-
-      if ($token === '') {
-        Response::error(
-          ErrorType::missingAuthToken(),
-          401
-        );
-        return;
-      }
-
-      // ===============================
-      // Logout process 
-      // ===============================
-      $this->authService->logout($token);
-
-      Response::success(
-        data: ['logged_out' => true],
-        meta: null,
-        status: 200
-      );
-
+      $this->authService->logout();
+      Response::success(['logged_out' => true], null, 200);
     } catch (ApiException $e) {
-      Response::error(
-        $e->getError(),
-        $e->getHttpStatus()
-      );
-
+      Response::error($e->getError(), $e->getCode());
     } catch (\Throwable $e) {
-      Response::error(
-        ErrorType::internal($e->getMessage()),
-        500
-      );
+      Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
-
 }

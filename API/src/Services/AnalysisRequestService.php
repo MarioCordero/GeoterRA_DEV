@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Services;
 
+use PDO;
 use DTO\AnalysisRequestDTO;
 use Http\ApiException;
 use Http\ErrorType;
-use Repositories\AnalysisRequestRepository;
-use PDO;
 use Services\AuthService;
+use Repositories\AnalysisRequestRepository;
 
 
 /**
