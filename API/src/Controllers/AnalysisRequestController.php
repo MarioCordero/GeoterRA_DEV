@@ -4,43 +4,33 @@ declare(strict_types=1);
 
 namespace Controllers;
 
-use DTO\AllowedUserRoles;
 use Services\AnalysisRequestService;
-use DTO\AnalysisRequestDTO;
-use Http\Response;
 use Http\Request;
-
-use Services\AuthService;
-USE Http\ApiException;
+use Http\Response;
+use Http\ApiException;
 use Http\ErrorType;
+use DTO\AnalysisRequestDTO;
 
 /**
- * Controlador para endpoints de AnalysisRequest
+ * Controller for handling analysis request related endpoints.
  */
 final class AnalysisRequestController
 {
   public function __construct(
     private AnalysisRequestService $service,
-    private AuthService $authService
   ) {}
 
   /**
    * Endpoint POST /analysis-request
+   * Creates a new analysis request for the authenticated user
    */
   public function store(): void
   {
     try {
-      $auth = $this->authService->requireAuth();
-
-      $userId = (string)$auth['user_id'];
-
-      // Obtén JSON del body
       $body = Request::parseJsonRequest();
       $dto = AnalysisRequestDTO::fromArray($body);
-      $this->service->create($dto, $userId);
-
-      Response::success(['message' => 'Analysis request created successfully'], [], 201);
-
+      $this->service->create($dto);
+      Response::success(['message' => 'Analysis request created successfully'], [], 201); // Use http response code 201 for created?
     } catch (ApiException $e) {
         Response::error($e->getError(), 400);
     } catch (\Throwable $e) {
@@ -55,46 +45,28 @@ final class AnalysisRequestController
   public function index(): void
   {
     try {
-      $auth = $this->authService->requireAuth();
-
-      $userId = (string) $auth['user_id'];
-
-      // Fetch user requests
-      $requests = $this->service->getAllByUser($userId);
-
+      $requests = $this->service->getAllByUser();
       Response::success(data: $requests);
-
     } catch (ApiException $e) {
-      Response::error($e->getError(), 400);
-
+      Response::error($e->getError(), $e->getCode());
     } catch (\Throwable $e) {
-      Response::error(
-        ErrorType::internal($e->getMessage()),
-        500
-      );
+      Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
    * PUT /analysis-request/{id}
+   * Updates an existing analysis request by ID, only if it belongs to the authenticated user
    */
   public function update(string $id): void
   {
     try {
-      $auth = $this->authService->requireAuth();
-      $userId = (string) $auth['user_id'];
-
       $body = Request::parseJsonRequest();
-
       $dto = AnalysisRequestDTO::fromArray($body);
-
-      $this->service->update($id, $dto, $userId);
-
+      $this->service->update($id, $dto);
       Response::success(['message' => 'Analysis request updated successfully']);
-
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-
     } catch (\Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
@@ -102,23 +74,17 @@ final class AnalysisRequestController
 
   /**
    * DELETE /analysis-request/{id}
+   * Deletes an analysis request by ID, only if it belongs to the authenticated user
    */
   public function delete(string $id): void
   {
     try {
-      $auth = $this->authService->requireAuth();
-      $userId = (string) $auth['user_id'];
-
-      $this->service->delete($id, $userId);
-
+      $this->service->delete($id);
       Response::success(['message' => 'Analysis request deleted successfully']);
-
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-
     } catch (\Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 }
-?>
