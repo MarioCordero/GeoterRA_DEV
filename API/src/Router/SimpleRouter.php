@@ -11,15 +11,11 @@ class SimpleRouter
     private array $routes;
     private array $controllers = [];
     private $db;
-    private $userRepository;
-    private $authRepository;
 
     public function __construct(array $routes, \PDO $db)
     {
         $this->routes = $routes;
         $this->db = $db;
-        $this->userRepository = new \Repositories\UserRepository($db);
-        $this->authRepository = new \Repositories\AuthRepository($db);
     }
 
     public function dispatch(string $method, string $path): ?object
