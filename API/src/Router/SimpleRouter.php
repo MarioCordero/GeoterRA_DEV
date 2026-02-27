@@ -28,30 +28,27 @@ class SimpleRouter
             if ($route['method'] !== $method) {
                 continue;
             }
-
             $pattern = $this->pathToRegex($route['path']);
             if (preg_match($pattern, $path, $matches)) {
-                // Extraer parámetros de la URL
                 $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
-                
-                // Obtener controlador y ejecutar acción
-                $controller = $this->getController($route['controller']);
+                try {
+                    $controller = $this->getController($route['controller']);
+                } catch (\Exception $e) {
+                    $error = ErrorType::notFound('Controller');
+                    return Response::error($error, $error->getStatusCode());
+                }
                 $action = $route['action'];
-                
                 if (!empty($params)) {
                     return $controller->$action(...array_values($params));
                 }
-                
                 return $controller->$action();
             }
         }
-
-        return null; // No route found
+        return null;
     }
 
     private function pathToRegex(string $path): string
     {
-        // Convertir /users/{id} a #^/users/([^/]+)$#
         $pattern = preg_replace('/\{([^}]+)\}/', '(?P<$1>[^/]+)', $path);
         return '#^' . $pattern . '$#';
     }
@@ -66,37 +63,7 @@ class SimpleRouter
 
     private function createController(string $name)
     {
-        switch ($name) {
-            // DEBUG
-            case 'HealthController':
-                $healthRepository = new \Repositories\HealthRepository($this->db);
-                $healthService = new \Services\HealthService($healthRepository);
-                return new \Controllers\HealthController($healthService);
-       
-            case 'AuthController':
-                $userService = new \Services\UserService($this->userRepository);
-                $authService = new \Services\AuthService($this->authRepository, $this->userRepository);
-                return new \Controllers\AuthController($authService, $userService);
-            
-            case 'UserController':
-                $userService = new \Services\UserService($this->userRepository);
-                $authService = new \Services\AuthService($this->authRepository, $this->userRepository);
-                return new \Controllers\UserController($userService, $authService);
-            
-            case 'AnalysisRequestController':
-                $repository = new \Repositories\AnalysisRequestRepository($this->db);
-                $service = new \Services\AnalysisRequestService($repository, $this->db);
-                $authService = new \Services\AuthService($this->authRepository, $this->userRepository);
-                return new \Controllers\AnalysisRequestController($service, $authService);
-            
-            case 'RegisteredManifestationController':
-                $repository = new \Repositories\RegisteredManifestationRepository($this->db);
-                $service = new \Services\RegisteredManifestationService($repository);
-                $authService = new \Services\AuthService($this->authRepository, $this->userRepository);
-                return new \Controllers\RegisteredManifestationController($service, $authService);
-            
-            default:
-                throw new \Exception("Controller not found: {$name}");
-        }
+        $controllerClass = "\\Controllers\\{$name}";
+        return new $controllerClass($this->db);
     }
 }
