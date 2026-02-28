@@ -9,6 +9,11 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Se necesita guardar la foto de geolocalización en la galería.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Se necesita el acceso a la galería para la solicitud de análisis.</string>
     <key>NSCameraUsageDescription</key>
     <string>Geoterra necesita acceder a la cámara para documentar las manifestaciones geológicas.</string>
     <key>NSLocationWhenInUseUsageDescription</key>

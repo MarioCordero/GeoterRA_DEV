@@ -31,7 +31,6 @@ fun AnalysisFormContent(
     modifier = Modifier
       .fillMaxSize()
       .padding(16.dp)
-      .background(Color(0xFFF8F9FA))
       .verticalScroll(rememberScrollState())
       .padding(20.dp),
     verticalArrangement = Arrangement.spacedBy(20.dp)
@@ -76,7 +75,6 @@ fun AnalysisFormContent(
       )
     }
     
-    // --- SECESSION: OBSERVACIONES ---
     FormSection(title = "Observaciones de Campo", icon = Icons.Default.Visibility) {
       CustomTextField(
         value = state.temperatureSensation,
@@ -112,26 +110,6 @@ fun AnalysisFormContent(
         minLines = 2
       )
     }
-//
-//    // --- SECCIÓN: COORDENADAS ---
-//    FormSection(title = "Ubicación Geográfica", icon = Icons.Default.Map) {
-//      Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-//        CustomTextField(
-//          value = state.latitude,
-//          onValueChange = { onEvent(AnalysisFormEvent.LatChanged(it)) },
-//          label = "Latitud",
-//          modifier = Modifier.weight(1f),
-//          keyboardType = KeyboardType.Number
-//        )
-//        CustomTextField(
-//          value = state.longitude,
-//          onValueChange = { onEvent(AnalysisFormEvent.LonChanged(it)) },
-//          label = "Longitud",
-//          modifier = Modifier.weight(1f),
-//          keyboardType = KeyboardType.Number
-//        )
-//      }
-//    }
 
     FormSection(title = "Ubicación Geográfica", icon = Icons.Default.Map) {
       Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -168,16 +146,16 @@ fun AnalysisFormContent(
             Spacer(Modifier.width(4.dp))
             Text("GPS Actual", style = MaterialTheme.typography.labelSmall)
           }
-
+          
           Button(
-            onClick = { onEvent(AnalysisFormEvent.TakePhoto) },
+            onClick = { onEvent(AnalysisFormEvent.PickPhoto) }, // Nuevo evento
             modifier = Modifier.weight(1f),
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF455A64))
           ) {
-            Icon(Icons.Default.CameraAlt, contentDescription = null)
+            Icon(Icons.Default.PhotoLibrary, contentDescription = null) // Icono de Galería
             Spacer(Modifier.width(4.dp))
-            Text("Tomar Foto", style = MaterialTheme.typography.labelSmall)
+            Text("Elegir Foto", style = MaterialTheme.typography.labelSmall) // Nuevo Texto
           }
         }
       }

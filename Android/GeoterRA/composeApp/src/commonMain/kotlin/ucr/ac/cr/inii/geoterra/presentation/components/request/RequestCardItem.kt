@@ -88,7 +88,7 @@ fun RequestCardItem(
       
       Spacer(modifier = Modifier.height(16.dp))
       InfoChip(
-        icon = Icons.Default.LocationOn, // Necesitas importar Icons.Default.LocationOn
+        icon = Icons.Default.LocationOn,
         label = "Región",
         value = request.region,
         modifier = Modifier.fillMaxWidth()
@@ -96,7 +96,6 @@ fun RequestCardItem(
 
       Spacer(modifier = Modifier.height(8.dp))
 
-      // Fila de Coordenadas (Dividida para mejor lectura)
       Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)

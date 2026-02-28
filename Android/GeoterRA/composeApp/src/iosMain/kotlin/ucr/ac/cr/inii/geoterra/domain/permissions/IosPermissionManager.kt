@@ -11,10 +11,22 @@ import platform.AVFoundation.AVMediaTypeVideo
 import platform.AVFoundation.authorizationStatusForMediaType
 import platform.AVFoundation.requestAccessForMediaType
 import kotlin.coroutines.suspendCoroutine
+import platform.Photos.*
 
 class IosPermissionManager : PermissionManager {
 
   private val locationManager = CLLocationManager()
+  
+  override fun hasGalleryPermission(): Boolean {
+    val status = PHPhotoLibrary.authorizationStatus()
+    return status == PHAuthorizationStatusAuthorized || status == PHAuthorizationStatusLimited
+  }
+  
+  override suspend fun requestGalleryPermission(): Boolean = suspendCoroutine { continuation ->
+    PHPhotoLibrary.requestAuthorization { status ->
+      continuation.resume(status == PHAuthorizationStatusAuthorized || status == PHAuthorizationStatusLimited)
+    }
+  }
 
   override fun hasLocationPermission(): Boolean {
     val status = locationManager.authorizationStatus

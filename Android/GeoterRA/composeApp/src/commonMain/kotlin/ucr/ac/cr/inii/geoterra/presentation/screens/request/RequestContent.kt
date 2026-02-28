@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -20,40 +21,60 @@ fun RequestsContent(
   onEdit: (AnalysisRequestRemote) -> Unit,
   onDelete: (AnalysisRequestRemote) -> Unit
 ) {
-  Column(modifier = modifier.fillMaxSize()) {
-    Text(
-      text = "Solicitudes",
-      style = MaterialTheme.typography.headlineMedium,
-      fontWeight = FontWeight.Bold,
-      modifier = Modifier.padding(16.dp),
-      color = Color(0xFF1A237E)
-    )
-    
-    if (state.isLoading) {
-      LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = Color(0xFFF57C00))
-    }
-    
-    state.errorMessage?.let {
-      Text(
-        text = it,
-        color = MaterialTheme.colorScheme.error,
-        modifier = Modifier.padding(16.dp)
-      )
-    }
-    
-    LazyColumn(
-      contentPadding = PaddingValues(16.dp),
-      verticalArrangement = Arrangement.spacedBy(16.dp),
-      modifier = Modifier.fillMaxSize()
-    ) {
-      items(state.requests, key = { it.id }) { request ->
-        RequestCardItem(
-          request = request,
-          onView = { onView(request) },
-          onEdit = { onEdit(request) },
-          onDelete = { onDelete(request) }
+  
+  Scaffold(
+    topBar = {
+      Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)) {
+        Text(
+          text = "Mis Solicitudes",
+          style = MaterialTheme.typography.headlineMedium,
+          fontWeight = FontWeight.Bold,
+          color = MaterialTheme.colorScheme.secondary
         )
       }
     }
+  ) { paddingValues ->
+    
+    Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+      if (state.isLoading) {
+        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+      }
+      
+      state.errorMessage?.let {
+        Text(
+          text = it,
+          color = MaterialTheme.colorScheme.error,
+          modifier = Modifier.padding(16.dp)
+        )
+      }
+      
+      LazyColumn(
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.fillMaxSize()
+      ) {
+        items(state.requests, key = { it.id }) { request ->
+          RequestCardItem(
+            request = request,
+            onView = { onView(request) },
+            onEdit = { onEdit(request) },
+            onDelete = { onDelete(request) }
+          )
+        }
+      }
+      
+    }
+    
   }
+  
+  
+//  Column(Modifier.fillMaxWidth()) {
+//    Text(
+//      text = "Solicitudes",
+//      style = MaterialTheme.typography.headlineMedium,
+//      fontWeight = FontWeight.Bold,
+//      modifier = Modifier.padding(horizontal = 18.dp),
+//      color = MaterialTheme.colorScheme.primary
+//    )
+//  }
 }

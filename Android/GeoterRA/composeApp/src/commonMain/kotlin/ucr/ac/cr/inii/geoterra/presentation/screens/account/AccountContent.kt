@@ -58,7 +58,7 @@ fun AccountContent(
           text = "Mi Perfil",
           style = MaterialTheme.typography.headlineMedium,
           fontWeight = FontWeight.Bold,
-          color = Color(0xFF1A237E) // Azul GeoTerra
+          color = MaterialTheme.colorScheme.secondary
         )
       }
     }
@@ -98,7 +98,7 @@ fun AccountContent(
           // Acciones de Cuenta (Peligro)
           item {
             Spacer(Modifier.height(16.dp))
-            HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+            HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outline)
             Spacer(Modifier.height(16.dp))
             
             DangerActionItem(

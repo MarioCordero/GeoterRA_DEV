@@ -41,7 +41,6 @@ class AccountViewModel(
     }
   }
   
-  
   fun logout() {
     screenModelScope.launch {
       authViewModel.logout()

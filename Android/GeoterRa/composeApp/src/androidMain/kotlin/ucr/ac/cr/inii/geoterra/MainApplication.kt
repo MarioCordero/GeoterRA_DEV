@@ -8,6 +8,7 @@ import org.koin.dsl.module
 import ucr.ac.cr.inii.geoterra.core.di.appModule
 import ucr.ac.cr.inii.geoterra.core.di.networkModule
 import ucr.ac.cr.inii.geoterra.core.di.platformSettingsModule
+import ucr.ac.cr.inii.geoterra.domain.camera.CameraManager
 import ucr.ac.cr.inii.geoterra.domain.location.AndroidLocationProvider
 import ucr.ac.cr.inii.geoterra.domain.location.LocationProvider
 import ucr.ac.cr.inii.geoterra.domain.permissions.AndroidPermissionManager
@@ -22,9 +23,7 @@ class MainApplication : Application() {
     super.onCreate()
     
     val androidModule = module {
-      factory<LocationProvider> {
-        AndroidLocationProvider(androidContext())
-      }
+      factory<LocationProvider> { AndroidLocationProvider(androidContext()) }
     }
     
     startKoin {

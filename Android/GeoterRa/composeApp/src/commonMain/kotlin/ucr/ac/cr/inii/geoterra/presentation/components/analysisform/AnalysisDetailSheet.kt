@@ -65,14 +65,30 @@ fun RequestDetailSheet(request: AnalysisRequestRemote) {
           label1 = "Propietario", value1 = request.owner_name ?: "N/D",
           label2 = "Contacto", value2 = request.owner_contact_number ?: "N/D"
         )
-        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), thickness = 0.5.dp)
+        HorizontalDivider(
+          modifier = Modifier.padding(vertical = 12.dp),
+          thickness = 0.5.dp,
+          color = MaterialTheme.colorScheme.outline
+        )
+        InfoGridRow(
+          label1 = "Región", value1 = (request.region)
+        )
+        HorizontalDivider(
+          modifier = Modifier.padding(vertical = 12.dp),
+          thickness = 0.5.dp,
+          color = MaterialTheme.colorScheme.outline
+        )
+        InfoGridRow(
+          label1 = "Uso actual", value1 = request.current_usage ?: "N/D"
+        )
+        HorizontalDivider(
+          modifier = Modifier.padding(vertical = 12.dp),
+          thickness = 0.5.dp,
+          color = MaterialTheme.colorScheme.outline
+        )
         InfoGridRow(
           label1 = "Latitud", value1 = (request.latitude),
           label2 = "Longitud", value2 = (request.longitude)
-        )
-        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), thickness = 0.5.dp)
-        InfoGridRow(
-          label1 = "Uso actual", value1 = request.current_usage ?: "N/D"
         )
       }
     }

@@ -18,6 +18,6 @@ class HomeViewModel {
    * Example event handler.
    */
   fun onCardSelected() {
-    // Business logic goes here
+
   }
 }

@@ -9,4 +9,8 @@ interface PermissionManager {
   suspend fun requestCameraPermission(): Boolean
 
   fun hasCameraPermission(): Boolean
+  
+  suspend fun requestGalleryPermission(): Boolean
+  
+  fun hasGalleryPermission(): Boolean
 }

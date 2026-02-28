@@ -32,62 +32,60 @@ import kotlin.coroutines.suspendCoroutine
 class IosCameraManager(
   private val locationProvider: LocationProvider // Inyectamos el provider para los metadatos
 ) : CameraManager {
+  
+  @OptIn(ExperimentalForeignApi::class)
   private fun saveImageToLibrary(image: UIImage, location: UserLocation?) {
     PHPhotoLibrary.sharedPhotoLibrary().performChanges({
       val request = PHAssetChangeRequest.creationRequestForAssetFromImage(image)
-      location?.let {
-        request.location = CLLocation(latitude = it.latitude, longitude = it.longitude)
+        location?.let {
+           // IMPORTANT: Use CLLocation with timestamp for better metadata indexing
+           request.location = CLLocation(
+             coordinate = CLLocationCoordinate2DMake(it.latitude, it.longitude),
+             altitude = 0.0,
+             horizontalAccuracy = it.accuracy.toDouble(),
+             verticalAccuracy = -1.0,
+             timestamp = NSDate()
+           )
+        }
+      }, completionHandler = { success, error ->
+        if (!success) println("iOS Gallery Error: ${error?.localizedDescription}")
       }
-    }, completionHandler = { success, error ->
-      if (!success) println("Error Geoterra (Gallery): ${error?.localizedDescription}")
-    })
+    )
   }
-
-  @OptIn(ExperimentalForeignApi::class)
+  
   override suspend fun takePhotoWithLocation(): Pair<ByteArray, UserLocation?>? {
-    val rootController = UIApplication.sharedApplication.keyWindow?.rootViewController ?: return null
-
-    // 1. Obtenemos la ubicación actual del flujo justo antes de disparar
-    // Usamos withTimeout para no quedar bloqueados si no hay señal GPS
-    val currentLocation = withContext(Dispatchers.Default) {
+    val root = UIApplication.sharedApplication.keyWindow?.rootViewController ?: return null
+    
+    // 1. Warm up GPS before opening UI
+    val currentLocation = withContext(Dispatchers.Main) {
       try {
-        withTimeout(2000) { locationProvider.observeLocation().firstOrNull() }
+        withTimeout(3000) { locationProvider.observeLocation().firstOrNull() }
       } catch (e: Exception) { null }
     }
-
+    
     return suspendCoroutine { continuation ->
-      val imagePicker = UIImagePickerController().apply {
+      val picker = UIImagePickerController().apply {
         sourceType = UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypeCamera
         delegate = object : NSObject(), UIImagePickerControllerDelegateProtocol, UINavigationControllerDelegateProtocol {
-
-          override fun imagePickerController(
-            picker: UIImagePickerController,
-            didFinishPickingMediaWithInfo: Map<Any?, *>
-          ) {
+          override fun imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo: Map<Any?, *>) {
             val image = didFinishPickingMediaWithInfo[UIImagePickerControllerOriginalImage] as? UIImage
-
-            if (image != null) {
-              // 2. Guardar en la galería con la ubicación obtenida
-              saveImageToLibrary(image, currentLocation)
-
-              // 3. Convertir a ByteArray para uso inmediato en la app
-              val imageData = UIImageJPEGRepresentation(image, 0.8)
-              val bytes = imageData?.toByteArray()
-
-              picker.dismissViewControllerAnimated(true) {
-                continuation.resume(if (bytes != null) Pair(bytes, currentLocation) else null)
+            
+            picker.dismissViewControllerAnimated(true) {
+              if (image != null) {
+                saveImageToLibrary(image, currentLocation)
+                val data = UIImageJPEGRepresentation(image, 0.8)
+                continuation.resume(Pair(data!!.toByteArray(), currentLocation))
+              } else {
+                continuation.resume(null)
               }
-            } else {
-              picker.dismissViewControllerAnimated(true) { continuation.resume(null) }
             }
           }
-
           override fun imagePickerControllerDidCancel(picker: UIImagePickerController) {
             picker.dismissViewControllerAnimated(true) { continuation.resume(null) }
           }
         }
       }
-      rootController.presentViewController(imagePicker, animated = true, completion = null)
+      root.presentViewController(picker, animated = true, completion = null)
     }
   }
 

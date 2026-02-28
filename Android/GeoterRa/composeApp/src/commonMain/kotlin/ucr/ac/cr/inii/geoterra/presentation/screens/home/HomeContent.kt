@@ -36,7 +36,7 @@ import ucr.ac.cr.inii.geoterra.presentation.components.layout.StepItem
 @Composable
 fun HomeContent(
   state: HomeState,
-  onCardClick: () -> Unit
+  onCardMapClick: () -> Unit
 ) {
   val scrollState = rememberScrollState()
   
@@ -98,7 +98,7 @@ fun HomeContent(
       )
       Spacer(modifier = Modifier.height(24.dp))
       Button(
-        onClick = onCardClick,
+        onClick = onCardMapClick,
         modifier = Modifier.fillMaxWidth().height(56.dp),
         shape = RoundedCornerShape(12.dp)
       ) {

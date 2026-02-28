@@ -52,8 +52,8 @@ class AnalysisFormViewModel(
       is AnalysisFormEvent.LonChanged -> _state.update { it.copy(longitude = event.value) }
       is AnalysisFormEvent.DetailsChanged -> _state.update { it.copy(details = event.value) }
       is AnalysisFormEvent.Submit -> submitForm()
-      is AnalysisFormEvent.UseCurrentLocation -> fetchCurrentLocation()
-      is AnalysisFormEvent.TakePhoto -> takePhoto()
+      is AnalysisFormEvent.UseCurrentLocation -> takePhoto()
+      is AnalysisFormEvent.PickPhoto -> pickPhoto()
       is AnalysisFormEvent.PhotoCaptured -> processPhoto(event.bytes)
     }
   }
@@ -110,20 +110,67 @@ class AnalysisFormViewModel(
       }
     }
   }
-
+  
+  fun pickPhoto() {
+    screenModelScope.launch {
+      _state.update { it.copy(isLoading = true, error = null) }
+      
+      if (!permissionManager.requestGalleryPermission()) {
+        _state.update { it.copy(isLoading = false, error = "Permiso de galería denegado") }
+        return@launch
+      }
+      
+      val bytes = cameraManager.pickPhotoFromGallery()
+      
+      if (bytes != null) {
+        val location = cameraManager.extractLocationFromCache(bytes)
+        
+        if (location != null) {
+          _state.update { it.copy(
+            latitude = location.latitude.toString(),
+            longitude = location.longitude.toString(),
+            isLoading = false,
+            error = null
+          )}
+        } else {
+          _state.update { it.copy(
+            isLoading = false,
+            error = "La foto no tiene GPS. Asegúrate de que la cámara tenga activada la ubicación."
+          )}
+        }
+      } else {
+        _state.update { it.copy(isLoading = false) }
+      }
+    }
+  }
+  
   private fun takePhoto() {
     screenModelScope.launch {
-      if (permissionManager.requestCameraPermission()) {
-        val result = cameraManager.takePhotoWithLocation()
-        result?.let { (bytes, location) ->
-          // Priorizamos la ubicación incrustada en la captura
-          _state.update { it.copy(
-            latitude = location?.latitude?.toString() ?: it.latitude,
-            longitude = location?.longitude?.toString() ?: it.longitude
-          )}
-          // Aquí podrías guardar los bytes de la foto si tu backend lo requiere
-        }
+      _state.update { it.copy(isLoading = true, error = null) }
+      
+      val cameraGranted = permissionManager.requestCameraPermission()
+      if (!cameraGranted) {
+        _state.update { it.copy(isLoading = false, error = "Permiso de cámara denegado") }
+        return@launch
       }
+      
+      val galleryGranted = permissionManager.requestGalleryPermission()
+      if (!galleryGranted) {
+        _state.update { it.copy(isLoading = false, error = "Permiso de galería denegado") }
+        return@launch
+      }
+      
+      permissionManager.requestLocationPermission()
+      
+      val result = cameraManager.takePhotoWithLocation()
+      
+      result?.let { (bytes, location) ->
+        _state.update { it.copy(
+          isLoading = false,
+          latitude = location?.latitude?.toString() ?: it.latitude,
+          longitude = location?.longitude?.toString() ?: it.longitude
+        )}
+      } ?: _state.update { it.copy(isLoading = false) }
     }
   }
 

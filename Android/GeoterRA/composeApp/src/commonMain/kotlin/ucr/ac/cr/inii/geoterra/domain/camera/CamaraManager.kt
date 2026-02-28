@@ -7,6 +7,8 @@ interface CameraManager {
    * Captura una foto y retorna los bytes junto con la ubicación capturada en ese instante.
    */
   suspend fun takePhotoWithLocation(): Pair<ByteArray, UserLocation?>?
+  
+  suspend fun pickPhotoFromGallery(): ByteArray?
 
   /**
    * Extrae la ubicación de una imagen a partir de sus bytes analizando los metadatos EXIF.

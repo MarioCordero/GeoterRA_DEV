@@ -30,6 +30,7 @@ sealed class AnalysisFormEvent {
   data class DetailsChanged(val value: String) : AnalysisFormEvent()
   object Submit : AnalysisFormEvent()
   object UseCurrentLocation : AnalysisFormEvent()
+  
   data class PhotoCaptured(val bytes: ByteArray) : AnalysisFormEvent() {
     override fun equals(other: Any?): Boolean {
       if (this === other) return true
@@ -46,6 +47,5 @@ sealed class AnalysisFormEvent {
       return bytes.contentHashCode()
     }
   }
-
-  object TakePhoto : AnalysisFormEvent()
+  object PickPhoto : AnalysisFormEvent()
 }

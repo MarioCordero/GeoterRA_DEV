@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.koin.compose.koinInject
@@ -26,7 +27,7 @@ class RequestsScreen : Screen {
   @OptIn(ExperimentalMaterial3Api::class)
   @Composable
   override fun Content() {
-    val viewModel = koinInject<RequestViewModel>()
+    val viewModel = getScreenModel<RequestViewModel>()
     val state by viewModel.state.collectAsState()
     val navigator = LocalNavigator.currentOrThrow
     

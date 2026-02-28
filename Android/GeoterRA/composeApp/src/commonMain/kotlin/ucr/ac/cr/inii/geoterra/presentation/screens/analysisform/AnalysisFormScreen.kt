@@ -5,10 +5,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
-import org.koin.compose.koinInject
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeViewModel
+import cafe.adriel.voyager.koin.getScreenModel
 
 data class AnalysisFormScreen(
   val requestToEdit: AnalysisRequestRemote? = null
@@ -17,7 +16,7 @@ data class AnalysisFormScreen(
   @Composable
   override fun Content() {
     val navigator = LocalNavigator.currentOrThrow
-    val viewModel: AnalysisFormViewModel = koinInject()
+    val viewModel = getScreenModel<AnalysisFormViewModel>()
     val state by viewModel.state.collectAsState()
     
     if (state.isSuccess) {

@@ -20,11 +20,10 @@ class AccountScreen : Screen {
       state = accountState,
       onLogoutClick = {
         accountViewModel.logout()
-        // navigator.popUntilRoot() // Opcional: limpiar stack
       },
       onDeleteAccountClick = {
         // Aquí podrías llamar a accountViewModel.deleteAccount()
-        
+//        accountViewModel.deleteAccount()
       },
       onEditClick = {
         // Navegar a pantalla de edición: navigator.push(EditProfileScreen())
