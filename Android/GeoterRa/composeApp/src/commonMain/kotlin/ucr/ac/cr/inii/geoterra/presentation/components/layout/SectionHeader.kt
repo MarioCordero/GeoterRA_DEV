@@ -17,13 +17,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun SectionHeader(title: String, icon: ImageVector) {
+fun SectionHeader(title: String, icon: ImageVector? = null) {
   Row(
     verticalAlignment = Alignment.CenterVertically,
     modifier = Modifier.padding(bottom = 12.dp)
   ) {
-    Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
-    Spacer(Modifier.width(8.dp))
+    if (icon != null) {
+      Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
+      Spacer(Modifier.width(8.dp))
+    }
     Text(
       text = title.uppercase(),
       style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 1.2.sp),

@@ -130,7 +130,7 @@ fun HomeContent(
     // --- SECCIÓN 4: ACERCA DE NOSOTROS (Card con profundidad) ---
     Card(
       modifier = Modifier.padding(16.dp),
-      colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
+      colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
       shape = RoundedCornerShape(24.dp)
     ) {
       Column(modifier = Modifier.padding(24.dp)) {
@@ -143,7 +143,8 @@ fun HomeContent(
         Spacer(modifier = Modifier.height(12.dp))
         Text(
           text = "Nuestra misión es proporcionar información geológica precisa para minimizar riesgos y maximizar la eficiencia energética.",
-          style = MaterialTheme.typography.bodyMedium
+          style = MaterialTheme.typography.bodyMedium,
+          color = MaterialTheme.colorScheme.onSurface
         )
       }
     }

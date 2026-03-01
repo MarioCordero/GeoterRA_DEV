@@ -25,14 +25,21 @@ val LightOutline = Color(0xff74777f)
 val LightOutlineVariant = Color(0xFFC4C6CF)
 
 // --- VARIANTES PARA MODO OSCURO (Desaturados y Luminosos) ---
-val DarkPrimary = Color(0xFFA9C7FF)
-val DarkOnPrimary = Color(0xFF003062)
-val DarkPrimaryContainer = Color(0xFF00468A)
-val DarkSecondary = BrandLightOrange
-val DarkOnSecondary = Color(0xFF422C00)
-val DarkBackground = Color(0xFF1A1C1E)
-val DarkSurface = Color(0xFF1A1C1E)
-val DarkOutline = Color(0xFF8E9199)
+val DarkPrimary = BrandOrange
+val DarkOnPrimary = Color(0xFF1B1B1F)
+val DarkPrimaryContainer = Color(0xFF1B1B1F)
+val DarkOnPrimaryContainer = Color(0xffffffff)
+val DarkSecondary = BrandDeepBlue
+val DarkOnSecondary = Color(0xFF002E69)
+val DarkSecondaryContainer = Color(0xFF004494)
+val DarkOnSecondaryContainer = Color(0xFFD6E3FF)
+val DarkBackground = Color(0xFF1B1B1F)
+val DarkSurface = Color(0xff212125)
+val DarkOnSurface = Color(0xFFE3E2E6)
+val DarkSurfaceVariant = Color(0xffd9d8dc)
+val DarkOutline = LightOutline
+
+val DarkOutlineVariant = LightOutlineVariant
 
 // --- COLORES DE ESTADO (Semánticos) ---
 val SuccessGreen = Color(0xFF4CAF50)

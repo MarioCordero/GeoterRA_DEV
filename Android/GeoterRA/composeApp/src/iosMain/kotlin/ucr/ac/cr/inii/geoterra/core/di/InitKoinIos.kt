@@ -13,7 +13,7 @@ object initKoinIos {
     val iosModules = module {
       single<LocationProvider> { IosLocationProvider() }
       single<PermissionManager> { IosPermissionManager() }
-      single<CameraManager> { IosCameraManager(get()) }
+      single<CameraManager> { IosCameraManager() }
     }
 
     initKoin(additionalModules = listOf(iosModules))

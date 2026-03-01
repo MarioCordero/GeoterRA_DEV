@@ -30,7 +30,6 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class IosCameraManager(
-  private val locationProvider: LocationProvider // Inyectamos el provider para los metadatos
 ) : CameraManager {
   
   @OptIn(ExperimentalForeignApi::class)
@@ -38,7 +37,6 @@ class IosCameraManager(
     PHPhotoLibrary.sharedPhotoLibrary().performChanges({
       val request = PHAssetChangeRequest.creationRequestForAssetFromImage(image)
         location?.let {
-           // IMPORTANT: Use CLLocation with timestamp for better metadata indexing
            request.location = CLLocation(
              coordinate = CLLocationCoordinate2DMake(it.latitude, it.longitude),
              altitude = 0.0,
@@ -53,15 +51,9 @@ class IosCameraManager(
     )
   }
   
-  override suspend fun takePhotoWithLocation(): Pair<ByteArray, UserLocation?>? {
+  override suspend fun takePhotoWithLocation(location: UserLocation): Pair<ByteArray, UserLocation?>? {
     val root = UIApplication.sharedApplication.keyWindow?.rootViewController ?: return null
-    
-    // 1. Warm up GPS before opening UI
-    val currentLocation = withContext(Dispatchers.Main) {
-      try {
-        withTimeout(3000) { locationProvider.observeLocation().firstOrNull() }
-      } catch (e: Exception) { null }
-    }
+
     
     return suspendCoroutine { continuation ->
       val picker = UIImagePickerController().apply {
@@ -72,9 +64,9 @@ class IosCameraManager(
             
             picker.dismissViewControllerAnimated(true) {
               if (image != null) {
-                saveImageToLibrary(image, currentLocation)
+                saveImageToLibrary(image, location)
                 val data = UIImageJPEGRepresentation(image, 0.8)
-                continuation.resume(Pair(data!!.toByteArray(), currentLocation))
+                continuation.resume(Pair(data!!.toByteArray(), location))
               } else {
                 continuation.resume(null)
               }
@@ -87,6 +79,10 @@ class IosCameraManager(
       }
       root.presentViewController(picker, animated = true, completion = null)
     }
+  }
+
+  override suspend fun pickPhotoFromGallery(): ByteArray? {
+    TODO("Not yet implemented")
   }
 
   @OptIn(ExperimentalForeignApi::class)
@@ -113,7 +109,6 @@ class IosCameraManager(
   }
 }
 
-// Helpers útiles para conversión
 @OptIn(ExperimentalForeignApi::class)
 fun NSData.toByteArray(): ByteArray = ByteArray(length.toInt()).apply {
   usePinned { memcpy(it.addressOf(0), bytes, length) }

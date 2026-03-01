@@ -40,7 +40,6 @@ class RequestsScreen : Screen {
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
         shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-        tonalElevation = 8.dp
       ) {
         RequestDetailSheet(request = selectedRequest!!)
       }

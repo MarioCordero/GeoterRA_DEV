@@ -41,7 +41,7 @@ import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
     super.onCreate(savedInstanceState)
     
     permissionManager = AndroidPermissionManager(this)
-    cameraManager = AndroidCameraManager(this, getKoin().get())
+    cameraManager = AndroidCameraManager(this)
     
     loadKoinModules(
       module {
@@ -56,7 +56,7 @@ import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
     
     cameraManager.onLaunchGallery = { callback ->
       this.galleryCallback = callback
-      pickPhotoLauncher.launch("image/*") // Solo imágenes
+      pickPhotoLauncher.launch("image/*")
     }
     
     setContent {

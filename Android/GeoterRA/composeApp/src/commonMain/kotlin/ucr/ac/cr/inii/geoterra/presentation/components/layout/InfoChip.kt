@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun InfoChip(
-  icon: androidx.compose.ui.graphics.vector.ImageVector,
+  icon: ImageVector,
   label: String,
   value: String,
   modifier: Modifier = Modifier,
@@ -67,7 +67,7 @@ fun InfoChip(
         text = value,
         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
         color = MaterialTheme.colorScheme.onSurface,
-        maxLines = 1,
+        maxLines = 4,
         overflow = TextOverflow.Ellipsis
       )
     }

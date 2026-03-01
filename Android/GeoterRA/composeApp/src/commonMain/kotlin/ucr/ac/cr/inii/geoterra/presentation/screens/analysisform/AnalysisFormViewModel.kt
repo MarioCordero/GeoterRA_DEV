@@ -147,7 +147,9 @@ class AnalysisFormViewModel(
   private fun takePhoto() {
     screenModelScope.launch {
       _state.update { it.copy(isLoading = true, error = null) }
-      
+
+      val location = locationProvider.observeLocation().firstOrNull()
+
       val cameraGranted = permissionManager.requestCameraPermission()
       if (!cameraGranted) {
         _state.update { it.copy(isLoading = false, error = "Permiso de cámara denegado") }
@@ -161,8 +163,8 @@ class AnalysisFormViewModel(
       }
       
       permissionManager.requestLocationPermission()
-      
-      val result = cameraManager.takePhotoWithLocation()
+
+      val result = cameraManager.takePhotoWithLocation(location ?: return@launch)
       
       result?.let { (bytes, location) ->
         _state.update { it.copy(

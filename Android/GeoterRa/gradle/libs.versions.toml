@@ -30,6 +30,7 @@ junit = "4.13.2"
 
 # Persistencia de datos
 settings-multiplatform = "1.3.0"
+exifinterface = "1.4.2"
 
 [libraries]
 stately-common = { module = "co.touchlab:stately-common", version.ref = "stately" }
@@ -90,6 +91,7 @@ kmplog = { module = "io.github.kdroidfilter:kmplog", version.ref = "kmplog" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterface" }
 
 [plugins]
 kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }

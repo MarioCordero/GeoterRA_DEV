@@ -16,6 +16,7 @@ import io.ktor.utils.io.InternalAPI
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
+import ucr.ac.cr.inii.geoterra.core.network.ErrorMapper
 import ucr.ac.cr.inii.geoterra.core.network.NetworkConfig
 import ucr.ac.cr.inii.geoterra.core.network.TokenManager
 import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenRequest
@@ -27,14 +28,12 @@ val networkModule = module {
   single { AuthEventBus() }
   single { TokenManager(get()) }
   
-  // Especifica el tipo <HttpClient> explícitamente
   single<HttpClient> {
     fun HttpClient.invalidateAuthTokens() {
       authProvider<BearerAuthProvider>()?.clearToken()
     }
     
     val authEventBus = get<AuthEventBus>()
-    // Usamos get() directamente en la configuración para evitar confusiones de scope
     HttpClient(CIO) {
       install(HttpTimeout) {
         requestTimeoutMillis = 30_000
@@ -57,7 +56,6 @@ val networkModule = module {
           }
         }
         
-        // 2. Mantén el nivel en ALL para ver headers y cuerpos
         level = LogLevel.ALL
         
       }
@@ -67,7 +65,6 @@ val networkModule = module {
         bearer {
           sendWithoutRequest { request ->
             val path = request.url.encodedPath
-            // Usamos contains para ignorar si el prefijo es /api/public/ o no
             val isPublic = path.contains("/auth/login") ||
               path.contains("/auth/register") ||
               path.contains("/auth/refresh")
@@ -102,9 +99,12 @@ val networkModule = module {
               
               val data = response.data
               val errors = response.errors
-              
-              // Check for errors and clear tokens
-              if (errors.isNotEmpty() || data == null) {
+
+              val hasRefreshTokenError = errors.any { error ->
+                error.code == ErrorMapper.INVALID_REFRESH_TOKEN || ErrorMapper.isAuthError(error.code)
+              }
+
+              if (hasRefreshTokenError || data == null) {
                 tm.clearTokens()
                 authEventBus.emitUnauthorized()
                 return@refreshTokens null
