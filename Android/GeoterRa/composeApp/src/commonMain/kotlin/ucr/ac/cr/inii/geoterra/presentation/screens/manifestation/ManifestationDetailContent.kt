@@ -36,20 +36,28 @@ import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.DataBox
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.SectionHeader
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.ActionCard
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.AdaptiveBackButton
 import ucr.ac.cr.inii.geoterra.presentation.components.manifestation.ChemicalRow
 
 @Composable
 fun ManifestationDetailContent(
   modifier: Modifier,
   manifestation: ManifestationRemote,
-  onDownload: () -> Unit
+  onDownload: () -> Unit,
+  onBack: () -> Unit
 ) {
+
   Column(
     modifier = modifier
       .fillMaxSize()
       .verticalScroll(rememberScrollState())
       .padding(16.dp)
   ) {
+    AdaptiveBackButton(
+      onBack = onBack,
+      modifier = Modifier.padding(bottom = 16.dp)
+    )
+
     // --- SECCIÓN: ENCABEZADO Y ACCIONES ---
     Text(
       "Acciones Rápidas",

@@ -31,7 +31,6 @@ class AuthRepositoryImpl(
     authProvider.clearToken()
   }
   
-  
   override suspend fun login(request: LoginRequest): Result<Unit> {
     return try {
       val response = client.post("auth/login") {

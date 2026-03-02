@@ -10,6 +10,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
@@ -20,11 +21,13 @@ class ManifestationDetailScreen(val manifestation: ManifestationRemote) : Screen
   override fun Content() {
     val viewModel: ManifestationDetailViewModel = koinInject { parametersOf(manifestation) }
     val state by viewModel.state.collectAsState()
-    
+    val navigator = LocalNavigator.currentOrThrow
+
     ManifestationDetailContent(
       modifier = Modifier.padding(16.dp),
       manifestation = state.manifestation!!,
-      onDownload = viewModel::downloadReport
+      onDownload = viewModel::downloadReport,
+      onBack = navigator::pop
     )
   }
 }

@@ -34,12 +34,20 @@ fun RequestsContent(
       }
     }
   ) { paddingValues ->
-    
-    Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-      if (state.isLoading) {
-        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+
+    Column(
+      modifier = Modifier
+        .fillMaxSize()
+        .padding(paddingValues)
+    ) {
+
+      // 1. Estado de Carga: Centrado en el espacio disponible si la lista está vacía
+      if (state.isLoading && state.requests.isEmpty()) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+          CircularProgressIndicator()
+        }
       }
-      
+
       state.errorMessage?.let {
         Text(
           text = it,
@@ -47,11 +55,11 @@ fun RequestsContent(
           modifier = Modifier.padding(16.dp)
         )
       }
-      
+
       LazyColumn(
-        contentPadding = PaddingValues(16.dp),
+        contentPadding = PaddingValues(bottom = 32.dp, start = 16.dp, end = 16.dp, top = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.weight(1f).fillMaxWidth()
       ) {
         items(state.requests, key = { it.id }) { request ->
           RequestCardItem(
@@ -62,19 +70,6 @@ fun RequestsContent(
           )
         }
       }
-      
     }
-    
   }
-  
-  
-//  Column(Modifier.fillMaxWidth()) {
-//    Text(
-//      text = "Solicitudes",
-//      style = MaterialTheme.typography.headlineMedium,
-//      fontWeight = FontWeight.Bold,
-//      modifier = Modifier.padding(horizontal = 18.dp),
-//      color = MaterialTheme.colorScheme.primary
-//    )
-//  }
 }

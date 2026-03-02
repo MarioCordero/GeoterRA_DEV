@@ -33,8 +33,7 @@ val appModule = module {
   factory { params ->
     AnalysisFormViewModel(
       get(),
-      initialRequest = params.getOrNull<AnalysisRequestRemote>(),
-      get(),
+      initialRequest = params.getOrNull<AnalysisRequestRemote>(),      get(),
       get(),
       get()
     )

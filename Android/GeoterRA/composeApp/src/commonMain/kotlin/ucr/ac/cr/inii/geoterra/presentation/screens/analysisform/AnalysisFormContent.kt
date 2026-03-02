@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.AdaptiveBackButton
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.CustomTextField
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.FormSection
 
@@ -25,16 +26,22 @@ import ucr.ac.cr.inii.geoterra.presentation.components.layout.FormSection
 @Composable
 fun AnalysisFormContent(
   state: AnalysisFormState,
-  onEvent: (AnalysisFormEvent) -> Unit
+  onEvent: (AnalysisFormEvent) -> Unit,
+  onBack: () -> Unit
 ) {
+
   Column(
     modifier = Modifier
       .fillMaxSize()
       .padding(16.dp)
-      .verticalScroll(rememberScrollState())
-      .padding(20.dp),
+      .verticalScroll(rememberScrollState()),
     verticalArrangement = Arrangement.spacedBy(20.dp)
   ) {
+    AdaptiveBackButton(
+      onBack = onBack,
+      modifier = Modifier.padding(bottom = 16.dp)
+    )
+
     FormSection(title = "Información General", icon = Icons.Default.Info) {
       CustomTextField(
         value = state.region,
