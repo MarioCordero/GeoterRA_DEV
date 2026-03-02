@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Drawer } from 'antd';
 import { MenuOutlined, CloseOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import logo from '../assets/images/GeoterRA-Logo-Color.svg';
-import '../colorModule.css';
-import '../fontsModule.css';
+import logo from '../../assets/images/GeoterRA-Logo-Color.svg';
+import '../../colorModule.css';
+import '../../fontsModule.css';
 
 export default function AppHeader() {
   const [drawerOpen, setDrawerOpen] = useState(false);

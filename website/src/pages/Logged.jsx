@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import SidebarLayout from '../components/loggedComponents/loggedSidebar';
 import LoggedMainPage from '../components/loggedComponents/loggedMainPage';
-import LoggedHeader from '../components/loggedHeader';
-import Footer from '../components/Footer';
+import LoggedHeader from '../components/common/loggedHeader';
+import Footer from '../components/common/Footer';
 // Import other pages as needed
 import Requests from '../components/common/UserRequests';
 
