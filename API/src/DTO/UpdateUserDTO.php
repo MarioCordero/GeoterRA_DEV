@@ -12,20 +12,30 @@ use Http\ErrorType;
 final class UpdateUserDTO
 {
   public function __construct(
+    public string $userId,
     public string $firstName,
     public string $lastName,
     public string $email,
     public ?string $phoneNumber
   ) {}
 
-  public static function fromArray(array $data): self
+  public static function fromArray(array $data, string $userId = ''): self
   {
     return new self(
-      trim($data['name'] ?? ''),
-      trim($data['lastname'] ?? ''),
+      $userId,
+      trim($data['firstName'] ?? $data['name'] ?? ''),
+      trim($data['lastName'] ?? $data['lastname'] ?? ''),
       trim($data['email'] ?? ''),
-      $data['phone_number'] ?? null
+      $data['phoneNumber'] ?? $data['phone_number'] ?? null
     );
+  }
+
+  /**
+   * Set the user ID for the DTO
+   */
+  public function setUserId(string $userId): void
+  {
+    $this->userId = $userId;
   }
 
   /**
