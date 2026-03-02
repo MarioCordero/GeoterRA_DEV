@@ -98,8 +98,17 @@ jobs:
           # website/dist: BORRAR TODO y copiar lo nuevo del build
           if [ -d "deploy/website/dist" ]; then
             mkdir -p main-branch/website/dist
-            rm -rf main-branch/website/dist/*           # limpia dist por completo
+            rm -rf main-branch/website/dist/* # limpia dist por completo
             rsync -av deploy/website/dist/ main-branch/website/dist/
+          fi
+
+          # NUEVO: Copiar pull.sh a la raíz de main
+          if [ -f "pull.sh" ]; then
+            echo "Copiando pull.sh a main-branch..."
+            cp pull.sh main-branch/pull.sh
+            chmod +x main-branch/pull.sh # Le da permisos de ejecución
+          else
+            echo "⚠️ No se encontró pull.sh en la raíz de ${{ env.SOURCE_BRANCH }}"
           fi
 
       # ---------------- FORZAR .htaccess EN dist ----------------
@@ -140,4 +149,6 @@ jobs:
       # ---------------- TRIGGER REMOTE DEPLOY ----------------
       - name: Trigger remote deploy
         run: |
+          # NOTA: Hacer curl a un .sh directamente lo descargará o mostrará, pero no lo ejecutará.
+          # Considera cambiar esto a un webhook en PHP o ejecutar por SSH directamente.
           curl -X GET "http://163.178.171.105/pull.sh"
