@@ -24,6 +24,12 @@ data class RegisterRequest(
 )
 
 @Serializable
+data class RegisterResponse(
+  val user_id: String
+)
+
+
+@Serializable
 data class RefreshAccessTokenRequest(val refresh_token: String)
 
 @Serializable

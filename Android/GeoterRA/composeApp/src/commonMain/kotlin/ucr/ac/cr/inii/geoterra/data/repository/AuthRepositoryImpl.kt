@@ -9,6 +9,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType.*
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import kotlinx.serialization.Serializable
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.ErrorMapper
 import ucr.ac.cr.inii.geoterra.core.network.TokenManager
@@ -16,6 +17,7 @@ import ucr.ac.cr.inii.geoterra.data.model.remote.LoginRequest
 import ucr.ac.cr.inii.geoterra.data.model.remote.LoginResponse
 import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenRequest
 import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenResponse
+import ucr.ac.cr.inii.geoterra.data.model.remote.RegisterRequest
 import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepository
 
 class AuthRepositoryImpl(
@@ -30,7 +32,42 @@ class AuthRepositoryImpl(
     
     authProvider.clearToken()
   }
-  
+
+  override suspend fun register(request: RegisterRequest): Result<Unit> {
+    return try {
+      val response = client.post("auth/register") {
+        contentType(Application.Json)
+        setBody(request)
+      }
+
+      if (!response.status.isSuccess()) {
+        val rawBody = response.bodyAsText()
+
+        // Log this for debugging
+        println("HTTP ${response.status.value}: $rawBody")
+      }
+
+      if (response.status.isSuccess()) {
+        val envelope = response.body<ApiResponseModel<LoginResponse>>()
+        if (envelope.data != null) {
+          return Result.success(Unit)
+        }
+      }
+
+      val errorEnvelope = response.body<ApiResponseModel<LoginResponse>>()
+      val firstError = errorEnvelope.errors.firstOrNull()
+      val friendlyMessage = firstError?.let { ErrorMapper.mapCodeToMessage(it.code) }
+        ?: "Error inesperado (${response.status.value})"
+
+      Result.failure(Exception(friendlyMessage))
+
+    } catch (e: Exception) {
+      e.printStackTrace()
+      // Handle network exceptions (No internet, timeout, etc.)
+      Result.failure(Exception("Error de red: verifica tu conexión."))
+    }
+  }
+
   override suspend fun login(request: LoginRequest): Result<Unit> {
     return try {
       val response = client.post("auth/login") {
