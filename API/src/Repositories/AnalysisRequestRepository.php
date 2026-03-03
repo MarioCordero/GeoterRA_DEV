@@ -175,7 +175,7 @@ final class AnalysisRequestRepository
 	): void {
 		$sql = '
 			UPDATE analysis_requests SET
-				region = :region,
+				region_id = :region_id,
 				email = :email,
 				owner_contact_number = :owner_contact_number,
 				owner_name = :owner_name,
@@ -191,7 +191,7 @@ final class AnalysisRequestRepository
 
 		$stmt = $this->pdo->prepare($sql);
 		$stmt->execute([
-			':region' => $dto->region,
+			':region_id' => $dto->region,
 			':email' => $dto->email,
 			':owner_contact_number' => $dto->owner_contact_number,
 			':owner_name' => $dto->owner_name,
