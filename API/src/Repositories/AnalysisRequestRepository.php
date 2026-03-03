@@ -20,7 +20,7 @@ final class AnalysisRequestRepository
 	 */
 	public function create(AnalysisRequestDTO $dto, string $userId): string
 	{    // Generate business-readable name AFTER insert
- 		$maxAttempts = 5; // Límite de reintentos para evitar bucles infinitos
+ 		$maxAttempts = 5;
     $attempts = 0;
     $requestId = Ulid::generate();
 
@@ -30,22 +30,22 @@ final class AnalysisRequestRepository
 				$generatedName = 'SOLI-' . $suffix;
 
 				$sql = "
-					INSERT INTO analysis_requests (
-						id, name, region, email, owner_contact_number, owner_name,
-						temperature_sensation, bubbles, details, current_usage,
-						latitude, longitude, created_by
-					) VALUES (
-						:id, :name, :region, :email, :owner_contact_number, :owner_name,
-						:temperature_sensation, :bubbles, :details, :current_usage,
-						:latitude, :longitude, :created_by
-					)
+						INSERT INTO analysis_requests (
+								id, name, region_id, email, owner_contact_number, owner_name,
+								temperature_sensation, bubbles, details, current_usage,
+								latitude, longitude, created_by
+						) VALUES (
+								:id, :name, :region_id, :email, :owner_contact_number, :owner_name,
+								:temperature_sensation, :bubbles, :details, :current_usage,
+								:latitude, :longitude, :created_by
+						)
 				";
 
 				$stmt = $this->pdo->prepare($sql);
 				$stmt->execute([
 						':id' => $requestId,
 						':name' => $generatedName,
-						':region' => $dto->region,
+						':region_id' => $dto->region,
 						':email' => $dto->email,
 						':owner_contact_number' => $dto->owner_contact_number,
 						':owner_name' => $dto->owner_name,
@@ -104,7 +104,7 @@ final class AnalysisRequestRepository
 	): void {
 		$sql = '
 			UPDATE analysis_requests SET
-				region = :region,
+				region_id = :region_id,
 				email = :email,
 				owner_contact_number = :owner_contact_number,
 				owner_name = :owner_name,
@@ -120,7 +120,7 @@ final class AnalysisRequestRepository
 
 		$stmt = $this->pdo->prepare($sql);
 		$stmt->execute([
-			':region' => $dto->region,
+			':region_id' => $dto->region,
 			':email' => $dto->email,
 			':owner_contact_number' => $dto->owner_contact_number,
 			':owner_name' => $dto->owner_name,
@@ -163,7 +163,7 @@ final class AnalysisRequestRepository
 			SELECT
 					id,
 					name,
-					region,
+					region_id,
 					email,
 					owner_name,
 					owner_contact_number,
@@ -203,5 +203,4 @@ final class AnalysisRequestRepository
 			':id' => $id
 		]);
 	}
-
 }
