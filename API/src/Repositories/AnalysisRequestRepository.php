@@ -97,41 +97,37 @@ final class AnalysisRequestRepository
 	/**
 	 * Updates an analysis request owned by a user.
 	 */
-	public function update(
-		string $id,
-		string $userId,
-		AnalysisRequestDTO $dto
-	): void {
+	public function update(string $id, string $userId, AnalysisRequestDTO $dto): void
+	{
 		$sql = '
-			UPDATE analysis_requests SET
-				region_id = :region_id,
-				email = :email,
-				owner_contact_number = :owner_contact_number,
-				owner_name = :owner_name,
-				temperature_sensation = :temperature_sensation,
-				bubbles = :bubbles,
-				details = :details,
-				current_usage = :current_usage,
-				latitude = :latitude,
-				longitude = :longitude,
-				updated_at = NOW()
-			WHERE id = :id AND created_by = :user_id
+				UPDATE analysis_requests SET
+						region_id               = :region_id,
+						email                   = :email,
+						owner_contact_number    = :owner_contact_number,
+						owner_name              = :owner_name,
+						temperature_sensation   = :temperature_sensation,
+						bubbles                 = :bubbles,
+						details                 = :details,
+						current_usage           = :current_usage,
+						latitude                = :latitude,
+						longitude               = :longitude
+				WHERE id = :id AND created_by = :user_id
 		';
 
 		$stmt = $this->pdo->prepare($sql);
 		$stmt->execute([
-			':region_id' => $dto->region,
-			':email' => $dto->email,
-			':owner_contact_number' => $dto->owner_contact_number,
-			':owner_name' => $dto->owner_name,
-			':temperature_sensation' => $dto->temperature_sensation,
-			':bubbles' => $dto->bubbles ? 1 : 0,
-			':details' => $dto->details,
-			':current_usage' => $dto->current_usage,
-			':latitude' => $dto->latitude,
-			':longitude' => $dto->longitude,
-			':id' => $id,
-			':user_id' => $userId
+				':region_id'             => $dto->region,
+				':email'                 => $dto->email,
+				':owner_contact_number'  => $dto->owner_contact_number,
+				':owner_name'            => $dto->owner_name,
+				':temperature_sensation' => $dto->temperature_sensation,
+				':bubbles'               => $dto->bubbles ? 1 : 0,
+				':details'               => $dto->details,
+				':current_usage'         => $dto->current_usage,
+				':latitude'              => $dto->latitude,
+				':longitude'             => $dto->longitude,
+				':id'                    => $id,
+				':user_id'               => $userId
 		]);
 	}
 
