@@ -21,54 +21,37 @@ fun RequestsContent(
   onEdit: (AnalysisRequestRemote) -> Unit,
   onDelete: (AnalysisRequestRemote) -> Unit
 ) {
-  
-  Scaffold(
-    topBar = {
-      Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)) {
-        Text(
-          text = "Mis Solicitudes",
-          style = MaterialTheme.typography.headlineMedium,
-          fontWeight = FontWeight.Bold,
-          color = MaterialTheme.colorScheme.secondary
-        )
+  Column(
+    modifier = modifier
+      .fillMaxSize()
+  ) {
+    // 1. Estado de Carga: Centrado en el espacio disponible si la lista está vacía
+    if (state.isLoading && state.requests.isEmpty()) {
+      Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator()
       }
     }
-  ) { paddingValues ->
 
-    Column(
-      modifier = Modifier
-        .fillMaxSize()
-        .padding(paddingValues)
+    state.errorMessage?.let {
+      Text(
+        text = it,
+        color = MaterialTheme.colorScheme.error,
+        modifier = Modifier.padding(16.dp)
+      )
+    }
+
+    LazyColumn(
+      contentPadding = PaddingValues(bottom = 32.dp, start = 16.dp, end = 16.dp, top = 16.dp),
+      verticalArrangement = Arrangement.spacedBy(16.dp),
+      modifier = Modifier.weight(1f).fillMaxWidth()
     ) {
-
-      // 1. Estado de Carga: Centrado en el espacio disponible si la lista está vacía
-      if (state.isLoading && state.requests.isEmpty()) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-          CircularProgressIndicator()
-        }
-      }
-
-      state.errorMessage?.let {
-        Text(
-          text = it,
-          color = MaterialTheme.colorScheme.error,
-          modifier = Modifier.padding(16.dp)
+      items(state.requests, key = { it.id }) { request ->
+        RequestCardItem(
+          request = request,
+          onView = { onView(request) },
+          onEdit = { onEdit(request) },
+          onDelete = { onDelete(request) }
         )
-      }
-
-      LazyColumn(
-        contentPadding = PaddingValues(bottom = 32.dp, start = 16.dp, end = 16.dp, top = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.weight(1f).fillMaxWidth()
-      ) {
-        items(state.requests, key = { it.id }) { request ->
-          RequestCardItem(
-            request = request,
-            onView = { onView(request) },
-            onEdit = { onEdit(request) },
-            onDelete = { onDelete(request) }
-          )
-        }
       }
     }
   }

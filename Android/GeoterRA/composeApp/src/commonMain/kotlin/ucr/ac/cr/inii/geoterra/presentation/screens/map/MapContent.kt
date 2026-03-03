@@ -37,13 +37,14 @@ import ucr.ac.cr.inii.geoterra.presentation.components.map.UserLocationInfoPanel
 
 @Composable
 fun MapContent(
+  modifier: Modifier = Modifier,
   state: MapState,
   onManifestationMarkerClick: (String) -> Unit,
   onUserMarkerClick: () -> Unit,
   onDetailsClick: (ManifestationRemote) -> Unit,
   onDismissPanel: () -> Unit
 ) {
-  Box(modifier = Modifier.fillMaxSize()) {
+  Box(modifier = modifier.fillMaxSize()) {
     
     val markerIcon = painterResource(Res.drawable.ic_marker)
     

@@ -49,6 +49,7 @@ import ucr.ac.cr.inii.geoterra.presentation.components.layout.PasswordField
 
 @Composable
 fun RegisterContent(
+  modifier: Modifier = Modifier,
   state: RegisterState,
   onEvent: RegisterViewModel,
   onBack: () -> Unit
@@ -62,118 +63,98 @@ fun RegisterContent(
     }
   }
 
-  Scaffold(
-    modifier = Modifier.fillMaxSize(),
-    containerColor = MaterialTheme.colorScheme.background,
-    snackbarHost = { SnackbarHost(snackbarHostState) },
-    topBar = {
-      Row(
-        modifier = Modifier
-          .fillMaxWidth()
-          .statusBarsPadding()
-          .height(32.dp)
-          .padding(horizontal = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-      ) {
-        AdaptiveBackButton(onBack = onBack)
-      }
-    }
-  ) { padding ->
-    Column(
-      modifier = Modifier
-        .fillMaxSize()
-        .padding(padding)
-        .padding(horizontal = 32.dp)
-        .imePadding()
-        .verticalScroll(rememberScrollState()),
-      horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.Center
+  Column(
+    modifier = modifier
+      .fillMaxSize()
+      .padding(horizontal = 32.dp)
+      .imePadding()
+      .verticalScroll(rememberScrollState()),
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.Center
+  ) {
+    Spacer(modifier = Modifier.height(48.dp))
+
+    Image(
+      painter = painterResource(Res.drawable.logo_GeoterRA),
+      contentDescription = null,
+      modifier = Modifier.height(80.dp).padding(bottom = 32.dp)
+    )
+
+    Surface(
+      modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+      shape = RoundedCornerShape(32.dp),
+      color = MaterialTheme.colorScheme.surface,
     ) {
-      Spacer(modifier = Modifier.height(48.dp))
-
-      Image(
-        painter = painterResource(Res.drawable.logo_GeoterRA),
-        contentDescription = null,
-        modifier = Modifier.height(80.dp).padding(bottom = 32.dp)
-      )
-
-      Surface(
-        modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-        shape = RoundedCornerShape(32.dp),
-        color = MaterialTheme.colorScheme.surface,
+      Column(
+        modifier = Modifier.padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
       ) {
-        Column(
-          modifier = Modifier.padding(24.dp),
-          horizontalAlignment = Alignment.CenterHorizontally,
-          verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-          Text(
-            text = "Crear Cuenta",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.ExtraBold
+        Text(
+          text = "Crear Cuenta",
+          style = MaterialTheme.typography.headlineSmall,
+          fontWeight = FontWeight.ExtraBold
+        )
+
+        FormSection {
+          CustomTextField(
+            value = state.name,
+            onValueChange = onEvent::onNameChanged,
+            label = "Nombre",
+            isError = state.nameError != null,
+            errorMessage = state.nameError
           )
+          CustomTextField(
+            value = state.lastname,
+            onValueChange = onEvent::onLastnameChanged,
+            label = "Apellidos"
+          )
+          CustomTextField(
+            value = state.email,
+            onValueChange = onEvent::onEmailChanged,
+            label = "Correo Electrónico",
+            keyboardType = KeyboardType.Email,
+            isError = state.emailError != null,
+            errorMessage = state.emailError
+          )
+          CustomTextField(
+            value = state.phoneNumber,
+            onValueChange = onEvent::onPhoneChanged,
+            label = "Teléfono (Opcional)",
+            keyboardType = KeyboardType.Phone
+          )
+          PasswordField(
+            value = state.password,
+            onValueChange = onEvent::onPasswordChanged,
+            label = "Contraseña",
+            isVisible = state.isPasswordVisible,
+            onToggleVisibility = onEvent::togglePasswordVisibility,
+            isError = state.passwordError != null,
+            errorMessage = state.passwordError
+          )
+          PasswordField(
+            value = state.confirmPassword,
+            onValueChange = onEvent::onConfirmPasswordChanged,
+            label = "Confirmar Contraseña",
+            isVisible = state.isPasswordVisible,
+            onToggleVisibility = onEvent::togglePasswordVisibility
+          )
+        }
 
-          FormSection {
-            CustomTextField(
-              value = state.name,
-              onValueChange = onEvent::onNameChanged,
-              label = "Nombre",
-              isError = state.nameError != null,
-              errorMessage = state.nameError
-            )
-            CustomTextField(
-              value = state.lastname,
-              onValueChange = onEvent::onLastnameChanged,
-              label = "Apellidos"
-            )
-            CustomTextField(
-              value = state.email,
-              onValueChange = onEvent::onEmailChanged,
-              label = "Correo Electrónico",
-              keyboardType = KeyboardType.Email,
-              isError = state.emailError != null,
-              errorMessage = state.emailError
-            )
-            CustomTextField(
-              value = state.phoneNumber,
-              onValueChange = onEvent::onPhoneChanged,
-              label = "Teléfono (Opcional)",
-              keyboardType = KeyboardType.Phone
-            )
-            PasswordField(
-              value = state.password,
-              onValueChange = onEvent::onPasswordChanged,
-              label = "Contraseña",
-              isVisible = state.isPasswordVisible,
-              onToggleVisibility = onEvent::togglePasswordVisibility,
-              isError = state.passwordError != null,
-              errorMessage = state.passwordError
-            )
-            PasswordField(
-              value = state.confirmPassword,
-              onValueChange = onEvent::onConfirmPasswordChanged,
-              label = "Confirmar Contraseña",
-              isVisible = state.isPasswordVisible,
-              onToggleVisibility = onEvent::togglePasswordVisibility
-            )
-          }
+        Button(
+          onClick = { onEvent.register(onBack) },
+          modifier = Modifier.fillMaxWidth().height(56.dp),
+          shape = RoundedCornerShape(16.dp),
+          enabled = !state.isLoading
+        ) {
+          if (state.isLoading) CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
+          else Text("REGISTRARME", fontWeight = FontWeight.Bold)
+        }
 
-          Button(
-            onClick = { onEvent.register(onBack) },
-            modifier = Modifier.fillMaxWidth().height(56.dp),
-            shape = RoundedCornerShape(16.dp),
-            enabled = !state.isLoading
-          ) {
-            if (state.isLoading) CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
-            else Text("REGISTRARME", fontWeight = FontWeight.Bold)
-          }
-
-          TextButton(onClick = onBack) {
-            Text("¿Ya tienes cuenta? Inicia sesión", color = MaterialTheme.colorScheme.onSurface)
-          }
+        TextButton(onClick = onBack) {
+          Text("¿Ya tienes cuenta? Inicia sesión", color = MaterialTheme.colorScheme.onSurface)
         }
       }
-      Spacer(modifier = Modifier.height(48.dp))
     }
   }
 }
