@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -21,14 +22,9 @@ fun AdaptiveBackButton(
   val platform = getPlatform()
 
   if (platform.isIOS) {
-    FilledIconButton(
+    IconButton(
       onClick = onBack,
       modifier = modifier.size(45.dp),
-      colors = IconButtonDefaults.filledIconButtonColors(
-        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
-        contentColor = MaterialTheme.colorScheme.primary
-      ),
-      shape = RoundedCornerShape(12.dp)
     ) {
       Icon(
         imageVector = Icons.Default.ArrowBackIosNew,

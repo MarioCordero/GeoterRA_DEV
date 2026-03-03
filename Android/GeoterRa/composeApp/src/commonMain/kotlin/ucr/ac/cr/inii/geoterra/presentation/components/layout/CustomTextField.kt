@@ -43,6 +43,8 @@ fun CustomTextField(
     readOnly = readOnly,
     colors = OutlinedTextFieldDefaults.colors(
       focusedBorderColor = MaterialTheme.colorScheme.primary,
+      unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+      unfocusedTextColor = MaterialTheme.colorScheme.outline,
       errorBorderColor = MaterialTheme.colorScheme.error
     )
   )

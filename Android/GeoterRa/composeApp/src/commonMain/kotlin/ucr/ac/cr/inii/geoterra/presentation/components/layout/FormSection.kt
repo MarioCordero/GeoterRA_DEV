@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,33 +25,44 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun FormSection(title: String, icon: ImageVector, content: @Composable ColumnScope.() -> Unit) {
+fun FormSection(
+  title: String? = null,
+  icon: ImageVector? = null,
+  content: @Composable ColumnScope.() -> Unit
+) {
   Column(modifier = Modifier.fillMaxWidth()) {
-    Row(
-      verticalAlignment = Alignment.CenterVertically,
-      modifier = Modifier.padding(bottom = 8.dp)
-    ) {
-      Icon(
-        icon,
-        contentDescription = null,
-        tint = Color(0xFFF57C00),
-        modifier = Modifier.size(20.dp)
-      )
-      Spacer(Modifier.width(8.dp))
-      Text(text = title, fontWeight = FontWeight.Bold, color = Color(0xFF1A237E), fontSize = 16.sp)
-    }
-    Card(
-      modifier = Modifier.fillMaxWidth(),
-      colors = CardDefaults.cardColors(containerColor = Color.White),
-      elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-      shape = RoundedCornerShape(16.dp)
-    ) {
-      Column(
-        modifier = Modifier.padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+    if (title != null || icon != null) {
+      Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(bottom = 8.dp)
       ) {
-        content()
+        if (icon != null) {
+          Icon(
+            icon,
+            contentDescription = null,
+            tint = Color(0xFFF57C00),
+            modifier = Modifier.size(20.dp)
+          )
+        }
+        if (title != null) {
+          if (icon != null) Spacer(Modifier.width(8.dp))
+          Text(
+            text = title,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = 16.sp
+          )
+        }
       }
+    }
+
+    Column(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(if (title == null && icon == null) 0.dp else 16.dp),
+      verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+      content()
     }
   }
 }

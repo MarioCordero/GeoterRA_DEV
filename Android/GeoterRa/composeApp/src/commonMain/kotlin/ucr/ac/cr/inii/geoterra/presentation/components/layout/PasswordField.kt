@@ -51,7 +51,10 @@ fun PasswordField(
     },
     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
     colors = OutlinedTextFieldDefaults.colors(
-      focusedBorderColor = MaterialTheme.colorScheme.primary
+      focusedBorderColor = MaterialTheme.colorScheme.primary,
+      unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+      unfocusedTextColor = MaterialTheme.colorScheme.outline,
+      errorBorderColor = MaterialTheme.colorScheme.error
     )
   )
 }

@@ -20,6 +20,7 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.manifestation.ManifestationDetailViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.map.MapViewModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.register.RegisterViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.request.RequestViewModel
 
 val appModule = module {
@@ -29,6 +30,8 @@ val appModule = module {
   factory { ManifestationDetailViewModel(get()) }
   factory { AccountViewModel(get(), get()) }
   factory { LoginViewModel(get(), get()) }
+  factory { RegisterViewModel(get()) }
+
   factory { RequestViewModel(get()) }
   factory { params ->
     AnalysisFormViewModel(

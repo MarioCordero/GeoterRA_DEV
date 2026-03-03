@@ -10,6 +10,7 @@ import geoterra.composeapp.generated.resources.ic_account
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import androidx.compose.runtime.getValue
+import cafe.adriel.voyager.navigator.Navigator
 import ucr.ac.cr.inii.geoterra.presentation.auth.AuthViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountContent
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountScreen
@@ -17,20 +18,23 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginContent
 import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginScreen
 import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginViewModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.map.MapScreen
 
 object AccountTab : Tab {
-  
+
   @Composable
   override fun Content() {
     val authViewModel = koinInject<AuthViewModel>()
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
-    
-    Crossfade(targetState = isLoggedIn) { authenticated ->
-      if (authenticated == true) {
-        AccountScreen().Content()
-      } else {
-        LoginScreen().Content()
-      }
+
+    val rootScreen = if (isLoggedIn == true) {
+      AccountScreen()
+    } else {
+      LoginScreen()
+    }
+
+    Crossfade(targetState = rootScreen) { screen ->
+      Navigator(screen)
     }
   }
   

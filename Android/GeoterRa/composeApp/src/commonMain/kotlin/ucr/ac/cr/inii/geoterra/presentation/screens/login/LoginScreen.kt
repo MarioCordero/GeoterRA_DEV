@@ -7,15 +7,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import org.koin.compose.koinInject
 import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeContent
 import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeViewModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.register.RegisterScreen
 
 /**
  * Voyager Screen for the Login screen.
@@ -24,17 +24,16 @@ class LoginScreen : Screen {
   
   @Composable
   override fun Content() {
-    // Inyectamos el ViewModel correcto para esta pantalla
     val viewModel: LoginViewModel = koinInject()
-    // Observamos el estado del login
     val state by viewModel.state.collectAsState()
-    
-    // Llamamos al componente UI (LoginContent)
+    val navigator = LocalNavigator.currentOrThrow
+
     LoginContent(
       state = state,
       onEmailChanged = viewModel::onEmailChanged,
       onPasswordChanged = viewModel::onPasswordChanged,
       onLoginClick = viewModel::login,
+      onRegisterClick = { navigator.push(RegisterScreen()) },
       onTogglePassword = viewModel::togglePasswordVisibility,
       onDismissSnackbar = viewModel::dismissSnackbar
     )

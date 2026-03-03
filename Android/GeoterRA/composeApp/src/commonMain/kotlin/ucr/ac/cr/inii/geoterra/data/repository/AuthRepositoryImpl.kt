@@ -18,6 +18,7 @@ import ucr.ac.cr.inii.geoterra.data.model.remote.LoginResponse
 import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenRequest
 import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenResponse
 import ucr.ac.cr.inii.geoterra.data.model.remote.RegisterRequest
+import ucr.ac.cr.inii.geoterra.data.model.remote.RegisterResponse
 import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepository
 
 class AuthRepositoryImpl(
@@ -48,13 +49,13 @@ class AuthRepositoryImpl(
       }
 
       if (response.status.isSuccess()) {
-        val envelope = response.body<ApiResponseModel<LoginResponse>>()
+        val envelope = response.body<ApiResponseModel<RegisterResponse>>()
         if (envelope.data != null) {
           return Result.success(Unit)
         }
       }
 
-      val errorEnvelope = response.body<ApiResponseModel<LoginResponse>>()
+      val errorEnvelope = response.body<ApiResponseModel<RegisterResponse>>()
       val firstError = errorEnvelope.errors.firstOrNull()
       val friendlyMessage = firstError?.let { ErrorMapper.mapCodeToMessage(it.code) }
         ?: "Error inesperado (${response.status.value})"
