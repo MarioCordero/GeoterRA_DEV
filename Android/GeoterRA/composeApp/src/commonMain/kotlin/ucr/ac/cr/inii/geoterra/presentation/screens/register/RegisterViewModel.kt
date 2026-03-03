@@ -22,7 +22,6 @@ class RegisterViewModel(
   fun register(onSuccess: () -> Unit) {
     val s = state.value
 
-    // Validaciones básicas
     if (s.name.isBlank()) return updateState { it.copy(nameError = "Requerido") }
     if (s.email.isBlank() || !s.email.contains("@")) return updateState { it.copy(emailError = "Email inválido") }
     if (s.password.length < 8) return updateState { it.copy(passwordError = "Mínimo 8 caracteres") }
@@ -45,7 +44,12 @@ class RegisterViewModel(
           onSuccess()
         }
         .onFailure { error ->
-          updateState { it.copy(isLoading = false, snackbarMessage = error.message) }
+          updateState {
+            it.copy(
+              isLoading = false,
+              snackbarMessage = error.message ?: "Ocurrió un error inesperado"
+            )
+          }
         }
     }
   }

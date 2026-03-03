@@ -11,6 +11,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
@@ -21,7 +23,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import org.koin.compose.koinInject
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
 import ucr.ac.cr.inii.geoterra.presentation.components.analysisform.RequestDetailSheet
 import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisFormScreen
@@ -33,9 +34,21 @@ class RequestsScreen : Screen {
     val viewModel = getScreenModel<RequestViewModel>()
     val state by viewModel.state.collectAsState()
     val navigator = LocalNavigator.currentOrThrow
-    
+
+    val snackbarHostState = remember { SnackbarHostState() }
     var selectedRequest by remember { mutableStateOf<AnalysisRequestRemote?>(null) }
     val sheetState = rememberModalBottomSheetState()
+
+    LaunchedEffect(Unit) {
+      viewModel.fetchSubmittedRequests()
+    }
+
+    LaunchedEffect(state.snackBarMessage) {
+      state.snackBarMessage?.let {
+        snackbarHostState.showSnackbar(it)
+        viewModel.dismissSnackBar()
+      }
+    }
 
     if (selectedRequest != null) {
       ModalBottomSheet(
@@ -49,6 +62,7 @@ class RequestsScreen : Screen {
     }
     
     Scaffold(
+      snackbarHost = { SnackbarHost(snackbarHostState) },
       floatingActionButton = {
         FloatingActionButton(
           onClick = { navigator.push(AnalysisFormScreen()) },
@@ -61,7 +75,7 @@ class RequestsScreen : Screen {
       topBar = {
         Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)) {
           Text(
-            text = "Mis Solicitudes",
+            text = "Solicitudes",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.secondary

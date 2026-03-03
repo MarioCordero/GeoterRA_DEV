@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.domain.repository.UserRepository
 import ucr.ac.cr.inii.geoterra.presentation.auth.AuthViewModel
+import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisFormState
 
 class AccountViewModel(
   private val userRepository: UserRepository,
   private val authViewModel: AuthViewModel
-) : ScreenModel {
-  private val _state = MutableStateFlow(AccountState())
-  val state = _state.asStateFlow()
+) : BaseScreenModel<AccountState>(AccountState()) {
   
   init {
     loadUserProfile()

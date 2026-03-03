@@ -8,8 +8,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +29,7 @@ import geoterra.composeapp.generated.resources.logo_GeoterRA
 import geoterra.composeapp.generated.resources.rocks
 import org.jetbrains.compose.resources.painterResource
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.StepItem
+import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisFormEvent
 
 /**
  * Pure UI composable for Home screen.
@@ -46,7 +49,6 @@ fun HomeContent(
       .background(MaterialTheme.colorScheme.background)
       .verticalScroll(scrollState)
   ) {
-    // --- SECCIÓN 1: HERO (Encabezado Impactante) ---
     Box(
       modifier = Modifier
         .fillMaxWidth()
@@ -58,7 +60,6 @@ fun HomeContent(
         contentScale = ContentScale.Crop,
         modifier = Modifier.fillMaxSize()
       )
-      // Degradado para que el texto sea legible sobre la imagen
       Box(
         modifier = Modifier
           .fillMaxSize()
@@ -88,7 +89,6 @@ fun HomeContent(
       }
     }
     
-    // --- SECCIÓN 2: INTRODUCCIÓN Y BOTÓN ACCIÓN ---
     Column(modifier = Modifier.padding(24.dp)) {
       Text(
         text = state.description,
@@ -99,14 +99,23 @@ fun HomeContent(
       Spacer(modifier = Modifier.height(24.dp))
       Button(
         onClick = onCardMapClick,
-        modifier = Modifier.fillMaxWidth().height(56.dp),
-        shape = RoundedCornerShape(12.dp)
+        modifier = Modifier
+          .fillMaxWidth()
+          .height(58.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = ButtonDefaults.buttonColors(
+          containerColor = MaterialTheme.colorScheme.primary,
+          contentColor = MaterialTheme.colorScheme.onPrimary
+        ),
+        elevation = ButtonDefaults.buttonElevation(
+          defaultElevation = 4.dp,
+          pressedElevation = 0.dp
+        ),
       ) {
         Text("Ver mapa interactivo", fontSize = 18.sp)
       }
     }
     
-    // --- SECCIÓN 3: CÓMO FUNCIONA (Pasos) ---
     SectionTitle("Cómo funciona")
     
     StepItem(
@@ -127,7 +136,6 @@ fun HomeContent(
     
     Spacer(modifier = Modifier.height(32.dp))
     
-    // --- SECCIÓN 4: ACERCA DE NOSOTROS (Card con profundidad) ---
     Card(
       modifier = Modifier.padding(16.dp),
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -149,11 +157,10 @@ fun HomeContent(
       }
     }
     
-    // --- SECCIÓN 5: FOOTER (Información de contacto) ---
     Box(
       modifier = Modifier
         .fillMaxWidth()
-        .background(Color(0xFF1C1B1F)) // Fondo oscuro para el footer
+        .background(Color(0xFF1C1B1F))
         .padding(24.dp)
     ) {
       Column {

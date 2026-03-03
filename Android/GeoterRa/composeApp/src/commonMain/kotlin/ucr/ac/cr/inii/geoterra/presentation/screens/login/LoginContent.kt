@@ -56,164 +56,150 @@ import ucr.ac.cr.inii.geoterra.presentation.components.layout.PasswordField
 
 @Composable
 fun LoginContent(
+  modifier: Modifier,
   state: LoginState,
   onEmailChanged: (String) -> Unit,
   onPasswordChanged: (String) -> Unit,
   onLoginClick: () -> Unit,
   onRegisterClick: () -> Unit,
   onTogglePassword: () -> Unit,
-  onDismissSnackbar: () -> Unit,
 ) {
-  val snackbarHostState = remember { SnackbarHostState() }
 
-  LaunchedEffect(state.snackbarMessage) {
-    state.snackbarMessage?.let {
-      snackbarHostState.showSnackbar(message = it)
-      onDismissSnackbar()
-    }
-  }
+  Box(modifier = modifier.fillMaxSize()) {
+    Image(
+      painter = painterResource(Res.drawable.rocks),
+      contentDescription = null,
+      contentScale = ContentScale.Crop,
+      modifier = Modifier.fillMaxSize()
+    )
 
-  Scaffold(
-    modifier = Modifier.fillMaxSize(),
-    containerColor = Color.Transparent,
-    snackbarHost = { SnackbarHost(snackbarHostState) }
-  ) { padding ->
-    Box(modifier = Modifier.fillMaxSize()) {
-      Image(
-        painter = painterResource(Res.drawable.rocks),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier = Modifier.fillMaxSize()
-      )
-
-      Box(
-        modifier = Modifier
-          .fillMaxSize()
-          .background(
-            Brush.verticalGradient(
-              colors = listOf(
-                Color.Black.copy(alpha = 0.3f),
-                Color.Black.copy(alpha = 0.7f)
-              )
+    Box(
+      modifier = Modifier
+        .fillMaxSize()
+        .background(
+          Brush.verticalGradient(
+            colors = listOf(
+              Color.Black.copy(alpha = 0.3f),
+              Color.Black.copy(alpha = 0.7f)
             )
           )
+        )
+    )
+
+    Column(
+      modifier = Modifier
+        .fillMaxSize()
+        .padding(horizontal = 32.dp)
+        .imePadding()
+        .verticalScroll(rememberScrollState()),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center
+    ) {
+
+      Image(
+        painter = painterResource(Res.drawable.logo_GeoterRA),
+        contentDescription = "GeoterRA Logo",
+        modifier = Modifier
+          .height(100.dp)
+          .padding(bottom = 48.dp)
       )
 
-      Column(
-        modifier = Modifier
-          .fillMaxSize()
-          .padding(horizontal = 32.dp)
-          .imePadding()
-          .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+      Surface(
+        modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+        shape = RoundedCornerShape(32.dp),
+        color = MaterialTheme.colorScheme.background,
+        tonalElevation = 8.dp,
+        shadowElevation = 12.dp
       ) {
-
-        Image(
-          painter = painterResource(Res.drawable.logo_GeoterRA),
-          contentDescription = "GeoterRA Logo",
-          modifier = Modifier
-            .height(100.dp)
-            .padding(bottom = 48.dp)
-        )
-
-        Surface(
-          modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-          shape = RoundedCornerShape(32.dp),
-          color = MaterialTheme.colorScheme.background,
-          tonalElevation = 8.dp,
-          shadowElevation = 12.dp
+        Column(
+          modifier = Modifier.padding(24.dp),
+          horizontalAlignment = Alignment.CenterHorizontally
         ) {
-          Column(
-            modifier = Modifier.padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+
+          Text(
+            text = "Bienvenido de nuevo",
+            style = MaterialTheme.typography.headlineSmall.copy(
+              fontWeight = FontWeight.ExtraBold,
+              letterSpacing = (-0.5).sp
+            ),
+            color = MaterialTheme.colorScheme.onSurface
+          )
+
+          Text(
+            text = "Ingresa tus credenciales para continuar",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(bottom = 24.dp)
+          )
+
+          FormSection() {
+            CustomTextField(
+              value = state.email,
+              onValueChange = onEmailChanged,
+              label = "Correo Electrónico",
+              keyboardType = KeyboardType.Email,
+              isError = state.emailError != null,
+              errorMessage = state.emailError,
+              modifier = Modifier.fillMaxWidth()
+            )
+
+            PasswordField(
+              value = state.password,
+              onValueChange = onPasswordChanged,
+              label = "Contraseña",
+              isVisible = state.isPasswordVisible,
+              onToggleVisibility = onTogglePassword,
+              isError = state.passwordError != null,
+              errorMessage = state.passwordError,
+              modifier = Modifier.fillMaxWidth()
+            )
+          }
+
+          TextButton(
+            onClick = { onRegisterClick() },
           ) {
-
             Text(
-              text = "Bienvenido de nuevo",
-              style = MaterialTheme.typography.headlineSmall.copy(
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = (-0.5).sp
-              ),
-              color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Text(
-              text = "Ingresa tus credenciales para continuar",
-              style = MaterialTheme.typography.bodySmall,
+              "¿No tienes cuenta? Regístrate aquí",
               color = MaterialTheme.colorScheme.onSurface,
-              modifier = Modifier.padding(bottom = 24.dp)
+              style = MaterialTheme.typography.bodyMedium
             )
+          }
 
-            FormSection() {
-              CustomTextField(
-                value = state.email,
-                onValueChange = onEmailChanged,
-                label = "Correo Electrónico",
-                keyboardType = KeyboardType.Email,
-                isError = state.emailError != null,
-                errorMessage = state.emailError,
-                modifier = Modifier.fillMaxWidth()
+          Button(
+            onClick = onLoginClick,
+            modifier = Modifier
+              .fillMaxWidth()
+              .height(58.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.buttonColors(
+              containerColor = MaterialTheme.colorScheme.primary,
+              contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+            elevation = ButtonDefaults.buttonElevation(
+              defaultElevation = 4.dp,
+              pressedElevation = 0.dp
+            ),
+            enabled = !state.isLoading
+          ) {
+            if (state.isLoading) {
+              CircularProgressIndicator(
+                modifier = Modifier.size(24.dp),
+                color = MaterialTheme.colorScheme.onPrimary,
+                strokeWidth = 3.dp
               )
-
-              PasswordField(
-                value = state.password,
-                onValueChange = onPasswordChanged,
-                label = "Contraseña",
-                isVisible = state.isPasswordVisible,
-                onToggleVisibility = onTogglePassword,
-                isError = state.passwordError != null,
-                errorMessage = state.passwordError,
-                modifier = Modifier.fillMaxWidth()
-              )
-            }
-
-            TextButton(
-              onClick = { onRegisterClick() },
-            ) {
-              Text(
-                "¿No tienes cuenta? Regístrate aquí",
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.bodyMedium
-              )
-            }
-
-            Button(
-              onClick = onLoginClick,
-              modifier = Modifier
-                .fillMaxWidth()
-                .height(58.dp),
-              shape = RoundedCornerShape(16.dp),
-              colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-              ),
-              elevation = ButtonDefaults.buttonElevation(
-                defaultElevation = 4.dp,
-                pressedElevation = 0.dp
-              ),
-              enabled = !state.isLoading
-            ) {
-              if (state.isLoading) {
-                CircularProgressIndicator(
-                  modifier = Modifier.size(24.dp),
-                  color = MaterialTheme.colorScheme.onPrimary,
-                  strokeWidth = 3.dp
-                )
-              } else {
-                Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                  Text(
-                    "INGRESAR",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                      fontWeight = FontWeight.Bold,
-                      letterSpacing = 1.2.sp
-                    )
+            } else {
+              Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+              ) {
+                Text(
+                  "INGRESAR",
+                  style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.2.sp
                   )
-                  Icon(Icons.Default.ArrowForward, contentDescription = null)
-                }
+                )
+                Icon(Icons.Default.ArrowForward, contentDescription = null)
               }
             }
           }

@@ -13,6 +13,8 @@ import ucr.ac.cr.inii.geoterra.domain.camera.CameraManager
 import ucr.ac.cr.inii.geoterra.domain.location.LocationProvider
 import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
 import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepository
+import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.request.RequestState
 
 class AnalysisFormViewModel(
   private val repository: AnalysisRequestRepository,
@@ -20,24 +22,9 @@ class AnalysisFormViewModel(
   private val cameraManager: CameraManager,
   private val locationProvider: LocationProvider,
   private val permissionManager: PermissionManager
-) : ScreenModel {
-  
-  private val _state = MutableStateFlow(
-    AnalysisFormState(
-      isEditing = initialRequest != null,
-      region = initialRequest?.region ?: "",
-      email = initialRequest?.email ?: "",
-      ownerName = initialRequest?.owner_name ?: "",
-      ownerContact = initialRequest?.owner_contact_number ?: "",
-      currentUsage = initialRequest?.current_usage ?: "",
-      temperatureSensation = initialRequest?.temperature_sensation ?: "",
-      bubbles = initialRequest?.bubbles == 1,
-      details = initialRequest?.details ?: "",
-      latitude = initialRequest?.latitude ?: "",
-      longitude = initialRequest?.longitude ?: ""
-    )
-  )
-  val state = _state.asStateFlow()
+) : BaseScreenModel<AnalysisFormState>(AnalysisFormState()) {
+
+  fun dismissSnackBar() = _state.update { it.copy(snackBarMessage = null) }
   
   fun onEvent(event: AnalysisFormEvent) {
     when (event) {
@@ -72,17 +59,17 @@ class AnalysisFormViewModel(
             )
           }
         } else {
-          _state.update { it.copy(error = "No se obtuvo señal GPS", isLoading = false) }
+          _state.update { it.copy(snackBarMessage = "No se obtuvo señal GPS", isLoading = false) }
         }
       } else {
-        _state.update { it.copy(error = "Permiso de ubicación denegado por el usuario") }
+        _state.update { it.copy(snackBarMessage = "Permiso de ubicación denegado por el usuario") }
       }
     }
   }
   
   private fun submitForm() {
     screenModelScope.launch {
-      _state.update { it.copy(isLoading = true, error = null) }
+      _state.update { it.copy(isLoading = true, snackBarMessage = null) }
       
       val form = AnalysisRequestFormRemote(
         region = _state.value.region,
@@ -106,17 +93,17 @@ class AnalysisFormViewModel(
       result.onSuccess {
         _state.update { it.copy(isSuccess = true, isLoading = false) }
       }.onFailure { e ->
-        _state.update { it.copy(error = e.message, isLoading = false) }
+        _state.update { it.copy(snackBarMessage = e.message, isLoading = false) }
       }
     }
   }
   
   fun pickPhoto() {
     screenModelScope.launch {
-      _state.update { it.copy(isLoading = true, error = null) }
+      _state.update { it.copy(isLoading = true, snackBarMessage = null) }
       
       if (!permissionManager.requestGalleryPermission()) {
-        _state.update { it.copy(isLoading = false, error = "Permiso de galería denegado") }
+        _state.update { it.copy(isLoading = false, snackBarMessage = "Permiso de galería denegado") }
         return@launch
       }
       
@@ -130,12 +117,12 @@ class AnalysisFormViewModel(
             latitude = location.latitude.toString(),
             longitude = location.longitude.toString(),
             isLoading = false,
-            error = null
+            snackBarMessage = null
           )}
         } else {
           _state.update { it.copy(
             isLoading = false,
-            error = "La foto no tiene GPS. Asegúrate de que la cámara tenga activada la ubicación."
+            snackBarMessage = "La foto no tiene GPS. Asegúrate de que la cámara tenga activada la ubicación."
           )}
         }
       } else {
@@ -146,19 +133,19 @@ class AnalysisFormViewModel(
   
   private fun takePhoto() {
     screenModelScope.launch {
-      _state.update { it.copy(isLoading = true, error = null) }
+      _state.update { it.copy(isLoading = true, snackBarMessage = null) }
 
       val location = locationProvider.observeLocation().firstOrNull()
 
       val cameraGranted = permissionManager.requestCameraPermission()
       if (!cameraGranted) {
-        _state.update { it.copy(isLoading = false, error = "Permiso de cámara denegado") }
+        _state.update { it.copy(isLoading = false, snackBarMessage = "Permiso de cámara denegado") }
         return@launch
       }
       
       val galleryGranted = permissionManager.requestGalleryPermission()
       if (!galleryGranted) {
-        _state.update { it.copy(isLoading = false, error = "Permiso de galería denegado") }
+        _state.update { it.copy(isLoading = false, snackBarMessage = "Permiso de galería denegado") }
         return@launch
       }
       
@@ -184,7 +171,7 @@ class AnalysisFormViewModel(
         longitude = location.longitude.toString()
       )}
     } else {
-      _state.update { it.copy(error = "La imagen no contiene metadatos GPS") }
+      _state.update { it.copy(snackBarMessage = "La imagen no contiene metadatos GPS") }
     }
   }
 }

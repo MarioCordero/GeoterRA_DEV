@@ -7,14 +7,22 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.Qualifier
 import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeContent
 import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeViewModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.manifestation.ManifestationDetailViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.register.RegisterScreen
 
 /**
@@ -24,18 +32,34 @@ class LoginScreen : Screen {
   
   @Composable
   override fun Content() {
-    val viewModel: LoginViewModel = koinInject()
+    val viewModel = getScreenModel<LoginViewModel>()
     val state by viewModel.state.collectAsState()
     val navigator = LocalNavigator.currentOrThrow
 
-    LoginContent(
-      state = state,
-      onEmailChanged = viewModel::onEmailChanged,
-      onPasswordChanged = viewModel::onPasswordChanged,
-      onLoginClick = viewModel::login,
-      onRegisterClick = { navigator.push(RegisterScreen()) },
-      onTogglePassword = viewModel::togglePasswordVisibility,
-      onDismissSnackbar = viewModel::dismissSnackbar
-    )
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(state.snackbarMessage) {
+      state.snackbarMessage?.let {
+        snackbarHostState.showSnackbar(message = it)
+        viewModel.dismissSnackbar()
+      }
+    }
+
+    Scaffold(
+      modifier = Modifier.fillMaxSize(),
+      containerColor = Color.Transparent,
+      snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { padding ->
+
+      LoginContent(
+        modifier = Modifier.padding(padding),
+        state = state,
+        onEmailChanged = viewModel::onEmailChanged,
+        onPasswordChanged = viewModel::onPasswordChanged,
+        onLoginClick = viewModel::login,
+        onRegisterClick = { navigator.push(RegisterScreen()) },
+        onTogglePassword = viewModel::togglePasswordVisibility,
+      )
+    }
   }
 }

@@ -11,6 +11,8 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.maplibre.spatialk.geojson.Geometry
 
+
+
 @Serializable
 data class ManifestationRemote(
   val id : String,

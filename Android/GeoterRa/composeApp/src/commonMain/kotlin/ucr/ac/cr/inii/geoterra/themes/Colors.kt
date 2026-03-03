@@ -22,7 +22,7 @@ val LightSurface = Color(0xfff9f9fd)
 val LightOnSurface = Color(0xFF1A1C1E)
 val LightSurfaceVariant = Color(0xffebebf2)
 val LightOutline = Color(0xff74777f)
-val LightOutlineVariant = Color(0xFFC4C6CF)
+val LightOutlineVariant = Color(0xFF5D6066)
 
 // --- VARIANTES PARA MODO OSCURO (Desaturados y Luminosos) ---
 val DarkPrimary = BrandOrange

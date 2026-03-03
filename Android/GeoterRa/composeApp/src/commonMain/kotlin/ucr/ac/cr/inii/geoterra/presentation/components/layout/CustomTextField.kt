@@ -42,6 +42,10 @@ fun CustomTextField(
     minLines = minLines,
     readOnly = readOnly,
     colors = OutlinedTextFieldDefaults.colors(
+      unfocusedLabelColor = MaterialTheme.colorScheme.outline,
+      focusedLabelColor = MaterialTheme.colorScheme.primary,
+      unfocusedLeadingIconColor = MaterialTheme.colorScheme.outline,
+      focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
       focusedBorderColor = MaterialTheme.colorScheme.primary,
       unfocusedBorderColor = MaterialTheme.colorScheme.outline,
       unfocusedTextColor = MaterialTheme.colorScheme.outline,

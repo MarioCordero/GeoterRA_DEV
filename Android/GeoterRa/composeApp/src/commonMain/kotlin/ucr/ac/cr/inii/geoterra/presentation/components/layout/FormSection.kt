@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -30,11 +31,15 @@ fun FormSection(
   icon: ImageVector? = null,
   content: @Composable ColumnScope.() -> Unit
 ) {
-  Column(modifier = Modifier.fillMaxWidth()) {
+  Column(
+    modifier = Modifier
+      .wrapContentHeight()
+      .fillMaxWidth()
+  ) {
     if (title != null || icon != null) {
       Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(bottom = 8.dp)
+        modifier = Modifier.padding(bottom = 4.dp)
       ) {
         if (icon != null) {
           Icon(
@@ -59,8 +64,8 @@ fun FormSection(
     Column(
       modifier = Modifier
         .fillMaxWidth()
-        .padding(if (title == null && icon == null) 0.dp else 16.dp),
-      verticalArrangement = Arrangement.spacedBy(12.dp)
+        .padding(if (title == null && icon == null) 0.dp else 8.dp),
+      verticalArrangement = Arrangement.spacedBy(0.dp)
     ) {
       content()
     }

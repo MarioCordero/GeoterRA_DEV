@@ -26,8 +26,10 @@ import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -46,7 +48,6 @@ fun ManifestationDetailContent(
   onDownload: () -> Unit,
   onBack: () -> Unit
 ) {
-
   Column(
     modifier = modifier
       .fillMaxSize()
@@ -73,9 +74,9 @@ fun ManifestationDetailContent(
       item { ActionCard("Descargar PDF", Icons.Default.Download, Color(0xFF4CAF50)) { onDownload() } }
       item { ActionCard("Historial", Icons.Default.History, Color(0xFF9C27B0)) { /* Ver Logs */ } }
     }
-    
+
     Spacer(modifier = Modifier.height(24.dp))
-    
+
     // Field parameters section
     SectionHeader("Parámetros de Campo", Icons.Default.Terrain)
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -84,19 +85,19 @@ fun ManifestationDetailContent(
     }
     Spacer(modifier = Modifier.height(8.dp))
     DataBox(Modifier.fillMaxWidth(), "Conductividad Eléctrica", "${manifestation.field_conductivity ?: "--"} µS/cm", Icons.Default.ElectricBolt, Color(0xFF4CAF50))
-    
+
     Spacer(modifier = Modifier.height(24.dp))
-    
+
     SectionHeader("Parámetros de Laboratorio", Icons.Default.Science)
     DataBox(Modifier.fillMaxWidth(), "pH", "${manifestation.field_pH ?: "--"}", Icons.Default.Opacity, Color(0xFF2196F3))
     Spacer(modifier = Modifier.height(8.dp))
     DataBox(Modifier.fillMaxWidth(), "Conductividad Eléctrica", "${manifestation.field_conductivity ?: "--"} µS/cm", Icons.Default.ElectricBolt, Color(0xFF4CAF50))
-    
+
     Spacer(modifier = Modifier.height(24.dp))
-    
+
     // Lab Analysis section
     SectionHeader("Análisis de Laboratorio", Icons.Default.Newspaper)
-    
+
     // Cations
     ChemicalGroupCard(
       title = "Cationes Principales",
@@ -110,9 +111,9 @@ fun ManifestationDetailContent(
         "Litio (Li)" to manifestation.li
       )
     )
-    
+
     Spacer(modifier = Modifier.height(12.dp))
-    
+
     // Anions
     ChemicalGroupCard(
       title = "Aniones y Otros",
@@ -126,7 +127,7 @@ fun ManifestationDetailContent(
         "Sílice (SiO2)" to manifestation.si
       )
     )
-    
+
     Spacer(modifier = Modifier.height(32.dp))
   }
 }

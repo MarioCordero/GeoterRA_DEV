@@ -175,9 +175,16 @@ fun RequestDetailSheet(request: AnalysisRequestRemote) {
       onClick = { /* TODO: Acción de descargar */ },
       modifier = Modifier
         .fillMaxWidth()
-        .height(56.dp),
+        .height(58.dp),
       shape = RoundedCornerShape(16.dp),
-      colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+      colors = ButtonDefaults.buttonColors(
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary
+      ),
+      elevation = ButtonDefaults.buttonElevation(
+        defaultElevation = 4.dp,
+        pressedElevation = 0.dp
+      )
     ) {
       Icon(
         imageVector = Icons.Default.Download,

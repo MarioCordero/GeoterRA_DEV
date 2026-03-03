@@ -19,7 +19,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DividerDefaults.color
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -51,14 +53,13 @@ import ucr.ac.cr.inii.geoterra.presentation.components.layout.PasswordField
 fun RegisterContent(
   modifier: Modifier = Modifier,
   state: RegisterState,
+  snackBarState : SnackbarHostState,
   onEvent: RegisterViewModel,
   onBack: () -> Unit
 ) {
-  val snackbarHostState = remember { SnackbarHostState() }
-
   LaunchedEffect(state.snackbarMessage) {
-    state.snackbarMessage?.let {
-      snackbarHostState.showSnackbar(it)
+    state.snackbarMessage?.let { message ->
+      snackBarState.showSnackbar(message)
       onEvent.dismissSnackbar()
     }
   }
@@ -142,13 +143,26 @@ fun RegisterContent(
         }
 
         Button(
-          onClick = { onEvent.register(onBack) },
-          modifier = Modifier.fillMaxWidth().height(56.dp),
+          onClick = {onEvent.register(onBack)},
+          modifier = Modifier
+            .fillMaxWidth()
+            .height(58.dp),
           shape = RoundedCornerShape(16.dp),
+          colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary
+          ),
+          elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = 4.dp,
+            pressedElevation = 0.dp
+          ),
           enabled = !state.isLoading
         ) {
-          if (state.isLoading) CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
-          else Text("REGISTRARME", fontWeight = FontWeight.Bold)
+          if (state.isLoading) {
+            CircularProgressIndicator(modifier = Modifier.size(24.dp),color = Color.White)
+          } else {
+            Text("REGISTRARME", fontWeight = FontWeight.Bold)
+          }
         }
 
         TextButton(onClick = onBack) {

@@ -3,7 +3,7 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.analysisform
 data class AnalysisFormState(
   val isLoading: Boolean = false,
   val isSuccess: Boolean = false,
-  val error: String? = null,
+  val snackBarMessage: String? = null,
   val region: String = "",
   val email: String = "",
   val ownerName: String = "",

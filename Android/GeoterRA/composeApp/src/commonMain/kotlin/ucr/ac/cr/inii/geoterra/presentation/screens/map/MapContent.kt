@@ -69,6 +69,22 @@ fun MapContent(
         )
       }
     }
+
+    LaunchedEffect(state.isUserLocationSelected, state.userLocation) {
+      if (state.isUserLocationSelected) {
+        state.userLocation?.let { userLoc ->
+          cameraState.animateTo(
+            CameraPosition(
+              target = Position(
+                latitude = userLoc.latitude,
+                longitude = userLoc.longitude
+              ),
+              zoom = 14.0
+            )
+          )
+        }
+      }
+    }
     
     MaplibreMap(
       modifier = Modifier.fillMaxSize(),
@@ -187,7 +203,7 @@ fun MapContent(
       CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
     }
     
-    state.error?.let { error ->
+    state.snackBarMessage?.let { error ->
       Text(
         text = error,
         modifier = Modifier.align(Alignment.BottomCenter)

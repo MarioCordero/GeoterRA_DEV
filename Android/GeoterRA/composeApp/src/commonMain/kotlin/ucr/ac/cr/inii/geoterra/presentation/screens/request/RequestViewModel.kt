@@ -1,9 +1,6 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.request
 
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepository
@@ -19,13 +16,13 @@ class RequestViewModel(
   
   fun fetchSubmittedRequests() {
     screenModelScope.launch {
-      _state.update { it.copy(isLoading = true, errorMessage = null) }
+      _state.update { it.copy(isLoading = true, snackBarMessage = null) }
       requestRepository.getMyRequests()
         .onSuccess { data ->
           _state.update { it.copy(isLoading = false, requests = data) }
         }
         .onFailure { exception ->
-          _state.update { it.copy(isLoading = false, errorMessage = exception.message) }
+          _state.update { it.copy(isLoading = false, snackBarMessage = exception.message) }
         }
     }
   }
@@ -38,8 +35,10 @@ class RequestViewModel(
           fetchSubmittedRequests()
         }
         .onFailure { exception ->
-          _state.update { it.copy(isLoading = false, errorMessage = exception.message) }
+          _state.update { it.copy(isLoading = false, snackBarMessage = exception.message) }
         }
     }
   }
+
+  fun dismissSnackBar() = updateState { it.copy(snackBarMessage = null) }
 }
