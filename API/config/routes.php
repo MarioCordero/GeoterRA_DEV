@@ -1,5 +1,4 @@
 <?php
-
 return [
     // Auth routes
     ['method' => 'POST', 'path' => '/auth/refresh', 'controller' => 'AuthController', 'action' => 'refresh'],
