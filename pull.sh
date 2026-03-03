@@ -1,6 +1,8 @@
 #!/bin/bash
-# Script de despliegue GeoterRA - Servidor reforesta01
+echo "Content-Type: text/plain; charset=utf-8"
+echo ""
 
+# Script de despliegue GeoterRA - Servidor reforesta01
 # Salir inmediatamente si un comando falla
 set -e
 
@@ -20,17 +22,13 @@ git pull origin main
 
 # 3. Sincronizar configuración (.ini)
 echo "⚙️ Configurando variables de entorno..."
-
 if [ -f "$CONFIG_SOURCE" ]; then
     # Nos aseguramos de que la carpeta exista (por si acaso)
     mkdir -p "$REPO_DIR/API/config"
-    
     # Copiamos el archivo del home al repo
     cp "$CONFIG_SOURCE" "$CONFIG_DEST"
-    
-    # Ajustamos permisos para que PHP pueda leerlo pero no cualquiera
+    # Ajustamos permisos para que PHP o Apache puedan leerlo pero no cualquiera
     chmod 644 "$CONFIG_DEST"
-    
     echo "✅ Archivo config.ini sincronizado correctamente en API/config/"
 else
     echo "❌ ERROR: No se encontró el archivo maestro $CONFIG_SOURCE"
