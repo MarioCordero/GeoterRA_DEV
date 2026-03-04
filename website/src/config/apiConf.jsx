@@ -23,11 +23,14 @@ const API_CONFIG = {
       delete: (id) => `/analysis-request/${id}`,
     },
     registeredManifestations: {
-      index: '/registered-manifestations',
+      index: '/registered-manifestations?region=all',
       store: '/registered-manifestations',
       update: (id) => `/registered-manifestations/${id}`,
       delete: (id) => `/registered-manifestations/${id}`,
-    }
+    },
+    Regions: {
+      index: '/regions',
+    },
   }
 };
 
