@@ -48,34 +48,11 @@ final class RegisteredManifestationController
   public function index(): void
   {
     try {
-      // ===============================
-      // Authorization
-      // ===============================
-      $auth = $this->authService->requireAuth();
-
-      // ===============================
-      // Query parameter parsing
-      // ===============================
       $region = isset($_GET['region']) ? trim((string) $_GET['region']) : '';
-
-      if (!AllowedRegions::isValid($region)) {
-        Response::error(
-          ErrorType::invalidRegion(region: $region),
-          422
-        );
-        return;
-      }
-
-      // ===============================
-      // Fetch data
-      // ===============================
       $manifestations = $this->service->getAllByRegion($region);
-
       Response::success(data: $manifestations);
-
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-
     } catch (\Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
@@ -87,36 +64,10 @@ final class RegisteredManifestationController
   public function update(string $id): void
   {
     try {
-      // ---------------------------------
-      // Authorization
-      // ---------------------------------
-      $auth = $this->authService->requireAuth();
-
-      $userId = (string) $auth['user_id'];
-      $user = $this->authService->findUserById($userId);
-
-      if ($user['role'] !== AllowedUserRoles::ADMIN) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
-      // ---------------------------------
-      // Body parsing
-      // ---------------------------------
       $body = Request::parseJsonRequest();
-
       $dto = RegisteredManifestationDTO::fromArray($body);
-
-      // ---------------------------------
-      // Business logic
-      // ---------------------------------
-      $this->service->update($dto, $id, $userId);
-
-      Response::success(
-        data: ['id' => $id],
-        meta: ['updated' => true]
-      );
-
+      $this->service->update($dto, $id);
+      Response::success(data: ['id' => $id],meta: ['updated' => true]);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
     } catch (\Throwable $e) {
@@ -130,34 +81,12 @@ final class RegisteredManifestationController
   public function delete(string $id): void
   {
     try {
-      // ---------------------------------
-      // Authorization
-      // ---------------------------------
-      $auth = $this->authService->requireAuth();
-
-      $userId = (string) $auth['user_id'];
-      $user = $this->authService->findUserById($userId);
-
-      if ($user['role'] !== AllowedUserRoles::ADMIN) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
-      // ---------------------------------
-      // Business logic
-      // ---------------------------------
-      $this->service->delete($id, $userId);
-
-      Response::success(
-        data: null,
-        meta: ['deleted' => true]
-      );
-
+      $this->service->delete($id);
+      Response::success(data: null,meta: ['deleted' => true]);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
     } catch (\Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
-
 }
