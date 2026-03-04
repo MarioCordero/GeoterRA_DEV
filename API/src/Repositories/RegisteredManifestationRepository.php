@@ -196,40 +196,28 @@ final class RegisteredManifestationRepository
    */
   public function getAll(): array
   {
-    $sql = <<<SQL
-    SELECT
-      id,
-      name,
-      region,
-      latitude,
-      longitude,
-      description,
-      temperature,
-      field_pH,
-      field_conductivity,
-      lab_pH,
-      lab_conductivity,
-      cl,
-      ca,
-      hco3,
-      so4,
-      fe,
-      si,
-      b,
-      li,
-      f,
-      na,
-      k,
-      mg,
-      created_at,
-      created_by,
-      modified_at,
-      modified_by
-    FROM registered_geothermal_manifestations
-    WHERE deleted_at IS NULL
-    SQL;
+    $stmt = $this->db->query(
+      'SELECT
+        id,
+        name,
+        region_id,
+        latitude,
+        longitude,
+        description,
+        temperature,
+        field_pH,
+        field_conductivity,
+        lab_pH,
+        lab_conductivity,
+        cl, ca, hco3, so4, fe, si, b, li, f, na, k, mg,
+        created_at,
+        created_by,
+        modified_at,
+        modified_by
+      FROM registered_geothermal_manifestations
+      WHERE deleted_at IS NULL'
+    );
 
-    $stmt = $this->db->query($sql);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
@@ -239,52 +227,31 @@ final class RegisteredManifestationRepository
    * @param string $region Geographical region identifier
    * @return array List of manifestations matching the given region
    */
-  public function getAllByRegion(string $region_id): array
+  public function getAllByRegion(int $region_id): array
   {
-    // SQL query using a named parameter to prevent SQL injection
-      $sql = <<<SQL
-    SELECT
-      id,
-      region_id,
-      latitude,
-      longitude,
-      description,
-      temperature,
-      field_pH,
-      field_conductivity,
-      lab_pH,
-      lab_conductivity,
-      cl,
-      ca,
-      hco3,
-      so4,
-      fe,
-      si,
-      b,
-      li,
-      f,
-      na,
-      k,
-      mg,
-      created_at,
-      created_by,
-      modified_at,
-      modified_by
-    FROM registered_geothermal_manifestations
-    WHERE region_id = :region_id
-      AND deleted_at IS NULL
-    SQL;
-
-    // Prepare the statement to enable safe parameter binding
-    $stmt = $this->db->prepare($sql);
-
-    // Execute the query with the bound parameter
-    $stmt->execute([
-      ':region_id' => $region_id
-    ]);
-
-    // Fetch all matching rows as associative arrays
+    $stmt = $this->db->prepare(
+      'SELECT
+        id,
+        name,
+        region_id,
+        latitude,
+        longitude,
+        description,
+        temperature,
+        field_pH,
+        field_conductivity,
+        lab_pH,
+        lab_conductivity,
+        cl, ca, hco3, so4, fe, si, b, li, f, na, k, mg,
+        created_at,
+        created_by,
+        modified_at,
+        modified_by
+      FROM registered_geothermal_manifestations
+      WHERE region_id = :region_id
+        AND deleted_at IS NULL'
+    );
+    $stmt->execute([':region_id' => $region_id]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
-
 }

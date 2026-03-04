@@ -86,8 +86,12 @@ final class RegisteredManifestationService
   /**
    * Update an existing manifestation
    */
-  public function update(RegisteredManifestationDTO $dto, string $id, string $userId): void
+  public function update(RegisteredManifestationDTO $dto, string $id): void
   {
+    $auth = $this->authService->requireAuth();
+    $userId = (string) $auth['user_id'];
+    $this->requireAdmin($userId);
+
     $dto->validate();
 
     if (!$this->repository->existsById($id)) {
@@ -97,7 +101,7 @@ final class RegisteredManifestationService
       );
     }
 
-    $updated = $this->repository->update($dto, $id,   $userId);
+    $updated = $this->repository->update($dto, $id, $userId);
 
     if (!$updated) {
       throw new ApiException(
@@ -109,8 +113,12 @@ final class RegisteredManifestationService
   /**
    * Soft delete a manifestation
    */
-  public function delete(string $id, string $userId): void
+  public function delete(string $id): void
   {
+    $auth = $this->authService->requireAuth();
+    $userId = (string) $auth['user_id'];
+    $this->requireAdmin($userId);
+
     if (!$this->repository->existsById($id)) {
       throw new ApiException(
         ErrorType::notFound('Registered manifestation'),
@@ -135,6 +143,13 @@ final class RegisteredManifestationService
     if ($region === 'all') {
       return $this->repository->getAll();
     }
-    return $this->repository->getAllByRegion($region);
+    if (!is_numeric($region)) {
+      throw new ApiException(
+        ErrorType::invalidRegion(region: $region),
+        422
+      );
+    }
+    $this->requireValidRegion((int) $region);
+    return $this->repository->getAllByRegion((int) $region);
   }
 }
