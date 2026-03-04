@@ -29,4 +29,10 @@ final class RegionRepository
     $stmt->execute([':id' => $id]);
     return (bool) $stmt->fetchColumn();
   }
+
+  public function getAll(): array
+  {
+    $stmt = $this->db->query('SELECT id, name FROM regions');
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
 }
