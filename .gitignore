@@ -30,3 +30,5 @@ API/.DS_Store
 .DS_Store
 API/config/config.ini
 GeoterRA_Local.session.sql
+website/.vite/deps/_metadata.json
+website/.vite/deps/package.json
