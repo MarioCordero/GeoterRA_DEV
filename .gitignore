@@ -1,3 +1,5 @@
 website/node_modules/*
 API/config/config.ini
 .vscode
+website/.vite/deps/_metadata.json
+website/.vite/deps/package.json
