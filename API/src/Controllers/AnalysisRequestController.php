@@ -4,24 +4,26 @@ declare(strict_types=1);
 
 namespace Controllers;
 
-use Services\AnalysisRequestService;
+use DTO\AnalysisRequestDTO;
 use Http\Request;
 use Http\Response;
 use Http\ApiException;
 use Http\ErrorType;
-use DTO\AnalysisRequestDTO;
+use Services\AnalysisRequestService;
 
 /**
  * Controller for handling analysis request related endpoints.
  */
 final class AnalysisRequestController
 {
-  public function __construct(
-    private AnalysisRequestService $service,
-  ) {}
+  private AnalysisRequestService $service;
+  public function __construct(private \PDO $pdo)
+  {
+    $this->service = new AnalysisRequestService($this->pdo);
+  }
 
   /**
-   * Endpoint POST /analysis-request
+   * POST /analysis-request
    * Creates a new analysis request for the authenticated user
    */
   public function store(): void

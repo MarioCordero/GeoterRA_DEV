@@ -14,7 +14,7 @@ use Http\ErrorType;
 final class AnalysisRequestDTO
 {
 	public function __construct(
-		public string $region,
+		public int $region,
 		public string $email,
 		public ?string $owner_contact_number,
 		public string $owner_name,
@@ -56,7 +56,7 @@ final class AnalysisRequestDTO
 		}
 
 		return new self(
-			trim((string) $data['region']),
+			(int) $data['region'],
 			strtolower(trim((string) $data['email'])),
 			$data['owner_contact_number'] ?? null,
 			trim((string) $data['owner_name']),
