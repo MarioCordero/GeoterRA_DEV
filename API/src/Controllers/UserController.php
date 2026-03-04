@@ -9,7 +9,6 @@ use Http\Response;
 use Http\Request;
 use Http\ErrorType;
 USE Http\ApiException;
-use PDO;
 use Services\UserService;
 
 final class UserController

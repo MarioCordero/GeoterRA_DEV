@@ -17,14 +17,12 @@ use Repositories\AnalysisRequestRepository;
  */
 final class AnalysisRequestService
 {
+  private AnalysisRequestRepository $repository;
   private AuthService $authService;
-  public function __construct(
-    private AnalysisRequestRepository $repository,
-    private PDO $pdo
-  ) {
-    $authRepository = new \Repositories\AuthRepository($this->pdo);
-    $userRepository = new \Repositories\UserRepository($this->pdo);
+  public function __construct(private PDO $pdo)
+  {
     $this->authService = new AuthService($this->pdo);
+    $this->repository = new AnalysisRequestRepository($this->pdo);
   }
 
   /**

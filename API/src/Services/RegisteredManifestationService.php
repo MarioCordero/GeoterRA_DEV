@@ -6,28 +6,68 @@ namespace Services;
 
 use DTO\AllowedRegions;
 use DTO\RegisteredManifestationDTO;
-use Repositories\RegisteredManifestationRepository;
+use DTO\AllowedUserRoles;
 use Http\ApiException;
 use Http\ErrorType;
+use Http\Response;
+use Http\Request;
+use Services\AuthService;
+use Services\UserService;
+use Repositories\RegisteredManifestationRepository;
+use Repositories\RegionRepository;
 
 /**
  * Business logic for registered geothermal manifestations
  */
 final class RegisteredManifestationService
 {
-  public function __construct(
-    private RegisteredManifestationRepository $repository
-  ) {}
+  private AuthService $authService;
+  private UserService $userService;
+  private RegionRepository $regionRepository; // TODO: move region validation to a separate service? Or is it fine here since it's only used for manifestations?
+  private RegisteredManifestationRepository $repository;
+  public function __construct(private \PDO $pdo)
+  {
+    $this->authService = new AuthService($this->pdo);
+    $this->userService = new UserService($this->pdo);
+    $this->repository = new RegisteredManifestationRepository($pdo);
+    $this->regionRepository = new RegionRepository($pdo);
+  }
+
+  /**
+   * Asserts the authenticated user has the ADMIN role.
+   */
+  private function requireAdmin(string $userId): void
+  {
+    $user = $this->userService->findById($userId);
+    if ((string) $user['role'] !== AllowedUserRoles::ADMIN) {
+      throw new ApiException(ErrorType::forbidden(), 403);
+    }
+  }
+
+  /**
+   * Asserts the region exists in the DB.
+   */
+  private function requireValidRegion(int $region_id): void
+  { 
+    if (!$this->regionRepository->existsById($region_id)) {
+      throw new ApiException(
+        ErrorType::invalidRegion(region: $region_id),
+        422
+      );
+    }
+  }
 
   /**
    * Create a new manifestation
    */
-  public function create(RegisteredManifestationDTO $dto,  string $userId): void
+  public function create(RegisteredManifestationDTO $dto): void
   {
-    // Domain validation
+    $auth = $this->authService->requireAuth();
+    $userId = (string) $auth['user_id'];
+    $this->requireAdmin($userId);
     $dto->validate();
+    $this->requireValidRegion($dto->region_id);
 
-    // Prevent duplicate primary key violations (409 Conflict)
     if ($this->repository->existsByName($dto->name)) {
       throw new ApiException(
         ErrorType::conflict("Registered manifestation name '{$dto->name}' already exists"),
@@ -46,8 +86,12 @@ final class RegisteredManifestationService
   /**
    * Update an existing manifestation
    */
-  public function update(RegisteredManifestationDTO $dto, string $id, string $userId): void
+  public function update(RegisteredManifestationDTO $dto, string $id): void
   {
+    $auth = $this->authService->requireAuth();
+    $userId = (string) $auth['user_id'];
+    $this->requireAdmin($userId);
+
     $dto->validate();
 
     if (!$this->repository->existsById($id)) {
@@ -57,7 +101,7 @@ final class RegisteredManifestationService
       );
     }
 
-    $updated = $this->repository->update($dto, $id,   $userId);
+    $updated = $this->repository->update($dto, $id, $userId);
 
     if (!$updated) {
       throw new ApiException(
@@ -69,8 +113,12 @@ final class RegisteredManifestationService
   /**
    * Soft delete a manifestation
    */
-  public function delete(string $id, string $userId): void
+  public function delete(string $id): void
   {
+    $auth = $this->authService->requireAuth();
+    $userId = (string) $auth['user_id'];
+    $this->requireAdmin($userId);
+
     if (!$this->repository->existsById($id)) {
       throw new ApiException(
         ErrorType::notFound('Registered manifestation'),
@@ -95,6 +143,13 @@ final class RegisteredManifestationService
     if ($region === 'all') {
       return $this->repository->getAll();
     }
-    return $this->repository->getAllByRegion($region);
+    if (!is_numeric($region)) {
+      throw new ApiException(
+        ErrorType::invalidRegion(region: $region),
+        422
+      );
+    }
+    $this->requireValidRegion((int) $region);
+    return $this->repository->getAllByRegion((int) $region);
   }
 }

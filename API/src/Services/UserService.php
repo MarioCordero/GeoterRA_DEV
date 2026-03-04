@@ -91,7 +91,6 @@ final class UserService
   /**
    * Get user info by ID
    *
-   * @param string $userId
    * @return array
    * @throws ApiException if user not found
    */
@@ -107,5 +106,21 @@ final class UserService
       'data' => $user,
       'meta' => null
     ];
+  }
+
+  /**
+   * Get user info by ID
+   * For internal service-to-service use only
+   *
+   * @return array
+   * @throws ApiException if user not found
+   */
+  public function findById(string $userId): array
+  {
+    $user = $this->repository->findActiveUserById($userId);
+    if (!$user) {
+      throw new ApiException(ErrorType::notFound('User'), 404);
+    }
+    return $user; // ← returns raw array, not wrapped in ['data' => ...]
   }
 }

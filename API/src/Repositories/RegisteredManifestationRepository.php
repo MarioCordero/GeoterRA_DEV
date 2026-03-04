@@ -21,28 +21,32 @@ final class RegisteredManifestationRepository
   public function existsById(string $id): bool
   {
     $stmt = $this->db->prepare(
-      'SELECT 1 
+      '
+      SELECT 1 
       FROM registered_geothermal_manifestations 
       WHERE id = :id 
         AND deleted_at IS NULL
-      LIMIT 1'
+      LIMIT 1
+      '
     );
     $stmt->execute([':id' => $id]);
     return (bool) $stmt->fetchColumn();
   }
 
 
-    /**
+  /**
    * Check if a manifestation with the given name already exists.
    */
   public function existsByName(string $name): bool
   {
     $stmt = $this->db->prepare(
-      'SELECT 1 
+      '
+      SELECT 1 
       FROM registered_geothermal_manifestations 
       WHERE name = :name 
         AND deleted_at IS NULL
-      LIMIT 1'
+      LIMIT 1
+      '
     );
     $stmt->execute([':name' => $name]);
     return (bool) $stmt->fetchColumn();
@@ -51,52 +55,54 @@ final class RegisteredManifestationRepository
   /**
    * Insert manifestation
    */
-  public function create(RegisteredManifestationDTO $dto, string $userId): bool
+  public function create(RegisteredManifestationDTO $dto, string $userId): string
   {
-    $sql = <<<SQL
-    INSERT INTO registered_geothermal_manifestations (
-      id, name, region, latitude, longitude, description,
-      temperature, field_pH, field_conductivity,
-      lab_pH, lab_conductivity,
-      cl, ca, hco3, so4, fe, si, b, li, f, na, k, mg,
-      created_by
-    ) VALUES (
-      :id, :name, :region, :latitude, :longitude, :description,
-      :temperature, :field_pH, :field_conductivity,
-      :lab_pH, :lab_conductivity,
-      :cl, :ca, :hco3, :so4, :fe, :si, :b, :li, :f, :na, :k, :mg,
-      :created_by
-    )
-    SQL;
+    $id = Ulid::generate();
 
-    $stmt = $this->db->prepare($sql);
+    $stmt = $this->db->prepare(
+      'INSERT INTO registered_geothermal_manifestations (
+        id, name, region_id, latitude, longitude, description,
+        temperature, field_pH, field_conductivity,
+        lab_pH, lab_conductivity,
+        cl, ca, hco3, so4, fe, si, b, li, f, na, k, mg,
+        created_by
+      ) VALUES (
+        :id, :name, :region_id, :latitude, :longitude, :description,
+        :temperature, :field_pH, :field_conductivity,
+        :lab_pH, :lab_conductivity,
+        :cl, :ca, :hco3, :so4, :fe, :si, :b, :li, :f, :na, :k, :mg,
+        :created_by
+      )'
+    );
 
-    return $stmt->execute([
-      ':id' => Ulid::generate(),
-      ':name' => $dto->name,
-      ':region' => $dto->region,
-      ':latitude' => $dto->latitude,
-      ':longitude' => $dto->longitude,
-      ':description' => $dto->description,
-      ':temperature' => $dto->temperature,
-      ':field_pH' => $dto->field_pH,
+    $stmt->execute([
+      ':id'                 => $id,
+      ':name'               => $dto->name,
+      ':region_id'          => $dto->region_id,
+      ':latitude'           => $dto->latitude,
+      ':longitude'          => $dto->longitude,
+      ':description'        => $dto->description,
+      ':temperature'        => $dto->temperature,
+      ':field_pH'           => $dto->field_pH,
       ':field_conductivity' => $dto->field_conductivity,
-      ':lab_pH' => $dto->lab_pH,
-      ':lab_conductivity' => $dto->lab_conductivity,
-      ':cl' => $dto->cl,
-      ':ca' => $dto->ca,
-      ':hco3' => $dto->hco3,
-      ':so4' => $dto->so4,
-      ':fe' => $dto->fe,
-      ':si' => $dto->si,
-      ':b' => $dto->b,
-      ':li' => $dto->li,
-      ':f' => $dto->f,
-      ':na' => $dto->na,
-      ':k' => $dto->k,
-      ':mg' => $dto->mg,
-      ':created_by' => $userId
+      ':lab_pH'             => $dto->lab_pH,
+      ':lab_conductivity'   => $dto->lab_conductivity,
+      ':cl'                 => $dto->cl,
+      ':ca'                 => $dto->ca,
+      ':hco3'               => $dto->hco3,
+      ':so4'                => $dto->so4,
+      ':fe'                 => $dto->fe,
+      ':si'                 => $dto->si,
+      ':b'                  => $dto->b,
+      ':li'                 => $dto->li,
+      ':f'                  => $dto->f,
+      ':na'                 => $dto->na,
+      ':k'                  => $dto->k,
+      ':mg'                 => $dto->mg,
+      ':created_by'         => $userId
     ]);
+
+    return $id;
   }
 
   public function update(RegisteredManifestationDTO $dto, string $id, string $userId): bool
@@ -105,7 +111,7 @@ final class RegisteredManifestationRepository
     UPDATE registered_geothermal_manifestations
     SET
       name = :name,
-      region = :region,
+      region_id = :region_id,
       latitude = :latitude,
       longitude = :longitude,
       description = :description,
@@ -137,7 +143,7 @@ final class RegisteredManifestationRepository
     return $stmt->execute([
       'id'=> $id,
       'name' => $dto->name,
-      'region' => $dto->region,
+      'region_id' => $dto->region_id,
       'latitude' => $dto->latitude,
       'longitude' => $dto->longitude,
       'description' => $dto->description,
@@ -190,40 +196,28 @@ final class RegisteredManifestationRepository
    */
   public function getAll(): array
   {
-    $sql = <<<SQL
-    SELECT
-      id,
-      name,
-      region,
-      latitude,
-      longitude,
-      description,
-      temperature,
-      field_pH,
-      field_conductivity,
-      lab_pH,
-      lab_conductivity,
-      cl,
-      ca,
-      hco3,
-      so4,
-      fe,
-      si,
-      b,
-      li,
-      f,
-      na,
-      k,
-      mg,
-      created_at,
-      created_by,
-      modified_at,
-      modified_by
-    FROM registered_geothermal_manifestations
-    WHERE deleted_at IS NULL
-    SQL;
+    $stmt = $this->db->query(
+      'SELECT
+        id,
+        name,
+        region_id,
+        latitude,
+        longitude,
+        description,
+        temperature,
+        field_pH,
+        field_conductivity,
+        lab_pH,
+        lab_conductivity,
+        cl, ca, hco3, so4, fe, si, b, li, f, na, k, mg,
+        created_at,
+        created_by,
+        modified_at,
+        modified_by
+      FROM registered_geothermal_manifestations
+      WHERE deleted_at IS NULL'
+    );
 
-    $stmt = $this->db->query($sql);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
@@ -233,52 +227,31 @@ final class RegisteredManifestationRepository
    * @param string $region Geographical region identifier
    * @return array List of manifestations matching the given region
    */
-  public function getAllByRegion(string $region): array
+  public function getAllByRegion(int $region_id): array
   {
-    // SQL query using a named parameter to prevent SQL injection
-      $sql = <<<SQL
-    SELECT
-      id,
-      region,
-      latitude,
-      longitude,
-      description,
-      temperature,
-      field_pH,
-      field_conductivity,
-      lab_pH,
-      lab_conductivity,
-      cl,
-      ca,
-      hco3,
-      so4,
-      fe,
-      si,
-      b,
-      li,
-      f,
-      na,
-      k,
-      mg,
-      created_at,
-      created_by,
-      modified_at,
-      modified_by
-    FROM registered_geothermal_manifestations
-    WHERE region = :region
-      AND deleted_at IS NULL
-    SQL;
-
-    // Prepare the statement to enable safe parameter binding
-    $stmt = $this->db->prepare($sql);
-
-    // Execute the query with the bound parameter
-    $stmt->execute([
-      ':region' => $region
-    ]);
-
-    // Fetch all matching rows as associative arrays
+    $stmt = $this->db->prepare(
+      'SELECT
+        id,
+        name,
+        region_id,
+        latitude,
+        longitude,
+        description,
+        temperature,
+        field_pH,
+        field_conductivity,
+        lab_pH,
+        lab_conductivity,
+        cl, ca, hco3, so4, fe, si, b, li, f, na, k, mg,
+        created_at,
+        created_by,
+        modified_at,
+        modified_by
+      FROM registered_geothermal_manifestations
+      WHERE region_id = :region_id
+        AND deleted_at IS NULL'
+    );
+    $stmt->execute([':region_id' => $region_id]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
-
 }
