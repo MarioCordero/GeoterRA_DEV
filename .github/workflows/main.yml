@@ -109,6 +109,11 @@ jobs:
             echo "⚠️ No se encontró pull.sh en la raíz de ${{ env.SOURCE_BRANCH }}"
           fi
 
+      # Inject .env file for production
+      - name: Create .env for production
+        run: |
+          echo "APP_ENV=${{ secrets.APP_ENV }}" > main-branch/.env
+
       # ---------------- FORZAR .htaccess EN dist ----------------
       - name: Ensure .htaccess in dist
         run: |
@@ -135,6 +140,8 @@ jobs:
           
           # Agregamos todo normalmente
           git add -A
+
+          git add -f .env 2>/dev/null || true  # Force add .env
           
           # FORZAMOS a Git a observar la carpeta config para esquivar el .gitignore
           # (Es seguro porque el config.ini ya fue excluido en el rsync anterior)
