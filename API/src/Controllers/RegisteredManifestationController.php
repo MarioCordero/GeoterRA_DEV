@@ -5,68 +5,37 @@ declare(strict_types=1);
 namespace Controllers;
 
 use DTO\AllowedRegions;
-use Services\RegisteredManifestationService;
-use Services\AuthService;
 use DTO\RegisteredManifestationDTO;
-use Http\Response;
-use Http\Request;
-use DTO\AllowedUserRoles;
-
 use Http\ErrorType;
 use Http\ApiException;
+use Http\Response;
+use Http\Request;
+use Services\RegisteredManifestationService;
 
 /**
  * Controller for Registered Geothermal Manifestations endpoints
  */
 final class RegisteredManifestationController
 {
-  public function __construct(
-    private RegisteredManifestationService $service,
-    private AuthService $authService
-  ) {}
+  private RegisteredManifestationService $service;
+  public function __construct(private \pdo $pdo) 
+  {
+    $this->service = new RegisteredManifestationService($this->pdo);
+  }
 
   /**
    * POST /registered-manifestations
+   * Creates a new registered manifestation (admin only)
    */
   public function store(): void
   {
     try {
-      // ===============================
-      // Authorization
-      // ===============================
-      $auth = $this->authService->requireAuth();
-
-      $userId = (string) $auth['user_id'];
-
-      $user = $this->authService->findUserById($userId);
-      $userRole = (string)$user['role'];
-
-      if ($userRole !== AllowedUserRoles::ADMIN) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-
-      }
-
-      // ===============================
-      // Body parsing
-      // ===============================
       $body = Request::parseJsonRequest();
-
-      // ===============================
-      // DTO + business logic
-      // ===============================
       $dto = RegisteredManifestationDTO::fromArray($body);
-      $this->service->create($dto, $userId);
-
-      Response::success(
-        data: ['success' => true ],
-        meta: null,
-        status: 201
-      );
-
+      $this->service->create($dto);
+      Response::success(data: ['success' => true ],meta: null,status: 201);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-
     } catch (\Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }

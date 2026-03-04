@@ -23,7 +23,7 @@ final class AnalysisRequestController
   }
 
   /**
-   * Endpoint POST /analysis-request
+   * POST /analysis-request
    * Creates a new analysis request for the authenticated user
    */
   public function store(): void

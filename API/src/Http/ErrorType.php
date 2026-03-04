@@ -160,7 +160,7 @@ final class ErrorType implements JsonSerializable
 		return new self('LONGITUDE_REQUIRED', 'Longitude is required');
 	}
 
-		public static function invalidRegion(string $region): self
+		public static function invalidRegion(int $region): self
   {
     return new self(
       'INVALID_REGION',
