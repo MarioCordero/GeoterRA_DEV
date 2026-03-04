@@ -14,7 +14,7 @@ final class RegisteredManifestationDTO
 {
   public function __construct(
     public string $name,
-    public string $region,
+    public int $region_id,
     public float $latitude,
     public float $longitude,
     public ?string $description,
@@ -48,10 +48,6 @@ final class RegisteredManifestationDTO
       throw new ApiException(ErrorType::invalidField('name'));
     }
 
-    if ($this->region !== 'all' && !AllowedRegions::isValid($this->region)) {
-      throw new ApiException(ErrorType::invalidRegion(region: $this->region), 422);
-    }
-
     if ($this->latitude < -90 || $this->latitude > 90) {
       throw new ApiException(ErrorType::invalidField('latitude'));
     }
@@ -71,8 +67,8 @@ final class RegisteredManifestationDTO
     if (!array_key_exists('name', $data) || trim((string) $data['name']) === '') {
       throw new ApiException(ErrorType::missingField('name'), 422);
     }
-    if (!array_key_exists('region', $data) || trim((string) $data['region']) === '') {
-      throw new ApiException(ErrorType::missingField('region'), 422);
+    if (!array_key_exists('region_id', $data) || !is_numeric($data['region_id'])) {
+      throw new ApiException(ErrorType::missingField('region_id'), 422);
     }
     if (!array_key_exists('latitude', $data)) {
       throw new ApiException(ErrorType::missingField('latitude'), 422);
@@ -83,7 +79,7 @@ final class RegisteredManifestationDTO
 
     return new self(
       trim((string) $data['name']),
-      trim((string) $data['region']),
+      (int) $data['region_id'],
       (float) $data['latitude'],
       (float) $data['longitude'],
       $data['description'] ?? null,
