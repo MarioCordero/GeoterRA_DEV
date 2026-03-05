@@ -1,5 +1,8 @@
 #!/bin/bash
 # Configuración de la base de datos
+echo "Content-Type: text/plain; charset=utf-8"
+echo ""
+
 DB_USER="root"
 DB_PASS="g3ot3rR4"
 DB_NAME="GeoterRA"
