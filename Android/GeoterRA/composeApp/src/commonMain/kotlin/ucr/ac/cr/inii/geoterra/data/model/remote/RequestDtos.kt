@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class AnalysisRequestRemote(
   val id: String,
   val name: String,
-  val region: String,
+  val region_id: UInt,
   val email: String,
   val owner_contact_number: String?,
   val owner_name: String?,
@@ -18,7 +18,20 @@ data class AnalysisRequestRemote(
   val longitude: String,
   val state: String,
   val created_at: String,
-)
+) {
+  fun regionName(): String {
+    return when (region_id) {
+      1u -> "San José"
+      2u -> "Alajuela"
+      3u -> "Cartago"
+      4u -> "Heredia"
+      5u -> "Guanacaste"
+      6u -> "Puntarenas"
+      7u -> "Limón"
+      else -> "Desconocida"
+    }
+  }
+}
 
 @Serializable
 data class AnalysisRequestFormRemote(

@@ -10,9 +10,10 @@ import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
 import ucr.ac.cr.inii.geoterra.domain.repository.ManifestationsRepository
 
 class ManifestationRepositoryImp(private val client: HttpClient) : ManifestationsRepository {
-  override suspend fun getManifestations(region: String): Result<List<ManifestationRemote>> {
+  override suspend fun getManifestations(region_id : UInt): Result<List<ManifestationRemote>> {
+
     return try {
-      val response = client.get("registered-manifestations?region=$region")
+      val response = client.get("registered-manifestations?region=$region_id")
       if (response.status.isSuccess()) {
         val envelope = response.body<ApiResponseModel<List<ManifestationRemote>>>()
         Result.success(envelope.data ?: emptyList())

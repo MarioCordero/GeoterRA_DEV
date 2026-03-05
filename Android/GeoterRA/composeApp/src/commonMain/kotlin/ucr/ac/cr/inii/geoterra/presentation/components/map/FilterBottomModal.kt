@@ -8,18 +8,12 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.Map
-import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,7 +21,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -42,7 +35,7 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.map.MapState
 fun FilterBottomModal(
   isVisible: Boolean,
   state: MapState,
-  onRegionSelected: (String) -> Unit,
+  onRegionSelected: (UInt) -> Unit,
   onLayerSelected: (String) -> Unit,
   onClearSelectedRegion: () -> Unit,
   onDismiss: () -> Unit,
@@ -114,9 +107,9 @@ fun FilterBottomModal(
         ) {
           items(state.availableRegions) { region ->
             ModernRegionChip(
-              region = region,
-              isSelected = region == state.selectedRegion,
-              onSelect = { onRegionSelected(region) }
+              region = region.first,
+              isSelected = region.second == state.selectedRegionId,
+              onSelect = { onRegionSelected(region.second) }
             )
           }
         }

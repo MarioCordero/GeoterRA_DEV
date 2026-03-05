@@ -3,7 +3,6 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.map
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
 import ucr.ac.cr.inii.geoterra.domain.location.LocationProvider
 import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
 import ucr.ac.cr.inii.geoterra.domain.repository.ManifestationsRepository
@@ -15,11 +14,11 @@ class MapViewModel(
   private val permissionManager: PermissionManager
 ) : BaseScreenModel<MapState>(MapState()) {
 
-  fun loadMapMarkers(region: String? = null) {
+  fun loadMapMarkers(region_id: UInt? = null) {
     screenModelScope.launch {
       _state.update { it.copy(isLoading = true) }
 
-      val queryParam = region ?: "all"
+      val queryParam = (region_id ?: 1u)
 
       manifestationsRepository.getManifestations(queryParam)
         .onSuccess { data ->
@@ -90,15 +89,15 @@ class MapViewModel(
     _state.update { it.copy(isFilterModalVisible = false) }
   }
 
-  fun toggleRegion(region: String) {
+  fun toggleRegion(regionId: UInt) {
     _state.update { state ->
-      val newSelected = if (state.selectedRegion == region) null else region
-      state.copy(selectedRegion = newSelected)
+      val newSelected = if (state.selectedRegionId == regionId) null else regionId
+      state.copy(selectedRegionId = newSelected)
     }
   }
 
   fun clearSelectedRegion() {
-    _state.update { it.copy(selectedRegion = null) }
+    _state.update { it.copy(selectedRegionId = null) }
   }
 
   fun applyFilters() {
@@ -110,6 +109,6 @@ class MapViewModel(
       isFilterModalVisible = false,
       styleUrl = newStyle ?: it.styleUrl
     ) }
-    loadMapMarkers(state.value.selectedRegion)
+    loadMapMarkers(state.value.selectedRegionId)
   }
 }

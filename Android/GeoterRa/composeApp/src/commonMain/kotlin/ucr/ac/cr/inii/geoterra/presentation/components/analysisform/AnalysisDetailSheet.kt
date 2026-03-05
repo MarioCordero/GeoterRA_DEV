@@ -1,6 +1,5 @@
 package ucr.ac.cr.inii.geoterra.presentation.components.analysisform
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,14 +12,11 @@ import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Thermostat
-import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -88,7 +84,7 @@ fun RequestDetailSheet(
 
     // --- SITIO ---
     SectionHeader(title = "Información del Sitio")
-    InfoChip(Icons.Default.LocationOn, "Región", request.region, Modifier.fillMaxWidth())
+    InfoChip(Icons.Default.LocationOn, "Región", request.regionName(), Modifier.fillMaxWidth())
 
     Spacer(modifier = Modifier.height(chipSpacing))
 

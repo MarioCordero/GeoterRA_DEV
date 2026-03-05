@@ -11,7 +11,6 @@ data class MapLayer(
 )
 
 data class MapState(
-  /* Inside your view-model */
   val styleUrl: String = "https://raw.githubusercontent.com/go2garret/maps/main/src/assets/json/arcgis_hybrid.json",
   val markers: List<ManifestationRemote> = emptyList(),
   val userLocation: UserLocation? = null,
@@ -21,10 +20,15 @@ data class MapState(
   val snackBarMessage: String? = null,
 
   val isFilterModalVisible: Boolean = false,
-  val selectedRegion: String? = null, // Regiones seleccionadas
-  val availableRegions: List<String> = listOf(
-    "Cartago", "San_José", "Puntarenas", "Limón",
-    "Guanacaste", "Heredia", "Alajuela"
+  val selectedRegionId: UInt? = null,
+  val availableRegions: List<Pair<String, UInt>> = listOf(
+    Pair("San José", 1u),
+    Pair("Alajuela", 2u),
+    Pair("Cartago", 3u),
+    Pair("Heredia", 4u),
+    Pair("Guanacaste", 5u),
+    Pair("Puntarenas", 6u),
+    Pair("Limón", 7u)
   ),
   val isLayerSelectionVisible: Boolean = false,
   val selectedLayerId: String = "hybrid",

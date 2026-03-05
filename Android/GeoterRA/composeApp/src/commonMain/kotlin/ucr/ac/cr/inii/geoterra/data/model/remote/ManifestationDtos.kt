@@ -2,22 +2,13 @@ package ucr.ac.cr.inii.geoterra.data.model.remote
 
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonObject
-import org.maplibre.spatialk.geojson.FeatureCollection
-import org.maplibre.spatialk.geojson.Feature
-import org.maplibre.spatialk.geojson.Point
-import org.maplibre.spatialk.geojson.Position
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
-import org.maplibre.spatialk.geojson.Geometry
-
 
 
 @Serializable
 data class ManifestationRemote(
   val id : String,
   val name : String,
-  val region : String,
+  val region_id : UInt,
   val latitude : Float,
   val longitude : Float,
   val description : String?,
@@ -42,7 +33,20 @@ data class ManifestationRemote(
   val created_by : String,
   val modified_at : String?,
   val modified_by : String?
-)
+) {
+  fun regionName(): String {
+    return when (region_id) {
+      1u -> "San José"
+      2u -> "Alajuela"
+      3u -> "Cartago"
+      4u -> "Heredia"
+      5u -> "Guanacaste"
+      6u -> "Puntarenas"
+      7u -> "Limón"
+      else -> "Desconocida"
+    }
+  }
+}
 
 fun List<ManifestationRemote>.toGeoJsonString(): String {
   val featuresJson = this.joinToString(",") { manifestation ->

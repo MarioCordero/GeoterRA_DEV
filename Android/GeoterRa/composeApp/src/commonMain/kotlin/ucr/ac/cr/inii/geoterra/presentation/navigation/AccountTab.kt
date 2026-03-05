@@ -10,6 +10,7 @@ import geoterra.composeapp.generated.resources.ic_account
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import cafe.adriel.voyager.navigator.Navigator
 import ucr.ac.cr.inii.geoterra.presentation.auth.AuthViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountContent
@@ -28,13 +29,15 @@ object AccountTab : Tab {
     val authViewModel = koinInject<AuthViewModel>()
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
 
-    val rootScreen = if (isLoggedIn == true) {
-      AccountScreen()
-    } else {
-      LoginScreen()
-    }
+    key(isLoggedIn) {
+      val rootScreen = if (isLoggedIn == true) {
+        AccountScreen()
+      } else {
+        LoginScreen()
+      }
 
-    Navigator(rootScreen)
+      Navigator(rootScreen)
+    }
   }
   
   override val options: TabOptions
