@@ -5,6 +5,7 @@ import ucr.ac.cr.inii.geoterra.data.model.remote.UserRemote
 data class AccountState(
   val isLoading: Boolean = false,
   val user: UserRemote? = null,
+  val isDarkMode: Boolean = false,
   val error: String? = null,
   val successMessage: String? = null
 )

@@ -10,6 +10,9 @@ import org.jetbrains.compose.resources.painterResource
 import ucr.ac.cr.inii.geoterra.presentation.screens.map.MapScreen
 
 internal object MapTab : Tab {
+  override val key: String = "MapScreen_${hashCode()}"
+
+
   override val options: TabOptions
     @Composable
     get() {

@@ -39,7 +39,8 @@ import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
   override fun onCreate(savedInstanceState: Bundle?) {
     enableEdgeToEdge()
     super.onCreate(savedInstanceState)
-    
+
+    ActivityContext.mContext = this
     permissionManager = AndroidPermissionManager(this)
     cameraManager = AndroidCameraManager(this)
     

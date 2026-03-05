@@ -17,7 +17,7 @@ data class UserRemote(
 
 @Serializable
 data class UserUpdateRequest(
-  val name: String, // El controlador PHP usa 'name' y 'lastname' en el DTO
+  val name: String,
   val lastname: String,
   val email: String,
   val phone_number: String? = null

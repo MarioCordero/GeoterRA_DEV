@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.register
+package ucr.ac.cr.inii.geoterra.presentation.screens.editProfile
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -19,11 +19,11 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.AdaptiveBackButton
 
-class RegisterScreen : Screen {
+class EditProfileScreen : Screen {
   @Composable
   override fun Content() {
     val navigator = LocalNavigator.currentOrThrow
-    val viewModel = getScreenModel<RegisterViewModel>()
+    val viewModel = getScreenModel<EditProfileViewModel>()
     val state by viewModel.state.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -40,7 +40,7 @@ class RegisterScreen : Screen {
         }
       }
     ) { padding ->
-      RegisterContent(
+      EditProfileContent(
         modifier = Modifier.padding(padding),
         state = state,
         snackBarState = snackbarHostState,

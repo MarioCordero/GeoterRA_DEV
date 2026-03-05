@@ -10,6 +10,10 @@
 		<true/>
 	</dict>
 
+    <key>UIFileSharingEnabled</key>
+    <true/>
+    <key>LSSupportsOpeningDocumentsInPlace</key>
+    <true/>
     <key>NSPhotoLibraryAddUsageDescription</key>
     <string>Se necesita guardar la foto de geolocalización en la galería.</string>
     <key>NSPhotoLibraryUsageDescription</key>

@@ -30,7 +30,15 @@ class AccountViewModel(
         .onFailure { e -> _state.update { it.copy(error = e.message, isLoading = false) } }
     }
   }
-  
+
+  fun deleteAccount() {
+    screenModelScope.launch {
+      _state.update { it.copy(isLoading = true, error = null) }
+      userRepository.deleteMe()
+        .onSuccess { _state.update { it.copy(isLoading = false) } }
+        .onFailure { e -> _state.update { it.copy(error = e.message, isLoading = false) } }
+    }
+  }
   fun refresh() {
     screenModelScope.launch {
       _state.update { it.copy(isLoading = true, error = null) }
@@ -39,6 +47,11 @@ class AccountViewModel(
       Log.i("AccountViewModel", "Refreshed access token")
       loadUserProfile()
     }
+  }
+
+  fun toggleTheme(isDark: Boolean) {
+    _state.update { it.copy(isDarkMode = isDark) }
+
   }
   
   fun logout() {

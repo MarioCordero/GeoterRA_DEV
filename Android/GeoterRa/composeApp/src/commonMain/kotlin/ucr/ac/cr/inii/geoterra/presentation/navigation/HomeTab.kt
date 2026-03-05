@@ -10,6 +10,8 @@ import org.jetbrains.compose.resources.painterResource
 import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeScreen
 
 internal object HomeTab : Tab {
+  override val key: String = "HomeScreen_${hashCode()}"
+
   override val options: TabOptions
     @Composable
     get() {

@@ -6,13 +6,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import org.koin.compose.koinInject
+import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import ucr.ac.cr.inii.geoterra.presentation.screens.editProfile.EditProfileScreen
 
 /**
  * Voyager Screen implementation for Home.
@@ -22,8 +26,13 @@ class AccountScreen : Screen {
   @Composable
   override fun Content() {
     
-    val accountViewModel = koinInject<AccountViewModel>()
-    val accountState by accountViewModel.state.collectAsState()
+    val viewModel = getScreenModel<AccountViewModel>()
+    val state by viewModel.state.collectAsState()
+    val navigator = LocalNavigator.currentOrThrow
+
+    LaunchedEffect(Unit) {
+      viewModel.loadUserProfile()
+    }
 
     Scaffold(
       topBar = {
@@ -39,18 +48,20 @@ class AccountScreen : Screen {
     ) { paddingValues ->
       AccountContent(
         modifier = Modifier.padding(paddingValues),
-        state = accountState,
+        state = state,
         onLogoutClick = {
-          accountViewModel.logout()
+          viewModel.logout()
         },
         onDeleteAccountClick = {
-          // Aquí podrías llamar a accountViewModel.deleteAccount()
-//        accountViewModel.deleteAccount()
+          viewModel.deleteAccount()
+          navigator.pop()
         },
         onEditClick = {
-          // Navegar a pantalla de edición: navigator.push(EditProfileScreen())
+          navigator.push(EditProfileScreen())
         },
-        onRefresh = accountViewModel::loadUserProfile
+        onThemeToggle = { isDark ->
+          viewModel.toggleTheme(isDark)
+        }
       )
     }
   }

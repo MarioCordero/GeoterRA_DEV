@@ -5,16 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -23,9 +14,14 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.dialogs.compose.rememberFileSaverLauncher
+import io.github.vinceglb.filekit.write
+import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
 import ucr.ac.cr.inii.geoterra.presentation.components.analysisform.RequestDetailSheet
 import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisFormScreen
+import ucr.ac.cr.inii.geoterra.presentation.utils.pdf.PdfGenerator
 
 class RequestsScreen : Screen {
   @OptIn(ExperimentalMaterial3Api::class)
@@ -38,6 +34,18 @@ class RequestsScreen : Screen {
     val snackbarHostState = remember { SnackbarHostState() }
     var selectedRequest by remember { mutableStateOf<AnalysisRequestRemote?>(null) }
     val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    var bytesToWrite by remember { mutableStateOf<ByteArray?>(null) }
+
+    val saverLauncher = rememberFileSaverLauncher { file ->
+      if (file != null && bytesToWrite != null) {
+        scope.launch {
+          file.write(bytesToWrite!!)
+          bytesToWrite = null
+          snackbarHostState.showSnackbar("Archivo guardado con éxito")
+        }
+      }
+    }
 
     LaunchedEffect(Unit) {
       viewModel.fetchSubmittedRequests()
@@ -50,17 +58,40 @@ class RequestsScreen : Screen {
       }
     }
 
-    if (selectedRequest != null) {
+    selectedRequest?.let { request ->
       ModalBottomSheet(
         onDismissRequest = { selectedRequest = null },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
         shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
       ) {
-        RequestDetailSheet(request = selectedRequest!!)
+        RequestDetailSheet(
+          request = request,
+          onDownloadPdf = { req ->
+            scope.launch {
+              try {
+                val pdfBytes = PdfGenerator.generateFromComposable(
+                  request = req,
+                  fileName = "Reporte_${req.name}"
+                )
+                if (pdfBytes != null) {
+                  bytesToWrite = pdfBytes // 1. Guardamos los bytes en memoria
+//                  saverLauncher.launch(
+//                    suggestedName = "Reporte_${req.name.replace(" ", "_")}",
+//                    extension = "pdf",
+//                    directory = null,
+//                  )
+                }
+              } catch (e: Exception) {
+                e.printStackTrace()
+                snackbarHostState.showSnackbar("Falló la generación: ${e.message}")
+              }
+            }
+          }
+        )
       }
     }
-    
+
     Scaffold(
       snackbarHost = { SnackbarHost(snackbarHostState) },
       floatingActionButton = {
@@ -86,9 +117,9 @@ class RequestsScreen : Screen {
       RequestsContent(
         modifier = Modifier.padding(padding),
         state = state,
-        onView = { request -> selectedRequest = request },
-        onEdit = { request -> navigator.push(AnalysisFormScreen(request)) },
-        onDelete = { request -> viewModel.deleteRequest(request.id) },
+        onView = { req -> selectedRequest = req },
+        onEdit = { req -> navigator.push(AnalysisFormScreen(req)) },
+        onDelete = { req -> viewModel.deleteRequest(req.id) },
       )
     }
   }

@@ -31,171 +31,118 @@ import ucr.ac.cr.inii.geoterra.presentation.components.layout.SectionHeader
 import ucr.ac.cr.inii.geoterra.presentation.components.request.StatusBadge
 
 @Composable
-fun RequestDetailSheet(request: AnalysisRequestRemote) {
-  val scrollState = rememberScrollState()
+fun RequestDetailSheet(
+  request: AnalysisRequestRemote,
+  isForPdf: Boolean = false,
+  onDownloadPdf: (AnalysisRequestRemote) -> Unit
+) {
+  val scrollState = if (!isForPdf) rememberScrollState() else null
+
+  val verticalSpacing = if (isForPdf) 8.dp else 16.dp
+  val chipSpacing = if (isForPdf) 4.dp else 8.dp
+  val titleSize = if (isForPdf) 18.sp else 22.sp
 
   Column(
     modifier = Modifier
-      .padding(20.dp)
-      .fillMaxSize()
-      .verticalScroll(scrollState),
+      .padding(if (isForPdf) 12.dp else 20.dp)
+      .then(
+        if (isForPdf) Modifier.width(380.dp) else Modifier.fillMaxSize()
+      )
+      .then(
+        if (scrollState != null) Modifier.verticalScroll(scrollState) else Modifier
+      ),
   ) {
     Row(
       modifier = Modifier.fillMaxWidth(),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically
     ) {
-      Column() {
-        Text(
-          text = request.name,
-          style = MaterialTheme.typography.titleLarge.copy(
-            fontWeight = FontWeight.ExtraBold,
-            letterSpacing = (-0.5).sp
-          ),
-          color = MaterialTheme.colorScheme.onSurface,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis
-        )
-      }
+      Text(
+        text = request.name,
+        style = MaterialTheme.typography.titleLarge.copy(
+          fontSize = titleSize,
+          fontWeight = FontWeight.ExtraBold,
+          letterSpacing = (-0.5).sp
+        ),
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier.weight(1f, fill = false),
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+      )
       StatusBadge(request.state)
     }
 
-    Spacer(modifier = Modifier.height(16.dp))
+    Spacer(modifier = Modifier.height(verticalSpacing))
 
+    // --- CONTACTO ---
     SectionHeader(title = "Información de Contacto")
 
-    InfoChip(
-      icon = Icons.Default.Person,
-      label = "Propietario",
-      value = request.owner_name ?: "N/D",
-      modifier = Modifier.fillMaxWidth(),
-      iconColor = MaterialTheme.colorScheme.primary
-    )
+    val contactModifier = Modifier.fillMaxWidth()
+    InfoChip(Icons.Default.Person, "Propietario", request.owner_name ?: "N/D", contactModifier, MaterialTheme.colorScheme.primary)
+    Spacer(modifier = Modifier.height(chipSpacing))
+    InfoChip(Icons.Default.Mail, "Número", request.owner_contact_number ?: "N/D", contactModifier, MaterialTheme.colorScheme.secondary)
+    Spacer(modifier = Modifier.height(chipSpacing))
+    InfoChip(Icons.Default.LocationOn, "Correo", request.email, contactModifier, MaterialTheme.colorScheme.secondary)
 
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(verticalSpacing))
 
-    InfoChip(
-      icon = Icons.Default.Mail,
-      label = "Número de Contacto",
-      value = request.owner_contact_number ?: "N/D",
-      modifier = Modifier.fillMaxWidth(),
-      iconColor = MaterialTheme.colorScheme.secondary
-    )
-
-    Spacer(modifier = Modifier.height(8.dp))
-
-    InfoChip(
-      icon = Icons.Default.LocationOn,
-      label = "Correo Solicitante",
-      value = request.email,
-      modifier = Modifier.fillMaxWidth(),
-      iconColor = MaterialTheme.colorScheme.secondary
-    )
-
-    Spacer(modifier = Modifier.height(16.dp))
-
+    // --- SITIO ---
     SectionHeader(title = "Información del Sitio")
+    InfoChip(Icons.Default.LocationOn, "Región", request.region, Modifier.fillMaxWidth())
 
-    InfoChip(
-      icon = Icons.Default.LocationOn,
-      label = "Región",
-      value = request.region,
-      modifier = Modifier.fillMaxWidth()
-    )
-
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(chipSpacing))
 
     Row(
       modifier = Modifier.fillMaxWidth(),
-      horizontalArrangement = Arrangement.spacedBy(8.dp)
+      horizontalArrangement = Arrangement.spacedBy(chipSpacing)
     ) {
-      InfoChip(
-        icon = Icons.Default.Explore,
-        label = "Latitud",
-        value = request.latitude.take(8),
-        modifier = Modifier.weight(1f),
-        iconColor = MaterialTheme.colorScheme.secondary
-      )
-      InfoChip(
-        icon = Icons.Default.Explore,
-        label = "Longitud",
-        value = request.longitude.take(8),
-        modifier = Modifier.weight(1f),
-        iconColor = MaterialTheme.colorScheme.secondary
-      )
+      val coordModifier = Modifier.weight(1f)
+      InfoChip(Icons.Default.Explore, "Lat", request.latitude.take(8), coordModifier, MaterialTheme.colorScheme.secondary)
+      InfoChip(Icons.Default.Explore, "Long", request.longitude.take(8), coordModifier, MaterialTheme.colorScheme.secondary)
     }
 
-    Spacer(modifier = Modifier.height(16.dp))
+    Spacer(modifier = Modifier.height(verticalSpacing))
 
+    // --- OBSERVACIONES ---
     SectionHeader(title = "Observaciones Físicas")
-
     Row(
       modifier = Modifier.fillMaxWidth(),
-      horizontalArrangement = Arrangement.spacedBy(8.dp)
+      horizontalArrangement = Arrangement.spacedBy(chipSpacing)
     ) {
-      InfoChip(
-        label = "Sensación",
-        value = request.temperature_sensation ?: "N/A",
-        icon = Icons.Default.Thermostat,
-        iconColor = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.weight(1f)
-      )
-      InfoChip(
-        label = "Burbujas",
-        value = if (request.bubbles == 1) "Presentes" else "Ausentes",
-        icon = Icons.Default.BubbleChart,
-        iconColor = MaterialTheme.colorScheme.secondary,
-        modifier = Modifier.weight(1f)
-      )
+      val obsModifier = Modifier.weight(1f)
+      InfoChip(Icons.Default.Thermostat, "Sensación", request.temperature_sensation ?: "N/A", obsModifier, MaterialTheme.colorScheme.primary)
+      InfoChip(Icons.Default.BubbleChart, "Burbujas", if (request.bubbles == 1) "Sí" else "No", obsModifier, MaterialTheme.colorScheme.secondary)
     }
 
+    // --- NOTAS ---
     if (!request.details.isNullOrBlank()) {
-      Spacer(modifier = Modifier.height(16.dp))
+      Spacer(modifier = Modifier.height(verticalSpacing))
       SectionHeader(title = "Notas de Campo")
-      InfoChip(
-        icon = Icons.Default.Description,
-        label = "Detalles",
-        value = request.details,
-        modifier = Modifier.fillMaxWidth(),
-      )
+      InfoChip(Icons.Default.Description, "Detalles", request.details, Modifier.fillMaxWidth())
     }
 
-    Spacer(modifier = Modifier.height(16.dp))
+    Spacer(modifier = Modifier.height(verticalSpacing))
 
+    // --- PIE DE PÁGINA ---
     Text(
       text = "Solicitud creada el ${request.created_at}",
-      style = MaterialTheme.typography.labelSmall,
-      color = MaterialTheme.colorScheme.onSurface,
+      style = MaterialTheme.typography.labelSmall.copy(fontSize = if (isForPdf) 8.sp else 10.sp),
+      color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
       modifier = Modifier.align(Alignment.CenterHorizontally)
     )
 
-    Spacer(modifier = Modifier.height(16.dp))
-
-    Button(
-      onClick = { /* TODO: Acción de descargar */ },
-      modifier = Modifier
-        .fillMaxWidth()
-        .height(58.dp),
-      shape = RoundedCornerShape(16.dp),
-      colors = ButtonDefaults.buttonColors(
-        containerColor = MaterialTheme.colorScheme.primary,
-        contentColor = MaterialTheme.colorScheme.onPrimary
-      ),
-      elevation = ButtonDefaults.buttonElevation(
-        defaultElevation = 4.dp,
-        pressedElevation = 0.dp
-      )
-    ) {
-      Icon(
-        imageVector = Icons.Default.Download,
-        contentDescription = "Descargar",
-        modifier = Modifier.size(20.dp)
-      )
-      Spacer(modifier = Modifier.width(8.dp))
-      Text("Descargar Solicitud", style = MaterialTheme.typography.titleMedium)
+    if (!isForPdf) {
+      Spacer(modifier = Modifier.height(16.dp))
+      Button(
+        onClick = { onDownloadPdf(request) },
+        modifier = Modifier.fillMaxWidth().height(58.dp),
+        shape = RoundedCornerShape(16.dp)
+      ) {
+        Icon(Icons.Default.Download, null, modifier = Modifier.size(20.dp))
+        Spacer(modifier = Modifier.width(8.dp))
+        Text("Descargar Solicitud", style = MaterialTheme.typography.titleMedium)
+      }
+      Spacer(modifier = Modifier.height(24.dp))
     }
-
-    Spacer(modifier = Modifier.height(24.dp)) // Espacio final para el scroll
-
   }
 }

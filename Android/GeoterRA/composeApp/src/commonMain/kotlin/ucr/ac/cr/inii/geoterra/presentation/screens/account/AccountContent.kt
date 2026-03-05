@@ -4,24 +4,35 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,7 +58,7 @@ fun AccountContent(
   onLogoutClick: () -> Unit,
   onDeleteAccountClick: () -> Unit,
   onEditClick: () -> Unit,
-  onRefresh: () -> Unit
+  onThemeToggle: (Boolean) -> Unit
 ) {
   var showLogoutDialog by remember { mutableStateOf(false) }
   var showDeleteDialog by remember { mutableStateOf(false) }
@@ -76,12 +87,14 @@ fun AccountContent(
         item {
           Text("Configuración", style = MaterialTheme.typography.labelLarge, color = Color.Gray)
           Spacer(Modifier.height(8.dp))
+          ThemeSelectorItem(
+            isDark = state.isDarkMode, // Asumiendo que esta prop existe en tu state
+            onToggle = { isDark ->
+              onThemeToggle(isDark)
+            }
+          )
           ActionMenuItem(Icons.Default.Edit, "Editar información personal", onClick = onEditClick)
-          ActionMenuItem(
-            Icons.Default.History,
-            "Historial de solicitudes",
-            onClick = { /* Historial */ })
-          ActionMenuItem(Icons.Default.Refresh, "Refrescar datos", onClick = onRefresh)
+          ActionMenuItem(Icons.Default.History, "Historial de solicitudes", onClick = { /* Historial */ })
         }
 
         // Acciones de Cuenta (Peligro)
@@ -102,9 +115,8 @@ fun AccountContent(
         }
       }
     } else if (state.error != null) {
-//        StatusDialog(state.error, onRefresh)
+//        StatusDialog(false, state.error, onDismiss = { showDeleteDialog = false })
     }
-
   }
   
   if (showLogoutDialog) {
@@ -126,5 +138,51 @@ fun AccountContent(
       onConfirm = onDeleteAccountClick,
       onDismiss = { showDeleteDialog = false }
     )
+  }
+}
+
+@Composable
+fun ThemeSelectorItem(
+  isDark: Boolean,
+  onToggle: (Boolean) -> Unit
+) {
+  Surface(
+    onClick = { onToggle(!isDark) },
+    shape = RoundedCornerShape(12.dp),
+    color = Color.Transparent
+  ) {
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(vertical = 8.dp),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+          imageVector = if (isDark) Icons.Default.DarkMode else Icons.Default.LightMode,
+          contentDescription = null,
+          tint = MaterialTheme.colorScheme.primary
+        )
+        Spacer(Modifier.width(12.dp))
+        Text(
+          text = if (isDark) "Modo Oscuro" else "Modo Claro",
+          style = MaterialTheme.typography.bodyLarge
+        )
+      }
+
+      // Switch moderno con iconos internos
+      Switch(
+        checked = isDark,
+        onCheckedChange = onToggle,
+        thumbContent = {
+          Icon(
+            modifier = Modifier.size(SwitchDefaults.IconSize),
+            imageVector = if (isDark) Icons.Default.DarkMode else Icons.Default.LightMode,
+            contentDescription = null,
+          )
+        }
+      )
+    }
   }
 }

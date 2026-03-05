@@ -21,6 +21,7 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.map.MapScreen
 
 object AccountTab : Tab {
+  override val key: String = "AccountScreen_${hashCode()}"
 
   @Composable
   override fun Content() {
@@ -33,9 +34,7 @@ object AccountTab : Tab {
       LoginScreen()
     }
 
-    Crossfade(targetState = rootScreen) { screen ->
-      Navigator(screen)
-    }
+    Navigator(rootScreen)
   }
   
   override val options: TabOptions

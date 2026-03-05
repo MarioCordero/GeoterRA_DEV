@@ -56,6 +56,8 @@ kotlin {
 
         // --- Dependencias COMPARTIDAS (Aquí no debe haber nada exclusivo de Android) ---
         commonMain.dependencies {
+            implementation(libs.pdf.kmp)
+            implementation(libs.file.kit)
             implementation(libs.stately.common)
             // Compose
             implementation(libs.compose.material3)

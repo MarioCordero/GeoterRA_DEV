@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.register
+package ucr.ac.cr.inii.geoterra.presentation.screens.editProfile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -21,7 +21,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -35,14 +34,13 @@ import geoterra.composeapp.generated.resources.logo_GeoterRA
 import org.jetbrains.compose.resources.painterResource
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.CustomTextField
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.FormSection
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.PasswordField
 
 @Composable
-fun RegisterContent(
+fun EditProfileContent(
   modifier: Modifier = Modifier,
-  state: RegisterState,
+  state: EditProfileState,
   snackBarState : SnackbarHostState,
-  onEvent: RegisterViewModel,
+  onEvent: EditProfileViewModel,
   onBack: () -> Unit
 ) {
   LaunchedEffect(state.snackbarMessage) {
@@ -80,7 +78,7 @@ fun RegisterContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
       ) {
         Text(
-          text = "Crear Cuenta",
+          text = "Editar Cuenta",
           style = MaterialTheme.typography.headlineSmall,
           fontWeight = FontWeight.ExtraBold
         )
@@ -109,24 +107,8 @@ fun RegisterContent(
           CustomTextField(
             value = state.phoneNumber,
             onValueChange = onEvent::onPhoneChanged,
-            label = "Teléfono (Opcional)",
+            label = "Teléfono",
             keyboardType = KeyboardType.Phone
-          )
-          PasswordField(
-            value = state.password,
-            onValueChange = onEvent::onPasswordChanged,
-            label = "Contraseña",
-            isVisible = state.isPasswordVisible,
-            onToggleVisibility = onEvent::togglePasswordVisibility,
-            isError = state.passwordError != null,
-            errorMessage = state.passwordError
-          )
-          PasswordField(
-            value = state.confirmPassword,
-            onValueChange = onEvent::onConfirmPasswordChanged,
-            label = "Confirmar Contraseña",
-            isVisible = state.isPasswordVisible,
-            onToggleVisibility = onEvent::togglePasswordVisibility
           )
         }
 
@@ -149,12 +131,8 @@ fun RegisterContent(
           if (state.isLoading) {
             CircularProgressIndicator(modifier = Modifier.size(24.dp),color = Color.White)
           } else {
-            Text("REGISTRARME", fontWeight = FontWeight.Bold)
+            Text("ACTUALIZAR", fontWeight = FontWeight.Bold)
           }
-        }
-
-        TextButton(onClick = onBack) {
-          Text("¿Ya tienes cuenta? Inicia sesión", color = MaterialTheme.colorScheme.onSurface)
         }
       }
     }

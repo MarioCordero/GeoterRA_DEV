@@ -1,6 +1,5 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.login
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -17,12 +16,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import org.koin.compose.koinInject
-import org.koin.core.parameter.parametersOf
-import org.koin.core.qualifier.Qualifier
-import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeContent
-import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeViewModel
-import ucr.ac.cr.inii.geoterra.presentation.screens.manifestation.ManifestationDetailViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.register.RegisterScreen
 
 /**

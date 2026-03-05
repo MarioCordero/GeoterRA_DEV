@@ -23,13 +23,10 @@ class UserRepositoryImpl(private val client: HttpClient) : UserRepository {
   }
   
   override suspend fun updateMe(
-    name: String,
-    lastname: String,
-    email: String,
-    phone: String?
+    request : UserUpdateRequest
   ): Result<String> = try {
     val response = client.put("users/me") {
-      setBody(UserUpdateRequest(name, lastname, email, phone))
+      setBody(request)
     }
     val envelope = response.body<ApiResponseModel<MessageResponse>>()
     Result.success(envelope.data?.message ?: "Success")
