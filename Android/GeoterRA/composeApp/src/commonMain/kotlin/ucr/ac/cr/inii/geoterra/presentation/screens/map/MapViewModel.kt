@@ -14,13 +14,11 @@ class MapViewModel(
   private val permissionManager: PermissionManager
 ) : BaseScreenModel<MapState>(MapState()) {
 
-  fun loadMapMarkers(region_id: UInt? = null) {
+  fun loadMapMarkers(regionId: UInt? = null) {
     screenModelScope.launch {
       _state.update { it.copy(isLoading = true) }
 
-      val queryParam = (region_id ?: 1u)
-
-      manifestationsRepository.getManifestations(queryParam)
+      manifestationsRepository.getManifestations(regionId)
         .onSuccess { data ->
           _state.update {
             it.copy(

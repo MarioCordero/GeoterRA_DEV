@@ -39,7 +39,7 @@ class AnalysisFormViewModel(
       is AnalysisFormEvent.LonChanged -> _state.update { it.copy(longitude = event.value) }
       is AnalysisFormEvent.DetailsChanged -> _state.update { it.copy(details = event.value) }
       is AnalysisFormEvent.Submit -> submitForm()
-      is AnalysisFormEvent.UseCurrentLocation -> takePhoto()
+      is AnalysisFormEvent.UseCurrentLocation -> fetchCurrentLocation()
       is AnalysisFormEvent.PickPhoto -> pickPhoto()
       is AnalysisFormEvent.PhotoCaptured -> processPhoto(event.bytes)
     }

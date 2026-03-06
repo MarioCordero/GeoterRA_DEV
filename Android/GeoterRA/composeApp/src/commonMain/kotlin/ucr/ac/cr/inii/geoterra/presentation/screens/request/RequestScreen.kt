@@ -104,7 +104,7 @@ class RequestsScreen : Screen {
         }
       },
       topBar = {
-        Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp)) {
           Text(
             text = "Solicitudes",
             style = MaterialTheme.typography.headlineMedium,

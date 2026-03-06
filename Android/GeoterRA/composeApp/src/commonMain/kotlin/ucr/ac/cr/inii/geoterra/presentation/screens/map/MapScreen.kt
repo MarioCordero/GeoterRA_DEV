@@ -44,17 +44,10 @@ class MapScreen(
     val navigator = LocalNavigator.currentOrThrow
 
     val snackBarHost = remember { SnackbarHostState() }
-
-//    LaunchedEffect(state.snackBarMessage) {
-//      state.snackBarMessage?.let {
-//        snackBarHost.showSnackbar(message = it)
-//        viewModel.dismissSnackBar()
-//      }
-//    }
     
     LaunchedEffect(Unit) {
       viewModel.requestLocationIfNeeded()
-      viewModel.loadMapMarkers()
+      viewModel.loadMapMarkers(state.selectedRegionId)
     }
 
     Scaffold(

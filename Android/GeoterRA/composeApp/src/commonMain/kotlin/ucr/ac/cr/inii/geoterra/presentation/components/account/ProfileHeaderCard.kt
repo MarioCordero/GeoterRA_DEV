@@ -28,18 +28,19 @@ import ucr.ac.cr.inii.geoterra.data.model.remote.UserRemote
 fun ProfileHeaderCard(user: UserRemote) {
   Card(
     modifier = Modifier.fillMaxWidth(),
-    colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     shape = RoundedCornerShape(24.dp)
   ) {
     Row(modifier = Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
       Box(
-        modifier = Modifier.size(65.dp).background(Color(0xFFE0E0E0), CircleShape),
+        modifier = Modifier.size(65.dp).background(MaterialTheme.colorScheme.background, CircleShape),
         contentAlignment = Alignment.Center
       ) {
         Text(
           "${user.first_name.first()}${user.last_name.first()}",
           fontWeight = FontWeight.Bold,
-          fontSize = 24.sp
+          fontSize = 24.sp,
+          color = MaterialTheme.colorScheme.onSurface
         )
       }
       Spacer(Modifier.width(16.dp))
@@ -47,12 +48,13 @@ fun ProfileHeaderCard(user: UserRemote) {
         Text(
           "${user.first_name} ${user.last_name}",
           style = MaterialTheme.typography.titleLarge,
-          fontWeight = FontWeight.Bold
+          fontWeight = FontWeight.Bold,
+          color = MaterialTheme.colorScheme.onSurface
         )
         Text(
           "Miembro desde: ${user.created_at.take(10)}",
           style = MaterialTheme.typography.bodySmall,
-          color = Color.Gray
+          color = MaterialTheme.colorScheme.outline
         )
       }
     }

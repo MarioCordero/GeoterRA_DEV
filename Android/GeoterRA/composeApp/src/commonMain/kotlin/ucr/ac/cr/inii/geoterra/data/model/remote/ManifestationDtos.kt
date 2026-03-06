@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 data class ManifestationRemote(
   val id : String,
   val name : String,
-  val region_id : UInt,
+  val region_id : UInt?,
   val latitude : Float,
   val longitude : Float,
   val description : String?,

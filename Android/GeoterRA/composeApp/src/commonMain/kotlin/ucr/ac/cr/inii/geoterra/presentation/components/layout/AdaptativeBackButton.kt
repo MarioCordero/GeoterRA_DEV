@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,12 +25,12 @@ fun AdaptiveBackButton(
   if (platform.isIOS) {
     IconButton(
       onClick = onBack,
-      modifier = modifier.size(45.dp),
+      modifier = modifier.size(44.dp),
     ) {
       Icon(
-        imageVector = Icons.Default.ArrowBackIosNew,
-        contentDescription = "Regresar",
-        modifier = Modifier.size(25.dp)
+        imageVector = Icons.Default.Close,
+        contentDescription = "Cerrar",
+        modifier = Modifier.size(24.dp)
       )
     }
   }

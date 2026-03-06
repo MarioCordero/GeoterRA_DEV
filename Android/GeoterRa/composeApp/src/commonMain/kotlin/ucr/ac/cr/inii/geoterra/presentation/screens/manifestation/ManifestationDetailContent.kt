@@ -52,12 +52,20 @@ fun ManifestationDetailContent(
     modifier = modifier
       .fillMaxSize()
       .verticalScroll(rememberScrollState())
-      .padding(16.dp)
   ) {
-    AdaptiveBackButton(
-      onBack = onBack,
-      modifier = Modifier.padding(bottom = 16.dp)
-    )
+    Row(
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.Start
+    ) {
+      AdaptiveBackButton(onBack = onBack)
+      Text(
+        text = manifestation.name,
+        style = MaterialTheme.typography.headlineMedium,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.primary
+      )
+    }
+    Spacer(modifier = Modifier.height(24.dp))
 
     // --- SECCIÓN: ENCABEZADO Y ACCIONES ---
     Text(
@@ -72,7 +80,7 @@ fun ManifestationDetailContent(
     ) {
       item { ActionCard("Diagrama Piper", Icons.Default.AutoGraph, Color(0xFF2196F3)) { /* Ver Gráfico */ } }
       item { ActionCard("Descargar PDF", Icons.Default.Download, Color(0xFF4CAF50)) { onDownload() } }
-      item { ActionCard("Historial", Icons.Default.History, Color(0xFF9C27B0)) { /* Ver Logs */ } }
+//      item { ActionCard("Historial", Icons.Default.History, Color(0xFF9C27B0)) { /* Ver Logs */ } }
     }
 
     Spacer(modifier = Modifier.height(24.dp))

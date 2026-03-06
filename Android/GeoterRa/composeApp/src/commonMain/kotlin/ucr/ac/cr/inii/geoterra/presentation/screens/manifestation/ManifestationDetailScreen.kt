@@ -31,29 +31,11 @@ class ManifestationDetailScreen(val manifestation: ManifestationRemote) : Screen
     val state by viewModel.state.collectAsState()
     val navigator = LocalNavigator.currentOrThrow
 
-    Scaffold(
-      topBar = {
-        Row(
-          modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.Start
-        ) {
-          AdaptiveBackButton(onBack = {navigator.pop()})
-          Text(
-            text = manifestation.name,
-            style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-          )
-        }
-      }
-    ) { paddingValues ->
-      ManifestationDetailContent(
-        modifier = Modifier.padding(paddingValues),
-        manifestation = state.manifestation!!,
-        onDownload = viewModel::downloadReport,
-        onBack = navigator::pop
-      )
-    }
+    ManifestationDetailContent(
+      modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+      manifestation = state.manifestation!!,
+      onDownload = viewModel::downloadReport,
+      onBack = navigator::pop
+    )
   }
 }

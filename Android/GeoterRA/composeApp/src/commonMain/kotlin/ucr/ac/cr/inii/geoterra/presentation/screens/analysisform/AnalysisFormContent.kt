@@ -121,7 +121,7 @@ fun AnalysisFormContent(
             label = "Latitud",
             modifier = Modifier.weight(1f),
             keyboardType = KeyboardType.Number,
-            readOnly = true // Opcional: para que usen los botones
+            readOnly = true
           )
           CustomTextField(
             value = state.longitude,
