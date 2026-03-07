@@ -8,5 +8,5 @@ data class LoginState(
   val passwordError: String? = null,
   val isLoading: Boolean = false,
   val isPasswordVisible: Boolean = false,
-  val snackbarMessage: String? = null
+  val snackBarMessage: String? = null
 )

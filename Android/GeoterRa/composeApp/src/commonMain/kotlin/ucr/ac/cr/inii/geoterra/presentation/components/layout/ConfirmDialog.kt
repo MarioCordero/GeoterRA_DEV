@@ -1,5 +1,6 @@
 package ucr.ac.cr.inii.geoterra.presentation.components.layout
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,6 +13,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -46,7 +48,8 @@ fun ConfirmDialog(
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.onSurface
       )
     },
     text = {
@@ -55,7 +58,7 @@ fun ConfirmDialog(
         style = MaterialTheme.typography.bodyMedium,
         textAlign = TextAlign.Center,
         modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.outline
+        color = MaterialTheme.colorScheme.onSurface
       )
     },
     confirmButton = {
@@ -69,15 +72,19 @@ fun ConfirmDialog(
         ),
         shape = RoundedCornerShape(12.dp)
       ) {
-        Text(confirmText, fontWeight = FontWeight.Bold)
+        Text(confirmText, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary)
       }
     },
     dismissButton = {
-      TextButton(onClick = onDismiss) {
+      OutlinedButton(
+        onClick = onDismiss,
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+      ) {
         Text(
           "Cancelar",
-          color = MaterialTheme.colorScheme.outline,
-          fontWeight = FontWeight.Medium
+          color = MaterialTheme.colorScheme.error,
+          fontWeight = FontWeight.Medium,
         )
       }
     }

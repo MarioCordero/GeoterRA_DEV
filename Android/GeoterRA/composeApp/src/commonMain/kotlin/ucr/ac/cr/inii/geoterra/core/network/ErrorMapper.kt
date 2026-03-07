@@ -29,17 +29,17 @@ object ErrorMapper {
 
   fun mapCodeToMessage(errorCode: String): String {
     return when (errorCode) {
-      INVALID_CREDENTIALS -> "The email or password you entered is incorrect."
-      MISSING_AUTH_TOKEN -> "Your session has expired. Please log in again."
-      INVALID_ACCESS_TOKEN -> "The provided access token is invalid."
-      INVALID_REFRESH_TOKEN -> "The provided refresh token is invalid."
-      EMAIL_ALREADY_IN_USE -> "This email is already registered."
-      WEAK_PASSWORD -> "Your password is too weak. Use at least 8 characters."
-      INVALID_EMAIL -> "Please enter a valid email address."
-      NOT_FOUND -> "The requested resource was not found."
-      INTERNAL_ERROR -> "A server error occurred. Please try again later."
-      FORBIDDEN_ACCESS -> "You do not have permission to perform this action."
-      else -> "An unexpected error occurred ($errorCode). Please try again."
+      INVALID_CREDENTIALS -> "El correo o la contraseña son incorrectos."
+      MISSING_AUTH_TOKEN -> "Tu sesión ha expirado. Por favor, inicia sesión de nuevo."
+      INVALID_ACCESS_TOKEN -> "El token de acceso proporcionado no es válido."
+      INVALID_REFRESH_TOKEN -> "El token de actualización proporcionado no es válido."
+      EMAIL_ALREADY_IN_USE -> "Este correo electrónico ya está registrado."
+      WEAK_PASSWORD -> "La contraseña es demasiado débil. Usa al menos 8 caracteres."
+      INVALID_EMAIL -> "Por favor, ingresa una dirección de correo válida."
+      NOT_FOUND -> "El recurso solicitado no fue encontrado."
+      INTERNAL_ERROR -> "Ocurrió un error en el servidor. Por favor, intenta más tarde."
+      FORBIDDEN_ACCESS -> "No tienes permiso para realizar esta acción."
+      else -> "Ocurrió un error inesperado ($errorCode). Por favor, intenta de nuevo."
     }
   }
 }

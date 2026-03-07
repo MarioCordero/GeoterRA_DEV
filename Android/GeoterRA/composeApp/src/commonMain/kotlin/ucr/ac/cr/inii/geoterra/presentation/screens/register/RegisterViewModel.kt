@@ -17,9 +17,11 @@ class RegisterViewModel(
   fun onPasswordChanged(v: String) = updateState { it.copy(password = v, passwordError = null) }
   fun onConfirmPasswordChanged(v: String) = updateState { it.copy(confirmPassword = v) }
   fun togglePasswordVisibility() = updateState { it.copy(isPasswordVisible = !it.isPasswordVisible) }
-  fun dismissSnackbar() = updateState { it.copy(snackbarMessage = null) }
+  fun dismissSnackbar() = updateState { it.copy(snackBarMessage = null) }
 
-  fun register(onSuccess: () -> Unit) {
+  fun clearStatus() = updateState { it.copy(isSuccess = false, errorMessage = null) }
+
+  fun register() {
     val s = state.value
 
     if (s.name.isBlank()) return updateState { it.copy(nameError = "Requerido") }
@@ -27,7 +29,7 @@ class RegisterViewModel(
     if (s.password.length < 8) return updateState { it.copy(passwordError = "Mínimo 8 caracteres") }
     if (s.password != s.confirmPassword) return updateState { it.copy(passwordError = "Las contraseñas no coinciden") }
 
-    updateState { it.copy(isLoading = true, snackbarMessage = null) }
+    updateState { it.copy(isLoading = true, snackBarMessage = null) }
 
     screenModelScope.launch {
       val request = RegisterRequest(
@@ -40,14 +42,14 @@ class RegisterViewModel(
 
       authRepository.register(request)
         .onSuccess {
-          updateState { it.copy(isLoading = false) }
-          onSuccess()
+          updateState { it.copy(isLoading = false, isSuccess = true) }
         }
         .onFailure { error ->
           updateState {
             it.copy(
               isLoading = false,
-              snackbarMessage = error.message ?: "Ocurrió un error inesperado"
+              errorMessage = error.message
+                ?: "Ha ocurrido un error de servidor al actualizar al crear la cuenta."
             )
           }
         }

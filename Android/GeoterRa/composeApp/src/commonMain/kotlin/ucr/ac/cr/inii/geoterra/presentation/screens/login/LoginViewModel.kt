@@ -1,7 +1,6 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.login
 
 import cafe.adriel.voyager.core.model.screenModelScope
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.remote.LoginRequest
 import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepository
@@ -36,16 +35,16 @@ class LoginViewModel(
     
     // 1. Validaciones básicas
     if (email.isBlank() || !email.contains("@")) {
-      updateState { it.copy(emailError = "Please enter a valid email") }
+      updateState { it.copy(emailError = "Por favor, ingrese un email válido") }
       return
     }
     if (password.length < 8) {
-      updateState { it.copy(passwordError = "Password must be at least 8 characters") }
+      updateState { it.copy(passwordError = "La contraseña debe tener al menos 8 carácteres") }
       return
     }
     
     // 2. Estado de carga
-    updateState { it.copy(isLoading = true, passwordError = null, snackbarMessage = null) }
+    updateState { it.copy(isLoading = true, passwordError = null, snackBarMessage = null) }
     
     // 3. Una sola corrutina
     screenModelScope.launch {
@@ -59,7 +58,7 @@ class LoginViewModel(
             it.copy(
               isLoading = false,
               passwordError = error.message, // Texto bajo el campo
-              snackbarMessage = error.message // Mensaje flotante
+              snackBarMessage = error.message // Mensaje flotante
             )
           }
         }
@@ -67,6 +66,6 @@ class LoginViewModel(
   }
   
   fun dismissSnackbar() {
-    updateState { it.copy(snackbarMessage = null) }
+    updateState { it.copy(snackBarMessage = null) }
   }
 }

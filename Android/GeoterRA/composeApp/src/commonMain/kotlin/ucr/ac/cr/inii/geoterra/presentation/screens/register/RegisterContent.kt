@@ -45,8 +45,8 @@ fun RegisterContent(
   onEvent: RegisterViewModel,
   onBack: () -> Unit
 ) {
-  LaunchedEffect(state.snackbarMessage) {
-    state.snackbarMessage?.let { message ->
+  LaunchedEffect(state.snackBarMessage) {
+    state.snackBarMessage?.let { message ->
       snackBarState.showSnackbar(message)
       onEvent.dismissSnackbar()
     }
@@ -131,7 +131,7 @@ fun RegisterContent(
         }
 
         Button(
-          onClick = {onEvent.register(onBack)},
+          onClick = {onEvent.register()},
           modifier = Modifier
             .fillMaxWidth()
             .height(58.dp),

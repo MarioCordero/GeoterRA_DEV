@@ -43,8 +43,8 @@ fun EditProfileContent(
   onEvent: EditProfileViewModel,
   onBack: () -> Unit
 ) {
-  LaunchedEffect(state.snackbarMessage) {
-    state.snackbarMessage?.let { message ->
+  LaunchedEffect(state.snackBarMessage) {
+    state.snackBarMessage?.let { message ->
       snackBarState.showSnackbar(message)
       onEvent.dismissSnackbar()
     }
@@ -113,7 +113,7 @@ fun EditProfileContent(
         }
 
         Button(
-          onClick = {onEvent.register(onBack)},
+          onClick = {onEvent.updateProfile()},
           modifier = Modifier
             .fillMaxWidth()
             .height(58.dp),

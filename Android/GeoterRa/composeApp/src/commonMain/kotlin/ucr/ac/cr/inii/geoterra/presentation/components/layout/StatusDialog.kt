@@ -11,6 +11,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextButton
@@ -30,6 +32,7 @@ fun StatusDialog(
   AlertDialog(
     onDismissRequest = onDismiss,
     shape = RoundedCornerShape(28.dp),
+    containerColor = MaterialTheme.colorScheme.surface,
     icon = {
       val color = if (isSuccess) SuccessGreen else MaterialTheme.colorScheme.error
       Surface(
@@ -51,7 +54,8 @@ fun StatusDialog(
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.ExtraBold,
         textAlign = TextAlign.Center,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.onSurface
       )
     },
     text = {
@@ -59,15 +63,24 @@ fun StatusDialog(
         text = message,
         style = MaterialTheme.typography.bodyMedium,
         textAlign = TextAlign.Center,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.onSurface
       )
     },
     confirmButton = {
-      TextButton(
+      Button(
         onClick = onDismiss,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(
+          containerColor = MaterialTheme.colorScheme.primary
+        ),
+        shape = RoundedCornerShape(12.dp)
       ) {
-        Text("Entendido", fontWeight = FontWeight.Bold)
+        Text(
+          "Aceptar",
+          fontWeight = FontWeight.Bold,
+          color = MaterialTheme.colorScheme.onPrimary
+        )
       }
     }
   )

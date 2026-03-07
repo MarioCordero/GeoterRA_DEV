@@ -9,9 +9,11 @@ data class RegisterState(
   val confirmPassword: String = "",
   val isLoading: Boolean = false,
   val isPasswordVisible: Boolean = false,
-  val snackbarMessage: String? = null,
   val nameError: String? = null,
   val lastnameError: String? = null,
   val emailError: String? = null,
-  val passwordError: String? = null
+  val passwordError: String? = null,
+  val snackBarMessage: String? = null,
+  val isSuccess: Boolean = false,
+  val errorMessage: String? = null
 )

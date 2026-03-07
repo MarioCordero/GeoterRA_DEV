@@ -20,6 +20,9 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import org.koin.core.parameter.parametersOf
 import ucr.ac.cr.inii.geoterra.data.model.remote.UserRemote
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.AdaptiveBackButton
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.LoadingDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.StatusDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.SuccessActionDialog
 
 class EditProfileScreen(
   private val userProfile: UserRemote
@@ -32,10 +35,32 @@ class EditProfileScreen(
     )
     val state by viewModel.state.collectAsState()
 
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackBarState = remember { SnackbarHostState() }
+
+    // --- Dialogs ---
+    if (state.isLoading) {
+      LoadingDialog(isVisible = true, message = "Actualizando cuenta...")
+    }
+
+    if (state.isSuccess) {
+      SuccessActionDialog(
+        message = "Cuenta actualizada correctamente.",
+        confirmText = "Aceptar",
+        onConfirm = { viewModel.clearStatus(); navigator.pop() },
+        onDismiss = { viewModel.clearStatus(); navigator.pop() }
+      )
+    }
+
+    if (state.errorMessage != null) {
+      StatusDialog(
+        isSuccess = false,
+        message = state.errorMessage!!,
+        onDismiss = { viewModel.clearStatus() }
+      )
+    }
 
     Scaffold(
-      snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+      snackbarHost = { SnackbarHost(hostState = snackBarState) },
       topBar = {
         Row(
           modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
@@ -49,7 +74,7 @@ class EditProfileScreen(
       EditProfileContent(
         modifier = Modifier.padding(padding),
         state = state,
-        snackBarState = snackbarHostState,
+        snackBarState = snackBarState,
         onEvent = viewModel,
         onBack = { navigator.pop() }
       )

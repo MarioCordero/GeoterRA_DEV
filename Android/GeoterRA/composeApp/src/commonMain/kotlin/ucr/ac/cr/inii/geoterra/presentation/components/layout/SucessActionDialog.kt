@@ -1,5 +1,6 @@
 package ucr.ac.cr.inii.geoterra.presentation.components.layout
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +26,7 @@ fun SuccessActionDialog(
   AlertDialog(
     onDismissRequest = onDismiss,
     shape = RoundedCornerShape(28.dp),
+    containerColor = MaterialTheme.colorScheme.surface,
     icon = {
       Surface(
         color = SuccessGreen.copy(alpha = 0.1f),
@@ -45,7 +47,8 @@ fun SuccessActionDialog(
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.ExtraBold,
         textAlign = TextAlign.Center,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.onSurface
       )
     },
     text = {
@@ -53,7 +56,8 @@ fun SuccessActionDialog(
         text = message,
         style = MaterialTheme.typography.bodyMedium,
         textAlign = TextAlign.Center,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.onSurface
       )
     },
     confirmButton = {
@@ -62,12 +66,16 @@ fun SuccessActionDialog(
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(containerColor = SuccessGreen)
       ) {
-        Text(confirmText, fontWeight = FontWeight.Bold)
+        Text(confirmText, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary)
       }
     },
     dismissButton = {
-      TextButton(onClick = onDismiss) {
-        Text(dismissText, color = MaterialTheme.colorScheme.outline)
+      OutlinedButton(
+        onClick = onDismiss,
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+      ) {
+        Text(dismissText, color = MaterialTheme.colorScheme.error)
       }
     }
   )

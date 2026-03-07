@@ -31,8 +31,8 @@ class LoginScreen : Screen {
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(state.snackbarMessage) {
-      state.snackbarMessage?.let {
+    LaunchedEffect(state.snackBarMessage) {
+      state.snackBarMessage?.let {
         snackbarHostState.showSnackbar(message = it)
         viewModel.dismissSnackbar()
       }

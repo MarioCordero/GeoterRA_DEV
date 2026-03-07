@@ -61,10 +61,10 @@ data class AnalysisFormScreen(
     if (state.isSuccess) {
       StatusDialog(
         isSuccess = true,
-        message = "La solicitud se ha enviado correctamente.",
+        message = "La solicitud se ha creado correctamente.",
         onDismiss = {
           viewModel.clearSuccess()
-          navigator.pop() // Cerramos la pantalla al dar "Entendido"
+          navigator.pop()
         }
       )
     }

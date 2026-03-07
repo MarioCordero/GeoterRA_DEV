@@ -106,11 +106,15 @@ class AnalysisFormViewModel(
       } else {
         repository.createRequest(form)
       }
-      
+
       result.onSuccess {
         _state.update { it.copy(isSuccess = true, isLoading = false) }
       }.onFailure { e ->
-        _state.update { it.copy(isLoading = false, error = e.message) }      }
+        _state.update { it.copy(
+          isLoading = false,
+          error = e.message ?: "Ha ocurrido un error de servidor al actualizar la solicitud."
+        )}
+      }
     }
   }
 

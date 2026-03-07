@@ -18,6 +18,9 @@ import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.AdaptiveBackButton
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.LoadingDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.StatusDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.SuccessActionDialog
 
 class RegisterScreen : Screen {
   @Composable
@@ -26,10 +29,40 @@ class RegisterScreen : Screen {
     val viewModel = getScreenModel<RegisterViewModel>()
     val state by viewModel.state.collectAsState()
 
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackBarState = remember { SnackbarHostState() }
+
+    if (state.isLoading) {
+      LoadingDialog(
+        isVisible = state.isLoading,
+        message = "Creando cuenta..."
+      )
+    }
+
+    if (state.isSuccess) {
+      SuccessActionDialog(
+        message = "¡Cuenta creada con éxito! Ya puedes iniciar sesión.",
+        confirmText = "Aceptar",
+        onConfirm = {
+          viewModel.clearStatus()
+          navigator.pop() // Navega hacia atrás después de confirmar
+        },
+        onDismiss = {
+          viewModel.clearStatus()
+          navigator.pop()
+        }
+      )
+    }
+
+    if (state.errorMessage != null) {
+      StatusDialog(
+        isSuccess = false,
+        message = state.errorMessage!!,
+        onDismiss = { viewModel.clearStatus() }
+      )
+    }
 
     Scaffold(
-      snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+      snackbarHost = { SnackbarHost(hostState = snackBarState) },
       topBar = {
         Row(
           modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
@@ -43,7 +76,7 @@ class RegisterScreen : Screen {
       RegisterContent(
         modifier = Modifier.padding(padding),
         state = state,
-        snackBarState = snackbarHostState,
+        snackBarState = snackBarState,
         onEvent = viewModel,
         onBack = { navigator.pop() }
       )
