@@ -3,6 +3,7 @@ package ucr.ac.cr.inii.geoterra.core.di
 import com.russhwolf.settings.Settings
 import org.koin.dsl.module
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
+import ucr.ac.cr.inii.geoterra.data.model.remote.UserRemote
 import ucr.ac.cr.inii.geoterra.data.repository.AnalysisRequestRepositoryImpl
 import ucr.ac.cr.inii.geoterra.data.repository.AuthRepositoryImpl
 import ucr.ac.cr.inii.geoterra.data.repository.ManifestationRepositoryImp
@@ -35,12 +36,18 @@ val appModule = module {
   factory { ManifestationDetailViewModel(get()) }
   factory { LoginViewModel(get(), get()) }
   factory { RegisterViewModel(get()) }
-  factory { EditProfileViewModel(get()) }
+
+  factory { params ->
+    EditProfileViewModel(
+      userProfile = params.get<UserRemote>(),
+      get(),
+    )
+  }
 
   factory { params ->
     AnalysisFormViewModel(
       get(),
-      initialRequest = params.getOrNull<AnalysisRequestRemote>(),      get(),
+      requestToEdit = params.getOrNull<AnalysisRequestRemote>(),      get(),
       get(),
       get()
     )

@@ -14,7 +14,7 @@ import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 class AnalysisFormViewModel(
   private val repository: AnalysisRequestRepository,
-  private val initialRequest: AnalysisRequestRemote? = null,
+  private val requestToEdit: AnalysisRequestRemote? = null,
   private val cameraManager: CameraManager,
   private val locationProvider: LocationProvider,
   private val permissionManager: PermissionManager
@@ -22,7 +22,7 @@ class AnalysisFormViewModel(
 
   init {
     // SOLUCIÓN: Si initialRequest no es nulo, cargamos sus datos en el estado
-    initialRequest?.let { request ->
+    requestToEdit?.let { request ->
       _state.update { currentState ->
         currentState.copy(
           region = request.regionName(),
@@ -102,7 +102,7 @@ class AnalysisFormViewModel(
       )
       
       val result = if (_state.value.isEditing) {
-        repository.updateRequest(initialRequest!!.id, form)
+        repository.updateRequest(requestToEdit!!.id, form)
       } else {
         repository.createRequest(form)
       }

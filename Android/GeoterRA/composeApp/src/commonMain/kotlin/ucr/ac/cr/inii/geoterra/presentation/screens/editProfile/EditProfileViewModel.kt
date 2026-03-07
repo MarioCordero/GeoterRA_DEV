@@ -2,13 +2,26 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.editProfile
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.launch
+import ucr.ac.cr.inii.geoterra.data.model.remote.UserRemote
 import ucr.ac.cr.inii.geoterra.data.model.remote.UserUpdateRequest
 import ucr.ac.cr.inii.geoterra.domain.repository.UserRepository
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 class EditProfileViewModel(
+  private val userProfile: UserRemote,
   private val userRepository: UserRepository
 ) : BaseScreenModel<EditProfileState>(EditProfileState()) {
+
+  init {
+    updateState {
+      it.copy(
+        name = userProfile.first_name,
+        lastname = userProfile.last_name,
+        email = userProfile.email,
+        phoneNumber = userProfile.phone_number ?: ""
+      )
+    }
+  }
 
   fun onNameChanged(v: String) = updateState { it.copy(name = v, nameError = null) }
   fun onLastnameChanged(v: String) = updateState { it.copy(lastname = v, lastnameError = null) }

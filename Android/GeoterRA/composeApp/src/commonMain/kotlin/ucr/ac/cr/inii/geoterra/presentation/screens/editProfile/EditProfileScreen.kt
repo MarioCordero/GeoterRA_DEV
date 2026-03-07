@@ -17,13 +17,19 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import org.koin.core.parameter.parametersOf
+import ucr.ac.cr.inii.geoterra.data.model.remote.UserRemote
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.AdaptiveBackButton
 
-class EditProfileScreen : Screen {
+class EditProfileScreen(
+  private val userProfile: UserRemote
+) : Screen {
   @Composable
   override fun Content() {
     val navigator = LocalNavigator.currentOrThrow
-    val viewModel = getScreenModel<EditProfileViewModel>()
+    val viewModel = getScreenModel<EditProfileViewModel>(
+      parameters = { parametersOf(userProfile) }
+    )
     val state by viewModel.state.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }

@@ -57,7 +57,7 @@ class AccountScreen : Screen {
           navigator.pop()
         },
         onEditClick = {
-          navigator.push(EditProfileScreen())
+          navigator.push(EditProfileScreen(userProfile = state.user!!))
         },
         onThemeToggle = { isDark ->
           viewModel.toggleTheme(isDark)
