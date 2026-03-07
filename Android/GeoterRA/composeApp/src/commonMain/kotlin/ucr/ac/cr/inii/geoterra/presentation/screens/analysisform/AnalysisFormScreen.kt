@@ -3,6 +3,7 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.analysisform
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -84,17 +85,20 @@ data class AnalysisFormScreen(
       containerColor = MaterialTheme.colorScheme.background,
       topBar = {
         Row(
-          modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 10.dp),
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.Start
         ) {
-          AdaptiveBackButton(onBack = {navigator.pop()})
           Text(
             text = "Nueva solicitud",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.secondary
+            color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.weight(1f)
           )
+          AdaptiveBackButton(onBack = {navigator.pop()})
         }
       }
     ) { paddingValues ->

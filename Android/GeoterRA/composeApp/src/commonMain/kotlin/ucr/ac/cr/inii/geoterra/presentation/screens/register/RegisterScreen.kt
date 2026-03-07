@@ -2,6 +2,7 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.register
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -65,9 +66,11 @@ class RegisterScreen : Screen {
       snackbarHost = { SnackbarHost(hostState = snackBarState) },
       topBar = {
         Row(
-          modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 10.dp),
           verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.Start
+          horizontalArrangement = Arrangement.End
         ) {
           AdaptiveBackButton(onBack = { navigator.pop() })
         }
