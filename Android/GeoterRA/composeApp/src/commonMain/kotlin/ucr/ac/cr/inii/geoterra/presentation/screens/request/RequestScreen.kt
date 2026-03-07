@@ -147,7 +147,7 @@ class RequestsScreen : Screen {
         modifier = Modifier.padding(padding),
         state = state,
         onView = { req -> selectedRequest = req },
-        onEdit = { req -> navigator.push(AnalysisFormScreen(req)) },
+        onEdit = { req -> navigator.push(AnalysisFormScreen(requestToEdit = req)) },
         onDelete = { req -> viewModel.deleteRequest(req.id) },
       )
     }

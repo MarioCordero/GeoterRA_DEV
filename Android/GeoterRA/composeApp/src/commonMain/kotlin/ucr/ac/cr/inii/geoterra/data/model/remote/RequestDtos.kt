@@ -34,15 +34,43 @@ data class AnalysisRequestRemote(
 }
 
 @Serializable
-data class AnalysisRequestFormRemote(
+data class AnalysisRequestDTO(
   val region: String,
   val email: String,
   val owner_contact_number: String?,
   val owner_name: String?,
   val temperature_sensation: String?,
-  val bubbles: Boolean?,
+  val bubbles: Int?,
   val details: String?,
   val current_usage: String?,
   val latitude: Float,
   val longitude: Float,
-)
+) {
+  companion object {
+    /**
+     * Maps a remote AnalysisRequest to a DTO.
+     *
+     * @param remote The remote AnalysisRequest to map.
+     * @return A DTO AnalysisRequest.
+     */
+    fun fromRemote(remote: AnalysisRequestRemote): AnalysisRequestDTO {
+      return AnalysisRequestDTO(
+        // Llamamos a la función que ya creaste en el Remote
+        region = remote.regionName(),
+        email = remote.email,
+        owner_contact_number = remote.owner_contact_number,
+        owner_name = remote.owner_name,
+        temperature_sensation = remote.temperature_sensation,
+
+        bubbles = remote.bubbles ?: 0,
+
+        details = remote.details,
+        current_usage = remote.current_usage,
+
+        // Convertimos String a Float de forma segura. Si falla, asignamos 0f.
+        latitude = remote.latitude.toFloatOrNull() ?: 0f,
+        longitude = remote.longitude.toFloatOrNull() ?: 0f
+      )
+    }
+  }
+}

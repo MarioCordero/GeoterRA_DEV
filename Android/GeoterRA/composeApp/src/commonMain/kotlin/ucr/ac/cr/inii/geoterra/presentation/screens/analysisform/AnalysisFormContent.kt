@@ -96,8 +96,8 @@ fun AnalysisFormContent(
           Text("¿Se observan burbujas en el agua?", style = MaterialTheme.typography.bodySmall)
         }
         Switch(
-          checked = state.bubbles,
-          onCheckedChange = { onEvent(AnalysisFormEvent.BubblesChanged(it)) },
+          checked = state.bubbles == 1,
+          onCheckedChange = { onEvent(AnalysisFormEvent.BubblesChanged(if (it) 1 else 0)) },
           colors = SwitchDefaults.colors(checkedThumbColor = Color(0xFFF57C00))
         )
       }

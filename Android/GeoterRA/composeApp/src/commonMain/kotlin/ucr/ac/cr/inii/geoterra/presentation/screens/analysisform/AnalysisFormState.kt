@@ -10,7 +10,7 @@ data class AnalysisFormState(
   val ownerName: String = "",
   val ownerContact: String = "",
   val temperatureSensation: String = "",
-  val bubbles: Boolean = false,
+  val bubbles: Int = 0,
   val currentUsage: String = "",
   val details: String = "",
   val latitude: String = "",
@@ -25,7 +25,7 @@ sealed class AnalysisFormEvent {
   data class OwnerContactChanged(val value: String) : AnalysisFormEvent()
   data class UsageChanged(val value: String) : AnalysisFormEvent()
   data class TempChanged(val value: String) : AnalysisFormEvent()
-  data class BubblesChanged(val value: Boolean) : AnalysisFormEvent()
+  data class BubblesChanged(val value: Int) : AnalysisFormEvent()
   data class LatChanged(val value: String) : AnalysisFormEvent()
   data class LonChanged(val value: String) : AnalysisFormEvent()
   data class DetailsChanged(val value: String) : AnalysisFormEvent()

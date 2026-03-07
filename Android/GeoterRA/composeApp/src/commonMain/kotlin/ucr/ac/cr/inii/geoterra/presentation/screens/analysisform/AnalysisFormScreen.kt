@@ -38,6 +38,7 @@ data class AnalysisFormScreen(
     val viewModel = getScreenModel<AnalysisFormViewModel>(
       parameters = { parametersOf(requestToEdit) }
     )
+
     val state by viewModel.state.collectAsState()
     
     if (state.isSuccess) {

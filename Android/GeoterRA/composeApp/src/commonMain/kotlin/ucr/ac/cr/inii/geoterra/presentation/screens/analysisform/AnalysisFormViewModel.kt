@@ -1,20 +1,16 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.analysisform
 
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestFormRemote
+import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestDTO
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
 import ucr.ac.cr.inii.geoterra.domain.camera.CameraManager
 import ucr.ac.cr.inii.geoterra.domain.location.LocationProvider
 import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
 import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepository
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
-import ucr.ac.cr.inii.geoterra.presentation.screens.request.RequestState
 
 class AnalysisFormViewModel(
   private val repository: AnalysisRequestRepository,
@@ -23,6 +19,27 @@ class AnalysisFormViewModel(
   private val locationProvider: LocationProvider,
   private val permissionManager: PermissionManager
 ) : BaseScreenModel<AnalysisFormState>(AnalysisFormState()) {
+
+  init {
+    // SOLUCIÓN: Si initialRequest no es nulo, cargamos sus datos en el estado
+    initialRequest?.let { request ->
+      _state.update { currentState ->
+        currentState.copy(
+          region = request.regionName(),
+          email = request.email,
+          ownerName = request.owner_name ?: "",
+          ownerContact = request.owner_contact_number ?: "",
+          temperatureSensation = request.temperature_sensation ?: "",
+          bubbles = request.bubbles ?: 0,
+          details = request.details ?: "",
+          currentUsage = request.current_usage ?: "",
+          latitude = request.latitude,
+          longitude = request.longitude,
+          isEditing = true
+        )
+      }
+    }
+  }
 
   fun dismissSnackBar() = _state.update { it.copy(snackBarMessage = null) }
   
@@ -71,7 +88,7 @@ class AnalysisFormViewModel(
     screenModelScope.launch {
       _state.update { it.copy(isLoading = true, snackBarMessage = null) }
       
-      val form = AnalysisRequestFormRemote(
+      val form = AnalysisRequestDTO(
         region = _state.value.region,
         email = _state.value.email,
         owner_name = _state.value.ownerName.ifBlank { null },

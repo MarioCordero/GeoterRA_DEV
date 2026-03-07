@@ -6,7 +6,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
-import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestFormRemote
+import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestDTO
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
 import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepository
 
@@ -29,7 +29,7 @@ class AnalysisRequestRepositoryImpl(
     }
   }
   
-  override suspend fun createRequest(form: AnalysisRequestFormRemote): Result<Unit> {
+  override suspend fun createRequest(form: AnalysisRequestDTO): Result<Unit> {
     return try {
       val response = client.post("analysis-request") {
         contentType(ContentType.Application.Json)
@@ -42,7 +42,7 @@ class AnalysisRequestRepositoryImpl(
     }
   }
   
-  override suspend fun updateRequest(id: String, form: AnalysisRequestFormRemote): Result<Unit> {
+  override suspend fun updateRequest(id: String, form: AnalysisRequestDTO): Result<Unit> {
     return try {
       val response = client.put("analysis-request/$id") {
         contentType(ContentType.Application.Json)
