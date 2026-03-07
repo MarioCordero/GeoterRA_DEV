@@ -111,7 +111,6 @@ class IosCameraManager(
 
     val picker = PHPickerViewController(configuration)
 
-    // Definimos el delegado con la firma exacta que espera iOS
     val delegate = object : NSObject(), PHPickerViewControllerDelegateProtocol {
 
       override fun picker(picker: PHPickerViewController, didFinishPicking: List<*>) {
@@ -123,7 +122,6 @@ class IosCameraManager(
           return
         }
 
-        // Obtenemos el identificador para acceder al PHAsset original
         val assetId = result.assetIdentifier
         if (assetId == null) {
           if (continuation.isActive) continuation.resume(null)
@@ -138,12 +136,10 @@ class IosCameraManager(
           return
         }
 
-        // Solicitamos el recurso original (con metadatos intactos)
         val options = PHContentEditingInputRequestOptions()
-        // Reemplaza el bloque de requestContentEditingInputWithOptions por este:
         val imageManager = PHImageManager.defaultManager()
         val requestOptions = PHImageRequestOptions()
-        requestOptions.networkAccessAllowed = true // Permite descargar de iCloud si es necesario
+        requestOptions.networkAccessAllowed = true
         requestOptions.synchronous = false
 
         imageManager.requestImageDataAndOrientationForAsset(
@@ -151,7 +147,6 @@ class IosCameraManager(
           requestOptions
         ) { data, dataUTI, orientation, info ->
 
-          // 'data' aquí contiene los metadatos EXIF originales de manera confiable
           val bytes = data?.let {
             val byteArray = ByteArray(it.length.toInt())
             memcpy(byteArray.refTo(0), it.bytes, it.length)
