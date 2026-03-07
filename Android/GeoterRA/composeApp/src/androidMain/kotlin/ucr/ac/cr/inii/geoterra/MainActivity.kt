@@ -1,5 +1,6 @@
 package ucr.ac.cr.inii.geoterra
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
@@ -14,6 +15,7 @@ import org.koin.mp.KoinPlatform.getKoin
 import ucr.ac.cr.inii.geoterra.core.di.initKoin
 import ucr.ac.cr.inii.geoterra.domain.camera.AndroidCameraManager
 import ucr.ac.cr.inii.geoterra.domain.camera.CameraManager
+import ucr.ac.cr.inii.geoterra.domain.pdf.PDFManager
 import ucr.ac.cr.inii.geoterra.domain.permissions.AndroidPermissionManager
 import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
 
@@ -41,6 +43,7 @@ import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
     super.onCreate(savedInstanceState)
 
     ActivityContext.mContext = this
+
     permissionManager = AndroidPermissionManager(this)
     cameraManager = AndroidCameraManager(this)
     
@@ -48,6 +51,8 @@ import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
       module {
         factory<PermissionManager> { permissionManager }
         factory<CameraManager> { cameraManager }
+        single { PDFManager() }
+        single<Context> { this@MainActivity }
       }
     )
     

@@ -180,11 +180,12 @@ fun AnalysisFormContent(
       ),
       enabled = !state.isLoading
     ) {
-      if (state.isLoading) {
-        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
-      } else {
-        Text("GUARDAR SOLICITUD", fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
-      }
+      Text("ENVIAR SOLICITUD", fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
+
+//      if (state.isLoading) {
+//        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
+//      } else {
+//      }
     }
 
     Spacer(Modifier.height(6.dp))

@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.koin.getScreenModel
 import org.koin.core.parameter.parametersOf
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.AdaptiveBackButton
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.LoadingDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.StatusDialog
 
 data class AnalysisFormScreen(
   val requestToEdit: AnalysisRequestRemote? = null
@@ -49,6 +51,30 @@ data class AnalysisFormScreen(
         snackBarHost.showSnackbar(message = it)
         viewModel.dismissSnackBar()
       }
+    }
+
+    LoadingDialog(
+      isVisible = state.isLoading,
+    )
+
+    if (state.isSuccess) {
+      StatusDialog(
+        isSuccess = true,
+        message = "La solicitud se ha enviado correctamente.",
+        onDismiss = {
+          viewModel.clearSuccess()
+          navigator.pop() // Cerramos la pantalla al dar "Entendido"
+        }
+      )
+    }
+
+    // 3. DIÁLOGO DE ERROR
+    state.error?.let { errorMessage ->
+      StatusDialog(
+        isSuccess = false,
+        message = errorMessage,
+        onDismiss = { viewModel.clearError() }
+      )
     }
 
     Scaffold(

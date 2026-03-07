@@ -7,6 +7,7 @@ import ucr.ac.cr.inii.geoterra.data.repository.AnalysisRequestRepositoryImpl
 import ucr.ac.cr.inii.geoterra.data.repository.AuthRepositoryImpl
 import ucr.ac.cr.inii.geoterra.data.repository.ManifestationRepositoryImp
 import ucr.ac.cr.inii.geoterra.data.repository.UserRepositoryImpl
+import ucr.ac.cr.inii.geoterra.domain.pdf.PDFManager
 import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepository
 import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepository
 import ucr.ac.cr.inii.geoterra.domain.repository.ManifestationsRepository
@@ -14,7 +15,6 @@ import ucr.ac.cr.inii.geoterra.domain.repository.UserRepository
 import ucr.ac.cr.inii.geoterra.presentation.auth.AuthViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisFormViewModel
-import ucr.ac.cr.inii.geoterra.presentation.screens.editProfile.EditProfileContent
 import ucr.ac.cr.inii.geoterra.presentation.screens.editProfile.EditProfileViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginViewModel
@@ -24,18 +24,19 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.register.RegisterViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.request.RequestViewModel
 
 val appModule = module {
-  // ViewModels (ScreenModels)
+  // Tabs ViewModels (ScreenModels)
   single { HomeViewModel() }
   single { MapViewModel(get(), get(), get()) }
   single { AccountViewModel(get(), get()) }
   single { AuthViewModel(get(), get()) }
+  single { RequestViewModel(get()) }
 
+  // Inner ViewModels
   factory { ManifestationDetailViewModel(get()) }
   factory { LoginViewModel(get(), get()) }
   factory { RegisterViewModel(get()) }
   factory { EditProfileViewModel(get()) }
 
-  factory { RequestViewModel(get()) }
   factory { params ->
     AnalysisFormViewModel(
       get(),
@@ -47,6 +48,7 @@ val appModule = module {
   
   // Util modules
   single { Settings() }
+  single { PDFManager() }
   
   // Repository implementation
   single<AuthRepository> { AuthRepositoryImpl(get(), get()) }

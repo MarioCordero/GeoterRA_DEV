@@ -40,5 +40,40 @@ class RequestViewModel(
     }
   }
 
+  /**
+   * Updates the state to reflect PDF generation progress.
+   */
+  fun setPdfGenerating(isGenerating: Boolean) {
+    _state.update { it.copy(isPdfGenerating = isGenerating) }
+  }
+
+  /**
+   * Stores the path of the generated PDF.
+   */
+  fun setGeneratedPdfPath(path: String?) {
+    _state.update { it.copy(lastGeneratedPdfPath = path) }
+  }
+
+  /**
+   * Resets PDF states after closing the success dialog.
+   */
+  fun clearPdfStatus() {
+    _state.update { it.copy(lastGeneratedPdfPath = null, isPdfGenerating = false) }
+  }
+
+  /**
+   * Stores the path of the generated PDF.
+   */
+  fun setPdfError(error: String?) {
+    _state.update { it.copy(pdfError = error) }
+  }
+
+  /**
+   * Resets PDF states after closing the success dialog.
+   */
+  fun clearPdfError() {
+    _state.update { it.copy(pdfError = null) }
+  }
+
   fun dismissSnackBar() = updateState { it.copy(snackBarMessage = null) }
 }

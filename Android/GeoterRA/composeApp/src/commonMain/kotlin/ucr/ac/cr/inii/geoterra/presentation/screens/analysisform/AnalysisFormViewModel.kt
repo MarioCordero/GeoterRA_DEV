@@ -93,10 +93,13 @@ class AnalysisFormViewModel(
       result.onSuccess {
         _state.update { it.copy(isSuccess = true, isLoading = false) }
       }.onFailure { e ->
-        _state.update { it.copy(snackBarMessage = e.message, isLoading = false) }
-      }
+        _state.update { it.copy(isLoading = false, error = e.message) }      }
     }
   }
+
+  fun clearError() = _state.update { it.copy(error = null) }
+
+  fun clearSuccess() = _state.update { it.copy(isSuccess = false) }
   
   fun pickPhoto() {
     screenModelScope.launch {
