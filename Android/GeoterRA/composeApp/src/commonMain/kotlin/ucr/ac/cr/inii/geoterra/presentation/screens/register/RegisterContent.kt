@@ -56,12 +56,11 @@ fun RegisterContent(
     modifier = modifier
       .fillMaxSize()
       .padding(horizontal = 32.dp)
-      .imePadding()
       .verticalScroll(rememberScrollState()),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center
   ) {
-    Spacer(modifier = Modifier.height(48.dp))
+    Spacer(modifier = Modifier.height(16.dp))
 
     Image(
       painter = painterResource(Res.drawable.logo_GeoterRA),
@@ -154,9 +153,13 @@ fun RegisterContent(
         }
 
         TextButton(onClick = onBack) {
-          Text("¿Ya tienes cuenta? Inicia sesión", color = MaterialTheme.colorScheme.onSurface)
+          Text("¿Ya tienes cuenta? Inicia sesión",
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface)
         }
       }
     }
+
+    Spacer(modifier = Modifier.height(16.dp))
   }
 }

@@ -104,7 +104,7 @@ data class AnalysisFormScreen(
     ) { paddingValues ->
 
       AnalysisFormContent(
-        modifier = Modifier.padding(paddingValues),
+        modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
         state = state,
         onEvent = viewModel::onEvent,
       )

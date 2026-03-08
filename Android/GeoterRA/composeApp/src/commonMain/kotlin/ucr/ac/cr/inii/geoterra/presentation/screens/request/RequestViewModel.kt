@@ -3,6 +3,7 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.request
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
 import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepository
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
@@ -26,18 +27,27 @@ class RequestViewModel(
         }
     }
   }
-  
+
+  fun setRequestToDelete(request: AnalysisRequestRemote?) {
+    _state.update { it.copy(requestToDelete = request) }
+  }
+
   fun deleteRequest(requestId: String) {
     screenModelScope.launch {
-      _state.update { it.copy(isLoading = true) }
+      _state.update { it.copy(isLoading = true, requestToDelete = null) }
       requestRepository.deleteRequest(requestId)
         .onSuccess {
+          _state.update { it.copy(isLoading = false, showSuccessDialog = true) }
           fetchSubmittedRequests()
         }
         .onFailure { exception ->
           _state.update { it.copy(isLoading = false, snackBarMessage = exception.message) }
         }
     }
+  }
+
+  fun clearSuccessDialog() {
+    _state.update { it.copy(showSuccessDialog = false) }
   }
 
   /**

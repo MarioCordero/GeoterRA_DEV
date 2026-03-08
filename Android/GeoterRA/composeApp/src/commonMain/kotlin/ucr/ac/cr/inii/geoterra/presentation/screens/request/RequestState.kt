@@ -8,5 +8,7 @@ data class RequestState(
   val lastGeneratedPdfPath: String? = null,
   val pdfError: String? = null,
   val requests: List<AnalysisRequestRemote> = emptyList(),
-  val snackBarMessage: String? = null
+  val snackBarMessage: String? = null,
+  val requestToDelete: AnalysisRequestRemote? = null,
+  val showSuccessDialog: Boolean = false
 )

@@ -54,7 +54,6 @@ fun EditProfileContent(
     modifier = modifier
       .fillMaxSize()
       .padding(horizontal = 32.dp)
-      .imePadding()
       .verticalScroll(rememberScrollState()),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center

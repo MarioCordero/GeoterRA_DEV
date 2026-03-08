@@ -24,12 +24,10 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -42,7 +40,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.ActionMenuItem
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.DangerActionItem
@@ -69,7 +66,7 @@ fun AccountContent(
     } else if (state.user != null) {
       LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(20.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
       ) {
         item {
@@ -88,7 +85,7 @@ fun AccountContent(
           Text("Configuración", style = MaterialTheme.typography.labelLarge, color = Color.Gray)
           Spacer(Modifier.height(8.dp))
           ThemeSelectorItem(
-            isDark = state.isDarkMode, // Asumiendo que esta prop existe en tu state
+            isDark = state.isDarkMode,
             onToggle = { isDark ->
               onThemeToggle(isDark)
             }
@@ -115,7 +112,7 @@ fun AccountContent(
         }
       }
     } else if (state.error != null) {
-//        StatusDialog(false, state.error, onDismiss = { showDeleteDialog = false })
+      StatusDialog(false, state.error, onDismiss = { showDeleteDialog = false })
     }
   }
   
@@ -133,8 +130,8 @@ fun AccountContent(
     ConfirmDialog(
       title = "¿Eliminar cuenta?",
       message = "Esta acción es irreversible. Se borrarán todas tus solicitudes y datos de campo permanentemente.",
-      confirmText = "Eliminar permanentemente",
-      isDanger = true, // Esto pondrá los acentos en rojo
+      confirmText = "Eliminar",
+      isDanger = true,
       onConfirm = onDeleteAccountClick,
       onDismiss = { showDeleteDialog = false }
     )
@@ -171,7 +168,6 @@ fun ThemeSelectorItem(
         )
       }
 
-      // Switch moderno con iconos internos
       Switch(
         checked = isDark,
         onCheckedChange = onToggle,

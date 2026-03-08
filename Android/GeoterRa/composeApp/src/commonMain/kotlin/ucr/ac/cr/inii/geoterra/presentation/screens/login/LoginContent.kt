@@ -155,16 +155,6 @@ fun LoginContent(
             )
           }
 
-          TextButton(
-            onClick = { onRegisterClick() },
-          ) {
-            Text(
-              "¿No tienes cuenta? Regístrate aquí",
-              color = MaterialTheme.colorScheme.onSurface,
-              style = MaterialTheme.typography.bodyMedium
-            )
-          }
-
           Button(
             onClick = onLoginClick,
             modifier = Modifier
@@ -202,6 +192,16 @@ fun LoginContent(
                 Icon(Icons.Default.ArrowForward, contentDescription = null)
               }
             }
+          }
+
+          TextButton(
+            onClick = { onRegisterClick() },
+          ) {
+            Text(
+              "¿No tienes cuenta? Regístrate aquí",
+              color = MaterialTheme.colorScheme.onSurface,
+              fontWeight = FontWeight.Bold
+            )
           }
         }
       }

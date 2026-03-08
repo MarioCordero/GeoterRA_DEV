@@ -7,6 +7,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.LayoutBoundsHolder
+import androidx.compose.ui.layout.layoutBounds
 import androidx.compose.ui.unit.dp
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
 import ucr.ac.cr.inii.geoterra.presentation.components.request.RequestCardItem
@@ -38,7 +40,7 @@ fun RequestsContent(
     }
 
     LazyColumn(
-      contentPadding = PaddingValues(bottom = 32.dp, start = 16.dp, end = 16.dp, top = 16.dp),
+      contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp),
       modifier = Modifier.weight(1f).fillMaxWidth()
     ) {
@@ -51,5 +53,6 @@ fun RequestsContent(
         )
       }
     }
+
   }
 }

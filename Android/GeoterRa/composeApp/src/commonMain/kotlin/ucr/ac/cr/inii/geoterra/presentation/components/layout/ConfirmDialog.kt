@@ -79,7 +79,7 @@ fun ConfirmDialog(
       OutlinedButton(
         onClick = onDismiss,
         shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
       ) {
         Text(
           "Cancelar",

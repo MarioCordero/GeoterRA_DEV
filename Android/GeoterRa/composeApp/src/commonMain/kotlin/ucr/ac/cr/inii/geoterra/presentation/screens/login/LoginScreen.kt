@@ -42,10 +42,9 @@ class LoginScreen : Screen {
       modifier = Modifier.fillMaxSize(),
       containerColor = Color.Transparent,
       snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { padding ->
-
+    ) {
       LoginContent(
-        modifier = Modifier.padding(padding),
+        modifier = Modifier,
         state = state,
         onEmailChanged = viewModel::onEmailChanged,
         onPasswordChanged = viewModel::onPasswordChanged,

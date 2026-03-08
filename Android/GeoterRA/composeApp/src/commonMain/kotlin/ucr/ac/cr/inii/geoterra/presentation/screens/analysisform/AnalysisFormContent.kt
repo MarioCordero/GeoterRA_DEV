@@ -70,8 +70,7 @@ fun AnalysisFormContent(
         value = state.currentUsage,
         onValueChange = { onEvent(AnalysisFormEvent.UsageChanged(it)) },
         label = "Uso actual",
-        icon = Icons.Default.Phone,
-        keyboardType = KeyboardType.Phone
+        icon = Icons.Default.Workspaces
       )
     }
 
@@ -181,15 +180,14 @@ fun AnalysisFormContent(
       ),
       enabled = !state.isLoading
     ) {
-      Text("ENVIAR SOLICITUD", fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
-
-//      if (state.isLoading) {
-//        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
-//      } else {
-//      }
+      if (state.isLoading) {
+        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
+      } else {
+        Text("ENVIAR SOLICITUD", fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
+      }
     }
 
-    Spacer(Modifier.height(6.dp))
+    Spacer(Modifier.height(16.dp))
 
   }
 }

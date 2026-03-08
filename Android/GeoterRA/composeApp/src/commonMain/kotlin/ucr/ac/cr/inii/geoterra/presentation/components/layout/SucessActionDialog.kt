@@ -64,7 +64,7 @@ fun SuccessActionDialog(
       Button(
         onClick = onConfirm,
         shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = SuccessGreen)
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
       ) {
         Text(confirmText, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary)
       }
@@ -73,7 +73,7 @@ fun SuccessActionDialog(
       OutlinedButton(
         onClick = onDismiss,
         shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
       ) {
         Text(dismissText, color = MaterialTheme.colorScheme.error)
       }

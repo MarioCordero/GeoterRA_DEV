@@ -75,9 +75,9 @@ class RegisterScreen : Screen {
           AdaptiveBackButton(onBack = { navigator.pop() })
         }
       }
-    ) { padding ->
+    ) { paddingValues ->
       RegisterContent(
-        modifier = Modifier.padding(padding),
+        modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
         state = state,
         snackBarState = snackBarState,
         onEvent = viewModel,

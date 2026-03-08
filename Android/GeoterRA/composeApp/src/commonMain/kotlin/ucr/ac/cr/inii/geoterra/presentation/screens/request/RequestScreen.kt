@@ -23,6 +23,7 @@ import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
 import ucr.ac.cr.inii.geoterra.domain.pdf.PDFManager
 import ucr.ac.cr.inii.geoterra.domain.pdf.PDFUtil
 import ucr.ac.cr.inii.geoterra.presentation.components.analysisform.RequestDetailSheet
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.ConfirmDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.LoadingDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.StatusDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.SuccessActionDialog
@@ -59,6 +60,27 @@ class RequestsScreen : Screen {
       LoadingDialog(
         isVisible = state.isPdfGenerating,
         message = "Renderizando documento, por favor espere..."
+      )
+    }
+
+    state.requestToDelete?.let { request ->
+      ConfirmDialog(
+        title = "Eliminar solicitud",
+        message = "¿Estás seguro de que deseas eliminar esta solicitud? Esta acción no se puede deshacer.",
+        confirmText = "Eliminar",
+        onConfirm = { viewModel.deleteRequest(request.id) },
+        onDismiss = { viewModel.setRequestToDelete(null) },
+        isDanger = true
+      )
+    }
+
+    // 2. SuccessActionDialog para éxito
+    if (state.showSuccessDialog) {
+      SuccessActionDialog(
+        title = "¡Borrado exitoso!",
+        message = "La solicitud ha sido eliminada correctamente de tu lista.",
+        onConfirm = { viewModel.clearSuccessDialog() },
+        onDismiss = { viewModel.clearSuccessDialog() }
       )
     }
 
@@ -100,7 +122,7 @@ class RequestsScreen : Screen {
             scope.launch {
               try {
                 viewModel.setPdfGenerating(true)
-                val fileName = "Report_${req.id}"
+                val fileName = "Reporte_Solicitud_${req.name}"
 
                 // Call the generator and capture the path
                 val resultPath = PDFUtil.generateRequestPdf(req, fileName)
@@ -142,13 +164,13 @@ class RequestsScreen : Screen {
           )
         }
       }
-    ) { padding ->
+    ) { paddingValues ->
       RequestsContent(
-        modifier = Modifier.padding(padding),
+        modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
         state = state,
         onView = { req -> selectedRequest = req },
         onEdit = { req -> navigator.push(AnalysisFormScreen(requestToEdit = req)) },
-        onDelete = { req -> viewModel.deleteRequest(req.id) },
+        onDelete = { req -> viewModel.setRequestToDelete(req) }
       )
     }
   }

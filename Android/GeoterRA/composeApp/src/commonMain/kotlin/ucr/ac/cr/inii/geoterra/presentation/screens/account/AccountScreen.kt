@@ -47,7 +47,7 @@ class AccountScreen : Screen {
       }
     ) { paddingValues ->
       AccountContent(
-        modifier = Modifier.padding(paddingValues),
+        modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
         state = state,
         onLogoutClick = {
           viewModel.logout()
