@@ -6,13 +6,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestDTO
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
+import ucr.ac.cr.inii.geoterra.data.repository.AnalysisRequestRepository
+import ucr.ac.cr.inii.geoterra.data.repository.RegionRepository
 import ucr.ac.cr.inii.geoterra.domain.location.LocationProvider
 import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
-import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepository
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 class AnalysisFormViewModel(
-  private val repository: AnalysisRequestRepository,
+  private val analysisRequestRepository: AnalysisRequestRepository,
+  private val regionRepository: RegionRepository,
   private val requestToEdit: AnalysisRequestRemote? = null,
   private val locationProvider: LocationProvider,
   private val permissionManager: PermissionManager
@@ -60,6 +62,7 @@ class AnalysisFormViewModel(
 
   private fun fetchCurrentLocation() {
     screenModelScope.launch {
+
       if (permissionManager.requestLocationPermission()) {
         _state.update { it.copy(isLoading = true) }
         val location = locationProvider.observeLocation().firstOrNull()
@@ -98,9 +101,9 @@ class AnalysisFormViewModel(
       )
       
       val result = if (_state.value.isEditing) {
-        repository.updateRequest(requestToEdit!!.id, form)
+        analysisRequestRepository.updateRequest(requestToEdit!!.id, form)
       } else {
-        repository.createRequest(form)
+        analysisRequestRepository.createRequest(form)
       }
 
       result.onSuccess {

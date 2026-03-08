@@ -3,7 +3,7 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.login
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.remote.LoginRequest
-import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepository
+import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepositoryInterface
 import ucr.ac.cr.inii.geoterra.presentation.auth.AuthViewModel
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
@@ -13,7 +13,7 @@ import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
  * @param authViewModel Handles the global app session state
  */
 class LoginViewModel(
-  private val authRepository: AuthRepository,
+  private val authRepository: AuthRepositoryInterface,
   private val authViewModel: AuthViewModel
 ) : BaseScreenModel<LoginState>(LoginState()) {
   

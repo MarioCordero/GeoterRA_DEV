@@ -39,6 +39,18 @@ data class MapState(
     MapLayer("light", "Claro", "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"),
     // Capas SNIT (Servicio IGN_5)
     MapLayer(
+      id = "snit_ortofoto_5k",
+      name = "Ortofoto 1:5k (2005-2007)",
+      styleUrl = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      snitRasterUrl = "https://geos0.snitcr.go.cr/cgi-bin/web?map=ortofoto.map&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&LAYERS=Mosaico5000&STYLES=&SRS=EPSG:3857&WIDTH=256&HEIGHT=256&BBOX={bbox-epsg-3857}"
+    ),
+    MapLayer(
+      id = "snit_ortofoto_1k",
+      name = "Ortofoto 1:1k (2006-2007)",
+      styleUrl = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      snitRasterUrl = "https://geos0.snitcr.go.cr/cgi-bin/web?map=ortofoto.map&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&LAYERS=Mosaico1000&STYLES=&SRS=EPSG:3857&WIDTH=256&HEIGHT=256&BBOX={bbox-epsg-3857}"
+    ),
+    MapLayer(
       id = "snit_cultivos",
       name = "Cultivos 2017",
       styleUrl = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",

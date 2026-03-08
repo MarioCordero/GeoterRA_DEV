@@ -4,15 +4,17 @@ import com.russhwolf.settings.Settings
 import org.koin.dsl.module
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
 import ucr.ac.cr.inii.geoterra.data.model.remote.UserRemote
-import ucr.ac.cr.inii.geoterra.data.repository.AnalysisRequestRepositoryImpl
-import ucr.ac.cr.inii.geoterra.data.repository.AuthRepositoryImpl
-import ucr.ac.cr.inii.geoterra.data.repository.ManifestationRepositoryImp
-import ucr.ac.cr.inii.geoterra.data.repository.UserRepositoryImpl
+import ucr.ac.cr.inii.geoterra.data.repository.AnalysisRequestRepository
+import ucr.ac.cr.inii.geoterra.data.repository.AuthRepository
+import ucr.ac.cr.inii.geoterra.data.repository.ManifestationRepository
+import ucr.ac.cr.inii.geoterra.data.repository.RegionRepository
+import ucr.ac.cr.inii.geoterra.data.repository.UserRepository
 import ucr.ac.cr.inii.geoterra.domain.pdf.PDFManager
-import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepository
-import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepository
-import ucr.ac.cr.inii.geoterra.domain.repository.ManifestationsRepository
-import ucr.ac.cr.inii.geoterra.domain.repository.UserRepository
+import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepositoryInterface
+import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepositoryInterface
+import ucr.ac.cr.inii.geoterra.domain.repository.ManifestationsRepositoryInterface
+import ucr.ac.cr.inii.geoterra.domain.repository.RegionRepositoryInterface
+import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
 import ucr.ac.cr.inii.geoterra.presentation.auth.AuthViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisFormViewModel
@@ -26,10 +28,10 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.request.RequestViewModel
 
 val appModule = module {
   // Tabs ViewModels (ScreenModels)
+  single { AuthViewModel(get(), get()) }
   single { HomeViewModel() }
   single { MapViewModel(get(), get(), get()) }
   single { AccountViewModel(get(), get()) }
-  single { AuthViewModel(get(), get()) }
   single { RequestViewModel(get()) }
 
   // Inner ViewModels
@@ -46,7 +48,7 @@ val appModule = module {
 
   factory { params ->
     AnalysisFormViewModel(
-      get(),
+      get(), get(),
       requestToEdit = params.getOrNull<AnalysisRequestRemote>(),
       get(),
       get(),
@@ -58,8 +60,15 @@ val appModule = module {
   single { PDFManager() }
   
   // Repository implementation
-  single<AuthRepository> { AuthRepositoryImpl(get(), get()) }
-  single<UserRepository> { UserRepositoryImpl(get()) }
-  single<AnalysisRequestRepository> { AnalysisRequestRepositoryImpl(get()) }
-  single<ManifestationsRepository> { ManifestationRepositoryImp(get()) }
+  single<AuthRepositoryInterface> { AuthRepository(get(), get()) }
+  single<UserRepositoryInterface> { UserRepository(get()) }
+  single<RegionRepositoryInterface> { RegionRepository(get()) }
+  single<AnalysisRequestRepositoryInterface> { AnalysisRequestRepository(get()) }
+  single<ManifestationsRepositoryInterface> { ManifestationRepository(get()) }
+
+  single { AuthRepository(get(), get())}
+  single { ManifestationRepository(get()) }
+  single { UserRepository(get()) }
+  single { RegionRepository(get()) }
+  single { AnalysisRequestRepository(get()) }
 }

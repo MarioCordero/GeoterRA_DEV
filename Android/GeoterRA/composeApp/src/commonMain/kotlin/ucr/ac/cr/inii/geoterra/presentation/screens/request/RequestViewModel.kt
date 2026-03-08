@@ -4,7 +4,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
-import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepository
+import ucr.ac.cr.inii.geoterra.data.repository.AnalysisRequestRepository
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 class RequestViewModel(

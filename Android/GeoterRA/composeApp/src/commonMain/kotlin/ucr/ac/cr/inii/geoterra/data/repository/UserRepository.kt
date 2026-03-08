@@ -10,16 +10,16 @@ import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.data.model.remote.MessageResponse
 import ucr.ac.cr.inii.geoterra.data.model.remote.UserRemote
 import ucr.ac.cr.inii.geoterra.data.model.remote.UserUpdateRequest
-import ucr.ac.cr.inii.geoterra.domain.repository.UserRepository
+import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
 
-class UserRepositoryImpl(private val client: HttpClient) : UserRepository {
+class UserRepository(private val client: HttpClient) : UserRepositoryInterface {
   override suspend fun getMe(): Result<UserRemote> = try {
     val response = client.get("users/me")
     val envelope = response.body<ApiResponseModel<UserRemote>>()
     if (envelope.data != null) Result.success(envelope.data)
     else Result.failure(Exception("User not found"))
   } catch (e: Exception) {
-    Result.failure(e)
+    Result.failure(Exception("Error de red: verifica tu conexión."))
   }
   
   override suspend fun updateMe(
@@ -31,7 +31,7 @@ class UserRepositoryImpl(private val client: HttpClient) : UserRepository {
     val envelope = response.body<ApiResponseModel<MessageResponse>>()
     Result.success(envelope.data?.message ?: "Success")
   } catch (e: Exception) {
-    Result.failure(e)
+    Result.failure(Exception("Error de red: verifica tu conexión."))
   }
   
   override suspend fun deleteMe(): Result<String> = try {
@@ -39,6 +39,6 @@ class UserRepositoryImpl(private val client: HttpClient) : UserRepository {
     val envelope = response.body<ApiResponseModel<MessageResponse>>()
     Result.success(envelope.data?.message ?: "Deleted")
   } catch (e: Exception) {
-    Result.failure(e)
+    Result.failure(Exception("Error de red: verifica tu conexión."))
   }
 }

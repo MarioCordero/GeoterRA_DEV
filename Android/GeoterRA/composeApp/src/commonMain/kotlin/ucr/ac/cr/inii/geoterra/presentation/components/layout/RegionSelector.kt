@@ -2,7 +2,6 @@ package ucr.ac.cr.inii.geoterra.presentation.components.layout
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.DrawerDefaults.backgroundColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.DropdownMenuItem

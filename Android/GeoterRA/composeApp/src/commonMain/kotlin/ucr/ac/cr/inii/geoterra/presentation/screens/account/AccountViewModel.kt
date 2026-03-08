@@ -1,17 +1,13 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.account
 
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.kdroid.kmplog.Log
 import com.kdroid.kmplog.i
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ucr.ac.cr.inii.geoterra.domain.repository.UserRepository
+import ucr.ac.cr.inii.geoterra.data.repository.UserRepository
 import ucr.ac.cr.inii.geoterra.presentation.auth.AuthViewModel
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
-import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisFormState
 
 class AccountViewModel(
   private val userRepository: UserRepository,

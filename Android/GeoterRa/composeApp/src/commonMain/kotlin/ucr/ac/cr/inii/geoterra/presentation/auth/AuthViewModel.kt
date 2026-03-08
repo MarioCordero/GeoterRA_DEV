@@ -5,7 +5,8 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepository
+import ucr.ac.cr.inii.geoterra.data.repository.AuthRepository
+import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepositoryInterface
 
 class AuthViewModel(
   private val authRepository: AuthRepository,

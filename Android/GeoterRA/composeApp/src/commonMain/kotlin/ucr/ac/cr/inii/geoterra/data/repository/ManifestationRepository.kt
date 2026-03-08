@@ -7,9 +7,9 @@ import io.ktor.http.isSuccess
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
 import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
-import ucr.ac.cr.inii.geoterra.domain.repository.ManifestationsRepository
+import ucr.ac.cr.inii.geoterra.domain.repository.ManifestationsRepositoryInterface
 
-class ManifestationRepositoryImp(private val client: HttpClient) : ManifestationsRepository {
+class ManifestationRepository(private val client: HttpClient) : ManifestationsRepositoryInterface {
   override suspend fun getManifestations(regionId : UInt?): Result<List<ManifestationRemote>> {
     return try {
       val finalRegion = regionId?.toString() ?: "all"
@@ -21,7 +21,7 @@ class ManifestationRepositoryImp(private val client: HttpClient) : Manifestation
         handleErrorResponse(response)
       }
     } catch (e: Exception) {
-      Result.failure(Exception("Error de conexión: ${e.message}"))
+      Result.failure(Exception("Error de red: verifica tu conexión."))
     }
   }
   

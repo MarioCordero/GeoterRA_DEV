@@ -9,7 +9,6 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType.*
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
-import kotlinx.serialization.Serializable
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.ErrorMapper
 import ucr.ac.cr.inii.geoterra.core.network.TokenManager
@@ -19,12 +18,12 @@ import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenRequest
 import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenResponse
 import ucr.ac.cr.inii.geoterra.data.model.remote.RegisterRequest
 import ucr.ac.cr.inii.geoterra.data.model.remote.RegisterResponse
-import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepository
+import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepositoryInterface
 
-class AuthRepositoryImpl(
+class AuthRepository(
   private val client: HttpClient,
   private val tokenManager: TokenManager
-) : AuthRepository {
+) : AuthRepositoryInterface {
   fun invalidateAuthTokens() {
     
     val authProvider = client.authProvider<BearerAuthProvider>()
@@ -122,7 +121,7 @@ class AuthRepositoryImpl(
   override suspend fun refreshAccessToken(): Result<Unit> {
     
     val refreshToken = tokenManager.getRefreshToken()
-      ?: return Result.failure(Exception("No refresh token found"))
+      ?: return Result.failure(Exception("No se encontró el token de refresco"))
     
     return try {
       
@@ -132,7 +131,7 @@ class AuthRepositoryImpl(
       }.body<ApiResponseModel<RefreshAccessTokenResponse>>()
       
       val data = envelope.data
-        ?: return Result.failure(Exception("Refresh failed: empty data"))
+        ?: return Result.failure(Exception("Refresh token no contiene datos válidos"))
       println("Refresh response: $data")
       
       tokenManager.saveTokens(
@@ -144,7 +143,7 @@ class AuthRepositoryImpl(
       
     } catch (e: Exception) {
       tokenManager.clearTokens()
-      Result.failure(Exception("Session expired. Please login again."))
+      Result.failure(Exception("Session expirada. Inicia sesión nuevamente."))
     }
   }
   

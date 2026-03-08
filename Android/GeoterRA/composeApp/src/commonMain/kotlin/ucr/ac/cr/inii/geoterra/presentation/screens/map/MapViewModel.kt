@@ -5,11 +5,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.domain.location.LocationProvider
 import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
-import ucr.ac.cr.inii.geoterra.domain.repository.ManifestationsRepository
+import ucr.ac.cr.inii.geoterra.domain.repository.ManifestationsRepositoryInterface
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 class MapViewModel(
-  private val manifestationsRepository: ManifestationsRepository,
+  private val manifestationsRepository: ManifestationsRepositoryInterface,
   private val locationProvider: LocationProvider,
   private val permissionManager: PermissionManager
 ) : BaseScreenModel<MapState>(MapState()) {

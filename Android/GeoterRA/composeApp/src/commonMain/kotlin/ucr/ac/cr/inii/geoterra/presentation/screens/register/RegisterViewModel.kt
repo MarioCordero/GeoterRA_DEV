@@ -3,11 +3,11 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.register
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.remote.RegisterRequest
-import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepository
+import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepositoryInterface
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 class RegisterViewModel(
-  private val authRepository: AuthRepository
+  private val authRepository: AuthRepositoryInterface
 ) : BaseScreenModel<RegisterState>(RegisterState()) {
 
   fun onNameChanged(v: String) = updateState { it.copy(name = v, nameError = null) }

@@ -8,11 +8,11 @@ import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestDTO
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
-import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepository
+import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepositoryInterface
 
-class AnalysisRequestRepositoryImpl(
+class AnalysisRequestRepository(
   private val client: HttpClient
-) : AnalysisRequestRepository {
+) : AnalysisRequestRepositoryInterface {
   
   override suspend fun getMyRequests(): Result<List<AnalysisRequestRemote>> {
     return try {
@@ -51,7 +51,7 @@ class AnalysisRequestRepositoryImpl(
       if (response.status.isSuccess()) Result.success(Unit)
       else handleErrorResponse(response)
     } catch (e: Exception) {
-      Result.failure(e)
+      Result.failure(Exception("Error de red: verifica tu conexión."))
     }
   }
   
@@ -61,7 +61,7 @@ class AnalysisRequestRepositoryImpl(
       if (response.status.isSuccess()) Result.success(Unit)
       else handleErrorResponse(response)
     } catch (e: Exception) {
-      Result.failure(e)
+      Result.failure(Exception("Error de red: verifica tu conexión."))
     }
   }
 }
