@@ -5,7 +5,7 @@ data class AnalysisFormState(
   val isSuccess: Boolean = false,
   val error: String? = null,
   val snackBarMessage: String? = null,
-  val region: String = "",
+  val regionId: UInt? = null,
   val email: String = "",
   val ownerName: String = "",
   val ownerContact: String = "",
@@ -19,7 +19,7 @@ data class AnalysisFormState(
 )
 
 sealed class AnalysisFormEvent {
-  data class RegionChanged(val value: String) : AnalysisFormEvent()
+  data class RegionChanged(val value: UInt) : AnalysisFormEvent()
   data class EmailChanged(val value: String) : AnalysisFormEvent()
   data class OwnerNameChanged(val value: String) : AnalysisFormEvent()
   data class OwnerContactChanged(val value: String) : AnalysisFormEvent()

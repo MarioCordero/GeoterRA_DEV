@@ -90,7 +90,6 @@ fun LoginContent(
       modifier = Modifier
         .fillMaxSize()
         .padding(horizontal = 32.dp)
-        .imePadding()
         .verticalScroll(rememberScrollState()),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center

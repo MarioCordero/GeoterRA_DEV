@@ -58,7 +58,7 @@ fun EditProfileContent(
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center
   ) {
-    Spacer(modifier = Modifier.height(48.dp))
+    Spacer(modifier = Modifier.height(16.dp))
 
     Image(
       painter = painterResource(Res.drawable.logo_GeoterRA),
@@ -135,5 +135,7 @@ fun EditProfileContent(
         }
       }
     }
+
+    Spacer(modifier = Modifier.height(8.dp))
   }
 }

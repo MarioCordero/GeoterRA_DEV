@@ -22,7 +22,7 @@ class AnalysisFormViewModel(
     requestToEdit?.let { request ->
       _state.update { currentState ->
         currentState.copy(
-          region = request.regionName(),
+          regionId = request.region_id,
           email = request.email,
           ownerName = request.owner_name ?: "",
           ownerContact = request.owner_contact_number ?: "",
@@ -42,7 +42,7 @@ class AnalysisFormViewModel(
   
   fun onEvent(event: AnalysisFormEvent) {
     when (event) {
-      is AnalysisFormEvent.RegionChanged -> _state.update { it.copy(region = event.value) }
+      is AnalysisFormEvent.RegionChanged -> _state.update { it.copy(regionId = event.value) }
       is AnalysisFormEvent.EmailChanged -> _state.update { it.copy(email = event.value) }
       is AnalysisFormEvent.OwnerNameChanged -> _state.update { it.copy(ownerName = event.value) }
       is AnalysisFormEvent.OwnerContactChanged -> _state.update { it.copy(ownerContact = event.value) }
@@ -85,7 +85,7 @@ class AnalysisFormViewModel(
       _state.update { it.copy(isLoading = true, snackBarMessage = null) }
       
       val form = AnalysisRequestDTO(
-        region = _state.value.region,
+        region = _state.value.regionId?.toString() ?: "1",
         email = _state.value.email,
         owner_name = _state.value.ownerName.ifBlank { null },
         owner_contact_number = _state.value.ownerContact.ifBlank { null },

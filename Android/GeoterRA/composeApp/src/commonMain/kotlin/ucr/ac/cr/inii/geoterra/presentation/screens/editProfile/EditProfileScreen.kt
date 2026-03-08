@@ -75,7 +75,7 @@ class EditProfileScreen(
       }
     ) { padding ->
       EditProfileContent(
-        modifier = Modifier.padding(padding),
+        modifier = Modifier.padding(top = padding.calculateTopPadding()),
         state = state,
         snackBarState = snackBarState,
         onEvent = viewModel,

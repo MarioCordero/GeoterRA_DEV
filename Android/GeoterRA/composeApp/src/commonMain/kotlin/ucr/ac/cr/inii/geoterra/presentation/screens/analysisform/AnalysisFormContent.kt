@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.CustomTextField
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.FormSection
 import ucr.ac.cr.inii.geoterra.presentation.components.camera.GalleryPickerButton
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.RegionSelector
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,12 +37,13 @@ fun AnalysisFormContent(
   ) {
 
     FormSection(title = "Información General", icon = Icons.Default.Info) {
-      CustomTextField(
-        value = state.region,
-        onValueChange = { onEvent(AnalysisFormEvent.RegionChanged(it)) },
-        label = "Región / Provincia",
-        icon = Icons.Default.Place
+      RegionSelector(
+        selectedRegionId = state.regionId,
+        onRegionSelected = { id -> onEvent(AnalysisFormEvent.RegionChanged(id)) }
       )
+
+      Spacer(Modifier.height(8.dp))
+
       CustomTextField(
         value = state.email,
         onValueChange = { onEvent(AnalysisFormEvent.EmailChanged(it)) },

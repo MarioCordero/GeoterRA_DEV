@@ -36,7 +36,7 @@ class AuthRepositoryImpl(
 
   override suspend fun register(request: RegisterRequest): Result<Unit> {
     return try {
-      val response = client.post("auth/register") {
+      val response = client.post("users/register") {
         contentType(Application.Json)
         setBody(request)
       }
