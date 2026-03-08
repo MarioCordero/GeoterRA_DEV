@@ -13,6 +13,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -22,7 +24,9 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.register.RegisterScreen
  * Voyager Screen for the Login screen.
  */
 class LoginScreen : Screen {
-  
+
+  override val key: ScreenKey = uniqueScreenKey
+
   @Composable
   override fun Content() {
     val viewModel = getScreenModel<LoginViewModel>()

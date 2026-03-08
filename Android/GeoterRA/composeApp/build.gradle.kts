@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.serialization)
     alias(libs.plugins.kotlinCocoapods)
+    alias(libs.plugins.kotlinParcelize)
 }
 
 kotlin {

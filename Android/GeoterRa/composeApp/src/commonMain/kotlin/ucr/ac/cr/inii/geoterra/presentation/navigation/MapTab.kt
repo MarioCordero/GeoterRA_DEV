@@ -4,13 +4,14 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import cafe.adriel.voyager.transitions.SlideTransition
 import geoterra.composeapp.generated.resources.Res
 import geoterra.composeapp.generated.resources.ic_map
 import org.jetbrains.compose.resources.painterResource
 import ucr.ac.cr.inii.geoterra.presentation.screens.map.MapScreen
 
 internal object MapTab : Tab {
-  override val key: String = "MapScreen_${hashCode()}"
+  override val key: String = "MapTab_${hashCode()}"
 
 
   override val options: TabOptions

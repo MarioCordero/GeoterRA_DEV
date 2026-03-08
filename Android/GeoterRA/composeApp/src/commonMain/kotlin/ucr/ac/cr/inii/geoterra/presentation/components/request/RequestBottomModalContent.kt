@@ -19,6 +19,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -175,6 +176,16 @@ fun RequestBottomModalContent(
       modifier = Modifier.align(Alignment.CenterHorizontally)
     )
 
+    if (isForPdf) {
+      Spacer(modifier = Modifier.height(8.dp))
+      Text(
+        modifier = Modifier.align(Alignment.CenterHorizontally),
+        text ="© 2021 Instituto de Investigaciones en Ingeniería - UCR",
+        style = MaterialTheme.typography.labelSmall,
+        color = Color.Gray
+      )
+    }
+
     if (!isForPdf) {
       Spacer(modifier = Modifier.height(16.dp))
       Button(
@@ -186,6 +197,7 @@ fun RequestBottomModalContent(
         Spacer(modifier = Modifier.width(8.dp))
         Text("Descargar Solicitud", style = MaterialTheme.typography.titleMedium)
       }
+
       Spacer(modifier = Modifier.height(24.dp))
     }
   }

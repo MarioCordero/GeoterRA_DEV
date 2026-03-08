@@ -11,12 +11,13 @@ import org.koin.compose.koinInject
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.transitions.SlideTransition
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountScreen
 import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginScreen
 
 object AccountTab : Tab {
-  override val key: String = "AccountScreen_${hashCode()}"
+  override val key: String = "AccountTab_${hashCode()}"
 
   @Composable
   override fun Content() {

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,8 +24,11 @@ import androidx.compose.material.icons.filled.Opacity
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.Terrain
 import androidx.compose.material.icons.filled.Thermostat
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -34,16 +38,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.DataBox
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.SectionHeader
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.ActionCard
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.AdaptiveBackButton
 import ucr.ac.cr.inii.geoterra.presentation.components.manifestation.ChemicalRow
+import ucr.ac.cr.inii.geoterra.presentation.components.manifestation.ManifestationReport
+import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisFormEvent
 
 @Composable
 fun ManifestationDetailContent(
   modifier: Modifier,
+  state : ManifestationDetailState,
   manifestation: ManifestationRemote,
   onDownload: () -> Unit,
   onBack: () -> Unit
@@ -53,89 +61,37 @@ fun ManifestationDetailContent(
       .fillMaxSize()
       .verticalScroll(rememberScrollState())
   ) {
-    Row(
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.Start
+
+    ManifestationReport(
+      manifestation = manifestation,
+      isForPdf = false,
+      onBack = onBack
+    )
+
+    Spacer(modifier = Modifier.height(24.dp))
+
+    Button(
+      onClick = { onDownload() },
+      modifier = Modifier
+        .fillMaxWidth()
+        .height(58.dp),
+      shape = RoundedCornerShape(16.dp),
+      colors = ButtonDefaults.buttonColors(
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary
+      ),
+      elevation = ButtonDefaults.buttonElevation(
+        defaultElevation = 4.dp,
+        pressedElevation = 0.dp
+      ),
+      enabled = !state.isLoading
     ) {
-      Text(
-        text = manifestation.name,
-        style = MaterialTheme.typography.headlineMedium,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.primary
-      )
-      AdaptiveBackButton(onBack = onBack)
+      if (state.isLoading) {
+        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
+      } else {
+        Text("Descargar Reporte", fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
+      }
     }
-    Spacer(modifier = Modifier.height(24.dp))
-
-    // --- SECCIÓN: ENCABEZADO Y ACCIONES ---
-    Text(
-      "Acciones Rápidas",
-      style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-      color = MaterialTheme.colorScheme.primary,
-      modifier = Modifier.padding(bottom = 12.dp)
-    )
-
-    LazyRow(
-      horizontalArrangement = Arrangement.spacedBy(12.dp),
-      modifier = Modifier.fillMaxWidth()
-    ) {
-      item { ActionCard("Diagrama Piper", Icons.Default.AutoGraph, Color(0xFF2196F3)) { /* Ver Gráfico */ } }
-      item { ActionCard("Descargar PDF", Icons.Default.Download, Color(0xFF4CAF50)) { onDownload() } }
-//      item { ActionCard("Historial", Icons.Default.History, Color(0xFF9C27B0)) { /* Ver Logs */ } }
-    }
-
-    Spacer(modifier = Modifier.height(24.dp))
-
-    // Field parameters section
-    SectionHeader("Parámetros de Campo", Icons.Default.Terrain)
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-      DataBox(Modifier.weight(1f), "Temperatura", "${manifestation.temperature ?: "--"}°C", Icons.Default.Thermostat, Color(0xFFFF5722))
-      DataBox(Modifier.weight(1f), "pH", "${manifestation.field_pH ?: "--"}", Icons.Default.Opacity, Color(0xFF2196F3))
-    }
-    Spacer(modifier = Modifier.height(8.dp))
-    DataBox(Modifier.fillMaxWidth(), "Conductividad Eléctrica", "${manifestation.field_conductivity ?: "--"} µS/cm", Icons.Default.ElectricBolt, Color(0xFF4CAF50))
-
-    Spacer(modifier = Modifier.height(24.dp))
-
-    SectionHeader("Parámetros de Laboratorio", Icons.Default.Science)
-    DataBox(Modifier.fillMaxWidth(), "pH", "${manifestation.field_pH ?: "--"}", Icons.Default.Opacity, Color(0xFF2196F3))
-    Spacer(modifier = Modifier.height(8.dp))
-    DataBox(Modifier.fillMaxWidth(), "Conductividad Eléctrica", "${manifestation.field_conductivity ?: "--"} µS/cm", Icons.Default.ElectricBolt, Color(0xFF4CAF50))
-
-    Spacer(modifier = Modifier.height(24.dp))
-
-    // Lab Analysis section
-    SectionHeader("Análisis de Laboratorio", Icons.Default.Newspaper)
-
-    // Cations
-    ChemicalGroupCard(
-      title = "Cationes Principales",
-      color = Color(0xFFE91E63),
-      elements = listOf(
-        "Sodio (Na)" to manifestation.na,
-        "Potasio (K)" to manifestation.k,
-        "Calcio (Ca)" to manifestation.ca,
-        "Magnesio (Mg)" to manifestation.mg,
-        "Hierro (Fe)" to manifestation.fe,
-        "Litio (Li)" to manifestation.li
-      )
-    )
-
-    Spacer(modifier = Modifier.height(12.dp))
-
-    // Anions
-    ChemicalGroupCard(
-      title = "Aniones y Otros",
-      color = Color(0xFF00BCD4),
-      elements = listOf(
-        "Cloro (Cl)" to manifestation.cl,
-        "Sulfatos (SO4)" to manifestation.so4,
-        "Bicarbonato (HCO3)" to manifestation.hco3,
-        "Flúor (F)" to manifestation.f,
-        "Boro (B)" to manifestation.b,
-        "Sílice (SiO2)" to manifestation.si
-      )
-    )
 
     Spacer(modifier = Modifier.height(32.dp))
   }

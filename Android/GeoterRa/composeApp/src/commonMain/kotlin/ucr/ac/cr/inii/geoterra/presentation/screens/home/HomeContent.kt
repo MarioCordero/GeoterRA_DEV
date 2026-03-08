@@ -165,8 +165,9 @@ fun HomeContent(
     ) {
       Column {
         Text("Contacto", color = Color.White, fontWeight = FontWeight.Bold)
-        Text("Email: contacto@geoterra.com", color = Color.Gray)
-        Text("Ubicación: Costa Rica", color = Color.Gray)
+        Text("Email: inii@ucr.ac.cr", color = Color.Gray)
+        Text("Teléfono: (506) 2511-6641 (506) 2511-6642", color = Color.Gray)
+        Text("Ubicación: Ciudad Universitaria Rodrigo Facio San Pedro, Montes de Oca.", color = Color.Gray)
         Spacer(modifier = Modifier.height(16.dp))
         Text(
           text = "© 2021 Instituto de Investigaciones en Ingeniería - UCR",

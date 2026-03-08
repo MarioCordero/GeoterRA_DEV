@@ -38,17 +38,20 @@ class RequestViewModel(
   
   fun fetchSubmittedRequests() {
     screenModelScope.launch {
-      if (authEventBus.isLoggedIn.value == true) {
-        _state.update { it.copy(isLoading = true, snackBarMessage = null) }
-        requestRepository.getMyRequests()
-          .onSuccess { data ->
-            _state.update { it.copy(isLoading = false, requests = data) }
-          }
-          .onFailure { exception ->
-            _state.update { it.copy(isLoading = false, snackBarMessage = exception.message) }
-          }
+      authEventBus.isLoggedIn.collect { isLoggedIn ->
+        if (isLoggedIn == true) {
+          _state.update { it.copy(isLoading = true, snackBarMessage = null) }
+          requestRepository.getMyRequests()
+            .onSuccess { data ->
+              _state.update { it.copy(isLoading = false, requests = data) }
+            }
+            .onFailure { exception ->
+              _state.update { it.copy(isLoading = false, snackBarMessage = exception.message) }
+            }
+        } else {
+          _state.update { it.copy(requests = emptyList()) }
+        }
       }
-
     }
   }
 
@@ -103,7 +106,7 @@ class RequestViewModel(
   }
 
   /**
-   * Resets PDF states after closing the success dialog.
+   * Resets PDF states after closing the status dialog.
    */
   fun clearPdfError() {
     _state.update { it.copy(pdfError = null) }

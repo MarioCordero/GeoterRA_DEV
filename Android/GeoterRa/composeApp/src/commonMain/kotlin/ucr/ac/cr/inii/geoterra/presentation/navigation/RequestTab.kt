@@ -17,7 +17,7 @@ import org.jetbrains.compose.resources.painterResource
 import ucr.ac.cr.inii.geoterra.presentation.screens.request.RequestsScreen
 
 internal object RequestTab : Tab {
-  override val key: String = "RequestsScreen_${hashCode()}"
+  override val key: String = "RequestTab_${hashCode()}"
 
   override val options: TabOptions
     @Composable

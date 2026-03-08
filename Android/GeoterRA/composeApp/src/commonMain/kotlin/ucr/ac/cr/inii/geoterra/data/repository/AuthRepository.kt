@@ -54,13 +54,7 @@ class AuthRepository(
         }
       }
 
-      val errorEnvelope = response.body<ApiResponseModel<RegisterResponse>>()
-      val firstError = errorEnvelope.errors.firstOrNull()
-      val friendlyMessage = firstError?.let { ErrorMapper.mapCodeToMessage(it.code) }
-        ?: "Error inesperado (${response.status.value})"
-
-      Result.failure(Exception(friendlyMessage))
-
+      Result.failure(Exception("Error inesperado (${response.status.value})"))
     } catch (e: Exception) {
       e.printStackTrace()
       // Handle network exceptions (No internet, timeout, etc.)
@@ -90,14 +84,9 @@ class AuthRepository(
           return Result.success(Unit)
         }
       }
-      
-      val errorEnvelope = response.body<ApiResponseModel<LoginResponse>>()
-      val firstError = errorEnvelope.errors.firstOrNull()
-      val friendlyMessage = firstError?.let { ErrorMapper.mapCodeToMessage(it.code) }
-        ?: "Error inesperado (${response.status.value})"
-      
-      Result.failure(Exception(friendlyMessage))
-      
+
+      Result.failure(Exception("Error inesperado (${response.status.value})"))
+
     } catch (e: Exception) {
       e.printStackTrace()
       // Handle network exceptions (No internet, timeout, etc.)

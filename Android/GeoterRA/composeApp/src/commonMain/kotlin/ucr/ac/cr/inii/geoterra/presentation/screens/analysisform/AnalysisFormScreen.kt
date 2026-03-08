@@ -23,6 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import org.koin.core.parameter.parametersOf
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.AdaptiveBackButton
@@ -32,7 +34,9 @@ import ucr.ac.cr.inii.geoterra.presentation.components.layout.StatusDialog
 data class AnalysisFormScreen(
   val requestToEdit: AnalysisRequestRemote? = null
 ) : Screen {
-  
+
+  override val key: ScreenKey = uniqueScreenKey
+
   @Composable
   override fun Content() {
     val navigator = LocalNavigator.currentOrThrow

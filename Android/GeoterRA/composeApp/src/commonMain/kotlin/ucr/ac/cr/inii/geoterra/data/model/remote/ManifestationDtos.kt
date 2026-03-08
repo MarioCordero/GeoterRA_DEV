@@ -3,7 +3,6 @@ package ucr.ac.cr.inii.geoterra.data.model.remote
 
 import kotlinx.serialization.Serializable
 
-
 @Serializable
 data class ManifestationRemote(
   val id : String,
@@ -33,7 +32,7 @@ data class ManifestationRemote(
   val created_by : String,
   val modified_at : String?,
   val modified_by : String?
-) {
+)  {
   fun regionName(): String {
     return when (region_id) {
       1u -> "San José"

@@ -13,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.transitions.SlideTransition
 import org.koin.compose.koinInject
 
 /**
@@ -25,6 +26,8 @@ fun App() {
   val state by viewModel.state.collectAsState()
 
   GeoterraTheme(useDarkTheme = state.isDarkMode) {
-    Navigator(screen = MainScreen())
+    Navigator(screen = MainScreen()) { navigator ->
+      SlideTransition(navigator)
+    }
   }
 }

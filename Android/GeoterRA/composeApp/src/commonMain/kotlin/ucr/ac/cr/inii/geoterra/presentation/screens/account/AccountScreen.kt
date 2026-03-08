@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -22,7 +24,9 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.editProfile.EditProfileScree
  * Voyager Screen implementation for Home.
  */
 class AccountScreen : Screen {
-  
+
+  override val key: ScreenKey = uniqueScreenKey
+
   @Composable
   override fun Content() {
     

@@ -22,7 +22,8 @@ suspend fun <T> handleErrorResponse(response: HttpResponse): Result<T> {
   return try {
     val errorEnvelope = response.body<ApiResponseModel<Unit>>()
     val errorCode = errorEnvelope.errors.firstOrNull()?.code ?: "INTERNAL_ERROR"
-    Result.failure(Exception(ErrorMapper.mapCodeToMessage(errorCode)))
+    val errorMessage = errorEnvelope.errors.firstOrNull()?.message ?: "Error inesperado en el servidor"
+    Result.failure(Exception(ErrorMapper.mapCodeToMessage(errorCode, errorMessage)))
   } catch (e: Exception) {
     Result.failure(Exception("Error inesperado en el servidor"))
   }
