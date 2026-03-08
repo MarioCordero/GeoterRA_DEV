@@ -1,10 +1,8 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.analysisform
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -13,13 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.CustomTextField
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.FormSection
+import ucr.ac.cr.inii.geoterra.presentation.components.camera.GalleryPickerButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,6 +26,7 @@ fun AnalysisFormContent(
   state: AnalysisFormState,
   onEvent: (AnalysisFormEvent) -> Unit,
 ) {
+
   Column(
     modifier = modifier
       .fillMaxSize()
@@ -148,16 +147,18 @@ fun AnalysisFormContent(
             Text("GPS Actual", style = MaterialTheme.typography.labelSmall)
           }
 
-          Button(
-            onClick = { onEvent(AnalysisFormEvent.PickPhoto) },
+          GalleryPickerButton(
             modifier = Modifier.weight(1f),
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF455A64))
-          ) {
-            Icon(Icons.Default.PhotoLibrary, contentDescription = null)
-            Spacer(Modifier.width(4.dp))
-            Text("Elegir Foto", style = MaterialTheme.typography.labelSmall)
-          }
+            onPhotoReady = { uri, location ->
+              if (location != null) {
+                onEvent(AnalysisFormEvent.LatChanged(location.latitude.toString()))
+                onEvent(AnalysisFormEvent.LonChanged(location.longitude.toString()))
+              } else {
+                onEvent(AnalysisFormEvent.ShowSnackBar("La imagen no tiene metadatos GPS"))
+              }
+            },
+            onMessage = { msg -> onEvent(AnalysisFormEvent.ShowSnackBar(msg)) }
+          )
         }
       }
     }

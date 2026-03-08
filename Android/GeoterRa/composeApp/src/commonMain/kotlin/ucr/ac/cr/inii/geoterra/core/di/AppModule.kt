@@ -47,9 +47,9 @@ val appModule = module {
   factory { params ->
     AnalysisFormViewModel(
       get(),
-      requestToEdit = params.getOrNull<AnalysisRequestRemote>(),      get(),
+      requestToEdit = params.getOrNull<AnalysisRequestRemote>(),
       get(),
-      get()
+      get(),
     )
   }
   
