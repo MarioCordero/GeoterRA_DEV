@@ -101,12 +101,12 @@ class MapViewModel(
   fun applyFilters() {
     hideFilterModal()
     val currentState = state.value
-    val newStyle = currentState.availableLayers.find { it.id == currentState.selectedLayerId }?.url
+    val newLayer = currentState.availableLayers.find { it.id == currentState.selectedLayerId }
 
     _state.update { it.copy(
       isFilterModalVisible = false,
-      styleUrl = newStyle ?: it.styleUrl
-    ) }
+      styleUrl = newLayer?.styleUrl ?: it.styleUrl
+    )}
     loadMapMarkers(state.value.selectedRegionId)
   }
 }

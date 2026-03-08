@@ -22,10 +22,12 @@ import org.maplibre.compose.expressions.dsl.interpolate
 import org.maplibre.compose.expressions.dsl.linear
 import org.maplibre.compose.expressions.dsl.zoom
 import org.maplibre.compose.expressions.value.SymbolAnchor
+import org.maplibre.compose.layers.RasterLayer
 import org.maplibre.compose.layers.SymbolLayer
 import org.maplibre.compose.map.MaplibreMap
 import org.maplibre.compose.sources.GeoJsonData
 import org.maplibre.compose.sources.rememberGeoJsonSource
+import org.maplibre.compose.sources.rememberRasterSource
 import org.maplibre.compose.style.BaseStyle
 import org.maplibre.compose.util.ClickResult
 import org.maplibre.spatialk.geojson.Position
@@ -100,6 +102,22 @@ fun MapContent(
       }
     
     ) {
+
+      val activeLayer = state.availableLayers.find { it.id == state.selectedLayerId }
+
+      activeLayer?.snitRasterUrl?.let { rasterUrl ->
+        val snitRasterSource = rememberRasterSource(
+          tiles = listOf(rasterUrl),
+          tileSize = 256
+        )
+
+        RasterLayer(
+          id = "snit-raster-layer",
+          source = snitRasterSource
+          // MapLibre dibuja en el orden que declaras los componentes.
+          // Al poner esto arriba, quedará por debajo del SymbolLayer de los marcadores.
+        )
+      }
       
       val manifestationSource = rememberGeoJsonSource(
         data = remember(state.markers) {

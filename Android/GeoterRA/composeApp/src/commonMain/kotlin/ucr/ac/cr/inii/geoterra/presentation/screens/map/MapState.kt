@@ -6,8 +6,8 @@ import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
 data class MapLayer(
   val id: String,
   val name: String,
-  val url: String,
-  val previewUrl: String? = null
+  val styleUrl: String,
+  val snitRasterUrl: String? = null
 )
 
 data class MapState(
@@ -36,6 +36,55 @@ data class MapState(
     MapLayer("hybrid", "Híbrido", "https://raw.githubusercontent.com/go2garret/maps/main/src/assets/json/arcgis_hybrid.json"),
     MapLayer("streets", "Calles", "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"),
     MapLayer("dark", "Oscuro", "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"),
-    MapLayer("light", "Claro", "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json")
+    MapLayer("light", "Claro", "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"),
+    // Capas SNIT (Servicio IGN_5)
+    MapLayer(
+      id = "snit_cultivos",
+      name = "Cultivos 2017",
+      styleUrl = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      snitRasterUrl = "https://geos.snitcr.go.cr/be/IGN_5/ows?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&LAYERS=cultivos2017_5k&STYLES=&CRS=EPSG:3857&WIDTH=256&HEIGHT=256&BBOX={bbox-epsg-3857}"
+    ),
+    MapLayer(
+      id = "snit_curvas",
+      name = "Curvas de Nivel",
+      styleUrl = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      snitRasterUrl = "https://geos.snitcr.go.cr/be/IGN_5/ows?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&LAYERS=curvas_5000&STYLES=&CRS=EPSG:3857&WIDTH=256&HEIGHT=256&BBOX={bbox-epsg-3857}"
+    ),
+    MapLayer(
+      id = "snit_edificaciones",
+      name = "Edificaciones 2017",
+      styleUrl = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      snitRasterUrl = "https://geos.snitcr.go.cr/be/IGN_5/ows?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&LAYERS=edificaciones2017_5k&STYLES=&CRS=EPSG:3857&WIDTH=256&HEIGHT=256&BBOX={bbox-epsg-3857}"
+    ),
+    MapLayer(
+      id = "snit_forestal",
+      name = "Cobertura Forestal",
+      styleUrl = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      snitRasterUrl = "https://geos.snitcr.go.cr/be/IGN_5/ows?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&LAYERS=forestal2017_5k&STYLES=&CRS=EPSG:3857&WIDTH=256&HEIGHT=256&BBOX={bbox-epsg-3857}"
+    ),
+    MapLayer(
+      id = "snit_hidrografia",
+      name = "Hidrografía",
+      styleUrl = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      snitRasterUrl = "https://geos.snitcr.go.cr/be/IGN_5/ows?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&LAYERS=hidrografia_5000&STYLES=&CRS=EPSG:3857&WIDTH=256&HEIGHT=256&BBOX={bbox-epsg-3857}"
+    ),
+    MapLayer(
+      id = "snit_pastos",
+      name = "Pastos 2017",
+      styleUrl = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      snitRasterUrl = "https://geos.snitcr.go.cr/be/IGN_5/ows?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&LAYERS=pastos2017_5k&STYLES=&CRS=EPSG:3857&WIDTH=256&HEIGHT=256&BBOX={bbox-epsg-3857}"
+    ),
+    MapLayer(
+      id = "snit_urbano",
+      name = "Urbano 1:5k",
+      styleUrl = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      snitRasterUrl = "https://geos.snitcr.go.cr/be/IGN_5/ows?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&LAYERS=urbano_5000&STYLES=&CRS=EPSG:3857&WIDTH=256&HEIGHT=256&BBOX={bbox-epsg-3857}"
+    ),
+    MapLayer(
+      id = "snit_vias",
+      name = "Vías 1:5k",
+      styleUrl = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      snitRasterUrl = "https://geos.snitcr.go.cr/be/IGN_5/ows?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&LAYERS=vias_5000&STYLES=&CRS=EPSG:3857&WIDTH=256&HEIGHT=256&BBOX={bbox-epsg-3857}"
+    )
   )
 )
