@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.components.analysisform
+package ucr.ac.cr.inii.geoterra.presentation.components.request
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -8,10 +8,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BubbleChart
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -24,10 +26,9 @@ import androidx.compose.ui.unit.sp
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.InfoChip
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.SectionHeader
-import ucr.ac.cr.inii.geoterra.presentation.components.request.StatusBadge
 
 @Composable
-fun RequestDetailSheet(
+fun RequestBottomModalContent(
   request: AnalysisRequestRemote,
   isForPdf: Boolean = false,
   onDownloadPdf: (AnalysisRequestRemote) -> Unit
@@ -69,22 +70,49 @@ fun RequestDetailSheet(
     }
 
     Spacer(modifier = Modifier.height(verticalSpacing))
+    val fillMaxWidth = Modifier.fillMaxWidth()
 
-    // --- CONTACTO ---
+    // --- SOLICITANTE ---
+    SectionHeader(title = "Información de Solicitante")
+
+    InfoChip(
+      Icons.Default.Email,
+      "Correo",
+      request.email,
+      fillMaxWidth,
+      MaterialTheme.colorScheme.primary
+    )
+
+    Spacer(modifier = Modifier.height(verticalSpacing))
+
+    // --- PROPIETARIO ---
     SectionHeader(title = "Información de Contacto")
-
-    val contactModifier = Modifier.fillMaxWidth()
-    InfoChip(Icons.Default.Person, "Propietario", request.owner_name ?: "N/D", contactModifier, MaterialTheme.colorScheme.primary)
+    InfoChip(
+      Icons.Default.Person,
+      "Propietario",
+      request.owner_name ?: "N/D",
+      fillMaxWidth,
+      MaterialTheme.colorScheme.primary
+    )
     Spacer(modifier = Modifier.height(chipSpacing))
-    InfoChip(Icons.Default.Mail, "Número", request.owner_contact_number ?: "N/D", contactModifier, MaterialTheme.colorScheme.secondary)
-    Spacer(modifier = Modifier.height(chipSpacing))
-    InfoChip(Icons.Default.LocationOn, "Correo", request.email, contactModifier, MaterialTheme.colorScheme.secondary)
+    InfoChip(
+      Icons.Default.Phone,
+      "Número",
+      request.owner_contact_number ?: "N/D",
+      fillMaxWidth,
+      MaterialTheme.colorScheme.secondary
+    )
 
     Spacer(modifier = Modifier.height(verticalSpacing))
 
     // --- SITIO ---
     SectionHeader(title = "Información del Sitio")
-    InfoChip(Icons.Default.LocationOn, "Región", request.regionName(), Modifier.fillMaxWidth())
+    InfoChip(
+      Icons.Default.LocationOn,
+      "Región",
+      request.regionName(),
+      Modifier.fillMaxWidth()
+    )
 
     Spacer(modifier = Modifier.height(chipSpacing))
 
@@ -92,9 +120,17 @@ fun RequestDetailSheet(
       modifier = Modifier.fillMaxWidth(),
       horizontalArrangement = Arrangement.spacedBy(chipSpacing)
     ) {
-      val coordModifier = Modifier.weight(1f)
-      InfoChip(Icons.Default.Explore, "Lat", request.latitude.take(8), coordModifier, MaterialTheme.colorScheme.secondary)
-      InfoChip(Icons.Default.Explore, "Long", request.longitude.take(8), coordModifier, MaterialTheme.colorScheme.secondary)
+      val fillMidWidth = Modifier.weight(1f)
+      InfoChip(
+        Icons.Default.Explore,
+        "Lat", request.latitude.take(8),
+        fillMidWidth,
+        MaterialTheme.colorScheme.secondary
+      )
+      InfoChip(Icons.Default.Explore,
+        "Long", request.longitude.take(8),
+        fillMidWidth, MaterialTheme.colorScheme.secondary
+      )
     }
 
     Spacer(modifier = Modifier.height(verticalSpacing))
@@ -106,16 +142,28 @@ fun RequestDetailSheet(
       horizontalArrangement = Arrangement.spacedBy(chipSpacing)
     ) {
       val obsModifier = Modifier.weight(1f)
-      InfoChip(Icons.Default.Thermostat, "Sensación", request.temperature_sensation ?: "N/A", obsModifier, MaterialTheme.colorScheme.primary)
-      InfoChip(Icons.Default.BubbleChart, "Burbujas", if (request.bubbles == 1) "Sí" else "No", obsModifier, MaterialTheme.colorScheme.secondary)
+      InfoChip(
+        Icons.Default.Thermostat, "Sensación",
+        request.temperature_sensation ?: "N/A", obsModifier,
+        MaterialTheme.colorScheme.primary
+      )
+      InfoChip(
+        Icons.Default.BubbleChart, "Burbujas",
+        if (request.bubbles == 1) "Sí" else "No",
+        obsModifier, MaterialTheme.colorScheme.secondary
+      )
     }
 
     // --- NOTAS ---
-    if (!request.details.isNullOrBlank()) {
-      Spacer(modifier = Modifier.height(verticalSpacing))
-      SectionHeader(title = "Notas de Campo")
-      InfoChip(Icons.Default.Description, "Detalles", request.details, Modifier.fillMaxWidth())
-    }
+    Spacer(modifier = Modifier.height(verticalSpacing))
+
+    SectionHeader(title = "Notas de Campo")
+
+    InfoChip(
+      Icons.Default.Description,
+      "Detalles", request.details ?: "N/D",
+      Modifier.fillMaxWidth()
+    )
 
     Spacer(modifier = Modifier.height(verticalSpacing))
 

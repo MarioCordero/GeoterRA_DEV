@@ -1,10 +1,7 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.request
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -18,11 +15,9 @@ import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
-import org.koin.mp.KoinPlatform.getKoin
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
-import ucr.ac.cr.inii.geoterra.domain.pdf.PDFManager
 import ucr.ac.cr.inii.geoterra.domain.pdf.PDFUtil
-import ucr.ac.cr.inii.geoterra.presentation.components.analysisform.RequestDetailSheet
+import ucr.ac.cr.inii.geoterra.presentation.components.request.RequestBottomModalContent
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.ConfirmDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.LoadingDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.StatusDialog
@@ -116,7 +111,7 @@ class RequestsScreen : Screen {
         containerColor = MaterialTheme.colorScheme.background,
         shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
       ) {
-        RequestDetailSheet(
+        RequestBottomModalContent(
           request = request,
           onDownloadPdf = { req ->
             scope.launch {

@@ -5,7 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.mp.KoinPlatform.getKoin
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
-import ucr.ac.cr.inii.geoterra.presentation.components.analysisform.RequestDetailSheet
+import ucr.ac.cr.inii.geoterra.presentation.components.request.RequestBottomModalContent
 
 object PDFUtil {
 
@@ -35,7 +35,7 @@ object PDFUtil {
     return generatePdf(
       fileName = fileName,
       content = {
-        RequestDetailSheet(
+        RequestBottomModalContent(
           request = request,
           isForPdf = true,
           onDownloadPdf = {}
