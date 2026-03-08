@@ -94,20 +94,20 @@ actual class PDFManager actual constructor() {
         }
         tempContainer.addView(composeView)
 
-//        val showDialog = mutableStateOf(true)
-//
-//        // Set the content with a dialog
-//        composeView.setContent {
-//          Box(modifier = Modifier.fillMaxSize().background(color = Color.White)) {
-//            content()
-//
+        val showDialog = mutableStateOf(true)
+
+        // Set the content with a dialog
+        composeView.setContent {
+          Box(modifier = Modifier.fillMaxSize().background(color = Color.White)) {
+            content()
+
 //            if (showDialog.value) {
 //              ProgressDialog(
 //                message = "Generating PDF, please wait...",
 //              )
 //            }
-//          }
-//        }
+          }
+        }
 
         Log.d("PdfGenerator", "ComposeView created and attached")
 
