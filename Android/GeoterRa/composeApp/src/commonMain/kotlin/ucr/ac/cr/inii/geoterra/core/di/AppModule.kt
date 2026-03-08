@@ -15,7 +15,7 @@ import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.ManifestationsRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.RegionRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
-import ucr.ac.cr.inii.geoterra.presentation.auth.AuthViewModel
+import ucr.ac.cr.inii.geoterra.presentation.auth.AuthService
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisFormViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.editProfile.EditProfileViewModel
@@ -28,15 +28,15 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.request.RequestViewModel
 
 val appModule = module {
   // Tabs ViewModels (ScreenModels)
-  single { AuthViewModel(get(), get()) }
+  single { AuthService(get(), get()) }
   single { HomeViewModel() }
   single { MapViewModel(get(), get(), get()) }
   single { AccountViewModel(get(), get()) }
-  single { RequestViewModel(get()) }
+  single { RequestViewModel(get(), get()) }
 
   // Inner ViewModels
   factory { ManifestationDetailViewModel(get()) }
-  factory { LoginViewModel(get(), get()) }
+  factory { LoginViewModel(get()) }
   factory { RegisterViewModel(get()) }
 
   factory { params ->

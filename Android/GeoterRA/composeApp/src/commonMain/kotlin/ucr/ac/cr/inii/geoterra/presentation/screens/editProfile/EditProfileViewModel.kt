@@ -5,11 +5,12 @@ import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.remote.UserRemote
 import ucr.ac.cr.inii.geoterra.data.model.remote.UserUpdateRequest
 import ucr.ac.cr.inii.geoterra.data.repository.UserRepository
+import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 class EditProfileViewModel(
   private val userProfile: UserRemote,
-  private val userRepository: UserRepository
+  private val userRepository: UserRepositoryInterface
 ) : BaseScreenModel<EditProfileState>(EditProfileState()) {
 
   init {

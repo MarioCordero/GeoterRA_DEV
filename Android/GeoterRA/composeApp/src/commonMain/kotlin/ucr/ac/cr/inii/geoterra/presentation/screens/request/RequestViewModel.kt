@@ -5,17 +5,45 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
 import ucr.ac.cr.inii.geoterra.data.repository.AnalysisRequestRepository
+import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepositoryInterface
+import ucr.ac.cr.inii.geoterra.presentation.auth.AuthEvent
+import ucr.ac.cr.inii.geoterra.presentation.auth.AuthEventBus
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 class RequestViewModel(
-  private val requestRepository: AnalysisRequestRepository
+  private val requestRepository: AnalysisRequestRepositoryInterface,
+  private val authEventBus: AuthEventBus
 ) : BaseScreenModel<RequestState>(RequestState()) {
   
   init {
-    fetchSubmittedRequests()
+    screenModelScope.launch {
+      authEventBus.events.collect { event ->
+        when (event) {
+          is AuthEvent.Unauthorized -> {
+            clearData()
+          }
+
+          is AuthEvent.Authorized -> {
+            fetchSubmittedRequests()
+          }
+
+          else -> {}
+        }
+      }
+    }
+
+    if (authEventBus.isLoggedIn.value == true) {
+      fetchSubmittedRequests()
+    }
+  }
+
+  private fun clearData() {
+    _state.update { it.copy(requests = emptyList(), isLoading = false) }
   }
   
   fun fetchSubmittedRequests() {
+    authEventBus.isLoggedIn.value?.let { if (!it) return }
+
     screenModelScope.launch {
       _state.update { it.copy(isLoading = true, snackBarMessage = null) }
       requestRepository.getMyRequests()

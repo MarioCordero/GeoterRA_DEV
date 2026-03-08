@@ -1,13 +1,45 @@
 package ucr.ac.cr.inii.geoterra.presentation.auth
 
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import ucr.ac.cr.inii.geoterra.data.model.remote.LoginRequest
+import ucr.ac.cr.inii.geoterra.data.model.remote.RegisterRequest
+import ucr.ac.cr.inii.geoterra.data.model.remote.UserRemote
+
+sealed class AuthEvent {
+  object Unauthorized : AuthEvent()
+  object Authorized : AuthEvent()
+
+  object RefreshToken : AuthEvent()
+
+  object Logout : AuthEvent()
+
+  data class Login(
+    val request: LoginRequest,
+    val response: CompletableDeferred<Result<Unit>>
+  ) : AuthEvent()
+
+  data class Register(
+    val request: RegisterRequest,
+    val response: CompletableDeferred<Result<Unit>>
+  ) : AuthEvent()
+}
 
 class AuthEventBus {
-  private val _events = MutableSharedFlow<Unit>(replay = 0)
-  val unauthorizedEvents = _events.asSharedFlow()
-  
-  suspend fun emitUnauthorized() {
-    _events.emit(Unit)
+  private val _events = MutableSharedFlow<AuthEvent>(replay = 1)
+  val events = _events.asSharedFlow()
+
+  private val _isLoggedIn = MutableStateFlow<Boolean?>(null)
+  val isLoggedIn = _isLoggedIn.asStateFlow()
+
+  suspend fun emit(event: AuthEvent) {
+    _events.emit(event)
+  }
+
+  fun updateLoginState(loggedIn: Boolean) {
+    _isLoggedIn.value = loggedIn
   }
 }

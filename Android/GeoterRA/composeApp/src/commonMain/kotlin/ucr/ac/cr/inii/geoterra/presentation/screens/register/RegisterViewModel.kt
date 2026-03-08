@@ -1,13 +1,15 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.register
 
 import cafe.adriel.voyager.core.model.screenModelScope
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.remote.RegisterRequest
-import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepositoryInterface
+import ucr.ac.cr.inii.geoterra.presentation.auth.AuthEvent
+import ucr.ac.cr.inii.geoterra.presentation.auth.AuthEventBus
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 class RegisterViewModel(
-  private val authRepository: AuthRepositoryInterface
+  private val authEventBus: AuthEventBus
 ) : BaseScreenModel<RegisterState>(RegisterState()) {
 
   fun onNameChanged(v: String) = updateState { it.copy(name = v, nameError = null) }
@@ -40,7 +42,11 @@ class RegisterViewModel(
         password = s.password
       )
 
-      authRepository.register(request)
+      val deferred = CompletableDeferred<Result<Unit>>()
+
+      authEventBus.emit(AuthEvent.Register(request, deferred))
+
+      deferred.await()
         .onSuccess {
           updateState { it.copy(isLoading = false, isSuccess = true) }
         }

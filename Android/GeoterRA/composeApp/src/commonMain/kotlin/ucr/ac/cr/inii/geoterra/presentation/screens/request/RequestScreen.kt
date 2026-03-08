@@ -37,9 +37,9 @@ class RequestsScreen : Screen {
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) {
-      viewModel.fetchSubmittedRequests()
-    }
+//    LaunchedEffect(Unit) {
+//      viewModel.fetchSubmittedRequests()
+//    }
 
     LaunchedEffect(state.snackBarMessage) {
       state.snackBarMessage?.let {

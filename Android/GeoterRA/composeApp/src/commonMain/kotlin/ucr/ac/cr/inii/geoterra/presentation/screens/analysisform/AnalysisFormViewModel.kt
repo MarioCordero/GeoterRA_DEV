@@ -10,11 +10,13 @@ import ucr.ac.cr.inii.geoterra.data.repository.AnalysisRequestRepository
 import ucr.ac.cr.inii.geoterra.data.repository.RegionRepository
 import ucr.ac.cr.inii.geoterra.domain.location.LocationProvider
 import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
+import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepositoryInterface
+import ucr.ac.cr.inii.geoterra.domain.repository.RegionRepositoryInterface
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 class AnalysisFormViewModel(
-  private val analysisRequestRepository: AnalysisRequestRepository,
-  private val regionRepository: RegionRepository,
+  private val analysisRequestRepository: AnalysisRequestRepositoryInterface,
+  private val regionRepository: RegionRepositoryInterface,
   private val requestToEdit: AnalysisRequestRemote? = null,
   private val locationProvider: LocationProvider,
   private val permissionManager: PermissionManager

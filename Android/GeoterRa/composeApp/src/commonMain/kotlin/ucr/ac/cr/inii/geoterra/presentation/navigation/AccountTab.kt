@@ -1,6 +1,5 @@
 package ucr.ac.cr.inii.geoterra.presentation.navigation
 
-import androidx.compose.animation.Crossfade
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import cafe.adriel.voyager.navigator.tab.Tab
@@ -12,22 +11,17 @@ import org.koin.compose.koinInject
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import cafe.adriel.voyager.navigator.Navigator
-import ucr.ac.cr.inii.geoterra.presentation.auth.AuthViewModel
-import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountContent
+import ucr.ac.cr.inii.geoterra.presentation.auth.AuthService
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountScreen
-import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountViewModel
-import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginContent
 import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginScreen
-import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginViewModel
-import ucr.ac.cr.inii.geoterra.presentation.screens.map.MapScreen
 
 object AccountTab : Tab {
   override val key: String = "AccountScreen_${hashCode()}"
 
   @Composable
   override fun Content() {
-    val authViewModel = koinInject<AuthViewModel>()
-    val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
+    val authService = koinInject<AuthService>()
+    val isLoggedIn by authService.isLoggedIn.collectAsState()
 
     key(isLoggedIn) {
       val rootScreen = if (isLoggedIn == true) {

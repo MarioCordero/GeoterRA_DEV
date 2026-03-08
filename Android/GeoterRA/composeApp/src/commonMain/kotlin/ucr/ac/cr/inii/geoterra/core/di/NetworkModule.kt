@@ -21,6 +21,7 @@ import ucr.ac.cr.inii.geoterra.core.network.NetworkConfig
 import ucr.ac.cr.inii.geoterra.core.network.TokenManager
 import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenRequest
 import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenResponse
+import ucr.ac.cr.inii.geoterra.presentation.auth.AuthEvent
 import ucr.ac.cr.inii.geoterra.presentation.auth.AuthEventBus
 
 @OptIn(InternalAPI::class)
@@ -106,7 +107,7 @@ val networkModule = module {
 
               if (hasRefreshTokenError || data == null) {
                 tm.clearTokens()
-                authEventBus.emitUnauthorized()
+                authEventBus.emit(AuthEvent.Unauthorized)
                 return@refreshTokens null
               }
               
@@ -117,7 +118,7 @@ val networkModule = module {
               
             } catch (e: Exception) {
               tm.clearTokens()
-              authEventBus.emitUnauthorized()
+              authEventBus.emit(AuthEvent.Unauthorized)
               null
             }
           }

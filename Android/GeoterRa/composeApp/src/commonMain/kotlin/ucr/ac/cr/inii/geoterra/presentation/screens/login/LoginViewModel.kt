@@ -1,10 +1,11 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.login
 
 import cafe.adriel.voyager.core.model.screenModelScope
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.remote.LoginRequest
-import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepositoryInterface
-import ucr.ac.cr.inii.geoterra.presentation.auth.AuthViewModel
+import ucr.ac.cr.inii.geoterra.presentation.auth.AuthEvent
+import ucr.ac.cr.inii.geoterra.presentation.auth.AuthEventBus
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 /**
@@ -13,8 +14,7 @@ import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
  * @param authViewModel Handles the global app session state
  */
 class LoginViewModel(
-  private val authRepository: AuthRepositoryInterface,
-  private val authViewModel: AuthViewModel
+  private val authEventBus: AuthEventBus,
 ) : BaseScreenModel<LoginState>(LoginState()) {
   
   fun onEmailChanged(newValue: String) {
@@ -48,9 +48,12 @@ class LoginViewModel(
     
     // 3. Una sola corrutina
     screenModelScope.launch {
-      authRepository.login(LoginRequest(email, password))
+      val deferred = CompletableDeferred<Result<Unit>>()
+
+      authEventBus.emit(AuthEvent.Login(LoginRequest(email, password), deferred))
+
+      deferred.await()
         .onSuccess {
-          authViewModel.loginSuccess()
           updateState { it.copy(isLoading = false) }
         }
         .onFailure { error ->

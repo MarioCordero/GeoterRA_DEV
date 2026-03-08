@@ -5,11 +5,10 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import ucr.ac.cr.inii.geoterra.data.repository.AuthRepository
 import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepositoryInterface
 
-class AuthViewModel(
-  private val authRepository: AuthRepository,
+class AuthService(
+  private val authRepository: AuthRepositoryInterface,
   private val authEventBus: AuthEventBus
 ) : ScreenModel {
   private val _isLoggedIn = MutableStateFlow<Boolean?>(null)
@@ -21,14 +20,43 @@ class AuthViewModel(
       // Check if the user is logged in when the ViewModel is created
       _isLoggedIn.value = authRepository.isUserLoggedIn()
       // Subscribe to unauthorized events
-      authEventBus.unauthorizedEvents.collect {
-        _isLoggedIn.value = false
+      authEventBus.events.collect { event ->
+        when (event) {
+          is AuthEvent.Login -> {
+            val result = authRepository.login(event.request)
+            event.response.complete(result)
+            if (result.isSuccess) {
+              loginSuccess()
+            }
+          }
+
+          is AuthEvent.Register -> {
+            val result = authRepository.register(event.request)
+            event.response.complete(result)
+
+          }
+
+          is AuthEvent.Logout -> {
+            logout()
+            authEventBus.emit(AuthEvent.Unauthorized)
+          }
+
+          is AuthEvent.RefreshToken -> {
+            refreshAccessToken()
+          }
+          else -> {}
+        }
+      }
+      if (_isLoggedIn.value == true) {
+        authEventBus.emit(AuthEvent.Authorized)
       }
     }
   }
   
-  fun loginSuccess() {
+  suspend fun loginSuccess() {
     _isLoggedIn.value = true
+    authEventBus.updateLoginState(true)
+    authEventBus.emit(AuthEvent.Authorized)
   }
   
   suspend fun logout() {
