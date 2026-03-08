@@ -57,13 +57,13 @@ fun ManifestationDetailContent(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.Start
     ) {
-      AdaptiveBackButton(onBack = onBack)
       Text(
         text = manifestation.name,
         style = MaterialTheme.typography.headlineMedium,
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.primary
       )
+      AdaptiveBackButton(onBack = onBack)
     }
     Spacer(modifier = Modifier.height(24.dp))
 
@@ -74,6 +74,7 @@ fun ManifestationDetailContent(
       color = MaterialTheme.colorScheme.primary,
       modifier = Modifier.padding(bottom = 12.dp)
     )
+
     LazyRow(
       horizontalArrangement = Arrangement.spacedBy(12.dp),
       modifier = Modifier.fillMaxWidth()
@@ -89,7 +90,7 @@ fun ManifestationDetailContent(
     SectionHeader("Parámetros de Campo", Icons.Default.Terrain)
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
       DataBox(Modifier.weight(1f), "Temperatura", "${manifestation.temperature ?: "--"}°C", Icons.Default.Thermostat, Color(0xFFFF5722))
-      DataBox(Modifier.weight(1f), "pH Campo", "${manifestation.field_pH ?: "--"}", Icons.Default.Opacity, Color(0xFF2196F3))
+      DataBox(Modifier.weight(1f), "pH", "${manifestation.field_pH ?: "--"}", Icons.Default.Opacity, Color(0xFF2196F3))
     }
     Spacer(modifier = Modifier.height(8.dp))
     DataBox(Modifier.fillMaxWidth(), "Conductividad Eléctrica", "${manifestation.field_conductivity ?: "--"} µS/cm", Icons.Default.ElectricBolt, Color(0xFF4CAF50))
