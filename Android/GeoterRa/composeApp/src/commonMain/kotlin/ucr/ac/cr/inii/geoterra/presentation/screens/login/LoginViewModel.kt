@@ -4,8 +4,8 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.remote.LoginRequest
-import ucr.ac.cr.inii.geoterra.presentation.auth.AuthEvent
-import ucr.ac.cr.inii.geoterra.presentation.auth.AuthEventBus
+import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
+import ucr.ac.cr.inii.geoterra.domain.auth.AuthEventBus
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 /**

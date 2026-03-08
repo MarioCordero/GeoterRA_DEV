@@ -11,7 +11,7 @@ import org.koin.compose.koinInject
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import cafe.adriel.voyager.navigator.Navigator
-import ucr.ac.cr.inii.geoterra.presentation.auth.AuthService
+import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountScreen
 import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginScreen
 

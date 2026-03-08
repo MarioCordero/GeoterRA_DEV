@@ -4,10 +4,9 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
-import ucr.ac.cr.inii.geoterra.data.repository.AnalysisRequestRepository
 import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepositoryInterface
-import ucr.ac.cr.inii.geoterra.presentation.auth.AuthEvent
-import ucr.ac.cr.inii.geoterra.presentation.auth.AuthEventBus
+import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
+import ucr.ac.cr.inii.geoterra.domain.auth.AuthEventBus
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 class RequestViewModel(
@@ -31,10 +30,6 @@ class RequestViewModel(
         }
       }
     }
-
-    if (authEventBus.isLoggedIn.value == true) {
-      fetchSubmittedRequests()
-    }
   }
 
   private fun clearData() {
@@ -42,17 +37,18 @@ class RequestViewModel(
   }
   
   fun fetchSubmittedRequests() {
-    authEventBus.isLoggedIn.value?.let { if (!it) return }
-
     screenModelScope.launch {
-      _state.update { it.copy(isLoading = true, snackBarMessage = null) }
-      requestRepository.getMyRequests()
-        .onSuccess { data ->
-          _state.update { it.copy(isLoading = false, requests = data) }
-        }
-        .onFailure { exception ->
-          _state.update { it.copy(isLoading = false, snackBarMessage = exception.message) }
-        }
+      if (authEventBus.isLoggedIn.value == true) {
+        _state.update { it.copy(isLoading = true, snackBarMessage = null) }
+        requestRepository.getMyRequests()
+          .onSuccess { data ->
+            _state.update { it.copy(isLoading = false, requests = data) }
+          }
+          .onFailure { exception ->
+            _state.update { it.copy(isLoading = false, snackBarMessage = exception.message) }
+          }
+      }
+
     }
   }
 

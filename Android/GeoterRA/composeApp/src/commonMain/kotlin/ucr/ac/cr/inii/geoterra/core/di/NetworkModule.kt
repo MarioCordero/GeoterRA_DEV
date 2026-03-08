@@ -21,8 +21,8 @@ import ucr.ac.cr.inii.geoterra.core.network.NetworkConfig
 import ucr.ac.cr.inii.geoterra.core.network.TokenManager
 import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenRequest
 import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenResponse
-import ucr.ac.cr.inii.geoterra.presentation.auth.AuthEvent
-import ucr.ac.cr.inii.geoterra.presentation.auth.AuthEventBus
+import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
+import ucr.ac.cr.inii.geoterra.domain.auth.AuthEventBus
 
 @OptIn(InternalAPI::class)
 val networkModule = module {

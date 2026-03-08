@@ -4,8 +4,8 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
-import ucr.ac.cr.inii.geoterra.presentation.auth.AuthEvent
-import ucr.ac.cr.inii.geoterra.presentation.auth.AuthEventBus
+import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
+import ucr.ac.cr.inii.geoterra.domain.auth.AuthEventBus
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 class AccountViewModel(
@@ -34,16 +34,6 @@ class AccountViewModel(
         .onFailure { e -> _state.update { it.copy(error = e.message, isLoading = false) } }
     }
   }
-
-//  fun refresh() {
-//    screenModelScope.launch {
-//      _state.update { it.copy(isLoading = true, error = null) }
-//      authViewModel.refreshAccessToken()
-//      _state.update { it.copy(isLoading = false) }
-//      Log.i("AccountViewModel", "Refreshed access token")
-//      loadUserProfile()
-//    }
-//  }
 
   fun toggleTheme(isDark: Boolean) {
     _state.update { it.copy(isDarkMode = isDark) }

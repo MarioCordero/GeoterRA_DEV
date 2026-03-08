@@ -15,7 +15,7 @@ import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.ManifestationsRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.RegionRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
-import ucr.ac.cr.inii.geoterra.presentation.auth.AuthService
+import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisFormViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.editProfile.EditProfileViewModel
