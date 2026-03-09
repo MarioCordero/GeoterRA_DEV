@@ -38,7 +38,7 @@ actual class PDFManager actual constructor() {
 
   // A4 page dimensions in points (72 points per inch)
   private var PAGE_WIDTH = 595.0
-  private var PAGE_HEIGHT = 842.0  // Adjusted to A4 size dynamically
+  private var PAGE_HEIGHT = 1500.0  // Adjusted to A4 size dynamically
 
   suspend fun createComposeViewController(content: @Composable () -> Unit): UIViewController? {
     return withContext(Dispatchers.Main) {
@@ -84,8 +84,8 @@ actual class PDFManager actual constructor() {
       val uiView = uiViewController.view ?: return@withContext null
 
       // Ensure UIKit has time to process layout updates
-      repeat(10) { attempt ->
-        delay(500)
+      repeat(5) { attempt ->
+        delay(300)
         uiView.setNeedsLayout()
         uiView.layoutIfNeeded()
 
@@ -101,16 +101,21 @@ actual class PDFManager actual constructor() {
       }
 
       // Ensure everything is properly rendered
-      delay(5000)
+      delay(2000)
       uiView.setNeedsDisplay()
       uiView.layoutIfNeeded()
 
       // Get final height of the rendered view
-      val fullHeight = uiView.frame.useContents { size.height }
+      val fittingSize = uiView.sizeThatFits(CGSizeMake(PAGE_WIDTH, PAGE_HEIGHT))
+      val fullHeight = fittingSize.useContents { height }
       println("📏 Final Rendered Height: $fullHeight")
 
       // Dynamically adjust PAGE_HEIGHT if needed
-      if (fullHeight > PAGE_HEIGHT) PAGE_HEIGHT = fullHeight
+//      if (fullHeight > PAGE_HEIGHT) PAGE_HEIGHT = fullHeight
+
+      // Update the frame of the view to match the actual content height before capture
+      uiView.setFrame(CGRectMake(0.0, 0.0, PAGE_WIDTH, fullHeight))
+      uiView.layoutIfNeeded()
 
       // Split layout into multiple images
       val images = captureUIViewSections(uiView, fullHeight)

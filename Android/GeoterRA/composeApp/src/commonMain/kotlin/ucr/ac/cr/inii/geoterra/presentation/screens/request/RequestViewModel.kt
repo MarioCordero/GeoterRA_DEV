@@ -38,20 +38,18 @@ class RequestViewModel(
   
   fun fetchSubmittedRequests() {
     screenModelScope.launch {
-      authEventBus.isLoggedIn.collect { isLoggedIn ->
-        if (isLoggedIn == true) {
-          _state.update { it.copy(isLoading = true, snackBarMessage = null) }
-          requestRepository.getMyRequests()
-            .onSuccess { data ->
-              _state.update { it.copy(isLoading = false, requests = data) }
-            }
-            .onFailure { exception ->
-              _state.update { it.copy(isLoading = false, snackBarMessage = exception.message) }
-            }
-        } else {
-          _state.update { it.copy(requests = emptyList()) }
+      _state.update { it.copy(isLoading = true, snackBarMessage = null) }
+      requestRepository.getMyRequests()
+        .onSuccess { data ->
+          _state.update { it.copy(isLoading = false, requests = data) }
         }
-      }
+        .onFailure { exception ->
+          if (exception.message == "Tu sesión ha expirado. Por favor, inicia sesión de nuevo.") {
+            _state.update { it.copy(isLoading = false) }
+          } else {
+            _state.update { it.copy(isLoading = false, snackBarMessage = exception.message) }
+          }
+        }
     }
   }
 

@@ -47,14 +47,16 @@ fun ManifestationReport(
       .padding(16.dp)
   ) {
     Row(
+      modifier = Modifier.fillMaxWidth(),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.Start
     ) {
       Text(
+        modifier = Modifier.weight(1f),
         text = manifestation.name,
         style = MaterialTheme.typography.headlineMedium,
         fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.primary
+        color = MaterialTheme.colorScheme.primary,
       )
       if (!isForPdf) {
         AdaptiveBackButton(onBack = onBack)
