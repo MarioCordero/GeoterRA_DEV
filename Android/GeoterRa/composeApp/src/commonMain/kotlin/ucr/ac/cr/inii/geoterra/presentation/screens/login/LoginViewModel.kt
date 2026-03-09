@@ -54,14 +54,13 @@ class LoginViewModel(
 
       deferred.await()
         .onSuccess {
-          updateState { it.copy(isLoading = false) }
+          updateState { it.copy(isLoading = false, isSuccess = true) }
         }
         .onFailure { error ->
           updateState {
             it.copy(
               isLoading = false,
-              passwordError = error.message, // Texto bajo el campo
-              snackBarMessage = error.message // Mensaje flotante
+              errorMessage = error.message
             )
           }
         }
@@ -70,5 +69,9 @@ class LoginViewModel(
   
   fun dismissSnackbar() {
     updateState { it.copy(snackBarMessage = null) }
+  }
+
+  fun clearStatus() {
+    updateState { it.copy(isSuccess = false, errorMessage = null) }
   }
 }

@@ -18,6 +18,8 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.StatusDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.SuccessActionDialog
 import ucr.ac.cr.inii.geoterra.presentation.screens.register.RegisterScreen
 
 /**
@@ -34,6 +36,23 @@ class LoginScreen : Screen {
     val navigator = LocalNavigator.currentOrThrow
 
     val snackbarHostState = remember { SnackbarHostState() }
+
+    if (state.isSuccess) {
+      SuccessActionDialog(
+        message = "Cuenta actualizada correctamente.",
+        confirmText = "Aceptar",
+        onConfirm = { viewModel.clearStatus(); navigator.pop() },
+        onDismiss = { viewModel.clearStatus(); navigator.pop() }
+      )
+    }
+
+    if (state.errorMessage != null) {
+      StatusDialog(
+        isSuccess = false,
+        message = state.errorMessage!!,
+        onDismiss = { viewModel.clearStatus() }
+      )
+    }
 
     LaunchedEffect(state.snackBarMessage) {
       state.snackBarMessage?.let {
