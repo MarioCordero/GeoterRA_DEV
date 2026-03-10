@@ -32,7 +32,7 @@ final class ErrorType implements JsonSerializable
 	 */
 	public static function invalidJson(): self
 	{
-		return new self('INVALID_JSON', 'Malformed or invalid JSON payload');
+		return new self('INVALID_JSON', 'El cuerpo de la solicitud (JSON) está malformado o no es válido');
 	}
 
 	/**
@@ -40,7 +40,7 @@ final class ErrorType implements JsonSerializable
 	 */
 	public static function invalidField(string $field): self
 	{
-		return new self("INVALID_FIELD", "Invalid value for field '{$field}'");
+		return new self("INVALID_FIELD", "El valor proporcionado para el campo '{$field}' no es válido");
 	}
 
 	/**
@@ -48,7 +48,7 @@ final class ErrorType implements JsonSerializable
 	 */
 	public static function missingField(string $field): self
 	{
-		return new self("MISSING_FIELD", "Required field '{$field}' is missing");
+		return new self("MISSING_FIELD", "El campo obligatorio '{$field}' no se encuentra en la solicitud");
 	}
 
 	/**
@@ -56,7 +56,7 @@ final class ErrorType implements JsonSerializable
 	 */
 	public static function invalidEmail(): self
 	{
-		return new self('INVALID_EMAIL', 'Email format is not valid');
+		return new self('INVALID_EMAIL', 'El formato del correo electrónico no es válido');
 	}
 
 	/**
@@ -64,7 +64,7 @@ final class ErrorType implements JsonSerializable
 	 */
 	public static function emailAlreadyInUse(): self
 	{
-		return new self('EMAIL_ALREADY_IN_USE', 'The provided email is already registered');
+		return new self('EMAIL_ALREADY_IN_USE', 'El correo electrónico proporcionado ya se encuentra registrado');
 	}
 
 	/**
@@ -72,7 +72,7 @@ final class ErrorType implements JsonSerializable
 	 */
 	public static function weakPassword(): self
 	{
-		return new self('WEAK_PASSWORD', 'Password does not meet minimum security requirements');
+		return new self('WEAK_PASSWORD', 'La contraseña no cumple con los requisitos mínimos de seguridad');
 	}
 
 	/**
@@ -80,31 +80,22 @@ final class ErrorType implements JsonSerializable
 	 */
 	public static function invalidCredentials(): self
 	{
-		return new self('INVALID_CREDENTIALS', 'Incorrect email or password');
+		return new self('INVALID_CREDENTIALS', 'El correo electrónico o la contraseña son incorrectos');
 	}
 
 	public static function userUpdateFailed(): self
-{
-  return new self(
-    'USER_UPDATE_FAILED',
-    'Failed to update user information'
-  );
-}
+	{
+		return new self('USER_UPDATE_FAILED', 'No se pudo actualizar la información del usuario');
+	}
 
 	public static function userDeleteFailed(): self
 	{
-		return new self(
-			'USER_DELETE_FAILED',
-			'Failed to delete user account'
-		);
+		return new self('USER_DELETE_FAILED', 'No se pudo eliminar la cuenta de usuario');
 	}
 
 	public static function userAlreadyDeleted(): self
 	{
-		return new self(
-			'USER_ALREADY_DELETED',
-			'User account is already deleted'
-		);
+		return new self('USER_ALREADY_DELETED', 'La cuenta de usuario ya ha sido eliminada anteriormente');
 	}
 
 	/**
@@ -112,7 +103,7 @@ final class ErrorType implements JsonSerializable
 	 */
 	public static function missingAuthToken(): self
 	{
-		return new self('MISSING_AUTH_TOKEN', 'Authorization token is required');
+		return new self('MISSING_AUTH_TOKEN', 'Se requiere un token de autorización para realizar esta acción');
 	}
 
 	/**
@@ -120,108 +111,85 @@ final class ErrorType implements JsonSerializable
 	 */
 	public static function invalidAccessToken(): self
 	{
-		return new self('INVALID_ACCESS_TOKEN', 'Authorization token is invalid or expired');
+		return new self('INVALID_ACCESS_TOKEN', 'El token de acceso no es válido o ha expirado');
 	}
 
 	public static function invalidRefreshToken(): self
 	{
-		return new self('INVALID_REFRESH_TOKEN', 'Refresh token is invalid or expired');
+  	return new self('INVALID_REFRESH_TOKEN', 'El token de actualización no es válido o ha expirado');
 	}
 
 	public static function unknownAccessToken(): self
 	{
-		return new self('UNKNOWN_TOKEN', 'The provided token is not recognized');
+  return new self('UNKNOWN_TOKEN', 'El token proporcionado no es reconocido por el sistema');
 	}
 
 	public static function sessionAlreadyRevoked(): self
 	{
-		return new self('SESSION_ALREADY_REVOKED', 'The session has already been revoked');
+		return new self('SESSION_ALREADY_REVOKED', 'La sesión ya ha sido revocada previamente');
 	}
 
 	public static function logoutFailed(): self
 	{
-		return new self('LOGOUT_FAILED', 'Unable to logout user');
+		return new self('LOGOUT_FAILED', 'No se pudo cerrar la sesión del usuario');
 	}
+
 	/**
 	 * Unauthorized access to a resource.
 	 */
 	public static function unauthorized(): self
 	{
-		return new self('UNAUTHORIZED_ACCESS', 'You do not have permission to access this resource');
+		return new self('UNAUTHORIZED_ACCESS', 'No tienes los permisos necesarios para acceder a este recurso');
 	}
 
 	public static function latitudeRequired(): self
 	{
-		return new self('LATITUDE_REQUIRED', 'Latitude is required');
+		return new self('LATITUDE_REQUIRED', 'La latitud es obligatoria');
 	}
 
 	public static function longitudeRequired(): self
 	{
-		return new self('LONGITUDE_REQUIRED', 'Longitude is required');
+		return new self('LONGITUDE_REQUIRED', 'La longitud es obligatoria');
 	}
 
   public static function invalidRegion(int|string $region): self
   {
-    return new self(
-      'INVALID_REGION',
-      "Region '{$region}' is not allowed"
-    );
+		return new self('INVALID_REGION', "La región '{$region}' no está permitida o no existe");
   }
 
   public static function manifestationCreateFailed(): self
   {
-    return new self(
-      'MANIFESTATION_CREATE_FAILED',
-      'Failed to create registered manifestation'
-    );
+		return new self('MANIFESTATION_CREATE_FAILED', 'Error al intentar registrar la manifestación');
   }
 
 	public static function analysisRequestNotFound(): self
 	{
-		return new self(
-			'ANALYSIS_REQUEST_NOT_FOUND',
-			'Analysis request not found'
-		);
+		return new self('ANALYSIS_REQUEST_NOT_FOUND', 'No se encontró la solicitud de análisis especificada');
 	}
 
 	public static function analysisRequestForbidden(): self
 	{
-		return new self(
-			'ANALYSIS_REQUEST_FORBIDDEN',
-			'You do not have permission to modify this analysis request'
-		);
+		return new self('ANALYSIS_REQUEST_FORBIDDEN', 'No tienes permiso para modificar esta solicitud de análisis');
 	}
 
 	public static function analysisRequestUpdateFailed(): self
 	{
-		return new self(
-			'ANALYSIS_REQUEST_UPDATE_FAILED',
-			'Failed to update analysis request'
-		);
+		return new self('ANALYSIS_REQUEST_UPDATE_FAILED', 'No se pudo actualizar la solicitud de análisis');
 	}
 
 	public static function analysisRequestDeleteFailed(): self
 	{
-		return new self(
-			'ANALYSIS_REQUEST_DELETE_FAILED',
-			'Failed to delete analysis request'
-		);
+		return new self('ANALYSIS_REQUEST_DELETE_FAILED', 'No se pudo eliminar la solicitud de análisis');
 	}
 
 	public static function manifestationUpdateFailed(): self
 	{
-		return new self(
-			'MANIFESTATION_UPDATE_FAILED',
-			'Failed to update registered manifestation'
-		);
+		return new self('MANIFESTATION_UPDATE_FAILED', 'No se pudo actualizar la manifestación registrada');
 	}
 
 	public static function manifestationDeleteFailed(): self
 	{
-		return new self(
-			'MANIFESTATION_DELETE_FAILED',
-			'Failed to delete registered manifestation'
-		);
+		return new self('MANIFESTATION_DELETE_FAILED', 'No se pudo eliminar la manifestación registrada');
 	}
 
 	/**
@@ -229,7 +197,7 @@ final class ErrorType implements JsonSerializable
 	 */
 	public static function forbidden(): self
 	{
-		return new self('FORBIDDEN_ACCESS', 'Access to this resource is forbidden');
+		return new self('FORBIDDEN_ACCESS', 'El acceso a este recurso está estrictamente prohibido');	
 	}
 
 	/**
@@ -237,7 +205,7 @@ final class ErrorType implements JsonSerializable
 	 */
 	public static function notFound(string $resource = 'Resource'): self
 	{
-		return new self("NOT_FOUND", "Resource {$resource} not found");
+		return new self("NOT_FOUND", "El recurso '{$resource}' no pudo ser localizado");
 	}
 
 	/**
