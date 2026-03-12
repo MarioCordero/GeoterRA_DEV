@@ -1,7 +1,6 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.home
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -11,7 +10,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,12 +22,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import geoterra.composeapp.generated.resources.Res
-import geoterra.composeapp.generated.resources.ic_geoterra_planet
 import geoterra.composeapp.generated.resources.logo_GeoterRA
+import geoterra.composeapp.generated.resources.logo_GeoterRA_exp
 import geoterra.composeapp.generated.resources.rocks
 import org.jetbrains.compose.resources.painterResource
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.StepItem
-import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisFormEvent
 
 /**
  * Pure UI composable for Home screen.
@@ -77,7 +74,7 @@ fun HomeContent(
         Image(
           painter = painterResource(Res.drawable.logo_GeoterRA),
           contentDescription = null,
-          modifier = Modifier.height(40.dp)
+          modifier = Modifier.height(80.dp)
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
@@ -121,7 +118,7 @@ fun HomeContent(
     StepItem(
       1,
       "Recolección de datos",
-      "GeoterRA comienza con la recolección integral de datos geológicos de diversas fuentes."
+      "GeoterRa comienza con la recolección integral de datos geológicos de diversas fuentes."
     )
     StepItem(
       2,

@@ -18,39 +18,56 @@ class LoginViewModel(
 ) : BaseScreenModel<LoginState>(LoginState()) {
   
   fun onEmailChanged(newValue: String) {
-    updateState { it.copy(email = newValue, emailError = null) }
+    updateState { it.copy(email = newValue, fieldErrors = it.fieldErrors - "email") }
   }
   
   fun onPasswordChanged(newValue: String) {
-    updateState { it.copy(password = newValue, passwordError = null) }
+    updateState { it.copy(password = newValue, fieldErrors = it.fieldErrors - "password") }
   }
   
   fun togglePasswordVisibility() {
     updateState { it.copy(isPasswordVisible = !it.isPasswordVisible) }
   }
+
+  private fun validateFields(): Boolean {
+    val errors = mutableMapOf<String, String>()
+    val s = state.value
+
+    val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[a-z]+$".toRegex()
+
+    if (s.email.isBlank()) {
+      errors["email"] = "Por favor, proporcione un correo electrónico."
+    } else if (!s.email.matches(emailRegex)) {
+      errors["email"] = "Invalid email format."
+    }
+
+    if (s.password.length < 8) {
+      errors["password"] = "La contraseña debe tener al menos 8 carácteres."
+    }
+
+    updateState { it.copy(fieldErrors = errors) }
+    return errors.isEmpty()
+  }
   
   fun login() {
-    val email = state.value.email
-    val password = state.value.password
-    
-    // 1. Validaciones básicas
-    if (email.isBlank() || !email.contains("@")) {
-      updateState { it.copy(emailError = "Por favor, ingrese un email válido") }
-      return
+    updateState {
+      it.copy(
+        email = it.email.trim(),
+        password = it.password.trim(),
+        fieldErrors = emptyMap(),
+        error = null
+      )
     }
-    if (password.length < 8) {
-      updateState { it.copy(passwordError = "La contraseña debe tener al menos 8 carácteres") }
-      return
-    }
-    
-    // 2. Estado de carga
-    updateState { it.copy(isLoading = true, passwordError = null, snackBarMessage = null) }
-    
-    // 3. Una sola corrutina
+
+    if (!validateFields()) return
+
+    updateState { it.copy(isLoading = true) }
+
     screenModelScope.launch {
+      val s = state.value
       val deferred = CompletableDeferred<Result<Unit>>()
 
-      authEventBus.emit(AuthEvent.Login(LoginRequest(email, password), deferred))
+      authEventBus.emit(AuthEvent.Login(LoginRequest(s.email, s.password), deferred))
 
       deferred.await()
         .onSuccess {
@@ -60,7 +77,7 @@ class LoginViewModel(
           updateState {
             it.copy(
               isLoading = false,
-              errorMessage = error.message
+              error = error.message
             )
           }
         }
@@ -72,6 +89,6 @@ class LoginViewModel(
   }
 
   fun clearStatus() {
-    updateState { it.copy(isSuccess = false, errorMessage = null) }
+    updateState { it.copy(isSuccess = false, error = null) }
   }
 }

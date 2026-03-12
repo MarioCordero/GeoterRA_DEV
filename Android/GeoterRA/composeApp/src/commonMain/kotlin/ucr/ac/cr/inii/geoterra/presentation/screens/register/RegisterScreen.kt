@@ -49,7 +49,7 @@ class RegisterScreen : Screen {
         confirmText = "Aceptar",
         onConfirm = {
           viewModel.clearStatus()
-          navigator.pop() // Navega hacia atrás después de confirmar
+          navigator.pop()
         },
         onDismiss = {
           viewModel.clearStatus()
@@ -58,10 +58,10 @@ class RegisterScreen : Screen {
       )
     }
 
-    if (state.errorMessage != null) {
+    if (state.error != null) {
       StatusDialog(
         isSuccess = false,
-        message = state.errorMessage!!,
+        message = state.error!!,
         onDismiss = { viewModel.clearStatus() }
       )
     }

@@ -49,7 +49,9 @@ fun AnalysisFormContent(
         onValueChange = { onEvent(AnalysisFormEvent.EmailChanged(it)) },
         label = "Correo de contacto",
         icon = Icons.Default.Email,
-        keyboardType = KeyboardType.Email
+        keyboardType = KeyboardType.Email,
+        isError = state.fieldErrors["email"] != null,
+        errorMessage = state.fieldErrors["email"]
       )
     }
 
@@ -66,7 +68,9 @@ fun AnalysisFormContent(
         onValueChange = { onEvent(AnalysisFormEvent.OwnerContactChanged(it)) },
         label = "Teléfono de contacto",
         icon = Icons.Default.Phone,
-        keyboardType = KeyboardType.Phone
+        keyboardType = KeyboardType.Phone,
+        isError = state.fieldErrors["phone"] != null,
+        errorMessage = state.fieldErrors["phone"]
       )
       CustomTextField(
         value = state.currentUsage,
@@ -81,7 +85,9 @@ fun AnalysisFormContent(
         value = state.temperatureSensation,
         onValueChange = { onEvent(AnalysisFormEvent.TempChanged(it)) },
         label = "Sensación térmica (ej: Muy Caliente)",
-        icon = Icons.Default.Thermostat
+        icon = Icons.Default.Thermostat,
+        isError = state.fieldErrors["temp"] != null,
+        errorMessage = state.fieldErrors["temp"]
       )
 
       Row(
@@ -121,7 +127,9 @@ fun AnalysisFormContent(
             label = "Latitud",
             modifier = Modifier.weight(1f),
             keyboardType = KeyboardType.Number,
-            readOnly = true
+            readOnly = true,
+            isError = state.fieldErrors["location"] != null,
+            errorMessage = state.fieldErrors["location"]
           )
           CustomTextField(
             value = state.longitude,
@@ -129,7 +137,9 @@ fun AnalysisFormContent(
             label = "Longitud",
             modifier = Modifier.weight(1f),
             keyboardType = KeyboardType.Number,
-            readOnly = true
+            readOnly = true,
+            isError = state.fieldErrors["location"] != null,
+            errorMessage = state.fieldErrors["location"]
           )
         }
 

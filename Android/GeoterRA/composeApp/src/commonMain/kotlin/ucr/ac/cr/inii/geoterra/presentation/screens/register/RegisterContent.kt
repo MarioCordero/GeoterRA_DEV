@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -32,6 +31,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import geoterra.composeapp.generated.resources.Res
 import geoterra.composeapp.generated.resources.logo_GeoterRA
+import geoterra.composeapp.generated.resources.logo_GeoterRA_exp
 import org.jetbrains.compose.resources.painterResource
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.CustomTextField
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.FormSection
@@ -89,27 +89,31 @@ fun RegisterContent(
             value = state.name,
             onValueChange = onEvent::onNameChanged,
             label = "Nombre",
-            isError = state.nameError != null,
-            errorMessage = state.nameError
+            isError = state.fieldErrors["name"] != null,
+            errorMessage = state.fieldErrors["name"]
           )
           CustomTextField(
             value = state.lastname,
             onValueChange = onEvent::onLastnameChanged,
-            label = "Apellidos"
+            label = "Apellidos",
+            isError = state.fieldErrors["lastname"] != null,
+            errorMessage = state.fieldErrors["lastname"]
           )
           CustomTextField(
             value = state.email,
             onValueChange = onEvent::onEmailChanged,
             label = "Correo Electrónico",
             keyboardType = KeyboardType.Email,
-            isError = state.emailError != null,
-            errorMessage = state.emailError
+            isError = state.fieldErrors["email"] != null,
+            errorMessage = state.fieldErrors["email"]
           )
           CustomTextField(
             value = state.phoneNumber,
             onValueChange = onEvent::onPhoneChanged,
             label = "Teléfono (Opcional)",
-            keyboardType = KeyboardType.Phone
+            keyboardType = KeyboardType.Phone,
+            isError = state.fieldErrors["phone"] != null,
+            errorMessage = state.fieldErrors["phone"]
           )
           PasswordField(
             value = state.password,
@@ -117,8 +121,8 @@ fun RegisterContent(
             label = "Contraseña",
             isVisible = state.isPasswordVisible,
             onToggleVisibility = onEvent::togglePasswordVisibility,
-            isError = state.passwordError != null,
-            errorMessage = state.passwordError
+            isError = state.fieldErrors["password"] != null,
+            errorMessage = state.fieldErrors["password"]
           )
           PasswordField(
             value = state.confirmPassword,

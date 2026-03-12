@@ -55,7 +55,6 @@ data class AnalysisRequestDTO(
      */
     fun fromRemote(remote: AnalysisRequestRemote): AnalysisRequestDTO {
       return AnalysisRequestDTO(
-        // Llamamos a la función que ya creaste en el Remote
         region = remote.regionName(),
         email = remote.email,
         owner_contact_number = remote.owner_contact_number,
@@ -67,7 +66,6 @@ data class AnalysisRequestDTO(
         details = remote.details,
         current_usage = remote.current_usage,
 
-        // Convertimos String a Float de forma segura. Si falla, asignamos 0f.
         latitude = remote.latitude.toFloatOrNull() ?: 0f,
         longitude = remote.longitude.toFloatOrNull() ?: 0f
       )

@@ -56,10 +56,10 @@ class EditProfileScreen(
       )
     }
 
-    if (state.errorMessage != null) {
+    if (state.error != null) {
       StatusDialog(
         isSuccess = false,
-        message = state.errorMessage!!,
+        message = state.error!!,
         onDismiss = { viewModel.clearStatus() }
       )
     }

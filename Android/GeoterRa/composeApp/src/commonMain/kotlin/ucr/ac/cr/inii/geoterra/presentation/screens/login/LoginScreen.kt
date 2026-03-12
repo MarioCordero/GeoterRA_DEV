@@ -1,7 +1,6 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.login
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -46,10 +45,10 @@ class LoginScreen : Screen {
       )
     }
 
-    if (state.errorMessage != null) {
+    if (state.error != null) {
       StatusDialog(
         isSuccess = false,
-        message = state.errorMessage!!,
+        message = state.error!!,
         onDismiss = { viewModel.clearStatus() }
       )
     }

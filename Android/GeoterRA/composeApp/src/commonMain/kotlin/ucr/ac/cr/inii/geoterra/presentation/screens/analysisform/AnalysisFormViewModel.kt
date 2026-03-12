@@ -86,23 +86,35 @@ class AnalysisFormViewModel(
   }
   
   private fun submitForm() {
+    _state.update { it.copy(
+      email = it.email.trim(),
+      temperatureSensation = it.temperatureSensation.trim(),
+      ownerName = it.ownerName.trim(),
+      ownerContact = it.ownerContact.trim(),
+      details = it.details.trim()
+    )}
+
+    if (!validateFields()) return
+
     screenModelScope.launch {
+
       _state.update { it.copy(isLoading = true, snackBarMessage = null) }
-      
+
+      val currentState = _state.value
       val form = AnalysisRequestDTO(
-        region = _state.value.regionId?.toString() ?: "1",
-        email = _state.value.email,
-        owner_name = _state.value.ownerName.ifBlank { null },
-        owner_contact_number = _state.value.ownerContact.ifBlank { null },
-        temperature_sensation = _state.value.temperatureSensation.ifBlank { null },
-        bubbles = _state.value.bubbles,
-        details = _state.value.details.ifBlank { null },
-        current_usage = _state.value.currentUsage.ifBlank { null },
-        latitude = _state.value.latitude.toFloatOrNull() ?: 0f,
-        longitude = _state.value.longitude.toFloatOrNull() ?: 0f
+        region = currentState.regionId.toString(),
+        email = currentState.email,
+        owner_name = currentState.ownerName.ifBlank { null },
+        owner_contact_number = currentState.ownerContact.ifBlank { null },
+        temperature_sensation = currentState.temperatureSensation,
+        bubbles = currentState.bubbles,
+        details = currentState.details.ifBlank { null },
+        current_usage = currentState.currentUsage.ifBlank { null },
+        latitude = currentState.latitude.toFloat(),
+        longitude = currentState.longitude.toFloat()
       )
-      
-      val result = if (_state.value.isEditing) {
+
+      val result = if (currentState.isEditing) {
         analysisRequestRepository.updateRequest(requestToEdit!!.id, form)
       } else {
         analysisRequestRepository.createRequest(form)
@@ -113,10 +125,44 @@ class AnalysisFormViewModel(
       }.onFailure { e ->
         _state.update { it.copy(
           isLoading = false,
-          error = e.message ?: "Ha ocurrido un error de servidor al actualizar la solicitud."
+          error = e.message ?: "Error al procesar la solicitud."
         )}
       }
     }
+  }
+
+  private fun validateFields(): Boolean {
+    val errors = mutableMapOf<String, String>()
+    val s = _state.value
+
+    if (s.regionId == null) errors["region"] = "Por favor, seleccione una región."
+
+    val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[a-z]+$".toRegex()
+    if (s.email.isBlank()) {
+      errors["email"] = "Por favor, proporcione un correo electrónico."
+    } else if (!s.email.matches(emailRegex)) {
+      errors["email"] = "El correo electrónico no es válido."
+    }
+
+    if (s.ownerContact.isNotBlank()) {
+      val phoneRegex = "^[0-9]{8}$|^[0-9]{4}[- ]?[0-9]{4}$".toRegex()
+      if (!s.ownerContact.trim().matches(phoneRegex)) {
+        errors["phone"] = "Debe ser un número de teléfono válido."
+      }
+    }
+
+    val lat = s.latitude.toFloatOrNull()
+    val lon = s.longitude.toFloatOrNull()
+    if (lat == null || lon == null || (lat == 0f && lon == 0f)) {
+      errors["location"] = "Por favor, proporcione datos de ubicación."
+    }
+
+    if (s.temperatureSensation.isBlank()) {
+      errors["temp"] = "Por favor, indique una sensación térmica."
+    }
+
+    _state.update { it.copy(fieldErrors = errors) }
+    return errors.isEmpty()
   }
 
   fun clearError() = _state.update { it.copy(error = null) }

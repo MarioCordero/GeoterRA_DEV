@@ -45,19 +45,8 @@ data class AnalysisFormScreen(
     )
 
     val state by viewModel.state.collectAsState()
-    
-    if (state.isSuccess) {
-      navigator.pop()
-    }
 
     val snackBarHost = remember { SnackbarHostState() }
-
-    LaunchedEffect(state.snackBarMessage) {
-      state.snackBarMessage?.let {
-        snackBarHost.showSnackbar(message = it)
-        viewModel.dismissSnackBar()
-      }
-    }
 
     LoadingDialog(
       isVisible = state.isLoading,
@@ -65,7 +54,7 @@ data class AnalysisFormScreen(
 
     if (state.isSuccess) {
       StatusDialog(
-        isSuccess = true,
+        isSuccess = state.isSuccess,
         message = "La solicitud se ha creado correctamente.",
         onDismiss = {
           viewModel.clearSuccess()

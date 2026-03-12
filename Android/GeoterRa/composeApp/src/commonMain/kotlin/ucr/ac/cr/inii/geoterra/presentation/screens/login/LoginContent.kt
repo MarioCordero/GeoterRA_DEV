@@ -6,11 +6,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -18,25 +16,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -48,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import geoterra.composeapp.generated.resources.Res
 import geoterra.composeapp.generated.resources.logo_GeoterRA
+import geoterra.composeapp.generated.resources.logo_GeoterRA_exp
 import geoterra.composeapp.generated.resources.rocks
 import org.jetbrains.compose.resources.painterResource
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.CustomTextField
@@ -99,8 +89,8 @@ fun LoginContent(
         painter = painterResource(Res.drawable.logo_GeoterRA),
         contentDescription = "GeoterRA Logo",
         modifier = Modifier
-          .height(100.dp)
-          .padding(bottom = 48.dp)
+          .height(80.dp)
+          .padding(bottom = 32.dp)
       )
 
       Surface(
@@ -137,8 +127,8 @@ fun LoginContent(
               onValueChange = onEmailChanged,
               label = "Correo Electrónico",
               keyboardType = KeyboardType.Email,
-              isError = state.emailError != null,
-              errorMessage = state.emailError,
+              isError = state.fieldErrors["email"] != null,
+              errorMessage = state.fieldErrors["email"],
               modifier = Modifier.fillMaxWidth()
             )
 
@@ -148,8 +138,8 @@ fun LoginContent(
               label = "Contraseña",
               isVisible = state.isPasswordVisible,
               onToggleVisibility = onTogglePassword,
-              isError = state.passwordError != null,
-              errorMessage = state.passwordError,
+              isError = state.fieldErrors["password"] != null,
+              errorMessage = state.fieldErrors["password"],
               modifier = Modifier.fillMaxWidth()
             )
           }
