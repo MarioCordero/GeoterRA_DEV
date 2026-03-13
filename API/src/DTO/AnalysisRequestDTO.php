@@ -17,8 +17,8 @@ final class AnalysisRequestDTO
 		public int $region,
 		public string $email,
 		public ?string $owner_contact_number,
-		public string $owner_name,
-		public ?string $temperature_sensation,
+		public ?string $owner_name,
+		public string $temperature_sensation,
 		public bool $bubbles,
 		public ?string $details,
 		public ?string $current_usage,
@@ -43,8 +43,8 @@ final class AnalysisRequestDTO
 			throw new ApiException(ErrorType::missingField('email'), 422);
 		}
 
-		if (!isset($data['owner_name']) || trim((string) $data['owner_name']) === '') {
-			throw new ApiException(ErrorType::missingField('owner_name'), 422);
+		if (!isset($data['temperature_sensation']) || trim((string) $data['temperature_sensation']) === '') {
+			throw new ApiException(ErrorType::missingField('temperature_sensation'), 422);
 		}
 
 		if (!isset($data['latitude']) || $data['latitude'] === '') {
@@ -59,8 +59,8 @@ final class AnalysisRequestDTO
 			(int) $data['region'],
 			strtolower(trim((string) $data['email'])),
 			$data['owner_contact_number'] ?? null,
-			trim((string) $data['owner_name']),
-			$data['temperature_sensation'] ?? null,
+			trim((string) $data['owner_name']) ?: null,
+			$data['temperature_sensation'],
 			isset($data['bubbles']) ? (bool) $data['bubbles'] : false,
 			$data['details'] ?? null,
 			$data['current_usage'] ?? null,

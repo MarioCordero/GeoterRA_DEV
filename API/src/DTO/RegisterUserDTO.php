@@ -56,6 +56,24 @@ final class RegisterUserDTO
       throw new ApiException(ErrorType::weakPassword(), 422);
     }
 
+    // Validate minimum password length.
+    if (strlen($this->password) < 8) {
+      throw new ApiException(ErrorType::weakPassword(), 422);
+    }
+
+    
+    // Password complexity validation. 
+    $passwordPattern = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,64}$/';
+
+    if (!preg_match($passwordPattern, $this->password)) {
+      throw new ApiException(ErrorType::weakPassword(), 422);
+    }
+
+    // Prevent the password from containing the email address for better security.
+    if (stripos($this->password, $this->email) !== false) {
+      throw new ApiException(ErrorType::weakPassword(), 422);
+    }
+
     if ($this->phoneNumber !== null && !preg_match('/^\d{8,15}$/', $this->phoneNumber)) {
       throw new ApiException(
         ErrorType::invalidField('phone_number'),
