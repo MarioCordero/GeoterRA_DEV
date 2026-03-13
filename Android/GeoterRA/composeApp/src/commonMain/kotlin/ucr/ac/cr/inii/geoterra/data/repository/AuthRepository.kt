@@ -12,6 +12,7 @@ import io.ktor.http.isSuccess
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.ErrorMapper
 import ucr.ac.cr.inii.geoterra.core.network.TokenManager
+import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
 import ucr.ac.cr.inii.geoterra.data.model.remote.LoginRequest
 import ucr.ac.cr.inii.geoterra.data.model.remote.LoginResponse
 import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenRequest
@@ -54,7 +55,7 @@ class AuthRepository(
         }
       }
 
-      Result.failure(Exception("Error inesperado (${response.status.value})"))
+      handleErrorResponse(response)
     } catch (e: Exception) {
       e.printStackTrace()
       // Handle network exceptions (No internet, timeout, etc.)
@@ -85,7 +86,7 @@ class AuthRepository(
         }
       }
 
-      Result.failure(Exception("Error inesperado (${response.status.value})"))
+      handleErrorResponse(response)
 
     } catch (e: Exception) {
       e.printStackTrace()

@@ -11,11 +11,15 @@ data class MapLayer(
 )
 
 data class MapState(
-  val styleUrl: String = "https://raw.githubusercontent.com/go2garret/maps/main/src/assets/json/arcgis_hybrid.json",
+  val styleUrl: String =
+    "https://raw.githubusercontent.com/go2garret/maps/main/src/assets/json/arcgis_hybrid.json",
+  val selectedLayerId: String = "hybrid",
+
   val markers: List<ManifestationRemote> = emptyList(),
   val userLocation: UserLocation? = null,
   val selectedManifestation: ManifestationRemote? = null,
   val isUserLocationSelected: Boolean = false,
+  val userLocationTrigger: Long = 0L,
   val isLoading: Boolean = false,
   val snackBarMessage: String? = null,
 
@@ -31,8 +35,7 @@ data class MapState(
     Pair("Limón", 7u)
   ),
   val isLayerSelectionVisible: Boolean = false,
-  val selectedLayerId: String = "hybrid",
-  val availableLayers: List<MapLayer> = listOf(
+  val availableStyleLayers: List<MapLayer> = listOf(
     MapLayer("hybrid", "Híbrido", "https://raw.githubusercontent.com/go2garret/maps/main/src/assets/json/arcgis_hybrid.json"),
     MapLayer("streets", "Calles", "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"),
     MapLayer("dark", "Oscuro", "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"),

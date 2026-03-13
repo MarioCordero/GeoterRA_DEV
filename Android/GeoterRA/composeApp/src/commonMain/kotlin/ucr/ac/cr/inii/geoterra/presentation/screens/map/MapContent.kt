@@ -72,16 +72,21 @@ fun MapContent(
       }
     }
 
-    LaunchedEffect(state.isUserLocationSelected, state.userLocation) {
+    LaunchedEffect(
+      state.isUserLocationSelected,
+      state.userLocationTrigger,
+      state.userLocation)
+    {
       if (state.isUserLocationSelected) {
         state.userLocation?.let { userLoc ->
+          val targetZoom = cameraState.position.zoom.coerceAtLeast(14.0)
           cameraState.animateTo(
             CameraPosition(
               target = Position(
                 latitude = userLoc.latitude,
                 longitude = userLoc.longitude
               ),
-              zoom = 14.0
+              zoom = targetZoom
             )
           )
         }
@@ -103,7 +108,7 @@ fun MapContent(
     
     ) {
 
-      val activeLayer = state.availableLayers.find { it.id == state.selectedLayerId }
+      val activeLayer = state.availableStyleLayers.find { it.id == state.selectedLayerId }
 
       activeLayer?.snitRasterUrl?.let { rasterUrl ->
         val snitRasterSource = rememberRasterSource(
@@ -114,8 +119,6 @@ fun MapContent(
         RasterLayer(
           id = "snit-raster-layer",
           source = snitRasterSource
-          // MapLibre dibuja en el orden que declaras los componentes.
-          // Al poner esto arriba, quedará por debajo del SymbolLayer de los marcadores.
         )
       }
       
@@ -155,29 +158,26 @@ fun MapContent(
       val userMarkerIcon = painterResource(Res.drawable.ic_userMarker)
       
       state.userLocation?.let { userLoc ->
-        val userGeoJson = """
-        {
-          "type": "FeatureCollection",
-          "features": [
-            {
-              "type": "Feature",
-              "geometry": {
-                "type": "Point",
-                "coordinates": [${userLoc.longitude}, ${userLoc.latitude}]
-              },
-              "properties": {
-                "type": "user",
-                "name": "Mi ubicación"
+        val userGeoJson = remember(userLoc.latitude, userLoc.longitude) {
+          """
+          {
+            "type": "FeatureCollection",
+            "features": [
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "Point",
+                  "coordinates": [${userLoc.longitude}, ${userLoc.latitude}]
+                },
+                "properties": { "type": "user" }
               }
-            }
-          ]
-        }
-    """.trimIndent()
-        
-        val userSource = rememberGeoJsonSource(
-          data = remember(userLoc) {
-            GeoJsonData.JsonString(userGeoJson)
+            ]
           }
+          """.trimIndent()
+        }
+
+        val userSource = rememberGeoJsonSource(
+          data = GeoJsonData.JsonString(userGeoJson)
         )
         
         SymbolLayer(
@@ -200,7 +200,7 @@ fun MapContent(
         )
       }
     }
-    
+
     state.selectedManifestation?.let { manifestation ->
       ManifestationInfoPanel(
         modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding(),
@@ -208,7 +208,7 @@ fun MapContent(
         onViewFullDetails = { onDetailsClick(manifestation) }
       )
     }
-    
+
     if (state.isUserLocationSelected && state.userLocation != null) {
       UserLocationInfoPanel(
         modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding(),
@@ -216,11 +216,11 @@ fun MapContent(
         longitude = state.userLocation.longitude
       )
     }
-    
+
     if (state.isLoading) {
       CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
     }
-    
+
     state.snackBarMessage?.let { error ->
       Text(
         text = error,

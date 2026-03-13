@@ -93,7 +93,9 @@ fun EditProfileContent(
           CustomTextField(
             value = state.lastname,
             onValueChange = onEvent::onLastnameChanged,
-            label = "Apellidos"
+            label = "Apellidos",
+            isError = state.fieldErrors["lastname"] != null,
+            errorMessage = state.fieldErrors["lastname"]
           )
           CustomTextField(
             value = state.email,

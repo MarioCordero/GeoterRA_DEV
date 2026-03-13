@@ -14,6 +14,8 @@ class IosLocationProvider : LocationProvider {
 
   private val locationManager = CLLocationManager()
 
+  private var locationDelegate: CLLocationManagerDelegateProtocol? = null
+
   @OptIn(ExperimentalForeignApi::class)
   override fun observeLocation(): Flow<UserLocation> = callbackFlow {
     val delegate = object : NSObject(), CLLocationManagerDelegateProtocol {
@@ -35,9 +37,12 @@ class IosLocationProvider : LocationProvider {
       }
     }
 
-    locationManager.delegate = delegate
-    locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-    locationManager.distanceFilter = 5.0
+    locationDelegate = delegate
+    locationManager.delegate = locationDelegate
+    locationManager.desiredAccuracy = kCLLocationAccuracyBest
+    locationManager.distanceFilter = 1.0
+
+    locationManager.requestWhenInUseAuthorization()
 
     locationManager.location?.let { lastLocation ->
       trySend(lastLocation.toUserLocation())
@@ -48,6 +53,7 @@ class IosLocationProvider : LocationProvider {
     awaitClose {
       locationManager.stopUpdatingLocation()
       locationManager.delegate = null
+      locationDelegate = null
     }
   }
 

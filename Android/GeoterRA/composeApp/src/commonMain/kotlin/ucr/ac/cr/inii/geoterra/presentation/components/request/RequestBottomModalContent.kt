@@ -124,12 +124,12 @@ fun RequestBottomModalContent(
       val fillMidWidth = Modifier.weight(1f)
       InfoChip(
         Icons.Default.Explore,
-        "Lat", request.latitude.take(8),
+        "Lat", request.latitude.take(10),
         fillMidWidth,
         MaterialTheme.colorScheme.secondary
       )
       InfoChip(Icons.Default.Explore,
-        "Long", request.longitude.take(8),
+        "Long", request.longitude.take(10),
         fillMidWidth, MaterialTheme.colorScheme.secondary
       )
     }

@@ -87,14 +87,14 @@ fun RequestCardItem(
         InfoChip(
           icon = Icons.Default.Explore,
           label = "Latitud",
-          value = request.latitude.take(8),
+          value = request.latitude.take(10),
           modifier = Modifier.weight(1f),
           iconColor = MaterialTheme.colorScheme.secondary
         )
         InfoChip(
           icon = Icons.Default.Explore,
           label = "Longitud",
-          value = request.longitude.take(8),
+          value = request.longitude.take(10),
           modifier = Modifier.weight(1f),
           iconColor = MaterialTheme.colorScheme.secondary
         )

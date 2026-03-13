@@ -7,7 +7,8 @@ import io.ktor.client.request.get
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
-import ucr.ac.cr.inii.geoterra.data.model.remote.MessageResponse
+import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
+import ucr.ac.cr.inii.geoterra.data.model.remote.UpdateUserResponse
 import ucr.ac.cr.inii.geoterra.data.model.remote.UserRemote
 import ucr.ac.cr.inii.geoterra.data.model.remote.UserUpdateRequest
 import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
@@ -17,7 +18,7 @@ class UserRepository(private val client: HttpClient) : UserRepositoryInterface {
     val response = client.get("users/me")
     val envelope = response.body<ApiResponseModel<UserRemote>>()
     if (envelope.data != null) Result.success(envelope.data)
-    else Result.failure(Exception("User not found"))
+    else handleErrorResponse(response)
   } catch (e: Exception) {
     Result.failure(Exception("Error de red: verifica tu conexión."))
   }
@@ -28,16 +29,28 @@ class UserRepository(private val client: HttpClient) : UserRepositoryInterface {
     val response = client.put("users/me") {
       setBody(request)
     }
-    val envelope = response.body<ApiResponseModel<MessageResponse>>()
-    Result.success(envelope.data?.message ?: "Success")
+    val envelope = response.body<ApiResponseModel<UpdateUserResponse>>()
+    val message = envelope.data?.message
+
+    if (!message.isNullOrEmpty()) {
+      Result.success(message)
+    } else {
+      handleErrorResponse(response)
+    }
   } catch (e: Exception) {
     Result.failure(Exception("Error de red: verifica tu conexión."))
   }
   
   override suspend fun deleteMe(): Result<String> = try {
     val response = client.delete("users/me")
-    val envelope = response.body<ApiResponseModel<MessageResponse>>()
-    Result.success(envelope.data?.message ?: "Deleted")
+    val envelope = response.body<ApiResponseModel<UpdateUserResponse>>()
+    val message = envelope.data?.message
+
+    if (!message.isNullOrEmpty()) {
+      Result.success(message)
+    } else {
+      handleErrorResponse(response)
+    }
   } catch (e: Exception) {
     Result.failure(Exception("Error de red: verifica tu conexión."))
   }

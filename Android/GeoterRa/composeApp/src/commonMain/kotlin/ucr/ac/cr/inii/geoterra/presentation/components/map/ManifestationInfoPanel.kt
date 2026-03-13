@@ -72,7 +72,8 @@ fun ManifestationInfoPanel(
             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
           )
           Text(
-            text = "Lat: ${manifestation.latitude}, Lon: ${manifestation.longitude}",
+            text = "Lat: ${manifestation.latitude.toString().take(10)}," +
+              " Lon: ${manifestation.longitude.toString().take(10)}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = Modifier.padding(top = 2.dp)

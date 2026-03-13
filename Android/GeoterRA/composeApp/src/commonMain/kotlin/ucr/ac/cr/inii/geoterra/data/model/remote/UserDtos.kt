@@ -24,4 +24,6 @@ data class UserUpdateRequest(
 )
 
 @Serializable
-data class MessageResponse(val message: String)
+data class UpdateUserResponse(
+  val message: String
+)

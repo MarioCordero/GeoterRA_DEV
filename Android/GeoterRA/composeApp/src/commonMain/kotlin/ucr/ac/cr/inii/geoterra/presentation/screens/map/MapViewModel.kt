@@ -3,6 +3,7 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.map
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import ucr.ac.cr.inii.geoterra.domain.location.LocationProvider
 import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
 import ucr.ac.cr.inii.geoterra.domain.repository.ManifestationsRepositoryInterface
@@ -34,7 +35,12 @@ class MapViewModel(
   }
   
   fun onUserMarkerSelected() {
-    _state.update { it.copy(selectedManifestation = null, isUserLocationSelected = true) }
+    _state.update {
+      it.copy(
+        selectedManifestation = null,
+        isUserLocationSelected = true,
+        userLocationTrigger = Clock.System.now().toEpochMilliseconds())
+    }
   }
   
   fun onManifestationMarkerSelected(manifestationID: String) {
@@ -73,7 +79,7 @@ class MapViewModel(
   }
 
   fun selectLayer(layerId: String) {
-    val layer = _state.value.availableLayers.find { it.id == layerId }
+    val layer = _state.value.availableStyleLayers.find { it.id == layerId }
     layer?.let {
       _state.update { s -> s.copy(selectedLayerId = it.id) }
     }
@@ -101,7 +107,7 @@ class MapViewModel(
   fun applyFilters() {
     hideFilterModal()
     val currentState = state.value
-    val newLayer = currentState.availableLayers.find { it.id == currentState.selectedLayerId }
+    val newLayer = currentState.availableStyleLayers.find { it.id == currentState.selectedLayerId }
 
     _state.update { it.copy(
       isFilterModalVisible = false,

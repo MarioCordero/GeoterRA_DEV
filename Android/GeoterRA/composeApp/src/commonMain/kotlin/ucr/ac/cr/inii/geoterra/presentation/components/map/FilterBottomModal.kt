@@ -85,7 +85,7 @@ fun FilterBottomModal(
           horizontalArrangement = Arrangement.spacedBy(12.dp),
           contentPadding = PaddingValues(horizontal = 24.dp)
         ) {
-          items(state.availableLayers) { layer ->
+          items(state.availableStyleLayers) { layer ->
             TileCard(
               layer = layer,
               isSelected = layer.id == state.selectedLayerId,

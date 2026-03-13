@@ -45,7 +45,10 @@ fun UserLocationInfoPanel(
     ) {
       Box(
         modifier = Modifier
-          .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
+          .background(
+            MaterialTheme.colorScheme.primary,
+            RoundedCornerShape(12.dp)
+          )
           .padding(8.dp)
       ) {
         Icon(
@@ -65,7 +68,8 @@ fun UserLocationInfoPanel(
           color = MaterialTheme.colorScheme.onPrimaryContainer
         )
         Text(
-          text = "Lat: ${latitude}, Long: ${longitude}",
+          text = "Lat: ${latitude.toString().take(10)}," +
+            " Long: ${longitude.toString().take(10)}",
           style = MaterialTheme.typography.bodyMedium,
           color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.95f)
         )
