@@ -73,8 +73,7 @@ final class ErrorType implements JsonSerializable
 	public static function weakPassword(): self
 	{
 		return new self(
-			'WEAK_PASSWORD', 'La contraseña no cumple con los requisitos:
-		 	debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, números y caracteres especiales'
+			'WEAK_PASSWORD', 'La contraseña debe contener al menos 8 caracteres, incluir mayúsculas, minúsculas, números y caracteres especiales'
 		);
 	}
 
