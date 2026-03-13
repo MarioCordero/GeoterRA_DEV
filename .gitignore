@@ -8,6 +8,7 @@ Android/.idea/*
 *.ap_
 /out
 /captures
+
 # Archivos del entorno
 .env
 *.keystore
@@ -16,13 +17,36 @@ Android/.idea/*
 *.lock
 *.tmp
 *.swp
+
 # Secretos y configuraciones locales
 secrets.properties
 secrets.defaults.properties
+
 # Cache de Kotlin DSL
+*.iml
+.kotlin
+.gradle
+**/build/
+xcuserdata
+!src/**/build/
+local.properties
+.idea
+.DS_Store
+captures
+.externalNativeBuild
+.cxx
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcodeproj/project.xcworkspace/
+!*.xcworkspace/contents.xcworkspacedata
+**/xcshareddata/WorkspaceSettings.xcsettings
+node_modules/
 /.kts_cache
+
 # Configuración de VSCode (si usás)
 .vscode/
+
 # .github/
 website/node_modules/*
 website/node_modules
@@ -32,3 +56,44 @@ API/config/config.ini
 GeoterRA_Local.session.sql
 website/.vite/deps/_metadata.json
 website/.vite/deps/package.json
+
+
+# -----------------------------
+# Android / Gradle
+# -----------------------------
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+captures/
+
+# -----------------------------
+# Kotlin Multiplatform
+# -----------------------------
+**/build/
+
+# -----------------------------
+# iOS / Xcode
+# -----------------------------
+DerivedData/
+*.xcworkspace
+!default.xcworkspace
+*.xcuserdata
+*.xcuserstate
+
+# CocoaPods
+Pods/
+iosApp/Pods/
+Podfile.lock
+
+# -----------------------------
+# macOS
+# -----------------------------
+.DS_Store
+
+# -----------------------------
+# Logs
+# -----------------------------
+*.log
+
