@@ -38,6 +38,7 @@ object ErrorMapper {
       INVALID_ACCESS_TOKEN -> errorMessage ?: "El token de acceso proporcionado no es válido."
       INVALID_REFRESH_TOKEN -> errorMessage ?: "El token de actualización proporcionado no es válido."
       EMAIL_ALREADY_IN_USE -> errorMessage ?: "Este correo electrónico ya está registrado."
+      WEAK_PASSWORD -> errorMessage ?: "La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial."
       INVALID_EMAIL -> errorMessage ?: "Por favor, ingresa una dirección de correo válida."
       NOT_FOUND -> errorMessage ?: "El recurso solicitado no fue encontrado."
       INTERNAL_ERROR -> errorMessage ?: "Ocurrió un error en el servidor. Por favor, intenta más tarde."
