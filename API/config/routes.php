@@ -23,4 +23,7 @@ return [
     ['method' => 'GET', 'path' => '/registered-regions', 'controller' => 'RegisteredManifestationController', 'action' => 'regions'],
     ['method' => 'PUT', 'path' => '/registered-manifestations/{id}', 'controller' => 'RegisteredManifestationController', 'action' => 'update'],
     ['method' => 'DELETE', 'path' => '/registered-manifestations/{id}', 'controller' => 'RegisteredManifestationController', 'action' => 'delete'],
+
+    // Registered regions routes
+    ['method' => 'GET', 'path' => '/regions', 'controller' => 'RegionController', 'action' => 'index'],
 ];
