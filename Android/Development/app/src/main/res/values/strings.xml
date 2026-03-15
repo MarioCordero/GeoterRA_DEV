@@ -27,5 +27,6 @@
   <string name="register">Registrarse</string>
   <string name="repeat_password">Confirme su contraseña</string>
   <string name="enter_lastname">Ingrese sus apellidos</string>
-
+  <string name="geoterra_descriptionText">GeoterRA es una aplicación permite visualizar puntos geográficos en un mapa interactivo. Su objetivo es facilitar la tarea de decisiones en proyectos de energía geotérmica mediante la consulta y gestión de datos geológicos validados. Los usuarios pueden registrar, editar y exportar información desde el mapa. GeoterRA busca apoyar el desarrollo sostenible mediante el uso eficiente de datos y tecnologías geoespaciales.</string>
+  <string name="GeoterRa_descriptionText">GeoterRA es una aplicación que combina tecnología multiplataforma con datos geoespaciales para ofrecer una herramienta versátil y colaborativa que impulsa proyectos sostenibles y rentables en sectores estratégicos. Su enfoque en la accesibilidad de la información y su contribución al desarrollo económico la convierten en una solución innovadora para la gestión eficiente de los recursos geotérmicos y del suelo. </string>
 </resources>

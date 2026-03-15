@@ -5,8 +5,8 @@ import android.content.Context
 import android.util.Log
 import android.widget.TextView
 import com.inii.geoterra.development.R
+import com.inii.geoterra.development.api.geospatial.models.ThermalPoint
 import com.inii.geoterra.development.interfaces.MessageListener
-import com.inii.geoterra.development.api.ThermalPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.infowindow.InfoWindow

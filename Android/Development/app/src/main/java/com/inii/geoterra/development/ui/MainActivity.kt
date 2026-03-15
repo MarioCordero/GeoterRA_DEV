@@ -8,15 +8,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.inii.geoterra.development.Geoterra
 import com.inii.geoterra.development.ui.map.views.MapView
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.ui.requests.views.RequestsView
 import com.inii.geoterra.development.ui.account.views.AccountView
-import com.inii.geoterra.development.interfaces.FragmentListener
-import com.inii.geoterra.development.api.CheckSessionResponse
+import com.inii.geoterra.development.interfaces.PageListener
 import com.inii.geoterra.development.api.RetrofitClient
+import com.inii.geoterra.development.api.authentication.models.SessionStatus
 import com.inii.geoterra.development.databinding.ActivityMainBinding
 import com.inii.geoterra.development.device.ActivityPermissionRequester
 import com.inii.geoterra.development.interfaces.PageView
@@ -24,13 +25,18 @@ import com.inii.geoterra.development.managers.SessionManager
 import com.inii.geoterra.development.ui.account.views.LoginView
 import com.inii.geoterra.development.ui.home.views.HomeView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.osmdroid.util.GeoPoint
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), FragmentListener {
+class MainActivity : AppCompatActivity(), PageListener {
   @Inject
   lateinit var app: Geoterra
 
@@ -178,28 +184,40 @@ class MainActivity : AppCompatActivity(), FragmentListener {
       .commit()
   }
 
-  override fun onFragmentEvent(event: String, data: Any?) {
+  override fun onPageEvent(event: String, data: Any?) {
     when (event) {
       "USER_LOGGED_IN" -> {
-        Log.i("onFragmentEvent", event)
+        Timber.tag("onPageEvent").i(event)
         this.showFragment(this.accountView)
       }
       "USER_LOGGED_OUT" -> {
-        Log.i("onFragmentEvent", event)
+        Timber.tag("onPageEvent").i(event)
+        this.requestsFragment.onParentEvent(event, data)
         this.showFragment(this.loginView)
       }
       "FINISHED" -> {
+        Timber.tag("onPageEvent").i(event)
         this.supportFragmentManager.popBackStack()
       }
     }
   }
 
+  override fun onPageRequestDataAsync(event : String,
+    data : Any?,
+    callback : (Any?) -> Unit
+  ) {
+    super.onPageRequestDataAsync(event, data, callback)
+    when (event) {
+
+    }
+  }
+
   private fun checkSession() {
     val apiService = RetrofitClient.getAPIService()
-    val call = apiService.checkSession()
-    call.enqueue(object : Callback<CheckSessionResponse> {
-      override fun onResponse(call : Call<CheckSessionResponse>,
-                              response : Response<CheckSessionResponse>) {
+    val call = apiService.validateSession()
+    call.enqueue(object : Callback<SessionStatus> {
+      override fun onResponse(call : Call<SessionStatus>,
+                              response : Response<SessionStatus>) {
         if (response.isSuccessful) {
           val userData = response.body()
           if (userData != null) {
@@ -216,7 +234,7 @@ class MainActivity : AppCompatActivity(), FragmentListener {
         }
       }
 
-      override fun onFailure(call : Call<CheckSessionResponse>, t : Throwable) {
+      override fun onFailure(call : Call<SessionStatus>, t : Throwable) {
         //Log.i("Error check", "Error en la consulta de session, $t")
       }
     })

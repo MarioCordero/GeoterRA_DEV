@@ -1,18 +1,14 @@
 package com.inii.geoterra.development.ui.account.models
 
-import android.content.Context
-import android.util.Log
-import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.inii.geoterra.development.Geoterra
-import com.inii.geoterra.development.api.Error
-import com.inii.geoterra.development.api.SignUpResponse
-import com.inii.geoterra.development.api.SingUpCredentials
+import com.inii.geoterra.development.api.authentication.models.SignUpCredentials
+import com.inii.geoterra.development.api.authentication.models.SignUpResponse
+import com.inii.geoterra.development.api.common.models.ApiError
 import com.inii.geoterra.development.interfaces.PageViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -35,7 +31,7 @@ class SignUpViewModel @Inject constructor(
   val signUpSuccess: LiveData<Boolean> get() = _signUpSuccess
 
   /** Executes client-side input validation */
-  fun validateAndCreateUser(credentials: SingUpCredentials) {
+  fun validateAndCreateUser(credentials: SignUpCredentials) {
     this.viewModelScope.launch {
       when {
         credentials.email.isBlank() || credentials.password.isBlank() -> {
@@ -69,8 +65,8 @@ class SignUpViewModel @Inject constructor(
    *
    * @param credentials Validated sign-up credentials.
    */
-  private fun createUser(credentials: SingUpCredentials) {
-    this.API.signUp(
+  private fun createUser(credentials: SignUpCredentials) {
+    this.API.registerUser(
       credentials.email,
       credentials.password,
       credentials.firstName,
@@ -109,10 +105,10 @@ class SignUpViewModel @Inject constructor(
    *
    * @param errors List of API-provided errors.
    */
-  private fun handleServerErrors(errors: Map<String, String>?) {
-    val combined = errors?.values?.joinToString(", ") ?:
-    "Error desconocido"
-    _errorMessage.value = combined
+  private fun handleServerErrors(errors: List<ApiError>) {
+//    val combined = errors.values?.joinToString(", ") ?:
+//    "Error desconocido"
+//    _errorMessage.value = combined
   }
 
   fun setErrorMessage(msg: String) {

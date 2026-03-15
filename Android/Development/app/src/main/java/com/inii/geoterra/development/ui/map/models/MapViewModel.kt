@@ -4,12 +4,11 @@ import android.graphics.Bitmap
 import android.location.Location
 import androidx.lifecycle.*
 import com.inii.geoterra.development.Geoterra
-import com.inii.geoterra.development.api.ThermalPoint
-import com.inii.geoterra.development.api.ThermalPointResponse
+import com.inii.geoterra.development.api.geospatial.models.ThermalPoint
+import com.inii.geoterra.development.api.geospatial.models.ThermalPointResponse
 import com.inii.geoterra.development.device.FragmentPermissionRequester
 import com.inii.geoterra.development.interfaces.LocationCallbackListener
 import com.inii.geoterra.development.interfaces.PageViewModel
-import com.inii.geoterra.development.interfaces.PermissionRequester
 import com.inii.geoterra.development.ui.map.views.MapView
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -135,7 +134,7 @@ class MapViewModel @Inject constructor(
   private fun fetchThermalPoints(region: String) {
     this.viewModelScope.launch {
       try {
-        val call = API.getMapPoints(region)
+        val call = API.fetchThermalPoints(region)
         call.enqueue(object : Callback<ThermalPointResponse> {
           override fun onResponse(
             call: Call<ThermalPointResponse>,

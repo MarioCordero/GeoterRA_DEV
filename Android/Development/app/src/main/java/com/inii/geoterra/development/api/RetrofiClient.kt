@@ -58,5 +58,5 @@ object RetrofitClient {
    *
    * @return The API service implementation.
    */
-  fun getAPIService(): APIService = retrofit.create(APIService::class.java)
+  fun getAPIService(): GeoTerraApi = retrofit.create(GeoTerraApi::class.java)
 }

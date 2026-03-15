@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.inii.geoterra.development.Geoterra
-import com.inii.geoterra.development.api.APIService
 import com.inii.geoterra.development.api.RetrofitClient
 import timber.log.Timber
 
@@ -21,7 +20,7 @@ abstract class PageViewModel (
 ) : ViewModel() {
 
   /** @brief Retrofit API service instance for network operations */
-  protected val API: APIService = RetrofitClient.getAPIService()
+  protected val API = RetrofitClient.getAPIService()
 
   /** Observable error messages to be displayed on the UI */
   protected val _errorMessage = MutableLiveData<String>()

@@ -1,32 +1,23 @@
 package com.inii.geoterra.development.ui.requests.views
 
+import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.core.view.size
 import androidx.fragment.app.viewModels
-import com.inii.geoterra.development.api.AnalysisRequest
 import com.inii.geoterra.development.databinding.FragmentRequestsBinding
 import com.inii.geoterra.development.interfaces.PageView
 import com.inii.geoterra.development.managers.SessionManager
 import com.inii.geoterra.development.ui.elements.RequestSheet
 import com.inii.geoterra.development.ui.requests.models.RequestsViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import com.inii.geoterra.development.R
+import com.inii.geoterra.development.api.requests.models.AnalysisRequest
+import timber.log.Timber
 
-/**
- * Fragment for displaying and managing user-submitted analysis requests.
- *
- * Provides functionality to:
- * - Display a list of previously submitted analysis requests
- * - Show a form for submitting new analysis requests
- * - Handle user authentication requirements
- * - Manage fragment transactions for request forms
- *
- */
 @AndroidEntryPoint
 class RequestsView : PageView<FragmentRequestsBinding, RequestsViewModel>(
   FragmentRequestsBinding::inflate,
@@ -35,28 +26,22 @@ class RequestsView : PageView<FragmentRequestsBinding, RequestsViewModel>(
 
   override val viewModel : RequestsViewModel by viewModels()
 
-  override fun onCreatePageView(inflater : LayoutInflater,
-    container : ViewGroup?
-  ) : View {
+  // Mapa para mantener referencia de los RequestSheet creados
+  private val requestSheets = mutableMapOf<String, RequestSheet>()
 
+  override fun onCreatePageView(inflater : LayoutInflater,
+                                container : ViewGroup?
+  ) : View {
     return this.binding.root
   }
 
   override fun onCreatePage(savedInstanceState : Bundle?) {
-
+    // Inicialización si es necesaria
   }
 
-  override fun onPageViewCreated(view : View, savedInstanceState : Bundle?) {
-
-    this.viewModel.setOnSessionStateChangeListener { isActive ->
-      if (isActive) {
-        this.viewModel.fetchSubmittedRequests()
-      } else {
-        if (this.binding.layoutSubmittedRequests.size != 0) {
-          this.binding.layoutSubmittedRequests.removeAllViews()
-        }
-      }
-    }
+  override fun onShow() {
+    super.onShow()
+    this.drawSubmittedRequests()
   }
 
   override fun observeViewModel() {
@@ -64,28 +49,30 @@ class RequestsView : PageView<FragmentRequestsBinding, RequestsViewModel>(
       this.showToast(error, Toast.LENGTH_SHORT)
     }
 
-    this.viewModel.submittedRequests.observe(viewLifecycleOwner) { requests ->
-      this.drawSubmittedRequests(requests)
+    this.viewModel.submittedRequests.observe(viewLifecycleOwner) {
+      this.drawSubmittedRequests()
+    }
+
+    this.viewModel.sessionActive.observe(viewLifecycleOwner) { isActive ->
+      if (isActive) {
+        viewModel.reloadIfSessionActive()
+      } else {
+        binding.layoutSubmittedRequests.removeAllViews()
+        requestSheets.clear()
+      }
     }
   }
 
   override fun setUpListeners() {
     this.binding.btnCreateRequest.setOnClickListener {
-      // Check authentication status
       if (SessionManager.isSessionActive()) {
-        // Show form for authenticated users
-        this.showRequestForm()
+        this.showRequestForm(null) // null indica creación nueva
       } else {
-        // Show prompt for unauthenticated users
         this.showLoginPrompt()
       }
     }
   }
 
-  /**
-   * Displays authentication prompt for unauthenticated users.
-   * Shown when user attempts to create request without active session.
-   */
   private fun showLoginPrompt() {
     this.showToast(
       "Por favor inicie sesión para crear una solicitud de análisis",
@@ -96,14 +83,12 @@ class RequestsView : PageView<FragmentRequestsBinding, RequestsViewModel>(
   /**
    * Displays the request submission form.
    *
-   * 1. Makes form container visible
-   * 2. Creates AnalysisFormView instance
-   * 3. Replaces container content with form fragment
-   * 4. Adds transaction to back stack
+   * @param request AnalysisRequest a editar, o null para creación nueva
    */
-  private fun showRequestForm() {
+  private fun showRequestForm(request: AnalysisRequest?) {
     // Create new form fragment instance
-    val formsFragment = AnalysisFormView()
+    val requestToUse = request ?: AnalysisRequest()
+    val formsFragment = RequestFormView.newInstance(requestToUse)
 
     // Make form container visible
     this.binding.containerForm.visibility = View.VISIBLE
@@ -117,75 +102,169 @@ class RequestsView : PageView<FragmentRequestsBinding, RequestsViewModel>(
 
   /**
    * @brief Handles the events triggered by child fragments.
-   *
-   * @param event Name of the event
-   * @param data Optional data associated with the event
    */
-  override fun onFragmentEvent(event: String, data: Any?) {
-    Log.i("FragmentEvent", "Event: $event, Data: $data")
+  override fun onPageEvent(event: String, data: Any?) {
+    Timber.tag("PageEvent").i("Event: $event, Data: $data")
     when (event) {
       "FORM_FINISHED" -> {
-        // Handle form submission completion
-        Log.i("FragmentEvent", "FORM_FINISHED, $data")
         this.binding.containerForm.visibility = View.GONE
         this.childFragmentManager.popBackStack()
-
         this.viewModel.fetchSubmittedRequests()
       }
     }
   }
 
-  /**
-   * Updates UI with current list of submitted requests.
-   *
-   * Steps:
-   * 1. Clears existing views
-   * 2. Iterates through submitted requests
-   * 3. Creates request sheet for each request
-   * 4. Adds visual spacer between requests
-   * 5. Adds all components to layout
-   */
-  private fun drawSubmittedRequests(summitedRequests : List<AnalysisRequest>?) {
-    // Remove all existing views
-    this.binding.layoutSubmittedRequests.removeAllViews()
-
-    summitedRequests?.forEachIndexed { index, request ->
-      // Create visual representation for request
-      val requestSheet = RequestSheet(
-        context = requireContext(),
-        latitude = request.latitude,
-        longitude = request.longitude,
-        date = request.date,
-        state = "accepted" // Should come from API response
-      )
-
-      // Add to layout
-      this.binding.layoutSubmittedRequests.addView(requestSheet)
-
-      // Add spacer between requests (except after last)
-      if (index < summitedRequests.size - 1) {
-        addRequestSpacer()
+  override fun onParentEvent(event: String, data: Any?) {
+    Timber.tag("PageEvent").i("Event: $event, Data: $data")
+    when (event) {
+      "USER_LOGGED_OUT" -> {
+        this.viewModel.fetchSubmittedRequests()
+        this.drawSubmittedRequests()
       }
     }
+  }
 
+  private fun drawSubmittedRequests() {
+    val requests = viewModel.submittedRequests.value ?: emptyList()
+
+    binding.layoutSubmittedRequests.removeAllViews()
+    requestSheets.clear()
+
+    requests.forEachIndexed { _, request ->
+      // Select image based on request type
+      val photo = when (request.type.name) {
+        "Manantial" -> BitmapFactory.decodeResource(
+          resources,
+          R.drawable.hotspring_image
+        )
+        "Fumarola" -> BitmapFactory.decodeResource(
+          resources,
+          R.drawable.fumaroles_image
+        )
+        else -> BitmapFactory.decodeResource(
+          resources,
+          R.drawable.hotspring_image
+        )
+      }
+
+      // Create UI component using domain model
+      val sheet = RequestSheet(
+        context = requireContext(),
+        request = request,
+        photoBitmap = photo
+      )
+
+      // Configurar listener para las acciones
+      sheet.onActionListener = { action, _ : AnalysisRequest ->
+        handleRequestAction(action, request)
+      }
+
+      // Guardar referencia por ID
+      requestSheets[request.id] = sheet
+
+      binding.layoutSubmittedRequests.addView(sheet)
+
+//      if (index < requests.lastIndex) {
+//        addRequestSpacer()
+//      }
+    }
+  }
+
+  /**
+   * @brief Handles actions from RequestSheet components
+   *
+   * @param action The action to perform: VIEW, EDIT, or DELETE
+   * @param request The AnalysisRequest associated with the action
+   */
+  private fun handleRequestAction(action: String, request: AnalysisRequest) {
+    Timber.tag("RequestAction").i("Action: $action on request: ${request.id}")
+
+    when (action) {
+      "VIEW" -> {
+        // Mostrar detalles completos de la solicitud
+        showToast("Viendo solicitud: ${request.id}", Toast.LENGTH_SHORT)
+        // Aquí puedes abrir un fragmento de detalles
+        showRequestDetails(request)
+      }
+
+      "EDIT" -> {
+        // Abrir formulario en modo edición
+        showToast("Editando solicitud: ${request.id}", Toast.LENGTH_SHORT)
+        showRequestForm(request)
+      }
+
+      "DELETE" -> {
+        // Confirmar y eliminar
+        showDeleteConfirmation(request)
+      }
+    }
+  }
+
+  /**
+   * @brief Shows details of a specific request
+   */
+  private fun showRequestDetails(request: AnalysisRequest) {
+    // Aquí puedes implementar un fragmento o diálogo para mostrar detalles completos
+    // Por ahora solo mostramos un toast
+    val message = """
+      Solicitud: ${request.id}
+      Tipo: ${request.type}
+      Región: ${request.region}
+      Fecha: ${request.date}
+      Estado: Pendiente
+    """.trimIndent()
+
+    // Para un diálogo más elaborado:
+    // DetailsDialogFragment.newInstance(request).show(childFragmentManager, "details")
+
+    showToast(message, Toast.LENGTH_LONG)
+  }
+
+  /**
+   * @brief Shows confirmation dialog before deleting a request
+   */
+  private fun showDeleteConfirmation(request: AnalysisRequest) {
+    // Puedes usar un AlertDialog o implementar un diálogo personalizado
+    androidx.appcompat.app.AlertDialog.Builder(requireContext())
+      .setTitle("Confirmar eliminación")
+      .setMessage("¿Está seguro de que desea eliminar la solicitud ${request.id}?")
+      .setPositiveButton("Eliminar") { dialog, _ ->
+        performDeleteRequest(request)
+        dialog.dismiss()
+      }
+      .setNegativeButton("Cancelar") { dialog, _ ->
+        dialog.dismiss()
+      }
+      .show()
+  }
+
+  /**
+   * @brief Performs the actual deletion of a request
+   */
+  private fun performDeleteRequest(request: AnalysisRequest) {
+//    // Aquí llamarías al ViewModel para eliminar
+//    viewModel.deleteRequest(request.id)
+
+    // Opcional: Mostrar retroalimentación visual en la tarjeta
+    requestSheets[request.id]?.apply {
+      // Puedes cambiar el color o mostrar un estado de "eliminando"
+      alpha = 0.5f
+      isEnabled = false
+    }
+
+    showToast("Solicitud ${request.id} eliminada", Toast.LENGTH_SHORT)
   }
 
   /**
    * Adds visual spacer between request sheets.
-   * Creates an empty view with fixed height for separation.
    */
   private fun addRequestSpacer() {
-    // Create spacer view
     val spacer = View(requireContext())
-
-    // Configure layout parameters (match width, fixed height)
     val layoutParams = LinearLayout.LayoutParams(
       LinearLayout.LayoutParams.MATCH_PARENT,
       40 // 40dp height
     )
     spacer.layoutParams = layoutParams
-
-    // Add to layout
     this.binding.layoutSubmittedRequests.addView(spacer)
   }
 }

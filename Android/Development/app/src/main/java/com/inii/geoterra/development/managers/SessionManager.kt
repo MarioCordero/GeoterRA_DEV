@@ -4,16 +4,19 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.core.content.edit
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 
 /**
- * @brief Manages user session persistence and event notifications
+ * @brief Manages user session persistence as observable state
  *
- * Handles session lifecycle using SharedPreferences for storage and provides:
- * - Session state tracking
- * - Email-based user identification
- * - Session event listeners
+ * Responsibilities:
+ * - Persist session data using SharedPreferences
+ * - Expose session state as observable LiveData
+ * - NEVER interact with UI or lifecycle owners directly
  */
 object SessionManager {
+
   // ==================== CONSTANTS ====================
   private const val PREFS_NAME = "user_session_prefs"
   private const val KEY_USER_EMAIL = "user_email"
@@ -21,64 +24,73 @@ object SessionManager {
   // ==================== STORAGE ====================
   private lateinit var sharedPreferences: SharedPreferences
 
-  // ==================== EVENT SYSTEM ====================
-  private val sessionListeners = mutableListOf<(Boolean) -> Unit>()
+  // ==================== SESSION STATE ====================
 
   /**
-   * @brief Initializes session storage system
-   * @param context Context for SharedPreferences access
+   * Internal mutable session state
+   */
+  private val _sessionActive = MutableLiveData<Boolean>()
+
+  /**
+   * Public immutable observable session state
+   */
+  val sessionActive: LiveData<Boolean>
+    get() = _sessionActive
+
+  /**
+   * Initializes session persistence and restores state.
+   *
+   * MUST be called once at application startup.
    */
   fun init(context: Context) {
-    this.sharedPreferences = context.getSharedPreferences(
+    sharedPreferences = context.getSharedPreferences(
       PREFS_NAME,
       Context.MODE_PRIVATE
     )
+
+    // Restore persisted session state
+    _sessionActive.value = sharedPreferences.contains(KEY_USER_EMAIL)
   }
 
   /**
-   * @brief Starts new authenticated session
-   * @param email User identifier for the session
+   * Starts a new authenticated session.
+   *
+   * @param email User identifier
    */
   fun startSession(email: String) {
-    sharedPreferences.edit() { putString(KEY_USER_EMAIL, email) }
-    Log.d("SessionManager", "User logged in with tv_email: $email")
-    sessionListeners.forEach { it.invoke(true) }
+    sharedPreferences.edit {
+      putString(KEY_USER_EMAIL, email)
+    }
+
+    Log.d("SessionManager", "User logged in: $email")
+
+    _sessionActive.value = true
   }
 
   /**
-   * @brief Terminates current session and clears credentials
+   * Terminates the active session.
    */
   fun endSession() {
-    val currentlyActive = isSessionActive()
-    sharedPreferences.edit() { remove(KEY_USER_EMAIL) }
-    Log.d("SessionManager", "User logged out")
-    if (currentlyActive) {
-      sessionListeners.forEach { it.invoke(false) }
+    if (_sessionActive.value == true) {
+      sharedPreferences.edit {
+        remove(KEY_USER_EMAIL)
+      }
+
+      Log.d("SessionManager", "User logged out")
+
+      _sessionActive.value = false
     }
   }
 
   /**
-   * @brief Registers session state change listener
-   * @param listener Callback to execute on session events. The boolean parameter indicates if the session is active.
-   *
-   * Immediately triggers callback with current session state.
-   */
-  fun setOnSessionStateChangeListener(listener: (isActive: Boolean) -> Unit) {
-    sessionListeners.add(listener)
-    listener(this.isSessionActive())
-  }
-
-  /**
-   * @brief Checks session validity
-   * @return Boolean indicating active session presence
+   * Checks session validity synchronously.
    */
   fun isSessionActive(): Boolean {
-    return sharedPreferences.contains(KEY_USER_EMAIL)
+    return _sessionActive.value == true
   }
 
   /**
-   * @brief Retrieves stored user identifier
-   * @return Email associated with current session or null
+   * Retrieves stored user email if available.
    */
   fun getUserEmail(): String? {
     return sharedPreferences.getString(KEY_USER_EMAIL, null)

@@ -1,0 +1,144 @@
+package com.inii.geoterra.development.ui.map.views
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
+import com.inii.geoterra.development.api.geospatial.models.ThermalPoint
+import com.inii.geoterra.development.databinding.FragmentThermalBinding
+import com.inii.geoterra.development.device.CoordinateConverter
+import com.inii.geoterra.development.interfaces.PageView
+import com.inii.geoterra.development.ui.map.models.ThermalManifestationViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
+import javax.inject.Inject
+
+/**
+ * Fragment displaying detailed information about a thermal point.
+ *
+ * Shows various properties of a thermal point including coordinates, temperature,
+ * and chemical composition. Provides navigation back to the map view.
+ */
+@AndroidEntryPoint
+class ThermalManifestationView : PageView<FragmentThermalBinding, ThermalManifestationViewModel>(
+  FragmentThermalBinding::inflate,
+  ThermalManifestationViewModel::class.java
+) {
+
+  companion object {
+    /** Class argument key for thermal data */
+    private const val ARG_PARAM1 = "thermal"
+
+    /**
+     * Creates a new instance of the fragment with thermal data.
+     *
+     * @param selectedThermal Thermal data to display
+     * @return Configured fragment instance
+     */
+    fun newInstance(selectedThermal: ThermalPoint) = ThermalManifestationView().apply {
+      arguments = Bundle().apply {
+        putParcelable(ARG_PARAM1, selectedThermal)
+      }
+    }
+  }
+
+  @Inject
+  /** Dependency injected factory instance */
+  lateinit var assistedFactory : ThermalManifestationViewModel.Factory
+
+  /** ViewModelFactory instance (subclasses use it directly) */
+  override val viewModelFactory: ViewModelProvider.Factory
+    get() = createAssistedViewModelFactory {
+      val thermal = requireArguments().getParcelable<ThermalPoint>(ARG_PARAM1)!!
+      assistedFactory.create(thermal)
+    }
+
+  override fun onCreatePage(savedInstanceState : Bundle?) {
+  }
+
+  /**
+   * @brief Sets all the listeners related to the View.
+   *
+   * Subclasses should implement this method to observe set their listeners.
+   */
+  override fun setUpListeners() {
+    this.binding.btnAnalysis.setOnClickListener {
+      this.prepareFragment(this.viewModel.thermal.value!!)
+    }
+  }
+
+  /**
+   * @brief Observes ViewModel LiveData.
+   *
+   * Subclasses should implement this method to observe ViewModel's LiveData.
+   */
+  override fun observeViewModel() {}
+
+  override fun onCreatePageView(inflater : LayoutInflater,
+    container : ViewGroup?
+  ) : View {
+    this.drawThermalData(this.viewModel.thermal.value!!)
+
+    return this.binding.root
+  }
+
+  /**
+   * @brief Handles the events triggered by child fragments.
+   *
+   * @param event Name of the event
+   * @param data Optional data associated with the event
+   */
+  override fun onPageEvent(event: String, data: Any?) {
+    Timber.i("Event: $event")
+    when (event) {
+      "FINISHED" -> {
+        // Handle form submission completion
+        Timber.i("FINISHED")
+        this.childFragmentManager.popBackStack()
+        this.binding.fragmentContainer.visibility = View.GONE
+      }
+    }
+  }
+
+  /**
+   * Prepares fragment transition for thermal point detail view.
+   *
+   * @param pointValue Thermal point data to display
+   */
+  private fun prepareFragment(pointValue: ThermalPoint) {
+    Timber.i("Preparing fragment")
+    this.binding.fragmentContainer.visibility = View.VISIBLE
+
+    val analysisPage = ManifestationMenuView.newInstance(pointValue)
+    this.childFragmentManager.beginTransaction()
+      .replace(this.binding.fragmentContainer.id, analysisPage)
+      .addToBackStack(null)
+      .commit()
+  }
+
+  /**
+   * Updates basic information views.
+   *
+   * @param point Thermal point data source
+   */
+  private fun drawThermalData(point: ThermalPoint) {
+    this.binding.tvIdentifier.text = "Análisis: ${point.id}"
+
+    // Corrigiendo orden coordenadas para el convertidor si lo requiere
+    val wgs84Coordinates = CoordinateConverter.convertCRT05toWGS84(
+      point.longitude, point.latitude
+    )
+
+    this.binding.tvLatitude.text = "%.7f".format(wgs84Coordinates.y)
+    this.binding.tvLongitude.text = "%.7f".format(wgs84Coordinates.x)
+
+    this.binding.tvTemperature.text = "%.2f °C".format(
+      point.temperature
+    )
+
+    this.binding.tvPh.text = point.labPh.toString()
+
+    this.binding.tvConductivity.text = point.labCond.toString()
+  }
+}

@@ -32,23 +32,52 @@
       />
   </LinearLayout>
   
-  <com.google.android.material.textfield.TextInputLayout
+  <RadioGroup
+    android:id="@+id/rg_thermal_sensation"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:hint="Seleccione una opción"
+    android:orientation="vertical"
+    android:background="@drawable/gray_rectangle_rounded2"
     app:errorEnabled="true"
-    android:background="@drawable/gray_rectangle_rounded2">
+    android:layout_marginTop="8dp">
     
-    <com.google.android.material.textfield.TextInputEditText
-      android:id="@+id/et_thermal_sensation"
-      android:layout_width="match_parent"
+    <com.google.android.material.radiobutton.MaterialRadioButton
+      android:id="@+id/rb_very_hot"
+      android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:text="Muy caliente"
       android:fontFamily="@font/poppins_regular"
-      android:textColor="@color/black"
       android:textSize="20sp"
-      android:padding="14dp"
-      android:background="@android:color/transparent"/>
-  </com.google.android.material.textfield.TextInputLayout>
+      android:textColor="@color/black" />
+    
+    <com.google.android.material.radiobutton.MaterialRadioButton
+      android:id="@+id/rb_hot"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Caliente"
+      android:fontFamily="@font/poppins_regular"
+      android:textSize="20sp"
+      android:textColor="@color/black" />
+    
+    <com.google.android.material.radiobutton.MaterialRadioButton
+      android:id="@+id/rb_warm"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Tibio"
+      android:fontFamily="@font/poppins_regular"
+      android:textSize="20sp"
+      android:textColor="@color/black" />
+    
+    <com.google.android.material.radiobutton.MaterialRadioButton
+      android:id="@+id/rb_cold"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Frío"
+      android:fontFamily="@font/poppins_regular"
+      android:textSize="20sp"
+      android:textColor="@color/black" />
+  
+  </RadioGroup>
   
   <LinearLayout
     android:layout_width="wrap_content"
@@ -77,22 +106,33 @@
       />
   </LinearLayout>
   
-  <com.google.android.material.textfield.TextInputLayout
+  <RadioGroup
+    android:id="@+id/rg_bubbl_presence"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:hint="Seleccione una opción"
+    android:orientation="vertical"
+    android:background="@drawable/gray_rectangle_rounded2"
     app:errorEnabled="true"
-    android:background="@drawable/gray_rectangle_rounded2">
+    android:layout_marginTop="8dp">
     
-    <com.google.android.material.textfield.TextInputEditText
-      android:id="@+id/et_bubbles"
-      android:layout_width="match_parent"
+    <com.google.android.material.radiobutton.MaterialRadioButton
+      android:id="@+id/rb_bubb_yes"
+      android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:text="Sí"
       android:fontFamily="@font/poppins_regular"
-      android:textColor="@color/black"
       android:textSize="20sp"
-      android:padding="14dp"
-      android:background="@android:color/transparent"/>
-  </com.google.android.material.textfield.TextInputLayout>
+      android:textColor="@color/black" />
+    
+    <com.google.android.material.radiobutton.MaterialRadioButton
+      android:id="@+id/rb_bubb_no"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="No"
+      android:fontFamily="@font/poppins_regular"
+      android:textSize="20sp"
+      android:textColor="@color/black" />
+  
+  </RadioGroup>
 
 </LinearLayout>

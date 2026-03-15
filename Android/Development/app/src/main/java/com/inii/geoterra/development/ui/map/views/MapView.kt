@@ -1,6 +1,7 @@
 package com.inii.geoterra.development.ui.map.views
 
 import android.content.Context
+import android.graphics.Point
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.inii.geoterra.development.R
 import com.inii.geoterra.development.interfaces.MessageListener
-import com.inii.geoterra.development.api.ThermalPoint
+import com.inii.geoterra.development.api.geospatial.models.ThermalPoint
 import com.inii.geoterra.development.databinding.FragmentMapBinding
 import com.inii.geoterra.development.device.CoordinateConverter.convertCRT05toWGS84
 import com.inii.geoterra.development.interfaces.PageView
@@ -173,7 +174,7 @@ class MapView : PageView<FragmentMapBinding, MapViewModel>(
    * for a Fragment, or `onCreate` for an Activity).
    */
   private fun initializeMapView() {
-    mapView = this.binding.MapView
+    this.mapView = this.binding.MapView
     this.applyMapSettings()
   }
 
@@ -255,7 +256,7 @@ class MapView : PageView<FragmentMapBinding, MapViewModel>(
    * @param event Name of the event
    * @param data Optional data associated with the event
    */
-  override fun onFragmentEvent(event: String, data: Any?) {
+  override fun onPageEvent(event: String, data: Any?) {
     Timber.i("Event: $event")
     when (event) {
       "FINISHED" -> {
@@ -286,7 +287,7 @@ class MapView : PageView<FragmentMapBinding, MapViewModel>(
     this.viewModel.stopLocationUpdates()
     this.binding.fragmentContainer.visibility = View.VISIBLE
 
-    val thermalFragment = ThermalView.newInstance(thermal)
+    val thermalFragment = ThermalManifestationView.newInstance(thermal)
     this.childFragmentManager.beginTransaction()
       .replace(R.id.fragment_container, thermalFragment)
       .addToBackStack(null)
@@ -461,6 +462,29 @@ class MapView : PageView<FragmentMapBinding, MapViewModel>(
       })
     }
   }
+
+  /**
+   * Verifica si los tiles alrededor del punto están cargados
+   */
+  private fun areTilesLoadedAround(center: GeoPoint, regionSizePx: Int): Boolean {
+    val projection = mapView.projection
+    val centerPoint = projection.toPixels(center, null)
+
+    // Verificar varios puntos alrededor del área de interés
+    val checkPoints = listOf(
+      centerPoint,
+      Point(centerPoint.x - regionSizePx/2, centerPoint.y - regionSizePx/2),
+      Point(centerPoint.x + regionSizePx/2, centerPoint.y + regionSizePx/2)
+    )
+
+    return checkPoints.all { point ->
+      val geoPoint = projection.fromPixels(point.x, point.y)
+      // OSMdroid no tiene API directa para verificar carga de tiles,
+      // pero podemos verificar si el mapa parece estar renderizado
+      true // Por ahora asumimos que está cargado después del delay
+    }
+  }
+
 
   /**
    * Handles permission request results for location services.

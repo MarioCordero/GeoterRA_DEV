@@ -1,5 +1,6 @@
 package com.inii.geoterra.development.ui.elements
 
+import ThermalSensation
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -34,14 +35,18 @@ class TerrainForm @JvmOverloads constructor(
 
   // =============== DATA ACCESS METHODS ===============
   /**
-   * @brief Retrieves thermal sensation rating
-   * @return String value from input field (1-5 scale)
+   * Returns the selected thermal sensation.
+   *
+   * @return ThermalSensation if selected, or null if nothing is selected.
    */
-  fun getThermalSensation() : Int {
-    if (this.binding.etThermalSensation.text.toString().isEmpty()) {
-      return -2000
+  fun getThermalSensation(): ThermalSensation? {
+    return when (binding.rgThermalSensation.checkedRadioButtonId) {
+      R.id.rb_very_hot -> ThermalSensation.VERY_HOT
+      R.id.rb_hot -> ThermalSensation.HOT
+      R.id.rb_warm -> ThermalSensation.WARM
+      R.id.rb_cold -> ThermalSensation.COLD
+      else -> null
     }
-    return this.binding.etThermalSensation.text.toString().toInt()
   }
 
   /**

@@ -5,14 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.inii.geoterra.development.databinding.FragmentAccountBinding
 import com.inii.geoterra.development.interfaces.PageView
 import com.inii.geoterra.development.managers.SessionManager
 import com.inii.geoterra.development.ui.account.models.AccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 /**
  * @brief Fragment for displaying and managing user account information.
@@ -43,14 +41,9 @@ class AccountView : PageView<FragmentAccountBinding, AccountViewModel>(
    * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
    */
   override fun onCreatePage(savedInstanceState: Bundle?) {
-    viewModel.checkSessionStatus()
 
-    this.viewModel.setOnSessionStateChangeListener { isActive ->
-      if (isActive) {
-        this.viewModel.fetchUserInformation()
-      }
-    }
   }
+
 
   /**
    * @brief Sets all the listeners related to the View.
@@ -93,15 +86,18 @@ class AccountView : PageView<FragmentAccountBinding, AccountViewModel>(
   }
 
   override fun observeViewModel() {
+    viewModel.sessionActive.observe(viewLifecycleOwner) { isActive ->
+      if (!isActive) {
+        navigateToLogin()
+      }
+    }
+
     viewModel.userInfo.observe(viewLifecycleOwner) { info ->
+      info ?: return@observe
+
       binding.tvUsername.text = info.name
       binding.tvEmail.text = info.email
       binding.tvPhoneNumber.text = info.phone
-
-    }
-
-    viewModel.sessionStatus.observe(viewLifecycleOwner) { isActive ->
-      // Optional: react to session changes
     }
 
     viewModel.requestsMade.observe(viewLifecycleOwner) { requestsMade ->
@@ -129,12 +125,15 @@ class AccountView : PageView<FragmentAccountBinding, AccountViewModel>(
       .setCancelable(false)
       .setPositiveButton("Sí") { dialog, _ ->
         SessionManager.endSession()
-        this.listener?.onFragmentEvent("USER_LOGGED_OUT")
         dialog.dismiss()
       }
       .setNegativeButton("No") { dialog, _ ->
         dialog.dismiss()
       }
       .show()
+  }
+
+  private fun navigateToLogin() {
+    listener?.onPageEvent("USER_LOGGED_OUT")
   }
 }
