@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Repositories;
 
+use Exception;
 use PDO;
 use DTO\AnalysisRequestDTO;
 use DTO\Ulid;
@@ -95,7 +96,31 @@ final class AnalysisRequestRepository
 	}
 
 	/**
+	 * Finds an analysis request by ID.
+	 */
+	public function findById(string $id): ?array
+	{
+		$stmt = $this->pdo->prepare(
+			'SELECT id FROM analysis_requests WHERE id = :id'
+		);
+
+		$stmt->execute([
+			':id' => $id
+		]);
+
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+		return $result ?: null;
+	}
+
+	/**
 	 * Updates an analysis request owned by a user.
+	 * 
+	 * @param string $id
+	 * @param string $userId
+	 * @param AnalysisRequestDTO $dto
+	 * 
+	 * @throws Exception
 	 */
 	public function update(string $id, string $userId, AnalysisRequestDTO $dto): void
 	{
@@ -132,6 +157,46 @@ final class AnalysisRequestRepository
 	}
 
 	/**
+	 * Updates any analysis request on the system.
+	 * 
+	 * @param string $id
+	 * @param AnalysisRequestDTO $dto
+	 * 
+	 * @throws Exception
+	 */
+	public function adminUpdate(string $id, AnalysisRequestDTO $dto): void
+	{
+		$sql = '
+				UPDATE analysis_requests SET
+						region_id               = :region_id,
+						email                   = :email,
+						owner_contact_number    = :owner_contact_number,
+						owner_name              = :owner_name,
+						temperature_sensation   = :temperature_sensation,
+						bubbles                 = :bubbles,
+						details                 = :details,
+						current_usage           = :current_usage,
+						latitude                = :latitude,
+						longitude               = :longitude
+		';
+
+		$stmt = $this->pdo->prepare($sql);
+		$stmt->execute([
+				':region_id'             => $dto->region,
+				':email'                 => $dto->email,
+				':owner_contact_number'  => $dto->owner_contact_number,
+				':owner_name'            => $dto->owner_name,
+				':temperature_sensation' => $dto->temperature_sensation,
+				':bubbles'               => $dto->bubbles ? 1 : 0,
+				':details'               => $dto->details,
+				':current_usage'         => $dto->current_usage,
+				':latitude'              => $dto->latitude,
+				':longitude'             => $dto->longitude,
+				':id'                    => $id,
+		]);
+	}
+
+	/**
 	 * Deletes an analysis request owned by a user.
 	 */
 	public function delete(string $id, string $userId): void
@@ -143,6 +208,23 @@ final class AnalysisRequestRepository
 		$stmt->execute([
 			':id' => $id,
 			':user_id' => $userId
+		]);
+	}
+
+	/**
+	 * Deletes any analysis request on the system.
+	 * 
+	 * @param string $id
+	 * @throws Exception
+	 */
+	public function adminDelete(string $id): void
+	{
+		$stmt = $this->pdo->prepare(
+			'DELETE FROM analysis_requests WHERE id = :id'
+		);
+
+		$stmt->execute([
+			':id' => $id
 		]);
 	}
 
@@ -181,6 +263,40 @@ final class AnalysisRequestRepository
 		$stmt->execute([
 			':user_id' => $userId
 		]);
+
+		return $stmt->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	/**
+	 * Returns all analysis requests regardless of creator. Only for admin use.
+	 *
+	 * @return array
+	 */
+	public function getAll(): array
+	{
+		$sql = "
+			SELECT
+					id,
+					name,
+					region_id,
+					email,
+					owner_name,
+					owner_contact_number,
+					current_usage,
+					temperature_sensation,
+					bubbles,
+					details,
+					latitude,
+					longitude,
+					state,
+					created_at,
+					created_by
+			FROM analysis_requests
+			ORDER BY created_at DESC
+			";
+
+		$stmt = $this->pdo->prepare($sql);
+		$stmt->execute();
 
 		return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}

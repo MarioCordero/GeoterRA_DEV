@@ -16,6 +16,11 @@ return [
     ['method' => 'GET', 'path' => '/analysis-request', 'controller' => 'AnalysisRequestController', 'action' => 'index'],
     ['method' => 'PUT', 'path' => '/analysis-request/{id}', 'controller' => 'AnalysisRequestController', 'action' => 'update'],
     ['method' => 'DELETE', 'path' => '/analysis-request/{id}', 'controller' => 'AnalysisRequestController', 'action' => 'delete'],
+
+    // Admin-only analysis request routes
+    ['method' => 'GET', 'path' => '/admin/analysis-requests', 'controller' => 'AnalysisRequestController', 'action' => 'adminIndex'],
+    ['method' => 'DELETE', 'path' => '/admin/analysis-request/{id}', 'controller' => 'AnalysisRequestController', 'action' => 'adminDelete'],
+    ['method' => 'PUT', 'path' => '/admin/analysis-request/{id}', 'controller' => 'AnalysisRequestController', 'action' => 'adminUpdate'],
     
     // Registered manifestations routes
     ['method' => 'POST', 'path' => '/registered-manifestations', 'controller' => 'RegisteredManifestationController', 'action' => 'store'],

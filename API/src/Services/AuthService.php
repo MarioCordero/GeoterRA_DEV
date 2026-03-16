@@ -121,6 +121,7 @@ final class AuthService
     return [
       'user_id' => (string) $user['user_id'],
       'email' => $user['email'],
+      'role' => $user['role'],
     ];
   }
 

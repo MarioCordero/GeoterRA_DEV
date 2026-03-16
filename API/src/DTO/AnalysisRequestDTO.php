@@ -23,7 +23,8 @@ final class AnalysisRequestDTO
 		public ?string $details,
 		public ?string $current_usage,
 		public float $latitude,
-		public float $longitude
+		public float $longitude,
+		public ?string $state
 	) {
 	}
 
@@ -65,7 +66,8 @@ final class AnalysisRequestDTO
 			$data['details'] ?? null,
 			$data['current_usage'] ?? null,
 			(float) $data['latitude'],
-			(float) $data['longitude']
+			(float) $data['longitude'],
+			$data['state'] ?? null
 		);
 	}
 
