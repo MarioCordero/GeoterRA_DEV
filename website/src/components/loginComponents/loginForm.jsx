@@ -8,7 +8,7 @@ import '../../fontsModule.css';
 
 function Login() {
   const navigate = useNavigate();
-  const { setTokens } = useSession();
+  const { refresh } = useSession();
   const bgImage = {
     backgroundImage: `url(${loginImage})`,
     backgroundRepeat: "no-repeat",
@@ -21,69 +21,50 @@ function Login() {
   const [loading, setLoading] = useState(false);
 
   // Handle form submit
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setErrorMsg("");
-  setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMsg("");
+    setLoading(true);
 
-  try {
-    const response = await fetch(auth.login(), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    });
-    const data = await response.json();
-    if (response.ok && data.data && data.data.access_token) {
-      setTokens(data.data.access_token, data.data.refresh_token);
-      const userResponse = await fetch(users.me(), {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${data.data.access_token}`,
-          'Content-Type': 'application/json',
-        },
+    try {
+      const response = await fetch(auth.login(), {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (userResponse.ok) {
-        const userData = await userResponse.json();
-        
-        if (userData.data && userData.data.role === 'admin') {
+      const data = await response.json().catch(() => ({}));
+      if (response.ok) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const sessionUser = await refresh();
+        if (sessionUser && (sessionUser.role === 'admin' || sessionUser.is_admin)) {
           navigate('/LoggedAdmin');
-        } else {
+        } else if (sessionUser) {
           navigate('/Logged');
-        }
-      } else {
-        navigate('/Logged');
-      }
-    } else {
-      let errorMessage = 'Credenciales incorrectas';
-      if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
-        if (typeof data.errors[0] === 'object' && data.errors[0].message) {
-          errorMessage = data.errors[0].message;
         } else {
-          errorMessage = String(data.errors[0]);
+          setErrorMsg('No se pudo establecer la sesión');
         }
+        return;
+      }
+      
+      let errorMessage = 'Credenciales incorrectas';
+      if (data.errors?.length > 0) {
+        errorMessage = data.errors[0].message || String(data.errors[0]);
       } else if (data.message) {
         errorMessage = data.message;
       }
-      
+
       setErrorMsg(errorMessage);
       setEmail("");
       setPassword("");
+    } catch (err) {
+      console.error('Login error:', err);
+      setErrorMsg('Error de conexión con el servidor');
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error('Login request failed:', err);
-    setErrorMsg('Error de conexión con el servidor');
-    setEmail("");
-    setPassword("");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleCloseError = () => {
     setErrorMsg("");
