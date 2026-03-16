@@ -20,10 +20,10 @@ return [
     // Registered manifestations routes
     ['method' => 'POST', 'path' => '/registered-manifestations', 'controller' => 'RegisteredManifestationController', 'action' => 'store'],
     ['method' => 'GET', 'path' => '/registered-manifestations', 'controller' => 'RegisteredManifestationController', 'action' => 'index'],
-    ['method' => 'GET', 'path' => '/registered-regions', 'controller' => 'RegisteredManifestationController', 'action' => 'regions'],
     ['method' => 'PUT', 'path' => '/registered-manifestations/{id}', 'controller' => 'RegisteredManifestationController', 'action' => 'update'],
     ['method' => 'DELETE', 'path' => '/registered-manifestations/{id}', 'controller' => 'RegisteredManifestationController', 'action' => 'delete'],
-
+    
     // Registered regions routes
+    ['method' => 'GET', 'path' => '/registered-regions', 'controller' => 'RegisteredManifestationController', 'action' => 'regions'], // TODO: Change controller to RegionController
     ['method' => 'GET', 'path' => '/regions', 'controller' => 'RegionController', 'action' => 'index'],
 ];
