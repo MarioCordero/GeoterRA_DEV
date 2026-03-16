@@ -61,10 +61,10 @@ final class AuthController
       setcookie('geoterra_session_token', $result['data']['access_token'], [
         'expires' => time() + ($result['meta']['expires_in'] ?? 3600),
         'path' => '/',
-        'domain' => '', // Vacío = aplica al dominio actual (geoterra.com en prod/dev)
-        'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on', // true en HTTPS, false en HTTP
+        'domain' => '',
+        'secure' => false,  // ✅ OK para HTTP local
         'httponly' => true,
-        'samesite' => 'Lax'
+        'samesite' => 'Lax'  // ✅ CAMBIO: 'None' → 'Lax'
       ]);
       Response::success($result['data'], $result['meta'], 200);
     } catch (ApiException $e) {
@@ -87,9 +87,9 @@ final class AuthController
         'expires' => time() - 3600,
         'path' => '/',
         'domain' => '',
-        'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on',
+        'secure' => false,  // ✅ OK para HTTP local
         'httponly' => true,
-        'samesite' => 'Lax'
+        'samesite' => 'Lax'  // ✅ CAMBIO: 'None' → 'Lax'
       ]);
       Response::success(['logged_out' => true], null, 200);
     } catch (ApiException $e) {
