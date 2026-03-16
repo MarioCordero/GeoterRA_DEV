@@ -57,6 +57,22 @@ final class AnalysisRequestController
   }
 
   /**
+   * GET /analysis-request
+   * Returns all analysis requests on the system, only if the authenticated user is an admin
+   */
+  public function adminIndex(): void
+  {
+    try {
+      $requests = $this->service->getAll();
+      Response::success(data: $requests);
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getCode());
+    } catch (\Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
+
+  /**
    * PUT /analysis-request/{id}
    * Updates an existing analysis request by ID, only if it belongs to the authenticated user
    */
@@ -75,6 +91,24 @@ final class AnalysisRequestController
   }
 
   /**
+   * PUT /analysis-request/{id}
+   * Updates an existing user's analysis request by ID, only if the authenticated user is an admin
+   */
+  public function adminUpdate(string $id): void
+  {
+    try {
+      $body = Request::parseJsonRequest();
+      $dto = AnalysisRequestDTO::fromArray($body);
+      $this->service->adminUpdate($id, $dto);
+      Response::success(['message' => 'Analysis request updated successfully']);
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getCode());
+    } catch (\Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
+
+  /**
    * DELETE /analysis-request/{id}
    * Deletes an analysis request by ID, only if it belongs to the authenticated user
    */
@@ -82,6 +116,22 @@ final class AnalysisRequestController
   {
     try {
       $this->service->delete($id);
+      Response::success(['message' => 'Analysis request deleted successfully']);
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getCode());
+    } catch (\Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
+
+  /**
+   * DELETE /analysis-request/{id}
+   * Deletes an user's analysis request by ID, only if the authenticated user is an admin
+   */
+  public function adminDelete(string $id): void
+  {
+    try {
+      $this->service->adminDelete($id);
       Response::success(['message' => 'Analysis request deleted successfully']);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
