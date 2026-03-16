@@ -94,7 +94,48 @@ final class AnalysisRequestService
   }
 
   /**
-   * Deletes an analysis request.
+   * Updates an existing analysis request from any user, only if the authenticated user is an admin.
+   * 
+   * @param string $id
+   * @param AnalysisRequestDTO $dto
+   * 
+   * @throws ApiException
+   */
+  public function adminUpdate(string $id, AnalysisRequestDTO $dto): void
+  {
+    $auth = $this->authService->requireAuth();
+    
+    if ($auth['role'] !== 'admin') {
+      throw new ApiException(ErrorType::forbidden(), 403);
+    }
+
+    $dto->validate();
+
+    try {
+      $this->pdo->beginTransaction();
+      $existing = $this->repository->findById($id);
+
+      if (!$existing) {
+        throw new ApiException(ErrorType::analysisRequestNotFound(), 404);
+      }
+
+      $this->repository->adminUpdate($id, $dto);
+      $this->pdo->commit();
+
+    } catch (ApiException $e) {
+      $this->pdo->rollBack();
+      throw $e;
+    } catch (\Throwable $e) {
+      $this->pdo->rollBack();
+      throw new ApiException(ErrorType::internal('Failed to update analysis request: ' . $e->getMessage()), 500);
+    }
+  }
+
+  /**
+   * Deletes an analysis request by ID, only if it belongs to the authenticated user.
+   * 
+   * @param string $id
+   * @throws ApiException
    */
   public function delete(string $id): void
   {
@@ -118,7 +159,38 @@ final class AnalysisRequestService
     }
   }
 
-    /**
+  /**
+   * Deletes an user's analysis request by ID, only if the authenticated user is an admin.
+   * 
+   * @param string $id
+   * @throws ApiException
+   */
+  public function adminDelete(string $id): void
+  {
+    $auth = $this->authService->requireAuth();
+
+    if ($auth['role'] !== 'admin') {
+      throw new ApiException(ErrorType::forbidden(), 403);
+    }
+
+    try {
+      $this->pdo->beginTransaction();
+      $existing = $this->repository->findById($id);
+      if (!$existing) {
+        throw new ApiException(ErrorType::analysisRequestNotFound(),404);
+      }
+      $this->repository->adminDelete($id);
+      $this->pdo->commit();
+    } catch (ApiException $e) {
+      $this->pdo->rollBack();
+      throw $e;
+    } catch (\Throwable $e) {
+      $this->pdo->rollBack();
+      throw new ApiException(ErrorType::internal('Failed to delete analysis request: ' . $e->getMessage()),500);
+    }
+  }
+
+  /**
    * Returns all analysis requests for an authenticated user.
    *
    * @return array
@@ -128,5 +200,21 @@ final class AnalysisRequestService
     $auth = $this->authService->requireAuth();
     $userId = (string)$auth['user_id'];
     return $this->repository->findAllByUser($userId);
+  }
+
+  /**
+   * Returns all analysis requests for an authenticated user, only if the authenticated user is an admin.
+   *
+   * @return array
+   */
+  public function getAll(): array
+  {
+    $auth = $this->authService->requireAuth();
+
+    if ($auth['role'] !== 'admin') {
+      throw new ApiException(ErrorType::forbidden(), 403);
+    }
+
+    return $this->repository->getAll();
   }
 }
