@@ -67,8 +67,6 @@ const SidebarDesktop = ({ selectedKey, setSelectedKey, collapsed, setCollapsed }
   const handleLogout = async () => {
     try {
       setLoggingOut(true);
-      console.log("🔵 [SidebarDesktop] Starting logout process...");
-
       const response = await fetch(auth.logout(), {
         method: "POST",
         credentials: "include",
@@ -76,20 +74,19 @@ const SidebarDesktop = ({ selectedKey, setSelectedKey, collapsed, setCollapsed }
       });
 
       if (response.ok) {
-        console.log("✅ [SidebarDesktop] Logout successful, clearing session and redirecting...");
         await sessionLogout();
         setLogoutModalVisible(false);
         navigate("/");
       } else {
         const data = await response.json();
-        console.error("❌ [SidebarDesktop] Logout failed:", data);
+        console.error("[SidebarDesktop] Logout failed:", data);
         Modal.error({
           title: 'Error al cerrar sesión',
           content: data.message || "Error desconocido",
         });
       }
     } catch (err) {
-      console.error("❌ [SidebarDesktop] Logout error:", err);
+      console.error("[SidebarDesktop] Logout error:", err);
       Modal.error({
         title: 'Error de conexión',
         content: err.message,
