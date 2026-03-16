@@ -27,6 +27,9 @@ function Login() {
     setLoading(true);
 
     try {
+      console.log('📤 [Login] Enviando petición POST /api/auth/login');
+      console.log('📤 [Login] Email:', email);
+      
       const response = await fetch(auth.login(), {
         method: 'POST',
         credentials: 'include',
@@ -34,15 +37,37 @@ function Login() {
         body: JSON.stringify({ email, password }),
       });
 
+      console.log('📥 [Login] Respuesta recibida - Status:', response.status);
+      console.log('📥 [Login] Headers:', {
+        'Content-Type': response.headers.get('content-type'),
+        'Set-Cookie': response.headers.get('set-cookie'),
+      });
+
       const data = await response.json().catch(() => ({}));
+      console.log('📥 [Login] JSON response:', data);
+      
       if (response.ok) {
+        console.log('✅ [Login] Login exitoso');
+        
+        // Verificar si la cookie existe
+        const cookieExists = document.cookie.includes('geoterra_session_token');
+        console.log('🍪 [Login] ¿Cookie geoterra_session_token existe?', cookieExists);
+        console.log('🍪 [Login] document.cookie:', document.cookie);
+        
         await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        console.log('📤 [Login] Llamando refresh() ...');
         const sessionUser = await refresh();
+        console.log('📥 [Login] refresh() respondió:', sessionUser);
+        
         if (sessionUser && (sessionUser.role === 'admin' || sessionUser.is_admin)) {
+          console.log('🔐 [Login] Usuario es admin, navegando a /LoggedAdmin');
           navigate('/LoggedAdmin');
         } else if (sessionUser) {
+          console.log('✅ [Login] Usuario es cliente, navegando a /Logged');
           navigate('/Logged');
         } else {
+          console.error('❌ [Login] sessionUser es null después de refresh()');
           setErrorMsg('No se pudo establecer la sesión');
         }
         return;
@@ -55,11 +80,12 @@ function Login() {
         errorMessage = data.message;
       }
 
+      console.error('❌ [Login] Error:', errorMessage);
       setErrorMsg(errorMessage);
       setEmail("");
       setPassword("");
     } catch (err) {
-      console.error('Login error:', err);
+      console.error('❌ [Login] Excepción:', err);
       setErrorMsg('Error de conexión con el servidor');
     } finally {
       setLoading(false);
