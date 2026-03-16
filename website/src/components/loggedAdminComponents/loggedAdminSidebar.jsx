@@ -12,7 +12,8 @@ import {
 } from "@ant-design/icons";
 import '../../fontsModule.css';
 import '../../colorModule.css';
-import { buildApiUrl } from '../../config/apiConf';
+import { useSession } from '../../hooks/useSession';
+import { auth } from '../../config/apiConf';
 
 const { Sider } = Layout;
 
@@ -20,28 +21,30 @@ const SidebarLayout = ({ selectedKey, setSelectedKey, collapsed, setCollapsed, i
   const navigate = useNavigate();
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const { logout: sessionLogout } = useSession();
 
   const handleLogout = async () => {
     try {
       setLoggingOut(true);
       console.log("Starting logout process...");
-      localStorage.removeItem('geoterra_session_token');
 
-      const response = await fetch(buildApiUrl("logout.php"), {
+      // Call the logout endpoint
+      const response = await fetch(auth.logout(), {
         method: "POST",
         credentials: "include",
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Accept': 'application/json' },
       });
 
-      const data = await response.json();
-
       if (response.ok) {
-        console.log("Logout successful, redirecting to login");
+        console.log("Logout successful, clearing session and redirecting...");
+        
+        // Call the session logout hook to clear user state
+        await sessionLogout();
+        
         setLogoutModalVisible(false);
         navigate("/Login");
       } else {
+        const data = await response.json();
         console.error("Logout failed:", data);
         Modal.error({
           title: 'Error al cerrar sesión',
@@ -160,6 +163,7 @@ const SidebarLayout = ({ selectedKey, setSelectedKey, collapsed, setCollapsed, i
             type="text"
             icon={<LogoutOutlined style={{ fontSize: '18px', color: '#ff4d4f' }} />}
             onClick={showLogoutConfirm}
+            disabled={loggingOut}
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -244,7 +248,7 @@ const SidebarLayout = ({ selectedKey, setSelectedKey, collapsed, setCollapsed, i
           padding: '1rem', 
           textAlign: collapsed ? 'center' : 'right',
           borderBottom: '1px solid #f0f0f0',
-          marginTop: '64px' // Account for header
+          marginTop: '64px'
         }}>
           <Button
             type="text"
@@ -271,15 +275,15 @@ const SidebarLayout = ({ selectedKey, setSelectedKey, collapsed, setCollapsed, i
             background: 'transparent',
             flex: 1,
           }}
-            items={menuItems.map(({ shortLabel, ...rest }) => ({
-              ...rest,
-              style: {
-                margin: '8px 0',
-                fontSize: '16px',
-                fontWeight: selectedKey === rest.key ? 'bold' : 'normal',
-                color: selectedKey === rest.key ? '#1890ff' : '#333',
-              }
-            }))}
+          items={menuItems.map(({ shortLabel, ...rest }) => ({
+            ...rest,
+            style: {
+              margin: '8px 0',
+              fontSize: '16px',
+              fontWeight: selectedKey === rest.key ? 'bold' : 'normal',
+              color: selectedKey === rest.key ? '#1890ff' : '#333',
+            }
+          }))}
           inlineCollapsed={collapsed}
         />
 
@@ -294,6 +298,7 @@ const SidebarLayout = ({ selectedKey, setSelectedKey, collapsed, setCollapsed, i
             danger
             block
             onClick={showLogoutConfirm}
+            disabled={loggingOut}
             icon={<LogoutOutlined />}
             className="bg-geoterra-orange"
             style={{
