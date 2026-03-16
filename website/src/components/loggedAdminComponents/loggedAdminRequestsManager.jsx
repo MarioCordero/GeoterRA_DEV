@@ -3,7 +3,7 @@ import { Spin, Tag, Button, Modal, Descriptions, Form, Input, InputNumber, messa
 import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import '../../colorModule.css';
 import '../../fontsModule.css';
-import { buildApiUrl } from '../../config/apiConf';
+import { buildApiUrl } from '../../config/apiConf'; // TODO USE THE SPECIFIC ENDPOINTS
 import NotImplementedModal from '../common/NotImplementedModal';
 
 const AdminRequestsManager = () => {
@@ -30,62 +30,29 @@ const AdminRequestsManager = () => {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // Session token management functions
-  const getSessionToken = () => {
-    return localStorage.getItem('geoterra_session_token');
-  };
-
-  const buildHeaders = () => {
-    const headers = {};
-    const token = getSessionToken();
-    if (token) {
-      headers['X-Session-Token'] = token;
-    }
-    return headers;
-  };
-
-  // Updated function to get user session with token support
-  const getUserSession = async () => {
-    try {
-      const response = await fetch(buildApiUrl("check_session.php"), {
-        method: "GET",
-        credentials: "include",
-        headers: buildHeaders(),
-      });
-      
-      const apiResponse = await response.json();
-      
-      if (apiResponse.response === 'Ok' && apiResponse.data.status === 'logged_in') {
-        if (apiResponse.data.is_admin) {
-          return apiResponse.data.user;
-        } else {
-          console.error("User is not admin");
-          return null;
-        }
-      }
-      
-      return null;
-    } catch (error) {
-      console.error("Error checking session:", error);
-      return null;
-    }
-  };
-
-  // Also update fetchAllRequests to use token headers
   const fetchAllRequests = async () => {
     try {
-      const response = await fetch(buildApiUrl("get_all_requests.inc.php"), {
-        method: "GET",
-        credentials: "include",
-        headers: buildHeaders(),
+      const url = typeof registeredManifestations.index === 'function'
+        ? registeredManifestations.index()
+        : registeredManifestations.index;
+      const response = await fetch(url, {
+        method: 'GET',
+        credentials: 'include',
+        headers: { 'Accept': 'application/json' },
       });
-      
+
+      if (response.status === 401) {
+        throw new Error('Unauthorized');
+      }
+      if (response.status === 403) {
+        throw new Error('Forbidden');
+      }
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const result = await response.json();
-      
+
       if (result.response === "Ok") {
         return result.data || [];
       } else {
@@ -97,25 +64,30 @@ const AdminRequestsManager = () => {
     }
   };
 
-  // Update deleteRequest to use token headers
   const deleteRequest = async (requestId) => {
     try {
-      const formData = new FormData();
-      formData.append('id_soli', requestId);
-
-      const response = await fetch(buildApiUrl("delete_request.inc.php"), {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-        headers: buildHeaders(),
+      const url = typeof registeredManifestations.delete === 'function'
+        ? registeredManifestations.delete(requestId)
+        : registeredManifestations.delete;
+      const response = await fetch(url, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: { 'Accept': 'application/json' },
       });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+
+      if (response.status === 401) {
+        throw new Error('Unauthorized');
       }
-      
+      if (response.status === 403) {
+        throw new Error('Forbidden');
+      }
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`HTTP error! status: ${response.status} - ${text}`);
+      }
+
       const result = await response.json();
-      
       if (result.response === "Ok") {
         return true;
       } else {
@@ -127,7 +99,7 @@ const AdminRequestsManager = () => {
     }
   };
 
-  // Function to submit approved point to puntos_estudiados table
+  // Submit approved point — keep using legacy endpoint if no API exists, but rely on credentials include
   const submitApprovedPoint = async (pointData) => {
     try {
       const requiredFields = ['id', 'region', 'coord_x', 'coord_y'];
@@ -180,11 +152,11 @@ const AdminRequestsManager = () => {
         }
       });
 
-      const response = await fetch(buildApiUrl("add_approved_point.inc.php"), {
+      // legacy endpoint — still used if no dedicated API. Rely on credentials cookie.
+      const response = await fetch(buildApiUrl("add_approved_point.inc.php"), { // TODO CHANGE WITH analysisRequest.store
         method: "POST",
         body: formData,
         credentials: "include",
-        headers: buildHeaders(),
       });
       
       if (!response.ok) {
@@ -231,9 +203,9 @@ const AdminRequestsManager = () => {
         setLoading(true);
         setError(null);
         
-        const userEmail = await getUserSession();
-        if (!userEmail) {
-          setError("Usuario no autenticado");
+        const user = await getUserSession();
+        if (!user || !user.is_admin) {
+          setError("Usuario no autenticado o no autorizado");
           return;
         }
         

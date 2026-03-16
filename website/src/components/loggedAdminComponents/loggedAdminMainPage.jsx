@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import "../../colorModule.css";
 import '../../fontsModule.css';
-import { buildApiUrl } from '../../config/apiConf';
+import { users } from '../../config/apiConf';
 
 const Dashboard = ({ user, loading, error }) => {
   if (loading) {
@@ -50,64 +50,35 @@ const LoggedMainPage = () => {
       try {
         setLoading(true);
         setError(null);
-
-        // Check session first
-        const sessionResponse = await fetch(buildApiUrl("check_session.php"), {
+        
+        const res = await fetch(users.me(), {
           credentials: 'include',
           method: 'GET',
           headers: {
-            'Content-Type': 'application/json',
-          }
+            'Accept': 'application/json',
+          },
         });
 
-        if (!sessionResponse.ok) {
-          throw new Error(`Session check failed: ${sessionResponse.status}`);
+        if (res.status === 401) {
+          setError('Sesión no activa. Por favor, inicia sesión nuevamente.');
+          return;
         }
 
-        const sessionData = await sessionResponse.json();
-        
-        if (sessionData.response === "Ok" && sessionData.data.status === 'logged_in') {
-          console.log('Session is active for user:', sessionData.data.user);
-          
-          // Fetch user data
-          const userResponse = await fetch(buildApiUrl("user_info.php"), {
-            credentials: 'include',
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            }
-          });
+        if (!res.ok) {
+          throw new Error(`Error en la petición: ${res.status}`);
+        }
 
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            
-            if (userData.response === "Ok") {
-              setUser({
-                name: userData.data.name || sessionData.data.user,
-                requestedPoints: userData.data.requestedPoints || 0,
-                isAdmin: sessionData.data.is_admin || false,
-                userType: sessionData.data.user_type || 'usr'
-              });
-            } else {
-              // Use session data as fallback
-              setUser({
-                name: sessionData.data.user,
-                requestedPoints: 0,
-                isAdmin: sessionData.data.is_admin || false,
-                userType: sessionData.data.user_type || 'usr'
-              });
-            }
-          } else {
-            // Use session data as fallback
-            setUser({
-              name: sessionData.data.user,
-              requestedPoints: 0,
-              isAdmin: sessionData.data.is_admin || false,
-              userType: sessionData.data.user_type || 'usr'
-            });
-          }
+        const body = await res.json();
+
+        if (body.response === 'Ok' && body.data) {
+          setUser({
+            name: body.data.name || body.data.email || '',
+            requestedPoints: body.data.requestedPoints || 0,
+            isAdmin: !!body.data.is_admin,
+            userType: body.data.user_type || 'usr',
+          });
         } else {
-          setError('Sesión no activa. Por favor, inicia sesión nuevamente.');
+          setError(body.message || 'No se pudo obtener la información del usuario.');
         }
       } catch (err) {
         setError(`Error al verificar la sesión: ${err.message}`);
