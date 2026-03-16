@@ -3,7 +3,8 @@ const API_CONFIG = {
   
   baseUrls: {
     production: 'http://163.178.171.105/API/public',
-    local: 'http://geoterra.com/API/public'
+    local: 'http://localhost:8000/API/public' // NEW COOKIES
+    //local: 'http://geoterra.com/API/public', (OLD)
   },
 
   endpoints: {
@@ -15,6 +16,7 @@ const API_CONFIG = {
     },
     users: {
       me: '/users/me',
+      meSession: `/users/me/session`,
     },
     analysisRequest: {
       index: '/analysis-request',
@@ -63,6 +65,7 @@ export const auth = {
 // ============================================
 export const users = {
   me: () => buildApiUrl(API_CONFIG.endpoints.users.me),
+  meSession: () => buildApiUrl(API_CONFIG.endpoints.users.meSession),
 };
 
 // ============================================

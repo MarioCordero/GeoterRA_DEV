@@ -3,7 +3,7 @@ import { users, auth } from '../config/apiConf';
 
 const SessionContext = createContext({
   user: null,
-  loading: true,
+  loading: false,
   error: null,
   refresh: async () => {},
   logout: async () => {},
@@ -11,14 +11,15 @@ const SessionContext = createContext({
 
 export const SessionProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [initialized, setInitialized] = useState(false);
 
   const fetchSession = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(users.me(), {
+      const res = await fetch(users.meSession(), {
         method: 'GET',
         credentials: 'include',
         headers: { 'Accept': 'application/json' },
@@ -30,11 +31,11 @@ export const SessionProvider = ({ children }) => {
       }
       if (!res.ok) {
         const text = await res.text().catch(() => '');
-        throw new Error(`HTTP ${res.status} ${text}`);
+        throw new Error(`HTTP ${res.status}`);
       }
 
       const body = await res.json();
-      if (body.response === 'Ok' && body.data) {
+      if (body.data) {  // Cambio: solo valida que body.data existe
         setUser(body.data);
         return body.data;
       }
@@ -42,7 +43,8 @@ export const SessionProvider = ({ children }) => {
       setUser(null);
       return null;
     } catch (err) {
-      setError(err.message || 'Error fetching session');
+      console.error('Session fetch error:', err);
+      setError(null);
       setUser(null);
       return null;
     } finally {
@@ -58,20 +60,25 @@ export const SessionProvider = ({ children }) => {
         headers: { 'Accept': 'application/json' },
       });
     } catch (err) {
-      // ignore network errors on logout, but clear client state
-      console.error('Logout error', err);
+      console.error('Logout error:', err);
     } finally {
       setUser(null);
     }
   }, []);
 
   useEffect(() => {
-    fetchSession();
+    const hasCookie = document.cookie.includes('geoterra_session_token');
+    
+    if (hasCookie) {
+      fetchSession().then(() => setInitialized(true));
+    } else {
+      setInitialized(true);
+    }
   }, [fetchSession]);
 
   return (
     <SessionContext.Provider value={{ user, loading, error, refresh: fetchSession, logout }}>
-      {children}
+      {initialized && children}
     </SessionContext.Provider>
   );
 };
