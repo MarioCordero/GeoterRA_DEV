@@ -49,13 +49,22 @@ final class AuthService
       $refreshToken,
       $refreshExpires
     );
+
+    $userInfo = $this->userRepository->findById($userId);
+
     return [
       'data' => [
         'access_token' => $accessToken,
-        'refresh_token' => $refreshToken
+        'refresh_token' => $refreshToken,
+        'user_id' => $userId,
+        'email' => $userInfo['email'],
+        'name' => $userInfo['name'] ?? '',
+        'is_admin' => (bool) ($userInfo['role'] === 'admin'),
+        'role' => $userInfo['role'] ?? 'usr'
       ],
       'meta' => [
-        'token_type' => 'Bearer'
+        'token_type' => 'Bearer',
+        'expires_in' => $accessExpires
       ]
     ];
   }
@@ -152,7 +161,7 @@ final class AuthService
    * @throws ApiException if token is invalid or expired
    * @return array token record from database
    */
-  private function validateAccessToken(string $rawToken): array
+  public function validateAccessToken(string $rawToken): array
   {
     $token = $this->authRepository->findValidAccessToken($rawToken);
     if (!$token) {

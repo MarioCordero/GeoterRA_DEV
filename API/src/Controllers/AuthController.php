@@ -56,6 +56,16 @@ final class AuthController
       $data = Request::parseJsonRequest();
       $dto = LoginUserDTO::fromArray($data);
       $result = $this->authService->login($dto);
+      // Set the access token as an HTTP-only cookie for session management
+      // TODO CHECK THIS VULNERABILITY
+      setcookie('geoterra_session_token', $result['data']['access_token'], [
+        'expires' => time() + ($result['meta']['expires_in'] ?? 3600),
+        'path' => '/',
+        'domain' => '', // Vacío = aplica al dominio actual (geoterra.com en prod/dev)
+        'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on', // true en HTTPS, false en HTTP
+        'httponly' => true,
+        'samesite' => 'Lax'
+      ]);
       Response::success($result['data'], $result['meta'], 200);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
@@ -72,6 +82,15 @@ final class AuthController
   {
     try {
       $this->authService->logout();
+      // Clean cookie
+      setcookie('geoterra_session_token', '', [
+        'expires' => time() - 3600,
+        'path' => '/',
+        'domain' => '',
+        'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on',
+        'httponly' => true,
+        'samesite' => 'Lax'
+      ]);
       Response::success(['logged_out' => true], null, 200);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
