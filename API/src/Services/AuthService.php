@@ -167,15 +167,18 @@ final class AuthService
   public function requireAuth(): array
   {
     $headers = getallheaders();
-    $authorization = $headers['Authorization'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-    if (!str_starts_with($authorization, 'Bearer ')) {
-      throw new ApiException(ErrorType::missingAuthToken(), 401);
+    $authorization = $headers['Authorization'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? ''; 
+    if (str_starts_with($authorization, 'Bearer ')) {
+      $token = trim(substr($authorization, 7));
+      if ($token !== '') {
+        return $this->authenticate($token);
+      }
     }
-    $token = trim(substr($authorization, 7));
-    if ($token === '') {
-      throw new ApiException(ErrorType::missingAuthToken(), 401);
+    $sessionToken = $_COOKIE['geoterra_session_token'] ?? null;
+    if ($sessionToken) {
+      return $this->authenticate($sessionToken);
     }
-    return $this->authenticate($token);
+    throw new ApiException(ErrorType::missingAuthToken(), 401);
   }
 
   /**
