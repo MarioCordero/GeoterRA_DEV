@@ -88,7 +88,7 @@ final class UserController
   }
 
   /**
-   * GET /users/me-session
+   * GET /users/me/session
    * Get authenticated user from session cookie (validates via session.php)
    */
   public function showSession(): void
@@ -101,8 +101,13 @@ final class UserController
         Response::error(ErrorType::missingAuthToken(), 401);
         return;
       }
-      
-      Response::success($user, null, 200);
+
+      // TODO: CHECK Return only essential user info to avoid exposing sensitive data
+      Response::success([
+        'id' => $user['user_id'],
+        'email' => $user['email'] ?? null,
+        'role' => $user['role'] ?? 'user',
+      ], null, 200);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
     } catch (\Throwable $e) {

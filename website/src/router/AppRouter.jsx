@@ -17,10 +17,10 @@ export default function AppRouter() {
           <Route path="/" element={<Home />} />
           <Route path="/Login" element={<Login />} />
           <Route path="/Map" element={<Map />} />
-          <Route path="/Logged" element={<PrivateRoute><Logged /></PrivateRoute>} />
+          <Route path="/Logged" element={<Logged />} />
           <Route path="/Register" element={<Register />} />
           <Route path="/point-details/:pointId" element={<PointDetails />} />
-          <Route path="/LoggedAdmin" element={<PrivateRoute requireAdmin={true}><LoggedAdmin /></PrivateRoute>} />
+          <Route path="/LoggedAdmin" element={<LoggedAdmin />} />
         </Routes>
       </div>
     </Router>
