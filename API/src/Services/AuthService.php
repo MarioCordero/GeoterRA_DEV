@@ -49,13 +49,22 @@ final class AuthService
       $refreshToken,
       $refreshExpires
     );
+
+    $userInfo = $this->userRepository->findById($userId);
+
     return [
       'data' => [
         'access_token' => $accessToken,
-        'refresh_token' => $refreshToken
+        'refresh_token' => $refreshToken,
+        'user_id' => $userId,
+        'email' => $userInfo['email'],
+        'name' => $userInfo['name'] ?? '',
+        'is_admin' => (bool) ($userInfo['role'] === 'admin'),
+        'role' => $userInfo['role'] ?? 'usr'
       ],
       'meta' => [
-        'token_type' => 'Bearer'
+        'token_type' => 'Bearer',
+        'expires_in' => $accessExpires
       ]
     ];
   }
@@ -99,13 +108,38 @@ final class AuthService
 
   /**
    * Logout the current user by revoking the session token.
+   * 
+   * Attempts to validate the token first, but if it's expired or invalid,
+   * still allows logout as a fallback (clears the session).
    *
-   * @throws ApiException if token is invalid or already revoked
+   * @throws ApiException only for real server errors (DB issues)
    */
   public function logout(): void
   {
-    $auth = $this->requireAuth();
-    $userId = $auth['user_id'];
+    try {
+      $auth = $this->requireAuth();
+      $userId = $auth['user_id'];
+    } catch (ApiException $e) {
+      $headers = getallheaders();
+      $authorization = $headers['Authorization'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+      
+      if (!str_starts_with($authorization, 'Bearer ')) {
+        return;
+      }
+      
+      $token = trim(substr($authorization, 7));
+      
+      if ($token === '') {
+        return;
+      }
+      $tokenRecord = $this->authRepository->findAccessTokenWithoutValidation($token);
+      
+      if (!$tokenRecord) {
+        return;
+      }
+      
+      $userId = $tokenRecord['user_id'];
+    }
     $this->authRepository->deleteUserTokens($userId);
   }
 
@@ -121,6 +155,7 @@ final class AuthService
     return [
       'user_id' => (string) $user['user_id'],
       'email' => $user['email'],
+      'role' => $user['role'],
     ];
   }
 
@@ -132,15 +167,18 @@ final class AuthService
   public function requireAuth(): array
   {
     $headers = getallheaders();
-    $authorization = $headers['Authorization'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-    if (!str_starts_with($authorization, 'Bearer ')) {
-      throw new ApiException(ErrorType::missingAuthToken(), 401);
+    $authorization = $headers['Authorization'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? ''; 
+    if (str_starts_with($authorization, 'Bearer ')) {
+      $token = trim(substr($authorization, 7));
+      if ($token !== '') {
+        return $this->authenticate($token);
+      }
     }
-    $token = trim(substr($authorization, 7));
-    if ($token === '') {
-      throw new ApiException(ErrorType::missingAuthToken(), 401);
+    $sessionToken = $_COOKIE['geoterra_session_token'] ?? null;
+    if ($sessionToken) {
+      return $this->authenticate($sessionToken);
     }
-    return $this->authenticate($token);
+    throw new ApiException(ErrorType::missingAuthToken(), 401);
   }
 
   /**
@@ -151,7 +189,7 @@ final class AuthService
    * @throws ApiException if token is invalid or expired
    * @return array token record from database
    */
-  private function validateAccessToken(string $rawToken): array
+  public function validateAccessToken(string $rawToken): array
   {
     $token = $this->authRepository->findValidAccessToken($rawToken);
     if (!$token) {

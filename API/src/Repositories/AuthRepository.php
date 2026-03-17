@@ -97,6 +97,25 @@ final class AuthRepository
   }
 
   /**
+   * Find an access token WITHOUT validating expiry.
+   * Used for logout fallback when token might be expired.
+   * 
+   * @param string $token the raw token string
+   * @return array|null token record or null if not found
+   */
+  public function findAccessTokenWithoutValidation(string $token): ?array
+  {
+    $stmt = $this->db->prepare('
+      SELECT * FROM access_tokens 
+      WHERE token = :token
+      LIMIT 1
+    ');
+    $stmt->execute(['token' => $token]);
+    $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+    return $result ?: null;
+  }
+
+  /**
    * Insert or replace the user's refresh token.
    */
   public function upsertRefreshToken(

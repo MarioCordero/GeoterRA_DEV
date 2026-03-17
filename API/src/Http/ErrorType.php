@@ -13,11 +13,13 @@ use JsonSerializable;
  */
 final class ErrorType implements JsonSerializable
 {
-	public function __construct(
-		private string $code,
-		private string $message,
-	) {
-	}
+	private string $message;
+  private string $type;
+  private function __construct(string $type, string $message)
+  {
+    $this->type = $type;
+    $this->message = $message;
+  }
 
 	/**
 	 * Generic constructor from code and message.
@@ -136,14 +138,6 @@ final class ErrorType implements JsonSerializable
 		return new self('LOGOUT_FAILED', 'No se pudo cerrar la sesión del usuario');
 	}
 
-	/**
-	 * Unauthorized access to a resource.
-	 */
-	public static function unauthorized(): self
-	{
-		return new self('UNAUTHORIZED_ACCESS', 'No tienes los permisos necesarios para acceder a este recurso');
-	}
-
 	public static function latitudeRequired(): self
 	{
 		return new self('LATITUDE_REQUIRED', 'La latitud es obligatoria');
@@ -168,6 +162,26 @@ final class ErrorType implements JsonSerializable
 	{
 		return new self('ANALYSIS_REQUEST_NOT_FOUND', 'No se encontró la solicitud de análisis especificada');
 	}
+
+  public static function requiredField(string $fieldName): self
+  {
+    return new self('REQUIRED_FIELD', ucfirst($fieldName) . ' is required');
+  }
+
+  public static function validationError(string $message): self
+  {
+    return new self('VALIDATION_ERROR', $message);
+  }
+
+  public static function invalidInput(string $message): self
+  {
+    return new self('INVALID_INPUT', $message);
+  }
+
+  public static function unauthorized(string $message = 'Unauthorized'): self
+  {
+    return new self('UNAUTHORIZED', $message);
+  }
 
 	public static function analysisRequestForbidden(): self
 	{
@@ -232,7 +246,7 @@ final class ErrorType implements JsonSerializable
 	public function jsonSerialize(): array
 	{
 		return [
-			'code' => $this->code,
+			'code' => $this->type,
 			'message' => $this->message,
 		];
 	}
@@ -242,7 +256,7 @@ final class ErrorType implements JsonSerializable
      */
     public function getStatusCode(): int
     {
-        return match($this->code) {
+        return match($this->type) {
             'NOT_FOUND' => 404,
             'UNAUTHORIZED_ACCESS', 'INVALID_ACCESS_TOKEN' => 401,
             'FORBIDDEN_ACCESS' => 403,
