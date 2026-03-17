@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Spin, Tag, Button, Modal, message } from 'antd';
-import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Spin, Tag, Button, Modal, message, Form, Input, Select, InputNumber, Checkbox } from 'antd';
+import { EyeOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import '../../colorModule.css';
 import '../../fontsModule.css';
@@ -15,11 +15,13 @@ const RequestsTable = ({ isAdmin = false }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [viewModalVisible, setViewModalVisible] = useState(false);
+  const [createModalVisible, setCreateModalVisible] = useState(false);
   const [isNotImplementedOpen, setIsNotImplementedOpen] = useState(false);
+  const [creatingRequest, setCreatingRequest] = useState(false);
+  const [form] = Form.useForm();
   const navigate = useNavigate();
   const { user } = useSession();
 
-  // Check if user is admin
   const userIsAdmin = user?.is_admin || user?.role === 'admin';
 
   useEffect(() => {
@@ -29,10 +31,8 @@ const RequestsTable = ({ isAdmin = false }) => {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // ✅ Load user's analysis requests
   useEffect(() => {
     const loadRequests = async () => {
-      // Only load if user is authenticated
       if (!user) {
         setLoading(false);
         return;
@@ -61,10 +61,7 @@ const RequestsTable = ({ isAdmin = false }) => {
         headers: { 'Accept': 'application/json' },
       });
 
-      if (res.status === 401) {
-        return [];
-      }
-      if (res.status === 403) {
+      if (res.status === 401 || res.status === 403) {
         return [];
       }
       if (!res.ok) {
@@ -99,7 +96,61 @@ const RequestsTable = ({ isAdmin = false }) => {
     }
   };
 
-  // ✅ Delete user's own request
+  const handleCreateRequest = async (formValues) => {
+    try {
+      setCreatingRequest(true);
+
+      const payload = {
+        email: formValues.email,
+        owner_name: formValues.owner_name,
+        owner_contact_number: formValues.owner_contact_number || null,
+        temperature_sensation: formValues.temperature_sensation || null,
+        bubbles: formValues.bubbles ? 1 : 0,
+        details: formValues.details || null,
+        current_usage: formValues.current_usage || null,
+        latitude: formValues.latitude ? parseFloat(formValues.latitude) : null,
+        longitude: formValues.longitude ? parseFloat(formValues.longitude) : null,
+        region_id: formValues.region_id || null,
+      };
+
+      // ✅ Use analysisRequest.store() for POST
+      const res = await fetch(analysisRequest.store(), {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        throw new Error('No autorizado para crear solicitudes');
+      }
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.errors?.[0]?.message || `HTTP error! status: ${res.status}`);
+      }
+
+      const result = await res.json();
+
+      if (result.data || result.response === 'Ok') {
+        message.success('✅ Solicitud creada correctamente');
+        form.resetFields();
+        setCreateModalVisible(false);
+        refreshRequests();
+      } else {
+        throw new Error(result.errors?.[0]?.message || 'Error al crear solicitud');
+      }
+    } catch (error) {
+      console.error('❌ Error creating request:', error);
+      message.error('Error: ' + error.message);
+    } finally {
+      setCreatingRequest(false);
+    }
+  };
+
   const deleteRequest = async (requestId) => {
     try {
       const url = analysisRequest.delete(requestId);
@@ -252,13 +303,23 @@ const RequestsTable = ({ isAdmin = false }) => {
             Mis Solicitudes ({requests.length})
           </h1>
           
-          <Button 
-            type="primary"
-            onClick={refreshRequests}
-            className="w-full md:w-auto"
-          >
-            🔄 Actualizar
-          </Button>
+          <div className="flex gap-2 w-full md:w-auto">
+            <Button 
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => setCreateModalVisible(true)}
+              className="flex-1 md:flex-initial"
+            >
+              Nueva Solicitud
+            </Button>
+            <Button 
+              type="default"
+              onClick={refreshRequests}
+              className="flex-1 md:flex-initial"
+            >
+              🔄 Actualizar
+            </Button>
+          </div>
         </div>
 
         <hr className="my-4" />
@@ -268,9 +329,16 @@ const RequestsTable = ({ isAdmin = false }) => {
             <p className="text-gray-600 mb-2">
               No tienes solicitudes registradas
             </p>
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-400 text-sm mb-4">
               Accede al módulo de "Agregar Punto" para crear tu primera solicitud
             </p>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => setCreateModalVisible(true)}
+            >
+              Crear Nueva Solicitud
+            </Button>
           </div>
         ) : (
           <>
@@ -360,7 +428,6 @@ const RequestsTable = ({ isAdmin = false }) => {
       >
         {selectedRequest && (
           <div className="space-y-4">
-            {/* Header Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4 border-b border-gray-200">
               <div>
                 <p className="text-xs text-gray-500 uppercase">Solicitud ID</p>
@@ -390,7 +457,6 @@ const RequestsTable = ({ isAdmin = false }) => {
               </div>
             </div>
 
-            {/* Solicitante Info */}
             <div>
               <h3 className="font-semibold text-gray-800 mb-3">👤 Información del Solicitante</h3>
               <div className="p-3 bg-blue-50 rounded-lg border border-blue-200 space-y-2">
@@ -409,7 +475,6 @@ const RequestsTable = ({ isAdmin = false }) => {
               </div>
             </div>
 
-            {/* Ubicación */}
             <div>
               <h3 className="font-semibold text-gray-800 mb-3">📍 Ubicación</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
@@ -424,7 +489,6 @@ const RequestsTable = ({ isAdmin = false }) => {
               </div>
             </div>
 
-            {/* Características */}
             <div>
               <h3 className="font-semibold text-gray-800 mb-3">🌡️ Características de la Manifestación</h3>
               <div className="grid grid-cols-1 gap-3">
@@ -453,6 +517,183 @@ const RequestsTable = ({ isAdmin = false }) => {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* ✅ Create New Request Modal */}
+      <Modal
+        title="➕ Crear Nueva Solicitud de Análisis"
+        open={createModalVisible}
+        onCancel={() => {
+          setCreateModalVisible(false);
+          form.resetFields();
+        }}
+        footer={[
+          <Button 
+            key="cancel"
+            onClick={() => {
+              setCreateModalVisible(false);
+              form.resetFields();
+            }}
+          >
+            Cancelar
+          </Button>,
+          <Button 
+            key="submit"
+            type="primary"
+            loading={creatingRequest}
+            onClick={() => form.submit()}
+          >
+            Crear Solicitud
+          </Button>
+        ]}
+        width={isMobile ? '95%' : 700}
+        centered
+        styles={{
+          body: {
+            maxHeight: isMobile ? 'calc(100vh - 200px)' : 'calc(100vh - 100px)',
+            overflowY: 'auto'
+          }
+        }}
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleCreateRequest}
+          className="mt-4"
+        >
+          {/* Email required */}
+          <Form.Item
+            name="email"
+            label="📧 Email"
+            rules={[
+              { required: true, message: 'El email es requerido' },
+              { type: 'email', message: 'Ingresa un email válido' }
+            ]}
+          >
+            <Input placeholder="correo@ejemplo.com" />
+          </Form.Item>
+
+          {/* Owner name required */}
+          <Form.Item
+            name="owner_name"
+            label="👤 Nombre del Solicitante"
+            rules={[{ required: true, message: 'El nombre es requerido' }]}
+          >
+            <Input placeholder="Ej: Juan Pérez" />
+          </Form.Item>
+
+          {/* Phone optional */}
+          <Form.Item
+            name="owner_contact_number"
+            label="📞 Teléfono"
+          >
+            <Input placeholder="+56912345678" />
+          </Form.Item>
+
+          {/* Region optional */}
+          <Form.Item
+            name="region_id"
+            label="🗺️ Región"
+          >
+            <Select
+              placeholder="Selecciona una región"
+              options={[
+                { value: 1, label: 'Región de Arica y Parinacota' },
+                { value: 2, label: 'Región de Tarapacá' },
+                { value: 3, label: 'Región de Antofagasta' },
+                { value: 4, label: 'Región de Atacama' },
+                { value: 5, label: 'Región de Coquimbo' },
+                { value: 6, label: 'Región de Valparaíso' },
+                { value: 7, label: 'Región del Libertador General Bernardo O\'Higgins' },
+                { value: 8, label: 'Región del Maule' },
+                { value: 9, label: 'Región de Ñuble' },
+                { value: 10, label: 'Región de Los Lagos' },
+                { value: 11, label: 'Región de Magallanes' },
+              ]}
+            />
+          </Form.Item>
+
+          {/* Temperature sensation optional */}
+          <Form.Item
+            name="temperature_sensation"
+            label="🌡️ Sensación Térmica"
+          >
+            <Select
+              placeholder="Selecciona la sensación térmica"
+              options={[
+                { value: 'hot', label: '🔥 Caliente' },
+                { value: 'warm', label: '🌡️ Tibio' },
+                { value: 'cold', label: '❄️ Frío' },
+              ]}
+            />
+          </Form.Item>
+
+          {/* Bubbles optional */}
+          <Form.Item
+            name="bubbles"
+            valuePropName="checked"
+            label="💧 Burbujeo"
+          >
+            <Checkbox>Hay burbujeo visible</Checkbox>
+          </Form.Item>
+
+          {/* Current usage optional */}
+          <Form.Item
+            name="current_usage"
+            label="🏗️ Uso Actual del Terreno"
+          >
+            <Select
+              placeholder="Selecciona el tipo de uso"
+              options={[
+                { value: 'agricultural', label: 'Agrícola' },
+                { value: 'industrial', label: 'Industrial' },
+                { value: 'residential', label: 'Residencial' },
+                { value: 'recreational', label: 'Recreativo' },
+                { value: 'other', label: 'Otro' },
+              ]}
+            />
+          </Form.Item>
+
+          {/* Coordinates optional */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Form.Item
+              name="latitude"
+              label="📍 Latitud"
+              rules={[
+                {
+                  pattern: /^-?(\d+\.?\d*|\.\d+)$/,
+                  message: 'Ingresa una latitud válida (ej: -33.4569)'
+                }
+              ]}
+            >
+              <Input placeholder="-33.4569" type="number" step="0.0000001" />
+            </Form.Item>
+
+            <Form.Item
+              name="longitude"
+              label="📍 Longitud"
+              rules={[
+                {
+                  pattern: /^-?(\d+\.?\d*|\.\d+)$/,
+                  message: 'Ingresa una longitud válida (ej: -70.6483)'
+                }
+              ]}
+            >
+              <Input placeholder="-70.6483" type="number" step="0.0000001" />
+            </Form.Item>
+          </div>
+
+          {/* Details optional */}
+          <Form.Item
+            name="details"
+            label="📝 Detalles Adicionales"
+          >
+            <Input.TextArea 
+              rows={4}
+              placeholder="Describe cualquier información adicional sobre la manifestación geotérmica..."
+            />
+          </Form.Item>
+        </Form>
       </Modal>
 
       <NotImplementedModal 

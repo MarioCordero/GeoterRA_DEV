@@ -19,10 +19,14 @@ const API_CONFIG = {
       meSession: `/users/me/session`,
     },
     analysisRequest: {
+      indexAll: '/analysis-request?all',
       index: '/analysis-request',
       store: '/analysis-request',
       update: (id) => `/analysis-request/${id}`,
       delete: (id) => `/analysis-request/${id}`,
+      adminIndex: '/admin/analysis-requests',
+      adminUpdate: (id) => `/admin/analysis-request/${id}`,
+      adminDelete: (id) => `/admin/analysis-request/${id}`,
     },
     registeredManifestations: {
       index: '/registered-manifestations?region=all',
@@ -76,6 +80,9 @@ export const analysisRequest = {
   store: () => buildApiUrl(API_CONFIG.endpoints.analysisRequest.store),
   update: (id) => buildApiUrl(API_CONFIG.endpoints.analysisRequest.update(id)),
   delete: (id) => buildApiUrl(API_CONFIG.endpoints.analysisRequest.delete(id)),
+  adminIndex: () => buildApiUrl(API_CONFIG.endpoints.analysisRequest.adminIndex),
+  adminUpdate: (id) => buildApiUrl(API_CONFIG.endpoints.analysisRequest.adminUpdate(id)),
+  adminDelete: (id) => buildApiUrl(API_CONFIG.endpoints.analysisRequest.adminDelete(id)),
 };
 
 // ============================================

@@ -42,7 +42,7 @@ const SidebarDesktop = ({ selectedKey, setSelectedKey, collapsed, setCollapsed }
         shortLabel: 'Solicitudes'
       },
       { 
-        key: '3', 
+        key: '4', 
         icon: <UserOutlined style={{ fontSize: '18px' }} />, 
         label: 'Perfil',
         shortLabel: 'Perfil'
@@ -52,10 +52,10 @@ const SidebarDesktop = ({ selectedKey, setSelectedKey, collapsed, setCollapsed }
     // Add admin-only item if user is admin
     if (isAdmin) {
       baseItems.splice(2, 0, {
-        key: '4',
+        key: '3',
         icon: <ExperimentOutlined style={{ fontSize: '18px' }} />,
-        label: 'Análisis de laboratorios',
-        shortLabel: 'Análisis'
+        label: 'Gestionar Solicitudes',
+        shortLabel: 'Gestionar'
       });
     }
 
