@@ -46,3 +46,18 @@ Purpose: Provide concise, actionable guidance so an AI coding agent (Copilot/Cla
 - Any change that requires provisioning or secret access (CI, production config).
 
 If anything is unclear or you want a different level of automation, leave a comment in `notes.txt` or open an issue.
+
+10. Git Commit Style
+- When generating commits, you MUST strictly follow this specific format and write the descriptions in ENGLISH:
+```
+# FEAT:
+
+- Description of the completed task
+
+- Description of another completed task
+
+----------------
+```
+- Replace `FEAT:` with the appropriate prefix as necessary (e.g. `FIX:`, `REFACTOR:`, `CHORE:`, etc) matching the exact capitalization and `# ` prefix layout.
+- List all descriptions of tasks separated by `- ` with empty newlines in between as shown.
+- Ensure the commit message is always closed out with `----------------`.
