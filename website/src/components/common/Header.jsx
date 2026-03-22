@@ -5,18 +5,22 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../../assets/images/GeoterRA-Logo-Color.svg';
 import '../../colorModule.css';
 import '../../fontsModule.css';
-
+import { useSession } from '../../hooks/useSession';
 export default function AppHeader() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { isLogged, user } = useSession();
 
   const navItems = [
     { key: 'about', path: '/#about-us', label: 'Acerca de nosotros', sectionId: 'about-us' },
     { key: 'how', path: '/#how-works', label: 'Cómo funciona', sectionId: 'how-works' },
     { key: 'contact', path: '/#contact-us', label: 'Contacto', sectionId: 'contact-us' },
     { key: 'map', path: '/map', label: 'Mapa', sectionId: null },
-    { key: 'login', path: '/login', label: 'Iniciar Sesión', sectionId: null },
+    isLogged
+      ? { key: 'profile', path: (user?.role === 'admin' || user?.user_type === 'admin' || user?.is_admin || user?.admin) ? '/LoggedAdmin' : '/Logged', label: 'Mi Perfil', sectionId: null }
+      : { key: 'login', path: '/login', label: 'Iniciar Sesión', sectionId: null },
   ];
 
   const showDrawer = () => {
@@ -111,7 +115,7 @@ export default function AppHeader() {
               onClick={() => handleNavigation(item)}
               className={`
                 px-4 py-2 rounded-md transition-all duration-200 transform hover:-translate-y-0.5 whitespace-nowrap cursor-pointer
-                ${item.key === 'login' 
+                ${(item.key === 'login' || item.key === 'profile')
                   ? 'bg-geoterra-orange text-white poppins-bold font-bold hover:bg-orange-600' 
                   : 'text-geoterra-blue poppins hover:text-blue-700 hover:bg-blue-50'
                 }
@@ -161,7 +165,7 @@ export default function AppHeader() {
                 onClick={() => handleNavigation(item, true)}
                 className={`
                   block w-full px-4 py-3 rounded-lg text-left transition-all duration-200 cursor-pointer
-                  ${item.key === 'login' 
+                  ${(item.key === 'login' || item.key === 'profile') 
                     ? 'bg-geoterra-orange text-white poppins-bold hover:bg-orange-600' 
                     : 'text-geoterra-blue poppins hover:text-blue-700 hover:bg-blue-50'
                   }

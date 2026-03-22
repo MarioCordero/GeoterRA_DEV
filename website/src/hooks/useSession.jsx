@@ -85,7 +85,7 @@ export const SessionProvider = ({ children }) => {
   }, [fetchSession]);
 
   return (
-    <SessionContext.Provider value={{ user, loading, error, refresh: fetchSession, logout }}>
+    <SessionContext.Provider value={{ isLogged: !!user, user, loading, error, refresh: fetchSession, checkSession: fetchSession, logout }}>
       {initialized && children}
     </SessionContext.Provider>
   );
