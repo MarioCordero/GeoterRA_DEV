@@ -15,7 +15,7 @@ const Dashboard = ({ user, loading, error }) => {
   useEffect(() => {
     const fetchStats = async () => {
       if (!user?.is_admin) return;
-      
+
       try {
         setStatsLoading(true);
         const res = await fetch(analysisRequest.adminIndex(), {
@@ -25,7 +25,7 @@ const Dashboard = ({ user, loading, error }) => {
         });
 
         if (!res.ok) throw new Error('Failed to fetch stats');
-        
+
         const result = await res.json();
         if (result.data && Array.isArray(result.data)) {
           const data = result.data;
