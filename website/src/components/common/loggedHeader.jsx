@@ -21,11 +21,7 @@ export default function AppHeader() {
     try {
       await checkSession();
       if (isLogged && user) {
-        if (user.role === 'admin' || user.user_type === 'admin' || user.is_admin === true || user.admin === true) {
-          navigate('/LoggedAdmin');
-        } else {
-          navigate('/Logged');
-        }
+        navigate('/Dashboard');
       } else {
         navigate('/Login');
       }
@@ -58,7 +54,7 @@ export default function AppHeader() {
     { key: 'how', path: '/#how-works', label: 'Cómo funciona' },
     { key: 'contact', path: '/#contact-us', label: 'Contacto' },
     { key: 'map', path: '/map', label: 'Mapa' },
-    { key: 'profile', path: '/Logged', label: 'Mi Perfil', requiresAuth: true },
+    { key: 'profile', path: '/Dashboard', label: 'Mi Perfil', requiresAuth: true },
   ];
 
   const renderNavButton = (item) => {

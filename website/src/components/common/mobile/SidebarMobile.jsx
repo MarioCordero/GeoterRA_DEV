@@ -39,7 +39,7 @@ const SidebarMobile = ({ selectedKey, setSelectedKey }) => {
         shortLabel: 'Solicitudes'
       },
       { 
-        key: '3', 
+        key: '4', 
         icon: <UserOutlined style={{ fontSize: '18px' }} />, 
         label: 'Perfil',
         shortLabel: 'Perfil'
@@ -48,10 +48,10 @@ const SidebarMobile = ({ selectedKey, setSelectedKey }) => {
 
     if (isAdmin) {
       baseItems.splice(2, 0, {
-        key: '4',
+        key: '3',
         icon: <ExperimentOutlined style={{ fontSize: '18px' }} />,
-        label: 'Análisis de laboratorios',
-        shortLabel: 'Análisis'
+        label: 'Gestionar Solicitudes',
+        shortLabel: 'Gestionar'
       });
     }
 

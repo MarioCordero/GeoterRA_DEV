@@ -14,7 +14,8 @@ const Dashboard = ({ user, loading, error }) => {
   // ✅ Fetch request statistics
   useEffect(() => {
     const fetchStats = async () => {
-      if (!user?.is_admin) return;
+      const isAdmin = user?.role === 'admin' || user?.role === 'maintenance' || user?.is_admin;
+      if (!isAdmin) return;
 
       try {
         setStatsLoading(true);
@@ -106,8 +107,8 @@ const Dashboard = ({ user, loading, error }) => {
         </Col>
       </Row>
 
-      {/* Statistics (Admin only) */}
-      {user?.role === 'admin' && (
+      {/* Statistics (Admin/Maintenance only) */}
+      {(user?.role === 'admin' || user?.role === 'maintenance' || user?.is_admin) && (
         <>
           <h2 className="text-2xl font-bold mb-4">📊 Estadísticas de Solicitudes</h2>
           <Row gutter={16} className="mb-8">
@@ -163,7 +164,7 @@ const Dashboard = ({ user, loading, error }) => {
             📋 Ver Mis Solicitudes
           </Button>
         </Col>
-        {user?.role === 'admin' && (
+        {(user?.role === 'admin' || user?.role === 'maintenance' || user?.is_admin) && (
           <Col xs={24} sm={12} md={6}>
             <Button type="primary" block size="large">
               🔧 Gestionar Solicitudes

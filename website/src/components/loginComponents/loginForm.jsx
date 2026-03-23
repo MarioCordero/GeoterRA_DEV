@@ -39,10 +39,8 @@ function Login() {
         await new Promise(resolve => setTimeout(resolve, 1000));
         const sessionUser = await refresh();
         
-        if (sessionUser && (sessionUser.role === 'admin' || sessionUser.is_admin)) {
-          navigate('/LoggedAdmin');
-        } else if (sessionUser) {
-          navigate('/Logged');
+        if (sessionUser) {
+          navigate('/Dashboard');
         } else {
           console.error('[Login] sessionUser es null después de refresh()');
           setErrorMsg('No se pudo establecer la sesión');

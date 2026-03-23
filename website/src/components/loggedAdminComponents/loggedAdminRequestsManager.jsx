@@ -167,8 +167,8 @@ const AdminRequestsManager = () => {
         setLoading(true);
         setError(null);
         
-        // Verify user is admin
-        const isAdmin = user?.is_admin || user?.role === 'admin';
+        // Verify user is admin or maintenance
+        const isAdmin = user?.role === 'admin' || user?.role === 'maintenance' || user?.is_admin;
         if (!isAdmin) {
           setError('Usuario no autorizado como administrador');
           return;

@@ -50,6 +50,13 @@ node_modules/
 # -----------------------------
 # Frontend
 # -----------------------------
+# Playwright
+website/test-results/
+website/playwright-report/
+website/blob-report/
+website/playwright/.cache/
+website/playwright/.auth/
+# Standart
 website/node_modules/*
 website/node_modules
 API/.DS_Store

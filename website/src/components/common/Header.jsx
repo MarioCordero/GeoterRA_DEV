@@ -19,7 +19,7 @@ export default function AppHeader() {
     { key: 'contact', path: '/#contact-us', label: 'Contacto', sectionId: 'contact-us' },
     { key: 'map', path: '/map', label: 'Mapa', sectionId: null },
     isLogged
-      ? { key: 'profile', path: (user?.role === 'admin' || user?.user_type === 'admin' || user?.is_admin || user?.admin) ? '/LoggedAdmin' : '/Logged', label: 'Mi Perfil', sectionId: null }
+      ? { key: 'profile', path: '/Dashboard', label: 'Mi Perfil', sectionId: null }
       : { key: 'login', path: '/login', label: 'Iniciar Sesión', sectionId: null },
   ];
 
