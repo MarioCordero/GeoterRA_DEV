@@ -12,7 +12,7 @@ test('Debe hacer login y almacenar la cookie en el browser', async ({ page }) =>
   await page.click('button[type="submit"]');
 
   // 4. Se asegura que hayamos navegado al dashboard
-  await expect(page).toHaveURL(/.*Logged/);
+  await expect(page).toHaveURL(/.*Dashboard/);
 
   // 5. Opcional: validar que el contexto guardó una cookie generada por la API
   const cookies = await page.context().cookies();
@@ -30,7 +30,7 @@ test('Debe mostrar Mi Perfil en el header del home cuando hay sesión activa', a
   await page.click('button[type="submit"]');
 
   // 3. Espera a que estemos en el dashboard
-  await expect(page).toHaveURL(/.*Logged/);
+  await expect(page).toHaveURL(/.*Dashboard/);
 
   // 4. Navegamos al home ('/') de vuelta para ver el common Header
   await page.goto('http://localhost:5173/');
