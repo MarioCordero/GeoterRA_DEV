@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import SidebarLayout from '../components/loggedComponents/loggedSidebar';
+import { useState, useEffect } from 'react';
+import Sidebar from '../components/common/Sidebar';
 import LoggedMainPage from '../components/loggedComponents/loggedMainPage';
 import LoggedHeader from '../components/common/loggedHeader';
 import Footer from '../components/common/Footer';
@@ -77,7 +77,7 @@ const Logged = () => {
     <div className="min-h-screen flex flex-col">
       <LoggedHeader />
       <div className="flex flex-1 pt-16"> 
-        <SidebarLayout 
+        <Sidebar
           selectedKey={selectedKey} 
           setSelectedKey={setSelectedKey} 
           collapsed={collapsed}

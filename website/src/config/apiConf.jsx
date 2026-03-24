@@ -3,7 +3,8 @@ const API_CONFIG = {
   
   baseUrls: {
     production: 'http://163.178.171.105/API/public',
-    local: 'http://geoterra.com/API/public'
+    local: 'http://localhost:8000/API/public' // NEW COOKIES
+    //local: 'http://geoterra.com/API/public', (OLD)
   },
 
   endpoints: {
@@ -15,12 +16,17 @@ const API_CONFIG = {
     },
     users: {
       me: '/users/me',
+      meSession: `/users/me/session`,
     },
     analysisRequest: {
+      indexAll: '/analysis-request?all',
       index: '/analysis-request',
       store: '/analysis-request',
       update: (id) => `/analysis-request/${id}`,
       delete: (id) => `/analysis-request/${id}`,
+      adminIndex: '/admin/analysis-requests',
+      adminUpdate: (id) => `/admin/analysis-request/${id}`,
+      adminDelete: (id) => `/admin/analysis-request/${id}`,
     },
     registeredManifestations: {
       index: '/registered-manifestations?region=all',
@@ -63,6 +69,7 @@ export const auth = {
 // ============================================
 export const users = {
   me: () => buildApiUrl(API_CONFIG.endpoints.users.me),
+  meSession: () => buildApiUrl(API_CONFIG.endpoints.users.meSession),
 };
 
 // ============================================
@@ -73,6 +80,9 @@ export const analysisRequest = {
   store: () => buildApiUrl(API_CONFIG.endpoints.analysisRequest.store),
   update: (id) => buildApiUrl(API_CONFIG.endpoints.analysisRequest.update(id)),
   delete: (id) => buildApiUrl(API_CONFIG.endpoints.analysisRequest.delete(id)),
+  adminIndex: () => buildApiUrl(API_CONFIG.endpoints.analysisRequest.adminIndex),
+  adminUpdate: (id) => buildApiUrl(API_CONFIG.endpoints.analysisRequest.adminUpdate(id)),
+  adminDelete: (id) => buildApiUrl(API_CONFIG.endpoints.analysisRequest.adminDelete(id)),
 };
 
 // ============================================

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Spin, Tag, Button, Modal, Descriptions, Form, Input, InputNumber, message } from 'antd';
-import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Spin, Tag, Button, Modal, Form, Input, InputNumber, Select, Checkbox, message } from 'antd';
+import { EyeOutlined, DeleteOutlined, EditOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import '../../colorModule.css';
 import '../../fontsModule.css';
-import { buildApiUrl } from '../../config/apiConf';
+import { analysisRequest } from '../../config/apiConf';
 import NotImplementedModal from '../common/NotImplementedModal';
+import { useSession } from '../../hooks/useSession';
 
 const AdminRequestsManager = () => {
   const [requests, setRequests] = useState([]);
@@ -17,6 +18,7 @@ const AdminRequestsManager = () => {
   const [submitting, setSubmitting] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isNotImplementedOpen, setIsNotImplementedOpen] = useState(false);
+  const { user } = useSession();
 
   // Check if screen is mobile size
   useEffect(() => {
@@ -30,196 +32,130 @@ const AdminRequestsManager = () => {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // Session token management functions
-  const getSessionToken = () => {
-    return localStorage.getItem('geoterra_session_token');
-  };
-
-  const buildHeaders = () => {
-    const headers = {};
-    const token = getSessionToken();
-    if (token) {
-      headers['X-Session-Token'] = token;
-    }
-    return headers;
-  };
-
-  // Updated function to get user session with token support
-  const getUserSession = async () => {
-    try {
-      const response = await fetch(buildApiUrl("check_session.php"), {
-        method: "GET",
-        credentials: "include",
-        headers: buildHeaders(),
-      });
-      
-      const apiResponse = await response.json();
-      
-      if (apiResponse.response === 'Ok' && apiResponse.data.status === 'logged_in') {
-        if (apiResponse.data.is_admin) {
-          return apiResponse.data.user;
-        } else {
-          console.error("User is not admin");
-          return null;
-        }
-      }
-      
-      return null;
-    } catch (error) {
-      console.error("Error checking session:", error);
-      return null;
-    }
-  };
-
-  // Also update fetchAllRequests to use token headers
+  // ✅ Fetch all analysis requests (admin view)
   const fetchAllRequests = async () => {
     try {
-      const response = await fetch(buildApiUrl("get_all_requests.inc.php"), {
-        method: "GET",
-        credentials: "include",
-        headers: buildHeaders(),
+      const res = await fetch(analysisRequest.adminIndex(), {
+        method: 'GET',
+        credentials: 'include',
+        headers: { 'Accept': 'application/json' },
       });
+
+      if (res.status === 401 || res.status === 403) {
+        throw new Error('No autorizado para ver todas las solicitudes');
+      }
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const result = await res.json();
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (result.data && Array.isArray(result.data)) {
+        return result.data.map(item => ({
+          id_soli: item.id,
+          name: item.name || `SOLI-${item.id.slice(-5)}`,
+          created_at: item.created_at,
+          email: item.email || 'Sin email',
+          region_id: item.region_id || '',
+          owner_name: item.owner_name || '',
+          owner_contact_number: item.owner_contact_number || '',
+          current_usage: item.current_usage || '',
+          temperature_sensation: item.temperature_sensation || '',
+          bubbles: item.bubbles || 0,
+          details: item.details || '',
+          latitude: item.latitude || '',
+          longitude: item.longitude || '',
+          state: item.state || 'Pendiente',
+          created_by: item.created_by || '',
+        }));
       }
       
-      const result = await response.json();
-      
-      if (result.response === "Ok") {
-        return result.data || [];
-      } else {
-        throw new Error(result.message || "Failed to fetch requests");
-      }
+      return [];
     } catch (error) {
-      console.error("Error fetching all requests:", error);
+      console.error('❌ [AdminRequests] Error fetching all requests:', error);
       throw error;
     }
   };
 
-  // Update deleteRequest to use token headers
-  const deleteRequest = async (requestId) => {
-    try {
-      const formData = new FormData();
-      formData.append('id_soli', requestId);
-
-      const response = await fetch(buildApiUrl("delete_request.inc.php"), {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-        headers: buildHeaders(),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const result = await response.json();
-      
-      if (result.response === "Ok") {
-        return true;
-      } else {
-        throw new Error(result.message || "Failed to delete request");
-      }
-    } catch (error) {
-      console.error("Error deleting request:", error);
-      throw error;
-    }
-  };
-
-  // Function to submit approved point to puntos_estudiados table
+  // ✅ Update analysis request with lab data
   const submitApprovedPoint = async (pointData) => {
     try {
-      const requiredFields = ['id', 'region', 'coord_x', 'coord_y'];
-      for (const field of requiredFields) {
-        if (!pointData[field]) {
-          throw new Error(`Campo requerido faltante: ${field}`);
-        }
-      }
-
-      const coordX = parseFloat(pointData.coord_x);
-      const coordY = parseFloat(pointData.coord_y);
-      
-      if (isNaN(coordX) || isNaN(coordY)) {
-        throw new Error("Las coordenadas deben ser números válidos");
-      }
-
-      const formData = new FormData();
-      
-      const fieldMapping = {
-        'id': String(pointData.id).trim(),
-        'region': String(pointData.region).trim(),
-        'coord_x': coordX,
-        'coord_y': coordY,
-        'temp': pointData.temp ? parseFloat(pointData.temp) : null,
-        'pH_campo': pointData.pH_campo ? parseFloat(pointData.pH_campo) : null,
-        'cond_campo': pointData.cond_campo ? parseFloat(pointData.cond_campo) : null,
-        'pH_lab': pointData.pH_lab ? parseFloat(pointData.pH_lab) : null,
-        'cond_lab': pointData.cond_lab ? parseFloat(pointData.cond_lab) : null,
-        'Cl': pointData.Cl ? parseFloat(pointData.Cl) : null,
-        'Ca+': pointData['Ca+'] ? parseFloat(pointData['Ca+']) : null,
-        'HCO3': pointData.HCO3 ? parseFloat(pointData.HCO3) : null,
-        'SO4': pointData.SO4 ? parseFloat(pointData.SO4) : null,
-        'Fe': pointData.Fe ? String(pointData.Fe).trim() : null,
-        'Si': pointData.Si ? parseFloat(pointData.Si) : null,
-        'B': pointData.B ? String(pointData.B).trim() : null,
-        'Li': pointData.Li ? String(pointData.Li).trim() : null,
-        'F': pointData.F ? String(pointData.F).trim() : null,
-        'Na': pointData.Na ? parseFloat(pointData.Na) : null,
-        'K': pointData.K ? parseFloat(pointData.K) : null,
-        'MG+': pointData['MG+'] ? parseFloat(pointData['MG+']) : null
+      const payload = {
+        description: pointData.description || null,
+        temperature: pointData.temperature ? parseFloat(pointData.temperature) : null,
+        field_pH: pointData.field_pH ? parseFloat(pointData.field_pH) : null,
+        field_conductivity: pointData.field_conductivity ? parseFloat(pointData.field_conductivity) : null,
+        lab_pH: pointData.lab_pH ? parseFloat(pointData.lab_pH) : null,
+        lab_conductivity: pointData.lab_conductivity ? parseFloat(pointData.lab_conductivity) : null,
+        cl: pointData.cl ? parseFloat(pointData.cl) : null,
+        ca: pointData.ca ? parseFloat(pointData.ca) : null,
+        hco3: pointData.hco3 ? parseFloat(pointData.hco3) : null,
+        so4: pointData.so4 ? parseFloat(pointData.so4) : null,
+        fe: pointData.fe ? parseFloat(pointData.fe) : null,
+        si: pointData.si ? parseFloat(pointData.si) : null,
+        b: pointData.b ? parseFloat(pointData.b) : null,
+        li: pointData.li ? parseFloat(pointData.li) : null,
+        f: pointData.f ? parseFloat(pointData.f) : null,
+        na: pointData.na ? parseFloat(pointData.na) : null,
+        k: pointData.k ? parseFloat(pointData.k) : null,
+        mg: pointData.mg ? parseFloat(pointData.mg) : null,
+        state: 'Analizada',
       };
 
-      Object.entries(fieldMapping).forEach(([key, value]) => {
-        if (value !== null && value !== undefined && value !== '') {
-          if (typeof value === 'number' && isNaN(value)) {
-            console.warn(`Skipping invalid numeric value for ${key}:`, value);
-            return;
-          }
-          formData.append(key, value);
-        }
+      const res = await fetch(analysisRequest.update(pointData.id_soli), {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
       });
 
-      const response = await fetch(buildApiUrl("add_approved_point.inc.php"), {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-        headers: buildHeaders(),
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("HTTP Error Response:", errorText);
-        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+      if (res.status === 401 || res.status === 403) {
+        throw new Error('No autorizado para actualizar solicitudes');
       }
-      
-      const responseText = await response.text();
-      
-      let result;
-      try {
-        result = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error("JSON Parse Error:", parseError);
-        console.error("Response text:", responseText);
-        throw new Error("Respuesta inválida del servidor");
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.errors?.[0]?.message || `HTTP error! status: ${res.status}`);
       }
-      
-      if (result.response === "Ok") {
+
+      const result = await res.json();
+      if (result.data || result.response === 'Ok') {
         return true;
-      } else {
-        const errorMessage = result.message || "Failed to add approved point";
-        const errors = result.errors || [];
-        
-        console.error("API Error Details:", { errorMessage, errors });
-        
-        if (errors.length > 0) {
-          throw new Error(`${errorMessage}. Detalles: ${errors.join(", ")}`);
-        } else {
-          throw new Error(errorMessage);
-        }
       }
+      throw new Error(result.errors?.[0]?.message || 'Error al actualizar');
     } catch (error) {
-      console.error("Error submitting approved point:", error);
+      console.error('❌ [AdminRequests] Error submitting approved point:', error);
+      throw error;
+    }
+  };
+
+  // ✅ Delete request
+  const deleteRequest = async (requestId) => {
+    try {
+      const res = await fetch(analysisRequest.delete(requestId), {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: { 'Accept': 'application/json' },
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        throw new Error('No autorizado para eliminar solicitudes');
+      }
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const result = await res.json();
+      if (result.data || result.response === 'Ok') {
+        return true;
+      }
+      throw new Error(result.message || 'Error al eliminar');
+    } catch (error) {
+      console.error('❌ [AdminRequests] Error deleting request:', error);
       throw error;
     }
   };
@@ -231,9 +167,10 @@ const AdminRequestsManager = () => {
         setLoading(true);
         setError(null);
         
-        const userEmail = await getUserSession();
-        if (!userEmail) {
-          setError("Usuario no autenticado");
+        // Verify user is admin
+        const isAdmin = user?.is_admin || user?.role === 'admin';
+        if (!isAdmin) {
+          setError('Usuario no autorizado como administrador');
           return;
         }
         
@@ -248,14 +185,15 @@ const AdminRequestsManager = () => {
     };
     
     loadAllRequests();
-  }, []);
+  }, [user]);
 
-  // Function to refresh requests
+  // Refresh requests
   const refreshRequests = async () => {
     try {
       setLoading(true);
       const allRequests = await fetchAllRequests();
       setRequests(allRequests);
+      message.success('Solicitudes actualizadas');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -269,36 +207,29 @@ const AdminRequestsManager = () => {
     setViewModalVisible(true);
   };
 
-  // Handle delete
-  const handleDelete = (record) => {
-    setIsNotImplementedOpen(true);
-  };
-
   // Handle review and accept
   const handleReviewAccept = (record) => {
     setSelectedRequest(record);
     reviewForm.setFieldsValue({
-      id: record.id.replace('SOLI-', 'POINT-'),
-      region: record.region || '',
-      coord_x: record.coord_x || '',
-      coord_y: record.coord_y || '',
-      temp: record.sens_termica === '3' ? 40 : record.sens_termica === '2' ? 25 : 15,
-      pH_campo: record.pH_campo || 7.0,
-      cond_campo: record.cond_campo || 500,
-      pH_lab: record.pH_campo || 7.0,
-      cond_lab: record.cond_campo || 500,
-      Cl: 10,
-      'Ca+': 20,
-      HCO3: 30,
-      SO4: 40,
-      Fe: '< 0.07',
-      Si: 50,
-      B: '< 1.0',
-      Li: '< 1',
-      F: '< 0.5',
-      Na: 60,
-      K: 70,
-      'MG+': 80
+      id_soli: record.id_soli,
+      description: record.details || '',
+      temperature: record.temperature_sensation === 'hot' ? 40 : record.temperature_sensation === 'warm' ? 25 : 15,
+      field_pH: 7.0,
+      field_conductivity: 500,
+      lab_pH: 7.0,
+      lab_conductivity: 500,
+      cl: 10,
+      ca: 20,
+      hco3: 30,
+      so4: 40,
+      fe: 0.07,
+      si: 50,
+      b: 1.0,
+      li: 1,
+      f: 0.5,
+      na: 60,
+      k: 70,
+      mg: 80,
     });
     setReviewModalVisible(true);
   };
@@ -310,20 +241,9 @@ const AdminRequestsManager = () => {
       
       setSubmitting(true);
 
-      const requiredNumericFields = ['coord_x', 'coord_y', 'temp', 'pH_campo', 'cond_campo', 'pH_lab', 'cond_lab', 'Cl', 'Ca+', 'HCO3', 'SO4', 'Si', 'Na', 'K', 'MG+'];
-      
-      for (const field of requiredNumericFields) {
-        if (!values[field] && values[field] !== 0) {
-          throw new Error(`El campo ${field} es requerido`);
-        }
-      }
-
       await submitApprovedPoint(values);
       
-      const requestId = selectedRequest.key;
-      await deleteRequest(requestId);
-      
-      message.success('Punto aprobado, agregado exitosamente y solicitud eliminada');
+      message.success('✅ Análisis completado y solicitud actualizada');
       setReviewModalVisible(false);
       reviewForm.resetFields();
       setSelectedRequest(null);
@@ -334,83 +254,118 @@ const AdminRequestsManager = () => {
       if (error.errorFields) {
         message.error('Por favor complete todos los campos requeridos');
       } else {
-        message.error('Error al aprobar el punto: ' + error.message);
+        message.error('Error al procesar la solicitud: ' + error.message);
       }
     } finally {
       setSubmitting(false);
     }
   };
 
+  // Handle refuse/reject
+  const handleRefuse = (record) => {
+    Modal.confirm({
+      title: '¿Rechazar solicitud?',
+      content: `¿Deseas rechazar la solicitud ${record.name}?`,
+      okText: 'Sí, rechazar',
+      cancelText: 'Cancelar',
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await submitApprovedPoint({
+            id_soli: record.id_soli,
+            state: 'Eliminada',
+          });
+          message.success('✅ Solicitud rechazada');
+          await refreshRequests();
+        } catch (error) {
+          message.error('Error: ' + error.message);
+        }
+      },
+    });
+  };
+
+  // Handle delete
+  const handleDelete = (record) => {
+    Modal.confirm({
+      title: '¿Eliminar solicitud?',
+      content: `¿Estás seguro de que deseas eliminar la solicitud ${record.name}?`,
+      okText: 'Sí, eliminar',
+      cancelText: 'Cancelar',
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await deleteRequest(record.id_soli);
+          message.success('✅ Solicitud eliminada');
+          await refreshRequests();
+        } catch (error) {
+          message.error('Error: ' + error.message);
+        }
+      },
+    });
+  };
+
   // Format data for the table
-  const dataSource = requests.map((request, index) => ({
+  const dataSource = (requests || []).map((request, index) => ({
     key: request.id_soli || index,
-    id: `SOLI-${String(request.id_soli).padStart(4, '0')}`,
-    fecha: request.fecha ? new Date(request.fecha).toLocaleDateString('es-ES') : 'N/A',
-    email: request.email || 'Sin email',
-    region: request.region,
-    propietario: request.propietario,
-    direccion: request.direccion,
-    uso_actual: request.uso_actual,
-    sens_termica: request.sens_termica,
-    burbujeo: request.burbujeo,
-    coord_x: request.coord_x,
-    coord_y: request.coord_y,
-    num_telefono: request.num_telefono,
-    pH_campo: request.pH_campo,
-    cond_campo: request.cond_campo,
+    ...request,
   }));
 
   // Mobile card component
   const MobileRequestCard = ({ request }) => (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-4">
-      <div className="flex justify-between items-center mb-3">
-        <p className="font-semibold text-sm">{request.id}</p>
-        <Tag color="blue">Pendiente Revisión</Tag>
+    <div className="bg-white rounded-lg shadow-md p-4 mb-4 border-l-4 border-blue-500">
+      <div className="flex justify-between items-start mb-3">
+        <div>
+          <p className="font-semibold text-sm">{request.name}</p>
+          <p className="text-xs text-gray-500">{request.owner_name}</p>
+        </div>
+        <Tag color={request.state === 'Pendiente' ? 'orange' : request.state === 'Analizada' ? 'green' : 'red'}>
+          {request.state}
+        </Tag>
       </div>
       
-      <p className="text-xs text-gray-500 mb-3">Fecha: {request.fecha}</p>
-      <p className="text-xs text-gray-500 mb-2">Email: {request.email}</p>
+      <p className="text-xs text-gray-500 mb-3">
+        📅 {new Date(request.created_at).toLocaleDateString('es-ES')}
+      </p>
       
-      {request.region && (
-        <div className="mb-2">
-          <p className="text-sm"><strong>Región:</strong> {request.region}</p>
-        </div>
-      )}
+      <div className="space-y-2 mb-4 text-sm">
+        {request.email && <p>📧 {request.email}</p>}
+        {request.owner_contact_number && <p>📞 {request.owner_contact_number}</p>}
+        {request.latitude && <p>📍 Lat: {request.latitude}° Lon: {request.longitude}°</p>}
+      </div>
       
-      {request.propietario && (
-        <div className="mb-2">
-          <p className="text-sm"><strong>Propietario:</strong> {request.propietario}</p>
-        </div>
-      )}
-      
-      {request.direccion && (
-        <div className="mb-3">
-          <p className="text-sm"><strong>Dirección:</strong> {request.direccion}</p>
-        </div>
-      )}
-      
-      <div className="flex gap-2 justify-end">
+      <div className="flex gap-2 justify-end flex-wrap">
+        <Button
+          size="small"
+          type="primary"
+          icon={<CheckOutlined />}
+          onClick={() => handleReviewAccept(request)}
+          disabled={request.state !== 'Pendiente'}
+          title="Revisar y aprobar"
+        />
+        <Button
+          size="small"
+          type="primary"
+          danger
+          icon={<CloseOutlined />}
+          onClick={() => handleRefuse(request)}
+          disabled={request.state !== 'Pendiente'}
+          title="Rechazar solicitud"
+        />
         <Button
           size="small"
           type="primary"
           danger
           icon={<DeleteOutlined />}
           onClick={() => handleDelete(request)}
+          title="Eliminar solicitud"
         />
         <Button
           size="small"
-          type="primary"
+          type="default"
           icon={<EyeOutlined />}
           onClick={() => handleViewDetails(request)}
+          title="Ver detalles"
         />
-        <Button
-          size="small"
-          type="primary"
-          className="bg-green-500 border-green-500"
-          onClick={() => handleReviewAccept(request)}
-        >
-          Revisar
-        </Button>
       </div>
     </div>
   );
@@ -446,7 +401,6 @@ const AdminRequestsManager = () => {
   return (
     <>
       <div className="w-full p-4 md:p-6">
-        {/* Header Section */}
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
           <h1 className="text-2xl md:text-3xl font-bold">
             Gestión de Solicitudes ({requests.length})
@@ -463,7 +417,6 @@ const AdminRequestsManager = () => {
         
         <hr className="my-4" />
         
-        {/* Content Section */}
         {requests.length === 0 ? (
           <div className="text-center p-8 md:p-10 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
             <p className="text-gray-600 mb-2">No hay solicitudes en el sistema</p>
@@ -473,7 +426,6 @@ const AdminRequestsManager = () => {
           </div>
         ) : (
           <>
-            {/* Mobile View - Cards */}
             {isMobile ? (
               <div>
                 {dataSource.map((request) => (
@@ -481,14 +433,14 @@ const AdminRequestsManager = () => {
                 ))}
               </div>
             ) : (
-              /* Desktop View - Table */
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse">
                   <thead>
                     <tr className="bg-gray-100 border-b-2 border-gray-300">
-                      <th className="p-3 text-left font-semibold">ID del Punto</th>
-                      <th className="p-3 text-left font-semibold">Fecha</th>
+                      <th className="p-3 text-left font-semibold">Solicitud</th>
+                      <th className="p-3 text-left font-semibold">Solicitante</th>
                       <th className="p-3 text-left font-semibold">Email</th>
+                      <th className="p-3 text-left font-semibold">Fecha</th>
                       <th className="p-3 text-left font-semibold">Estado</th>
                       <th className="p-3 text-left font-semibold">Acciones</th>
                     </tr>
@@ -496,14 +448,40 @@ const AdminRequestsManager = () => {
                   <tbody>
                     {dataSource.map((request) => (
                       <tr key={request.key} className="border-b border-gray-200 hover:bg-gray-50">
-                        <td className="p-3">{request.id}</td>
-                        <td className="p-3">{request.fecha}</td>
+                        <td className="p-3 font-semibold">{request.name}</td>
+                        <td className="p-3 text-sm">{request.owner_name}</td>
                         <td className="p-3 text-sm">{request.email}</td>
-                        <td className="p-3">
-                          <Tag color="blue">Pendiente</Tag>
+                        <td className="p-3 text-sm">
+                          {new Date(request.created_at).toLocaleDateString('es-ES')}
                         </td>
                         <td className="p-3">
-                          <div className="flex gap-2">
+                          <Tag color={
+                            request.state === 'Pendiente' ? 'orange' :
+                            request.state === 'Analizada' ? 'green' :
+                            'red'
+                          }>
+                            {request.state}
+                          </Tag>
+                        </td>
+                        <td className="p-3">
+                          <div className="flex gap-2 flex-wrap">
+                            <Button
+                              size="small"
+                              type="primary"
+                              icon={<CheckOutlined />}
+                              onClick={() => handleReviewAccept(request)}
+                              disabled={request.state !== 'Pendiente'}
+                              title="Revisar y aprobar"
+                            />
+                            <Button
+                              size="small"
+                              type="primary"
+                              danger
+                              icon={<CloseOutlined />}
+                              onClick={() => handleRefuse(request)}
+                              disabled={request.state !== 'Pendiente'}
+                              title="Rechazar solicitud"
+                            />
                             <Button
                               size="small"
                               type="primary"
@@ -514,20 +492,11 @@ const AdminRequestsManager = () => {
                             />
                             <Button
                               size="small"
-                              type="primary"
+                              type="default"
                               icon={<EyeOutlined />}
                               onClick={() => handleViewDetails(request)}
                               title="Ver detalles"
                             />
-                            <Button
-                              size="small"
-                              type="primary"
-                              className="bg-green-500 border-green-500"
-                              onClick={() => handleReviewAccept(request)}
-                              title="Revisar y aprobar"
-                            >
-                              Revisar
-                            </Button>
                           </div>
                         </td>
                       </tr>
@@ -544,14 +513,11 @@ const AdminRequestsManager = () => {
 
       {/* View Details Modal */}
       <Modal
-        title={`Detalles de la Solicitud ${selectedRequest?.id}`}
+        title={`Detalles: ${selectedRequest?.name}`}
         open={viewModalVisible}
         onCancel={() => setViewModalVisible(false)}
         footer={[
-          <Button 
-            key="close"
-            onClick={() => setViewModalVisible(false)}
-          >
+          <Button key="close" onClick={() => setViewModalVisible(false)}>
             Cerrar
           </Button>
         ]}
@@ -566,118 +532,87 @@ const AdminRequestsManager = () => {
       >
         {selectedRequest && (
           <div className="space-y-4">
-            {/* Header Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4 border-b border-gray-200">
               <div>
-                <p className="text-xs text-gray-500 uppercase">ID Solicitud</p>
-                <p className="text-lg font-bold text-gray-800">{selectedRequest.id}</p>
+                <p className="text-xs text-gray-500 uppercase">ID</p>
+                <p className="text-lg font-bold">{selectedRequest.name}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-500 uppercase">Email Usuario</p>
-                <p className="text-sm text-gray-700 break-all">{selectedRequest.email}</p>
+                <p className="text-xs text-gray-500 uppercase">Estado</p>
+                <Tag color={selectedRequest.state === 'Pendiente' ? 'orange' : 'green'}>
+                  {selectedRequest.state}
+                </Tag>
               </div>
               <div>
                 <p className="text-xs text-gray-500 uppercase">Fecha</p>
-                <p className="text-sm text-gray-700">{selectedRequest.fecha}</p>
+                <p className="text-sm">
+                  {new Date(selectedRequest.created_at).toLocaleDateString('es-ES')}
+                </p>
               </div>
               <div>
-                <p className="text-xs text-gray-500 uppercase">Teléfono</p>
-                <p className="text-sm text-gray-700">{selectedRequest.num_telefono || 'No disponible'}</p>
+                <p className="text-xs text-gray-500 uppercase">Región</p>
+                <p className="text-sm">{selectedRequest.region_id || 'N/A'}</p>
               </div>
             </div>
 
-            {/* Ubicación */}
             <div>
-              <h3 className="font-semibold text-gray-800 mb-3 text-base">📍 Ubicación</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <div>
-                  <p className="text-xs text-gray-500">Región</p>
-                  <p className="font-semibold text-gray-800">{selectedRequest.region}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Propietario</p>
-                  <p className="font-semibold text-gray-800">{selectedRequest.propietario || 'No especificado'}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Coordenada X</p>
-                  <p className="font-semibold text-gray-800">{selectedRequest.coord_x}°</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Coordenada Y</p>
-                  <p className="font-semibold text-gray-800">{selectedRequest.coord_y}°</p>
-                </div>
-              </div>
-              <div className="mt-3 p-3 bg-gray-100 rounded-lg">
-                <p className="text-xs text-gray-500 mb-2">Dirección</p>
-                <p className="text-sm text-gray-700">{selectedRequest.direccion || 'No especificada'}</p>
+              <h3 className="font-semibold mb-3">👤 Solicitante</h3>
+              <div className="p-3 bg-blue-50 rounded-lg space-y-2">
+                <p><strong>Nombre:</strong> {selectedRequest.owner_name}</p>
+                <p><strong>Email:</strong> {selectedRequest.email}</p>
+                <p><strong>Teléfono:</strong> {selectedRequest.owner_contact_number || 'N/A'}</p>
               </div>
             </div>
 
-            {/* Características */}
             <div>
-              <h3 className="font-semibold text-gray-800 mb-3 text-base">🌡️ Características</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                  <p className="text-xs text-gray-500">Uso Actual</p>
-                  <p className="font-semibold text-green-700">{selectedRequest.uso_actual || 'No especificado'}</p>
-                </div>
-                <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
-                  <p className="text-xs text-gray-500">Sensación Térmica</p>
-                  <p className="font-semibold text-orange-700">
-                    {selectedRequest.sens_termica === '1' ? '❄️ Frío' : 
-                    selectedRequest.sens_termica === '2' ? '🌡️ Tibio' : '🔥 Caliente'}
-                  </p>
-                </div>
-                <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
-                  <p className="text-xs text-gray-500">Burbujeo</p>
-                  <p className="font-semibold text-purple-700">
-                    {selectedRequest.burbujeo ? '✅ Sí' : '❌ No'}
-                  </p>
-                </div>
+              <h3 className="font-semibold mb-3">📍 Ubicación</h3>
+              <div className="p-3 bg-green-50 rounded-lg grid grid-cols-2 gap-3">
+                <p><strong>Lat:</strong> {selectedRequest.latitude}°</p>
+                <p><strong>Lon:</strong> {selectedRequest.longitude}°</p>
               </div>
             </div>
 
-            {/* Mediciones */}
             <div>
-              <h3 className="font-semibold text-gray-800 mb-3 text-base">🧪 Mediciones</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="p-3 bg-red-50 rounded-lg border border-red-200">
-                  <p className="text-xs text-gray-500">pH Campo</p>
-                  <p className="font-semibold text-red-700">{selectedRequest.pH_campo || 'No medido'}</p>
-                </div>
-                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <p className="text-xs text-gray-500">Conductividad Campo</p>
-                  <p className="font-semibold text-blue-700">{selectedRequest.cond_campo || 'No medida'} μS/cm</p>
-                </div>
+              <h3 className="font-semibold mb-3">🌡️ Características</h3>
+              <div className="space-y-2">
+                <p><strong>Uso actual:</strong> {selectedRequest.current_usage || 'N/A'}</p>
+                <p><strong>Sensación térmica:</strong> {selectedRequest.temperature_sensation || 'N/A'}</p>
+                <p><strong>Burbujeo:</strong> {selectedRequest.bubbles ? '✅ Sí' : '❌ No'}</p>
+                <p><strong>Detalles:</strong> {selectedRequest.details || 'Sin detalles'}</p>
               </div>
             </div>
           </div>
         )}
       </Modal>
 
-      {/* Review and Accept Modal */}
+      {/* Review and Approve Modal */}
       <Modal
-        title={`Revisar y Aprobar Solicitud ${selectedRequest?.id}`}
+        title={`Revisar y Procesar: ${selectedRequest?.name}`}
         open={reviewModalVisible}
-        onCancel={() => setReviewModalVisible(false)}
+        onCancel={() => {
+          setReviewModalVisible(false);
+          reviewForm.resetFields();
+        }}
         footer={[
           <Button 
             key="cancel"
-            onClick={() => setReviewModalVisible(false)}
+            onClick={() => {
+              setReviewModalVisible(false);
+              reviewForm.resetFields();
+            }}
           >
             Cancelar
           </Button>,
           <Button 
-            key="approve"
+            key="submit"
             type="primary"
-            onClick={handleSubmitApproval}
             loading={submitting}
-            className="bg-green-500"
+            onClick={handleSubmitApproval}
           >
-            {submitting ? 'Aprobando...' : 'Aprobar y Agregar'}
+            Procesar Análisis
           </Button>
         ]}
-        width={isMobile ? '95%' : 800}
+        width={isMobile ? '95%' : 900}
         centered
         styles={{
           body: {
@@ -691,75 +626,125 @@ const AdminRequestsManager = () => {
           layout="vertical"
           scrollToFirstError
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Form.Item label="ID del Punto" name="id" rules={[{ required: true, message: 'ID requerido' }]}>
-              <Input placeholder="Ej: POINT-0001" />
+          <Form.Item name="id_soli" hidden>
+            <Input />
+          </Form.Item>
+
+          {/* Descripción */}
+          <Form.Item
+            name="description"
+            label="📝 Descripción / Observaciones"
+          >
+            <Input.TextArea rows={3} placeholder="Notas adicionales sobre el análisis..." />
+          </Form.Item>
+
+          <hr className="my-4" />
+          <h3 className="font-semibold text-base mb-4">🌡️ Mediciones de Campo</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Form.Item
+              name="temperature"
+              label="Temperatura (°C)"
+              rules={[
+                { 
+                  pattern: /^-?\d+(\.\d{1,2})?$/, 
+                  message: 'Ingresa una temperatura válida'
+                }
+              ]}
+            >
+              <InputNumber style={{ width: '100%' }} placeholder="25.5" step={0.1} />
             </Form.Item>
-            <Form.Item label="Región" name="region" rules={[{ required: true, message: 'Región requerida' }]}>
-              <Input />
+
+            <Form.Item
+              name="field_pH"
+              label="pH Campo"
+              rules={[
+                {
+                  pattern: /^\d+(\.\d{1,2})?$/,
+                  message: 'pH debe estar entre 0 y 14'
+                }
+              ]}
+            >
+              <InputNumber style={{ width: '100%' }} placeholder="7.0" step={0.01} min={0} max={14} />
             </Form.Item>
-            <Form.Item label="Coordenada X (Longitud)" name="coord_x" rules={[{ required: true, message: 'Coordenada X requerida' }]}>
-              <InputNumber style={{ width: '100%' }} placeholder="-84.123456" />
+
+            <Form.Item
+              name="field_conductivity"
+              label="Conductividad Campo (μS/cm)"
+            >
+              <InputNumber style={{ width: '100%' }} placeholder="500" step={0.01} />
             </Form.Item>
-            <Form.Item label="Coordenada Y (Latitud)" name="coord_y" rules={[{ required: true, message: 'Coordenada Y requerida' }]}>
-              <InputNumber style={{ width: '100%' }} placeholder="9.123456" />
+          </div>
+
+          <hr className="my-4" />
+          <h3 className="font-semibold text-base mb-4">🧪 Mediciones de Laboratorio</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Form.Item
+              name="lab_pH"
+              label="pH Laboratorio"
+              rules={[
+                {
+                  pattern: /^\d+(\.\d{1,2})?$/,
+                  message: 'pH debe estar entre 0 y 14'
+                }
+              ]}
+            >
+              <InputNumber style={{ width: '100%' }} placeholder="7.0" step={0.01} min={0} max={14} />
             </Form.Item>
-            <Form.Item label="Temperatura (°C)" name="temp" rules={[{ required: true, message: 'Temperatura requerida' }]}>
-              <InputNumber style={{ width: '100%' }} placeholder="25.5" />
+
+            <Form.Item
+              name="lab_conductivity"
+              label="Conductividad Lab (μS/cm)"
+            >
+              <InputNumber style={{ width: '100%' }} placeholder="500" step={0.01} />
             </Form.Item>
-            <Form.Item label="pH Campo" name="pH_campo" rules={[{ required: true, message: 'pH campo requerido' }]}>
-              <InputNumber style={{ width: '100%' }} placeholder="7.0" step={0.1} />
+          </div>
+
+          <hr className="my-4" />
+          <h3 className="font-semibold text-base mb-4">⚗️ Iones y Elementos (mg/L)</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Form.Item name="cl" label="Cl">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="10" />
             </Form.Item>
-            <Form.Item label="Conductividad Campo" name="cond_campo" rules={[{ required: true, message: 'Conductividad campo requerida' }]}>
-              <InputNumber style={{ width: '100%' }} placeholder="500" />
+            <Form.Item name="ca" label="Ca">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="20" />
             </Form.Item>
-            <Form.Item label="pH Laboratorio" name="pH_lab" rules={[{ required: true, message: 'pH lab requerido' }]}>
-              <InputNumber style={{ width: '100%' }} placeholder="7.0" step={0.1} />
+            <Form.Item name="hco3" label="HCO3">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="30" />
             </Form.Item>
-            <Form.Item label="Conductividad Lab" name="cond_lab" rules={[{ required: true, message: 'Conductividad lab requerida' }]}>
-              <InputNumber style={{ width: '100%' }} placeholder="500" />
+            <Form.Item name="so4" label="SO4">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="40" />
             </Form.Item>
-            <Form.Item label="Cl (mg/L)" name="Cl" rules={[{ required: true, message: 'Cl requerido' }]}>
-              <InputNumber style={{ width: '100%' }} placeholder="10" />
+            <Form.Item name="fe" label="Fe">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="0.07" />
             </Form.Item>
-            <Form.Item label="Ca+ (mg/L)" name="Ca+" rules={[{ required: true, message: 'Ca+ requerido' }]}>
-              <InputNumber style={{ width: '100%' }} placeholder="20" />
+            <Form.Item name="si" label="Si">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="50" />
             </Form.Item>
-            <Form.Item label="HCO3 (mg/L)" name="HCO3" rules={[{ required: true, message: 'HCO3 requerido' }]}>
-              <InputNumber style={{ width: '100%' }} placeholder="30" />
+            <Form.Item name="b" label="B">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="1.0" />
             </Form.Item>
-            <Form.Item label="SO4 (mg/L)" name="SO4" rules={[{ required: true, message: 'SO4 requerido' }]}>
-              <InputNumber style={{ width: '100%' }} placeholder="40" />
+            <Form.Item name="li" label="Li">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="1" />
             </Form.Item>
-            <Form.Item label="Fe (mg/L)" name="Fe" rules={[{ required: true, message: 'Fe requerido' }]}>
-              <Input placeholder="Ej: < 0.07 o 0.05" />
+            <Form.Item name="f" label="F">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="0.5" />
             </Form.Item>
-            <Form.Item label="Si (mg/L)" name="Si" rules={[{ required: true, message: 'Si requerido' }]}>
-              <InputNumber style={{ width: '100%' }} placeholder="50" />
+            <Form.Item name="na" label="Na">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="60" />
             </Form.Item>
-            <Form.Item label="B (mg/L)" name="B" rules={[{ required: true, message: 'B requerido' }]}>
-              <Input placeholder="Ej: < 1.0 o 0.8" />
+            <Form.Item name="k" label="K">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="70" />
             </Form.Item>
-            <Form.Item label="Li (mg/L)" name="Li" rules={[{ required: true, message: 'Li requerido' }]}>
-              <Input placeholder="Ej: < 1 o 0.5" />
-            </Form.Item>
-            <Form.Item label="F (mg/L)" name="F" rules={[{ required: true, message: 'F requerido' }]}>
-              <Input placeholder="Ej: < 0.5 o 0.3" />
-            </Form.Item>
-            <Form.Item label="Na (mg/L)" name="Na" rules={[{ required: true, message: 'Na requerido' }]}>
-              <InputNumber style={{ width: '100%' }} placeholder="60" />
-            </Form.Item>
-            <Form.Item label="K (mg/L)" name="K" rules={[{ required: true, message: 'K requerido' }]}>
-              <InputNumber style={{ width: '100%' }} placeholder="70" />
-            </Form.Item>
-            <Form.Item label="MG (mg/L)" name="MG+" rules={[{ required: true, message: 'MG requerido' }]}>
-              <InputNumber style={{ width: '100%' }} placeholder="80" />
+            <Form.Item name="mg" label="Mg">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="80" />
             </Form.Item>
           </div>
         </Form>
       </Modal>
 
-      {/* NotImplemented Modal */}
       <NotImplementedModal 
         isOpen={isNotImplementedOpen} 
         onClose={() => setIsNotImplementedOpen(false)} 

@@ -86,4 +86,32 @@ final class UserController
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
+
+  /**
+   * GET /users/me/session
+   * Get authenticated user from session cookie (validates via session.php)
+   */
+  public function showSession(): void
+  {
+    try {
+      $user = \Http\Request::getUser();
+      error_log('DEBUG: UserController.showSession - user = ' . ($user ? json_encode($user) : 'null'));
+      
+      if (!$user) {
+        Response::error(ErrorType::missingAuthToken(), 401);
+        return;
+      }
+
+      // TODO: CHECK Return only essential user info to avoid exposing sensitive data
+      Response::success([
+        'id' => $user['user_id'],
+        'email' => $user['email'] ?? null,
+        'role' => $user['role'] ?? 'user',
+      ], null, 200);
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getCode());
+    } catch (\Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
 }

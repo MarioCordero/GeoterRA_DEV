@@ -8,6 +8,7 @@ return [
     // User routes
     ['method' => 'GET', 'path' => '/users/me', 'controller' => 'UserController', 'action' => 'show'],
     ['method' => 'PUT', 'path' => '/users/me', 'controller' => 'UserController', 'action' => 'update'],
+    ['method' => 'GET', 'path' => '/users/me/session', 'controller' => 'UserController', 'action' => 'showSession'],
     ['method' => 'POST', 'path' => '/users/register', 'controller' => 'UserController', 'action' => 'register'],
     ['method' => 'DELETE', 'path' => '/users/me', 'controller' => 'UserController', 'action' => 'delete'],
     
@@ -23,12 +24,16 @@ return [
     ['method' => 'PUT', 'path' => '/admin/analysis-request/{id}', 'controller' => 'AnalysisRequestController', 'action' => 'adminUpdate'],
     
     // Registered manifestations routes
-    ['method' => 'POST', 'path' => '/registered-manifestations', 'controller' => 'RegisteredManifestationController', 'action' => 'store'],
-    ['method' => 'GET', 'path' => '/registered-manifestations', 'controller' => 'RegisteredManifestationController', 'action' => 'index'],
-    ['method' => 'GET', 'path' => '/registered-regions', 'controller' => 'RegisteredManifestationController', 'action' => 'regions'],
-    ['method' => 'PUT', 'path' => '/registered-manifestations/{id}', 'controller' => 'RegisteredManifestationController', 'action' => 'update'],
-    ['method' => 'DELETE', 'path' => '/registered-manifestations/{id}', 'controller' => 'RegisteredManifestationController', 'action' => 'delete'],
-
-    // Registered regions routes
     ['method' => 'GET', 'path' => '/regions', 'controller' => 'RegionController', 'action' => 'index'],
+    ['method' => 'GET', 'path' => '/regions/{id}', 'controller' => 'RegionController', 'action' => 'show'],
+    ['method' => 'POST', 'path' => '/regions', 'controller' => 'RegionController', 'action' => 'store'],
+    ['method' => 'PUT', 'path' => '/regions/{id}', 'controller' => 'RegionController', 'action' => 'update'],
+    ['method' => 'DELETE', 'path' => '/regions/{id}', 'controller' => 'RegionController', 'action' => 'delete'],
+    
+    // Region routes
+    ['method' => 'GET', 'path' => '/regions', 'controller' => 'RegionController', 'action' => 'index'],
+    ['method' => 'GET', 'path' => '/regions/{id}', 'controller' => 'RegionController', 'action' => 'show'],
+    ['method' => 'POST', 'path' => '/regions', 'controller' => 'RegionController', 'action' => 'store'],
+    ['method' => 'PUT', 'path' => '/regions/{id}', 'controller' => 'RegionController', 'action' => 'update'],
+    ['method' => 'DELETE', 'path' => '/regions/{id}', 'controller' => 'RegionController', 'action' => 'delete'],
 ];

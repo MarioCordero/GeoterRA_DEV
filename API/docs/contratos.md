@@ -99,6 +99,36 @@ Las referencias a códigos de error corresponden a [src/Http/ErrorType.php](../s
   - `NOT_FOUND` (404, recurso User): no existe. Ver datos o sesión.
   - `INTERNAL_ERROR` (500).
 
+### GET /users/me-session
+Obtiene usuario autenticado desde sesión (cookie HttpOnly).
+
+**Headers:**
+- Cookie: geoterra_session_token=...
+
+**Response 200:**
+```json
+{
+  "data": {
+    "user_id": "...",
+    "email": "...",
+    "name": "...",
+    "role": "admin",
+    "is_admin": true
+  },
+  "meta": null,
+  "errors": []
+}
+```
+
+**Response 401:**
+```json
+{
+  "data": null,
+  "meta": null,
+  "errors": [{"code": "MISSING_AUTH_TOKEN", "message": "..."}]
+}
+```
+
 ### PUT /users/me
 - **Auth**: requerido.
 - **Propósito**: actualizar perfil del usuario.
