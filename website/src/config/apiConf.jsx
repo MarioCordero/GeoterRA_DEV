@@ -10,12 +10,12 @@ const API_CONFIG = {
   endpoints: {
     auth: {
       refresh: '/auth/refresh',
-      register: '/auth/register',
       login: '/auth/login',
       logout: '/auth/logout',
     },
     users: {
       me: '/users/me',
+      register: '/users/register',
       meSession: `/users/me/session`,
     },
     analysisRequest: {
@@ -59,7 +59,6 @@ export const buildApiUrl = (endpoint) => {
 // ============================================
 export const auth = {
   login: () => buildApiUrl(API_CONFIG.endpoints.auth.login),
-  register: () => buildApiUrl(API_CONFIG.endpoints.auth.register),
   refresh: () => buildApiUrl(API_CONFIG.endpoints.auth.refresh),
   logout: () => buildApiUrl(API_CONFIG.endpoints.auth.logout),
 };
@@ -70,6 +69,7 @@ export const auth = {
 export const users = {
   me: () => buildApiUrl(API_CONFIG.endpoints.users.me),
   meSession: () => buildApiUrl(API_CONFIG.endpoints.users.meSession),
+  register: () => buildApiUrl(API_CONFIG.endpoints.users.register),
 };
 
 // ============================================

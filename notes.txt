@@ -13,3 +13,11 @@
   "phone_number": "84624161",
   "password": "uvgxNdxP1!"
 }
+
+{
+  "name": "Alberto",
+  "lastname": "Cuadrado",
+  "email": "alberto@gmail.com",
+  "phone_number": "88888888",
+  "password": "Alberto8*"
+}
