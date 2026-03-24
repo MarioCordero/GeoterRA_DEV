@@ -15,9 +15,9 @@
 }
 
 {
-  "name": "Alberto",
-  "lastname": "Cuadrado",
-  "email": "alberto@gmail.com",
+  "name": "Mario",
+  "lastname": "Developer",
+  "email": "mario@developer.com",
   "phone_number": "88888888",
-  "password": "Alberto8*"
+  "password": "Mario2003*"
 }
