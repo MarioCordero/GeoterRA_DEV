@@ -1,65 +1,101 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
-import UserDashboard from '../loggedComponents/loggedMainPage';
-import AdminDashboard from '../loggedAdminComponents/loggedAdminDashboard';
-import UserRequests from '../common/UserRequests';
-import AdminRequestsManager from '../loggedAdminComponents/loggedAdminRequestsManager';
+import { usePermissions } from '../../hooks/usePermissions';
 
-/**
- * Placeholder for the Profile section
- */
-const ProfilePlaceholder = ({ role }) => (
-  <div className="flex flex-col items-center justify-center min-h-[400px] m-8 p-12 bg-gray-50 rounded-lg shadow-sm border border-gray-100">
-    <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center text-4xl mb-6 text-blue-600">
-      👤
-    </div>
-    <h2 className="text-2xl font-bold text-gray-800 poppins-bold">
-      Perfil de {role === 'admin' ? 'Administrador' : role === 'maintenance' ? 'Mantenimiento' : 'Usuario'}
-    </h2>
-    <p className="text-gray-500 mt-2 poppins">Esta sección está actualmente en desarrollo.</p>
-  </div>
-);
+// Import all views
+import UserWelcome from '../loggedComponents/views/home/UserWelcome';
+import AdminDashboard from '../loggedComponents/views/home/AdminDashboard';
+import UserRequestsList from '../loggedComponents/views/requests/UserRequestsList';
+import AdminRequestManager from '../loggedComponents/views/manage/AdminRequestManager';
+import ProfilePage from '../loggedComponents/views/profile/ProfilePage';
+import UserManagement from '../loggedComponents/views/users/UserManagement';
+import SystemStatus from '../loggedComponents/views/infrastructure/SystemStatus';
+import SystemLogs from '../loggedComponents/views/logs/SystemLogs';
 
 /**
  * DashboardContentController
  * 
- * Decides which component to render based on the user's role and the selected menu key.
+ * Router component that determines which view to render based on:
+ * 1. The selected menu key (from sidebar)
+ * 2. User permissions (via usePermissions hook)
  * 
- * Keys:
- * 1: Dashboard (Admin or User)
- * 2: My Requests (Consistent for all)
- * 3: Manage Requests (Admin/Maintenance only)
- * 4: Profile (Consistent for all)
+ * Each route is handled as a separate view component organized by feature.
+ * Views handle their own permission checks and content rendering.
+ * 
+ * Menu Keys:
+ * 1 = Dashboard (UserWelcome for users, AdminDashboard for admin/maintenance)
+ * 2 = My Requests (UserRequestsList)
+ * 3 = Manage Requests (AdminRequestManager - admin/maintenance only)
+ * 4 = Profile (ProfilePage)
+ * 5 = User Management (UserManagement - maintenance only)
+ * 6 = System Status (SystemStatus - maintenance only)
+ * 7 = System Logs (SystemLogs - maintenance only)
  */
-const DashboardContentController = ({ selectedKey, user, setSelectedKey }) => {
-  const role = user?.role || 'user';
-  const isAdmin = role === 'admin' || role === 'maintenance';
+const DashboardContentController = ({ selectedKey }) => {
+  const { hasPermission, PERMISSIONS } = usePermissions();
 
   switch (selectedKey) {
-    case '1':
-      // Main Dashboard view
-      return isAdmin ? <AdminDashboard /> : <UserDashboard />;
-    
-    case '2':
-      // User's own requests
-      return <UserRequests />;
-    
-    case '3':
-      // Admin/Maintenance request manager
-      if (isAdmin) {
-        return <AdminRequestsManager />;
+    case '1': {
+      // Dashboard - show different dashboard based on role
+      if (hasPermission(PERMISSIONS.REVIEW_REQUESTS)) {
+        return <AdminDashboard />;
       }
-      // If a regular user somehow lands here, redirect to dashboard
-      setSelectedKey('1');
-      return <UserDashboard />;
-    
+      return <UserWelcome />;
+    }
+
+    case '2':
+      // My Requests - show to all users
+      return <UserRequestsList />;
+
+    case '3':
+      // Manage Requests - admin/maintenance only
+      if (!hasPermission(PERMISSIONS.REVIEW_REQUESTS)) {
+        return <div style={{ padding: '24px', color: 'red' }}>Acceso denegado</div>;
+      }
+      return <AdminRequestManager />;
+
     case '4':
-      // User profile
-      return <ProfilePlaceholder role={role} />;
-    
+      // Profile - show to all users
+      return <ProfilePage />;
+
+    case '5':
+      // User Management - maintenance only
+      return <UserManagement />;
+
+    case '6':
+      // System Status - maintenance only
+      return <SystemStatus />;
+
+    case '7':
+      // System Logs - maintenance only
+      return <SystemLogs />;
+
+    case '8':
+      // Export Data - admin/maintenance
+      if (!hasPermission(PERMISSIONS.EXPORT_DATA)) {
+        return <div style={{ padding: '24px', color: 'red' }}>Acceso denegado</div>;
+      }
+      return <div style={{ padding: '24px' }}>Exportar Datos - En desarrollo</div>;
+
+    case '9':
+      // Edit Chemistry - admin/maintenance
+      if (!hasPermission(PERMISSIONS.EDIT_CHEMISTRY)) {
+        return <div style={{ padding: '24px', color: 'red' }}>Acceso denegado</div>;
+      }
+      return <div style={{ padding: '24px' }}>Editar Química - En desarrollo</div>;
+
+    case '10':
+      // Settings - maintenance only
+      if (!hasPermission(PERMISSIONS.VIEW_SYSTEM_LOGS)) {
+        return <div style={{ padding: '24px', color: 'red' }}>Acceso denegado</div>;
+      }
+      return <div style={{ padding: '24px' }}>Configuración - En desarrollo</div>;
+
     default:
-      // Fallback
-      return isAdmin ? <AdminDashboard /> : <UserDashboard />;
+      // Fallback to dashboard
+      if (hasPermission(PERMISSIONS.REVIEW_REQUESTS)) {
+        return <AdminDashboard />;
+      }
+      return <UserWelcome />;
   }
 };
 

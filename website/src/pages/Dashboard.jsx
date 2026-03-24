@@ -1,18 +1,11 @@
-import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSession } from '../hooks/useSession';
-import Sidebar from '../components/common/Sidebar';
-import LoggedHeader from '../components/common/loggedHeader';
 import Footer from '../components/common/Footer';
+import Sidebar from '../components/common/Sidebar';
+import React, { useState, useEffect } from 'react';
+import LoggedHeader from '../components/common/loggedHeader';
 import DashboardContentController from '../components/dashboard/DashboardContentController';
 
-/**
- * Dashboard Page
- * 
- * Unified landing page for all authenticated users.
- * Uses a side sidebar and a header, rendering the appropriate 
- * content based on user role and menu selection.
- */
 const Dashboard = () => {
   const { user, isLogged, loading } = useSession();
   const [selectedKey, setSelectedKey] = useState('1');
@@ -35,7 +28,7 @@ const Dashboard = () => {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // Show a loading screen while resolving the session context
+  // TODO : CREATE A LOADING SCREEN COMPONENT AND USE IT HERE INSTEAD OF THIS    
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -70,7 +63,7 @@ const Dashboard = () => {
           style={{
             marginLeft: isMobile ? 0 : (collapsed ? '80px' : '220px'),
             transition: 'margin-left 0.3s ease',
-            marginBottom: isMobile ? '60px' : 0, // Bottom space for mobile nav
+            marginBottom: isMobile ? '60px' : 0,
           }}
         >
           <div className="flex-1 relative">

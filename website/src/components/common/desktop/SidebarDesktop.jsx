@@ -1,68 +1,30 @@
-import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
-import { Layout, Menu, Button, Modal } from "antd";
 import {
-  UserOutlined,
-  DashboardOutlined,
-  FileTextOutlined,
-  ExperimentOutlined,
   LogoutOutlined,
   MenuOutlined,
   ExclamationCircleOutlined,
 } from "@ant-design/icons";
-import { useSession } from '../../../hooks/useSession';
-import { auth } from '../../../config/apiConf';
 import '../../../fontsModule.css';
 import '../../../colorModule.css';
+import { useNavigate } from "react-router-dom";
+import { auth } from '../../../config/apiConf';
+import { Layout, Menu, Button, Modal } from "antd";
+import { useSession } from '../../../hooks/useSession';
+import { usePermissions } from '../../../hooks/usePermissions';
+import { getMenuItems, createPermissionsObject } from '../../../utils/menuConfig.jsx';
 
 const { Sider } = Layout;
 
 const SidebarDesktop = ({ selectedKey, setSelectedKey, collapsed, setCollapsed }) => {
   const navigate = useNavigate();
-  const { logout: sessionLogout, user } = useSession();
+  const { logout: sessionLogout } = useSession();
+  const { hasPermission, PERMISSIONS } = usePermissions();
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
-  // Determine if user is admin
-  const isAdmin = user?.is_admin || user?.role === 'admin';
-
-  // Menu items based on user role
-  const getMenuItems = () => {
-    const baseItems = [
-      { 
-        key: '1', 
-        icon: <DashboardOutlined style={{ fontSize: '18px' }} />, 
-        label: 'Dashboard',
-        shortLabel: 'Inicio'
-      },
-      { 
-        key: '2', 
-        icon: <FileTextOutlined style={{ fontSize: '18px' }} />, 
-        label: 'Solicitudes',
-        shortLabel: 'Solicitudes'
-      },
-      { 
-        key: '4', 
-        icon: <UserOutlined style={{ fontSize: '18px' }} />, 
-        label: 'Perfil',
-        shortLabel: 'Perfil'
-      },
-    ];
-
-    // Add admin-only item if user is admin
-    if (isAdmin) {
-      baseItems.splice(2, 0, {
-        key: '3',
-        icon: <ExperimentOutlined style={{ fontSize: '18px' }} />,
-        label: 'Gestionar Solicitudes',
-        shortLabel: 'Gestionar'
-      });
-    }
-
-    return baseItems;
-  };
-
-  const menuItems = getMenuItems();
+  // Get menu items from centralized configuration
+  const permissionsObj = createPermissionsObject(hasPermission, PERMISSIONS);
+  const menuItems = getMenuItems(permissionsObj);
 
   const handleLogout = async () => {
     try {

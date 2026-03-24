@@ -28,6 +28,7 @@ const LoggedMainPage = () => {
   const fetchUserData = async () => {
     try {
       setDataLoading(true);
+      // API CALL
       const response = await fetch(users.me(), {
         method: 'GET',
         headers: buildHeaders(),
