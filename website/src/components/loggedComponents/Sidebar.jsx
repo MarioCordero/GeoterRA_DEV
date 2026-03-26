@@ -1,5 +1,5 @@
-import SidebarDesktop from './desktop/SidebarDesktop';
 import SidebarMobile from './mobile/SidebarMobile';
+import SidebarDesktop from './desktop/SidebarDesktop';
 
 const Sidebar = ({ selectedKey, setSelectedKey, collapsed, setCollapsed, isMobile }) => {
   if (isMobile) {

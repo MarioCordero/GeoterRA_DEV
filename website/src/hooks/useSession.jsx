@@ -21,6 +21,7 @@ export const SessionProvider = ({ children }) => {
     try {
       const meSessionUrl = users.meSession();
       
+      // API CALL
       const res = await fetch(meSessionUrl, {
         method: 'GET',
         credentials: 'include',

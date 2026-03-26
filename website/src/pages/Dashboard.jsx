@@ -1,9 +1,9 @@
 import { Navigate } from 'react-router-dom';
 import { useSession } from '../hooks/useSession';
 import Footer from '../components/common/Footer';
-import Sidebar from '../components/common/Sidebar';
+import Sidebar from '../components/loggedComponents/Sidebar';
 import React, { useState, useEffect } from 'react';
-import LoggedHeader from '../components/common/loggedHeader';
+import LoggedHeader from '../components/common/loggedHeader'; // TODO : CREATE A COMMON LOGGED HEADER COMPONENT AND USE IT HERE INSTEAD OF THIS
 import DashboardContentController from '../components/dashboard/DashboardContentController';
 
 const Dashboard = () => {

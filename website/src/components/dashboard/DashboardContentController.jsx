@@ -5,7 +5,7 @@ import { usePermissions } from '../../hooks/usePermissions';
 import UserWelcome from '../loggedComponents/views/home/UserWelcome';
 import AdminDashboard from '../loggedComponents/views/home/AdminDashboard';
 import UserRequestsList from '../loggedComponents/views/requests/UserRequestsList';
-import AdminRequestManager from '../loggedComponents/views/manage/AdminRequestManager';
+import RequestManager from '../loggedComponents/views/manage/RequestsManager';
 import ProfilePage from '../loggedComponents/views/profile/ProfilePage';
 import UserManagement from '../loggedComponents/views/users/UserManagement';
 import SystemStatus from '../loggedComponents/views/infrastructure/SystemStatus';
@@ -24,7 +24,7 @@ import SystemLogs from '../loggedComponents/views/logs/SystemLogs';
  * Menu Keys:
  * 1 = Dashboard (UserWelcome for users, AdminDashboard for admin/maintenance)
  * 2 = My Requests (UserRequestsList)
- * 3 = Manage Requests (AdminRequestManager - admin/maintenance only)
+ * 3 = Manage Requests (RequestManager - admin/maintenance only)
  * 4 = Profile (ProfilePage)
  * 5 = User Management (UserManagement - maintenance only)
  * 6 = System Status (SystemStatus - maintenance only)
@@ -51,7 +51,7 @@ const DashboardContentController = ({ selectedKey }) => {
       if (!hasPermission(PERMISSIONS.REVIEW_REQUESTS)) {
         return <div style={{ padding: '24px', color: 'red' }}>Acceso denegado</div>;
       }
-      return <AdminRequestManager />;
+      return <RequestManager />;
 
     case '4':
       // Profile - show to all users

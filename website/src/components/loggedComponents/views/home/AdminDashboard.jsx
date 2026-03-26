@@ -26,6 +26,7 @@ const AdminDashboard = () => {
 
       try {
         setStatsLoading(true);
+        // API CALL
         const res = await fetch(analysisRequest.adminIndex(), {
           method: 'GET',
           credentials: 'include',

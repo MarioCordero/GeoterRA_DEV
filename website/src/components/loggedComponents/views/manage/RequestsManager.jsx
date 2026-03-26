@@ -3,11 +3,11 @@ import '../../../../fontsModule.css';
 import React, { useState, useEffect } from 'react';
 import { useSession } from '../../../../hooks/useSession';
 import { analysisRequest } from '../../../../config/apiConf';
-import NotImplementedModal from '../../../../components/common/NotImplementedModal';
+import NotImplementedModal from '../../../common/NotImplementedModal';
 import { Spin, Tag, Button, Modal, Form, Input, InputNumber, Select, Checkbox, message } from 'antd';
 import { EyeOutlined, DeleteOutlined, EditOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
 
-const AdminRequestsManager = () => {
+const RequestsManager = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -134,7 +134,6 @@ const AdminRequestsManager = () => {
 
   const deleteRequest = async (requestId) => {
     try {
-      // API CALL
       const res = await fetch(analysisRequest.delete(requestId), {
         method: 'DELETE',
         credentials: 'include',
@@ -753,4 +752,4 @@ const AdminRequestsManager = () => {
   );
 };
 
-export default AdminRequestsManager;
+export default RequestsManager;
