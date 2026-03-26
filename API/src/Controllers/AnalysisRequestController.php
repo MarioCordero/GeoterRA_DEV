@@ -69,25 +69,17 @@ final class AnalysisRequestController
       
       // Debug logging
       if (!$user) {
-        error_log('❌ [adminIndex] User not authenticated');
+        error_log('[AnalysisRequestController: adminIndex] ❌ User not authenticated');
         Response::error(ErrorType::forbidden(), 403);
         return;
       }
-      
-      error_log('📋 [adminIndex] User: ' . json_encode($user));
-      error_log('📋 [adminIndex] User role: ' . ($user['role'] ?? 'NO ROLE'));
-      error_log('📋 [adminIndex] Checking permission: REVIEW_REQUESTS');
-      
       $hasPermission = PermissionService::hasPermission($user['role'], Permissions::REVIEW_REQUESTS);
-      error_log('📋 [adminIndex] Permission result: ' . ($hasPermission ? 'TRUE' : 'FALSE'));
-      
       if (!$hasPermission) {
-        error_log('❌ [adminIndex] Permission denied - User role "' . ($user['role'] ?? 'null') . '" does not have REVIEW_REQUESTS');
+        error_log('[AnalysisRequestController: adminIndex] ❌ Permission denied - User role "' . ($user['role'] ?? 'null') . '" does not have REVIEW_REQUESTS');
         Response::error(ErrorType::forbidden(), 403);
         return;
       }
       
-      error_log('✅ [adminIndex] Permission granted - proceeding to fetch requests');
       $requests = $this->service->getAll();
       Response::success(data: $requests);
     } catch (ApiException $e) {

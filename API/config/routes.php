@@ -23,6 +23,9 @@ return [
     ['method' => 'DELETE', 'path' => '/admin/analysis-request/{id}', 'controller' => 'AnalysisRequestController', 'action' => 'adminDelete'],
     ['method' => 'PUT', 'path' => '/admin/analysis-request/{id}', 'controller' => 'AnalysisRequestController', 'action' => 'adminUpdate'],
     
+    // Logs routes
+    ['method' => 'GET', 'path' => '/logs/system', 'controller' => 'LogController', 'action' => 'getSystemLogs'],
+    
     // Registered manifestations routes
     ['method' => 'GET', 'path' => '/regions', 'controller' => 'RegionController', 'action' => 'index'],
     ['method' => 'GET', 'path' => '/regions/{id}', 'controller' => 'RegionController', 'action' => 'show'],

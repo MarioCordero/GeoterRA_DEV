@@ -11,20 +11,20 @@ use Repositories\UserRepository;
 function validateSessionToken(PDO $db): void
 {
     $sessionToken = $_COOKIE['geoterra_session_token'] ?? null;
-    
-    error_log('🔍 [Session] Token exists: ' . ($sessionToken ? 'YES' : 'NO'));
-    error_log('🔍 [Session] All cookies: ' . json_encode($_COOKIE));
 
     if (!$sessionToken) {
         error_log('🔴 [Session] No token in cookie');
         return;
     }
 
+    // Log the client connection details for debugging
+    $clientIp = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
+    error_log("🔵 [Session] Client connected: IP=$clientIp, UserAgent=$userAgent");
+
     try {
         $authService = new AuthService($db);
         $tokenData = $authService->validateAccessToken($sessionToken);
-        
-        error_log('✅ [Session] Token validated: ' . json_encode($tokenData));
         
         if (!$tokenData) {
             error_log('🔴 [Session] validateAccessToken returned null');
@@ -45,7 +45,6 @@ function validateSessionToken(PDO $db): void
         }
 
         \Http\Request::setUser($user);
-        error_log('✅ [Session] User SET: ' . $user['user_id']);
         
     } catch (\Exception $e) {
         error_log('🔴 [Session] Exception: ' . $e->getMessage());

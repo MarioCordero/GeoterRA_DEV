@@ -67,7 +67,7 @@ export const getMenuItems = (permissions) => {
     menuItems.push({
       key: '6',
       icon: <ToolOutlined style={{ fontSize: '18px' }} />,
-      label: 'Sistema',
+      label: 'Logs del Sistema',
       shortLabel: 'Sistema',
     });
   }

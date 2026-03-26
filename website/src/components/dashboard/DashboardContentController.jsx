@@ -63,7 +63,7 @@ const DashboardContentController = ({ selectedKey }) => {
 
     case '6':
       // System Status - maintenance only
-      return <SystemStatus />;
+      return <SystemLogs />;
 
     case '7':
       // System Logs - maintenance only

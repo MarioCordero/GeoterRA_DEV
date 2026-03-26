@@ -42,7 +42,7 @@ const RequestsManager = () => {
       });
 
       if (res.status === 401 || res.status === 403) {
-        throw new Error('No autorizado para ver todas las solicitudes');
+        throw new Error('No autorizado desde el backend para ver todas las solicitudes, por favor consulte a su administrador');
       }
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
@@ -72,7 +72,7 @@ const RequestsManager = () => {
       
       return [];
     } catch (error) {
-      console.error('❌ [AdminRequests] Error fetching all requests:', error);
+      console.error('[AdminRequests] ❌ Error fetching all requests:', error);
       throw error;
     }
   };

@@ -37,6 +37,9 @@ const API_CONFIG = {
     Regions: {
       index: '/regions',
     },
+    logs: {
+      system: '/logs/system',
+    },
   }
 };
 
@@ -96,6 +99,13 @@ export const registeredManifestations = {
 };
 
 // ============================================
+// LOGS ENDPOINTS
+// ============================================
+export const logs = {
+  system: () => buildApiUrl(API_CONFIG.endpoints.logs.system),
+};
+
+// ============================================
 // DEBUG & CONFIG
 // ============================================
 export const debugApiConfig = () => {
@@ -107,6 +117,7 @@ export const debugApiConfig = () => {
       users,
       analysisRequest,
       registeredManifestations,
+      logs,
     }
   });
 };
