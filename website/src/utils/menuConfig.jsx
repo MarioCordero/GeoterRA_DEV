@@ -71,16 +71,6 @@ export const getMenuItems = (permissions) => {
       shortLabel: 'Sistema',
     });
   }
-
-  if (permissions.hasSystemLogs) {
-    menuItems.push({
-      key: '7',
-      icon: <SettingOutlined style={{ fontSize: '18px' }} />,
-      label: 'Configuración',
-      shortLabel: 'Config',
-    });
-  }
-
   return menuItems;
 };
 

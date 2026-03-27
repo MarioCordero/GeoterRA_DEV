@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Card, Spin, Modal, Divider, Row, Col, message } from 'antd';
-import { LockOutlined, MailOutlined, UserOutlined, PhoneOutlined, SaveOutlined, EditOutlined } from '@ant-design/icons';
+import { LockOutlined, MailOutlined, UserOutlined, PhoneOutlined, SaveOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useSession } from '../../../../hooks/useSession';
 import { users } from '../../../../config/apiConf';
 
@@ -17,7 +17,9 @@ const ProfilePage = () => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [pendingData, setPendingData] = useState(null);
 
   // Initialize form with user data
@@ -125,6 +127,45 @@ const ProfilePage = () => {
       message.error(`Error: ${error.message}`);
     } finally {
       setPasswordLoading(false);
+    }
+  };
+
+  // Handle account deletion
+  const handleDeleteAccount = async () => {
+    setDeleteModalVisible(false);
+    setDeleteLoading(true);
+
+    try {
+      const endpoint = users.me();
+      const response = await fetch(endpoint, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('No autorizado');
+      }
+
+      if (!response.ok) {
+        const errorMessage = data.errors?.[0]?.message || `Error: ${response.status}`;
+        throw new Error(errorMessage);
+      }
+
+      message.success('✅ Cuenta eliminada correctamente');
+      // Redirect to home after successful deletion
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1500);
+    } catch (error) {
+      console.error('Account deletion error:', error);
+      message.error(`Error: ${error.message}`);
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -373,6 +414,34 @@ const ProfilePage = () => {
         </Spin>
       </Card>
 
+      {/* Delete Account Card - Danger Zone */}
+      <Card
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ff4d4f' }}>
+            <ExclamationCircleOutlined />
+            <span>Zona de Peligro</span>
+          </div>
+        }
+        style={{ marginBottom: '24px', borderColor: '#ff4d4f' }}
+      >
+        <div style={{ padding: '12px 0' }}>
+          <h4 style={{ margin: '0 0 8px 0', color: '#ff4d4f' }}>Eliminar Cuenta</h4>
+          <p style={{ color: '#666', margin: '0 0 16px 0' }}>
+            Una vez que elimines tu cuenta, no hay forma de recuperarla. Por favor, asegúrate de que deseas hacer esto.
+          </p>
+          <Spin spinning={deleteLoading}>
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => setDeleteModalVisible(true)}
+              disabled={deleteLoading}
+            >
+              Eliminar mi Cuenta
+            </Button>
+          </Spin>
+        </div>
+      </Card>
+
       {/* Confirmation Modal */}
       <Modal
         title="Confirmar cambios"
@@ -395,6 +464,37 @@ const ProfilePage = () => {
             <li>Teléfono: <strong>{user.phone_number || '(No especificado)'}</strong> → <strong>{pendingData?.phone || '(No especificado)'}</strong></li>
           )}
         </ul>
+      </Modal>
+
+      {/* Delete Account Confirmation Modal */}
+      <Modal
+        title={<div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ff4d4f' }}>
+          <ExclamationCircleOutlined />
+          <span>Eliminar Cuenta Permanentemente</span>
+        </div>}
+        open={deleteModalVisible}
+        onOk={handleDeleteAccount}
+        onCancel={() => setDeleteModalVisible(false)}
+        okText="Sí, eliminar mi cuenta"
+        cancelText="Cancelar"
+        okButtonProps={{ danger: true }}
+        confirmLoading={deleteLoading}
+      >
+        <div style={{ padding: '12px 0' }}>
+          <p style={{ color: '#ff4d4f', fontWeight: 'bold', marginBottom: '12px' }}>
+            ⚠️ Esta acción es irreversible y permanente.
+          </p>
+          <p>Se eliminarán los siguientes datos:</p>
+          <ul style={{ margin: '12px 0' }}>
+            <li>Tu perfil de usuario</li>
+            <li>Todas tus solicitudes de análisis</li>
+            <li>Tu historial de sesiones</li>
+            <li>Todos tus datos personales almacenados</li>
+          </ul>
+          <p style={{ marginTop: '12px' }}>
+            <strong>¿Estás completamente seguro de que deseas continuar?</strong>
+          </p>
+        </div>
       </Modal>
     </div>
   );
