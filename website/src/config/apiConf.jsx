@@ -38,7 +38,7 @@ const API_CONFIG = {
       index: '/regions',
     },
     logs: {
-      system: '/maintenance/system',
+      system: '/maintenance/system/logs',
     },
   }
 };

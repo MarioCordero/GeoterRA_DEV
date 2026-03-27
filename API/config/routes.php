@@ -24,7 +24,7 @@ return [
     ['method' => 'PUT', 'path' => '/admin/analysis-request/{id}', 'controller' => 'AnalysisRequestController', 'action' => 'adminUpdate'],
     
     // Maintenance routes
-    ['method' => 'GET', 'path' => '/maintenance/system', 'controller' => 'MaintenanceController', 'action' => 'getSystemLogs'],
+    ['method' => 'GET', 'path' => '/maintenance/system/logs', 'controller' => 'MaintenanceController', 'action' => 'getSystemLogs'],
     
     // Registered manifestations routes
     ['method' => 'GET', 'path' => '/regions', 'controller' => 'RegionController', 'action' => 'index'],
