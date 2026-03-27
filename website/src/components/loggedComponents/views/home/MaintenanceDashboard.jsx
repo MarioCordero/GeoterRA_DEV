@@ -8,8 +8,6 @@ import { HddOutlined, TeamOutlined, DatabaseOutlined, FileTextOutlined } from '@
 
 const MaintenanceDashboard = () => {
   const { user: sessionUser, loading: sessionLoading } = useSession();
-
-  console.log('Session User:', sessionUser);
   
   // State Management
   const [dashboardData, setDashboardData] = useState(null);

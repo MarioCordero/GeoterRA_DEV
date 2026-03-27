@@ -1,18 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Statistic, Tag, Button } from 'antd';
-import { FileTextOutlined, CheckCircleOutlined, ClockCircleOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Spin } from 'antd';
 import "../../../../colorModule.css";
 import '../../../../fontsModule.css';
+import React, { useState, useEffect } from 'react';
 import { useSession } from '../../../../hooks/useSession';
-import { usePermissions } from '../../../../hooks/usePermissions';
-import { Spin } from 'antd';
 import { analysisRequest } from '../../../../config/apiConf';
+import { Card, Row, Col, Statistic, Tag, Button } from 'antd';
+import { usePermissions } from '../../../../hooks/usePermissions';
+import { FileTextOutlined, CheckCircleOutlined, ClockCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 
-/**
- * AdminDashboard Component
- * Shown to admins and maintenance users
- * Displays admin stats, user info, and quick actions
- */
 const AdminDashboard = () => {
   const { user: sessionUser, loading, error } = useSession();
   const { hasPermission, PERMISSIONS } = usePermissions();
