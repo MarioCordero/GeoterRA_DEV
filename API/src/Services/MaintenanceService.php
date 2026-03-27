@@ -90,4 +90,64 @@ final class MaintenanceService
       throw new ApiException(ErrorType::internal($e->getMessage()), 500);
     }
   }
+
+  /**
+   * Get all database tables with their structure and data
+   * 
+   * @return array All tables with columns and data
+   * @throws ApiException
+   */
+  public function getAllDatabaseTables(): array
+  {
+    try {
+      // Get all tables in current database
+      $stmt = $this->pdo->query("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE()");
+      $tables = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+      
+      $result = [];
+      
+      foreach ($tables as $table) {
+        try {
+          // Get table columns info
+          $columnsStmt = $this->pdo->query("DESCRIBE $table");
+          $columns = $columnsStmt->fetchAll(\PDO::FETCH_ASSOC);
+          
+          // Get table data (limit 1000 rows for performance)
+          $dataStmt = $this->pdo->query("SELECT * FROM $table LIMIT 1000");
+          $data = $dataStmt->fetchAll(\PDO::FETCH_ASSOC);
+          
+          $result[$table] = [
+            'columns' => $columns,
+            'data' => $data,
+            'count' => count($data),
+            'displayName' => $this->humanizeTableName($table),
+          ];
+        } catch (\Throwable $e) {
+          error_log("Error reading table $table: " . $e->getMessage());
+          continue;
+        }
+      }
+      
+      return $result;
+    } catch (\Throwable $e) {
+      throw new ApiException(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
+
+  /**
+   * Convert table name to human readable format
+   * e.g., users -> Usuarios, analysis_requests -> Solicitudes de Análisis
+   */
+  private function humanizeTableName(string $tableName): string
+  {
+    $translations = [
+      'users' => 'Usuarios',
+      'analysis_requests' => 'Solicitudes de Análisis',
+      'regions' => 'Regiones',
+      'tokens' => 'Tokens',
+      'sessions' => 'Sesiones',
+    ];
+    
+    return $translations[$tableName] ?? ucfirst(str_replace('_', ' ', $tableName));
+  }
 }

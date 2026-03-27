@@ -11,7 +11,6 @@ import UserRequestsList from '../loggedComponents/views/requests/UserRequestsLis
 import RequestManager from '../loggedComponents/views/manage/RequestsManager';
 import ProfilePage from '../loggedComponents/views/profile/ProfilePage';
 import UserManagement from '../loggedComponents/views/users/UserManagement';
-import SystemStatus from '../loggedComponents/views/infrastructure/SystemStatus';
 import SystemLogs from '../loggedComponents/views/logs/SystemLogs';
 
 const DashboardContentController = ({ selectedKey }) => {
@@ -57,7 +56,7 @@ const DashboardContentController = ({ selectedKey }) => {
       if (!hasPermission(PERMISSIONS.VIEW_INFRASTRUCTURE)) {
         return <div style={{ padding: '24px', color: 'red' }}>Acceso denegado</div>;
       }
-      return <div style={{ padding: '24px' }}>Base de datos - En desarrollo</div>;
+      return <DatabaseViewer />;
 
     case '7':
       // Logs - maintenance only

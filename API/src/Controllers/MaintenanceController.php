@@ -94,4 +94,29 @@ final class MaintenanceController
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
+
+  public function getAllDatabaseTables(): void
+  {
+    try {
+      $user = Request::getUser();
+
+      if (!$user) {
+        Response::error(ErrorType::unauthorized(), 401);
+        return;
+      }
+
+      if (!PermissionService::hasPermission($user['role'], Permissions::VIEW_INFRASTRUCTURE)) {
+        Response::error(ErrorType::forbidden(), 403);
+        return;
+      }
+
+      $tables = $this->service->getAllDatabaseTables();
+      Response::success($tables);
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getCode());
+    } catch (\Throwable $e) {
+      error_log('❌ [MaintenanceController::getAllDatabaseTables] Error: ' . $e->getMessage());
+      Response::error(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
 }

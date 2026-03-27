@@ -41,6 +41,7 @@ const API_CONFIG = {
       systemLogs: '/maintenance/system/logs',
       dashboardInfo: '/maintenance/dashboard',
       allUsers: '/maintenance/users',
+      allTables: '/maintenance/database/tables',
     },
   }
 };
@@ -107,6 +108,7 @@ export const maintenance = {
   systemLogs: () => buildApiUrl(API_CONFIG.endpoints.maintenance.systemLogs),
   dashboardInfo: () => buildApiUrl(API_CONFIG.endpoints.maintenance.dashboardInfo),
   allUsers: () => buildApiUrl(API_CONFIG.endpoints.maintenance.allUsers),
+  allTables: () => buildApiUrl(API_CONFIG.endpoints.maintenance.allTables),
 };
 
 // ============================================

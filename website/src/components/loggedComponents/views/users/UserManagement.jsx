@@ -4,11 +4,6 @@ import { usePermissions } from '../../../../hooks/usePermissions';
 import { Table, Card, Spin, Tag, message, Button, Space } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 
-/**
- * UserManagement View
- * Maintenance role only - manage users and assign roles
- * Requires MANAGE_USERS permission
- */
 const UserManagement = () => {
   const { hasPermission, PERMISSIONS } = usePermissions();
   const [users, setUsers] = useState([]);
