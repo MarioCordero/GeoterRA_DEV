@@ -109,6 +109,8 @@ final class UserController
         'email' => $user['email'] ?? null,
         'is_active' => $user['is_active'] ?? null,
         'first_name' => $user['first_name'] ?? null,
+        'last_name' => $user['last_name'] ?? null,
+        'phone_number' => $user['phone_number'] ?? null,
       ], null, 200);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());

@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { users } from '../../../../config/apiConf';
+import { useSession } from '../../../../hooks/useSession';
 import { Form, Input, Button, Card, Spin, Modal, Divider, Row, Col, message } from 'antd';
 import { LockOutlined, MailOutlined, UserOutlined, PhoneOutlined, SaveOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { useSession } from '../../../../hooks/useSession';
-import { users } from '../../../../config/apiConf';
 
-/**
- * ProfilePage View
- * User profile management page
- * Allows authenticated users to view and edit their profile information
- */
 const ProfilePage = () => {
   const { user, refresh: refreshSession } = useSession();
   const [form] = Form.useForm();
@@ -22,17 +17,6 @@ const ProfilePage = () => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [pendingData, setPendingData] = useState(null);
 
-  // Initialize form with user data
-  useEffect(() => {
-    if (user) {
-      form.setFieldsValue({
-        name: user.name || '',
-        email: user.email || '',
-        phone: user.phone_number || '',
-      });
-    }
-  }, [user, form]);
-
   // Handle profile update submission
   const handleProfileUpdate = async (values) => {
     setPendingData(values);
@@ -45,6 +29,7 @@ const ProfilePage = () => {
     setLoading(true);
 
     try {
+      // API CALL
       const endpoint = users.me();
       const response = await fetch(endpoint, {
         method: 'PUT',
@@ -54,9 +39,10 @@ const ProfilePage = () => {
           'Accept': 'application/json',
         },
         body: JSON.stringify({
-          name: pendingData.name,
+          firstName: pendingData.firstName,
+          lastName: pendingData.lastName,
           email: pendingData.email,
-          phone_number: pendingData.phone,
+          phoneNumber: pendingData.phone,
         }),
       });
 
@@ -90,10 +76,9 @@ const ProfilePage = () => {
       message.error('Las contraseñas no coinciden');
       return;
     }
-
     setPasswordLoading(true);
-
     try {
+      // API CALL
       const endpoint = users.me();
       const response = await fetch(endpoint, {
         method: 'PUT',
@@ -136,6 +121,7 @@ const ProfilePage = () => {
     setDeleteLoading(true);
 
     try {
+      // API CALL
       const endpoint = users.me();
       const response = await fetch(endpoint, {
         method: 'DELETE',
@@ -171,23 +157,23 @@ const ProfilePage = () => {
 
   if (!user) {
     return (
-      <div style={{ padding: '24px', textAlign: 'center' }}>
+      <div className="p-6 text-center">
         <Spin size="large" />
       </div>
     );
   }
 
   return (
-    <div style={{ padding: '24px', maxWidth: '800px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ marginBottom: '8px' }}>Perfil de Usuario</h1>
-        <p style={{ color: '#666', margin: '0' }}>Gestiona tu información personal y seguridad</p>
+    <div className="p-6 max-w-3xl mx-auto">
+      <div className="mb-8">
+        <h1 className="mb-2">Perfil de Usuario</h1>
+        <p className="text-gray-500 m-0">Gestiona tu información personal y seguridad</p>
       </div>
 
       {/* Profile Information Card */}
       <Card
         title={
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div className="flex items-center justify-between">
             <span>Información Personal</span>
             {!isEditing && (
               <Button
@@ -200,7 +186,7 @@ const ProfilePage = () => {
             )}
           </div>
         }
-        style={{ marginBottom: '24px' }}
+        className="mb-6"
       >
         <Spin spinning={loading}>
           {!isEditing ? (
@@ -208,29 +194,37 @@ const ProfilePage = () => {
             <div>
               <Row gutter={[16, 16]}>
                 <Col xs={24} sm={12}>
-                  <div style={{ padding: '12px 0' }}>
-                    <p style={{ color: '#999', margin: '0 0 4px 0', fontSize: '12px' }}>Nombre</p>
-                    <p style={{ margin: '0', fontSize: '16px', fontWeight: '500' }}>{user.name || '-'}</p>
+                  <div className="py-3">
+                    <p className="text-gray-400 m-0 text-xs">Nombre</p>
+                    <p className="m-0 text-base font-medium">{user.first_name || '-'}</p>
                   </div>
                 </Col>
                 <Col xs={24} sm={12}>
-                  <div style={{ padding: '12px 0' }}>
-                    <p style={{ color: '#999', margin: '0 0 4px 0', fontSize: '12px' }}>Email</p>
-                    <p style={{ margin: '0', fontSize: '16px', fontWeight: '500' }}>{user.email || '-'}</p>
+                  <div className="py-3">
+                    <p className="text-gray-400 m-0 text-xs">Apellido</p>
+                    <p className="m-0 text-base font-medium">{user.last_name || '-'}</p>
                   </div>
                 </Col>
               </Row>
               <Row gutter={[16, 16]}>
                 <Col xs={24} sm={12}>
-                  <div style={{ padding: '12px 0' }}>
-                    <p style={{ color: '#999', margin: '0 0 4px 0', fontSize: '12px' }}>Número de Teléfono</p>
-                    <p style={{ margin: '0', fontSize: '16px', fontWeight: '500' }}>{user.phone_number || '-'}</p>
+                  <div className="py-3">
+                    <p className="text-gray-400 m-0 text-xs">Email</p>
+                    <p className="m-0 text-base font-medium">{user.email || '-'}</p>
+                  </div>
+                </Col>
+              </Row>
+              <Row gutter={[16, 16]}>
+                <Col xs={24} sm={12}>
+                  <div className="py-3">
+                    <p className="text-gray-400 m-0 text-xs">Número de Teléfono</p>
+                    <p className="m-0 text-base font-medium">{user.phone_number || '-'}</p>
                   </div>
                 </Col>
                 <Col xs={24} sm={12}>
-                  <div style={{ padding: '12px 0' }}>
-                    <p style={{ color: '#999', margin: '0 0 4px 0', fontSize: '12px' }}>Rol</p>
-                    <p style={{ margin: '0', fontSize: '16px', fontWeight: '500', textTransform: 'capitalize' }}>
+                  <div className="py-3">
+                    <p className="text-gray-400 m-0 text-xs">Rol</p>
+                    <p className="m-0 text-base font-medium capitalize">
                       {user.role || '-'}
                     </p>
                   </div>
@@ -239,9 +233,9 @@ const ProfilePage = () => {
               {user.created_at && (
                 <Row gutter={[16, 16]}>
                   <Col xs={24}>
-                    <div style={{ padding: '12px 0' }}>
-                      <p style={{ color: '#999', margin: '0 0 4px 0', fontSize: '12px' }}>Miembro desde</p>
-                      <p style={{ margin: '0', fontSize: '16px', fontWeight: '500' }}>
+                    <div className="py-3">
+                      <p className="text-gray-400 m-0 text-xs">Miembro desde</p>
+                      <p className="m-0 text-base font-medium">
                         {new Date(user.created_at).toLocaleDateString('es-ES', {
                           year: 'numeric',
                           month: 'long',
@@ -259,21 +253,47 @@ const ProfilePage = () => {
               form={form}
               layout="vertical"
               onFinish={handleProfileUpdate}
+              initialValues={{
+                firstName: user.first_name || '',
+                lastName: user.last_name || '',
+                email: user.email || '',
+                phone: user.phone_number || '',
+              }}
             >
-              <Form.Item
-                label="Nombre Completo"
-                name="name"
-                rules={[
-                  { required: true, message: 'Ingresa tu nombre completo' },
-                  { min: 2, message: 'El nombre debe tener al menos 2 caracteres' },
-                ]}
-              >
-                <Input
-                  prefix={<UserOutlined />}
-                  placeholder="Tu nombre completo"
-                  disabled={loading}
-                />
-              </Form.Item>
+              <Row gutter={16}>
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    label="Nombre"
+                    name="firstName"
+                    rules={[
+                      { required: true, message: 'Ingresa tu nombre' },
+                      { min: 2, message: 'El nombre debe tener al menos 2 caracteres' },
+                    ]}
+                  >
+                    <Input
+                      prefix={<UserOutlined />}
+                      placeholder="Tu nombre"
+                      disabled={loading}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    label="Apellido"
+                    name="lastName"
+                    rules={[
+                      { required: true, message: 'Ingresa tu apellido' },
+                      { min: 2, message: 'El apellido debe tener al menos 2 caracteres' },
+                    ]}
+                  >
+                    <Input
+                      prefix={<UserOutlined />}
+                      placeholder="Tu apellido"
+                      disabled={loading}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
 
               <Form.Item
                 label="Email"
@@ -304,7 +324,7 @@ const ProfilePage = () => {
                 />
               </Form.Item>
 
-              <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+              <div className="flex gap-3 mt-6">
                 <Button
                   type="primary"
                   htmlType="submit"
@@ -329,7 +349,7 @@ const ProfilePage = () => {
       </Card>
 
       {/* Password Change Card */}
-      <Card title="Cambiar Contraseña" style={{ marginBottom: '24px' }}>
+      <Card title="Cambiar Contraseña" className="mb-6">
         <Spin spinning={passwordLoading}>
           {!isChangingPassword ? (
             <Button
@@ -391,7 +411,7 @@ const ProfilePage = () => {
                 />
               </Form.Item>
 
-              <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+              <div className="flex gap-3 mt-6">
                 <Button
                   type="primary"
                   htmlType="submit"
@@ -417,16 +437,16 @@ const ProfilePage = () => {
       {/* Delete Account Card - Danger Zone */}
       <Card
         title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ff4d4f' }}>
+          <div className="flex items-center gap-2 text-red-500">
             <ExclamationCircleOutlined />
             <span>Zona de Peligro</span>
           </div>
         }
-        style={{ marginBottom: '24px', borderColor: '#ff4d4f' }}
+        className="mb-6 border-red-500"
       >
-        <div style={{ padding: '12px 0' }}>
-          <h4 style={{ margin: '0 0 8px 0', color: '#ff4d4f' }}>Eliminar Cuenta</h4>
-          <p style={{ color: '#666', margin: '0 0 16px 0' }}>
+        <div className="py-3">
+          <h4 className="m-0 mb-2 text-red-500">Eliminar Cuenta</h4>
+          <p className="text-gray-500 m-0 mb-4">
             Una vez que elimines tu cuenta, no hay forma de recuperarla. Por favor, asegúrate de que deseas hacer esto.
           </p>
           <Spin spinning={deleteLoading}>
@@ -453,12 +473,15 @@ const ProfilePage = () => {
         confirmLoading={loading}
       >
         <p>¿Estás seguro de que deseas actualizar tu información personal?</p>
-        <ul style={{ marginTop: '12px' }}>
+        <ul className="mt-3">
+          {pendingData?.firstName !== user.first_name && (
+            <li>Nombre: <strong>{user.first_name}</strong> → <strong>{pendingData?.firstName}</strong></li>
+          )}
+          {pendingData?.lastName !== user.last_name && (
+            <li>Apellido: <strong>{user.last_name}</strong> → <strong>{pendingData?.lastName}</strong></li>
+          )}
           {pendingData?.email !== user.email && (
             <li>Email: <strong>{user.email}</strong> → <strong>{pendingData?.email}</strong></li>
-          )}
-          {pendingData?.name !== user.name && (
-            <li>Nombre: <strong>{user.name}</strong> → <strong>{pendingData?.name}</strong></li>
           )}
           {pendingData?.phone !== (user.phone_number || '') && (
             <li>Teléfono: <strong>{user.phone_number || '(No especificado)'}</strong> → <strong>{pendingData?.phone || '(No especificado)'}</strong></li>
@@ -468,7 +491,7 @@ const ProfilePage = () => {
 
       {/* Delete Account Confirmation Modal */}
       <Modal
-        title={<div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ff4d4f' }}>
+        title={<div className="flex items-center gap-2 text-red-500">
           <ExclamationCircleOutlined />
           <span>Eliminar Cuenta Permanentemente</span>
         </div>}
@@ -480,18 +503,18 @@ const ProfilePage = () => {
         okButtonProps={{ danger: true }}
         confirmLoading={deleteLoading}
       >
-        <div style={{ padding: '12px 0' }}>
-          <p style={{ color: '#ff4d4f', fontWeight: 'bold', marginBottom: '12px' }}>
+        <div className="py-3">
+          <p className="text-red-500 font-bold mb-3">
             ⚠️ Esta acción es irreversible y permanente.
           </p>
           <p>Se eliminarán los siguientes datos:</p>
-          <ul style={{ margin: '12px 0' }}>
+          <ul className="my-3">
             <li>Tu perfil de usuario</li>
             <li>Todas tus solicitudes de análisis</li>
             <li>Tu historial de sesiones</li>
             <li>Todos tus datos personales almacenados</li>
           </ul>
-          <p style={{ marginTop: '12px' }}>
+          <p className="mt-3">
             <strong>¿Estás completamente seguro de que deseas continuar?</strong>
           </p>
         </div>

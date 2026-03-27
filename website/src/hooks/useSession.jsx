@@ -41,7 +41,6 @@ export const SessionProvider = ({ children }) => {
       }
 
       const body = await res.json();
-      
       if (body.data) {
         setUser(body.data);
         return body.data;
