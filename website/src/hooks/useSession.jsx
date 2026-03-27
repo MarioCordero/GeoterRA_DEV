@@ -19,9 +19,9 @@ export const SessionProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const meSessionUrl = users.meSession();
       
-      // API CALL
+      // API CALL REFACT
+      const meSessionUrl = users.meSession();
       const res = await fetch(meSessionUrl, {
         method: 'GET',
         credentials: 'include',

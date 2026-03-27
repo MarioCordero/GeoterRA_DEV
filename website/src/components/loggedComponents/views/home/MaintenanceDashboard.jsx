@@ -1,81 +1,68 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Statistic, Tag, Spin } from 'antd';
-import { DatabaseOutlined, FileTextOutlined } from '@ant-design/icons';
 import "../../../../colorModule.css";
 import '../../../../fontsModule.css';
+import React, { useState, useEffect } from 'react';
 import { useSession } from '../../../../hooks/useSession';
-import { analysisRequest } from '../../../../config/apiConf';
+import { Card, Row, Col, Statistic, Tag, Spin } from 'antd';
+import { maintenance } from '../../../../config/apiConf';
+import { HddOutlined, TeamOutlined, DatabaseOutlined, FileTextOutlined } from '@ant-design/icons';
 
-/**
- * MaintenanceDashboard Component
- * Shown to maintenance users
- * Displays quick overview and statistics
- */
 const MaintenanceDashboard = () => {
   const { user: sessionUser, loading: sessionLoading } = useSession();
+
+  console.log('Session User:', sessionUser);
   
   // State Management
-  const [analysisRequests, setAnalysisRequests] = useState([]);
-  const [regions, setRegions] = useState([]);
+  const [dashboardData, setDashboardData] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
 
-  // Fetch Analysis Requests
-  const fetchStats = async () => {
+  // Fetch Dashboard Stats
+  const fetchDashboardStats = async () => {
     setStatsLoading(true);
     try {
-      const res = await fetch(analysisRequest.adminIndex(), {
+      // API CALL
+      const res = await fetch(maintenance.dashboardInfo(), {
         method: 'GET',
         credentials: 'include',
         headers: { 'Accept': 'application/json' },
       });
 
-      if (!res.ok) throw new Error('Failed to fetch requests');
+      if (!res.ok) throw new Error('Failed to fetch dashboard stats');
 
       const data = await res.json();
-      if (data.data && Array.isArray(data.data)) {
-        setAnalysisRequests(data.data);
+      if (data.data) {
+        setDashboardData(data.data);
       }
     } catch (err) {
-      console.error('Error fetching analysis requests:', err);
+      console.error('Error fetching dashboard stats:', err);
     } finally {
       setStatsLoading(false);
-    }
-  };
-
-  // Fetch Regions
-  const fetchRegions = async () => {
-    try {
-      const res = await fetch('/API/public/regions', {
-        method: 'GET',
-        credentials: 'include',
-        headers: { 'Accept': 'application/json' },
-      });
-
-      if (!res.ok) throw new Error('Failed to fetch regions');
-
-      const data = await res.json();
-      if (data.data && Array.isArray(data.data)) {
-        setRegions(data.data);
-      }
-    } catch (err) {
-      console.error('Error fetching regions:', err);
     }
   };
 
   // Initial data fetch
   useEffect(() => {
     if (sessionUser) {
-      fetchStats();
-      fetchRegions();
+      fetchDashboardStats();
     }
   }, [sessionUser]);
 
-  // Stats calculation
-  const stats = {
-    totalRequests: analysisRequests.length,
-    pendingRequests: analysisRequests.filter(r => r.state === 'Pendiente').length,
-    analyzedRequests: analysisRequests.filter(r => r.state === 'Analizada').length,
-    totalRegions: regions.length,
+  // Helper function to get status color
+  const getStatusColor = (status) => {
+    return status === 'Online' ? 'green' : 'red';
+  };
+
+  // Helper function to get load color
+  const getLoadColor = (load) => {
+    switch(load) {
+      case 'Low':
+        return '#52c41a';
+      case 'Moderate':
+        return '#faad14';
+      case 'High':
+        return '#ff4d4f';
+      default:
+        return '#1890ff';
+    }
   };
 
   if (sessionLoading) {
@@ -120,21 +107,31 @@ const MaintenanceDashboard = () => {
         </Col>
         <Col xs={24} sm={12} md={6}>
           <Card>
-            <p className="text-gray-600 text-sm">Acceso a Datos</p>
+            <p className="text-gray-600 text-sm">Acceso a Datos (MOCK)</p>
             <Tag color="blue">🔍 Solo Lectura</Tag>
           </Card>
         </Col>
       </Row>
 
-      {/* Database Statistics */}
-      <h2 className="text-2xl font-bold mb-4">📈 Estadísticas de la Base de Datos</h2>
+      {/* System Statistics */}
+      <h2 className="text-2xl font-bold mb-4">📈 Estado del Sistema (MOCK)</h2>
       <Row gutter={16} className="mb-8">
         <Col xs={24} sm={12} md={6}>
           <Card loading={statsLoading}>
             <Statistic
-              title="Total de Solicitudes"
-              value={stats.totalRequests}
-              icon={<FileTextOutlined />}
+              title="Estado del Servidor"
+              value={dashboardData?.serverStatus || 'N/A'}
+              icon={<HddOutlined />}
+              valueStyle={{ color: dashboardData?.serverStatus === 'Online' ? '#52c41a' : '#ff4d4f' }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card loading={statsLoading}>
+            <Statistic
+              title="Usuarios Activos"
+              value={dashboardData?.activeUsers || 0}
+              icon={<TeamOutlined />}
               valueStyle={{ color: '#1890ff' }}
             />
           </Card>
@@ -143,7 +140,8 @@ const MaintenanceDashboard = () => {
           <Card loading={statsLoading}>
             <Statistic
               title="Solicitudes Pendientes"
-              value={stats.pendingRequests}
+              value={dashboardData?.pendingRequests || 0}
+              icon={<FileTextOutlined />}
               valueStyle={{ color: '#faad14' }}
             />
           </Card>
@@ -151,19 +149,10 @@ const MaintenanceDashboard = () => {
         <Col xs={24} sm={12} md={6}>
           <Card loading={statsLoading}>
             <Statistic
-              title="Solicitudes Analizadas"
-              value={stats.analyzedRequests}
-              valueStyle={{ color: '#52c41a' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card loading={statsLoading}>
-            <Statistic
-              title="Total de Regiones"
-              value={stats.totalRegions}
+              title="Carga del Sistema"
+              value={dashboardData?.systemLoad || 'N/A'}
               icon={<DatabaseOutlined />}
-              valueStyle={{ color: '#722ed1' }}
+              valueStyle={{ color: getLoadColor(dashboardData?.systemLoad) }}
             />
           </Card>
         </Col>
@@ -176,9 +165,9 @@ const MaintenanceDashboard = () => {
           <Col xs={24} sm={12}>
             <h4 className="font-semibold mb-2">✅ Permitido:</h4>
             <ul style={{ margin: '0', paddingLeft: '20px' }}>
-              <li>Ver todos los datos de las tablas</li>
-              <li>Buscar y filtrar registros</li>
-              <li>Exportar datos para análisis</li>
+              <li>Ver todos los datos del sistema</li>
+              <li>Monitorear estado del servidor</li>
+              <li>Ver estadísticas en tiempo real</li>
               <li>Ver registros del sistema</li>
               <li>Gestionar usuarios</li>
             </ul>
