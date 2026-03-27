@@ -47,5 +47,32 @@ class MaintenanceController {
             Response::error($e->getMessage(), 500);
         }
     }
-    
+    public function getDashboardInfo(): void {
+        try {
+            $user = Request::getUser();
+            
+            if (!$user) {
+                Response::error('Not authenticated', 403);
+                return;
+            }
+            
+            if (!PermissionService::hasPermission($user['role'], Permissions::VIEW_INFRASTRUCTURE)) {
+                Response::error('Permission denied', 403);
+                return;
+            }
+            
+            // Simulate fetching infrastructure status
+            $dashboardInfo = [
+                'serverStatus' => 'Online',
+                'activeUsers' => 42,
+                'pendingRequests' => 5,
+                'systemLoad' => 'Moderate',
+            ];
+            
+            Response::success($dashboardInfo);
+        } catch (\Throwable $e) {
+            error_log('❌ [MaintenanceController] Error: ' . $e->getMessage());
+            Response::error($e->getMessage(), 500);
+        }
+    }
 }

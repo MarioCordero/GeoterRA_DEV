@@ -40,7 +40,9 @@ class SimpleRouter
                 return $controller->$action();
             }
         }
-        return null;
+        $error = ErrorType::notFound('Route');
+        $error->setMessage("No endpoint found for {$method} {$path}. Please check the request method and path.");
+        return Response::error($error, 404);
     }
 
     private function pathToRegex(string $path): string
