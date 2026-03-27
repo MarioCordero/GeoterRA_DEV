@@ -1,9 +1,12 @@
 import React from 'react';
 import { usePermissions } from '../../hooks/usePermissions';
+import { useSession } from '../../hooks/useSession';
 
 // Import all views
 import UserWelcome from '../loggedComponents/views/home/UserWelcome';
 import AdminDashboard from '../loggedComponents/views/home/AdminDashboard';
+import MaintenanceDashboard from '../loggedComponents/views/home/MaintenanceDashboard';
+import DatabaseViewer from '../loggedComponents/views/database/DatabaseViewer';
 import UserRequestsList from '../loggedComponents/views/requests/UserRequestsList';
 import RequestManager from '../loggedComponents/views/manage/RequestsManager';
 import ProfilePage from '../loggedComponents/views/profile/ProfilePage';
@@ -11,33 +14,18 @@ import UserManagement from '../loggedComponents/views/users/UserManagement';
 import SystemStatus from '../loggedComponents/views/infrastructure/SystemStatus';
 import SystemLogs from '../loggedComponents/views/logs/SystemLogs';
 
-/**
- * DashboardContentController
- * 
- * Router component that determines which view to render based on:
- * 1. The selected menu key (from sidebar)
- * 2. User permissions (via usePermissions hook)
- * 
- * Each route is handled as a separate view component organized by feature.
- * Views handle their own permission checks and content rendering.
- * 
- * Menu Keys:
- * 1 = Dashboard (UserWelcome for users, AdminDashboard for admin/maintenance)
- * 2 = My Requests (UserRequestsList)
- * 3 = Manage Requests (RequestManager - admin/maintenance only)
- * 4 = Profile (ProfilePage)
- * 5 = User Management (UserManagement - maintenance only)
- * 6 = System Status (SystemStatus - maintenance only)
- * 7 = System Logs (SystemLogs - maintenance only)
- */
 const DashboardContentController = ({ selectedKey }) => {
   const { hasPermission, PERMISSIONS } = usePermissions();
+  const { user } = useSession();
 
   switch (selectedKey) {
     case '1': {
       // Dashboard - show different dashboard based on role
-      if (hasPermission(PERMISSIONS.REVIEW_REQUESTS)) {
+      if (user?.role === 'admin') {
         return <AdminDashboard />;
+      }
+      if (user?.role === 'maintenance') {
+        return <MaintenanceDashboard />;
       }
       return <UserWelcome />;
     }
@@ -59,14 +47,23 @@ const DashboardContentController = ({ selectedKey }) => {
 
     case '5':
       // User Management - maintenance only
+      if (!hasPermission(PERMISSIONS.MANAGE_USERS)) {
+        return <div style={{ padding: '24px', color: 'red' }}>Acceso denegado</div>;
+      }
       return <UserManagement />;
 
     case '6':
-      // System Status - maintenance only
-      return <SystemLogs />;
+      // Database - maintenance only
+      if (!hasPermission(PERMISSIONS.VIEW_INFRASTRUCTURE)) {
+        return <div style={{ padding: '24px', color: 'red' }}>Acceso denegado</div>;
+      }
+      return <div style={{ padding: '24px' }}>Base de datos - En desarrollo</div>;
 
     case '7':
-      // System Logs - maintenance only
+      // Logs - maintenance only
+      if (!hasPermission(PERMISSIONS.VIEW_SYSTEM_LOGS)) {
+        return <div style={{ padding: '24px', color: 'red' }}>Acceso denegado</div>;
+      }
       return <SystemLogs />;
 
     case '8':

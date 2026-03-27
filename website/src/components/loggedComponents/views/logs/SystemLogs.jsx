@@ -1,4 +1,4 @@
-import { logs } from '../../../../config/apiConf';
+import { maintenance } from '../../../../config/apiConf';
 import React, { useState, useEffect } from 'react';
 import { usePermissions } from '../../../../hooks/usePermissions';
 
@@ -17,7 +17,7 @@ const SystemLogs = () => {
 
     const fetchLogs = async () => {
       try {
-        const response = await fetch(logs.system(), {
+        const response = await fetch(maintenance.systemLogs(), {
           credentials: 'include'
         });
         const data = await response.json();

@@ -37,8 +37,9 @@ const API_CONFIG = {
     Regions: {
       index: '/regions',
     },
-    logs: {
-      system: '/maintenance/system/logs',
+    maintenance: {
+      systemLogs: '/maintenance/system/logs',
+      dashboardInfo: '/maintenance/dashboard',
     },
   }
 };
@@ -99,10 +100,11 @@ export const registeredManifestations = {
 };
 
 // ============================================
-// LOGS ENDPOINTS
+// MAINTENANCE ENDPOINTS
 // ============================================
-export const logs = {
-  system: () => buildApiUrl(API_CONFIG.endpoints.logs.system),
+export const maintenance = {
+  systemLogs: () => buildApiUrl(API_CONFIG.endpoints.maintenance.systemLogs),
+  dashboardInfo: () => buildApiUrl(API_CONFIG.endpoints.maintenance.dashboardInfo),
 };
 
 // ============================================
@@ -117,7 +119,7 @@ export const debugApiConfig = () => {
       users,
       analysisRequest,
       registeredManifestations,
-      logs,
+      maintenance,
     }
   });
 };
