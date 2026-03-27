@@ -23,6 +23,8 @@ return [
     ['method' => 'DELETE', 'path' => '/admin/analysis-request/{id}', 'controller' => 'AnalysisRequestController', 'action' => 'adminDelete'],
     ['method' => 'PUT', 'path' => '/admin/analysis-request/{id}', 'controller' => 'AnalysisRequestController', 'action' => 'adminUpdate'],
     
+    // Maintenance routes
+    //['method' => 'GET', 'path' => '/maintenance/users', 'controller' => 'LogController', 'action' => 'getSystemLogs'],
     // Logs routes
     ['method' => 'GET', 'path' => '/logs/system', 'controller' => 'LogController', 'action' => 'getSystemLogs'],
     

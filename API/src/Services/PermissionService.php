@@ -23,14 +23,12 @@ final class PermissionService
         AllowedUserRoles::USER => [
             Permissions::CREATE_REQUESTS,
             Permissions::VIEW_OWN_REQUESTS,
-            Permissions::EXPORT_PDF,
         ],
         
         AllowedUserRoles::ADMIN => [
             // All user permissions
             Permissions::CREATE_REQUESTS,
             Permissions::VIEW_OWN_REQUESTS,
-            Permissions::EXPORT_PDF,
             
             // Admin permissions
             Permissions::REVIEW_REQUESTS,
@@ -43,17 +41,14 @@ final class PermissionService
         
         AllowedUserRoles::MAINTENANCE => [
             // All admin permissions
-            Permissions::CREATE_REQUESTS,
-            Permissions::VIEW_OWN_REQUESTS,
-            Permissions::EXPORT_PDF,
-            Permissions::REVIEW_REQUESTS,
-            Permissions::APPROVE_REQUESTS,
-            Permissions::EDIT_REQUEST_COORDINATES,
-            Permissions::EDIT_REQUEST_CHEMISTRY,
-            Permissions::DELETE_REQUESTS,
+            // Permissions::CREATE_REQUESTS,
+            // Permissions::VIEW_OWN_REQUESTS,
+            // Permissions::REVIEW_REQUESTS,
+            // Permissions::APPROVE_REQUESTS,
+            // Permissions::EDIT_REQUEST_COORDINATES,
+            // Permissions::EDIT_REQUEST_CHEMISTRY,
+            // Permissions::DELETE_REQUESTS,
             Permissions::VIEW_USERS,
-            
-            // Maintenance-specific permissions
             Permissions::MANAGE_USERS,
             Permissions::ASSIGN_ROLES,
             Permissions::VIEW_INFRASTRUCTURE,
