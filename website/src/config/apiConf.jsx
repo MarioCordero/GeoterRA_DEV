@@ -40,6 +40,7 @@ const API_CONFIG = {
     maintenance: {
       systemLogs: '/maintenance/system/logs',
       dashboardInfo: '/maintenance/dashboard',
+      allUsers: '/maintenance/users',
     },
   }
 };
@@ -105,6 +106,7 @@ export const registeredManifestations = {
 export const maintenance = {
   systemLogs: () => buildApiUrl(API_CONFIG.endpoints.maintenance.systemLogs),
   dashboardInfo: () => buildApiUrl(API_CONFIG.endpoints.maintenance.dashboardInfo),
+  allUsers: () => buildApiUrl(API_CONFIG.endpoints.maintenance.allUsers),
 };
 
 // ============================================

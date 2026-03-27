@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Controllers;
 
 use DTO\AnalysisRequestDTO;
-use DTO\Permissions;
+use DTO\PermissionsDTO as Permissions;
 use Http\Request;
 use Http\Response;
 use Http\ApiException;

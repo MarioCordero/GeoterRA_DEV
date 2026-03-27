@@ -26,6 +26,7 @@ return [
     // Maintenance routes
     ['method' => 'GET', 'path' => '/maintenance/system/logs', 'controller' => 'MaintenanceController', 'action' => 'getSystemLogs'],
     ['method' => 'GET', 'path' => '/maintenance/dashboard', 'controller' => 'MaintenanceController', 'action' => 'getDashboardInfo'],
+    ['method' => 'GET', 'path' => '/maintenance/users', 'controller' => 'MaintenanceController', 'action' => 'showAllUsers'],
     
     // Registered manifestations routes
     ['method' => 'GET', 'path' => '/regions', 'controller' => 'RegionController', 'action' => 'index'],
