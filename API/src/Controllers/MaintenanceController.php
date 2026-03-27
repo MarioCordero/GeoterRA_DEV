@@ -3,10 +3,11 @@ namespace Controllers;
 
 use Http\Request;
 use Http\Response;
-use DTO\Permissions;
+use DTO\PermissionsDTO as Permissions;
 use Services\PermissionService;
 
-class LogController {
+class MaintenanceController {
+    // REFACT, too much BLL here
     public function getSystemLogs(): void {
         try {
             $user = Request::getUser();
@@ -21,11 +22,10 @@ class LogController {
                 return;
             }
             
-            // FIXED: Correct path to logs directory
             $logFile = __DIR__ . '/../../logs/system.log';
             
-            error_log('🔍 [LogController] Looking for log file at: ' . $logFile);
-            error_log('🔍 [LogController] File exists: ' . (file_exists($logFile) ? 'YES' : 'NO'));
+            error_log('🔍 [MaintenanceController] Looking for log file at: ' . $logFile);
+            error_log('🔍 [MaintenanceController] File exists: ' . (file_exists($logFile) ? 'YES' : 'NO'));
             
             if (!file_exists($logFile)) {
                 Response::success(['logs' => [], 'message' => 'No logs available']);
@@ -47,4 +47,5 @@ class LogController {
             Response::error($e->getMessage(), 500);
         }
     }
+    
 }

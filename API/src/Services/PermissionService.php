@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Services;
 
 use DTO\AllowedUserRoles;
-use DTO\Permissions;
+use DTO\PermissionsDTO as Permissions;
 
 /**
  * Service for managing role-based permissions

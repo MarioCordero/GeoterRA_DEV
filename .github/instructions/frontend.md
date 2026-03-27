@@ -41,7 +41,7 @@ Todos los endpoints de la API deben definirse en [website/src/config/apiConf.jsx
 // En apiConf.jsx
 endpoints: {
   logs: {
-    system: '/logs/system',
+    system: '/maintenance/system',
   },
 }
 

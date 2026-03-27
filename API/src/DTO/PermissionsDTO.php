@@ -9,7 +9,7 @@ namespace DTO;
  * Define all available permissions in the system. These are mapped to roles
  * in the PermissionService and used for authorization checks.
  */
-final class Permissions
+final class PermissionsDTO
 {
     // Request Management
     public const CREATE_REQUESTS = 'CREATE_REQUESTS';
