@@ -9,6 +9,7 @@ import {
   DatabaseOutlined,
   SafetyOutlined,
   SettingOutlined,
+  HistoryOutlined,
 } from '@ant-design/icons';
 
 /**
@@ -22,7 +23,6 @@ import {
 export const getMenuItems = (permissions) => {
   const menuItems = [];
 
-  // ===== ALWAYS SHOW =====
   menuItems.push({
     key: '1',
     icon: <DashboardOutlined style={{ fontSize: '18px' }} />,
@@ -30,14 +30,15 @@ export const getMenuItems = (permissions) => {
     shortLabel: 'Inicio',
   });
 
-  menuItems.push({
-    key: '2',
-    icon: <FileTextOutlined style={{ fontSize: '18px' }} />,
-    label: 'Mis Solicitudes',
-    shortLabel: 'Solicitudes',
-  });
+  if (permissions.hasRequests) {
+    menuItems.push({
+      key: '2',
+      icon: <FileTextOutlined style={{ fontSize: '18px' }} />,
+      label: 'Mis Solicitudes',
+      shortLabel: 'Solicitudes',
+    });
+  }
 
-  // ===== CONDITIONAL =====
   if (permissions.hasReviewRequests) {
     menuItems.push({
       key: '3',
@@ -54,6 +55,7 @@ export const getMenuItems = (permissions) => {
     shortLabel: 'Perfil',
   });
 
+  // Maintenance-specific menu items
   if (permissions.hasManageUsers) {
     menuItems.push({
       key: '5',
@@ -66,11 +68,21 @@ export const getMenuItems = (permissions) => {
   if (permissions.hasViewInfrastructure) {
     menuItems.push({
       key: '6',
-      icon: <ToolOutlined style={{ fontSize: '18px' }} />,
-      label: 'Logs del Sistema',
-      shortLabel: 'Sistema',
+      icon: <DatabaseOutlined style={{ fontSize: '18px' }} />,
+      label: 'Base de datos',
+      shortLabel: 'BD',
     });
   }
+
+  if (permissions.hasSystemLogs) {
+    menuItems.push({
+      key: '7',
+      icon: <HistoryOutlined style={{ fontSize: '18px' }} />,
+      label: 'Logs',
+      shortLabel: 'Logs',
+    });
+  }
+
   return menuItems;
 };
 
@@ -80,6 +92,7 @@ export const getMenuItems = (permissions) => {
  */
 export const createPermissionsObject = (hasPermissionFn, PERMISSIONS) => ({
   hasReviewRequests: hasPermissionFn(PERMISSIONS.REVIEW_REQUESTS),
+  hasRequests: hasPermissionFn(PERMISSIONS.CREATE_REQUESTS) || hasPermissionFn(PERMISSIONS.VIEW_OWN_REQUESTS) || hasPermissionFn(PERMISSIONS.REVIEW_REQUESTS),
   hasManageUsers: hasPermissionFn(PERMISSIONS.MANAGE_USERS),
   hasViewInfrastructure: hasPermissionFn(PERMISSIONS.VIEW_INFRASTRUCTURE),
   hasViewLogs: hasPermissionFn(PERMISSIONS.VIEW_LOGS),
