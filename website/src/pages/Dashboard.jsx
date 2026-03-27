@@ -3,7 +3,7 @@ import { useSession } from '../hooks/useSession';
 import Footer from '../components/common/Footer';
 import Sidebar from '../components/loggedComponents/Sidebar';
 import React, { useState, useEffect } from 'react';
-import LoggedHeader from '../components/common/loggedHeader'; // TODO : CREATE A COMMON LOGGED HEADER COMPONENT AND USE IT HERE INSTEAD OF THIS
+import AppHeader from '../components/common/Header';
 import DashboardContentController from '../components/dashboard/DashboardContentController';
 
 const Dashboard = () => {
@@ -45,7 +45,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Top Header */}
-      <LoggedHeader />
+      <AppHeader />
 
       <div className="flex flex-1 pt-16">
         {/* Navigation Sidebar (Desktop/Mobile) */}

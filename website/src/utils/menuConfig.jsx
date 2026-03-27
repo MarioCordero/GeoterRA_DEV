@@ -72,36 +72,9 @@ export const getMenuItems = (permissions) => {
     });
   }
 
-  if (permissions.hasViewLogs) {
-    menuItems.push({
-      key: '7',
-      icon: <DesktopOutlined style={{ fontSize: '18px' }} />,
-      label: 'Registros',
-      shortLabel: 'Registros',
-    });
-  }
-
-  if (permissions.hasExportData) {
-    menuItems.push({
-      key: '8',
-      icon: <DatabaseOutlined style={{ fontSize: '18px' }} />,
-      label: 'Exportar Datos',
-      shortLabel: 'Exportar',
-    });
-  }
-
-  if (permissions.hasEditChemistry) {
-    menuItems.push({
-      key: '9',
-      icon: <SafetyOutlined style={{ fontSize: '18px' }} />,
-      label: 'Editar Química',
-      shortLabel: 'Química',
-    });
-  }
-
   if (permissions.hasSystemLogs) {
     menuItems.push({
-      key: '10',
+      key: '7',
       icon: <SettingOutlined style={{ fontSize: '18px' }} />,
       label: 'Configuración',
       shortLabel: 'Config',

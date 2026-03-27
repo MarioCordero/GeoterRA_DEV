@@ -24,13 +24,9 @@ const SystemLogs = () => {
 
         if (data.data && Array.isArray(data.data.logs)) {
           const rawLogs = data.data.logs;
-          console.log('📋 [SystemLogs] Raw logs count:', rawLogs.length);
-
           const logLines = rawLogs
             .map((log) => log.replace(/\\n$/, '').trim())
             .filter((log) => log.length > 0);
-
-          console.log('📋 [SystemLogs] Parsed logs:', logLines.length, 'lines');
 
           setLogsData(logLines);
           setError(null);

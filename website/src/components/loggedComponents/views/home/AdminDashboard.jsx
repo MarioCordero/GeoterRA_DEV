@@ -19,41 +19,41 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState({ total: 0, pending: 0, analyzed: 0, rejected: 0 });
   const [statsLoading, setStatsLoading] = useState(false);
 
-  // ✅ Fetch request statistics
-  useEffect(() => {
-    const fetchStats = async () => {
-      if (!hasPermission(PERMISSIONS.REVIEW_REQUESTS)) return;
+  // useEffect(() => {
 
-      try {
-        setStatsLoading(true);
-        // API CALL
-        const res = await fetch(analysisRequest.adminIndex(), {
-          method: 'GET',
-          credentials: 'include',
-          headers: { 'Accept': 'application/json' },
-        });
+  //   const fetchStats = async () => {
+  //     if (!hasPermission(PERMISSIONS.REVIEW_REQUESTS)) return;
 
-        if (!res.ok) throw new Error('Failed to fetch stats');
+  //     try {
+  //       setStatsLoading(true);
+  //       // API CALL
+  //       const res = await fetch(analysisRequest.adminIndex(), {
+  //         method: 'GET',
+  //         credentials: 'include',
+  //         headers: { 'Accept': 'application/json' },
+  //       });
 
-        const result = await res.json();
-        if (result.data && Array.isArray(result.data)) {
-          const data = result.data;
-          setStats({
-            total: data.length,
-            pending: data.filter(r => r.state === 'Pendiente').length,
-            analyzed: data.filter(r => r.state === 'Analizada').length,
-            rejected: data.filter(r => r.state === 'Eliminada').length,
-          });
-        }
-      } catch (err) {
-        console.error('Error fetching stats:', err);
-      } finally {
-        setStatsLoading(false);
-      }
-    };
+  //       if (!res.ok) throw new Error('Failed to fetch stats');
 
-    fetchStats();
-  }, [hasPermission, PERMISSIONS]);
+  //       const result = await res.json();
+  //       if (result.data && Array.isArray(result.data)) {
+  //         const data = result.data;
+  //         setStats({
+  //           total: data.length,
+  //           pending: data.filter(r => r.state === 'Pendiente').length,
+  //           analyzed: data.filter(r => r.state === 'Analizada').length,
+  //           rejected: data.filter(r => r.state === 'Eliminada').length,
+  //         });
+  //       }
+  //     } catch (err) {
+  //       console.error('Error fetching stats:', err);
+  //     } finally {
+  //       setStatsLoading(false);
+  //     }
+  //   };
+
+  //   fetchStats();
+  // }, [hasPermission, PERMISSIONS]);
 
   if (loading) {
     return (
