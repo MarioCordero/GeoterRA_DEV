@@ -17,4 +17,4 @@ dependencyResolutionManagement {
     }
 }
 
-include(":composeApp")
+include(":geoterraApp")
