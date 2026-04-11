@@ -1,0 +1,5 @@
+# Generate Documentation for all formats
+./gradlew :geoterraApp:dokkaGenerate
+
+# Displays all available commands
+./gradlew tasks --all | Select-String "dokka"
