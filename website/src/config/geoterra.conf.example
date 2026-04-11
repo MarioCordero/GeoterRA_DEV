@@ -1,0 +1,105 @@
+<VirtualHost *:80>
+    ServerName geoterra.com
+    
+    # Document root pointing to the dist folder
+    DocumentRoot /home/mario/Desktop/JOB/GEOTERRA/geoterRA_dev/website/dist
+    
+    # Main directory permissions
+    <Directory /home/mario/Desktop/JOB/GEOTERRA/geoterRA_dev>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+        Require all granted
+        Order allow,deny
+        Allow from all
+    </Directory>
+    
+    # API alias - handle API requests first
+    Alias /API /home/mario/Desktop/JOB/GEOTERRA/geoterRA_dev/API
+    
+    # API directory permissions
+    <Directory /home/mario/Desktop/JOB/GEOTERRA/geoterRA_dev/API>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+        Require all granted
+        Order allow,deny
+        Allow from all
+        
+        # Enable PHP processing
+        <FilesMatch "\.php$">
+            SetHandler application/x-httpd-php
+        </FilesMatch>
+    </Directory>
+    
+    # Website dist directory permissions with React Router support
+    <Directory /home/mario/Desktop/JOB/GEOTERRA/geoterRA_dev/website/dist>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+        Require all granted
+        Order allow,deny
+        Allow from all
+        
+        # Handle React Router (SPA routing) - Critical for your routes
+        <IfModule mod_rewrite.c>
+            RewriteEngine On
+            RewriteBase /
+            
+            # Handle existing files and directories
+            RewriteCond %{REQUEST_FILENAME} !-f
+            RewriteCond %{REQUEST_FILENAME} !-d
+            
+            # Don't rewrite API calls
+            RewriteCond %{REQUEST_URI} !^/API/
+            
+            # Don't rewrite static assets
+            RewriteCond %{REQUEST_URI} !\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ [NC]
+            
+            # Redirect all other requests to index.html for React Router
+            RewriteRule ^.*$ /index.html [L,QSA]
+        </IfModule>
+        
+        # Set proper MIME types
+        <IfModule mod_mime.c>
+            AddType text/javascript .js
+            AddType text/css .css
+            AddType application/json .json
+        </IfModule>
+    </Directory>
+    
+    # Additional permissions for parent directories
+    <Directory /home/mario/>
+        Options FollowSymLinks
+        AllowOverride None
+        Require all granted
+    </Directory>
+    
+    # Security headers
+    <IfModule mod_headers.c>
+    	Header always set X-Content-Type-Options nosniff
+    	Header always set X-Frame-Options SAMEORIGIN
+    	Header always set X-XSS-Protection "1; mode=block"
+
+    	# Remove these CORS lines completely - let PHP handle CORS for API
+    	# Header always set Access-Control-Allow-Origin "*"
+    	# Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT, DELETE"
+    	# Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+    </IfModule>
+    
+    # Enable compression for better performance
+    <IfModule mod_deflate.c>
+        AddOutputFilterByType DEFLATE text/plain
+        AddOutputFilterByType DEFLATE text/html
+        AddOutputFilterByType DEFLATE text/xml
+        AddOutputFilterByType DEFLATE text/css
+        AddOutputFilterByType DEFLATE application/xml
+        AddOutputFilterByType DEFLATE application/xhtml+xml
+        AddOutputFilterByType DEFLATE application/rss+xml
+        AddOutputFilterByType DEFLATE application/javascript
+        AddOutputFilterByType DEFLATE application/x-javascript
+        AddOutputFilterByType DEFLATE application/json
+    </IfModule>
+    
+    # Logging
+    ErrorLog ${APACHE_LOG_DIR}/geoterra_error.log
+    CustomLog ${APACHE_LOG_DIR}/geoterra_access.log combined
+    LogLevel warn
+</VirtualHost>

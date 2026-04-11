@@ -28,18 +28,22 @@ ErrorHandler::register();
 // 5. Bootstrap
 $db = require __DIR__ . '/../config/database.php';
 
-// 6. Parsear request
+// 6. Validar sesión
+require __DIR__ . '/../config/session.php';
+validateSessionToken($db);
+
+// 7. Parsear request
 $path = RequestParser::getPath();
 $method = RequestParser::getMethod();
 
-// 7. Cargar rutas
+// 8. Cargar rutas
 $routes = require __DIR__ . '/../config/routes.php';
 
-// 8. Enrutar
+// 9. Enrutar
 $router = new SimpleRouter($routes, $db);
 $response = $router->dispatch($method, $path);
 
-// 9. Respuesta o 404
+// 10. Respuesta o 404
 if ($response === null) {
     Response::error(ErrorType::notFound('Route'), 404);
 }
