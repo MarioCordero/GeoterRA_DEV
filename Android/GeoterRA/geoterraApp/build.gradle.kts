@@ -1,0 +1,165 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+plugins {
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.serialization)
+    alias(libs.plugins.kotlinCocoapods)
+    alias(libs.plugins.kotlinParcelize)
+    alias(libs.plugins.dokka)
+}
+
+kotlin {
+    androidTarget {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
+    }
+
+    iosArm64()
+    iosSimulatorArm64()
+
+    cocoapods {
+        summary = "geoterraApp Shared Module"
+        homepage = "https://github.com/tu-usuario/proyecto"
+        ios.deploymentTarget = "15.0"
+        version = "1.0.0"
+
+        framework {
+            baseName = "Shared"
+            isStatic = true
+        }
+
+        pod("MapLibre") {
+            version = "6.17.1"
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
+    }
+
+    sourceSets {
+        // --- Dependencias de ANDROID ---
+        androidMain.dependencies {
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.ktor.client.okhttp)
+            implementation(libs.koin.android)
+            implementation(libs.kotlinx.coroutines.android)
+            implementation(libs.androidx.exifinterface)
+        }
+
+        // --- Dependencias de iOS ---
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
+        }
+
+        // --- Dependencias COMPARTIDAS (Aquí no debe haber nada exclusivo de Android) ---
+        commonMain.dependencies {
+            implementation(libs.imagepickerkmp)
+            implementation(libs.pdf.kmp)
+            implementation(libs.file.kit)
+            implementation(libs.stately.common)
+            // Compose
+            implementation(libs.compose.material3)
+            implementation(libs.compose.material.icons.extended)
+            implementation(libs.maplibre.compose)
+            implementation(libs.mapCompose)
+            
+            // Persistencia de datos
+            implementation(libs.settings)
+            implementation(libs.kotlinx.serialization.json)
+
+            // Compose Core
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.ui)
+            api(compose.components.resources)
+
+            // Utilidades y Logs
+            implementation(libs.kmplog)
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.kotlinx.coroutines.core)
+
+            // Koin (Inyección de Dependencias)
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+
+            // Ktor (Networking)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.logging)
+            implementation(libs.ktor.client.auth)
+            implementation(libs.ktor.client.cio)
+
+            // Voyager (Navegación)
+            implementation(libs.voyager.navigator)
+            implementation(libs.voyager.tabNavigator)
+            implementation(libs.voyager.screenModel)
+            implementation(libs.voyager.bottomSheetNavigator)
+            implementation(libs.voyager.transitions)
+            implementation(libs.voyager.koin)
+
+        }
+
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+        }
+    }
+    sourceSets.all {
+        languageSettings.optIn("kotlin.ExperimentalMultiplatform")
+    }
+
+    // Para quitar el warning específico de expect/actual:
+    targets.configureEach {
+        compilations.configureEach {
+            compileTaskProvider.get().compilerOptions {
+                freeCompilerArgs.add("-Xexpect-actual-classes")
+            }
+        }
+    }
+}
+
+android {
+    namespace = "ucr.ac.cr.inii.geoterra"
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
+
+    defaultConfig {
+        applicationId = "ucr.ac.cr.inii.geoterra"
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        targetSdk = libs.versions.android.targetSdk.get().toInt()
+        versionCode = 1
+        versionName = "1.0"
+    }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+}
+
+compose {
+}
+
+configurations.all {
+    resolutionStrategy {
+        force("androidx.activity:activity:1.9.3")
+        force("androidx.activity:activity-ktx:1.9.3")
+        force("androidx.activity:activity-compose:1.9.3")
+    }
+}
