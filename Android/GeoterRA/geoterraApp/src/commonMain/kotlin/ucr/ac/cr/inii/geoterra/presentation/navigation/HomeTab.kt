@@ -4,8 +4,8 @@ package ucr.ac.cr.inii.geoterra.presentation.navigation
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import geoterra.composeapp.generated.resources.Res
-import geoterra.composeapp.generated.resources.ic_home
+import geoterra.geoterraapp.generated.resources.Res
+import geoterra.geoterraapp.generated.resources.ic_home
 import org.jetbrains.compose.resources.painterResource
 import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeScreen
 

@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import geoterra.composeapp.generated.resources.Res
-import geoterra.composeapp.generated.resources.ic_account
+import geoterra.geoterraapp.generated.resources.Res
+import geoterra.geoterraapp.generated.resources.ic_account
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import androidx.compose.runtime.getValue

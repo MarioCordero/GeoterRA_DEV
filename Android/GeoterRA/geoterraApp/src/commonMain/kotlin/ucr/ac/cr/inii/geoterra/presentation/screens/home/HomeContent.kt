@@ -21,10 +21,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import geoterra.composeapp.generated.resources.Res
-import geoterra.composeapp.generated.resources.logo_GeoterRA
-import geoterra.composeapp.generated.resources.logo_GeoterRA_exp
-import geoterra.composeapp.generated.resources.rocks
+import geoterra.geoterraapp.generated.resources.Res
+import geoterra.geoterraapp.generated.resources.logo_GeoterRA
+import geoterra.geoterraapp.generated.resources.logo_GeoterRA_exp
+import geoterra.geoterraapp.generated.resources.rocks
 import org.jetbrains.compose.resources.painterResource
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.StepItem
 

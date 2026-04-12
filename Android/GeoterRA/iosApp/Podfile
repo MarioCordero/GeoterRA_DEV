@@ -3,5 +3,5 @@ platform :ios, '15.0'
 target 'iosApp' do
   use_frameworks!
 
-  pod 'Shared', :path => '../composeApp'
+  pod 'Shared', :path => '../geoterraApp'
 end

@@ -10,9 +10,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import geoterra.composeapp.generated.resources.Res
-import geoterra.composeapp.generated.resources.ic_marker
-import geoterra.composeapp.generated.resources.ic_userMarker
+import geoterra.geoterraapp.generated.resources.Res
+import geoterra.geoterraapp.generated.resources.ic_marker
+import geoterra.geoterraapp.generated.resources.ic_userMarker
 import org.jetbrains.compose.resources.painterResource
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState

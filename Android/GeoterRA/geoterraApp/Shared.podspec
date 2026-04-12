@@ -17,7 +17,7 @@ Pod::Spec.new do |spec|
         Kotlin framework 'Shared' doesn't exist yet, so a proper Xcode project can't be generated.
         'pod install' should be executed after running ':generateDummyFramework' Gradle task:
 
-            ./gradlew :composeApp:generateDummyFramework
+            ./gradlew :geoterraApp:generateDummyFramework
 
         Alternatively, proper pod installation is performed during Gradle sync in the IDE (if Podfile location is set)"
     end
@@ -27,13 +27,13 @@ Pod::Spec.new do |spec|
     }
                 
     spec.pod_target_xcconfig = {
-        'KOTLIN_PROJECT_PATH' => ':composeApp',
+        'KOTLIN_PROJECT_PATH' => ':geoterraApp',
         'PRODUCT_MODULE_NAME' => 'Shared',
     }
                 
     spec.script_phases = [
         {
-            :name => 'Build composeApp',
+            :name => 'Build geoterraApp',
             :execution_position => :before_compile,
             :shell_path => '/bin/sh',
             :script => <<-SCRIPT

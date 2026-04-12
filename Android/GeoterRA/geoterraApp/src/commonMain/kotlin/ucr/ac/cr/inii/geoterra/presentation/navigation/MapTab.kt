@@ -5,8 +5,8 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.SlideTransition
-import geoterra.composeapp.generated.resources.Res
-import geoterra.composeapp.generated.resources.ic_map
+import geoterra.geoterraapp.generated.resources.Res
+import geoterra.geoterraapp.generated.resources.ic_map
 import org.jetbrains.compose.resources.painterResource
 import ucr.ac.cr.inii.geoterra.presentation.screens.map.MapScreen
 
