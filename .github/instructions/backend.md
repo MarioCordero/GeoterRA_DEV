@@ -12,13 +12,14 @@
 1. [Overview](#overview)
 2. [Architecture & Layers](#architecture--layers)
 3. [Session & Cookie Management](#session--cookie-management)
-4. [Request/Response Flow](#requestresponse-flow)
-5. [All Endpoints Documentation](#all-endpoints-documentation)
-6. [Core Components](#core-components)
-7. [Authentication & Authorization](#authentication--authorization)
-8. [Error Handling](#error-handling)
-9. [Security Measures](#security-measures)
-10. [Database Configuration](#database-configuration)
+4. [Multi-Platform Authentication](#multi-platform-authentication)
+5. [Request/Response Flow](#requestresponse-flow)
+6. [All Endpoints Documentation](#all-endpoints-documentation)
+7. [Core Components](#core-components)
+8. [Authentication & Authorization](#authentication--authorization)
+9. [Error Handling](#error-handling)
+10. [Security Measures](#security-measures)
+11. [Database Configuration](#database-configuration)
 
 ---
 
@@ -439,6 +440,400 @@ When access token expires (after 1.5 hours):
 │  - No token sent with future requests    │
 └──────────────────────────────────────────┘
 ```
+
+---
+
+## Multi-Platform Authentication
+
+### Overview
+
+GeoterRA API supports **two authentication methods** simultaneously based on client type:
+
+- **Web Browsers**: HTTP-only cookies (session-based, automatic)
+- **Mobile Apps** (Kotlin, iOS): Bearer tokens in `Authorization` header (stateless, manual)
+
+The system automatically detects the client platform and applies the appropriate authentication method. **No breaking changes to web clients** - they continue to work with cookies as before.
+
+### Client Detection
+
+The API detects client platform using the `ClientDetector` utility (`Http/ClientDetector.php`):
+
+```php
+class ClientDetector {
+    public const PLATFORM_WEB = 'web';
+    public const PLATFORM_MOBILE_ANDROID = 'mobile_android';
+    public const PLATFORM_MOBILE_IOS = 'mobile_ios';
+    
+    public function getPlatform(): string { ... }
+    public function isMobileApp(): bool { ... }
+    public function isWebBrowser(): bool { ... }
+}
+```
+
+**Detection Priority**:
+1. Check for custom Kotlin app headers: `X-App-Platform`, `X-App-Name`, `X-App-Version`
+2. Check `User-Agent` for iOS patterns (iPad, iPhone, iPod)
+3. Check `User-Agent` for Android patterns
+4. Check `User-Agent` for generic mobile patterns
+5. Check `User-Agent` for browser patterns (Chrome, Firefox, Safari, Edge)
+6. Default to `PLATFORM_UNKNOWN`
+
+### Web Browser Authentication (Cookie-Based)
+
+**Flow Diagram**:
+```
+┌──────────────┐
+│ Browser      │
+│ Login        │
+└──────┬───────┘
+       ↓
+┌──────────────────────────────────────┐
+│ POST /auth/login                     │
+│ (Cookie-based browser detected)      │
+└──────┬───────────────────────────────┘
+       ↓
+┌──────────────────────────────────────┐
+│ validate credentials                 │
+│ generate access & refresh tokens     │
+│ save to database                     │
+└──────┬───────────────────────────────┘
+       ↓
+┌──────────────────────────────────────┐
+│ Set HTTP-only cookie:                │
+│ geoterra_session_token=<token>       │
+│ (secure=false for HTTP/localhost)    │
+│ (secure=true for HTTPS/production)   │
+│ (httponly=true)                      │
+│ (samesite=Lax)                       │
+└──────┬───────────────────────────────┘
+       ↓
+┌──────────────────────────────────────┐
+│ Return response (minimal tokens)     │
+│ {                                    │
+│   "authentication_method": "cookie", │
+│   "access_token": "...",             │
+│   "expires_in": 5400                 │
+│ }                                    │
+└──────┬───────────────────────────────┘
+       ↓
+┌──────────────────────────────────────┐
+│ Browser stores cookie automatically  │
+│ (in  secure storage)                 │
+└──────┬───────────────────────────────┘
+       ↓
+┌──────────────────────────────────────┐
+│ Subsequent requests include cookie   │
+│ automatically (same-origin)          │
+└──────────────────────────────────────┘
+```
+
+**Browser Login Response**:
+```json
+{
+  "data": {
+    "access_token": "a1b2c3d4...",
+    "user_id": "user_123",
+    "email": "user@example.com",
+    "name": "John Doe",
+    "role": "usr",
+    "is_admin": false,
+    "authentication_method": "cookie"
+  },
+  "meta": {
+    "token_type": "Cookie",
+    "expires_in": 5400,
+    "message": "Session token set in HTTP-only cookie"
+  },
+  "errors": []
+}
+```
+
+**Key Differences from Mobile**:
+- No `refresh_token` in response body (only stored securely in database)
+- `authentication_method` is `"cookie"`
+- Cookie automatically sent by browser
+- Client doesn't need to manually manage tokens
+
+### Mobile App Authentication (Bearer Token)
+
+**Flow Diagram**:
+```
+┌──────────────┐
+│ Mobile App   │
+│ (Kotlin)     │
+│ Login        │
+└──────┬───────┘
+       ↓
+┌──────────────────────────────────────┐
+│ POST /auth/login                     │
+│ Headers:                             │
+│   X-App-Platform: android-kotlin     │
+│   X-App-Name: GeoterRA               │
+│   X-App-Version: 1.0.0               │
+└──────┬───────────────────────────────┘
+       ↓
+┌──────────────────────────────────────┐
+│ validate credentials                 │
+│ generate access & refresh tokens     │
+│ save to database                     │
+└──────┬───────────────────────────────┘
+       ↓
+┌──────────────────────────────────────┐
+│ Return tokens in response body:      │
+│ {                                    │
+│   "access_token": "...",             │
+│   "refresh_token": "...",            │
+│   "authentication_method":           │
+│       "bearer_token"                 │
+│ }                                    │
+└──────┬───────────────────────────────┘
+       ↓
+┌──────────────────────────────────────┐
+│ Mobile app stores tokens in secure   │
+│ local storage (Keystore/Keychain)    │
+└──────┬───────────────────────────────┘
+       ↓
+┌──────────────────────────────────────┐
+│ Subsequent requests include token in │
+│ Authorization header:                │
+│ Authorization: Bearer <access_token> │
+└──────────────────────────────────────┘
+```
+
+**Mobile Login Response**:
+```json
+{
+  "data": {
+    "access_token": "a1b2c3d4...",
+    "refresh_token": "x1y2z3a4...",
+    "user_id": "user_123",
+    "email": "user@example.com",
+    "name": "John Doe",
+    "role": "usr",
+    "is_admin": false,
+    "authentication_method": "bearer_token"
+  },
+  "meta": {
+    "token_type": "Bearer",
+    "expires_in": 5400,
+    "refresh_expires_in": 2592000,
+    "message": "Use access_token in Authorization header: \"Bearer <token>\""
+  },
+  "errors": []
+}
+```
+
+**Key Differences from Browser**:
+- Both `access_token` and `refresh_token` in response body
+- Mobile app must store tokens securely locally
+- `authentication_method` is `"bearer_token"`
+- Token sent manually in `Authorization` header
+- Client responsible for token management
+
+### Kotlin Mobile App Implementation Example
+
+```kotlin
+// Configure Ktor HTTP client with custom headers for platform detection
+val httpClient = HttpClient(CIO) {
+    install(Auth) {
+        bearer {
+            // Automatically add Bearer token to all requests
+            loadTokens {
+                val accessToken = tokenManager.getAccessToken()
+                if (accessToken != null) {
+                    BearerTokens(accessToken, "")
+                } else null
+            }
+            
+            refreshTokens {
+                // When token expires, use refresh_token to get new one
+                try {
+                    val refreshToken = tokenManager.getRefreshToken()
+                    val response = client.post("auth/refresh") {
+                        setBody(mapOf("refresh_token" to refreshToken))
+                    }.body<RefreshResponse>()
+                    
+                    tokenManager.saveTokens(
+                        response.data.access_token,
+                        response.data.refresh_token
+                    )
+                    BearerTokens(response.data.access_token, "")
+                } catch (e: Exception) {
+                    // Refresh failed, trigger logout
+                    authEventBus.emit(AuthEvent.Unauthorized)
+                    null
+                }
+            }
+        }
+    }
+    
+    defaultRequest {
+        // Custom headers for platform detection
+        header("X-App-Platform", "android-kotlin")
+        header("X-App-Name", "GeoterRA")
+        header("X-App-Version", "1.0.0")
+        url(NetworkConfig.BASE_URL)
+    }
+}
+
+// Login
+suspend fun login(email: String, password: String) {
+    val response = httpClient.post("auth/login") {
+        setBody(mapOf("email" to email, "password" to password))
+    }.body<LoginResponse>()
+    
+    // Automatically add tokens to Authorization header in subsequent requests
+    tokenManager.saveTokens(
+        response.data.access_token,
+        response.data.refresh_token
+    )
+}
+
+// Authenticated request - token automatically added
+suspend fun getUserProfile() {
+    val response = httpClient.get("users/me")  // Bearer token automatically included
+    return response.body<UserProfile>()
+}
+```
+
+### Dual Authentication in Authentication Endpoints
+
+All authentication endpoints include platform detection:
+
+#### Login Endpoint
+
+```php
+public function login(): void {
+    $clientDetector = new ClientDetector();
+    
+    if ($clientDetector->isMobileApp()) {
+        $this->loginMobileClient($result);  // Bearer tokens in response
+    } else {
+        $this->loginWebClient($result);     // Cookie set, minimal response
+    }
+}
+```
+
+#### Refresh Endpoint
+
+- **Web Browser**: Validates cookie is still valid (no refresh needed)
+- **Mobile App**: Rotates tokens using refresh_token from request body
+
+#### Logout Endpoint
+
+- **Web Browser**: Deletes HTTP-only cookie
+- **Mobile App**: No cookie to delete (client discards tokens)
+- **Both**: Revoke tokens in database
+
+### Session Validation (config/session.php)
+
+Every request runs through dual-path session validation:
+
+```php
+function validateSessionToken(PDO $db): void {
+    $clientDetector = new ClientDetector();
+    
+    if ($clientDetector->isMobileApp()) {
+        validateMobileAppToken($db);        // Check Authorization header
+    } else {
+        validateBrowserCookie($db);         // Check cookie
+    }
+}
+```
+
+**Browser Path** (`validateBrowserCookie`):
+1. Extract token from `$_COOKIE['geoterra_session_token']`
+2. Validate token in database
+3. Load user from database
+4. Attach user to request context
+
+**Mobile Path** (`validateMobileAppToken`):
+1. Extract token from `Authorization: Bearer <token>` header
+2. Validate token in database
+3. Load user from database
+4. Attach user to request context
+
+Both paths result in `Request::getUser()` being available to controllers, so **controller code is identical** regardless of platform.
+
+### Request Class Bearer Token Support
+
+The `Http\Request` class now supports bearer token extraction:
+
+```php
+// Extract Bearer token from Authorization header
+$token = Request::getBearerToken();  // Returns token or null
+
+// Check if request has Bearer token
+if (Request::hasBearerToken()) {
+    // Token present in Authorization header
+}
+
+// Check if user is authenticated (works for both methods)
+if (Request::isAuthenticated()) {
+    // User was authenticated via cookie or bearer token
+    $user = Request::getUser();
+}
+```
+
+### Testing Multi-Platform Authentication
+
+Three test scripts are provided in `API/tests/`:
+
+1. **test_browser_auth.sh** - Tests web browser cookie-based flow
+   ```bash
+   bash test_browser_auth.sh http://localhost:8000
+   ```
+
+2. **test_mobile_auth.sh** - Tests mobile app bearer token flow
+   ```bash
+   bash test_mobile_auth.sh http://localhost:8000
+   ```
+
+3. **test_auth_comparison.sh** - Shows differences between methods
+   ```bash
+   bash test_auth_comparison.sh http://localhost:8000
+   ```
+
+### Backward Compatibility
+
+✅ **Existing web clients work without any changes**:
+- Cookies still work as before
+- Same response format
+- Same endpoints
+- No migration needed
+
+✅ **New mobile clients supported alongside web clients**:
+- Same API endpoints
+- Automatic platform detection
+- No separate API version needed
+- Can evolve independently
+
+### Security Comparison
+
+| Aspect | Browser (Cookie) | Mobile (Bearer) |
+|--------|------------------|-----------------|
+| Token Storage | HTTP-only cookie | Secure local storage |
+| Token Transmission | Automatic | Authorization header |
+| XSS Protection | ✅ HTTP-only flag | ✅ Native app |
+| CSRF Protection | ✅ SameSite=Lax | ✅ N/A (stateless) |
+| Token Leakage Risk | Low | Medium (requires secure storage) |
+| Token Expiration | 1.5 hours | 1.5 hours |
+| Refresh Handling | Automatic | Manual (with auto-retry) |
+
+### Bug Fixes Included
+
+This implementation also fixes a critical bug in the logout flow:
+
+**Fixed** (`Repositories/AuthRepository::findAccessTokenWithoutValidation`):
+```php
+// BEFORE (bug):
+WHERE token = :token
+
+// AFTER (fixed):
+WHERE token_hash = hash('sha256', :token)
+```
+
+Tokens are stored as SHA-256 hashes in the database, not plaintext. The logout fallback was querying the wrong field, making it non-functional.
 
 ---
 
