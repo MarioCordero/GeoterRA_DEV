@@ -67,6 +67,11 @@ GeoterRA.session.sql
 website/.vite/deps/_metadata.json
 website/.vite/deps/package.json
 
+# -----------------------------
+# Backend
+# -----------------------------
+API/vendor/*
+
 
 # -----------------------------
 # Android / Gradle
