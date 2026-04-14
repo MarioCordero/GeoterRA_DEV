@@ -71,6 +71,7 @@ website/.vite/deps/package.json
 # Backend
 # -----------------------------
 API/vendor/*
+API/.phpunit.cache/*
 
 
 # -----------------------------
