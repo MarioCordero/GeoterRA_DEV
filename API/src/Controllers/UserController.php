@@ -105,8 +105,12 @@ final class UserController
       // TODO: CHECK Return only essential user info to avoid exposing sensitive data
       Response::success([
         'id' => $user['user_id'],
-        'email' => $user['email'] ?? null,
         'role' => $user['role'] ?? 'user',
+        'email' => $user['email'] ?? null,
+        'is_active' => $user['is_active'] ?? null,
+        'first_name' => $user['first_name'] ?? null,
+        'last_name' => $user['last_name'] ?? null,
+        'phone_number' => $user['phone_number'] ?? null,
       ], null, 200);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());

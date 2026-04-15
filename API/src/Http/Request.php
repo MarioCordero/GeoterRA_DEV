@@ -66,4 +66,34 @@ final class Request
   {
     return self::$user !== null;
   }
+
+  /**
+   * Extract Bearer token from Authorization header.
+   * Format: "Bearer <token>"
+   *
+   * @return string|null The token if present, null otherwise
+   */
+  public static function getBearerToken(): ?string
+  {
+    $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+    
+    if (empty($authHeader)) {
+      return null;
+    }
+
+    // Parse "Bearer <token>" format
+    if (!preg_match('/Bearer\s+([a-f0-9]+)$/i', $authHeader, $matches)) {
+      return null;
+    }
+
+    return $matches[1];
+  }
+
+  /**
+   * Check if request has a valid Bearer token in Authorization header.
+   */
+  public static function hasBearerToken(): bool
+  {
+    return self::getBearerToken() !== null;
+  }
 }

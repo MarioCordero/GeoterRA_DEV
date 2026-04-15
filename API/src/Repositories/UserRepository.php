@@ -123,4 +123,24 @@ final class UserRepository
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     return $user ?: null;
   }
+
+  /**
+   * Get count of active users
+   */
+  public function getActiveUsersCount(): int
+  {
+    $stmt = $this->db->prepare('SELECT COUNT(*) as count FROM users WHERE is_active = 1 AND deleted_at IS NULL');
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return (int)($result['count'] ?? 0);
+  }
+
+  /**
+   * Get all users with basic information
+   */
+  public function getAllUsers(): array
+  {
+    $stmt = $this->db->query('SELECT user_id, first_name, last_name, email, phone_number, role, is_active, created_at FROM users WHERE deleted_at IS NULL ORDER BY created_at DESC');
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
 }

@@ -1,0 +1,16 @@
+[Tue Apr 14 23:57:38 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
+[Tue Apr 14 23:57:59 2026] 127.0.0.1:49698 Accepted
+[Tue Apr 14 23:57:59 2026] 🔵 [Session] Client connected: Platform=web, IP=127.0.0.1, AppName=N/A, AppVersion=N/A
+[Tue Apr 14 23:57:59 2026] 🔴 [Session] No token in browser cookie
+[Tue Apr 14 23:57:59 2026] DEBUG: UserController.showSession - user = null
+[Tue Apr 14 23:57:59 2026] 127.0.0.1:49698 [401]: GET /API/public/users/me/session
+[Tue Apr 14 23:57:59 2026] 127.0.0.1:49698 Closing
+[Tue Apr 14 23:57:59 2026] 127.0.0.1:49702 Accepted
+[Tue Apr 14 23:57:59 2026] 🔵 [Session] Client connected: Platform=web, IP=127.0.0.1, AppName=N/A, AppVersion=N/A
+[Tue Apr 14 23:57:59 2026] 🔴 [Session] No token in browser cookie
+[Tue Apr 14 23:57:59 2026] DEBUG: UserController.showSession - user = null
+[Tue Apr 14 23:57:59 2026] 127.0.0.1:49702 [401]: GET /API/public/users/me/session
+[Tue Apr 14 23:57:59 2026] 127.0.0.1:49702 Closing
+[Tue Apr 14 23:58:41 2026] 127.0.0.1:38082 Accepted
+[Tue Apr 14 23:58:41 2026] 127.0.0.1:38082 [204]: OPTIONS /API/public/auth/login
+[Tue Apr 14 23:58:41 2026] 127.0.0.1:38082 Closing

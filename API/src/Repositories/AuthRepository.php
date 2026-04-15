@@ -105,12 +105,14 @@ final class AuthRepository
    */
   public function findAccessTokenWithoutValidation(string $token): ?array
   {
+    $hash = hash('sha256', $token);
+    
     $stmt = $this->db->prepare('
       SELECT * FROM access_tokens 
-      WHERE token = :token
+      WHERE token_hash = :hash
       LIMIT 1
     ');
-    $stmt->execute(['token' => $token]);
+    $stmt->execute(['hash' => $hash]);
     $result = $stmt->fetch(\PDO::FETCH_ASSOC);
     return $result ?: null;
   }
