@@ -3,15 +3,16 @@
 ## Table of Contents
 
 1. [Quick Start](#quick-start)
-2. [Installation & Setup](#installation--setup)
-3. [Running Tests](#running-tests)
-4. [Writing Tests](#writing-tests)
-5. [Test Organization](#test-organization)
-6. [Common Patterns](#common-patterns)
-7. [Mock Testing](#mock-testing)
-8. [Fixtures](#fixtures)
-9. [Troubleshooting](#troubleshooting)
-10. [CI/CD Integration](#cicd-integration)
+2. [Unit Testing Flow](#unit-testing-flow)
+3. [Installation & Setup](#installation--setup)
+4. [Running Tests](#running-tests)
+5. [Writing Tests](#writing-tests)
+6. [Test Organization](#test-organization)
+7. [Common Patterns](#common-patterns)
+8. [Mock Testing](#mock-testing)
+9. [Fixtures](#fixtures)
+10. [Troubleshooting](#troubleshooting)
+11. [CI/CD Integration](#cicd-integration)
 
 ---
 
@@ -48,6 +49,15 @@ Web Stack Tests: OK (30+ tests) in 2-3 seconds
 Mobile Stack Tests: Framework ready (expand as needed)
 Coverage: Warnings (code coverage driver) - non-critical
 ```
+
+---
+
+## Unit Testing Flow
+
+- phpunit.xml : What executes and what no
+- bootstrap.php : Initializer
+- TestCase.php : Parent class with generic methods
+- 
 
 ---
 
