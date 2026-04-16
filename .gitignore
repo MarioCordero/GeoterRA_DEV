@@ -151,3 +151,4 @@ website/.vite/deps/package.json
 #----------------------
 API/vendor/*
 API/.phpunit.cache/*
+GeoterRA_local.session.sql
