@@ -8,6 +8,41 @@ final class Request
   private static ?array $user = null;
   private static array $body = [];
 
+  private static ?string $platform = null;
+  private static ?string $apiKey = null;
+
+  public static function init(): void
+  {
+    $headers = array_change_key_case(getallheaders(), CASE_LOWER);
+    self::$apiKey = $headers['-x-api-key'] ?? null;
+
+    $apiKeys = require __DIR__ . '../../../config/apiKeys.php';
+
+    // API keys mapped to platforms. In a real app, this would come from a secure config or database.
+    $allowedClients = $apiKeys;
+
+    if (self::$apiKey && isset($allowedClients[self::$apiKey])) {
+      self::$platform = $allowedClients[self::$apiKey];
+    } else {
+      self::$platform = 'unknown';
+    }
+  }
+
+  public static function getPlatform(): string 
+  {
+    if (self::$platform === null) self::init();
+    return self::$platform;
+  }
+
+  public static function isValidClient(): bool 
+  {
+    return self::getPlatform() !== 'unknown';
+  }
+
+  public static function isWeb(): bool { return self::getPlatform() === 'web'; }
+
+  public static function isMobile(): bool { return self::getPlatform() === 'mobile'; }
+
   /**
    * Get raw JSON from request body.
    */
@@ -65,6 +100,14 @@ final class Request
   public static function isAuthenticated(): bool
   {
     return self::$user !== null;
+  }
+
+  public static function getToken(): ?string
+  {
+    if (self::isWeb()) {
+      return $_COOKIE['geoterra_session_token'] ?? null;
+    }
+    return self::getBearerToken();
   }
 
   /**

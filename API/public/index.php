@@ -32,6 +32,10 @@ $db = require __DIR__ . '/../config/database.php';
 require __DIR__ . '/../config/session.php';
 validateSessionToken($db);
 
+if (!Http\Request::isValidClient()) {
+    Http\Response::error(Http\ErrorType::unauthorized('Invalid API Key'), 403);
+}
+
 // 7. Parsear request
 $path = RequestParser::getPath();
 $method = RequestParser::getMethod();
