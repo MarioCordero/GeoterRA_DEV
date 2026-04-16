@@ -45,7 +45,7 @@ jobs:
           token: ${{ secrets.GH_PAT }}
 
       # ---------------- CLEAN & SYNC ONLY REQUIRED FOLDERS ----------------
-      - name: Clean main-branch and copy only API, Mobile, website
+      - name: Clean main-branch and copy only API, Mobile, website, database
         run: |
           # 1. Limpieza total de main-branch (excepto .git)
           # Esto elimina carpetas viejas como .idea, Doc, database, etc.
@@ -53,7 +53,7 @@ jobs:
 
           # 2. Copiar solo las carpetas permitidas desde la raíz del workspace
           # Usamos rsync para asegurar que la estructura sea idéntica
-          for dir in API Mobile website; do
+          for dir in API Mobile website database; do
             if [ -d "$dir" ]; then
               echo "Copiando carpeta: $dir"
               rsync -av --exclude 'node_modules' --exclude 'dist' "$dir/" "main-branch/$dir/"
