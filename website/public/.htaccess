@@ -1,17 +1,12 @@
-<Directory /home/proyecto/GeoterRA_DEV/website/dist>
-    Options Indexes FollowSymLinks
-    AllowOverride All
-    Require all granted
-    Options -Indexes
+Options -Indexes
 
-    RewriteEngine On
-    RewriteBase /
+RewriteEngine On
+RewriteBase /
 
-    # If the request is for a real file or directory, serve it
-    RewriteCond %{REQUEST_FILENAME} -f [OR]
-    RewriteCond %{REQUEST_FILENAME} -d
-    RewriteRule ^ - [L]
+# Si el archivo o carpeta existe, sírvelo normalmente
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
 
-    # Otherwise, fallback to index.html for SPA
-    RewriteRule ^ index.html [L]
-</Directory>
+# Si no existe, manda todo al index.html
+RewriteRule ^ index.html [L]
