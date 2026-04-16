@@ -1,7 +1,6 @@
 name: Force Deploy (Manual)
 
 on:
-  # Manual desde Actions
   workflow_dispatch:
 
 permissions:
@@ -15,138 +14,95 @@ jobs:
       # ---------------- DETERMINAR RAMA ORIGEN ----------------
       - name: Set source branch
         run: |
-          # Para ejecución manual usamos headerWeb por defecto
-          echo "SOURCE_BRANCH=headerWeb" >> $GITHUB_ENV
+          echo "SOURCE_BRANCH=develop" >> $GITHUB_ENV
 
-      # ---------------- CHECKOUT RAMA ORIGEN (headerWeb) ----------------
+      # ---------------- CHECKOUT RAMA ORIGEN (develop) ----------------
       - name: Checkout source branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.SOURCE_BRANCH }}
+          ref: develop
           fetch-depth: 0
 
-      # ---------------- BUILD FRONTEND EN headerWeb ----------------
+      # ---------------- BUILD FRONTEND ----------------
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Install frontend dependencies
+      - name: Install and Build Frontend
         run: |
           cd website
           npm install
-
-      - name: Build frontend
-        run: |
-          cd website
           npm run build
 
-      # ---------------- CHECKOUT MAIN (CON PAT) ----------------
+      # ---------------- CHECKOUT MAIN (En subcarpeta) ----------------
       - name: Checkout main branch
         uses: actions/checkout@v4
         with:
           ref: main
           path: main-branch
           fetch-depth: 0
-          token: ${{ secrets.GH_PAT }}   # usa tu PAT para el remote
+          token: ${{ secrets.GH_PAT }}
 
-      # ---------------- PREPARAR ARTEFACTOS ----------------
-      - name: Prepare deployment artifacts
+      # ---------------- SYNC TOTAL HACIA main-branch ----------------
+      - name: Sync everything and inject build
         run: |
-          mkdir -p deploy/API
-          mkdir -p deploy/database
-          mkdir -p deploy/website/dist
+          # 1. Sincronizar toda la estructura de archivos de develop a main
+          # Excluimos .git, la propia carpeta de destino y archivos de despliegue
+          rsync -av --delete \
+            --exclude '.git/' \
+            --exclude 'main-branch/' \
+            --exclude 'website/node_modules/' \
+            ./ main-branch/
 
-          # Usamos rsync en lugar de cp para garantizar un clon exacto (incluso de carpetas y archivos ocultos)
-          if [ -d "API" ]; then
-            rsync -av API/ deploy/API/
-          fi
-
-          if [ -d "database" ]; then
-            rsync -av database/ deploy/database/
-          fi
-
+          # 2. Inyectar el build de Vite en main-branch
+          # Esto asegura que el dist esté actualizado aunque esté en .gitignore
           if [ -d "website/dist" ]; then
-            rsync -av website/dist/ deploy/website/dist/
-          fi
-
-      - name: Remove forbidden files
-        run: |
-          if [ -d "deploy/API" ]; then
-            cd deploy/API
-            rm -f "(DELETE)"*.php 2>/dev/null || true
-          fi
-
-      # ---------------- SYNC HACIA main-branch ----------------
-      - name: Sync deploy folders into main
-        run: |
-          # API y database: reemplazo completo
-          if [ -d "deploy/API" ]; then
-            mkdir -p main-branch/API
-            rsync -av --delete \
-              --exclude 'config/config.ini' \
-              deploy/API/ main-branch/API/
-          fi
-
-          if [ -d "deploy/database" ]; then
-            mkdir -p main-branch/database
-            rsync -av --delete deploy/database/ main-branch/database/
-          fi
-
-          # website/dist: BORRAR TODO y copiar lo nuevo del build
-          if [ -d "deploy/website/dist" ]; then
+            echo "Injecting fresh build into main-branch/website/dist..."
             mkdir -p main-branch/website/dist
-            rm -rf main-branch/website/dist/* # limpia dist por completo
-            rsync -av deploy/website/dist/ main-branch/website/dist/
+            rsync -av --delete website/dist/ main-branch/website/dist/
           fi
 
-          # NUEVO: Copiar pull.sh a la raíz de main
-          if [ -f "pull.sh" ]; then
-            echo "Copiando pull.sh a main-branch..."
-            cp pull.sh main-branch/pull.sh
-            chmod +x main-branch/pull.sh # Le da permisos de ejecución
-          else
-            echo "⚠️ No se encontró pull.sh en la raíz de ${{ env.SOURCE_BRANCH }}"
-          fi
-
-      # Inject .env file for production
-      - name: Create .env for production
+      # ---------------- CONFIGURACIÓN FINAL ----------------
+      - name: Production Config & Cleanup
         run: |
+          # Crear .env de producción
           echo "APP_ENV=${{ secrets.APP_ENV }}" > main-branch/.env
+          
+          # Limpiar archivos prohibidos en API
+          find main-branch/API -name "(DELETE)*.php" -delete || true
 
-      # ---------------- FORZAR .htaccess EN dist ----------------
-      - name: Ensure .htaccess in dist
-        run: |
-          mkdir -p main-branch/website/dist
-
-          # Prioridad: si existe en website/dist, úsalo
+          # Asegurar .htaccess en el dist
           if [ -f "website/dist/.htaccess" ]; then
-            echo "Found website/dist/.htaccess, copying to main-branch..."
             cp website/dist/.htaccess main-branch/website/dist/.htaccess
-          # Si no, intenta website/.htaccess
           elif [ -f "website/.htaccess" ]; then
-            echo "Found website/.htaccess, copying to main-branch/dist..."
             cp website/.htaccess main-branch/website/dist/.htaccess
-          else
-            echo "⚠️ No .htaccess found in website/dist or website/"
           fi
 
-      # ---------------- COMMIT & PUSH CON PAT ----------------
+          # Asegurar que pull.sh tenga permisos
+          if [ -f "main-branch/pull.sh" ]; then
+            chmod +x main-branch/pull.sh
+          fi
+
+      # ---------------- COMMIT & PUSH ----------------
       - name: Commit and push changes to main
         run: |
           cd main-branch
           git config user.name "MarioCordero (CI)"
           git config user.email "ci+${{ github.repository_owner }}@users.noreply.github.com"
           
-          # Agregamos todo normalmente
+          # Agregamos todo el contenido actualizado
           git add -A
 
-          git add -f .env 2>/dev/null || true  # Force add .env
+          # FORZAMOS la carpeta dist (por si el .gitignore de develop la bloquea)
+          if [ -d "website/dist" ]; then
+            git add -f website/dist/
+          fi
           
-          # FORZAMOS a Git a observar la carpeta config para esquivar el .gitignore
-          # (Es seguro porque el config.ini ya fue excluido en el rsync anterior)
+          # Forzamos otros archivos críticos
+          git add -f .env 2>/dev/null || true
           if [ -d "API/config" ]; then
-            git add -f API/config/* 2>/dev/null || true
+            git add -f API/config/ 2>/dev/null || true
           fi
 
           if git diff --cached --quiet; then
@@ -154,12 +110,13 @@ jobs:
             exit 0
           fi
 
-          git commit -m "🚀 Auto-deploy from ${{ env.SOURCE_BRANCH }}"
-
-          # Push usando tu PAT (identidad de tu usuario)
-          git push "https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git" HEAD:main
+          git commit -m "🚀 Full sync & build from ${{ env.SOURCE_BRANCH }} [$(date +'%Y-%m-%d %H:%M:%S')]"
+          
+          # Push usando PAT hacia main
+          git push "https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git" HEAD:main --force
 
       # ---------------- TRIGGER REMOTE DEPLOY ----------------
       - name: Trigger remote deploy
         run: |
+          # Se recomienda usar un query string o header si el pull.sh requiere validación
           curl -X GET "http://163.178.171.105/pull.sh"
