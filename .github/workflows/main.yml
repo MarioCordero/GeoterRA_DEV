@@ -15,10 +15,10 @@ jobs:
       # ---------------- DETERMINAR RAMA ORIGEN ----------------
       - name: Set source branch
         run: |
-          # Para ejecución manual usamos headerWeb por defecto
-          echo "SOURCE_BRANCH=headerWeb" >> $GITHUB_ENV
+          # Para ejecución manual usamos develop por defecto
+          echo "SOURCE_BRANCH=develop" >> $GITHUB_ENV
 
-      # ---------------- CHECKOUT RAMA ORIGEN (headerWeb) ----------------
+      # ---------------- CHECKOUT RAMA ORIGEN (develop) ----------------
       - name: Checkout source branch
         uses: actions/checkout@v4
         with:
