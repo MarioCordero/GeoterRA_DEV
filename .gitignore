@@ -4,3 +4,5 @@
 API/vendor/*
 API/.phpunit.cache/*
 notes.txt
+GeoterRA_local.session.sql
+.vscode/*
