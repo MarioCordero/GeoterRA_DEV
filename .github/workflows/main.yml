@@ -1,4 +1,4 @@
-name: Force Deploy (Manual)
+name: Deploy API, Mobile, and Website to Main  
 
 on:
   workflow_dispatch:
@@ -11,12 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ---------------- DETERMINAR RAMA ORIGEN ----------------
+      # ---------------- SET SOURCE BRANCH ----------------
       - name: Set source branch
         run: |
           echo "SOURCE_BRANCH=develop" >> $GITHUB_ENV
 
-      # ---------------- CHECKOUT RAMA ORIGEN (develop) ----------------
+      # ---------------- CHECKOUT SOURCE (develop) ----------------
       - name: Checkout source branch
         uses: actions/checkout@v4
         with:
@@ -35,7 +35,7 @@ jobs:
           npm install
           npm run build
 
-      # ---------------- CHECKOUT MAIN (En subcarpeta) ----------------
+      # ---------------- CHECKOUT MAIN (into subdirectory) ----------------
       - name: Checkout main branch
         uses: actions/checkout@v4
         with:
@@ -44,79 +44,95 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GH_PAT }}
 
-      # ---------------- SYNC TOTAL HACIA main-branch ----------------
-      - name: Sync everything and inject build
+      # ---------------- CLEAN & SYNC ONLY REQUIRED FOLDERS ----------------
+      - name: Clean main-branch and copy only API, Mobile, website
         run: |
-          # 1. Sincronizar toda la estructura de archivos de develop a main
-          # Excluimos .git, la propia carpeta de destino y archivos de despliegue
-          rsync -av --delete \
-            --exclude '.git/' \
-            --exclude 'main-branch/' \
-            --exclude 'website/node_modules/' \
-            ./ main-branch/
+          # Remove everything in main-branch except .git
+          find main-branch -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
 
-          # 2. Inyectar el build de Vite en main-branch
-          # Esto asegura que el dist esté actualizado aunque esté en .gitignore
+          # Copy the three required folders from develop
+          if [ -d "API" ]; then
+            rsync -av --delete API/ main-branch/API/
+          fi
+          if [ -d "Mobile" ]; then
+            rsync -av --delete Mobile/ main-branch/Mobile/
+          fi
+          if [ -d "website" ]; then
+            rsync -av --delete website/ main-branch/website/
+          fi
+
+          # Copy any essential root files (adjust as needed)
+          for file in .env.example pull.sh .htaccess; do
+            if [ -f "$file" ]; then
+              cp -v "$file" main-branch/
+            fi
+          done
+
+      # ---------------- INJECT FRESH BUILD (dist) ----------------
+      - name: Inject fresh build into main-branch/website/dist
+        run: |
           if [ -d "website/dist" ]; then
-            echo "Injecting fresh build into main-branch/website/dist..."
+            echo "Injecting fresh build..."
             mkdir -p main-branch/website/dist
             rsync -av --delete website/dist/ main-branch/website/dist/
           fi
 
-      # ---------------- CONFIGURACIÓN FINAL ----------------
-      - name: Production Config & Cleanup
+      # ---------------- PRODUCTION CONFIG & CLEANUP ----------------
+      - name: Production configuration
         run: |
-          # Crear .env de producción
+          # Create production .env
           echo "APP_ENV=${{ secrets.APP_ENV }}" > main-branch/.env
-          
-          # Limpiar archivos prohibidos en API
-          find main-branch/API -name "(DELETE)*.php" -delete || true
 
-          # Asegurar .htaccess en el dist
-          if [ -f "website/dist/.htaccess" ]; then
+          # Remove forbidden PHP files
+          find main-branch/API -name "(DELETE)*.php" -delete 2>/dev/null || true
+
+          # Ensure .htaccess exists in dist (copy from dist or root)
+          if [ -f "main-branch/website/dist/.htaccess" ]; then
+            echo ".htaccess already in dist"
+          elif [ -f "main-branch/.htaccess" ]; then
+            cp main-branch/.htaccess main-branch/website/dist/.htaccess
+          elif [ -f "website/dist/.htaccess" ]; then
             cp website/dist/.htaccess main-branch/website/dist/.htaccess
-          elif [ -f "website/.htaccess" ]; then
-            cp website/.htaccess main-branch/website/dist/.htaccess
           fi
 
-          # Asegurar que pull.sh tenga permisos
+          # Make pull.sh executable
           if [ -f "main-branch/pull.sh" ]; then
             chmod +x main-branch/pull.sh
           fi
 
-      # ---------------- COMMIT & PUSH ----------------
+      # ---------------- COMMIT & PUSH TO MAIN ----------------
       - name: Commit and push changes to main
         run: |
           cd main-branch
+
           git config user.name "MarioCordero (CI)"
           git config user.email "ci+${{ github.repository_owner }}@users.noreply.github.com"
-          
-          # Agregamos todo el contenido actualizado
-          git add -A
 
-          # FORZAMOS la carpeta dist (por si el .gitignore de develop la bloquea)
+          # Add only the three folders and essential root files
+          git add API/ Mobile/ website/ .env pull.sh .htaccess 2>/dev/null || true
+
+          # Force-add dist folder (since it's often in .gitignore)
           if [ -d "website/dist" ]; then
             git add -f website/dist/
           fi
-          
-          # Forzamos otros archivos críticos
-          git add -f .env 2>/dev/null || true
+
+          # Force-add API/config if needed
           if [ -d "API/config" ]; then
             git add -f API/config/ 2>/dev/null || true
           fi
 
+          # Check if there are changes to commit
           if git diff --cached --quiet; then
-            echo "⚠️ No changes to deploy"
+            echo "No changes to deploy"
             exit 0
           fi
 
-          git commit -m "🚀 Full sync & build from ${{ env.SOURCE_BRANCH }} [$(date +'%Y-%m-%d %H:%M:%S')]"
-          
-          # Push usando PAT hacia main
+          git commit -m "🚀 Deploy API, Mobile, website from ${{ env.SOURCE_BRANCH }} [$(date +'%Y-%m-%d %H:%M:%S')]"
+
+          # Push to main using PAT
           git push "https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git" HEAD:main --force
 
       # ---------------- TRIGGER REMOTE DEPLOY ----------------
       - name: Trigger remote deploy
         run: |
-          # Se recomienda usar un query string o header si el pull.sh requiere validación
           curl -X GET "http://163.178.171.105/pull.sh"
