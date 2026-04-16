@@ -22,7 +22,7 @@ final class RegisterUserDTO
       trim($data['name'] ?? ''),
       trim($data['lastname'] ?? ''),
       strtolower(trim($data['email'] ?? '')),
-      $data['phone_number'] ?? null,
+      $data['phone'] ?? null,
       $data['password'] ?? ''
     );
   }
@@ -74,11 +74,31 @@ final class RegisterUserDTO
       throw new ApiException(ErrorType::weakPassword(), 422);
     }
 
-    if ($this->phoneNumber !== null && !preg_match('/^\d{8,15}$/', $this->phoneNumber)) {
-      throw new ApiException(
-        ErrorType::invalidField('phone_number'),
-        422
-      );
+    // Check password doesn't contain email components
+    $emailParts = explode('@', $this->email);
+    foreach ($emailParts as $part) {
+      if (strlen($part) > 3 && stripos($this->password, $part) !== false) {
+        throw new ApiException(ErrorType::weakPassword(), 422);
+      }
+    }
+
+    if ($this->phoneNumber !== null && trim($this->phoneNumber) !== '') {
+      // Accept international format like +56912345678 or just digits like 56912345678
+      if (!preg_match('/^\+?[\d\-\s\(\)]{7,20}$/', $this->phoneNumber)) {
+        throw new ApiException(
+          ErrorType::invalidField('phone'),
+          422
+        );
+      }
+      
+      // Extract just digits to validate length
+      $digitsOnly = preg_replace('/\D/', '', $this->phoneNumber);
+      if (strlen($digitsOnly) < 8 || strlen($digitsOnly) > 15) {
+        throw new ApiException(
+          ErrorType::invalidField('phone'),
+          422
+        );
+      }
     }
   }
 }

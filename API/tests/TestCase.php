@@ -1,7 +1,5 @@
 <?php
-
 declare(strict_types=1);
-
 namespace Tests;
 
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
@@ -24,10 +22,8 @@ abstract class TestCase extends PHPUnitTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
         // Get test database connection
         $this->pdo = $_SERVER['TEST_DATABASE'];
-        
         // Reset database state for each test
         $this->resetDatabase();
     }
@@ -38,12 +34,12 @@ abstract class TestCase extends PHPUnitTestCase
     protected function resetDatabase(): void
     {
         // Delete data in reverse order of foreign key dependencies
-        $this->pdo->exec('DELETE FROM registered_manifestations');
+        $this->pdo->exec('DELETE FROM registered_geothermal_manifestations'); // <-- EL CAMBIO ESTÁ AQUÍ
         $this->pdo->exec('DELETE FROM analysis_requests');
         $this->pdo->exec('DELETE FROM refresh_tokens');
         $this->pdo->exec('DELETE FROM access_tokens');
-        $this->pdo->exec('DELETE FROM regions');
         $this->pdo->exec('DELETE FROM users');
+        $this->pdo->exec('DELETE FROM regions');
         
         // Insert default regions
         $this->insertDefaultRegions();
@@ -55,18 +51,18 @@ abstract class TestCase extends PHPUnitTestCase
     protected function insertDefaultRegions(): void
     {
         $regions = [
-            'Los Andes',
-            'Zona Sur',
-            'Pacifico',
-            'Zona Central',
-            'Araucanía',
-            'Los Lagos',
-            'Zona Austral'
+            'Guanacaste',
+            'San José',
+            'Heredia',
+            'Cartago',
+            'Alajuela',
+            'Puntarenas'
         ];
 
         foreach ($regions as $region) {
-            $stmt = $this->pdo->prepare('INSERT INTO regions (id, name) VALUES (?, ?)');
-            $stmt->execute([\Core\Ulid::generate(), $region]);
+            // Use INSERT IGNORE to skip if region already exists
+            $stmt = $this->pdo->prepare('INSERT IGNORE INTO regions (name) VALUES (?)');
+            $stmt->execute([$region]);
         }
     }
 
@@ -172,8 +168,12 @@ abstract class TestCase extends PHPUnitTestCase
         int $expectedStatus
     ): void {
         $this->assertInstanceOf(ApiException::class, $exception);
+        
+        /** @var ApiException $exception */
         $this->assertEquals($expectedStatus, $exception->getHttpStatus());
     }
+
+    // ------------------- Helper methods for database queries ------------------ //
 
     /**
      * Get user from database by email
