@@ -101,31 +101,28 @@ jobs:
           fi
 
       # ---------------- COMMIT & PUSH TO MAIN ----------------
-      - name: Commit and push changes to main
-        run: |
-          cd main-branch
+        - name: Commit and push changes to main
+          run: |
+            cd main-branch
 
-          git config user.name "MarioCordero (CI)"
-          git config user.email "ci+${{ github.repository_owner }}@users.noreply.github.com"
+            git config user.name "MarioCordero (CI)"
+            git config user.email "ci+${{ github.repository_owner }}@users.noreply.github.com"
 
-          # Add only the three folders and essential root files
-          git add API/ Mobile/ website/ .env pull.sh .htaccess 2>/dev/null || true
+            # Stage deletions for removed files
+            git add -A
 
-          # Force-add dist folder (since it's often in .gitignore)
-          if [ -d "website/dist" ]; then
-            git add -f website/dist/
-          fi
+            # Force-add dist and config (already covered by -A, but kept for safety)
+            if [ -d "website/dist" ]; then
+              git add -f website/dist/
+            fi
+            if [ -d "API/config" ]; then
+              git add -f API/config/ 2>/dev/null || true
+            fi
 
-          # Force-add API/config if needed
-          if [ -d "API/config" ]; then
-            git add -f API/config/ 2>/dev/null || true
-          fi
-
-          # Check if there are changes to commit
-          if git diff --cached --quiet; then
-            echo "No changes to deploy"
-            exit 0
-          fi
+            if git diff --cached --quiet; then
+              echo "No changes to deploy"
+              exit 0
+            fi
 
           git commit -m "🚀 Deploy API, Mobile, website from ${{ env.SOURCE_BRANCH }} [$(date +'%Y-%m-%d %H:%M:%S')]"
 
