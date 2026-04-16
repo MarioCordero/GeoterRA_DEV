@@ -144,9 +144,14 @@ jobs:
           git add -f .env 2>/dev/null || true  # Force add .env
           
           # FORZAMOS a Git a observar la carpeta config para esquivar el .gitignore
-          # (Es seguro porque el config.ini ya fue excluido en el rsync anterior)
           if [ -d "API/config" ]; then
             git add -f API/config/* 2>/dev/null || true
+          fi
+
+          # NUEVO: FORZAMOS a Git a incluir todos los archivos de Vite (JS/CSS)
+          if [ -d "website/dist" ]; then
+            git add -f website/dist/* 2>/dev/null || true
+            git add -f website/dist/assets/* 2>/dev/null || true
           fi
 
           if git diff --cached --quiet; then
@@ -156,7 +161,7 @@ jobs:
 
           git commit -m "🚀 Auto-deploy from ${{ env.SOURCE_BRANCH }}"
 
-          # Push usando tu PAT (identidad de tu usuario)
+          # Push usando tu PAT
           git push "https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git" HEAD:main
 
       # ---------------- TRIGGER REMOTE DEPLOY ----------------
