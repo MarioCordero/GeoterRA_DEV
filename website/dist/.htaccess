@@ -1,13 +1,13 @@
 <IfModule mod_rewrite.c>
-    RewriteEngine On
-    
-    # Handle client-side routing
-    RewriteBase /
-    
-    # If the request is for an existing file or directory, serve it directly
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    
-    # Otherwise, redirect everything to index.html
-    RewriteRule . /index.html [L]
+  RewriteEngine On
+  RewriteBase /
+
+  # 1. Si el archivo solicitado existe (JS, CSS, Imágenes), servirlo normalmente
+  RewriteCond %{REQUEST_FILENAME} -f
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule . - [L]
+
+  # 2. Si el archivo NO existe, mandar todo al index.html
+  # Esto permite que React Router/Vue Router manejen las rutas internamente
+  RewriteRule ^ index.html [L]
 </IfModule>
