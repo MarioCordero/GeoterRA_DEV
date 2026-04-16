@@ -126,9 +126,9 @@ val networkModule = module {
       }
       
       defaultRequest {
-        url(NetworkConfig.BASE_URL)
+        url(NetworkConfig.API_URL)
         header(HttpHeaders.ContentType, ContentType.Application.Json)
-
+        header("x-api-key", NetworkConfig.API_KEY)
       }
     }
   }

@@ -2,6 +2,7 @@
 
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -12,6 +13,7 @@ plugins {
     alias(libs.plugins.kotlinCocoapods)
     alias(libs.plugins.kotlinParcelize)
     alias(libs.plugins.dokka)
+    id("com.codingfeline.buildkonfig") version "0.15.1"
 }
 
 kotlin {
@@ -161,5 +163,27 @@ configurations.all {
         force("androidx.activity:activity:1.9.3")
         force("androidx.activity:activity-ktx:1.9.3")
         force("androidx.activity:activity-compose:1.9.3")
+    }
+}
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
+val apiUrl = localProperties.getProperty("API_URL") ?: ""
+val androidApiKey = localProperties.getProperty("ANDROID_API_KEY") ?: ""
+val iosApiKey = localProperties.getProperty("IOS_API_KEY") ?: ""
+
+
+buildkonfig {
+    packageName = "ucr.ac.cr.inii.geoterra"
+    objectName = "AppConfig"
+
+    defaultConfigs {
+        buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "API_URL", apiUrl)
+        buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "ANDROID_API_KEY", androidApiKey)
+        buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "IOS_API_KEY", iosApiKey)
     }
 }
