@@ -1,4 +1,4 @@
-name: Deploy API, Mobile, and Website to Main  
+name: Deploy API, Mobile, and Website to Main
 
 on:
   workflow_dispatch:
@@ -47,22 +47,21 @@ jobs:
       # ---------------- CLEAN & SYNC ONLY REQUIRED FOLDERS ----------------
       - name: Clean main-branch and copy only API, Mobile, website
         run: |
-          # Remove everything in main-branch except .git
+          # 1. Limpieza total de main-branch (excepto .git)
+          # Esto elimina carpetas viejas como .idea, Doc, database, etc.
           find main-branch -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
 
-          # Copy the three required folders from develop
-          if [ -d "API" ]; then
-            rsync -av --delete API/ main-branch/API/
-          fi
-          if [ -d "Mobile" ]; then
-            rsync -av --delete Mobile/ main-branch/Mobile/
-          fi
-          if [ -d "website" ]; then
-            rsync -av --delete website/ main-branch/website/
-          fi
+          # 2. Copiar solo las carpetas permitidas desde la raíz del workspace
+          # Usamos rsync para asegurar que la estructura sea idéntica
+          for dir in API Mobile website; do
+            if [ -d "$dir" ]; then
+              echo "Copiando carpeta: $dir"
+              rsync -av --exclude 'node_modules' --exclude 'dist' "$dir/" "main-branch/$dir/"
+            fi
+          done
 
-          # Copy any essential root files (adjust as needed)
-          for file in .env.example pull.sh .htaccess; do
+          # 3. Copiar archivos esenciales de la raíz
+          for file in .env.example pull.sh .htaccess .gitignore; do
             if [ -f "$file" ]; then
               cp -v "$file" main-branch/
             fi
@@ -72,7 +71,7 @@ jobs:
       - name: Inject fresh build into main-branch/website/dist
         run: |
           if [ -d "website/dist" ]; then
-            echo "Injecting fresh build..."
+            echo "Inyectando build de producción en website/dist..."
             mkdir -p main-branch/website/dist
             rsync -av --delete website/dist/ main-branch/website/dist/
           fi
@@ -80,53 +79,53 @@ jobs:
       # ---------------- PRODUCTION CONFIG & CLEANUP ----------------
       - name: Production configuration
         run: |
-          # Create production .env
+          # Crear .env de producción
           echo "APP_ENV=${{ secrets.APP_ENV }}" > main-branch/.env
 
-          # Remove forbidden PHP files
+          # Limpiar archivos prohibidos
           find main-branch/API -name "(DELETE)*.php" -delete 2>/dev/null || true
 
-          # Ensure .htaccess exists in dist (copy from dist or root)
+          # Asegurar .htaccess en la carpeta dist para el routing de Vite
           if [ -f "main-branch/website/dist/.htaccess" ]; then
-            echo ".htaccess already in dist"
+             echo ".htaccess ya existe en dist"
           elif [ -f "main-branch/.htaccess" ]; then
-            cp main-branch/.htaccess main-branch/website/dist/.htaccess
-          elif [ -f "website/dist/.htaccess" ]; then
-            cp website/dist/.htaccess main-branch/website/dist/.htaccess
+             cp main-branch/.htaccess main-branch/website/dist/.htaccess
           fi
 
-          # Make pull.sh executable
+          # Dar permisos al pull.sh
           if [ -f "main-branch/pull.sh" ]; then
             chmod +x main-branch/pull.sh
           fi
 
       # ---------------- COMMIT & PUSH TO MAIN ----------------
-        - name: Commit and push changes to main
-          run: |
-            cd main-branch
+      - name: Commit and push changes to main
+        run: |
+          cd main-branch
+          
+          git config user.name "MarioCordero (CI)"
+          git config user.email "ci+${{ github.repository_owner }}@users.noreply.github.com"
 
-            git config user.name "MarioCordero (CI)"
-            git config user.email "ci+${{ github.repository_owner }}@users.noreply.github.com"
+          # git add -A registra cambios, nuevos archivos y sobre todo las ELIMINACIONES
+          git add -A
 
-            # Stage deletions for removed files
-            git add -A
+          # Forzamos la carpeta dist por si está en el .gitignore de develop
+          if [ -d "website/dist" ]; then
+            git add -f website/dist/
+          fi
+          
+          # Forzamos config de API por si acaso
+          if [ -d "API/config" ]; then
+            git add -f API/config/ 2>/dev/null || true
+          fi
 
-            # Force-add dist and config (already covered by -A, but kept for safety)
-            if [ -d "website/dist" ]; then
-              git add -f website/dist/
-            fi
-            if [ -d "API/config" ]; then
-              git add -f API/config/ 2>/dev/null || true
-            fi
+          if git diff --cached --quiet; then
+            echo "No changes to deploy"
+            exit 0
+          fi
 
-            if git diff --cached --quiet; then
-              echo "No changes to deploy"
-              exit 0
-            fi
-
-          git commit -m "🚀 Deploy API, Mobile, website from ${{ env.SOURCE_BRANCH }} [$(date +'%Y-%m-%d %H:%M:%S')]"
-
-          # Push to main using PAT
+          git commit -m "🚀 Clean Deploy: API, Mobile, website [$(date +'%Y-%m-%d %H:%M:%S')]"
+          
+          # El push forzado garantiza que main sea idéntico a lo que acabamos de armar
           git push "https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git" HEAD:main --force
 
       # ---------------- TRIGGER REMOTE DEPLOY ----------------
