@@ -1,4 +1,4 @@
-name: Deploy API, Mobile, and Website to Main
+name: Deploy API, Mobile, Website, Database to Main
 
 on:
   workflow_dispatch:
@@ -44,15 +44,14 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GH_PAT }}
 
-      # ---------------- CLEAN & SYNC ONLY REQUIRED FOLDERS ----------------
+      # ---------------- CLEAN & SYNC REQUIRED FOLDERS ----------------
       - name: Clean main-branch and copy only API, Mobile, website, database
         run: |
           # 1. Limpieza total de main-branch (excepto .git)
-          # Esto elimina carpetas viejas como .idea, Doc, database, etc.
           find main-branch -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
 
-          # 2. Copiar solo las carpetas permitidas desde la raíz del workspace
-          # Usamos rsync para asegurar que la estructura sea idéntica
+          # 2. Copiar carpetas permitidas
+          # Añadimos 'database' al bucle para que se sincronice
           for dir in API Mobile website database; do
             if [ -d "$dir" ]; then
               echo "Copiando carpeta: $dir"
@@ -85,7 +84,7 @@ jobs:
           # Limpiar archivos prohibidos
           find main-branch/API -name "(DELETE)*.php" -delete 2>/dev/null || true
 
-          # Asegurar .htaccess en la carpeta dist para el routing de Vite
+          # Asegurar .htaccess en la carpeta dist (priorizando el de website/public)
           if [ -f "main-branch/website/dist/.htaccess" ]; then
              echo ".htaccess ya existe en dist"
           elif [ -f "main-branch/.htaccess" ]; then
@@ -105,15 +104,14 @@ jobs:
           git config user.name "MarioCordero (CI)"
           git config user.email "ci+${{ github.repository_owner }}@users.noreply.github.com"
 
-          # git add -A registra cambios, nuevos archivos y sobre todo las ELIMINACIONES
+          # Registra cambios, nuevos archivos y ELIMINACIONES (limpia carpetas como .idea o Doc)
           git add -A
 
-          # Forzamos la carpeta dist por si está en el .gitignore de develop
+          # Forzamos dist y config por seguridad
           if [ -d "website/dist" ]; then
             git add -f website/dist/
           fi
           
-          # Forzamos config de API por si acaso
           if [ -d "API/config" ]; then
             git add -f API/config/ 2>/dev/null || true
           fi
@@ -123,9 +121,10 @@ jobs:
             exit 0
           fi
 
-          git commit -m "🚀 Clean Deploy: API, Mobile, website [$(date +'%Y-%m-%d %H:%M:%S')]"
+          # Commit actualizado con 'database' en el mensaje
+          git commit -m "🚀 Clean Deploy: API, Mobile, Website, Database [$(date +'%Y-%m-%d %H:%M:%S')]"
           
-          # El push forzado garantiza que main sea idéntico a lo que acabamos de armar
+          # Push forzado para garantizar que main sea idéntico al build actual
           git push "https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git" HEAD:main --force
 
       # ---------------- TRIGGER REMOTE DEPLOY ----------------
