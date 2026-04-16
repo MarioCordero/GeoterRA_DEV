@@ -15,4 +15,8 @@ echo "📦 Trayendo cambios de Git (main)..."
 git checkout main
 git pull origin main
 
+echo "Updating execution script in cgi-bin..."
+sudo cp /home/proyecto/GeoterRA_DEV/pull.sh /var/www/cgi-bin/pull.sh
+sudo chmod +x /var/www/cgi-bin/pull.sh
+
 echo "✨ Despliegue completado con éxito."
