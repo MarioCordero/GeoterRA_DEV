@@ -45,4 +45,8 @@ class AccountViewModel(
       authEventBus.emit(AuthEvent.Logout)
     }
   }
+
+  fun clearError() {
+    _state.update { it.copy(error = null) }
+  }
 }

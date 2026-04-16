@@ -55,7 +55,8 @@ fun AccountContent(
   onLogoutClick: () -> Unit,
   onDeleteAccountClick: () -> Unit,
   onEditClick: () -> Unit,
-  onThemeToggle: (Boolean) -> Unit
+  onThemeToggle: (Boolean) -> Unit,
+  clearError: () -> Unit
 ) {
   var showLogoutDialog by remember { mutableStateOf(false) }
   var showDeleteDialog by remember { mutableStateOf(false) }
@@ -63,7 +64,9 @@ fun AccountContent(
   Box(modifier = modifier.fillMaxSize()) {
     if (state.isLoading) {
       CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-    } else if (state.user != null) {
+    }
+
+    if (state.user != null) {
       LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp),
@@ -111,9 +114,12 @@ fun AccountContent(
             onClick = { showDeleteDialog = true })
         }
       }
-    } else if (state.error != null) {
-      StatusDialog(false, state.error, onDismiss = { showDeleteDialog = false })
     }
+
+    if (state.error != null) {
+      StatusDialog(false, state.error, onDismiss = { clearError()})
+    }
+
   }
   
   if (showLogoutDialog) {
