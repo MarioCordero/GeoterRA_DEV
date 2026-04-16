@@ -10,7 +10,7 @@ final class AllowedUserRoles
 {   
     public const ADMIN = 'admin'; 
     public const MAINTENANCE = 'maintenance';
-    public const USER = 'usr';
+    public const USER = 'user';
 
     /**
      * Return all allowed user roles as strings.

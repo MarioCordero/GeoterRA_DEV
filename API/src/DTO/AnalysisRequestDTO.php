@@ -14,7 +14,7 @@ use Http\ErrorType;
 final class AnalysisRequestDTO
 {
 	public function __construct(
-		public string $region,
+		public int $region,
 		public string $email,
 		public ?string $owner_contact_number,
 		public ?string $owner_name,
@@ -57,11 +57,11 @@ final class AnalysisRequestDTO
 		}
 
 		return new self(
-			trim((string) $data['region']),
+			(int) $data['region'],
 			strtolower(trim((string) $data['email'])),
 			$data['owner_contact_number'] ?? null,
-			isset($data['owner_name']) ? trim((string) $data['owner_name']) ?: null : null,
-			trim((string) $data['temperature_sensation']),
+			trim((string) $data['owner_name']) ?: null,
+			$data['temperature_sensation'],
 			isset($data['bubbles']) ? (bool) $data['bubbles'] : false,
 			$data['details'] ?? null,
 			$data['current_usage'] ?? null,
@@ -81,52 +81,6 @@ final class AnalysisRequestDTO
 		if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
 			throw new ApiException(
 				ErrorType::invalidField('email'),
-				422
-			);
-		}
-
-		$validRegions = [
-			'Los Andes',
-			'Zona Sur',
-			'Pacifico',
-			'Zona Central',
-			'Araucanía',
-			'Los Lagos',
-			'Zona Austral'
-		];
-
-		if (!in_array($this->region, $validRegions, true)) {
-			throw new ApiException(
-				ErrorType::invalidField('region'),
-				422
-			);
-		}
-
-		$validTemperatureSensations = [
-			'mucho_frio',
-			'frio',
-			'templado',
-			'calor',
-			'mucho_calor'
-		];
-
-		if (!in_array($this->temperature_sensation, $validTemperatureSensations, true)) {
-			throw new ApiException(
-				ErrorType::invalidField('temperature_sensation'),
-				422
-			);
-		}
-
-		if ($this->latitude < -90 || $this->latitude > 90) {
-			throw new ApiException(
-				ErrorType::invalidField('latitude'),
-				422
-			);
-		}
-
-		if ($this->longitude < -180 || $this->longitude > 180) {
-			throw new ApiException(
-				ErrorType::invalidField('longitude'),
 				422
 			);
 		}

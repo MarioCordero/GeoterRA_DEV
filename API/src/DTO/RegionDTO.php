@@ -15,24 +15,9 @@ final class RegionDTO
     $this->name = trim($data['name'] ?? '');
   }
 
-  /**
-   * Creates DTO from request payload.
-   */
-  public static function fromArray(array $data): self
-  {
-    return new self($data);
-  }
-
   public function validate(): void
   {
     $validRegions = [
-      'Los Andes',
-      'Zona Sur',
-      'Pacifico',
-      'Zona Central',
-      'Araucanía',
-      'Los Lagos',
-      'Zona Austral',
       'Guanacaste',
       'Alajuela',
       'San José',

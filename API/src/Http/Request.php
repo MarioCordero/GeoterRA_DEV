@@ -13,12 +13,9 @@ final class Request
 
   public static function init(): void
   {
-    $headers = array_change_key_case(getallheaders(), CASE_LOWER);
-    self::$apiKey = $headers['-x-api-key'] ?? null;
+    self::$apiKey = $headers['x-api-key'] ?? $_SERVER['HTTP_X_API_KEY'] ?? null;
 
-    $apiKeys = require __DIR__ . '../../../config/apiKeys.php';
-
-    // API keys mapped to platforms. In a real app, this would come from a secure config or database.
+    $apiKeys = require __DIR__ . '../../../config/api-keys.php';
     $allowedClients = $apiKeys;
 
     if (self::$apiKey && isset($allowedClients[self::$apiKey])) {
@@ -118,13 +115,15 @@ final class Request
    */
   public static function getBearerToken(): ?string
   {
-    $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+    $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
     
-    if (empty($authHeader)) {
-      return null;
+    if (empty($authHeader) && function_exists('apache_request_headers')) {
+      $headers = apache_request_headers();
+      $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
     }
 
-    // Parse "Bearer <token>" format
+    if (empty($authHeader)) return null;
+
     if (!preg_match('/Bearer\s+([a-f0-9]+)$/i', $authHeader, $matches)) {
       return null;
     }

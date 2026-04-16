@@ -26,7 +26,7 @@ final class UpdateUserDTO
       trim($data['firstName'] ?? $data['name'] ?? ''),
       trim($data['lastName'] ?? $data['lastname'] ?? ''),
       trim($data['email'] ?? ''),
-      $data['phoneNumber'] ?? $data['phone'] ?? null
+      $data['phoneNumber'] ?? $data['phone_number'] ?? null
     );
   }
 
@@ -61,23 +61,14 @@ final class UpdateUserDTO
       throw new ApiException(ErrorType::invalidEmail(), 422);
     }
 
-    if ($this->phoneNumber !== null && trim($this->phoneNumber) !== '') {
-      // Accept international format like +56912345678 or just digits like 56912345678
-      if (!preg_match('/^\+?[\d\-\s\(\)]{7,20}$/', $this->phoneNumber)) {
-        throw new ApiException(
-          ErrorType::invalidField('phone'),
-          422
-        );
-      }
-      
-      // Extract just digits to validate length
-      $digitsOnly = preg_replace('/\D/', '', $this->phoneNumber);
-      if (strlen($digitsOnly) < 8 || strlen($digitsOnly) > 15) {
-        throw new ApiException(
-          ErrorType::invalidField('phone'),
-          422
-        );
-      }
+    if (
+      $this->phoneNumber !== null &&
+      !preg_match('/^\d{8,15}$/', $this->phoneNumber)
+    ) {
+      throw new ApiException(
+        ErrorType::invalidField('phone_number'),
+        422
+      );
     }
   }
 }
