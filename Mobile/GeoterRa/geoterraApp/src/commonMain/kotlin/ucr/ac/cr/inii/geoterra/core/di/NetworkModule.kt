@@ -128,6 +128,7 @@ val networkModule = module {
       defaultRequest {
         url(NetworkConfig.BASE_URL)
         header(HttpHeaders.ContentType, ContentType.Application.Json)
+
       }
     }
   }
