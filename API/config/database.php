@@ -20,9 +20,10 @@ if (file_exists($envFile)) {
 
 $env = $_ENV['APP_ENV'] ?? getenv('APP_ENV') ?: 'development';
 
+// TODO: CAMBIAR ESTOOOOO
 $configPath = $env === 'production'
   ? realpath(__DIR__ . '/../../../') . '/config.ini'
-  : __DIR__ . '/config.ini';
+  : __DIR__ . '/../../../config.ini';
 
 if (!file_exists($configPath)) {
   throw new RuntimeException('Database configuration file not found.');
