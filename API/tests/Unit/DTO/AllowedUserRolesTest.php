@@ -1,5 +1,11 @@
 <?php
+<<<<<<< HEAD
 declare(strict_types=1);
+=======
+
+declare(strict_types=1);
+
+>>>>>>> origin/web{fixWebApp}
 namespace Tests\Unit\DTO;
 
 use Tests\TestCase;
@@ -23,7 +29,11 @@ class AllowedUserRolesTest extends TestCase
 
     public function testGetAllRolesReturnsAllowedRoles(): void
     {
+<<<<<<< HEAD
         $roles = AllowedUserRoles::values();
+=======
+        $roles = AllowedUserRoles::getAll();
+>>>>>>> origin/web{fixWebApp}
         
         $this->assertIsArray($roles);
         $this->assertCount(3, $roles);
@@ -46,4 +56,8 @@ class AllowedUserRolesTest extends TestCase
         $this->assertFalse(AllowedUserRoles::isValid('user '));
         $this->assertFalse(AllowedUserRoles::isValid(''));
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/web{fixWebApp}

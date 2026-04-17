@@ -127,4 +127,8 @@ class PermissionServiceTest extends TestCase
         
         $this->assertEquals($perms1, $perms2);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/web{fixWebApp}

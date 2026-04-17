@@ -182,4 +182,8 @@ class UpdateUserDTOTest extends TestCase
         $dto = UpdateUserDTO::fromArray($data);
         $dto->validate();
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/web{fixWebApp}

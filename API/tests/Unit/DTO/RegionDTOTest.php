@@ -75,4 +75,8 @@ class RegionDTOTest extends TestCase
 
         $this->assertTrue(true);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/web{fixWebApp}
