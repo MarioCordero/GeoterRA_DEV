@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Controllers;
 
 use DTO\AnalysisRequestDTO;
+use DTO\PermissionsDTO as Permissions;
 use Http\Request;
 use Http\Response;
 use Http\ApiException;
 use Http\ErrorType;
 use Services\AnalysisRequestService;
+use Services\PermissionService;
 
 /**
  * Controller for handling analysis request related endpoints.
@@ -63,6 +65,21 @@ final class AnalysisRequestController
   public function adminIndex(): void
   {
     try {
+      $user = Request::getUser();
+      
+      // Debug logging
+      if (!$user) {
+        error_log('[AnalysisRequestController: adminIndex] ❌ User not authenticated');
+        Response::error(ErrorType::forbidden(), 403);
+        return;
+      }
+      $hasPermission = PermissionService::hasPermission($user['role'], Permissions::REVIEW_REQUESTS);
+      if (!$hasPermission) {
+        error_log('[AnalysisRequestController: adminIndex] ❌ Permission denied - User role "' . ($user['role'] ?? 'null') . '" does not have REVIEW_REQUESTS');
+        Response::error(ErrorType::forbidden(), 403);
+        return;
+      }
+      
       $requests = $this->service->getAll();
       Response::success(data: $requests);
     } catch (ApiException $e) {
@@ -97,6 +114,11 @@ final class AnalysisRequestController
   public function adminUpdate(string $id): void
   {
     try {
+      $user = Request::getUser();
+      if (!$user || !PermissionService::hasPermission($user['role'], Permissions::APPROVE_REQUESTS)) {
+        Response::error(ErrorType::forbidden(), 403);
+      }
+      
       $body = Request::parseJsonRequest();
       $dto = AnalysisRequestDTO::fromArray($body);
       $this->service->adminUpdate($id, $dto);
@@ -131,6 +153,11 @@ final class AnalysisRequestController
   public function adminDelete(string $id): void
   {
     try {
+      $user = Request::getUser();
+      if (!$user || !PermissionService::hasPermission($user['role'], Permissions::DELETE_REQUESTS)) {
+        Response::error(ErrorType::forbidden(), 403);
+      }
+      
       $this->service->adminDelete($id);
       Response::success(['message' => 'Analysis request deleted successfully']);
     } catch (ApiException $e) {

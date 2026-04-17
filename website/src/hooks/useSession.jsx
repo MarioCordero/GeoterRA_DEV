@@ -19,8 +19,9 @@ export const SessionProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const meSessionUrl = users.meSession();
       
+      // API CALL REFACT
+      const meSessionUrl = users.meSession();
       const res = await fetch(meSessionUrl, {
         method: 'GET',
         credentials: 'include',
@@ -40,7 +41,6 @@ export const SessionProvider = ({ children }) => {
       }
 
       const body = await res.json();
-      
       if (body.data) {
         setUser(body.data);
         return body.data;
@@ -85,7 +85,7 @@ export const SessionProvider = ({ children }) => {
   }, [fetchSession]);
 
   return (
-    <SessionContext.Provider value={{ user, loading, error, refresh: fetchSession, logout }}>
+    <SessionContext.Provider value={{ isLogged: !!user, user, loading, error, refresh: fetchSession, checkSession: fetchSession, logout }}>
       {initialized && children}
     </SessionContext.Provider>
   );

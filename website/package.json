@@ -11,7 +11,7 @@
     "build:prod": "npm run build"
   },
   "dependencies": {
-    "@ant-design/icons": "^6.0.0",
+    "@ant-design/icons": "^6.1.1",
     "antd": "^5.27.6",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.561.0",
@@ -24,8 +24,10 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4.1.7",
     "@tailwindcss/vite": "^4.1.7",
+    "@types/node": "^25.5.0",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",

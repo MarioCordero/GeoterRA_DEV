@@ -18,6 +18,7 @@ gradle-app.setting
 
 # --- Android Studio configuration (user-specific) ---
 .idea/
+.kotlin
 *.iml
 .idea/workspace.xml
 .idea/tasks.xml
@@ -135,20 +136,78 @@ secrets.defaults.properties
 
 # Configuración de VSCode (si usás)
 .vscode/
-.github/
-website/
-*.json
 *.klib
 
+# -----------------------------
+# Frontend
+# -----------------------------
+# Playwright
+website/test-results/
+website/playwright-report/
+website/blob-report/
+website/playwright/.cache/
+website/playwright/.auth/
+# Standart
 website/node_modules/*
 API/config/config.ini
 .vscode
 website/.vite/deps/_metadata.json
-website/.vite/deps/package.json
 
 #----------------------
 #     BACKEND
 #----------------------
 API/vendor/*
 API/.phpunit.cache/*
+notes.txt
 GeoterRA_local.session.sql
+.vscode/*
+GeoterRA_Local.session.sql
+GeoterRA.session.sql
+website/.vite/deps/_metadata.json
+
+# -----------------------------
+# Backend
+# -----------------------------
+API/vendor/*
+API/.phpunit.cache/*
+
+
+# -----------------------------
+# Android / Gradle
+# -----------------------------
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+captures/
+
+# -----------------------------
+# Kotlin Multiplatform
+# -----------------------------
+**/build/
+
+# -----------------------------
+# iOS / Xcode
+# -----------------------------
+DerivedData/
+*.xcworkspace
+!default.xcworkspace
+*.xcuserdata
+*.xcuserstate
+
+# CocoaPods
+Pods/
+iosApp/Pods/
+Podfile.lock
+
+# -----------------------------
+# macOS
+# -----------------------------
+.DS_Store
+
+# -----------------------------
+# Logs
+# -----------------------------
+*.log
+notes.txt

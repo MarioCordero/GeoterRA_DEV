@@ -8,12 +8,48 @@ Documentación completa de la arquitectura y endpoints de la carpeta `API/src` s
 
 1. [Estructura General](#estructura-general)
 2. [Requisitos](#requisitos)
-3. [Arquitectura en Capas](#arquitectura-en-capas)
-4. [Endpoints Disponibles](#endpoints-disponibles)
-5. [Repositorios](#repositorios)
-6. [Servicios](#servicios)
-7. [DTOs (Data Transfer Objects)](#dtos-data-transfer-objects)
-8. [Manejo de Errores](#manejo-de-errores)
+3. [Testing](#testing)
+4. [Arquitectura en Capas](#arquitectura-en-capas)
+5. [Endpoints Disponibles](#endpoints-disponibles)
+6. [Repositorios](#repositorios)
+7. [Servicios](#servicios)
+8. [DTOs (Data Transfer Objects)](#dtos-data-transfer-objects)
+9. [Manejo de Errores](#manejo-de-errores)
+
+---
+
+## Testing
+
+### Running All Unit Tests
+
+```bash
+cd API
+composer install
+composer test
+```
+
+**Expected Output**: ~200 tests passing in 5-10 seconds with 80%+ code coverage
+
+### Comprehensive Testing Guide
+
+See [docs/UNIT_TESTING.md](docs/UNIT_TESTING.md) for:
+- **Quick start** - Get testing in 2 minutes
+- **Running tests** - All commands and options
+- **Writing tests** - Best practices and patterns
+- **Test organization** - How tests are structured
+- **Fixtures** - Creating test data
+- **Troubleshooting** - Common issues and solutions
+- **CI/CD Integration** - GitHub Actions setup
+
+### Quick Test Commands
+
+```bash
+composer test                  # All tests
+composer run test:dto          # DTO validation only
+composer run test:services     # Service layer only
+composer run test:repositories # Data access layer only
+composer run test:coverage     # With code coverage report
+```
 
 ---
 

@@ -10,12 +10,12 @@ const API_CONFIG = {
   endpoints: {
     auth: {
       refresh: '/auth/refresh',
-      register: '/auth/register',
       login: '/auth/login',
       logout: '/auth/logout',
     },
     users: {
       me: '/users/me',
+      register: '/users/register',
       meSession: `/users/me/session`,
     },
     analysisRequest: {
@@ -36,6 +36,12 @@ const API_CONFIG = {
     },
     Regions: {
       index: '/regions',
+    },
+    maintenance: {
+      systemLogs: '/maintenance/system/logs',
+      dashboardInfo: '/maintenance/dashboard',
+      allUsers: '/maintenance/users',
+      allTables: '/maintenance/database/tables',
     },
   }
 };
@@ -59,7 +65,6 @@ export const buildApiUrl = (endpoint) => {
 // ============================================
 export const auth = {
   login: () => buildApiUrl(API_CONFIG.endpoints.auth.login),
-  register: () => buildApiUrl(API_CONFIG.endpoints.auth.register),
   refresh: () => buildApiUrl(API_CONFIG.endpoints.auth.refresh),
   logout: () => buildApiUrl(API_CONFIG.endpoints.auth.logout),
 };
@@ -70,6 +75,7 @@ export const auth = {
 export const users = {
   me: () => buildApiUrl(API_CONFIG.endpoints.users.me),
   meSession: () => buildApiUrl(API_CONFIG.endpoints.users.meSession),
+  register: () => buildApiUrl(API_CONFIG.endpoints.users.register),
 };
 
 // ============================================
@@ -96,6 +102,16 @@ export const registeredManifestations = {
 };
 
 // ============================================
+// MAINTENANCE ENDPOINTS
+// ============================================
+export const maintenance = {
+  systemLogs: () => buildApiUrl(API_CONFIG.endpoints.maintenance.systemLogs),
+  dashboardInfo: () => buildApiUrl(API_CONFIG.endpoints.maintenance.dashboardInfo),
+  allUsers: () => buildApiUrl(API_CONFIG.endpoints.maintenance.allUsers),
+  allTables: () => buildApiUrl(API_CONFIG.endpoints.maintenance.allTables),
+};
+
+// ============================================
 // DEBUG & CONFIG
 // ============================================
 export const debugApiConfig = () => {
@@ -107,6 +123,7 @@ export const debugApiConfig = () => {
       users,
       analysisRequest,
       registeredManifestations,
+      maintenance,
     }
   });
 };

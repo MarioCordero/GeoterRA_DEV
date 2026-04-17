@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Mar 04, 2026 at 11:28 PM
+-- Generation Time: Mar 24, 2026 at 07:55 PM
 -- Server version: 8.0.45-0ubuntu0.24.04.1
 -- PHP Version: 8.3.6
 
@@ -42,7 +42,7 @@ CREATE TABLE `access_tokens` (
 
 INSERT INTO `access_tokens` (`user_id`, `token_hash`, `expires_at`, `updated_at`, `revoked_at`, `created_at`) VALUES
 ('06E0TGS8ZBFNSVB2J8KA01NSZC', 'b19527b931ec52dcac38ddf72565ef0c2858222ab51959be7c2ccc966ec90975', '2026-02-20 21:11:28', '2026-02-20 19:41:28', NULL, '2026-02-21 01:41:28'),
-('06E9GJ4K61A8H6CC3C5WRWJFY4', '5391ede6a9fcbc59b9a0ea8c65cb0eff0b8c9bccb07f7d11d0ae04f82db604a8', '2026-03-04 18:49:10', '2026-03-04 17:19:10', NULL, '2026-03-04 23:10:38');
+('06EJ2JM5Z1QVHV5HFD64S07W5W', '3b62091249c4c08662c4006548bbfda4c9054ce56cbd1f51a5de60b22bc06184', '2026-03-24 15:21:53', '2026-03-24 13:51:53', NULL, '2026-03-24 19:51:53');
 
 -- --------------------------------------------------------
 
@@ -99,7 +99,7 @@ CREATE TABLE `refresh_tokens` (
 
 INSERT INTO `refresh_tokens` (`user_id`, `token_hash`, `expires_at`, `revoked_at`, `updated_at`, `created_at`) VALUES
 ('06E0TGS8ZBFNSVB2J8KA01NSZC', 'ceae1ccf2c7b3436a6e2a866fd35b6c7f98f58adcdcd3fd42af39be68c856332', '2026-03-22 19:41:28', NULL, '2026-02-20 19:41:28', '2026-02-21 01:41:28'),
-('06E9GJ4K61A8H6CC3C5WRWJFY4', '49cfc61fcd778d003b4471a3c0ec999f7d9f8fff972633773f70c6b6ff5278df', '2026-04-03 17:19:11', NULL, '2026-03-04 17:19:11', '2026-03-04 23:10:38');
+('06EJ2JM5Z1QVHV5HFD64S07W5W', '4a3535209f5e68c7cc3e73432f48b812deb008f0ec2a1aa882ac20cd0ea6e3ba', '2026-04-23 13:51:53', NULL, '2026-03-24 13:51:53', '2026-03-24 19:51:53');
 
 -- --------------------------------------------------------
 
@@ -124,7 +124,7 @@ INSERT INTO `regions` (`id`, `name`, `created_at`) VALUES
 (4, 'Puntarenas', '2026-02-27 00:30:59'),
 (5, 'Limón', '2026-02-27 00:30:59'),
 (6, 'Heredia', '2026-02-27 00:30:59'),
-(7, 'Cartago', '2026-02-27 00:30:59');
+(8, 'Cartago', '2026-03-17 02:30:54');
 
 -- --------------------------------------------------------
 
@@ -205,7 +205,7 @@ CREATE TABLE `users` (
   `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `phone_number` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `password_hash` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `role` enum('admin','user','moderator') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'user',
+  `role` enum('admin','user','maintenance') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'user',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `is_verified` tinyint(1) NOT NULL DEFAULT '0',
   `failed_login_attempts` int NOT NULL DEFAULT '0',
@@ -223,7 +223,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `first_name`, `last_name`, `email`, `phone_number`, `password_hash`, `role`, `is_active`, `is_verified`, `failed_login_attempts`, `last_login_at`, `password_changed_at`, `created_at`, `updated_at`, `deleted_at`, `deleted_by`) VALUES
 ('06E0TGS8ZBFNSVB2J8KA01NSZC', 'Carlos', 'Perez', 'test4@test.com', '88881234', '$2y$10$lS8KHIMbRLD.SK0f/R4e4e1X4cWyPiYJ6YITNB4Rn94KdCogjd6Fm', 'admin', 1, 0, 0, NULL, NULL, '2026-01-29 22:57:11', '2026-02-12 19:26:17', NULL, NULL),
-('06E9GJ4K61A8H6CC3C5WRWJFY4', 'Mario', 'Updated', 'mario@gmail.com', '87654321', '$2y$10$xbVsgsejIq/RLpdzq4jBR.CoZn.JDAk8nSIGMb3hxqOLKpc7kvevm', 'admin', 1, 0, 0, NULL, NULL, '2026-02-25 22:50:19', '2026-03-03 18:30:38', NULL, NULL);
+('06E9GJ4K61A8H6CC3C5WRWJFY4', 'Mario', 'Updated', 'mario@gmail.com', '87654321', '$2y$10$xbVsgsejIq/RLpdzq4jBR.CoZn.JDAk8nSIGMb3hxqOLKpc7kvevm', 'admin', 1, 0, 0, NULL, NULL, '2026-02-25 22:50:19', '2026-03-03 18:30:38', NULL, NULL),
+('06EJ2JM5Z1QVHV5HFD64S07W5W', 'Mario', 'Developer', 'mario@developer.com', '88888888', '$2y$10$xd567SWNynoikvNhM/z/yua0Thm2/sDygtA5jKdT5bMDZYn8cIQYu', 'maintenance', 1, 0, 0, NULL, NULL, '2026-03-24 13:20:25', '2026-03-24 13:22:01', NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -291,7 +292,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `regions`
 --
 ALTER TABLE `regions`
-  MODIFY `id` tinyint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` tinyint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Constraints for dumped tables
