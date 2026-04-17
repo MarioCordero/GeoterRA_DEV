@@ -1,0 +1,61 @@
+name: Distribución de API a Develop, Web y Mobile
+
+on:
+  # Manual desde Actions
+  workflow_dispatch:
+
+permissions:
+  contents: write # Necesario para que el bot pueda hacer push a las otras ramas
+
+jobs:
+  test-and-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Necesario para tener el historial de todas las ramas
+
+      # 1. Preparar el entorno
+      - name: Configurar PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo, sqlite3, pdo_sqlite
+          
+      - name: Instalar Dependencias
+        working-directory: ./API
+        run: composer install --no-interaction --prefer-dist
+
+      # 2. EL GUARDIÁN: Pruebas Unitarias con PHPUnit
+      # Si una sola prueba falla, el bot se detiene aquí y no fusiona nada.
+      - name: Ejecutar Pruebas Unitarias
+        working-directory: ./API
+        run: ./vendor/bin/phpunit 
+
+      # 3. Si las pruebas pasan, configuramos Git para el bot
+      - name: Configurar usuario de Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # 4. Distribuir a Develop
+      - name: Fusionar API en develop
+        run: |
+          git checkout develop
+          git merge origin/API --no-edit
+          git push origin develop
+
+      # 5. Distribuir a Web
+      - name: Fusionar API en web
+        run: |
+          git checkout web
+          git merge origin/API --no-edit
+          git push origin web
+
+      # 6. Distribuir a Mobile
+      - name: Fusionar API en mobile
+        run: |
+          git checkout mobile
+          git merge origin/API --no-edit
+          git push origin mobile
