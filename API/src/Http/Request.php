@@ -15,7 +15,17 @@ final class Request
   {
     self::$apiKey = $headers['x-api-key'] ?? $_SERVER['HTTP_X_API_KEY'] ?? null;
 
-    $apiKeys = require __DIR__ . '../../../config/api-keys.php';
+    // Load api-keys from home directory on production, otherwise use local
+    $env = $_ENV['APP_ENV'] ?? getenv('APP_ENV') ?: 'development';
+    $apiKeysPath = $env === 'production'
+      ? getenv('HOME') . '/api-keys.php'
+      : __DIR__ . '/../../../config/api-keys.php';
+
+    if (!file_exists($apiKeysPath)) {
+      throw new \RuntimeException('API keys configuration file not found at: ' . $apiKeysPath);
+    }
+
+    $apiKeys = require $apiKeysPath;
     $allowedClients = $apiKeys;
 
     if (self::$apiKey && isset($allowedClients[self::$apiKey])) {
