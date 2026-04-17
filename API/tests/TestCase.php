@@ -1,7 +1,5 @@
 <?php
-
 declare(strict_types=1);
-
 namespace Tests;
 
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
@@ -10,8 +8,7 @@ use Http\ErrorType;
 
 /**
  * Base TestCase for all GeoterRA API tests
- * 
- * Provides:
+ * * Provides:
  * - Database access (in-memory SQLite)
  * - Helper methods for creating test data
  * - Common assertions for API testing
@@ -24,10 +21,8 @@ abstract class TestCase extends PHPUnitTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
         // Get test database connection
         $this->pdo = $_SERVER['TEST_DATABASE'];
-        
         // Reset database state for each test
         $this->resetDatabase();
     }
@@ -38,12 +33,12 @@ abstract class TestCase extends PHPUnitTestCase
     protected function resetDatabase(): void
     {
         // Delete data in reverse order of foreign key dependencies
-        $this->pdo->exec('DELETE FROM registered_manifestations');
+        $this->pdo->exec('DELETE FROM registered_geothermal_manifestations');
         $this->pdo->exec('DELETE FROM analysis_requests');
         $this->pdo->exec('DELETE FROM refresh_tokens');
         $this->pdo->exec('DELETE FROM access_tokens');
-        $this->pdo->exec('DELETE FROM regions');
         $this->pdo->exec('DELETE FROM users');
+        $this->pdo->exec('DELETE FROM regions');
         
         // Insert default regions
         $this->insertDefaultRegions();

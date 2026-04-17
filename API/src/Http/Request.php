@@ -99,6 +99,14 @@ final class Request
     return self::$user !== null;
   }
 
+  public static function getToken(): ?string
+  {
+    if (self::isWeb()) {
+      return $_COOKIE['geoterra_session_token'] ?? null;
+    }
+    return self::getBearerToken();
+  }
+
   /**
    * Extract Bearer token from Authorization header.
    * Format: "Bearer <token>"
@@ -107,13 +115,15 @@ final class Request
    */
   public static function getBearerToken(): ?string
   {
-    $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+    $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
     
-    if (empty($authHeader)) {
-      return null;
+    if (empty($authHeader) && function_exists('apache_request_headers')) {
+      $headers = apache_request_headers();
+      $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
     }
 
-    // Parse "Bearer <token>" format
+    if (empty($authHeader)) return null;
+
     if (!preg_match('/Bearer\s+([a-f0-9]+)$/i', $authHeader, $matches)) {
       return null;
     }

@@ -11,22 +11,15 @@
          displayDetailsOnSkippedTests="true">
 
     <testsuites>
-<<<<<<< HEAD
         <!-- <testsuite name="Unit">
             <directory>tests/Unit/</directory>
         </testsuite> -->
-=======
-        <testsuite name="Unit">
-            <directory>tests/Unit/</directory>
-        </testsuite>
->>>>>>> origin/web{fixWebApp}
         <testsuite name="DTO">
             <directory>tests/Unit/DTO/</directory>
         </testsuite>
         <testsuite name="Services">
             <directory>tests/Unit/Services/</directory>
         </testsuite>
-<<<<<<< HEAD
         <!-- <testsuite name="Repositories">
             <directory>tests/Unit/Repositories/</directory>
         </testsuite> -->
@@ -36,14 +29,6 @@
         <testsuite name="Controller">
             <directory>tests/Unit/Http/Controller/</directory>
         </testsuite> -->
-=======
-        <testsuite name="Repositories">
-            <directory>tests/Unit/Repositories/</directory>
-        </testsuite>
-        <testsuite name="Http">
-            <directory>tests/Unit/Http/</directory>
-        </testsuite>
->>>>>>> origin/web{fixWebApp}
     </testsuites>
 
     <source>
