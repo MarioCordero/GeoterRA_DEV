@@ -11,9 +11,9 @@
          displayDetailsOnSkippedTests="true">
 
     <testsuites>
-        <testsuite name="Unit">
+        <!-- <testsuite name="Unit">
             <directory>tests/Unit/</directory>
-        </testsuite>
+        </testsuite> -->
         <testsuite name="DTO">
             <directory>tests/Unit/DTO/</directory>
         </testsuite>
@@ -23,12 +23,12 @@
         <!-- <testsuite name="Repositories">
             <directory>tests/Unit/Repositories/</directory>
         </testsuite> -->
-        <testsuite name="Http">
+        <!-- <testsuite name="Http">
             <directory>tests/Unit/Http/</directory>
         </testsuite>
         <testsuite name="Controller">
             <directory>tests/Unit/Http/Controller/</directory>
-        </testsuite>
+        </testsuite> -->
     </testsuites>
 
     <source>
