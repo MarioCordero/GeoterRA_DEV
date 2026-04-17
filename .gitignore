@@ -151,6 +151,7 @@ website/.vite/deps/package.json
 # -----------------------------
 API/vendor/*
 API/.phpunit.cache/*
+API/config/config.ini
 notes.txt
 GeoterRA_local.session.sql
 .vscode/*
