@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 /**
  * Database connection factory.
- * Loads credentials from a config.ini file located outside the public scope.
+ * Loads credentials from .env (home directory) and config.ini based on APP_ENV.
  */
 
-// Load .env file if exists
-$envFile = __DIR__ . '/../../.env';
+// Load .env file from home directory if exists
+$envFile = getenv('HOME') . '/.env';
 if (file_exists($envFile)) {
   $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
   foreach ($lines as $line) {
@@ -20,12 +20,13 @@ if (file_exists($envFile)) {
 
 $env = $_ENV['APP_ENV'] ?? getenv('APP_ENV') ?: 'development';
 
+// Use production config.ini from home if APP_ENV=production, otherwise use local
 $configPath = $env === 'production'
-  ? realpath(__DIR__ . '/../../../') . '/config.ini'
+  ? getenv('HOME') . '/config.ini'
   : __DIR__ . '/config.ini';
 
 if (!file_exists($configPath)) {
-  throw new RuntimeException('Database configuration file not found.');
+  throw new RuntimeException('Database configuration file not found at: ' . $configPath);
 }
 
 $config = parse_ini_file($configPath, true);
