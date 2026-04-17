@@ -39,150 +39,11 @@ final class AuthController
   public function login(): void
   {
     try {
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/web{fixWebApp}
       // Parse and validate request
       $data = Request::parseJsonRequest();
       $dto = LoginUserDTO::fromArray($data);
       $result = $this->authService->login($dto);
 
-<<<<<<< HEAD
-    if (Request::isMobile()) {
-      $this->respondMobile($result);
-    } else {
-      $this->respondWeb($result);
-    }
-
-    } catch (ApiException $e) {
-      Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
-      Response::error(ErrorType::internal($e->getMessage()), 500);
-    }
-  }
-
-  private function respondWeb(array $result): void
-  {
-      // $expiresIn = $result['meta']['expires_in'] ?? 5400;
-
-      // setcookie('geoterra_session_token', $result['data']['access_token'], [
-      //     'expires' => time() + $expiresIn,
-      //     'httponly' => true,
-      //     'secure' => true, // Siempre recomendado en este nuevo esquema
-      //     'samesite' => 'Lax'
-      // ]);
-
-    $accessToken = $result['data']['access_token'];
-    $expiresIn = $result['meta']['expires_in'] ?? 5400;
-
-    // Set HTTP-only cookie for browser
-    setcookie('geoterra_session_token', $accessToken, [
-      'expires' => time() + $expiresIn,
-      'path' => '/',
-      'domain' => '',
-      'secure' => $this->isSecureContext(),
-      'httponly' => true,
-      'samesite' => 'Lax'
-    ]);
-
-    error_log(sprintf(
-      '✅ [Auth] Browser login successful: %s (IP: %s)',
-      $result['data']['email'],
-      $_SERVER['REMOTE_ADDR'] ?? 'unknown'
-    ));
-
-    $responseData = $this->filterResponse($result, 'cookie');
-
-    // Return response WITHOUT refresh_token in body (only in cookie)
-    Response::success(
-      $responseData, [
-        'token_type' => 'Cookie',
-        'expires_in' => $expiresIn,
-        'message' => 'Session set via HTTP-only cookie'
-      ], 200
-    );
-  }
-
-  /**
-   * Prepara la respuesta para Apps Móviles (Bearer)
-   */
-  private function respondMobile(array $result): void
-  {
-    $responseData = $this->filterResponse($result, 'bearer');
-    
-    Response::success($responseData, [
-        'token_type' => 'Bearer',
-        'expires_in' => 5400,
-        'refresh_expires_in' => 2592000
-    ], 200);
-  }
-
-  private function filterResponse(array $result, string $method): array
-  {
-    $data = $result['data'];
-    
-    $baseResponse = [];
-
-    if ($method === 'bearer') {
-      $baseResponse['access_token']  = $data['access_token'];
-      $baseResponse['refresh_token'] = $data['refresh_token'];
-    } else {
-      $baseResponse['user_id']      = $data['user_id'];
-      $baseResponse['email']        = $data['email'];
-      $baseResponse['name']         = $data['name'];
-      $baseResponse['role']         = $data['role'];
-      $baseResponse['is_admin']     = $data['is_admin'];
-      $baseResponse['access_token'] = $data['access_token'];
-    }
-
-    return $baseResponse;
-  }
-
-  /**
-   * POST /auth/logout
-   * Revokes current session and logs out user (both web and mobile).
-   */
-  public function logout(): void
-  {
-    try {
-      $user = Request::getUser();
-      if (!$user) {
-        throw new ApiException(
-          ErrorType::unauthorized('Not authenticated'),
-          401
-        );
-      }
-
-      // Logout (revoke tokens in database)
-      $this->authService->logout();
-
-      // Detect client platform and respond accordingly
-      if (Request::isMobile()) {
-        error_log(sprintf(
-          '✅ [Auth] Mobile app logout successful: %s',
-          $user['email']
-        ));
-      } else {
-        // Web browser: delete cookie
-        setcookie('geoterra_session_token', '', [
-          'expires' => time() - 3600,
-          'path' => '/',
-          'samesite' => 'Lax'
-        ]);
-
-        error_log(sprintf(
-          '✅ [Auth] Browser logout successful: %s',
-          $user['email']
-        ));
-      }
-
-      Response::success([
-        'logged_out' => true,
-        'message' => 'Successfully logged out'
-      ], null, 200);
-
-=======
       // Detect client platform
       $clientDetector = new ClientDetector();
 
@@ -192,7 +53,6 @@ final class AuthController
         $this->loginWebClient($result, $clientDetector);
       }
 
->>>>>>> origin/web{fixWebApp}
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
     } catch (\Throwable $e) {
@@ -201,10 +61,6 @@ final class AuthController
   }
 
   /**
-<<<<<<< HEAD
-   * POST /auth/refresh
-   * Rotates tokens for both web and mobile clients.
-=======
    * Handle web browser login - set HTTP-only cookie.
    */
   private function loginWebClient(array $result, ClientDetector $clientDetector): void
@@ -281,20 +137,10 @@ final class AuthController
   /**
    * POST /auth/logout
    * Revokes current session and logs out user (both web and mobile).
->>>>>>> origin/web{fixWebApp}
    */
-  public function refresh(): void
+  public function logout(): void
   {
     try {
-<<<<<<< HEAD
-      // Detect client platform and handle accordingly
-      if (Request::isMobile()) {
-        $this->refreshMobileClient();
-      } else {
-        $this->refreshWebClient();
-      }
-
-=======
       $user = Request::getUser();
       if (!$user) {
         throw new ApiException(
@@ -333,7 +179,6 @@ final class AuthController
         'message' => 'Successfully logged out'
       ], null, 200);
 
->>>>>>> origin/web{fixWebApp}
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
     } catch (\Throwable $e) {
@@ -342,8 +187,6 @@ final class AuthController
   }
 
   /**
-<<<<<<< HEAD
-=======
    * POST /auth/refresh
    * Rotates tokens for both web and mobile clients.
    */
@@ -366,7 +209,6 @@ final class AuthController
   }
 
   /**
->>>>>>> origin/web{fixWebApp}
    * Handle token refresh for web browser.
    * Browser typically doesn't refresh manually - this validates current session.
    */

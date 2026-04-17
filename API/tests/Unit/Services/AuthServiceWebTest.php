@@ -56,13 +56,8 @@ class AuthServiceWebTest extends TestCase
     {
         $user = $this->createTestUser(['email' => 'secure@example.com']);
         
-<<<<<<< HEAD
         $stmt = $this->pdo->prepare('SELECT password_hash FROM users WHERE user_id = ?');
         $stmt->execute([$user['user_id']]);
-=======
-        $stmt = $this->pdo->prepare('SELECT password_hash FROM users WHERE id = ?');
-        $stmt->execute([$user['id']]);
->>>>>>> origin/web{fixWebApp}
         $result = $stmt->fetch();
         
         $this->assertNotEmpty($result['password_hash']);
@@ -75,11 +70,7 @@ class AuthServiceWebTest extends TestCase
     public function testAccessTokenCreation(): void
     {
         $user = $this->createTestUser();
-<<<<<<< HEAD
         $token = $this->createTestAccessToken($user['user_id']);
-=======
-        $token = $this->createTestAccessToken($user['id']);
->>>>>>> origin/web{fixWebApp}
         
         $this->assertNotEmpty($token['token']);
         $this->assertNotEmpty($token['token_hash']);
@@ -91,11 +82,7 @@ class AuthServiceWebTest extends TestCase
     public function testRefreshTokenCreation(): void
     {  
         $user = $this->createTestUser();
-<<<<<<< HEAD
         $token = $this->createTestRefreshToken($user['user_id']);
-=======
-        $token = $this->createTestRefreshToken($user['id']);
->>>>>>> origin/web{fixWebApp}
         
         $this->assertNotEmpty($token['token']);
         $this->assertNotEmpty($token['token_hash']);
@@ -107,7 +94,6 @@ class AuthServiceWebTest extends TestCase
     public function testAccessTokenPersists(): void
     {
         $user = $this->createTestUser();
-<<<<<<< HEAD
         $created = $this->createTestAccessToken($user['user_id']);
         
         $stmt = $this->pdo->prepare('SELECT * FROM access_tokens WHERE user_id = ?');
@@ -118,15 +104,3 @@ class AuthServiceWebTest extends TestCase
         $this->assertEquals($user['user_id'], $retrieved['user_id']);
     }
 }
-=======
-        $created = $this->createTestAccessToken($user['id']);
-        
-        $stmt = $this->pdo->prepare('SELECT * FROM access_tokens WHERE user_id = ?');
-        $stmt->execute([$user['id']]);
-        $retrieved = $stmt->fetch();
-        
-        $this->assertNotEmpty($retrieved);
-        $this->assertEquals($user['id'], $retrieved['user_id']);
-    }
-}
->>>>>>> origin/web{fixWebApp}

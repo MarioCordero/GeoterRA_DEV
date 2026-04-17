@@ -119,8 +119,4 @@ class PasswordServiceTest extends TestCase
             $this->assertFalse(PasswordService::verify('wrong', $hash));
         }
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/web{fixWebApp}

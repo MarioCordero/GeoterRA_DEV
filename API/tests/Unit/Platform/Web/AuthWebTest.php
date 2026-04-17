@@ -17,26 +17,11 @@ use Http\ApiException;
 class AuthWebTest extends TestCase
 {
     private \Services\AuthService $authService;
-<<<<<<< HEAD
-=======
-    private \Repositories\UserRepository $userRepository;
-    private \Repositories\AuthRepository $authRepository;
->>>>>>> origin/web{fixWebApp}
 
     protected function setUp(): void
     {
         parent::setUp();
-<<<<<<< HEAD
         $this->authService = new \Services\AuthService($this->pdo);
-=======
-        
-        $this->userRepository = new \Repositories\UserRepository($this->pdo);
-        $this->authRepository = new \Repositories\AuthRepository($this->pdo);
-        $this->authService = new \Services\AuthService(
-            $this->userRepository,
-            $this->authRepository
-        );
->>>>>>> origin/web{fixWebApp}
     }
     public function testLoginResultsInSessionCookie(): void
     {

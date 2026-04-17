@@ -323,8 +323,4 @@ class RegisterUserDTOTest extends TestCase
         $dto = RegisterUserDTO::fromArray($data);
         $dto->validate();
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/web{fixWebApp}

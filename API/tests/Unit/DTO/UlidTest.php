@@ -72,12 +72,6 @@ class UlidTest extends TestCase
         // Should be suitable for use as database primary key
         $this->assertIsString($ulid);
         $this->assertNotEmpty($ulid);
-<<<<<<< HEAD
         $this->assertStringNotContainsString(' ', $ulid);
     }
 }
-=======
-        $this->assertNotContains(' ', $ulid);
-    }
-}
->>>>>>> origin/web{fixWebApp}
