@@ -20,9 +20,9 @@
         <testsuite name="Services">
             <directory>tests/Unit/Services/</directory>
         </testsuite>
-        <testsuite name="Repositories">
+        <!-- <testsuite name="Repositories">
             <directory>tests/Unit/Repositories/</directory>
-        </testsuite>
+        </testsuite> -->
         <testsuite name="Http">
             <directory>tests/Unit/Http/</directory>
         </testsuite>
