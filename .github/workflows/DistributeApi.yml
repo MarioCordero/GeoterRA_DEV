@@ -1,59 +1,79 @@
 name: Distribución de API a Develop, Web y Mobile
 
 on:
-  # Manual desde Actions
   workflow_dispatch:
 
 permissions:
-  contents: write # Necesario para que el bot pueda hacer push a las otras ramas
+  contents: write
 
 jobs:
   test-and-sync:
     runs-on: ubuntu-latest
+
+    # 1. Le decimos a GitHub que levante un MySQL temporal
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
       - name: Descargar el código
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Necesario para tener el historial de todas las ramas
+          fetch-depth: 0 
 
-      # 1. Preparar el entorno
       - name: Configurar PHP 8.3
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: pdo, sqlite3, pdo_sqlite
+          # Cambié pdo_sqlite por pdo_mysql
+          extensions: pdo, pdo_mysql 
           
       - name: Instalar Dependencias
         working-directory: ./API
         run: composer install --no-interaction --prefer-dist
 
-      # 2. EL GUARDIÁN: Pruebas Unitarias con PHPUnit
-      # Si una sola prueba falla, el bot se detiene aquí y no fusiona nada.
+      # 2. Creamos las BD e importamos tu esquema
+      - name: Preparar Base de Datos MySQL
+        working-directory: ./API
+        run: |
+          mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE GeoterRA;"
+          mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE GeoterRA_test;"
+          # Inyectamos tu archivo de Fixtures a la BD de producción simulada
+          mysql -h 127.0.0.1 -u root -proot GeoterRA < tests/Fixtures/database_schema.sql
+
+      # 3. EL GUARDIÁN
       - name: Ejecutar Pruebas Unitarias
         working-directory: ./API
+        env:
+          # Inyectamos variables de entorno para que tu bootstrap.php pueda conectarse
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_USER: root
+          DB_PASS: root
         run: ./vendor/bin/phpunit 
 
-      # 3. Si las pruebas pasan, configuramos Git para el bot
       - name: Configurar usuario de Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      # 4. Distribuir a Develop
       - name: Fusionar API en develop
         run: |
           git checkout develop
           git merge origin/API --no-edit
           git push origin develop
 
-      # 5. Distribuir a Web
       - name: Fusionar API en web
         run: |
           git checkout web
           git merge origin/API --no-edit
           git push origin web
 
-      # 6. Distribuir a Mobile
       - name: Fusionar API en mobile
         run: |
           git checkout mobile
