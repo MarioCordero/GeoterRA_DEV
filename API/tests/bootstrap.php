@@ -36,24 +36,21 @@ spl_autoload_register(function (string $class): void {
  * Initialize test database - copies schema from production
  */
 function initializeTestDatabase(): \PDO {
-    // ===== Production Database Configuration =====
-    $prodDbHost = 'localhost';
-    $prodDbPort = 3306;
-    $prodDbName = 'GeoterRA';
-    $prodDbUser = 'mario';
-    $prodDbPassword = '2003';
+    // Leemos las variables de entorno (GitHub Actions) o usamos los defaults (Local)
+    // Nota: Es mejor usar 127.0.0.1 en lugar de 'localhost' para forzar conexión TCP y evitar el error 2002
+    $host = getenv('DB_HOST') ?: '127.0.0.1';
+    $port = getenv('DB_PORT') ?: 3306;
+    $user = getenv('DB_USER') ?: 'mario';
+    $password = getenv('DB_PASS') !== false ? getenv('DB_PASS') : '2003';
     
-    // ===== Test Database Configuration =====
-    $testDbHost = 'localhost';
-    $testDbPort = 3306;
+    // Nombres de las bases de datos
+    $prodDbName = 'GeoterRA';
     $testDbName = 'GeoterRA_test';
-    $testDbUser = 'mario';
-    $testDbPassword = '2003';
     
     // Connect to production database (to read schema)
-    $prodDsn = "mysql:host={$prodDbHost};port={$prodDbPort};dbname={$prodDbName};charset=utf8mb4";
+    $prodDsn = "mysql:host={$host};port={$port};dbname={$prodDbName};charset=utf8mb4";
     try {
-        $prodPdo = new \PDO($prodDsn, $prodDbUser, $prodDbPassword, [
+        $prodPdo = new \PDO($prodDsn, $user, $password, [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
             \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
         ]);
@@ -64,9 +61,9 @@ function initializeTestDatabase(): \PDO {
     }
     
     // Connect to test database
-    $testDsn = "mysql:host={$testDbHost};port={$testDbPort};dbname={$testDbName};charset=utf8mb4";
+    $testDsn = "mysql:host={$host};port={$port};dbname={$testDbName};charset=utf8mb4";
     try {
-        $testPdo = new \PDO($testDsn, $testDbUser, $testDbPassword, [
+        $testPdo = new \PDO($testDsn, $user, $password, [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
             \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
         ]);
