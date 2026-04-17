@@ -156,3 +156,4 @@ notes.txt
 GeoterRA_local.session.sql
 .vscode/*
 API/config/api-keys.php
+API/config/config.ini
