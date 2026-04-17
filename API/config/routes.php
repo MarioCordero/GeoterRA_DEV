@@ -23,6 +23,12 @@ return [
     ['method' => 'DELETE', 'path' => '/admin/analysis-request/{id}', 'controller' => 'AnalysisRequestController', 'action' => 'adminDelete'],
     ['method' => 'PUT', 'path' => '/admin/analysis-request/{id}', 'controller' => 'AnalysisRequestController', 'action' => 'adminUpdate'],
     
+    // Maintenance routes
+    ['method' => 'GET', 'path' => '/maintenance/system/logs', 'controller' => 'MaintenanceController', 'action' => 'getSystemLogs'],
+    ['method' => 'GET', 'path' => '/maintenance/dashboard', 'controller' => 'MaintenanceController', 'action' => 'getDashboardInfo'],
+    ['method' => 'GET', 'path' => '/maintenance/users', 'controller' => 'MaintenanceController', 'action' => 'showAllUsers'],
+    ['method' => 'GET', 'path' => '/maintenance/database/tables', 'controller' => 'MaintenanceController', 'action' => 'getAllDatabaseTables'],
+    
     // Registered manifestations routes
     ['method' => 'POST', 'path' => '/registered-manifestations', 'controller' => 'RegisteredManifestationController', 'action' => 'store'],
     ['method' => 'GET', 'path' => '/registered-manifestations', 'controller' => 'RegisteredManifestationController', 'action' => 'index'],

@@ -9,7 +9,7 @@ namespace DTO;
 final class AllowedUserRoles
 {   
     public const ADMIN = 'admin'; 
-    public const MODERATOR = 'moderator';
+    public const MAINTENANCE = 'maintenance';
     public const USER = 'user';
 
     /**
@@ -19,7 +19,7 @@ final class AllowedUserRoles
     {
         return [
             self::ADMIN,
-            self::MODERATOR,
+            self::MAINTENANCE,
             self::USER,
         ];
     }

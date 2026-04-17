@@ -2,53 +2,29 @@
 declare(strict_types=1);
 
 use Services\AuthService;
-use Repositories\UserRepository;
+use Http\Request;
 
-/**
- * Validate session token from cookie and attach user to Request.
- * Call this after autoloader is registered but before routing.
- */
 function validateSessionToken(PDO $db): void
 {
-    $sessionToken = $_COOKIE['geoterra_session_token'] ?? null;
-    
-    error_log('🔍 [Session] Token exists: ' . ($sessionToken ? 'YES' : 'NO'));
-    error_log('🔍 [Session] All cookies: ' . json_encode($_COOKIE));
+    Request::init();
 
-    if (!$sessionToken) {
-        error_log('🔴 [Session] No token in cookie');
+    if (!Request::isValidClient()) {
         return;
     }
 
+    $token = Request::getToken();
+    if (!$token) return;
+
     try {
         $authService = new AuthService($db);
-        $tokenData = $authService->validateAccessToken($sessionToken);
+        $userData = $authService->requireAuth(); 
         
-        error_log('✅ [Session] Token validated: ' . json_encode($tokenData));
-        
-        if (!$tokenData) {
-            error_log('🔴 [Session] validateAccessToken returned null');
-            return;
-        }
+        Request::setUser($userData);
 
-        if (!isset($tokenData['user_id'])) {
-            error_log('🔴 [Session] No user_id in tokenData: ' . json_encode($tokenData));
-            return;
-        }
+        error_log(sprintf('✅ [Session] User %s authenticated via %s', 
+            $userData['email'], Request::getPlatform()));
 
-        $userRepository = new UserRepository($db);
-        $user = $userRepository->findById($tokenData['user_id']);
-        
-        if (!$user) {
-            error_log('🔴 [Session] User not found: ' . $tokenData['user_id']);
-            return;
-        }
-
-        \Http\Request::setUser($user);
-        error_log('✅ [Session] User SET: ' . $user['user_id']);
-        
     } catch (\Exception $e) {
-        error_log('🔴 [Session] Exception: ' . $e->getMessage());
-        error_log('🔴 [Session] Trace: ' . $e->getTraceAsString());
+        error_log('info [Session] Anonymous access or invalid token');
     }
 }
