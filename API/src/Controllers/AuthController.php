@@ -6,7 +6,6 @@ namespace Controllers;
 
 use DTO\LoginUserDTO;
 use Http\ApiException;
-use Http\ClientDetector;
 use Http\Request;
 use Http\Response;
 use Http\ErrorType;
@@ -39,19 +38,17 @@ final class AuthController
   public function login(): void
   {
     try {
+
       // Parse and validate request
       $data = Request::parseJsonRequest();
       $dto = LoginUserDTO::fromArray($data);
       $result = $this->authService->login($dto);
 
-      // Detect client platform
-      $clientDetector = new ClientDetector();
-
-      if ($clientDetector->isMobileApp()) {
-        $this->loginMobileClient($result, $clientDetector);
-      } else {
-        $this->loginWebClient($result, $clientDetector);
-      }
+    if (Request::isMobile()) {
+      $this->respondMobile($result);
+    } else {
+      $this->respondWeb($result);
+    }
 
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
@@ -60,11 +57,17 @@ final class AuthController
     }
   }
 
-  /**
-   * Handle web browser login - set HTTP-only cookie.
-   */
-  private function loginWebClient(array $result, ClientDetector $clientDetector): void
+  private function respondWeb(array $result): void
   {
+      // $expiresIn = $result['meta']['expires_in'] ?? 5400;
+
+      // setcookie('geoterra_session_token', $result['data']['access_token'], [
+      //     'expires' => time() + $expiresIn,
+      //     'httponly' => true,
+      //     'secure' => true, // Siempre recomendado en este nuevo esquema
+      //     'samesite' => 'Lax'
+      // ]);
+
     $accessToken = $result['data']['access_token'];
     $expiresIn = $result['meta']['expires_in'] ?? 5400;
 
@@ -84,54 +87,51 @@ final class AuthController
       $_SERVER['REMOTE_ADDR'] ?? 'unknown'
     ));
 
+    $responseData = $this->filterResponse($result, 'cookie');
+
     // Return response WITHOUT refresh_token in body (only in cookie)
-    Response::success([
-      'access_token' => $accessToken,
-      'user_id' => $result['data']['user_id'],
-      'email' => $result['data']['email'],
-      'name' => $result['data']['name'],
-      'role' => $result['data']['role'],
-      'is_admin' => $result['data']['is_admin'],
-      'authentication_method' => 'cookie',
-    ], [
-      'token_type' => 'Cookie',
-      'expires_in' => $expiresIn,
-      'message' => 'Session token set in HTTP-only cookie'
-    ], 200);
+    Response::success(
+      $responseData, [
+        'token_type' => 'Cookie',
+        'expires_in' => $expiresIn,
+        'message' => 'Session set via HTTP-only cookie'
+      ], 200
+    );
   }
 
   /**
-   * Handle mobile app login - return bearer tokens in response body.
+   * Prepara la respuesta para Apps Móviles (Bearer)
    */
-  private function loginMobileClient(array $result, ClientDetector $clientDetector): void
+  private function respondMobile(array $result): void
   {
-    $accessToken = $result['data']['access_token'];
-    $refreshToken = $result['data']['refresh_token'];
-
-    error_log(sprintf(
-      '✅ [Auth] Mobile app login successful: %s (App: %s v%s, IP: %s)',
-      $result['data']['email'],
-      $clientDetector->getAppName() ?? 'Unknown',
-      $clientDetector->getAppVersion() ?? 'unknown',
-      $_SERVER['REMOTE_ADDR'] ?? 'unknown'
-    ));
-
-    // Return tokens in response body for mobile app
-    Response::success([
-      'access_token' => $accessToken,
-      'refresh_token' => $refreshToken,
-      'user_id' => $result['data']['user_id'],
-      'email' => $result['data']['email'],
-      'name' => $result['data']['name'],
-      'role' => $result['data']['role'],
-      'is_admin' => $result['data']['is_admin'],
-      'authentication_method' => 'bearer_token',
-    ], [
-      'token_type' => 'Bearer',
-      'expires_in' => 5400,
-      'refresh_expires_in' => 2592000,
-      'message' => 'Use access_token in Authorization header: "Bearer <token>"'
+    $responseData = $this->filterResponse($result, 'bearer');
+    
+    Response::success($responseData, [
+        'token_type' => 'Bearer',
+        'expires_in' => 5400,
+        'refresh_expires_in' => 2592000
     ], 200);
+  }
+
+  private function filterResponse(array $result, string $method): array
+  {
+    $data = $result['data'];
+    
+    $baseResponse = [];
+
+    if ($method === 'bearer') {
+      $baseResponse['access_token']  = $data['access_token'];
+      $baseResponse['refresh_token'] = $data['refresh_token'];
+    } else {
+      $baseResponse['user_id']      = $data['user_id'];
+      $baseResponse['email']        = $data['email'];
+      $baseResponse['name']         = $data['name'];
+      $baseResponse['role']         = $data['role'];
+      $baseResponse['is_admin']     = $data['is_admin'];
+      $baseResponse['access_token'] = $data['access_token'];
+    }
+
+    return $baseResponse;
   }
 
   /**
@@ -152,10 +152,8 @@ final class AuthController
       // Logout (revoke tokens in database)
       $this->authService->logout();
 
-      // Detect client platform
-      $clientDetector = new ClientDetector();
-
-      if ($clientDetector->isMobileApp()) {
+      // Detect client platform and respond accordingly
+      if (Request::isMobile()) {
         error_log(sprintf(
           '✅ [Auth] Mobile app logout successful: %s',
           $user['email']
@@ -193,9 +191,8 @@ final class AuthController
   public function refresh(): void
   {
     try {
-      $clientDetector = new ClientDetector();
-
-      if ($clientDetector->isMobileApp()) {
+      // Detect client platform and handle accordingly
+      if (Request::isMobile()) {
         $this->refreshMobileClient();
       } else {
         $this->refreshWebClient();

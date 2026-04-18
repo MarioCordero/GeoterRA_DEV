@@ -56,8 +56,8 @@ class AuthServiceWebTest extends TestCase
     {
         $user = $this->createTestUser(['email' => 'secure@example.com']);
         
-        $stmt = $this->pdo->prepare('SELECT password_hash FROM users WHERE id = ?');
-        $stmt->execute([$user['id']]);
+        $stmt = $this->pdo->prepare('SELECT password_hash FROM users WHERE user_id = ?');
+        $stmt->execute([$user['user_id']]);
         $result = $stmt->fetch();
         
         $this->assertNotEmpty($result['password_hash']);
@@ -70,7 +70,7 @@ class AuthServiceWebTest extends TestCase
     public function testAccessTokenCreation(): void
     {
         $user = $this->createTestUser();
-        $token = $this->createTestAccessToken($user['id']);
+        $token = $this->createTestAccessToken($user['user_id']);
         
         $this->assertNotEmpty($token['token']);
         $this->assertNotEmpty($token['token_hash']);
@@ -82,7 +82,7 @@ class AuthServiceWebTest extends TestCase
     public function testRefreshTokenCreation(): void
     {  
         $user = $this->createTestUser();
-        $token = $this->createTestRefreshToken($user['id']);
+        $token = $this->createTestRefreshToken($user['user_id']);
         
         $this->assertNotEmpty($token['token']);
         $this->assertNotEmpty($token['token_hash']);
@@ -94,13 +94,13 @@ class AuthServiceWebTest extends TestCase
     public function testAccessTokenPersists(): void
     {
         $user = $this->createTestUser();
-        $created = $this->createTestAccessToken($user['id']);
+        $created = $this->createTestAccessToken($user['user_id']);
         
         $stmt = $this->pdo->prepare('SELECT * FROM access_tokens WHERE user_id = ?');
-        $stmt->execute([$user['id']]);
+        $stmt->execute([$user['user_id']]);
         $retrieved = $stmt->fetch();
         
         $this->assertNotEmpty($retrieved);
-        $this->assertEquals($user['id'], $retrieved['user_id']);
+        $this->assertEquals($user['user_id'], $retrieved['user_id']);
     }
 }

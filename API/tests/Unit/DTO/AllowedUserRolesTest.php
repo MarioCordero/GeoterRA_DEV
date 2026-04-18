@@ -1,7 +1,5 @@
 <?php
-
 declare(strict_types=1);
-
 namespace Tests\Unit\DTO;
 
 use Tests\TestCase;
@@ -25,7 +23,7 @@ class AllowedUserRolesTest extends TestCase
 
     public function testGetAllRolesReturnsAllowedRoles(): void
     {
-        $roles = AllowedUserRoles::getAll();
+        $roles = AllowedUserRoles::values();
         
         $this->assertIsArray($roles);
         $this->assertCount(3, $roles);

@@ -1,7 +1,5 @@
 <?php
-
 declare(strict_types=1);
-
 namespace Tests;
 
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
@@ -10,8 +8,7 @@ use Http\ErrorType;
 
 /**
  * Base TestCase for all GeoterRA API tests
- * 
- * Provides:
+ * * Provides:
  * - Database access (in-memory SQLite)
  * - Helper methods for creating test data
  * - Common assertions for API testing
@@ -24,10 +21,8 @@ abstract class TestCase extends PHPUnitTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
         // Get test database connection
         $this->pdo = $_SERVER['TEST_DATABASE'];
-        
         // Reset database state for each test
         $this->resetDatabase();
     }
@@ -38,12 +33,12 @@ abstract class TestCase extends PHPUnitTestCase
     protected function resetDatabase(): void
     {
         // Delete data in reverse order of foreign key dependencies
-        $this->pdo->exec('DELETE FROM registered_manifestations');
+        $this->pdo->exec('DELETE FROM registered_geothermal_manifestations');
         $this->pdo->exec('DELETE FROM analysis_requests');
         $this->pdo->exec('DELETE FROM refresh_tokens');
         $this->pdo->exec('DELETE FROM access_tokens');
-        $this->pdo->exec('DELETE FROM regions');
         $this->pdo->exec('DELETE FROM users');
+        $this->pdo->exec('DELETE FROM regions');
         
         // Insert default regions
         $this->insertDefaultRegions();
@@ -55,18 +50,18 @@ abstract class TestCase extends PHPUnitTestCase
     protected function insertDefaultRegions(): void
     {
         $regions = [
-            'Los Andes',
-            'Zona Sur',
-            'Pacifico',
-            'Zona Central',
-            'Araucanía',
-            'Los Lagos',
-            'Zona Austral'
+            'Guanacaste',
+            'San José',
+            'Heredia',
+            'Cartago',
+            'Alajuela',
+            'Puntarenas'
         ];
 
         foreach ($regions as $region) {
-            $stmt = $this->pdo->prepare('INSERT INTO regions (id, name) VALUES (?, ?)');
-            $stmt->execute([\Core\Ulid::generate(), $region]);
+            // Use INSERT IGNORE to skip if region already exists
+            $stmt = $this->pdo->prepare('INSERT IGNORE INTO regions (name) VALUES (?)');
+            $stmt->execute([$region]);
         }
     }
 
@@ -75,33 +70,33 @@ abstract class TestCase extends PHPUnitTestCase
      */
     protected function createTestUser(array $overrides = []): array
     {
-        $userId = $overrides['id'] ?? \Core\Ulid::generate();
-        $name = $overrides['name'] ?? 'Test';
-        $lastname = $overrides['lastname'] ?? 'User';
+        // Mapeamos los campos a los nombres reales de tu base de datos
+        $userId = $overrides['user_id'] ?? $overrides['id'] ?? \Core\Ulid::generate();
+        $firstName = $overrides['first_name'] ?? $overrides['name'] ?? 'Test';
+        $lastName = $overrides['last_name'] ?? $overrides['lastname'] ?? 'User';
         $email = $overrides['email'] ?? 'testuser' . rand(1000, 9999) . '@example.com';
         $password = $overrides['password'] ?? 'Password123!';
         $passwordHash = $overrides['password_hash'] ?? password_hash($password, PASSWORD_BCRYPT);
-        $phone = $overrides['phone'] ?? null;
-        $role = $overrides['role'] ?? 'usr';
-        $is_admin = $overrides['is_admin'] ?? ($role === 'admin' ? 1 : 0);
+        $phone = $overrides['phone_number'] ?? $overrides['phone'] ?? null;
+        $role = $overrides['role'] ?? 'user';
 
+        // Consulta actualizada con las columnas correctas
         $stmt = $this->pdo->prepare(
-            'INSERT INTO users (id, name, lastname, email, password_hash, phone, role, is_admin) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+            'INSERT INTO users (user_id, first_name, last_name, email, password_hash, phone_number, role) 
+             VALUES (?, ?, ?, ?, ?, ?, ?)'
         );
         
-        $stmt->execute([$userId, $name, $lastname, $email, $passwordHash, $phone, $role, $is_admin]);
+        $stmt->execute([$userId, $firstName, $lastName, $email, $passwordHash, $phone, $role]);
 
         return [
-            'id' => $userId,
-            'name' => $name,
-            'lastname' => $lastname,
+            'user_id' => $userId,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
             'email' => $email,
             'password' => $password,
             'password_hash' => $passwordHash,
-            'phone' => $phone,
-            'role' => $role,
-            'is_admin' => $is_admin
+            'phone_number' => $phone,
+            'role' => $role
         ];
     }
 
@@ -116,17 +111,15 @@ abstract class TestCase extends PHPUnitTestCase
 
         $token = bin2hex(random_bytes(32));
         $tokenHash = hash('sha256', $token);
-        $tokenId = \Core\Ulid::generate();
 
         $stmt = $this->pdo->prepare(
-            'INSERT INTO access_tokens (id, user_id, token_hash, expires_at) 
-             VALUES (?, ?, ?, ?)'
+            'INSERT INTO access_tokens (user_id, token_hash, expires_at) 
+             VALUES (?, ?, ?)'
         );
         
-        $stmt->execute([$tokenId, $userId, $tokenHash, $expiresAt->format('Y-m-d H:i:s')]);
+        $stmt->execute([$userId, $tokenHash, $expiresAt->format('Y-m-d H:i:s')]);
 
         return [
-            'id' => $tokenId,
             'user_id' => $userId,
             'token' => $token,
             'token_hash' => $tokenHash,
@@ -145,17 +138,15 @@ abstract class TestCase extends PHPUnitTestCase
 
         $token = bin2hex(random_bytes(64));
         $tokenHash = hash('sha256', $token);
-        $tokenId = \Core\Ulid::generate();
 
         $stmt = $this->pdo->prepare(
-            'INSERT INTO refresh_tokens (id, user_id, token_hash, expires_at) 
-             VALUES (?, ?, ?, ?)'
+            'INSERT INTO refresh_tokens (user_id, token_hash, expires_at) 
+             VALUES (?, ?, ?)'
         );
         
-        $stmt->execute([$tokenId, $userId, $tokenHash, $expiresAt->format('Y-m-d H:i:s')]);
+        $stmt->execute([$userId, $tokenHash, $expiresAt->format('Y-m-d H:i:s')]);
 
         return [
-            'id' => $tokenId,
             'user_id' => $userId,
             'token' => $token,
             'token_hash' => $tokenHash,
@@ -172,8 +163,12 @@ abstract class TestCase extends PHPUnitTestCase
         int $expectedStatus
     ): void {
         $this->assertInstanceOf(ApiException::class, $exception);
+        
+        /** @var ApiException $exception */
         $this->assertEquals($expectedStatus, $exception->getHttpStatus());
     }
+
+    // ------------------- Helper methods for database queries ------------------ //
 
     /**
      * Get user from database by email
@@ -190,7 +185,8 @@ abstract class TestCase extends PHPUnitTestCase
      */
     protected function getUserById(string $userId): ?array
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM users WHERE id = ? AND deleted_at IS NULL');
+        // Cambiado de 'id' a 'user_id'
+        $stmt = $this->pdo->prepare('SELECT * FROM users WHERE user_id = ? AND deleted_at IS NULL');
         $stmt->execute([$userId]);
         return $stmt->fetch() ?: null;
     }

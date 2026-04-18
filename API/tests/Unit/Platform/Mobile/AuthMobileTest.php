@@ -17,19 +17,11 @@ use Http\ApiException;
 class AuthMobileTest extends TestCase
 {
     private \Services\AuthService $authService;
-    private \Repositories\UserRepository $userRepository;
-    private \Repositories\AuthRepository $authRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
-        $this->userRepository = new \Repositories\UserRepository($this->pdo);
-        $this->authRepository = new \Repositories\AuthRepository($this->pdo);
-        $this->authService = new \Services\AuthService(
-            $this->userRepository,
-            $this->authRepository
-        );
+        $this->authService = new \Services\AuthService($this->pdo);
     }
     public function testMobileLoginReturnsBearerToken(): void
     {
