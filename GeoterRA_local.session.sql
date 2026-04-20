@@ -1,5 +1,0 @@
-SHOW TABLES;
-
-SELECT * FROM users;
-
-DESCRIBE users;
