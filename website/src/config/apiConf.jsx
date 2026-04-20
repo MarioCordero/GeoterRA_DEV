@@ -158,27 +158,39 @@ export const autoDetectEnvironment = () => {
  */
 export const callApi = async (endpoint, method = 'GET', payload = null, customHeaders = {}) => {
   try {
+    const headers = {
+      ...API_CONFIG.defaultHeaders,
+      ...customHeaders,
+    };
+
     const options = {
       method,
       credentials: 'include',
-      headers: { 
-        ...API_CONFIG.defaultHeaders,
-        ...customHeaders,
-      },
+      headers,
     };
 
-    if (payload && (method === 'POST' || method === 'PUT')) {
+    // Add body only for POST/PUT with payload
+    if (payload && ['POST', 'PUT'].includes(method)) {
       options.body = JSON.stringify(payload);
     }
 
     const response = await fetch(endpoint, options);
     const data = await response.json().catch(() => ({}));
 
+    // Extract error message from different response formats
+    const getErrorMessage = () => {
+      if (data.message) return data.message;
+      if (Array.isArray(data.errors) && data.errors.length > 0) {
+        return data.errors[0].message || data.errors[0].code;
+      }
+      return 'API Error';
+    };
+
     return {
       ok: response.ok,
       status: response.status,
-      data,
-      error: response.ok ? null : data.message || data.errors?.[0]?.message || 'API Error',
+      data: data.data || data, // Support both { data: {...} } and direct response
+      error: response.ok ? null : getErrorMessage(),
     };
   } catch (error) {
     return {
