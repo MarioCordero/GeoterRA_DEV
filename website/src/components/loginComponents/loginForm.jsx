@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useSession } from "../../hooks/useSession";
-import { auth, users } from '../../config/apiConf';
-import loginImage from "../../assets/images/login-background.png";
 import "../../colorModule.css";
 import '../../fontsModule.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { authLogin } from '../../config/apiConf';
+import { useSession } from "../../hooks/useSession";
+import loginImage from "../../assets/images/login-background.png";
 
 function Login() {
   const navigate = useNavigate();
@@ -27,15 +27,12 @@ function Login() {
     setLoading(true);
 
     try {
-      const response = await fetch(auth.login(), {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await response.json().catch(() => ({}));
       
-      if (response.ok) {
+      // API CALL
+      const payload = { email, password };
+      const result = await authLogin(payload);
+      
+      if (result.ok) {
         await new Promise(resolve => setTimeout(resolve, 1000));
         const sessionUser = await refresh();
         
@@ -48,13 +45,7 @@ function Login() {
         return;
       }
       
-      let errorMessage = 'Credenciales incorrectas';
-      if (data.errors?.length > 0) {
-        errorMessage = data.errors[0].message || String(data.errors[0]);
-      } else if (data.message) {
-        errorMessage = data.message;
-      }
-
+      const errorMessage = result.error || 'Credenciales incorrectas';
       console.error('[Login] Error:', errorMessage);
       setErrorMsg(errorMessage);
       setEmail("");
