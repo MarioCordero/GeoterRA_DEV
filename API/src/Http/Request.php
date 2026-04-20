@@ -13,7 +13,7 @@ final class Request
 
   public static function init(): void
   {
-    self::$apiKey = $headers['-x-api-key'] ?? $_SERVER['HTTP__X_API_KEY'] ?? null;
+    self::$apiKey = $headers['-x-api-key'] ?? $_SERVER['HTTP_X_API_KEY'] ?? null;
 
     // Determine environment: check if .env exists, else default to development
     $envFile = getenv('HOME') . '/.env';
