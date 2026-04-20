@@ -89,29 +89,13 @@ final class UserController
 
   /**
    * GET /users/me/session
-   * Get authenticated user from session cookie (validates via session.php)
+   * Get authenticated user from session (validates via AuthService::requireAuth)
    */
   public function showSession(): void
   {
     try {
-      $user = \Http\Request::getUser();
-      error_log('DEBUG: UserController.showSession - user = ' . ($user ? json_encode($user) : 'null'));
-      
-      if (!$user) {
-        Response::error(ErrorType::missingAuthToken(), 401);
-        return;
-      }
-
-      // TODO: CHECK Return only essential user info to avoid exposing sensitive data
-      Response::success([
-        'id' => $user['user_id'],
-        'role' => $user['role'] ?? 'user',
-        'email' => $user['email'] ?? null,
-        'is_active' => $user['is_active'] ?? null,
-        'first_name' => $user['first_name'] ?? null,
-        'last_name' => $user['last_name'] ?? null,
-        'phone_number' => $user['phone_number'] ?? null,
-      ], null, 200);
+      $user = $this->userService->getSessionUser();
+      Response::success($user, null, 200);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
     } catch (\Throwable $e) {
