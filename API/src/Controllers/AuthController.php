@@ -59,15 +59,6 @@ final class AuthController
 
   private function respondWeb(array $result): void
   {
-      // $expiresIn = $result['meta']['expires_in'] ?? 5400;
-
-      // setcookie('geoterra_session_token', $result['data']['access_token'], [
-      //     'expires' => time() + $expiresIn,
-      //     'httponly' => true,
-      //     'secure' => true, // Siempre recomendado en este nuevo esquema
-      //     'samesite' => 'Lax'
-      // ]);
-
     $accessToken = $result['data']['access_token'];
     $expiresIn = $result['meta']['expires_in'] ?? 5400;
 
@@ -75,7 +66,6 @@ final class AuthController
     setcookie('geoterra_session_token', $accessToken, [
       'expires' => time() + $expiresIn,
       'path' => '/',
-      'domain' => '',
       'secure' => $this->isSecureContext(),
       'httponly' => true,
       'samesite' => 'Lax'
@@ -89,13 +79,15 @@ final class AuthController
 
     $responseData = $this->filterResponse($result, 'cookie');
 
-    // Return response WITHOUT refresh_token in body (only in cookie)
+    // Return response with user data (token is in HTTP-only cookie)
     Response::success(
-      $responseData, [
+      $responseData, 
+      [
         'token_type' => 'Cookie',
         'expires_in' => $expiresIn,
         'message' => 'Session set via HTTP-only cookie'
-      ], 200
+      ], 
+      200
     );
   }
 
