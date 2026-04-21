@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { maintenance } from '../../../../config/apiConf';
+import { maintenanceAllUsers } from '../../../../config/apiConf';
 import { usePermissions } from '../../../../hooks/usePermissions';
 import { Table, Card, Spin, Tag, message, Button, Space } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
@@ -13,21 +13,14 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      // API CALL
-      const response = await fetch(maintenance.allUsers(), {
-        method: 'GET',
-        credentials: 'include',
-        headers: { 'Accept': 'application/json' },
-      });
+      const result = await maintenanceAllUsers();
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.errors?.[0]?.message || 'Error fetching users');
+      if (!result.ok) {
+        throw new Error(result.error || 'Error fetching users');
       }
 
-      setUsers(data.data || []);
-      setTotal(data.meta?.total || 0);
+      setUsers(result.data || []);
+      setTotal(result.data?.length || 0);
     } catch (error) {
       console.error('Error fetching users:', error);
       message.error(`Error: ${error.message}`);
