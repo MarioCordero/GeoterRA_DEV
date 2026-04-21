@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace Services;
 
 use PDO;
-use DTO\RegisterUserDTO;
+use Http\ErrorType;
 use DTO\UpdateUserDTO;
 use Http\ApiException;
-use Http\ErrorType;
-use Services\PasswordService;
+use DTO\RegisterUserDTO;
 use Services\AuthService;
+use Services\PasswordService;
 use Repositories\UserRepository;
 
 /**
