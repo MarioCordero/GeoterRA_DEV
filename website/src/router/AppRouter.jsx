@@ -4,10 +4,9 @@ import PrivateRoute from './PrivateRoute';
 import Home from '../pages/Home'
 import Login from '../pages/Login'
 import Map from '../pages/Map'
-import Logged from '../pages/Logged';
 import Register from '../pages/Register'
 import PointDetails from '../components/mapComponents/PointDetails'
-import LoggedAdmin from '../pages/LoggedAdmin'
+import Dashboard from '../pages/Dashboard'
 
 export default function AppRouter() {
   return (
@@ -17,10 +16,9 @@ export default function AppRouter() {
           <Route path="/" element={<Home />} />
           <Route path="/Login" element={<Login />} />
           <Route path="/Map" element={<Map />} />
-          <Route path="/Logged" element={<Logged />} />
+          <Route path="/Dashboard" element={<Dashboard />} />
           <Route path="/Register" element={<Register />} />
           <Route path="/point-details/:pointId" element={<PointDetails />} />
-          <Route path="/LoggedAdmin" element={<LoggedAdmin />} />
         </Routes>
       </div>
     </Router>

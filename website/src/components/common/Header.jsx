@@ -5,18 +5,23 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../../assets/images/GeoterRA-Logo-Color.svg';
 import '../../colorModule.css';
 import '../../fontsModule.css';
+import { useSession } from '../../hooks/useSession';
 
 export default function AppHeader() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
+  const { isLogged, user, checkSession } = useSession();
+
   const navItems = [
     { key: 'about', path: '/#about-us', label: 'Acerca de nosotros', sectionId: 'about-us' },
     { key: 'how', path: '/#how-works', label: 'Cómo funciona', sectionId: 'how-works' },
     { key: 'contact', path: '/#contact-us', label: 'Contacto', sectionId: 'contact-us' },
     { key: 'map', path: '/map', label: 'Mapa', sectionId: null },
-    { key: 'login', path: '/login', label: 'Iniciar Sesión', sectionId: null },
+    isLogged
+      ? { key: 'profile', path: '/Dashboard', label: 'Mi Perfil', sectionId: null }
+      : { key: 'login', path: '/login', label: 'Iniciar Sesión', sectionId: null },
   ];
 
   const showDrawer = () => {
@@ -31,9 +36,9 @@ export default function AppHeader() {
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      const headerHeight = 64; // Header height (h-16 = 64px)
+      const headerHeight = 64;
       const elementPosition = element.offsetTop - headerHeight;
-      
+
       window.scrollTo({
         top: elementPosition,
         behavior: 'smooth'
@@ -46,23 +51,36 @@ export default function AppHeader() {
     const handleHashNavigation = () => {
       const hash = location.hash.replace('#', '');
       if (hash && location.pathname === '/') {
-        // Small delay to ensure DOM is ready
         setTimeout(() => {
           scrollToSection(hash);
         }, 100);
       }
     };
 
-    // Handle initial load with hash
     handleHashNavigation();
 
-    // Handle hash changes (back/forward browser navigation)
     window.addEventListener('hashchange', handleHashNavigation);
-
     return () => {
       window.removeEventListener('hashchange', handleHashNavigation);
     };
   }, [location.hash, location.pathname]);
+
+  // Handle profile click with session check
+  const handleProfileClick = async (e) => {
+    e.preventDefault();
+
+    try {
+      await checkSession();
+      if (isLogged && user) {
+        navigate('/Dashboard');
+      } else {
+        navigate('/login');
+      }
+    } catch (err) {
+      console.error("Session check failed:", err);
+      navigate('/login');
+    }
+  };
 
   // Handle navigation with smooth scroll
   const handleNavigation = (item, closeMobile = false) => {
@@ -70,17 +88,20 @@ export default function AppHeader() {
       onClose();
     }
 
+    if (item.key === 'profile') {
+      handleProfileClick({ preventDefault: () => {} });
+      return;
+    }
+
     // If it's a section link (has sectionId)
     if (item.sectionId) {
       // If we're already on the home page, just scroll
       if (location.pathname === '/') {
-        // Update URL hash
         window.history.pushState(null, null, `#${item.sectionId}`);
         scrollToSection(item.sectionId);
       } else {
         // Navigate to home first, then scroll
         navigate(`/#${item.sectionId}`);
-        // The useEffect will handle the scrolling after navigation
       }
     } else {
       // Regular navigation for non-section links
@@ -89,7 +110,7 @@ export default function AppHeader() {
   };
 
   return (
-    <header className="fixed top-0 left-0 z-[1000] bg-white w-full  shadow-md">
+    <header className="fixed top-0 left-0 z-[1000] bg-white w-full shadow-md">
       <div className="flex items-center justify-between h-full p-5">
         
         {/* Logo */}
@@ -105,21 +126,23 @@ export default function AppHeader() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-4">
-          {navItems.map((item) => (
-            <button
-              key={item.key}
-              onClick={() => handleNavigation(item)}
-              className={`
-                px-4 py-2 rounded-md transition-all duration-200 transform hover:-translate-y-0.5 whitespace-nowrap cursor-pointer
-                ${item.key === 'login' 
-                  ? 'bg-geoterra-orange text-white poppins-bold font-bold hover:bg-orange-600' 
-                  : 'text-geoterra-blue poppins hover:text-blue-700 hover:bg-blue-50'
-                }
-              `}
-            >
-              {item.label}
-            </button>
-          ))}
+          {navItems.map((item) => {
+            return (
+              <button
+                key={item.key}
+                onClick={() => handleNavigation(item)}
+                className={`
+                  px-4 py-2 rounded-md transition-all duration-200 transform hover:-translate-y-0.5 whitespace-nowrap cursor-pointer
+                  ${(item.key === 'login' || item.key === 'profile')
+                    ? 'bg-geoterra-orange text-white poppins-bold font-bold hover:bg-orange-600' 
+                    : 'text-geoterra-blue poppins hover:text-blue-700 hover:bg-blue-50'
+                  }
+                `}
+              >
+                {item.label}
+              </button>
+            );
+          })}
         </nav>
 
         {/* Mobile Menu Button */}
@@ -155,21 +178,23 @@ export default function AppHeader() {
           closeIcon={<CloseOutlined className="text-gray-600" />}
         >
           <nav className="flex flex-col gap-3">
-            {navItems.map((item) => (
-              <button
-                key={item.key}
-                onClick={() => handleNavigation(item, true)}
-                className={`
-                  block w-full px-4 py-3 rounded-lg text-left transition-all duration-200 cursor-pointer
-                  ${item.key === 'login' 
-                    ? 'bg-geoterra-orange text-white poppins-bold hover:bg-orange-600' 
-                    : 'text-geoterra-blue poppins hover:text-blue-700 hover:bg-blue-50'
-                  }
-                `}
-              >
-                {item.label}
-              </button>
-            ))}
+            {navItems.map((item) => {
+              return (
+                <button
+                  key={item.key}
+                  onClick={() => handleNavigation(item, true)}
+                  className={`
+                    block w-full px-4 py-3 rounded-lg text-left transition-all duration-200 cursor-pointer
+                    ${(item.key === 'login' || item.key === 'profile') 
+                      ? 'bg-geoterra-orange text-white poppins-bold hover:bg-orange-600' 
+                      : 'text-geoterra-blue poppins hover:text-blue-700 hover:bg-blue-50'
+                    }
+                  `}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
           </nav>
         </Drawer>
       </div>

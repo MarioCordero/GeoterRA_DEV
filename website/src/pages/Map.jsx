@@ -1,7 +1,6 @@
 import React from 'react';
 import MapContainer from '../components/mapComponents/mapComponent';
-import LoggedHeader from '../components/common/loggedHeader';
-import Header from '../components/common/Header';
+import AppHeader from '../components/common/Header';
 import Footer from '../components/common/Footer';
 import { useSession } from '../hooks/useSession';
 
@@ -24,7 +23,7 @@ const Map = () => {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {isLogged ? <LoggedHeader /> : <Header />}
+      <AppHeader />
       <div style={{ flex: 1 }}>
         <MapContainer />
       </div>

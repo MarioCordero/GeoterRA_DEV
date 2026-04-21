@@ -211,10 +211,12 @@ final class AnalysisRequestService
   {
     $auth = $this->authService->requireAuth();
 
-    if ($auth['role'] !== 'admin') {
+    if ($auth['role'] !== 'admin' && $auth['role'] !== 'maintenance') {
       throw new ApiException(ErrorType::forbidden(), 403);
     }
 
+    // TODO: Implement pagination and filtering in the repository method to avoid returning too much data at once
+    // TODO: Consider adding a separate method for maintenance users if they should have different access than admins
     return $this->repository->getAll();
   }
 }

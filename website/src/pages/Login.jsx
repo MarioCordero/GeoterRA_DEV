@@ -1,11 +1,11 @@
 import React from 'react';
 import LoginForm from '../components/loginComponents/loginForm';
-import Header from '../components/common/Header';
+import AppHeader from '../components/common/Header';
 
 const Login = () => {
   return (
     <div className="general-container">
-      <Header />
+      <AppHeader />
       <div className="index-container Montserrat-Regular">
         <LoginForm />
       </div>

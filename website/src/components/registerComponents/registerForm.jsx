@@ -4,7 +4,7 @@ import { Form, Input } from "antd";
 import PhoneInput from "../common/PhoneInput";
 import "../../colorModule.css";
 import "../../fontsModule.css";
-import { auth } from "../../config/apiConf";
+import { auth, users } from "../../config/apiConf";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ export default function Register() {
     };
 
     try {
-      const response = await fetch(auth.register(), {
+      const response = await fetch(users.register(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useSession } from "../../hooks/useSession";
-import { auth, users } from '../../config/apiConf';
-import loginImage from "../../assets/images/login-background.png";
 import "../../colorModule.css";
 import '../../fontsModule.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { authLogin } from '../../config/apiConf';
+import { useSession } from "../../hooks/useSession";
+import loginImage from "../../assets/images/login-background.png";
 
 function Login() {
   const navigate = useNavigate();
@@ -27,37 +27,43 @@ function Login() {
     setLoading(true);
 
     try {
-      const response = await fetch(auth.login(), {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await response.json().catch(() => ({}));
-      
-      if (response.ok) {
-        const cookieExists = document.cookie.includes('geoterra_session_token');
-        await new Promise(resolve => setTimeout(resolve, 1000));
+      // API CALL
+      const payload = { email, password };
+      const result = await authLogin(payload);
+
+      if (result.ok) {
+        // Wait for cookie to be set
+        let cookieIsSet = false;
+        let retries = 0;
+        const maxRetries = 10;
+
+        while (!cookieIsSet && retries < maxRetries) {
+          if (document.cookie.includes('geoterra_session_token')) {
+            cookieIsSet = true;
+            console.log('✅ [Login] Cookie detected');
+            break;
+          }
+          await new Promise(resolve => setTimeout(resolve, 100)); // Check every 100ms
+          retries++;
+        }
+
+        if (!cookieIsSet) {
+          console.warn('⚠️ [Login] Cookie not set after 1 second');
+        }
+
+        // Now fetch session
         const sessionUser = await refresh();
-        
-        if (sessionUser && (sessionUser.role === 'admin' || sessionUser.is_admin)) {
-          navigate('/LoggedAdmin');
-        } else if (sessionUser) {
-          navigate('/Logged');
+
+        if (sessionUser) {
+          navigate('/Dashboard');
         } else {
           console.error('[Login] sessionUser es null después de refresh()');
           setErrorMsg('No se pudo establecer la sesión');
         }
         return;
       }
-      
-      let errorMessage = 'Credenciales incorrectas';
-      if (data.errors?.length > 0) {
-        errorMessage = data.errors[0].message || String(data.errors[0]);
-      } else if (data.message) {
-        errorMessage = data.message;
-      }
 
+      const errorMessage = result.error || 'Credenciales incorrectas';
       console.error('[Login] Error:', errorMessage);
       setErrorMsg(errorMessage);
       setEmail("");

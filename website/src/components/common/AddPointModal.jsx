@@ -11,36 +11,6 @@ import PhoneInput from './PhoneInput';
 const defaultPosition = [9.93333, -84.08333];
 const FORM_CACHE_KEY = "addPointFormCache";
 
-// Session token management functions
-const getSessionToken = () => {
-  const localToken = localStorage.getItem('geoterra_session_token');
-  const sessionToken = sessionStorage.getItem('geoterra_session_token');
-  const token = localToken || sessionToken;
-  return token;
-};
-
-const clearSessionToken = () => {
-  localStorage.removeItem('geoterra_session_token');
-  sessionStorage.removeItem('geoterra_session_token');
-};
-
-const setSessionToken = (token) => {
-  localStorage.setItem('geoterra_session_token', token);
-};
-
-// Build headers for API requests
-const buildHeaders = () => {
-  const headers = {
-    'Content-Type': 'application/json',
-  };
-  const token = getSessionToken();
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-    headers['X-Session-Token'] = token;
-  }
-  return headers;
-};
-
 function LocationMarker({ setLatLng, latLng }) {
   const [position, setPosition] = useState(null);
   useEffect(() => {
@@ -327,19 +297,8 @@ const AddPointModal = ({
         formData.append("foto", values.foto[0].originFileObj);
       }
 
-      // Build headers for FormData request (don't set Content-Type for FormData)
-      const headers = {};
-      if (useTokenAuth) {
-        const token = getSessionToken();
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
-          headers['X-Session-Token'] = token;
-        }
-      }
-
       const response = await fetch(buildApiUrl("request.inc.php"), {
         method: "POST",
-        headers,
         body: formData,
         credentials: "include",
       });
@@ -870,7 +829,5 @@ const AddPointModal = ({
   );
 };
 
-// Export the utility functions for use in other components if needed
-export { getSessionToken, setSessionToken, clearSessionToken, buildHeaders };
 
 export default AddPointModal;
