@@ -114,3 +114,4 @@ Podfile.lock
 *.log
 
 notes.txt
+GeoterRA_local.session.sql
