@@ -13,8 +13,7 @@ final class Request
 
   public static function init(): void
   {
-    // self::$apiKey = $headers['-x-api-key'] ?? $_SERVER['HTTP_X_API_KEY'] ?? null;
-    self::$apiKey = $_SERVER['HTTP__X_API_KEY'] ?? null;
+    self::$apiKey = $headers['-x-api-key'] ?? $_SERVER['HTTP_X_API_KEY'] ?? null;
 
     // Determine environment: check if .env exists, else default to development
     $envFile = getenv('HOME') . '/.env';
@@ -66,6 +65,17 @@ final class Request
   public static function isWeb(): bool { return self::getPlatform() === 'web'; }
 
   public static function isMobile(): bool { return self::getPlatform() === 'mobile'; }
+
+  /**
+   * Get a cookie value by name.
+   *
+   * @param string $name Cookie name
+   * @return string|null The cookie value if present, null otherwise
+   */
+  public static function getCookie(string $name): ?string
+  {
+    return $_COOKIE[$name] ?? null;
+  }
 
   /**
    * Get raw JSON from request body.
