@@ -60,33 +60,26 @@ final class AuthController
   private function respondWeb(array $result): void
   {
     $accessToken = $result['data']['access_token'];
-    $expiresIn = $result['meta']['expires_in'] ?? 5400;
+    
+    setcookie(
+      'geoterra_session_token',
+      $accessToken,
+      [
+        'expires' => time() + 5400,
+        'path' => '/',
+        'secure' => true,
+        'httponly' => true,
+        'samesite' => 'None',
+      ]
+    );
 
-    // Set HTTP-only cookie for browser
-    setcookie('geoterra_session_token', $accessToken, [
-      'expires' => time() + $expiresIn,
-      'path' => '/',
-      'secure' => $this->isSecureContext(),
-      'httponly' => true,
-      'samesite' => 'Lax'
-    ]);
-
-    error_log(sprintf(
-      '✅ [Auth] Browser login successful: %s (IP: %s)',
-      $result['data']['email'],
-      $_SERVER['REMOTE_ADDR'] ?? 'unknown'
-    ));
-
-    $responseData = $this->filterResponse($result, 'cookie');
-
-    // Return response with user data (token is in HTTP-only cookie)
     Response::success(
-      $responseData, 
+      $result['data'],
       [
         'token_type' => 'Cookie',
-        'expires_in' => $expiresIn,
+        'expires_in' => 5400,
         'message' => 'Session set via HTTP-only cookie'
-      ], 
+      ],
       200
     );
   }
