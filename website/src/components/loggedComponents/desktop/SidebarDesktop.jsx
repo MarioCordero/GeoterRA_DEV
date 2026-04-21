@@ -3,6 +3,7 @@ import {
   LogoutOutlined,
   MenuOutlined,
   ExclamationCircleOutlined,
+  MenuFoldOutlined,
 } from "@ant-design/icons";
 import '../../../fontsModule.css';
 import '../../../colorModule.css';
@@ -117,14 +118,17 @@ const SidebarDesktop = ({ selectedKey, setSelectedKey, collapsed, setCollapsed }
       >
         {/* Custom collapse trigger at the top */}
         <div style={{ 
-          padding: '1rem', 
-          textAlign: collapsed ? 'center' : 'right',
+          padding: '0.75rem 1rem', 
+          display: 'flex',
+          justifyContent: collapsed ? 'center' : 'flex-end',
+          alignItems: 'center',
           borderBottom: '1px solid #f0f0f0',
-          marginTop: '64px'
+          marginTop: '100px',
+          transition: 'all 0.3s ease',
         }}>
           <Button
             type="text"
-            icon={collapsed ? <MenuOutlined /> : <MenuOutlined style={{ transform: 'rotate(180deg)' }} />}
+            icon={collapsed ? <MenuOutlined /> : <MenuFoldOutlined />}
             onClick={() => setCollapsed(!collapsed)}
             style={{
               width: '32px',
@@ -132,6 +136,7 @@ const SidebarDesktop = ({ selectedKey, setSelectedKey, collapsed, setCollapsed }
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              transition: 'all 0.3s ease',
             }}
           />
         </div>
