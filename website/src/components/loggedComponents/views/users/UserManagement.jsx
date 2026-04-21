@@ -13,6 +13,7 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
+      // API CALL
       const result = await maintenanceAllUsers();
 
       if (!result.ok) {
