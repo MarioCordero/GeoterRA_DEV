@@ -47,7 +47,6 @@ final class MaintenanceController
   {
     try {
       $user = $this->authService->requireAuth();
-
       if (!PermissionService::hasPermission($user['role'], Permissions::VIEW_INFRASTRUCTURE)) {
         Response::error(ErrorType::forbidden(), 403);
         return;

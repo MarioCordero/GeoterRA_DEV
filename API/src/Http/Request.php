@@ -67,6 +67,17 @@ final class Request
   public static function isMobile(): bool { return self::getPlatform() === 'mobile'; }
 
   /**
+   * Get a cookie value by name.
+   *
+   * @param string $name Cookie name
+   * @return string|null The cookie value if present, null otherwise
+   */
+  public static function getCookie(string $name): ?string
+  {
+    return $_COOKIE[$name] ?? null;
+  }
+
+  /**
    * Get raw JSON from request body.
    */
   private static function json(): ?array
