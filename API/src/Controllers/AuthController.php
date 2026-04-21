@@ -38,17 +38,24 @@ final class AuthController
   public function login(): void
   {
     try {
-
-      // Parse and validate request
       $data = Request::parseJsonRequest();
       $dto = LoginUserDTO::fromArray($data);
       $result = $this->authService->login($dto);
 
-    if (Request::isMobile()) {
-      $this->respondMobile($result);
-    } else {
-      $this->respondWeb($result);
-    }
+      if (Request::isMobile()) {
+        $responseData = $this->authService->prepareMobileResponse($result);
+        Response::success($responseData, [
+          'token_type' => 'Bearer',
+          'expires_in' => 5400,
+        ], 200);
+      } else {
+        $responseData = $this->authService->prepareWebResponse($result);
+        Response::success($responseData, [
+          'token_type' => 'Cookie',
+          'expires_in' => 5400,
+          'message' => 'Session set via HTTP-only cookie'
+        ], 200);
+      }
 
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
@@ -57,46 +64,7 @@ final class AuthController
     }
   }
 
-  private function respondWeb(array $result): void
-  {
-    $accessToken = $result['data']['access_token'];
-    
-    setcookie(
-      'geoterra_session_token',
-      $accessToken,
-      [
-        'expires' => time() + 5400,
-        'path' => '/',
-        'secure' => true,
-        'httponly' => true,
-        'samesite' => 'None',
-      ]
-    );
-
-    Response::success(
-      $result['data'],
-      [
-        'token_type' => 'Cookie',
-        'expires_in' => 5400,
-        'message' => 'Session set via HTTP-only cookie'
-      ],
-      200
-    );
-  }
-
-  /**
-   * Prepara la respuesta para Apps Móviles (Bearer)
-   */
-  private function respondMobile(array $result): void
-  {
-    $responseData = $this->filterResponse($result, 'bearer');
-    
-    Response::success($responseData, [
-        'token_type' => 'Bearer',
-        'expires_in' => 5400,
-        'refresh_expires_in' => 2592000
-    ], 200);
-  }
+  // ???? 
 
   private function filterResponse(array $result, string $method): array
   {
