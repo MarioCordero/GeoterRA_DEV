@@ -7,7 +7,7 @@ import {
 import '../../../fontsModule.css';
 import '../../../colorModule.css';
 import { useNavigate } from "react-router-dom";
-import { auth } from '../../../config/apiConf';
+import { authLogout } from '../../../config/apiConf';
 import { Layout, Menu, Button, Modal } from "antd";
 import { useSession } from '../../../hooks/useSession';
 import { usePermissions } from '../../../hooks/usePermissions';
@@ -29,26 +29,19 @@ const SidebarDesktop = ({ selectedKey, setSelectedKey, collapsed, setCollapsed }
   const handleLogout = async () => {
     try {
       setLoggingOut(true);
-      const response = await fetch(auth.logout(), {
-        method: "POST",
-        credentials: "include",
-        headers: { 'Accept': 'application/json' },
-      });
+      const result = await authLogout();
 
-      if (response.ok) {
+      if (result.ok) {
         await sessionLogout();
         setLogoutModalVisible(false);
         navigate("/");
       } else {
-        const data = await response.json();
-        console.error("[SidebarDesktop] Logout failed:", data);
         Modal.error({
           title: 'Error al cerrar sesión',
-          content: data.message || "Error desconocido",
+          content: result.error || "Error desconocido",
         });
       }
     } catch (err) {
-      console.error("[SidebarDesktop] Logout error:", err);
       Modal.error({
         title: 'Error de conexión',
         content: err.message,
