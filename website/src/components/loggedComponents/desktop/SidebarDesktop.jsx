@@ -3,11 +3,12 @@ import {
   LogoutOutlined,
   MenuOutlined,
   ExclamationCircleOutlined,
+  MenuFoldOutlined,
 } from "@ant-design/icons";
 import '../../../fontsModule.css';
 import '../../../colorModule.css';
 import { useNavigate } from "react-router-dom";
-import { auth } from '../../../config/apiConf';
+import { authLogout } from '../../../config/apiConf';
 import { Layout, Menu, Button, Modal } from "antd";
 import { useSession } from '../../../hooks/useSession';
 import { usePermissions } from '../../../hooks/usePermissions';
@@ -29,26 +30,19 @@ const SidebarDesktop = ({ selectedKey, setSelectedKey, collapsed, setCollapsed }
   const handleLogout = async () => {
     try {
       setLoggingOut(true);
-      const response = await fetch(auth.logout(), {
-        method: "POST",
-        credentials: "include",
-        headers: { 'Accept': 'application/json' },
-      });
+      const result = await authLogout();
 
-      if (response.ok) {
+      if (result.ok) {
         await sessionLogout();
         setLogoutModalVisible(false);
         navigate("/");
       } else {
-        const data = await response.json();
-        console.error("[SidebarDesktop] Logout failed:", data);
         Modal.error({
           title: 'Error al cerrar sesión',
-          content: data.message || "Error desconocido",
+          content: result.error || "Error desconocido",
         });
       }
     } catch (err) {
-      console.error("[SidebarDesktop] Logout error:", err);
       Modal.error({
         title: 'Error de conexión',
         content: err.message,
@@ -124,14 +118,17 @@ const SidebarDesktop = ({ selectedKey, setSelectedKey, collapsed, setCollapsed }
       >
         {/* Custom collapse trigger at the top */}
         <div style={{ 
-          padding: '1rem', 
-          textAlign: collapsed ? 'center' : 'right',
+          padding: '0.75rem 1rem', 
+          display: 'flex',
+          justifyContent: collapsed ? 'center' : 'flex-end',
+          alignItems: 'center',
           borderBottom: '1px solid #f0f0f0',
-          marginTop: '64px'
+          marginTop: '100px',
+          transition: 'all 0.3s ease',
         }}>
           <Button
             type="text"
-            icon={collapsed ? <MenuOutlined /> : <MenuOutlined style={{ transform: 'rotate(180deg)' }} />}
+            icon={collapsed ? <MenuOutlined /> : <MenuFoldOutlined />}
             onClick={() => setCollapsed(!collapsed)}
             style={{
               width: '32px',
@@ -139,6 +136,7 @@ const SidebarDesktop = ({ selectedKey, setSelectedKey, collapsed, setCollapsed }
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              transition: 'all 0.3s ease',
             }}
           />
         </div>

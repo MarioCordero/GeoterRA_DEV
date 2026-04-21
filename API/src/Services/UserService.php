@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace Services;
 
 use PDO;
-use DTO\RegisterUserDTO;
+use Http\ErrorType;
 use DTO\UpdateUserDTO;
 use Http\ApiException;
-use Http\ErrorType;
-use Services\PasswordService;
+use DTO\RegisterUserDTO;
 use Services\AuthService;
+use Services\PasswordService;
 use Repositories\UserRepository;
 
 /**
@@ -121,6 +121,37 @@ final class UserService
     if (!$user) {
       throw new ApiException(ErrorType::notFound('User'), 404);
     }
-    return $user; // ← returns raw array, not wrapped in ['data' => ...]
+    return $user;
+  }
+
+  /**
+   * Get authenticated user from session token
+   * Validates session and returns full user data
+   *
+   * @throws ApiException if session is invalid
+   * @return array user data formatted for response
+   */
+  public function getSessionUser(): array
+  {
+    // Validate session using AuthService::requireAuth()
+    // This handles session cookie extraction and validation
+    $auth = $this->authService->requireAuth();
+    $userId = (string) $auth['user_id'];
+    
+    // Get full user data from database
+    $user = $this->repository->findActiveUserById($userId);
+    if (!$user) {
+      throw new ApiException(ErrorType::notFound('User'), 404);
+    }
+    
+    return [
+      'id' => $user['user_id'],
+      'role' => $user['role'] ?? 'user',
+      'email' => $user['email'] ?? null,
+      'is_active' => $user['is_active'] ?? null,
+      'first_name' => $user['first_name'] ?? null,
+      'last_name' => $user['last_name'] ?? null,
+      'phone_number' => $user['phone_number'] ?? null,
+    ];
   }
 }

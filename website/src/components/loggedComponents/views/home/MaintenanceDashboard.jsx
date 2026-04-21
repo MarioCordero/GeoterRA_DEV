@@ -3,7 +3,7 @@ import '../../../../fontsModule.css';
 import React, { useState, useEffect } from 'react';
 import { useSession } from '../../../../hooks/useSession';
 import { Card, Row, Col, Statistic, Tag, Spin } from 'antd';
-import { maintenance } from '../../../../config/apiConf';
+import { maintenanceDashboardInfo } from '../../../../config/apiConf';
 import { HddOutlined, TeamOutlined, DatabaseOutlined, FileTextOutlined } from '@ant-design/icons';
 
 const MaintenanceDashboard = () => {
@@ -18,17 +18,12 @@ const MaintenanceDashboard = () => {
     setStatsLoading(true);
     try {
       // API CALL
-      const res = await fetch(maintenance.dashboardInfo(), {
-        method: 'GET',
-        credentials: 'include',
-        headers: { 'Accept': 'application/json' },
-      });
+      const result = await maintenanceDashboardInfo();
 
-      if (!res.ok) throw new Error('Failed to fetch dashboard stats');
-
-      const data = await res.json();
-      if (data.data) {
-        setDashboardData(data.data);
+      if (result.ok && result.data) {
+        setDashboardData(result.data);
+      } else {
+        console.error('Error fetching dashboard stats:', result.error);
       }
     } catch (err) {
       console.error('Error fetching dashboard stats:', err);
@@ -80,6 +75,24 @@ const MaintenanceDashboard = () => {
         </h1>
         <p className="text-green-100">Panel de Mantenimiento - GeoterRA</p>
       </div>
+
+      {/* Role Description */}
+      <Card className="mb-8 bg-blue-50 border-l-4 border-blue-500">
+        <h3 className="text-xl font-bold mb-3">📋 Descripción del Rol: Mantenimiento</h3>
+        <p className="text-gray-700 mb-4">
+          Como administrador de <strong>Mantenimiento</strong>, eres responsable de monitorear y mantener la integridad del sistema GeoterRA. 
+          Tu rol te permite supervisar el estado de la infraestructura, gestionar usuarios y acceder a información crítica del sistema.
+        </p>
+        <h4 className="font-semibold text-gray-800 mb-2">🎯 Responsabilidades Principales:</h4>
+        <ul style={{ margin: '0', paddingLeft: '20px', color: '#333' }}>
+          <li>Monitorear el estado y rendimiento del servidor en tiempo real</li>
+          <li>Supervisar usuarios activos en el sistema</li>
+          <li>Revisar solicitudes pendientes y su estado</li>
+          <li>Acceder a registros del sistema para auditoría y diagnóstico</li>
+          <li>Gestionar la información de usuarios registrados</li>
+          <li>Visualizar la estructura y contenido de la base de datos</li>
+        </ul>
+      </Card>
 
       {/* User Info */}
       <Row gutter={16} className="mb-8">
@@ -156,30 +169,73 @@ const MaintenanceDashboard = () => {
         </Col>
       </Row>
 
+      {/* Available Features */}
+      <Card className="mb-8 bg-amber-50 border-l-4 border-amber-500">
+        <h3 className="text-lg font-bold mb-4">🔧 Opciones Disponibles para tu Rol</h3>
+        <Row gutter={16}>
+          <Col xs={24} sm={12} md={6}>
+            <div className="p-4 bg-white rounded border border-gray-200">
+              <h4 className="font-semibold text-blue-600 mb-2">📊 Registros del Sistema</h4>
+              <p className="text-sm text-gray-600">Accede a los últimos 500 registros de eventos, errores y acciones realizadas en el sistema para auditoría y diagnóstico.</p>
+            </div>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <div className="p-4 bg-white rounded border border-gray-200">
+              <h4 className="font-semibold text-blue-600 mb-2">👥 Gestionar Usuarios</h4>
+              <p className="text-sm text-gray-600">Visualiza la lista completa de usuarios registrados en el sistema, incluyendo su información de contacto y estado.</p>
+            </div>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <div className="p-4 bg-white rounded border border-gray-200">
+              <h4 className="font-semibold text-blue-600 mb-2">🗄️ Base de Datos</h4>
+              <p className="text-sm text-gray-600">Accede a todas las tablas de la base de datos, consulta la estructura y visualiza los datos almacenados (hasta 1000 registros por tabla).</p>
+            </div>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <div className="p-4 bg-white rounded border border-gray-200">
+              <h4 className="font-semibold text-blue-600 mb-2">📈 Panel de Control</h4>
+              <p className="text-sm text-gray-600">Monitorea las estadísticas del sistema en tiempo real: estado del servidor, usuarios activos y carga del sistema.</p>
+            </div>
+          </Col>
+        </Row>
+      </Card>
+
       {/* Database Access Info */}
       <Card className="mb-8">
-        <h3 className="text-lg font-bold mb-4">🔐 Permisos de Acceso</h3>
+        <h3 className="text-lg font-bold mb-4">🔐 Permisos de Acceso y Restricciones</h3>
         <Row gutter={16}>
           <Col xs={24} sm={12}>
-            <h4 className="font-semibold mb-2">✅ Permitido:</h4>
+            <h4 className="font-semibold mb-3 text-green-600">✅ Permitido (Lee):</h4>
             <ul style={{ margin: '0', paddingLeft: '20px' }}>
-              <li>Ver todos los datos del sistema</li>
-              <li>Monitorear estado del servidor</li>
-              <li>Ver estadísticas en tiempo real</li>
-              <li>Ver registros del sistema</li>
-              <li>Gestionar usuarios</li>
+              <li>Ver todos los datos del sistema sin restricción</li>
+              <li>Monitorear estado del servidor en tiempo real</li>
+              <li>Ver estadísticas y métricas del sistema</li>
+              <li>Acceder a registros del sistema (logs)</li>
+              <li>Gestionar usuarios (crear, editar información básica)</li>
+              <li>Visualizar toda la estructura de la base de datos</li>
+              <li>Consultar datos de todas las tablas (hasta 1000 registros)</li>
             </ul>
           </Col>
           <Col xs={24} sm={12}>
-            <h4 className="font-semibold mb-2">❌ No Permitido:</h4>
+            <h4 className="font-semibold mb-3 text-red-600">❌ No Permitido (Escribe/Elimina):</h4>
             <ul style={{ margin: '0', paddingLeft: '20px' }}>
-              <li>Modificar registros existentes</li>
-              <li>Eliminar registros</li>
-              <li>Crear nuevos registros</li>
-              <li>Cambiar configuración del sistema</li>
+              <li>Modificar registros existentes directamente</li>
+              <li>Eliminar registros de la base de datos</li>
+              <li>Crear nuevos registros manualmente</li>
+              <li>Cambiar configuración crítica del sistema</li>
+              <li>Borrar registros de auditoría (logs)</li>
+              <li>Modificar roles y permisos de otros usuarios</li>
+              <li>Cambiar configuración de la base de datos</li>
             </ul>
           </Col>
         </Row>
+        <div style={{ marginTop: '20px', padding: '12px', backgroundColor: '#e6f7ff', borderRadius: '4px', borderLeft: '4px solid #1890ff' }}>
+          <p style={{ margin: '0', fontSize: '14px', color: '#0050b3' }}>
+            <strong>💡 Nota:</strong> El rol de Mantenimiento es de solo lectura para la base de datos y datos del sistema. 
+            Esto garantiza que no se modificarán datos críticos accidentalmente. Para hacer cambios en los datos, 
+            contacta con un administrador de base de datos.
+          </p>
+        </div>
       </Card>
     </div>
   );
