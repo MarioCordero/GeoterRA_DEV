@@ -41,8 +41,50 @@ Purpose: Provide concise, actionable guidance so an AI coding agent (Copilot/Cla
 - When adding or changing endpoints: update `API/docs/contratos.md`, add or update tests under `API/tests/`, and run the relevant test scripts.
 - If a global change is needed (e.g., API URL rename), update `website/src/config/apiConf.jsx`, `Android/Development` configs, and document the change in this file.
 
+### API Endpoint Refactoring Pattern (Frontend)
+
+When refactoring a component to use centralized API calls from `apiConf.jsx`:
+
+1. **Check if the function already exists** in `website/src/config/apiConf.jsx`. Look for patterns like `authLogin`, `authLogout`, `userMe`, etc.
+
+2. **If it exists**, replace direct `fetch()` calls with the abstracted function:
+   ```javascript
+   // BEFORE:
+   const response = await fetch(auth.logout(), {
+     method: "POST",
+     credentials: "include",
+   });
+   if (response.ok) { /* ... */ }
+
+   // AFTER:
+   const result = await authLogout();
+   if (result.ok) { /* ... */ }
+   ```
+
+3. **Update imports** from `import { auth } from '...'` to `import { authLogout } from '...'`
+
+4. **Handle error consistently**: Use `result.error` (string) instead of parsing `response.json()`
+
+5. **To request this refactoring**, ask: "Refactor the [endpoint name] API call in [component name] to use the abstracted function from apiConf"
+   - Example: "Refactor the logout API call in SidebarDesktop to use authLogout from apiConf"
+
 9. When to ask for human review
 - Changes touching auth, DB migrations, or release branching.
 - Any change that requires provisioning or secret access (CI, production config).
 
 If anything is unclear or you want a different level of automation, leave a comment in `notes.txt` or open an issue.
+
+10. Git Commit Style
+- When generating commits, you MUST strictly follow this specific format and write the descriptions in ENGLISH:
+```
+# FEAT:
+
+- Description of the completed task
+
+- Description of another completed task
+
+----------------
+```
+- Replace `FEAT:` with the appropriate prefix as necessary (e.g. `FIX:`, `REFACTOR:`, `CHORE:`, etc) matching the exact capitalization and `# ` prefix layout.
+- List all descriptions of tasks separated by `- ` with empty newlines in between as shown.
+- Ensure the commit message is always closed out with `----------------`.
