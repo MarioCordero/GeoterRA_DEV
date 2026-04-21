@@ -7,7 +7,7 @@ import {
 } from "@ant-design/icons";
 import { useSession } from '../../../hooks/useSession';
 import { usePermissions } from '../../../hooks/usePermissions';
-import { auth } from '../../../config/apiConf';
+import { authLogout } from '../../../config/apiConf';
 import '../../../fontsModule.css';
 import '../../../colorModule.css';
 import { getMenuItems, createPermissionsObject } from '../../../utils/menuConfig.jsx';
@@ -26,29 +26,19 @@ const SidebarMobile = ({ selectedKey, setSelectedKey }) => {
   const handleLogout = async () => {
     try {
       setLoggingOut(true);
-      console.log("🔵 [SidebarMobile] Starting logout process...");
+      const result = await authLogout();
 
-      const response = await fetch(auth.logout(), {
-        method: "POST",
-        credentials: "include",
-        headers: { 'Accept': 'application/json' },
-      });
-
-      if (response.ok) {
-        console.log("✅ [SidebarMobile] Logout successful, clearing session and redirecting...");
+      if (result.ok) {
         await sessionLogout();
         setLogoutModalVisible(false);
         navigate("/");
       } else {
-        const data = await response.json();
-        console.error("❌ [SidebarMobile] Logout failed:", data);
         Modal.error({
           title: 'Error al cerrar sesión',
-          content: data.message || "Error desconocido",
+          content: result.error || "Error desconocido",
         });
       }
     } catch (err) {
-      console.error("❌ [SidebarMobile] Logout error:", err);
       Modal.error({
         title: 'Error de conexión',
         content: err.message,
