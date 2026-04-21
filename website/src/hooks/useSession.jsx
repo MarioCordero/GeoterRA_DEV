@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { users, auth } from '../config/apiConf';
+import { userMeSession, authLogout } from '../config/apiConf';
 
 const SessionContext = createContext({
   user: null,
@@ -19,39 +19,28 @@ export const SessionProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
+      // API CALL - using userMeSession() function
+      const result = await userMeSession();
       
-      // API CALL REFACT
-      const meSessionUrl = users.meSession();
-      const res = await fetch(meSessionUrl, {
-        method: 'GET',
-        credentials: 'include',
-        headers: { 'Accept': 'application/json' },
-      });
+      if (result.ok && result.data) {
+        setUser(result.data);
+        return result.data;
+      }
 
-      if (res.status === 401) {
+      if (result.status === 401) {
         console.warn('⚠️ [useSession] 401 Unauthorized - No hay sesión válida');
         setUser(null);
         return null;
       }
       
-      if (!res.ok) {
-        const text = await res.text().catch(() => '');
-        console.error('❌ [useSession] HTTP error:', res.status, text);
-        throw new Error(`HTTP ${res.status}`);
-      }
-
-      const body = await res.json();
-      if (body.data) {
-        setUser(body.data);
-        return body.data;
-      }
-
-      console.warn('⚠️ [useSession] Respuesta OK pero sin body.data');
+      console.error('❌ [useSession] Error:', result.error);
+      setError(result.error);
       setUser(null);
       return null;
+      
     } catch (err) {
-      console.error('❌ [useSession] Error en fetchSession:', err);
-      setError(null);
+      console.error('❌ [useSession] Exception:', err);
+      setError(err.message);
       setUser(null);
       return null;
     } finally {
@@ -61,25 +50,32 @@ export const SessionProvider = ({ children }) => {
 
   const logout = useCallback(async () => {
     try {
-      const logoutUrl = auth.logout();
+      // API CALL - using authLogout() function
+      const result = await authLogout();
       
-      const res = await fetch(logoutUrl, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Accept': 'application/json' },
-      });
-      
+      if (!result.ok) {
+        console.warn('⚠️ [useSession] Logout failed:', result.error);
+      }
     } catch (err) {
-      console.error('[useSession] Logout error:', err);
+      console.error('❌ [useSession] Logout exception:', err);
     } finally {
       setUser(null);
     }
   }, []);
 
   useEffect(() => {
-    fetchSession().then((result) => {
+    // Only check session if session cookie exists
+    // Skip on initial load to avoid 401 errors before login
+    const hasSessionCookie = document.cookie.includes('geoterra_session_token');
+
+    if (hasSessionCookie) {
+      fetchSession().then(() => {
+        setInitialized(true);
+      });
+    } else {
+      // No session cookie, initialize without fetching
       setInitialized(true);
-    });
+    }
 
     return () => {};
   }, [fetchSession]);

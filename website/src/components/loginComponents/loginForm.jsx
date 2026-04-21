@@ -27,15 +27,33 @@ function Login() {
     setLoading(true);
 
     try {
-      
       // API CALL
       const payload = { email, password };
       const result = await authLogin(payload);
-      
+
       if (result.ok) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Wait for cookie to be set
+        let cookieIsSet = false;
+        let retries = 0;
+        const maxRetries = 10;
+
+        while (!cookieIsSet && retries < maxRetries) {
+          if (document.cookie.includes('geoterra_session_token')) {
+            cookieIsSet = true;
+            console.log('✅ [Login] Cookie detected');
+            break;
+          }
+          await new Promise(resolve => setTimeout(resolve, 100)); // Check every 100ms
+          retries++;
+        }
+
+        if (!cookieIsSet) {
+          console.warn('⚠️ [Login] Cookie not set after 1 second');
+        }
+
+        // Now fetch session
         const sessionUser = await refresh();
-        
+
         if (sessionUser) {
           navigate('/Dashboard');
         } else {
@@ -44,7 +62,7 @@ function Login() {
         }
         return;
       }
-      
+
       const errorMessage = result.error || 'Credenciales incorrectas';
       console.error('[Login] Error:', errorMessage);
       setErrorMsg(errorMessage);

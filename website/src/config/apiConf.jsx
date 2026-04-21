@@ -6,6 +6,7 @@ const API_CONFIG = {
     local: 'http://localhost:8000/API/public'
   },
 
+  // TODO: HIDE THE APIKEY
   defaultHeaders: {
     'Content-Type': 'application/json',
     'x-api-key': 'web-secret-key-789',
@@ -119,17 +120,7 @@ export const maintenance = {
 // DEBUG & CONFIG
 // ============================================
 export const debugApiConfig = () => {
-  console.log('🔧 API Configuration:', {
-    environment: API_CONFIG.environment,
-    baseUrl: getApiBaseUrl(),
-    endpoints: {
-      auth,
-      users,
-      analysisRequest,
-      registeredManifestations,
-      maintenance,
-    }
-  });
+  // Debug function removed
 };
 
 export const autoDetectEnvironment = () => {
@@ -140,8 +131,6 @@ export const autoDetectEnvironment = () => {
   } else {
     API_CONFIG.environment = 'production';
   }
-  
-  console.log(`🔄 Auto-detected environment: ${API_CONFIG.environment}`);
 };
 
 // ============================================
@@ -163,6 +152,13 @@ export const callApi = async (endpoint, method = 'GET', payload = null, customHe
       ...customHeaders,
     };
 
+    // Remove headers with empty string values (e.g., skip x-api-key for session requests)
+    Object.keys(headers).forEach(key => {
+      if (headers[key] === '') {
+        delete headers[key];
+      }
+    });
+
     const options = {
       method,
       credentials: 'include',
@@ -177,6 +173,7 @@ export const callApi = async (endpoint, method = 'GET', payload = null, customHe
     const response = await fetch(endpoint, options);
     const data = await response.json().catch(() => ({}));
 
+
     // Extract error message from different response formats
     const getErrorMessage = () => {
       if (data.message) return data.message;
@@ -189,7 +186,7 @@ export const callApi = async (endpoint, method = 'GET', payload = null, customHe
     return {
       ok: response.ok,
       status: response.status,
-      data: data.data || data, // Support both { data: {...} } and direct response
+      data: data.data || data,
       error: response.ok ? null : getErrorMessage(),
     };
   } catch (error) {
@@ -225,6 +222,7 @@ export const userMe = async () => {
 };
 
 export const userMeSession = async () => {
+  // Session endpoint requires both session cookie AND API key
   return callApi(users.meSession(), 'GET');
 };
 
