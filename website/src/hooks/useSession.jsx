@@ -64,20 +64,12 @@ export const SessionProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    // Only check session if session cookie exists
-    // Skip on initial load to avoid 401 errors before login
-    const hasSessionCookie = document.cookie.includes('geoterra_session_token');
-
-    if (hasSessionCookie) {
-      fetchSession().then(() => {
-        setInitialized(true);
-      });
-    } else {
-      // No session cookie, initialize without fetching
+    // Always check session on mount, regardless of cookie presence
+    fetchSession().then((userData) => {
       setInitialized(true);
-    }
-
-    return () => {};
+    }).catch(() => {
+      setInitialized(true);
+    });
   }, [fetchSession]);
 
   return (
