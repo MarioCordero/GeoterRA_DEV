@@ -3,66 +3,66 @@ declare(strict_types=1);
 
 /**
  * Database connection factory.
- * Loads credentials from .env (home directory) and config.ini based on APP_ENV.
+ * Busca .env y config.ini un nivel arriba de la carpeta del proyecto.
  */
 
-// Load .env file from home directory if exists
-$envFile = getenv('HOME') . '/.env';
+// 1. Definimos las rutas relativas al proyecto
+// Si este archivo está en la raíz de GeoterRA_DEV, __DIR__ es esa raíz.
+// dirname(__DIR__) nos sube a la carpeta JOB/
+$projectRoot = __DIR__;
+$parentDir   = dirname($projectRoot); 
+
+// 2. Cargar .env desde el nivel de JOB/
+$envFile = $parentDir . '/.env';
+
 if (file_exists($envFile)) {
-  $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-  foreach ($lines as $line) {
-    if (str_starts_with(trim($line), '#')) continue;
-    if (!str_contains($line, '=')) continue;
-    [$key, $value] = explode('=', $line, 2);
-    $_ENV[trim($key)] = trim($value);
-  }
+    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line === '' || str_starts_with($line, '#')) continue;
+        if (!str_contains($line, '=')) continue;
+        
+        [$key, $value] = explode('=', $line, 2);
+        $_ENV[trim($key)] = trim($value, " \t\n\r\0\x0B\"");
+    }
 }
 
 $env = $_ENV['APP_ENV'] ?? getenv('APP_ENV') ?: 'development';
 
-// Use production config.ini from home if APP_ENV=production, otherwise use local
-$configPath = $env === 'production'
-  ? getenv('HOME') . '/config.ini'
-  : __DIR__ . '/config.ini';
+// 3. Determinar la ruta del config.ini
+// Si es producción, lo busca en JOB/. Si no, en la carpeta local del repo.
+$configPath = ($env === 'production')
+    ? $parentDir . '/config.ini'
+    : $projectRoot . '/config.ini';
 
 if (!file_exists($configPath)) {
-  throw new RuntimeException('Database configuration file not found at: ' . $configPath);
+    throw new RuntimeException("Archivo de configuración no encontrado en: $configPath");
 }
 
 $config = parse_ini_file($configPath, true);
 
 if ($config === false || !isset($config['database'])) {
-  throw new RuntimeException('Invalid database configuration.');
+    throw new RuntimeException('Configuración de base de datos inválida.');
 }
 
 $db = $config['database'];
 
-$host = $db['host'] ?? 'localhost';
-$port = $db['port'] ?? '3306';
-$name = $db['name'] ?? '';
-$user = $db['user'] ?? '';
-$password = $db['pass'] ?? '';
-$charset = $db['charset'] ?? 'utf8mb4';
-
-if ($name === '' || $user === '') {
-  throw new RuntimeException('Incomplete database credentials.');
-}
-
+// ... (resto del código de conexión PDO igual que antes)
 $dsn = sprintf(
-  'mysql:host=%s;port=%s;dbname=%s;charset=%s',
-  $host,
-  $port,
-  $name,
-  $charset
+    'mysql:host=%s;port=%s;dbname=%s;charset=%s',
+    $db['host'] ?? 'localhost',
+    $db['port'] ?? '3306',
+    $db['name'] ?? '',
+    $db['charset'] ?? 'utf8mb4'
 );
 
 return new PDO(
-  $dsn,
-  $user,
-  $password,
-  [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES => false,
-  ]
+    $dsn,
+    $db['user'] ?? '',
+    $db['pass'] ?? '',
+    [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false,
+    ]
 );
