@@ -135,14 +135,74 @@ secrets.defaults.properties
 
 # Configuración de VSCode (si usás)
 .vscode/
-.github/
-website/
 *.json
 *.klib
 
+# -----------------------------
+# Frontend
+# -----------------------------
+# Playwright
+website/test-results/
+website/playwright-report/
+website/blob-report/
+website/playwright/.cache/
+website/playwright/.auth/
+# Standart
 website/node_modules/*
 API/config/config.ini
 .vscode
 website/.vite/deps/_metadata.json
 website/.vite/deps/package.json
+GeoterRA_Local.session.sql
+GeoterRA.session.sql
+website/.vite/deps/_metadata.json
+website/.vite/deps/package.json
+
+# -----------------------------
+# Backend
+# -----------------------------
+API/vendor/*
+API/.phpunit.cache/*
+
+
+# -----------------------------
+# Android / Gradle
+# -----------------------------
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+captures/
+
+# -----------------------------
+# Kotlin Multiplatform
+# -----------------------------
+**/build/
+
+# -----------------------------
+# iOS / Xcode
+# -----------------------------
+DerivedData/
+*.xcworkspace
+!default.xcworkspace
+*.xcuserdata
+*.xcuserstate
+
+# CocoaPods
+Pods/
+iosApp/Pods/
+Podfile.lock
+
+# -----------------------------
+# macOS
+# -----------------------------
+.DS_Store
+
+# -----------------------------
+# Logs
+# -----------------------------
+*.log
+
+notes.txt
 GeoterRA_local.session.sql
