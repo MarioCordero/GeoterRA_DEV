@@ -122,39 +122,26 @@ final class AuthController
   /**
    * POST /auth/logout
    * Revokes current session and logs out user (both web and mobile).
+   * 
+   * The AuthService handles both cookie and bearer token authentication.
    */
   public function logout(): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user) {
-        throw new ApiException(
-          ErrorType::unauthorized('Not authenticated'),
-          401
-        );
-      }
-
-      // Logout (revoke tokens in database)
+      // Logout handles both web (cookies) and mobile (bearer tokens)
       $this->authService->logout();
 
-      // Detect client platform and respond accordingly
-      if (Request::isMobile()) {
-        error_log(sprintf(
-          '✅ [Auth] Mobile app logout successful: %s',
-          $user['email']
-        ));
-      } else {
-        // Web browser: delete cookie
+      // For web clients, delete the HTTP-only cookie
+      if (!Request::isMobile()) {
         setcookie('geoterra_session_token', '', [
           'expires' => time() - 3600,
           'path' => '/',
           'samesite' => 'Lax'
         ]);
 
-        error_log(sprintf(
-          '✅ [Auth] Browser logout successful: %s',
-          $user['email']
-        ));
+        error_log('✅ [Auth] Browser logout successful');
+      } else {
+        error_log('✅ [Auth] Mobile app logout successful');
       }
 
       Response::success([
