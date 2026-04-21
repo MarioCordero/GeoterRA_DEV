@@ -7,29 +7,27 @@ use Http\Request;
 use Http\Response;
 use Http\ApiException;
 use Http\ErrorType;
-use DTO\PermissionsDTO as Permissions;
+use Services\AuthService;
 use Services\PermissionService;
 use Services\MaintenanceService;
+use DTO\PermissionsDTO as Permissions;
 
 
 final class MaintenanceController
 {
   private MaintenanceService $service;
+  private AuthService $authService;
 
   public function __construct(private \PDO $pdo)
   {
     $this->service = new MaintenanceService($pdo);
+    $this->authService = new AuthService($pdo);
   }
 
   public function getSystemLogs(): void
   {
     try {
-      $user = Request::getUser();
-
-      if (!$user) {
-        Response::error(ErrorType::unauthorized(), 401);
-        return;
-      }
+      $user = $this->authService->requireAuth();
 
       if (!PermissionService::hasPermission($user['role'], Permissions::VIEW_SYSTEM_LOGS)) {
         Response::error(ErrorType::forbidden(), 403);
@@ -48,13 +46,7 @@ final class MaintenanceController
   public function getDashboardInfo(): void
   {
     try {
-      $user = Request::getUser();
-
-      if (!$user) {
-        Response::error(ErrorType::unauthorized(), 401);
-        return;
-      }
-
+      $user = $this->authService->requireAuth();
       if (!PermissionService::hasPermission($user['role'], Permissions::VIEW_INFRASTRUCTURE)) {
         Response::error(ErrorType::forbidden(), 403);
         return;
@@ -73,12 +65,7 @@ final class MaintenanceController
   public function showAllUsers(): void
   {
     try {
-      $user = Request::getUser();
-
-      if (!$user) {
-        Response::error(ErrorType::unauthorized(), 401);
-        return;
-      }
+      $user = $this->authService->requireAuth();
 
       if (!PermissionService::hasPermission($user['role'], Permissions::VIEW_USERS)) {
         Response::error(ErrorType::forbidden(), 403);
@@ -98,12 +85,7 @@ final class MaintenanceController
   public function getAllDatabaseTables(): void
   {
     try {
-      $user = Request::getUser();
-
-      if (!$user) {
-        Response::error(ErrorType::unauthorized(), 401);
-        return;
-      }
+      $user = $this->authService->requireAuth();
 
       if (!PermissionService::hasPermission($user['role'], Permissions::VIEW_INFRASTRUCTURE)) {
         Response::error(ErrorType::forbidden(), 403);

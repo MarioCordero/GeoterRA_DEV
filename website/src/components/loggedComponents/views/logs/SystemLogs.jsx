@@ -1,4 +1,4 @@
-import { maintenance } from '../../../../config/apiConf';
+import { maintenanceSystemLogs } from '../../../../config/apiConf';
 import React, { useState, useEffect } from 'react';
 import { usePermissions } from '../../../../hooks/usePermissions';
 
@@ -17,29 +17,22 @@ const SystemLogs = () => {
 
     const fetchLogs = async () => {
       try {
-        const response = await fetch(maintenance.systemLogs(), {
-          credentials: 'include'
-        });
-        const data = await response.json();
+        const result = await maintenanceSystemLogs();
 
-        if (data.data && Array.isArray(data.data.logs)) {
-          const rawLogs = data.data.logs;
-          const logLines = rawLogs
-            .map((log) => log.replace(/\\n$/, '').trim())
-            .filter((log) => log.length > 0);
-
-          setLogsData(logLines);
-          setError(null);
-        } else {
-          console.error('❌ [SystemLogs] No logs array found', {
-            hasSuccess: data.success,
-            hasData: !!data.data,
-            hasLogs: !!data.data?.logs,
-            isArray: Array.isArray(data.data?.logs)
-          });
+        if (!result.ok || !result.data?.logs) {
+          console.error('❌ [SystemLogs] Error:', result.error || 'No logs data received');
           setLogsData([]);
-          setError('No logs data received');
+          setError(result.error || 'No logs data received');
+          return;
         }
+
+        const rawLogs = result.data.logs;
+        const logLines = rawLogs
+          .map((log) => log.replace(/\\n$/, '').trim())
+          .filter((log) => log.length > 0);
+
+        setLogsData(logLines);
+        setError(null);
 
       } catch (err) {
         console.error('❌ [SystemLogs] Error:', err);

@@ -4,7 +4,7 @@ import { ReloadOutlined, SearchOutlined } from '@ant-design/icons';
 import "../../../../colorModule.css";
 import '../../../../fontsModule.css';
 import { useSession } from '../../../../hooks/useSession';
-import { maintenance } from '../../../../config/apiConf';
+import { maintenanceAllTables } from '../../../../config/apiConf';
 
 /**
  * DatabaseViewer Component
@@ -24,19 +24,15 @@ const DatabaseViewer = () => {
   const fetchAllTables = async () => {
     setLoading(true);
     try {
-      const response = await fetch(maintenance.allTables(), {
-        method: 'GET',
-        credentials: 'include',
-        headers: { 'Accept': 'application/json' },
-      });
+      // API CALL
+      const result = await maintenanceAllTables();
 
-      if (!response.ok) throw new Error('Failed to fetch database tables');
+      if (!result.ok) throw new Error(result.error || 'Failed to fetch database tables');
 
-      const data = await response.json();
-      setTables(data.data || {});
+      setTables(result.data || {});
       
       // Set first table as active tab
-      const tableNames = Object.keys(data.data || {});
+      const tableNames = Object.keys(result.data || {});
       if (tableNames.length > 0) {
         setActiveTab(tableNames[0]);
       }

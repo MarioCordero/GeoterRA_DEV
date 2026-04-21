@@ -38,17 +38,24 @@ final class AuthController
   public function login(): void
   {
     try {
-
-      // Parse and validate request
       $data = Request::parseJsonRequest();
       $dto = LoginUserDTO::fromArray($data);
       $result = $this->authService->login($dto);
 
-    if (Request::isMobile()) {
-      $this->respondMobile($result);
-    } else {
-      $this->respondWeb($result);
-    }
+      if (Request::isMobile()) {
+        $responseData = $this->authService->prepareMobileResponse($result);
+        Response::success($responseData, [
+          'token_type' => 'Bearer',
+          'expires_in' => 5400,
+        ], 200);
+      } else {
+        $responseData = $this->authService->prepareWebResponse($result);
+        Response::success($responseData, [
+          'token_type' => 'Cookie',
+          'expires_in' => 5400,
+          'message' => 'Session set via HTTP-only cookie'
+        ], 200);
+      }
 
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
@@ -57,61 +64,7 @@ final class AuthController
     }
   }
 
-  private function respondWeb(array $result): void
-  {
-      // $expiresIn = $result['meta']['expires_in'] ?? 5400;
-
-      // setcookie('geoterra_session_token', $result['data']['access_token'], [
-      //     'expires' => time() + $expiresIn,
-      //     'httponly' => true,
-      //     'secure' => true, // Siempre recomendado en este nuevo esquema
-      //     'samesite' => 'Lax'
-      // ]);
-
-    $accessToken = $result['data']['access_token'];
-    $expiresIn = $result['meta']['expires_in'] ?? 5400;
-
-    // Set HTTP-only cookie for browser
-    setcookie('geoterra_session_token', $accessToken, [
-      'expires' => time() + $expiresIn,
-      'path' => '/',
-      'domain' => '',
-      'secure' => $this->isSecureContext(),
-      'httponly' => true,
-      'samesite' => 'Lax'
-    ]);
-
-    error_log(sprintf(
-      '✅ [Auth] Browser login successful: %s (IP: %s)',
-      $result['data']['email'],
-      $_SERVER['REMOTE_ADDR'] ?? 'unknown'
-    ));
-
-    $responseData = $this->filterResponse($result, 'cookie');
-
-    // Return response WITHOUT refresh_token in body (only in cookie)
-    Response::success(
-      $responseData, [
-        'token_type' => 'Cookie',
-        'expires_in' => $expiresIn,
-        'message' => 'Session set via HTTP-only cookie'
-      ], 200
-    );
-  }
-
-  /**
-   * Prepara la respuesta para Apps Móviles (Bearer)
-   */
-  private function respondMobile(array $result): void
-  {
-    $responseData = $this->filterResponse($result, 'bearer');
-    
-    Response::success($responseData, [
-        'token_type' => 'Bearer',
-        'expires_in' => 5400,
-        'refresh_expires_in' => 2592000
-    ], 200);
-  }
+  // ???? 
 
   private function filterResponse(array $result, string $method): array
   {
@@ -137,39 +90,26 @@ final class AuthController
   /**
    * POST /auth/logout
    * Revokes current session and logs out user (both web and mobile).
+   * 
+   * The AuthService handles both cookie and bearer token authentication.
    */
   public function logout(): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user) {
-        throw new ApiException(
-          ErrorType::unauthorized('Not authenticated'),
-          401
-        );
-      }
-
-      // Logout (revoke tokens in database)
+      // Logout handles both web (cookies) and mobile (bearer tokens)
       $this->authService->logout();
 
-      // Detect client platform and respond accordingly
-      if (Request::isMobile()) {
-        error_log(sprintf(
-          '✅ [Auth] Mobile app logout successful: %s',
-          $user['email']
-        ));
-      } else {
-        // Web browser: delete cookie
+      // For web clients, delete the HTTP-only cookie
+      if (!Request::isMobile()) {
         setcookie('geoterra_session_token', '', [
           'expires' => time() - 3600,
           'path' => '/',
           'samesite' => 'Lax'
         ]);
 
-        error_log(sprintf(
-          '✅ [Auth] Browser logout successful: %s',
-          $user['email']
-        ));
+        error_log('✅ [Auth] Browser logout successful');
+      } else {
+        error_log('✅ [Auth] Mobile app logout successful');
       }
 
       Response::success([
