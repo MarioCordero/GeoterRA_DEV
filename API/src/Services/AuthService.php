@@ -173,25 +173,6 @@ final class AuthService
     ];
   }
 
-
-  // public function requireAuth(): array
-  // {
-  //   $headers = getallheaders();
-  //   $authorization = $headers['Authorization'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? ''; 
-  //   if (str_starts_with($authorization, 'Bearer ')) {
-  //     $token = trim(substr($authorization, 7));
-  //     if ($token !== '') {
-  //       return $this->authenticate($token);
-  //     }
-  //   }
-  //   $sessionToken = $_COOKIE['geoterra_session_token'] ?? null;
-  //   if ($sessionToken) {
-  //     return $this->authenticate($sessionToken);
-  //   }
-  //   throw new ApiException(ErrorType::missingAuthToken(), 401);
-  // }
-
-
   /**
    * Require authentication for an endpoint and return the authenticated user info.
    *
