@@ -8,12 +8,12 @@ export default defineConfig({
     tailwindcss(),                          
   ],
   server: {
-    host: 'geoterra.com',
+    host: '0.0.0.0',
     port: 5173,
-    allowedHosts: ['geoterra.com'],
+    allowedHosts: ['geoterra.com', 'localhost', '127.0.0.1'],
     proxy: {
       '/API': {
-        target: 'http://geoterra.com',
+        target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
         configure: (proxy, _options) => {
