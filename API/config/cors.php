@@ -6,7 +6,7 @@ $allowedOrigins = [
     'http://localhost:3000',
     'http://geoterra.com',
     'http://127.0.0.1:5173',
-    'http://geoterra.com:5173',  // Add this - your current frontend URL
+    'http://geoterra.com:5173',
 ];
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
