@@ -10,6 +10,7 @@ export default defineConfig({
   server: {
     host: 'geoterra.com',
     port: 5173,
+    allowedHosts: ['geoterra.com'],
     proxy: {
       '/API': {
         target: 'http://geoterra.com',
