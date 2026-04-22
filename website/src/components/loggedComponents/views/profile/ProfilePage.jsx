@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { users } from '../../../../config/apiConf';
+import { userMeUpdate, userMeDelete } from '../../../../config/apiConf';
 import { useSession } from '../../../../hooks/useSession';
 import { Form, Input, Button, Card, Spin, Modal, Divider, Row, Col, message } from 'antd';
 import { LockOutlined, MailOutlined, UserOutlined, PhoneOutlined, SaveOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
@@ -29,32 +29,15 @@ const ProfilePage = () => {
     setLoading(true);
 
     try {
-      // API CALL
-      const endpoint = users.me();
-      const response = await fetch(endpoint, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName: pendingData.firstName,
-          lastName: pendingData.lastName,
-          email: pendingData.email,
-          phoneNumber: pendingData.phone,
-        }),
+      const result = await userMeUpdate({
+        firstName: pendingData.firstName,
+        lastName: pendingData.lastName,
+        email: pendingData.email,
+        phoneNumber: pendingData.phone,
       });
 
-      const data = await response.json();
-
-      if (response.status === 401 || response.status === 403) {
-        throw new Error('No autorizado');
-      }
-
-      if (!response.ok) {
-        const errorMessage = data.errors?.[0]?.message || `Error: ${response.status}`;
-        throw new Error(errorMessage);
+      if (!result.ok) {
+        throw new Error(result.error || 'Error updating profile');
       }
 
       // Refresh session to update user data
@@ -78,30 +61,13 @@ const ProfilePage = () => {
     }
     setPasswordLoading(true);
     try {
-      // API CALL
-      const endpoint = users.me();
-      const response = await fetch(endpoint, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          currentPassword: values.currentPassword,
-          password: values.newPassword,
-        }),
+      const result = await userMeUpdate({
+        currentPassword: values.currentPassword,
+        password: values.newPassword,
       });
 
-      const data = await response.json();
-
-      if (response.status === 401 || response.status === 403) {
-        throw new Error('Contraseña actual incorrecta');
-      }
-
-      if (!response.ok) {
-        const errorMessage = data.errors?.[0]?.message || `Error: ${response.status}`;
-        throw new Error(errorMessage);
+      if (!result.ok) {
+        throw new Error(result.error || 'Password change failed');
       }
 
       message.success('✅ Contraseña actualizada correctamente');
@@ -121,25 +87,10 @@ const ProfilePage = () => {
     setDeleteLoading(true);
 
     try {
-      // API CALL
-      const endpoint = users.me();
-      const response = await fetch(endpoint, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: {
-          'Accept': 'application/json',
-        },
-      });
+      const result = await userMeDelete();
 
-      const data = await response.json();
-
-      if (response.status === 401 || response.status === 403) {
-        throw new Error('No autorizado');
-      }
-
-      if (!response.ok) {
-        const errorMessage = data.errors?.[0]?.message || `Error: ${response.status}`;
-        throw new Error(errorMessage);
+      if (!result.ok) {
+        throw new Error(result.error || 'Account deletion failed');
       }
 
       message.success('✅ Cuenta eliminada correctamente');
