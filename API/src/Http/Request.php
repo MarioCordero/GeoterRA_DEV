@@ -13,29 +13,28 @@ final class Request
 
   public static function init(): void
   {
+    // Configure session cookie parameters early
+    session_set_cookie_params([
+        'lifetime' => 5400,  // 1.5 hours
+        'path' => '/',
+        'domain' => '',      // Empty domain = request host (works with IPs)
+        'secure' => \Core\EnvironmentDetector::shouldUseSecureCookie(),
+        'httponly' => true,
+        'samesite' => \Core\EnvironmentDetector::getSameSiteValue()
+    ]);
+    
     self::$apiKey = $headers['-x-api-key'] ?? $_SERVER['HTTP_X_API_KEY'] ?? null;
 
-    // Determine environment: check if .env exists, else default to development
-    $envFile = getenv('HOME') . '/.env';
-    $env = 'development';
+    // Load API keys from environment-aware location
+    // Production: JOB/api-keys.php (outside project)
+    // Local: API/config/api-keys.php
+    $productionKeysPath = dirname(__DIR__, 4) . '/api-keys.php';
+    $localKeysPath = dirname(__DIR__, 2) . '/config/api-keys.php';
     
-    if (file_exists($envFile)) {
-      $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-      foreach ($lines as $line) {
-        if (str_starts_with(trim($line), '#')) continue;
-        if (!str_contains($line, '=')) continue;
-        [$key, $value] = explode('=', $line, 2);
-        if (trim($key) === 'APP_ENV') {
-          $env = trim($value);
-          break;
-        }
-      }
-    }
-
-    // Load api-keys from home directory on production, otherwise use local
-    $apiKeysPath = $env === 'production'
-      ? getenv('HOME') . '/api-keys.php'
-      : __DIR__ . '/../../config/api-keys.php';
+    // Try production path first if HTTPS, then fall back to local
+    $apiKeysPath = (\Core\EnvironmentDetector::isHttps() && file_exists($productionKeysPath))
+      ? $productionKeysPath
+      : $localKeysPath;
 
     if (!file_exists($apiKeysPath)) {
       throw new \RuntimeException('API keys configuration file not found at: ' . $apiKeysPath);

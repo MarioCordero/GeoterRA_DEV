@@ -204,30 +204,34 @@ final class AuthService
    * @param array $result Login result from login()
    * @return array Response data to send to client
    */
-  public function prepareWebResponse(array $result): array
-  {
-    $accessToken = $result['data']['access_token'];
-    
-    setcookie(
-      'geoterra_session_token',
-      $accessToken,
-      [
-        'expires' => time() + 5400,
-        'path' => '/',
-        'secure' => true,
-        'httponly' => true,
-        'samesite' => 'None',
-      ]
-    );
+    public function prepareWebResponse(array $result): array
+    {
+      $accessToken = $result['data']['access_token'];
+      
+      // Dynamically determine cookie security settings based on protocol
+      $useSecureFlag = \Core\EnvironmentDetector::shouldUseSecureCookie();
+      $sameSite = \Core\EnvironmentDetector::getSameSiteValue();
+      
+      setcookie(
+        'geoterra_session_token',
+        $accessToken,
+        [
+          'expires' => time() + 5400,
+          'path' => '/',
+          'secure' => $useSecureFlag,
+          'httponly' => true,
+          'samesite' => $sameSite,
+        ]
+      );
 
-    return [
-      'user_id' => $result['data']['user_id'],
-      'email' => $result['data']['email'],
-      'name' => $result['data']['name'],
-      'role' => $result['data']['role'],
-      'is_admin' => $result['data']['is_admin'],
-    ];
-  }
+      return [
+        'user_id' => $result['data']['user_id'],
+        'email' => $result['data']['email'],
+        'name' => $result['data']['name'],
+        'role' => $result['data']['role'],
+        'is_admin' => $result['data']['is_admin'],
+      ];
+    }
 
   /**
    * Prepare login response for mobile clients (returns bearer tokens).
