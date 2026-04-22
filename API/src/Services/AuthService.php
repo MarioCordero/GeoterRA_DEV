@@ -208,9 +208,10 @@ final class AuthService
     {
       $accessToken = $result['data']['access_token'];
       
-      // Dynamically determine cookie security settings based on protocol
+      // Dynamically determine cookie settings based on protocol and domain
       $useSecureFlag = \Core\EnvironmentDetector::shouldUseSecureCookie();
       $sameSite = \Core\EnvironmentDetector::getSameSiteValue();
+      $cookieDomain = \Core\EnvironmentDetector::getCookieDomain();
       
       setcookie(
         'geoterra_session_token',
@@ -218,6 +219,7 @@ final class AuthService
         [
           'expires' => time() + 5400,
           'path' => '/',
+          'domain' => $cookieDomain,
           'secure' => $useSecureFlag,
           'httponly' => true,
           'samesite' => $sameSite,

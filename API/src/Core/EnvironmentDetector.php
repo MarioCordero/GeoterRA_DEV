@@ -90,4 +90,34 @@ final class EnvironmentDetector
   {
     return self::isHttps() ? 'None' : 'Lax';
   }
+
+  /**
+   * Get the appropriate domain for setting cookies.
+   * Detects the current host and returns the correct domain for cookie storage.
+   * 
+   * Returns:
+   * - '.geoterra.com' for geoterra.com (allows all subdomains)
+   * - '163.178.171.105' for the production IP
+   * - '' for localhost/127.0.0.1 (no domain restriction)
+   */
+  public static function getCookieDomain(): string
+  {
+    $host = self::getHost();
+    
+    // Remove port if present (e.g., 'geoterra.com:5173' -> 'geoterra.com')
+    $domain = explode(':', $host)[0];
+    
+    // For geoterra.com, allow all subdomains
+    if ($domain === 'geoterra.com') {
+      return '.geoterra.com';
+    }
+    
+    // For production IP address
+    if ($domain === '163.178.171.105') {
+      return '163.178.171.105';
+    }
+    
+    // For localhost/127.0.0.1 - no domain restriction
+    return '';
+  }
 }
