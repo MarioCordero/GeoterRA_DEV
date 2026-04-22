@@ -60,19 +60,25 @@ const ProfilePage = () => {
       return;
     }
     setPasswordLoading(true);
+
     try {
-      const result = await userMeUpdate({
+      const response = await userMeUpdate({
         currentPassword: values.currentPassword,
         password: values.newPassword,
+        firstName: user.first_name || user.firstName,
+        lastName: user.last_name || user.lastName,
+        email: user.email,
+        phoneNumber: user.phone_number || user.phoneNumber,
       });
 
-      if (!result.ok) {
-        throw new Error(result.error || 'Password change failed');
+      if (!response.ok) {
+        throw new Error(response.error || 'Password change failed');
       }
 
       message.success('✅ Contraseña actualizada correctamente');
       passwordForm.resetFields();
       setIsChangingPassword(false);
+      await refreshSession();
     } catch (error) {
       console.error('Password change error:', error);
       message.error(`Error: ${error.message}`);
