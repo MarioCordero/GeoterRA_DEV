@@ -26,13 +26,13 @@ final class Request
     self::$apiKey = $headers['-x-api-key'] ?? $_SERVER['HTTP_X_API_KEY'] ?? null;
 
     // Load API keys from environment-aware location
-    // Production: JOB/api-keys.php (outside project)
-    // Local: API/config/api-keys.php
+    // Production: JOB/api-keys.php (outside project, on 163.178.171.105 or geoterra.com)
+    // Local: API/config/api-keys.php (on localhost or 127.0.0.1)
     $productionKeysPath = dirname(__DIR__, 4) . '/api-keys.php';
     $localKeysPath = dirname(__DIR__, 2) . '/config/api-keys.php';
     
-    // Try production path first if HTTPS, then fall back to local
-    $apiKeysPath = (\Core\EnvironmentDetector::isHttps() && file_exists($productionKeysPath))
+    // Detect by hostname/IP, not protocol (production is HTTP, not HTTPS)
+    $apiKeysPath = (\Core\EnvironmentDetector::isProduction() && file_exists($productionKeysPath))
       ? $productionKeysPath
       : $localKeysPath;
 

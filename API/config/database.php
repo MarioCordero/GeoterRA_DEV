@@ -3,15 +3,16 @@ declare(strict_types=1);
 
 /**
  * Database connection factory
- * Loads configuration from the top-level JOB/ directory
+ * Loads configuration based on environment detection (hostname or IP)
+ * Production: JOB/config.ini (163.178.171.105)
+ * Local: GeoterRA_DEV/config.ini (localhost, 127.0.0.1)
  */
 
 $jobLevelDir = dirname(__DIR__, 3);
 $repoLevelDir = dirname(__DIR__, 2);
 
-// Load environment variables from .env file
+// Load environment variables from .env if it exists (optional)
 $envFile = $jobLevelDir . '/.env';
-
 if (file_exists($envFile)) {
     $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
@@ -28,21 +29,19 @@ if (file_exists($envFile)) {
     }
 }
 
-// Detect environment (APP_ENV variable or path-based detection)
-$env = $_ENV['APP_ENV'] ?? getenv('APP_ENV');
+// Detect environment based on hostname/IP (not path)
+// Production: 163.178.171.105 or geoterra.com
+// Local: localhost or 127.0.0.1
+$host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
+$isProduction = str_contains($host, '163.178.171.105') || str_contains($host, 'geoterra.com');
 
-if (!$env) {
-    $env = (str_contains(__DIR__, '/home/proyecto')) ? 'production' : 'development';
-}
-
-// Locate config file based on environment
-// Production: JOB/config.ini | Development: GeoterRA_DEV/config.ini
-$configPath = ($env === 'production')
+// Locate config.ini based on detected environment
+$configPath = $isProduction
     ? $jobLevelDir . '/config.ini'
-    : $repoLevelDir . '/config.ini'; 
+    : $repoLevelDir . '/config.ini';
 
 if (!file_exists($configPath)) {
-    throw new RuntimeException("Configuration file not found at: $configPath (Environment: $env)");
+    throw new RuntimeException("Configuration file not found at: $configPath (Host: $host, Environment: " . ($isProduction ? 'production' : 'local') . ")");
 }
 
 $config = parse_ini_file($configPath, true);
@@ -51,7 +50,7 @@ if ($config === false || !isset($config['database'])) {
     throw new RuntimeException('Invalid database configuration.');
 }
 
-// Parse database connection parameters
+// Parse and create database connection
 $db = $config['database'];
 
 $dsn = sprintf(
@@ -62,7 +61,6 @@ $dsn = sprintf(
     $db['charset'] ?? 'utf8mb4'
 );
 
-// Create and return PDO connection
 return new PDO(
     $dsn,
     $db['user'] ?? '',

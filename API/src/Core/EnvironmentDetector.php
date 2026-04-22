@@ -5,7 +5,10 @@ namespace Core;
 
 /**
  * Detects server environment and protocol at runtime.
- * Does not rely on .env files - uses $_SERVER inspection.
+ * Does not rely on .env files - uses $_SERVER inspection and hostname detection.
+ * 
+ * Production: http://163.178.171.105 (public IPv4)
+ * Local/Dev:  http://localhost or http://127.0.0.1
  */
 final class EnvironmentDetector
 {
@@ -28,7 +31,7 @@ final class EnvironmentDetector
   }
 
   /**
-   * Get the current server host.
+   * Get the current server host (without port).
    */
   public static function getHost(): string
   {
@@ -44,7 +47,7 @@ final class EnvironmentDetector
   }
 
   /**
-   * Check if running on localhost/127.0.0.1 (development).
+   * Check if running on localhost/127.0.0.1 (development/local).
    */
   public static function isLocalhost(): bool
   {
@@ -55,12 +58,21 @@ final class EnvironmentDetector
   }
 
   /**
+   * Check if running on production server (163.178.171.105 or geoterra.com).
+   */
+  public static function isProduction(): bool
+  {
+    $host = self::getHost();
+    return str_contains($host, '163.178.171.105') ||
+           str_contains($host, 'geoterra.com');
+  }
+
+  /**
    * Determine if secure cookie flag should be set.
+   * Cookie security is ONLY determined by protocol, not environment.
    * 
-   * Returns true if:
-   * - Running HTTPS (production or secured staging)
-   * Returns false if:
-   * - Running plain HTTP (development or unencrypted IP)
+   * Returns true:  Only if running HTTPS
+   * Returns false: All HTTP environments (dev, staging, production IPs)
    */
   public static function shouldUseSecureCookie(): bool
   {
@@ -69,9 +81,10 @@ final class EnvironmentDetector
 
   /**
    * Get appropriate SameSite attribute value.
+   * SameSite policy depends on protocol, not environment.
    * 
-   * - For HTTP: 'Lax' (allows cookies in top-level navigation)
-   * - For HTTPS: 'None' (requires Secure flag, allows cross-site cookies)
+   * For HTTP: 'Lax' (allows cookies in top-level navigation)
+   * For HTTPS: 'None' (requires Secure flag, allows cross-site cookies)
    */
   public static function getSameSiteValue(): string
   {
