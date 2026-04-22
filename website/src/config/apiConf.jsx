@@ -225,6 +225,10 @@ export const userMeUpdate = async (payload) => {
   return callApi(users.me(), 'PUT', payload);
 };
 
+export const userMeDelete = async () => {
+  return callApi(users.me(), 'DELETE');
+};
+
 export const userMeSession = async () => {
   return callApi(users.meSession(), 'GET');
 };
