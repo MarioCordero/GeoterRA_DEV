@@ -163,6 +163,7 @@ website/.vite/deps/package.json
 # -----------------------------
 API/vendor/*
 API/.phpunit.cache/*
+API/config/api-keys.php
 
 
 # -----------------------------
