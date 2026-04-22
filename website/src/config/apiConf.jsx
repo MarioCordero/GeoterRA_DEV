@@ -221,8 +221,11 @@ export const userMe = async () => {
   return callApi(users.me(), 'GET');
 };
 
+export const userMeUpdate = async (payload) => {
+  return callApi(users.me(), 'PUT', payload);
+};
+
 export const userMeSession = async () => {
-  // Session endpoint requires both session cookie AND API key
   return callApi(users.meSession(), 'GET');
 };
 
