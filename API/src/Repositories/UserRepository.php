@@ -33,20 +33,46 @@ final class UserRepository
   }
 
   /**
-   * Updates user profile information.
+   * Updates user profile including password if provided.
    */
   public function update(UpdateUserDTO $dto): bool
   {
-    $stmt = $this->db->prepare(
-      'UPDATE users SET
+    // If password is being updated, update password hash
+    if ($dto->password) {
+      $stmt = $this->db->prepare(
+        'UPDATE users SET
         first_name = :first_name,
         last_name = :last_name,
         email = :email,
         phone_number = :phone_number,
+        password_hash = :password_hash,
         updated_at = NOW()
       WHERE user_id = :user_id
         AND deleted_at IS NULL
         AND is_active = 1'
+      );
+
+      return $stmt->execute([
+        ':first_name' => $dto->firstName,
+        ':last_name' => $dto->lastName,
+        ':email' => $dto->email,
+        ':phone_number' => $dto->phoneNumber,
+        ':password_hash' => $dto->password,
+        ':user_id' => $dto->userId
+      ]);
+    }
+
+    // Standard profile update (no password change)
+    $stmt = $this->db->prepare(
+      'UPDATE users SET
+      first_name = :first_name,
+      last_name = :last_name,
+      email = :email,
+      phone_number = :phone_number,
+      updated_at = NOW()
+    WHERE user_id = :user_id
+      AND deleted_at IS NULL
+      AND is_active = 1'
     );
 
     return $stmt->execute([
@@ -106,7 +132,9 @@ final class UserRepository
    */
   public function findById(string $userId): ?array
   {
-    $stmt = $this->db->prepare('SELECT user_id, first_name, last_name, email, phone_number, role, is_active, is_verified, created_at FROM users WHERE user_id = :uid LIMIT 1');
+    $stmt = $this->db->prepare(
+      'SELECT user_id, first_name, last_name, email, phone_number, role, is_active, is_verified, password_hash, created_at FROM users WHERE user_id = :uid LIMIT 1'
+    );
     $stmt->execute(['uid' => $userId]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     return $user ?: null;
@@ -118,7 +146,9 @@ final class UserRepository
    */
   public function findActiveUserById(string $userId): ?array
   {
-    $stmt = $this->db->prepare('SELECT user_id, first_name, last_name, email, phone_number, role, is_active, is_verified, created_at FROM users WHERE user_id = :uid AND deleted_at IS NULL AND is_active = 1 LIMIT 1');
+    $stmt = $this->db->prepare(
+      'SELECT user_id, first_name, last_name, email, phone_number, role, is_active, is_verified, password_hash, created_at FROM users WHERE user_id = :uid AND deleted_at IS NULL AND is_active = 1 LIMIT 1'
+    );
     $stmt->execute(['uid' => $userId]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     return $user ?: null;
