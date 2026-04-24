@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace Services;
 
 use PDO;
+use Http\Request;
+use Http\ErrorType;
 use DTO\LoginUserDTO;
 use Http\ApiException;
-use Http\ErrorType;
-use Http\Request;
 use Services\PasswordService;
 use Repositories\UserRepository;
 use Repositories\AuthRepository;
