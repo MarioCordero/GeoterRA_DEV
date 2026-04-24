@@ -5,8 +5,8 @@ namespace Repositories;
 
 use PDO;
 use DTO\Ulid;
-use DTO\RegisterUserDTO;
 use DTO\UpdateUserDTO;
+use DTO\RegisterUserDTO;
 
 final class UserRepository
 {
@@ -81,6 +81,26 @@ final class UserRepository
       ':email' => $dto->email,
       ':phone_number' => $dto->phoneNumber,
       ':user_id' => $dto->userId
+    ]);
+  }
+
+  /**
+   * Updates a user's role.
+   */
+  public function updateRole(string $userId, string $role): bool
+  {
+    $stmt = $this->db->prepare(
+      'UPDATE users SET
+      role = :role,
+      updated_at = NOW()
+    WHERE user_id = :user_id
+      AND deleted_at IS NULL
+      AND is_active = 1'
+    );
+
+    return $stmt->execute([
+      ':role' => $role,
+      ':user_id' => $userId
     ]);
   }
 

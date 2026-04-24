@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Services;
 
-use DTO\AllowedRegions;
-use DTO\RegisteredManifestationDTO;
-use DTO\AllowedUserRoles;
-use Http\ApiException;
-use Http\ErrorType;
-use Http\Response;
 use Http\Request;
+use Http\Response;
+use Http\ErrorType;
+use Http\ApiException;
+use DTO\AllowedRegions;
+use DTO\AllowedUserRoles;
 use Services\AuthService;
 use Services\UserService;
-use Repositories\RegisteredManifestationRepository;
 use Repositories\RegionRepository;
+use DTO\RegisteredManifestationDTO;
+use Repositories\RegisteredManifestationRepository;
 
 /**
  * Business logic for registered geothermal manifestations
