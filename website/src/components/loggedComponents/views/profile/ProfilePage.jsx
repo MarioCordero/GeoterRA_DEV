@@ -18,6 +18,7 @@ const ProfilePage = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
+  const [profileUpdateSuccessVisible, setProfileUpdateSuccessVisible] = useState(false);
   const [pendingData, setPendingData] = useState(null);
 
   // Handle profile update submission
@@ -32,28 +33,28 @@ const ProfilePage = () => {
     setLoading(true);
 
     try {
-      const result = await userMeUpdate({
+      const payload = {
         firstName: pendingData.firstName,
         lastName: pendingData.lastName,
         email: pendingData.email,
         phoneNumber: pendingData.phone,
-      });
+      };
+      const result = await userMeUpdate(payload);
+      if (!result.ok) throw new Error(result.error || 'Error updating profile');
 
-      if (!result.ok) {
-        throw new Error(result.error || 'Error updating profile');
-      }
-
-      // Refresh session to update user data
-      await refreshSession();
-      message.success('✅ Perfil actualizado correctamente');
-      setIsEditing(false);
+      setLoading(false);
       setPendingData(null);
+      setProfileUpdateSuccessVisible(true);
     } catch (error) {
-      console.error('Profile update error:', error);
       message.error(`Error: ${error.message}`);
-    } finally {
       setLoading(false);
     }
+  };
+
+  const handleProfileUpdateSuccess = async () => {
+    setProfileUpdateSuccessVisible(false);
+    setIsEditing(false);
+    await refreshSession();
   };
 
   // Handle password change submission
@@ -80,6 +81,7 @@ const ProfilePage = () => {
       }
 
       setSuccessModalVisible(true);
+      console.log('✅ [handlePasswordChange] Password changed successfully - Success modal is now visible');
       passwordForm.resetFields();
     } catch (error) {
       console.error('❌ [handlePasswordChange] Error:', error);
@@ -109,7 +111,6 @@ const ProfilePage = () => {
       }
 
       message.success('✅ Cuenta eliminada correctamente');
-      // Redirect to home after successful deletion
       setTimeout(() => {
         window.location.href = '/';
       }, 1500);
@@ -491,6 +492,17 @@ const ProfilePage = () => {
         status="success"
         confirmText="Continuar"
         onConfirm={handlePasswordChangeSuccess}
+      />
+
+      {/* Profile Update Success Modal */}
+      <SuccessModal
+        open={profileUpdateSuccessVisible}
+        title="¡Éxito!"
+        subtitle="Perfil actualizado"
+        message="Tu información personal ha sido actualizada correctamente."
+        status="success"
+        confirmText="Continuar"
+        onConfirm={handleProfileUpdateSuccess}
       />
     </div>
   );

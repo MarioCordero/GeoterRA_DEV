@@ -173,6 +173,53 @@ All backend communication must go through centralized functions in `website/src/
    ```
    - Example: `Refactor the PUT http://localhost:8000/API/public/users/me API call in ProfilePage to use userMeUpdate from apiConf`
 
+#### Modal-Then-Refresh Pattern for SuccessModal ⚠️
+
+**CRITICAL**: When using `SuccessModal` after an API call that updates session/user data, follow this exact order to prevent state reset:
+
+```javascript
+// ❌ WRONG - refreshSession() causes state reset:
+try {
+  const result = await userMeUpdate(payload);
+  if (!result.ok) throw new Error(result.error);
+  setLoading(false);
+  setSuccessModalVisible(true);
+  await refreshSession(); // BUG: Re-render resets modal state to false
+} catch (error) {
+  message.error(`Error: ${error.message}`);
+  setLoading(false);
+}
+
+// ✅ CORRECT - Show modal FIRST, refresh in background:
+try {
+  const result = await userMeUpdate(payload);
+  if (!result.ok) throw new Error(result.error);
+  setLoading(false);
+  setPendingData(null);
+  setSuccessModalVisible(true); // Show modal BEFORE refresh
+  console.log('✅ [handler] Success modal is now visible');
+  
+  // Refresh in background WITHOUT awaiting
+  refreshSession().catch(error => {
+    console.error('Session refresh error:', error);
+  });
+} catch (error) {
+  console.error('❌ [handler] Error:', error);
+  message.error(`Error: ${error.message}`);
+  setLoading(false);
+}
+```
+
+**Why this matters:**
+1. `refreshSession()` updates the context which causes a full component re-render
+2. If you await it before showing the modal, the re-render resets `setSuccessModalVisible` to `false`
+3. Solution: Set modal visible state **first**, then call `refreshSession().catch()` without awaiting
+
+**Console logging pattern:**
+- After API success, log: `console.log('✅ [confirmProfileUpdate] Profile updated successfully');`
+- After setting modal visible, log: `console.log('✅ [confirmProfileUpdate] Success modal is now visible');`
+- In catch block, log: `console.error('❌ [confirmProfileUpdate] Profile update error:', error);`
+
 #### Session & Cookie Handling
 - Authentication handled via `useSession` hook
 - Session token stored as HttpOnly cookie (browser manages automatically)
