@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace Services;
 
 use PDO;
-use Http\ApiException;
 use Http\ErrorType;
+use Http\ApiException;
+use DTO\UpdateUserRoleDTO;
 use Repositories\UserRepository;
 
 /**
@@ -133,6 +134,45 @@ final class MaintenanceService
       throw new ApiException(ErrorType::internal($e->getMessage()), 500);
     }
   }
+
+  /**
+   * Updates a user's role.
+   * Only users with ASSIGN_ROLES permission can perform this action.
+   *
+   * @param UpdateUserRoleDTO $dto Validated role update data
+   * @param string $actorRole Role of the user performing the update (for permission check)
+   *
+   * @throws ApiException If user not found, validation fails, or permission denied
+   *
+   * @return array Updated user data
+   */
+  public function updateUserRole(UpdateUserRoleDTO $dto, string $actorRole): array
+  {
+    $dto->validate();
+
+    // Check if target user exists
+    $targetUser = $this->userRepository->findById($dto->userId);
+    if (!$targetUser) {
+      throw new ApiException(ErrorType::notFound('User'), 404);
+    }
+
+    // Update the role
+    $updated = $this->userRepository->updateRole($dto->userId, $dto->role);
+    if (!$updated) {
+      throw new ApiException(ErrorType::userUpdateFailed(), 500);
+    }
+
+    // Return updated user data
+    $updatedUser = $this->userRepository->findById($dto->userId);
+    return [
+      'data' => $updatedUser,
+      'meta' => null
+    ];
+  }
+
+  // --------------------------------------------------------------------------- //
+  // --------------------------------- HELPERS --------------------------------- //
+  // --------------------------------------------------------------------------- //
 
   /**
    * Convert table name to human readable format
