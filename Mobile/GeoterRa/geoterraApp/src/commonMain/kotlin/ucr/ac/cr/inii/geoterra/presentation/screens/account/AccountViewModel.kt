@@ -12,9 +12,23 @@ class AccountViewModel(
   private val userRepository: UserRepositoryInterface,
   private val authEventBus: AuthEventBus
 ) : BaseScreenModel<AccountState>(AccountState()) {
+<<<<<<< Updated upstream
   
   init {
     loadUserProfile()
+=======
+
+  init {
+    screenModelScope.launch {
+      authEventBus.isLoggedIn.collect { isLogged ->
+        when (isLogged) {
+          true -> loadUserProfile()
+          false -> _state.update { it.copy(user = null, error = null) }
+          null -> {}
+        }
+      }
+    }
+>>>>>>> Stashed changes
   }
   
   fun loadUserProfile() {

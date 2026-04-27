@@ -195,7 +195,11 @@ fun AnalysisFormContent(
       if (state.isLoading) {
         CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
       } else {
+<<<<<<< Updated upstream
         Text("ENVIAR SOLICITUD", fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
+=======
+        Text("Enviar solicitud", fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
+>>>>>>> Stashed changes
       }
     }
 

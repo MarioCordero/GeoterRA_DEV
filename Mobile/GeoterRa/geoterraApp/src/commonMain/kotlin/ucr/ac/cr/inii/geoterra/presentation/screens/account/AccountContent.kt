@@ -111,7 +111,12 @@ fun AccountContent(
             Icons.Default.DeleteForever,
             "Eliminar cuenta",
             isCritical = true,
+<<<<<<< Updated upstream
             onClick = { showDeleteDialog = true })
+=======
+            onClick = { showDeleteDialog = true }
+          )
+>>>>>>> Stashed changes
         }
       }
     }

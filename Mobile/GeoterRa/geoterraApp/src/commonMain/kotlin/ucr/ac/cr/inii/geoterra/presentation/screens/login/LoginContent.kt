@@ -40,6 +40,10 @@ import geoterra.geoterraapp.generated.resources.logo_GeoterRA
 import geoterra.geoterraapp.generated.resources.logo_GeoterRA_exp
 import geoterra.geoterraapp.generated.resources.rocks
 import org.jetbrains.compose.resources.painterResource
+<<<<<<< Updated upstream
+=======
+import ucr.ac.cr.inii.geoterra.presentation.components.layout.ActionButton
+>>>>>>> Stashed changes
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.CustomTextField
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.FormSection
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.PasswordField
@@ -144,6 +148,7 @@ fun LoginContent(
             )
           }
 
+<<<<<<< Updated upstream
           Button(
             onClick = onLoginClick,
             modifier = Modifier
@@ -182,6 +187,13 @@ fun LoginContent(
               }
             }
           }
+=======
+          ActionButton(
+            isLoading = state.isLoading,
+            text = "Ingresar",
+            onClick = onLoginClick,
+          )
+>>>>>>> Stashed changes
 
           TextButton(
             onClick = { onRegisterClick() },

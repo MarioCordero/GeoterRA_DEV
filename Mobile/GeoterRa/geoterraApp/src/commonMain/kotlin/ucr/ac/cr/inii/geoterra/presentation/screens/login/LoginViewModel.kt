@@ -2,6 +2,10 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.login
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.CompletableDeferred
+<<<<<<< Updated upstream
+=======
+import kotlinx.coroutines.delay
+>>>>>>> Stashed changes
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.remote.LoginRequest
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
@@ -67,10 +71,23 @@ class LoginViewModel(
       val s = state.value
       val deferred = CompletableDeferred<Result<Unit>>()
 
+<<<<<<< Updated upstream
       authEventBus.emit(AuthEvent.Login(LoginRequest(s.email, s.password), deferred))
 
       deferred.await()
         .onSuccess {
+=======
+      authEventBus.emit(
+        AuthEvent.Login(
+          LoginRequest(s.email, s.password)
+          , deferred
+        )
+      )
+
+      deferred.await()
+        .onSuccess {
+          delay(100)
+>>>>>>> Stashed changes
           updateState { it.copy(isLoading = false, isSuccess = true) }
         }
         .onFailure { error ->

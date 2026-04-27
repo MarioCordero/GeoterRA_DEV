@@ -75,7 +75,11 @@ fun SuccessActionDialog(
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
       ) {
+<<<<<<< Updated upstream
         Text(dismissText, color = MaterialTheme.colorScheme.error)
+=======
+        Text(dismissText, color = MaterialTheme.colorScheme.onSurface)
+>>>>>>> Stashed changes
       }
     }
   )
