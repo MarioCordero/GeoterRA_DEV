@@ -40,10 +40,7 @@ import geoterra.geoterraapp.generated.resources.logo_GeoterRA
 import geoterra.geoterraapp.generated.resources.logo_GeoterRA_exp
 import geoterra.geoterraapp.generated.resources.rocks
 import org.jetbrains.compose.resources.painterResource
-<<<<<<< Updated upstream
-=======
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.ActionButton
->>>>>>> Stashed changes
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.CustomTextField
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.FormSection
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.PasswordField
@@ -148,52 +145,11 @@ fun LoginContent(
             )
           }
 
-<<<<<<< Updated upstream
-          Button(
-            onClick = onLoginClick,
-            modifier = Modifier
-              .fillMaxWidth()
-              .height(58.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.buttonColors(
-              containerColor = MaterialTheme.colorScheme.primary,
-              contentColor = MaterialTheme.colorScheme.onPrimary
-            ),
-            elevation = ButtonDefaults.buttonElevation(
-              defaultElevation = 4.dp,
-              pressedElevation = 0.dp
-            ),
-            enabled = !state.isLoading
-          ) {
-            if (state.isLoading) {
-              CircularProgressIndicator(
-                modifier = Modifier.size(24.dp),
-                color = MaterialTheme.colorScheme.onPrimary,
-                strokeWidth = 3.dp
-              )
-            } else {
-              Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-              ) {
-                Text(
-                  "INGRESAR",
-                  style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.2.sp
-                  )
-                )
-                Icon(Icons.Default.ArrowForward, contentDescription = null)
-              }
-            }
-          }
-=======
           ActionButton(
             isLoading = state.isLoading,
             text = "Ingresar",
             onClick = onLoginClick,
           )
->>>>>>> Stashed changes
 
           TextButton(
             onClick = { onRegisterClick() },

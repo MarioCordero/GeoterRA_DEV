@@ -4,10 +4,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-<<<<<<< Updated upstream
-=======
 import kotlinx.coroutines.yield
->>>>>>> Stashed changes
 import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepositoryInterface
 
 class AuthService(
@@ -28,18 +25,11 @@ class AuthService(
         when (event) {
           is AuthEvent.Login -> {
             val result = authRepository.login(event.request)
-<<<<<<< Updated upstream
-            event.response.complete(result)
-            if (result.isSuccess) {
-              loginSuccess()
-            }
-=======
             if (result.isSuccess) {
               authEventBus.emit(AuthEvent.LoginSuccess)
               loginSuccess()
             }
             event.response.complete(result)
->>>>>>> Stashed changes
           }
 
           is AuthEvent.Register -> {

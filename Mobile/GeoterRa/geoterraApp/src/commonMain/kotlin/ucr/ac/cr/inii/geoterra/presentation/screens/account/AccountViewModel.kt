@@ -12,11 +12,6 @@ class AccountViewModel(
   private val userRepository: UserRepositoryInterface,
   private val authEventBus: AuthEventBus
 ) : BaseScreenModel<AccountState>(AccountState()) {
-<<<<<<< Updated upstream
-  
-  init {
-    loadUserProfile()
-=======
 
   init {
     screenModelScope.launch {
@@ -28,7 +23,6 @@ class AccountViewModel(
         }
       }
     }
->>>>>>> Stashed changes
   }
   
   fun loadUserProfile() {

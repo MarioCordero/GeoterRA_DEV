@@ -14,11 +14,8 @@ sealed class AuthEvent {
 
   object RefreshToken : AuthEvent()
 
-<<<<<<< Updated upstream
-=======
   object LoginSuccess : AuthEvent()
 
->>>>>>> Stashed changes
   object Logout : AuthEvent()
 
   data class Login(

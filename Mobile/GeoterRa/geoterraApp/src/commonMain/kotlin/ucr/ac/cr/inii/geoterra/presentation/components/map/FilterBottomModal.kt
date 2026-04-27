@@ -26,10 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
-<<<<<<< Updated upstream
-=======
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.ActionButton
->>>>>>> Stashed changes
 import ucr.ac.cr.inii.geoterra.presentation.components.layout.SectionHeader
 import ucr.ac.cr.inii.geoterra.presentation.screens.map.MapLayer
 import ucr.ac.cr.inii.geoterra.presentation.screens.map.MapState
@@ -119,31 +116,6 @@ fun FilterBottomModal(
         }
         Spacer(modifier = Modifier.height(32.dp))
 
-<<<<<<< Updated upstream
-        Button(
-          onClick = {
-            scope.launch { sheetState.hide() }.invokeOnCompletion { onApplyFilters() }
-          },
-          modifier = Modifier
-            .fillMaxWidth()
-            .height(58.dp),
-          shape = RoundedCornerShape(16.dp),
-          colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
-          ),
-          elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 4.dp,
-            pressedElevation = 0.dp
-          )
-        ) {
-          Text(
-            "Aplicar Configuración",
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-          )
-        }
-=======
-
         ActionButton(
           onClick = {
             scope.launch { sheetState.hide() }.invokeOnCompletion { onApplyFilters() }
@@ -152,7 +124,6 @@ fun FilterBottomModal(
           isLoading = false,
           modifier = Modifier.fillMaxWidth()
         )
->>>>>>> Stashed changes
       }
     }
   }
