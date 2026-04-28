@@ -165,6 +165,22 @@ const DatabaseViewer = () => {
         <p className="text-gray-600">
           Visualiza todos los datos de la base de datos (solo lectura)
         </p>
+
+        <div className="mt-4 p-4 bg-green-50 rounded-lg border border-green-200">
+          <p className="text-sm text-gray-700 mb-2">
+            <strong>¿Para qué sirve este panel?</strong>
+          </p>
+          <ul className="text-sm text-gray-600 space-y-1">
+            <li>✓ Visualizar todas las tablas de la base de datos en una interfaz unificada</li>
+            <li>✓ Acceder a datos completos de cada tabla con navegación sencilla</li>
+            <li>✓ Buscar registros específicos dentro de cualquier tabla</li>
+            <li>✓ Ordenar los datos por diferentes columnas</li>
+            <li>✓ Ver el número total de registros de cada tabla</li>
+            <li>✓ Paginar resultados para una mejor visualización</li>
+            <li>✓ Acceso de solo lectura para proteger la integridad de los datos</li>
+            <li>✓ Refrescar datos en tiempo real</li>
+          </ul>
+        </div>
       </div>
 
       <Spin spinning={loading}>
