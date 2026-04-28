@@ -4,10 +4,7 @@ declare(strict_types=1);
 // 1. CORS (must be first)
 require __DIR__ . '/../config/cors.php';
 
-// 2. Configuración inicial
-require __DIR__ . '/../config/init.php';
-
-// 3. Autoloader (MUST be before using any classes)
+// 2. Autoloader (MUST be before using any classes)
 spl_autoload_register(function (string $class): void {
     $baseDir = __DIR__ . '/../src/';
     $file = $baseDir . str_replace('\\', '/', $class) . '.php';
@@ -15,6 +12,9 @@ spl_autoload_register(function (string $class): void {
         require_once $file;
     }
 });
+
+// 3. Configuración inicial (after autoloader)
+require __DIR__ . '/../config/init.php';
 
 use Http\RequestParser;
 use Http\Response;

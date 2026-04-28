@@ -6,6 +6,7 @@ namespace Services;
 use PDO;
 use Http\ErrorType;
 use Http\ApiException;
+use Core\Logger;
 use DTO\UpdateUserRoleDTO;
 use Repositories\UserRepository;
 
@@ -124,7 +125,7 @@ final class MaintenanceService
             'displayName' => $this->humanizeTableName($table),
           ];
         } catch (\Throwable $e) {
-          error_log("Error reading table $table: " . $e->getMessage());
+          Logger::error("Error reading table $table: " . $e->getMessage());
           continue;
         }
       }
