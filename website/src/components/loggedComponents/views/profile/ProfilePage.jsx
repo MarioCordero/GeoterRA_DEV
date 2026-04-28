@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { userMeUpdate, userMeDelete } from '../../../../config/apiConf';
 import { useSession } from '../../../../hooks/useSession';
-import ConfirmationModal from '../../../common/ConfirmationModal';
+import ConfirmationModal from '../../../../common/ConfirmationModal';
 import SuccessModal from '../../../common/SuccessModal';
 import { Form, Input, Button, Card, Spin, Row, Col, message } from 'antd';
 import { LockOutlined, MailOutlined, UserOutlined, PhoneOutlined, SaveOutlined, ExclamationCircleOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
