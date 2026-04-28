@@ -7,6 +7,7 @@ use Http\Request;
 use Http\Response;
 use Http\ErrorType;
 use Http\ApiException;
+use Core\Logger;
 use Services\AuthService;
 use DTO\UpdateUserRoleDTO;
 use Services\PermissionService;
@@ -41,7 +42,7 @@ final class MaintenanceController
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
     } catch (\Throwable $e) {
-      error_log('❌ [MaintenanceController::getSystemLogs] Error: ' . $e->getMessage());
+      Logger::error('❌ [MaintenanceController::getSystemLogs] Error: ' . $e->getMessage());
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -61,7 +62,7 @@ final class MaintenanceController
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
     } catch (\Throwable $e) {
-      error_log('❌ [MaintenanceController::getDashboardInfo] Error: ' . $e->getMessage());
+      Logger::error('❌ [MaintenanceController::getDashboardInfo] Error: ' . $e->getMessage());
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -82,7 +83,7 @@ final class MaintenanceController
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
     } catch (\Throwable $e) {
-      error_log('❌ [MaintenanceController::showAllUsers] Error: ' . $e->getMessage());
+      Logger::error('❌ [MaintenanceController::showAllUsers] Error: ' . $e->getMessage());
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -103,7 +104,7 @@ final class MaintenanceController
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
     } catch (\Throwable $e) {
-      error_log('❌ [MaintenanceController::getAllDatabaseTables] Error: ' . $e->getMessage());
+      Logger::error('❌ [MaintenanceController::getAllDatabaseTables] Error: ' . $e->getMessage());
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -136,7 +137,7 @@ final class MaintenanceController
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
     } catch (\Throwable $e) {
-      error_log('❌ [MaintenanceController::updateUserRole] Error: ' . $e->getMessage());
+      Logger::error('❌ [MaintenanceController::updateUserRole] Error: ' . $e->getMessage());
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }

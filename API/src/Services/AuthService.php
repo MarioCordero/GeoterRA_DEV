@@ -8,6 +8,7 @@ use Http\Request;
 use Http\ErrorType;
 use DTO\LoginUserDTO;
 use Http\ApiException;
+use Core\Logger;
 use Services\PasswordService;
 use Repositories\UserRepository;
 use Repositories\AuthRepository;
@@ -172,7 +173,7 @@ final class AuthService
         ? Request::getCookie('geoterra_session_token')
         : Request::getBearerToken();
 
-    error_log('info [AuthService] Authenticating request. Client type: ' . (Request::isWeb() ? 'web' : 'mobile') . ', Token: ' . ($token ? substr($token, 0, 8) . '...' : 'none'));
+    Logger::debug('info [AuthService] Authenticating request. Client type: ' . (Request::isWeb() ? 'web' : 'mobile') . ', Token: ' . ($token ? substr($token, 0, 8) . '...' : 'none'));
 
     if (!$token) {
       throw new ApiException(ErrorType::missingAuthToken(), 401);
