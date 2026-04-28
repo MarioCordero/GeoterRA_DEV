@@ -46,6 +46,7 @@ const API_CONFIG = {
       systemLogs: '/maintenance/system/logs',
       dashboardInfo: '/maintenance/dashboard',
       allUsers: '/maintenance/users',
+      updateUserRole: (id) => `/maintenance/users/${id}`,
       allTables: '/maintenance/database/tables',
     },
   }
@@ -113,6 +114,7 @@ export const maintenance = {
   systemLogs: () => buildApiUrl(API_CONFIG.endpoints.maintenance.systemLogs),
   dashboardInfo: () => buildApiUrl(API_CONFIG.endpoints.maintenance.dashboardInfo),
   allUsers: () => buildApiUrl(API_CONFIG.endpoints.maintenance.allUsers),
+  updateUserRole: (id) => buildApiUrl(API_CONFIG.endpoints.maintenance.updateUserRole(id)),
   allTables: () => buildApiUrl(API_CONFIG.endpoints.maintenance.allTables),
 };
 
@@ -300,6 +302,10 @@ export const maintenanceDashboardInfo = async () => {
 
 export const maintenanceAllUsers = async () => {
   return callApi(maintenance.allUsers(), 'GET');
+};
+
+export const maintenanceUpdateUserRole = async (id, payload) => {
+  return callApi(maintenance.updateUserRole(id), 'PUT', payload);
 };
 
 export const maintenanceAllTables = async () => {

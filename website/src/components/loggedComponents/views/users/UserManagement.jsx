@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { maintenanceAllUsers } from '../../../../config/apiConf';
+import { maintenanceAllUsers, maintenanceUpdateUserRole } from '../../../../config/apiConf';
 import { usePermissions } from '../../../../hooks/usePermissions';
-import { Table, Card, Spin, Tag, message, Button, Space } from 'antd';
-import { ReloadOutlined } from '@ant-design/icons';
+import { Table, Card, Spin, Tag, message, Button, Space, Modal, Select } from 'antd';
+import { ReloadOutlined, EditOutlined } from '@ant-design/icons';
 
 const UserManagement = () => {
   const { hasPermission, PERMISSIONS } = usePermissions();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState(0);
+  const [editingUser, setEditingUser] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedRole, setSelectedRole] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -28,6 +32,58 @@ const UserManagement = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEditRole = (record) => {
+    setEditingUser(record);
+    setSelectedRole(record.role);
+    setIsModalVisible(true);
+  };
+
+  const handleSaveRole = async () => {
+    if (!selectedRole) {
+      message.warning('Please select a new role');
+      return;
+    }
+
+    if (selectedRole === editingUser.role) {
+      message.info('Role is the same as the current role');
+      setIsModalVisible(false);
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const result = await maintenanceUpdateUserRole(editingUser.user_id, {
+        role: selectedRole,
+      });
+
+      if (!result.ok) {
+        throw new Error(result.error || 'Error updating user role');
+      }
+
+      // Update user in the list
+      const updatedUsers = users.map((user) =>
+        user.user_id === editingUser.user_id ? { ...user, role: selectedRole } : user
+      );
+      setUsers(updatedUsers);
+
+      message.success(`User role updated to ${selectedRole}`);
+      setIsModalVisible(false);
+      setEditingUser(null);
+      setSelectedRole(null);
+    } catch (error) {
+      console.error('Error updating user role:', error);
+      message.error(`Error: ${error.message}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setEditingUser(null);
+    setSelectedRole(null);
   };
 
   useEffect(() => {
@@ -115,8 +171,14 @@ const UserManagement = () => {
       key: 'actions',
       render: (_, record) => (
         <Space>
-          <Button type="primary" size="small">Editar</Button>
-          <Button danger size="small">Eliminar</Button>
+          <Button
+            type="primary"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => handleEditRole(record)}
+          >
+            Editar Rol
+          </Button>
         </Space>
       ),
     },
@@ -127,6 +189,21 @@ const UserManagement = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Gestionar Usuarios</h1>
         <p className="text-gray-500">Administra todos los usuarios del sistema</p>
+        
+        <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <p className="text-sm text-gray-700 mb-2">
+            <strong>¿Qué puedes hacer aquí?</strong>
+          </p>
+          <ul className="text-sm text-gray-600 space-y-1">
+            <li>✓ Ver la lista completa de usuarios del sistema</li>
+            <li>✓ Consultar detalles de cada usuario (nombre, email, teléfono, rol, estado)</li>
+            <li>✓ Editar el rol de los usuarios (Admin, Maintenance, User)</li>
+            <li>✓ Filtrar usuarios por rol o estado (Activo/Inactivo)</li>
+            <li>✓ Ordenar la tabla por diferentes columnas</li>
+            <li>✓ Ver la fecha de registro de cada usuario</li>
+            <li>✓ Actualizar la lista de usuarios</li>
+          </ul>
+        </div>
       </div>
 
       <Card
@@ -160,6 +237,46 @@ const UserManagement = () => {
           />
         </Spin>
       </Card>
+
+      {/* Edit Role Modal */}
+      <Modal
+        title="Editar Rol de Usuario"
+        open={isModalVisible}
+        onOk={handleSaveRole}
+        onCancel={handleCancel}
+        confirmLoading={isSaving}
+        okText="Guardar"
+        cancelText="Cancelar"
+      >
+        {editingUser && (
+          <div className="space-y-4">
+            <div>
+              <p className="font-semibold">
+                {editingUser.first_name} {editingUser.last_name}
+              </p>
+              <p className="text-gray-500 text-sm">{editingUser.email}</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Nuevo Rol</label>
+              <Select
+                style={{ width: '100%' }}
+                value={selectedRole}
+                onChange={setSelectedRole}
+                options={[
+                  { label: 'Admin', value: 'admin' },
+                  { label: 'Maintenance', value: 'maintenance' },
+                  { label: 'User', value: 'user' },
+                ]}
+                placeholder="Seleccionar rol"
+              />
+            </div>
+            <div className="bg-blue-50 p-3 rounded text-sm">
+              <p className="font-semibold mb-1">Rol actual:</p>
+              <p>{editingUser.role.toUpperCase()}</p>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };
