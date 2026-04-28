@@ -10,6 +10,7 @@ use Http\Request;
 use Http\Response;
 use Http\ErrorType;
 use Services\AuthService;
+use Core\Logger;
 
 /**
  * Handles authentication-related operations for both web and mobile clients.
@@ -107,9 +108,9 @@ final class AuthController
           'samesite' => 'Lax'
         ]);
 
-        error_log('✅ [Auth] Browser logout successful');
+        Logger::info('✅ [Auth] Browser logout successful');
       } else {
-        error_log('✅ [Auth] Mobile app logout successful');
+        Logger::info('✅ [Auth] Mobile app logout successful');
       }
 
       Response::success([

@@ -278,6 +278,50 @@ Recurso: `registered-manifestations`.
 
 ---
 
+## Mantenimiento y Administración de Usuarios
+
+Endpoints administrativos para gestión del sistema.
+
+### PUT /maintenance/users/{id}
+- **Auth**: requerido; rol `maintenance`.
+- **Propósito**: actualizar el rol de un usuario.
+- **Path Param**: `id` (ULID, identificador del usuario a actualizar, `[0-9A-HJKMNP-TV-Z]{26}`).
+- **Body (JSON)**:
+  - `role` (string, requerido): rol a asignar. Valores permitidos: `admin`, `maintenance`, `user`.
+- **Respuesta (200)**:
+  ```json
+  {
+    "data": {
+      "user_id": "<ULID>",
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john@example.com",
+      "phone_number": "555-1234",
+      "role": "admin",
+      "is_active": 1,
+      "is_verified": 1,
+      "created_at": "2026-04-24 10:30:00"
+    },
+    "meta": null,
+    "errors": []
+  }
+  ```
+- **Errores y resolución**:
+  - `FORBIDDEN_ACCESS` (403): usuario no posee rol `maintenance` o no tiene permiso `ASSIGN_ROLES`.
+  - `MISSING_FIELD_id` (400): `id` faltante en ruta.
+  - `MISSING_FIELD_role` (422): campo `role` faltante en payload.
+  - `INVALID_FIELD_role` (422): valor de `role` inválido. Usar: `admin`, `maintenance`, `user`.
+  - `NOT_FOUND` (404): usuario con `id` especificado no existe.
+  - `USER_UPDATE_FAILED` (500): error en persistencia; revisar logs del servidor.
+  - `MISSING_AUTH_TOKEN` / `INVALID_TOKEN` (401): token inválido o expirado.
+- **Consideraciones**:
+  - Solo usuarios con rol `maintenance` pueden ejecutar este endpoint.
+  - No hay restricciones sobre qué roles pueden asignarse (un usuario `maintenance` puede promover a otro a `admin`).
+  - La actualización de rol es inmediata y no requiere confirmación.
+  - El timestamp `updated_at` en la base de datos se actualiza automáticamente.
+
+---
+
 ## Notas Generales
 
 - **Autorización**: los endpoints protegidos requieren `Authorization: Bearer <access_token>`; para refresh usar body con `refresh_token`.

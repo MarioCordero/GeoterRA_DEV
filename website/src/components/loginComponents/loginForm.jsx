@@ -27,37 +27,16 @@ function Login() {
     setLoading(true);
 
     try {
-      // API CALL
       const payload = { email, password };
       const result = await authLogin(payload);
 
       if (result.ok) {
-        // Wait for cookie to be set
-        let cookieIsSet = false;
-        let retries = 0;
-        const maxRetries = 10;
-
-        while (!cookieIsSet && retries < maxRetries) {
-          if (document.cookie.includes('geoterra_session_token')) {
-            cookieIsSet = true;
-            console.log('✅ [Login] Cookie detected');
-            break;
-          }
-          await new Promise(resolve => setTimeout(resolve, 100)); // Check every 100ms
-          retries++;
-        }
-
-        if (!cookieIsSet) {
-          console.warn('⚠️ [Login] Cookie not set after 1 second');
-        }
-
-        // Now fetch session
         const sessionUser = await refresh();
 
         if (sessionUser) {
           navigate('/Dashboard');
         } else {
-          console.error('[Login] sessionUser es null después de refresh()');
+          console.error('[Login] sessionUser is null after refresh()');
           setErrorMsg('No se pudo establecer la sesión');
         }
         return;
@@ -69,7 +48,7 @@ function Login() {
       setEmail("");
       setPassword("");
     } catch (err) {
-      console.error('[Login] Excepción:', err);
+      console.error('[Login] Exception:', err);
       setErrorMsg('Error de conexión con el servidor');
     } finally {
       setLoading(false);

@@ -16,7 +16,9 @@ final class UpdateUserDTO
     public string $firstName,
     public string $lastName,
     public string $email,
-    public ?string $phoneNumber
+    public ?string $phoneNumber,
+    public ?string $currentPassword,
+    public ?string $password,  
   ) {}
 
   public static function fromArray(array $data, string $userId = ''): self
@@ -26,7 +28,9 @@ final class UpdateUserDTO
       trim($data['firstName'] ?? $data['name'] ?? ''),
       trim($data['lastName'] ?? $data['lastname'] ?? ''),
       trim($data['email'] ?? ''),
-      $data['phoneNumber'] ?? $data['phone_number'] ?? null
+      $data['phoneNumber'] ?? $data['phone_number'] ?? null,
+      $data['currentPassword'] ?? $data['current_password'] ?? null,
+      $data['password'] ?? $data['password'] ?? null
     );
   }
 
@@ -45,12 +49,33 @@ final class UpdateUserDTO
    */
   public function validate(): void
   {
+    if ($this->password && !$this->currentPassword) {
+      throw new ApiException(
+        ErrorType::validationError('Current password is required to change password'),
+        400
+      );
+    }
+
+    if ($this->email && !filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+      throw new ApiException(
+        ErrorType::invalidEmail(),
+        422
+      );
+    }
+
+    if ($this->password && strlen($this->password) < 8) {
+      throw new ApiException(
+        ErrorType::validationError('Password must be at least 8 characters'),
+        400
+      );
+    }
+
     if ($this->firstName === '') {
-      throw new ApiException(ErrorType::missingField('name'), 422);
+      throw new ApiException(ErrorType::missingField('firstName'), 422);
     }
 
     if ($this->lastName === '') {
-      throw new ApiException(ErrorType::missingField('lastname'), 422);
+      throw new ApiException(ErrorType::missingField('lastName'), 422);
     }
 
     if ($this->email === '') {
@@ -66,7 +91,7 @@ final class UpdateUserDTO
       !preg_match('/^\d{8,15}$/', $this->phoneNumber)
     ) {
       throw new ApiException(
-        ErrorType::invalidField('phone_number'),
+        ErrorType::invalidField('phoneNumber'),
         422
       );
     }
