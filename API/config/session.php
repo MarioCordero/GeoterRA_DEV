@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use Services\AuthService;
 use Http\Request;
+use Core\Logger;
 
 function validateSessionToken(PDO $db): void
 {
@@ -21,10 +22,10 @@ function validateSessionToken(PDO $db): void
         
         Request::setUser($userData);
 
-        error_log(sprintf('✅ [Session] User %s authenticated via %s', 
+        Logger::info(sprintf('✅ [Session] User %s authenticated via %s', 
             $userData['email'], Request::getPlatform()));
 
     } catch (\Exception $e) {
-        error_log('info [Session] Anonymous access or invalid token');
+        Logger::debug('info [Session] Anonymous access or invalid token');
     }
 }

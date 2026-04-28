@@ -5,11 +5,11 @@ declare(strict_types=1);
  * Database connection factory
  * Loads configuration based on environment detection (hostname or IP)
  * Production: JOB/config.ini (163.178.171.105)
- * Local: GeoterRA_DEV/config.ini (localhost, 127.0.0.1)
+ * Local: API/config/config.ini (localhost, 127.0.0.1)
  */
 
 $jobLevelDir = dirname(__DIR__, 3);
-$repoLevelDir = dirname(__DIR__, 2);
+$apiLevelDir = dirname(__DIR__, 1);
 
 // Load environment variables from .env if it exists (optional)
 $envFile = $jobLevelDir . '/.env';
@@ -38,7 +38,7 @@ $isProduction = str_contains($host, '163.178.171.105') || str_contains($host, 'g
 // Locate config.ini based on detected environment
 $configPath = $isProduction
     ? $jobLevelDir . '/config.ini'
-    : $repoLevelDir . '/config.ini';
+    : $apiLevelDir . '/config/config.ini';
 
 if (!file_exists($configPath)) {
     throw new RuntimeException("Configuration file not found at: $configPath (Host: $host, Environment: " . ($isProduction ? 'production' : 'local') . ")");

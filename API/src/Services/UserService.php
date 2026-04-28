@@ -52,29 +52,49 @@ final class UserService
       ];
     }
 
-    /**
-     * Updates user profile information.
-     *
-     * @param UpdateUserDTO $dto Validated update data
-     *
-     * @throws ApiException If update fails
-     */
-    public function updateUser(UpdateUserDTO $dto): void
-    {
-      $auth = $this->authService->requireAuth();
-      $userId = $auth['user_id'];
-      $dto->setUserId($userId);
-      $dto->validate();
-      $updated = $this->repository->update($dto);
-      if (!$updated) {
-        throw new ApiException(ErrorType::userUpdateFailed(), 500);
+  /**
+   * Updates user profile information.
+   *
+   * @param UpdateUserDTO $dto Validated update data
+   *
+   * @throws ApiException If update fails
+   */
+  public function updateUser(UpdateUserDTO $dto): void
+  {
+    $auth = $this->authService->requireAuth();
+    $userId = $auth['user_id'];
+    $dto->setUserId($userId);
+    $dto->validate();
+
+    // If password change requested, verify current password
+    if ($dto->password) {
+      $currentUser = $this->repository->findById($userId);
+      if (!$currentUser) {
+        throw new ApiException(ErrorType::notFound('User'), 404);
       }
+
+      // Verify current password
+      if (!PasswordService::verify($dto->currentPassword, $currentUser['password_hash'])) {
+        throw new ApiException(
+          ErrorType::validationError('Current password is incorrect'),
+          400
+        );
+      }
+
+      // Hash the new password
+      $dto->password = PasswordService::hash($dto->password);
     }
+
+    $updated = $this->repository->update($dto);
+    if (!$updated) {
+      throw new ApiException(ErrorType::userUpdateFailed(), 500);
+    }
+  }
 
   /**
    * Deletes a user by their ID.
    *
-   * @param string $userId ID of the user to delete
+   * @param string $userId ID of the user to delete, extracted from session
    *
    * @throws ApiException If deletion fails
    */

@@ -4,10 +4,11 @@ declare(strict_types=1);
 namespace Services;
 
 use PDO;
+use Http\Request;
+use Http\ErrorType;
 use DTO\LoginUserDTO;
 use Http\ApiException;
-use Http\ErrorType;
-use Http\Request;
+use Core\Logger;
 use Services\PasswordService;
 use Repositories\UserRepository;
 use Repositories\AuthRepository;
@@ -172,7 +173,7 @@ final class AuthService
         ? Request::getCookie('geoterra_session_token')
         : Request::getBearerToken();
 
-    error_log('info [AuthService] Authenticating request. Client type: ' . (Request::isWeb() ? 'web' : 'mobile') . ', Token: ' . ($token ? substr($token, 0, 8) . '...' : 'none'));
+    Logger::debug('info [AuthService] Authenticating request. Client type: ' . (Request::isWeb() ? 'web' : 'mobile') . ', Token: ' . ($token ? substr($token, 0, 8) . '...' : 'none'));
 
     if (!$token) {
       throw new ApiException(ErrorType::missingAuthToken(), 401);
@@ -208,9 +209,10 @@ final class AuthService
     {
       $accessToken = $result['data']['access_token'];
       
-      // Dynamically determine cookie security settings based on protocol
+      // Dynamically determine cookie settings based on protocol and domain
       $useSecureFlag = \Core\EnvironmentDetector::shouldUseSecureCookie();
       $sameSite = \Core\EnvironmentDetector::getSameSiteValue();
+      $cookieDomain = \Core\EnvironmentDetector::getCookieDomain();
       
       setcookie(
         'geoterra_session_token',
@@ -218,6 +220,7 @@ final class AuthService
         [
           'expires' => time() + 5400,
           'path' => '/',
+          'domain' => $cookieDomain,
           'secure' => $useSecureFlag,
           'httponly' => true,
           'samesite' => $sameSite,

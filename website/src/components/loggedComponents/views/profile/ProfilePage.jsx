@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { users } from '../../../../config/apiConf';
+import { userMeUpdate, userMeDelete } from '../../../../config/apiConf';
 import { useSession } from '../../../../hooks/useSession';
-import { Form, Input, Button, Card, Spin, Modal, Divider, Row, Col, message } from 'antd';
-import { LockOutlined, MailOutlined, UserOutlined, PhoneOutlined, SaveOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import ConfirmationModal from '../../../common/ConfirmationModal';
+import SuccessModal from '../../../common/SuccessModal';
+import { Form, Input, Button, Card, Spin, Row, Col, message } from 'antd';
+import { LockOutlined, MailOutlined, UserOutlined, PhoneOutlined, SaveOutlined, ExclamationCircleOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const ProfilePage = () => {
   const { user, refresh: refreshSession } = useSession();
@@ -15,6 +17,8 @@ const ProfilePage = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
+  const [profileUpdateSuccessVisible, setProfileUpdateSuccessVisible] = useState(false);
   const [pendingData, setPendingData] = useState(null);
 
   // Handle profile update submission
@@ -29,45 +33,28 @@ const ProfilePage = () => {
     setLoading(true);
 
     try {
-      // API CALL
-      const endpoint = users.me();
-      const response = await fetch(endpoint, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName: pendingData.firstName,
-          lastName: pendingData.lastName,
-          email: pendingData.email,
-          phoneNumber: pendingData.phone,
-        }),
-      });
+      const payload = {
+        firstName: pendingData.firstName,
+        lastName: pendingData.lastName,
+        email: pendingData.email,
+        phoneNumber: pendingData.phone,
+      };
+      const result = await userMeUpdate(payload);
+      if (!result.ok) throw new Error(result.error || 'Error updating profile');
 
-      const data = await response.json();
-
-      if (response.status === 401 || response.status === 403) {
-        throw new Error('No autorizado');
-      }
-
-      if (!response.ok) {
-        const errorMessage = data.errors?.[0]?.message || `Error: ${response.status}`;
-        throw new Error(errorMessage);
-      }
-
-      // Refresh session to update user data
-      await refreshSession();
-      message.success('✅ Perfil actualizado correctamente');
-      setIsEditing(false);
+      setLoading(false);
       setPendingData(null);
+      setProfileUpdateSuccessVisible(true);
     } catch (error) {
-      console.error('Profile update error:', error);
       message.error(`Error: ${error.message}`);
-    } finally {
       setLoading(false);
     }
+  };
+
+  const handleProfileUpdateSuccess = async () => {
+    setProfileUpdateSuccessVisible(false);
+    setIsEditing(false);
+    await refreshSession();
   };
 
   // Handle password change submission
@@ -77,42 +64,38 @@ const ProfilePage = () => {
       return;
     }
     setPasswordLoading(true);
+
     try {
-      // API CALL
-      const endpoint = users.me();
-      const response = await fetch(endpoint, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          currentPassword: values.currentPassword,
-          password: values.newPassword,
-        }),
-      });
+      const payload = {
+        currentPassword: values.currentPassword,
+        password: values.newPassword,
+        firstName: user.first_name || user.firstName,
+        lastName: user.last_name || user.lastName,
+        email: user.email,
+        phoneNumber: user.phone_number || user.phoneNumber,
+      };
 
-      const data = await response.json();
-
-      if (response.status === 401 || response.status === 403) {
-        throw new Error('Contraseña actual incorrecta');
-      }
-
+      const response = await userMeUpdate(payload);
       if (!response.ok) {
-        const errorMessage = data.errors?.[0]?.message || `Error: ${response.status}`;
-        throw new Error(errorMessage);
+        throw new Error(response.error || 'Password change failed');
       }
 
-      message.success('✅ Contraseña actualizada correctamente');
+      setSuccessModalVisible(true);
+      console.log('✅ [handlePasswordChange] Password changed successfully - Success modal is now visible');
       passwordForm.resetFields();
-      setIsChangingPassword(false);
     } catch (error) {
-      console.error('Password change error:', error);
+      console.error('❌ [handlePasswordChange] Error:', error);
       message.error(`Error: ${error.message}`);
     } finally {
       setPasswordLoading(false);
     }
+  };
+
+  // Handle success modal confirmation
+  const handlePasswordChangeSuccess = async () => {
+    setSuccessModalVisible(false);
+    setIsChangingPassword(false);
+    await refreshSession();
   };
 
   // Handle account deletion
@@ -121,29 +104,13 @@ const ProfilePage = () => {
     setDeleteLoading(true);
 
     try {
-      // API CALL
-      const endpoint = users.me();
-      const response = await fetch(endpoint, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: {
-          'Accept': 'application/json',
-        },
-      });
+      const result = await userMeDelete();
 
-      const data = await response.json();
-
-      if (response.status === 401 || response.status === 403) {
-        throw new Error('No autorizado');
-      }
-
-      if (!response.ok) {
-        const errorMessage = data.errors?.[0]?.message || `Error: ${response.status}`;
-        throw new Error(errorMessage);
+      if (!result.ok) {
+        throw new Error(result.error || 'Account deletion failed');
       }
 
       message.success('✅ Cuenta eliminada correctamente');
-      // Redirect to home after successful deletion
       setTimeout(() => {
         window.location.href = '/';
       }, 1500);
@@ -462,63 +429,81 @@ const ProfilePage = () => {
         </div>
       </Card>
 
-      {/* Confirmation Modal */}
-      <Modal
-        title="Confirmar cambios"
+      {/* Profile Update Confirmation Modal */}
+      <ConfirmationModal
         open={modalVisible}
-        onOk={confirmProfileUpdate}
-        onCancel={() => setModalVisible(false)}
+        title="Confirmar cambios"
+        message="¿Estás seguro de que deseas actualizar tu información personal?"
+        items={[
+          ...(pendingData?.firstName !== user.first_name ? [{
+            label: 'Nombre',
+            old: user.first_name,
+            new: pendingData?.firstName,
+          }] : []),
+          ...(pendingData?.lastName !== user.last_name ? [{
+            label: 'Apellido',
+            old: user.last_name,
+            new: pendingData?.lastName,
+          }] : []),
+          ...(pendingData?.email !== user.email ? [{
+            label: 'Email',
+            old: user.email,
+            new: pendingData?.email,
+          }] : []),
+          ...(pendingData?.phone !== (user.phone_number || '') ? [{
+            label: 'Teléfono',
+            old: user.phone_number || '(No especificado)',
+            new: pendingData?.phone || '(No especificado)',
+          }] : []),
+        ]}
         okText="Confirmar"
         cancelText="Cancelar"
-        confirmLoading={loading}
-      >
-        <p>¿Estás seguro de que deseas actualizar tu información personal?</p>
-        <ul className="mt-3">
-          {pendingData?.firstName !== user.first_name && (
-            <li>Nombre: <strong>{user.first_name}</strong> → <strong>{pendingData?.firstName}</strong></li>
-          )}
-          {pendingData?.lastName !== user.last_name && (
-            <li>Apellido: <strong>{user.last_name}</strong> → <strong>{pendingData?.lastName}</strong></li>
-          )}
-          {pendingData?.email !== user.email && (
-            <li>Email: <strong>{user.email}</strong> → <strong>{pendingData?.email}</strong></li>
-          )}
-          {pendingData?.phone !== (user.phone_number || '') && (
-            <li>Teléfono: <strong>{user.phone_number || '(No especificado)'}</strong> → <strong>{pendingData?.phone || '(No especificado)'}</strong></li>
-          )}
-        </ul>
-      </Modal>
+        onOk={confirmProfileUpdate}
+        onCancel={() => setModalVisible(false)}
+        loading={loading}
+      />
 
       {/* Delete Account Confirmation Modal */}
-      <Modal
-        title={<div className="flex items-center gap-2 text-red-500">
-          <ExclamationCircleOutlined />
-          <span>Eliminar Cuenta Permanentemente</span>
-        </div>}
+      <ConfirmationModal
         open={deleteModalVisible}
-        onOk={handleDeleteAccount}
-        onCancel={() => setDeleteModalVisible(false)}
+        title="Eliminar Cuenta Permanentemente"
+        message="⚠️ Esta acción es irreversible y permanente."
+        icon="danger"
+        danger={true}
+        items={[
+          'Tu perfil de usuario',
+          'Todas tus solicitudes de análisis',
+          'Tu historial de sesiones',
+          'Todos tus datos personales almacenados',
+        ]}
         okText="Sí, eliminar mi cuenta"
         cancelText="Cancelar"
-        okButtonProps={{ danger: true }}
-        confirmLoading={deleteLoading}
-      >
-        <div className="py-3">
-          <p className="text-red-500 font-bold mb-3">
-            ⚠️ Esta acción es irreversible y permanente.
-          </p>
-          <p>Se eliminarán los siguientes datos:</p>
-          <ul className="my-3">
-            <li>Tu perfil de usuario</li>
-            <li>Todas tus solicitudes de análisis</li>
-            <li>Tu historial de sesiones</li>
-            <li>Todos tus datos personales almacenados</li>
-          </ul>
-          <p className="mt-3">
-            <strong>¿Estás completamente seguro de que deseas continuar?</strong>
-          </p>
-        </div>
-      </Modal>
+        onOk={handleDeleteAccount}
+        onCancel={() => setDeleteModalVisible(false)}
+        loading={deleteLoading}
+      />
+
+      {/* Password Change Success Modal */}
+      <SuccessModal
+        open={successModalVisible}
+        title="¡Éxito!"
+        subtitle="Contraseña actualizada"
+        message="Tu contraseña ha sido actualizada correctamente."
+        status="success"
+        confirmText="Continuar"
+        onConfirm={handlePasswordChangeSuccess}
+      />
+
+      {/* Profile Update Success Modal */}
+      <SuccessModal
+        open={profileUpdateSuccessVisible}
+        title="¡Éxito!"
+        subtitle="Perfil actualizado"
+        message="Tu información personal ha sido actualizada correctamente."
+        status="success"
+        confirmText="Continuar"
+        onConfirm={handleProfileUpdateSuccess}
+      />
     </div>
   );
 };
