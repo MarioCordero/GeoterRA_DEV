@@ -1,26 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { Spin, Tag, Button, Modal, message, Form, Input, Select, InputNumber, Checkbox } from 'antd';
-import { EyeOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
 import '../../colorModule.css';
 import '../../fontsModule.css';
-import { analysisRequest } from '../../config/apiConf';
-import NotImplementedModal from './NotImplementedModal';
+import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import { useSession } from '../../hooks/useSession';
+import NotImplementedModal from './NotImplementedModal';
+import { EyeOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { Spin, Tag, Button, Modal, message, Form, Input, Select, InputNumber, Checkbox } from 'antd';
+import { analysisRequestIndex, analysisRequestStore, analysisRequestDelete } from '../../config/apiConf';
 
 const RequestsTable = ({ isAdmin = false }) => {
+  const [form] = Form.useForm();
+  const { user } = useSession();
+  const navigate = useNavigate();
+  const [error, setError] = useState(null);
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [creatingRequest, setCreatingRequest] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [viewModalVisible, setViewModalVisible] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [isNotImplementedOpen, setIsNotImplementedOpen] = useState(false);
-  const [creatingRequest, setCreatingRequest] = useState(false);
-  const [form] = Form.useForm();
-  const navigate = useNavigate();
-  const { user } = useSession();
 
   const userIsAdmin = user?.is_admin || user?.role === 'admin';
 
@@ -55,21 +55,15 @@ const RequestsTable = ({ isAdmin = false }) => {
 
   const fetchRequests = async () => {
     try {
-      const res = await fetch(analysisRequest.index(), {
-        method: 'GET',
-        credentials: 'include',
-        headers: { 'Accept': 'application/json' },
-      });
+      const result = await analysisRequestIndex();
 
-      if (res.status === 401 || res.status === 403) {
-        return [];
-      }
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+      if (!result.ok) {
+        if (result.status === 401 || result.status === 403) {
+          return [];
+        }
+        throw new Error(result.error || 'Failed to fetch requests');
       }
 
-      const result = await res.json();
-      
       if (result.data && Array.isArray(result.data)) {
         return result.data.map(item => ({
           id_soli: item.id,
@@ -110,38 +104,26 @@ const RequestsTable = ({ isAdmin = false }) => {
         current_usage: formValues.current_usage || null,
         latitude: formValues.latitude ? parseFloat(formValues.latitude) : null,
         longitude: formValues.longitude ? parseFloat(formValues.longitude) : null,
-        region_id: formValues.region_id || null,
+        region: formValues.region_id || null,
       };
 
-      // ✅ Use analysisRequest.store() for POST
-      const res = await fetch(analysisRequest.store(), {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
+      const result = await analysisRequestStore(payload);
 
-      if (res.status === 401 || res.status === 403) {
+      if (result.status === 401 || result.status === 403) {
         throw new Error('No autorizado para crear solicitudes');
       }
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.errors?.[0]?.message || `HTTP error! status: ${res.status}`);
+      if (!result.ok) {
+        throw new Error(result.error || 'Error al crear solicitud');
       }
 
-      const result = await res.json();
-
-      if (result.data || result.response === 'Ok') {
+      if (result.data) {
         message.success('✅ Solicitud creada correctamente');
         form.resetFields();
         setCreateModalVisible(false);
         refreshRequests();
       } else {
-        throw new Error(result.errors?.[0]?.message || 'Error al crear solicitud');
+        throw new Error('Error al crear solicitud');
       }
     } catch (error) {
       console.error('❌ Error creating request:', error);
@@ -153,29 +135,19 @@ const RequestsTable = ({ isAdmin = false }) => {
 
   const deleteRequest = async (requestId) => {
     try {
-      const url = analysisRequest.delete(requestId);
-      
-      const response = await fetch(url, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: { 'Accept': 'application/json' },
-      });
+      const result = await analysisRequestDelete(requestId);
 
-      if (response.status === 401 || response.status === 403) {
+      if (result.status === 401 || result.status === 403) {
         throw new Error('No autorizado para eliminar esta solicitud');
       }
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (!result.ok) {
+        throw new Error(result.error || 'Error al eliminar la solicitud');
       }
 
-      const result = await response.json();
-      if (result.data || result.response === "Ok") {
-        message.success('Solicitud eliminada correctamente');
-        refreshRequests();
-        return true;
-      }
-      throw new Error(result.message || "Failed to delete request");
+      message.success('Solicitud eliminada correctamente');
+      refreshRequests();
+      return true;
     } catch (error) {
       console.error("❌ Error deleting request:", error);
       message.error('Error al eliminar la solicitud: ' + error.message);
