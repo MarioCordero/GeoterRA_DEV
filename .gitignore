@@ -157,6 +157,7 @@ GeoterRA_Local.session.sql
 GeoterRA.session.sql
 website/.vite/deps/_metadata.json
 website/.vite/deps/package.json
+website/dist/
 
 # -----------------------------
 # Backend
