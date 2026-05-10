@@ -163,27 +163,44 @@ Recurso: `analysis-request` (ULID en path para operaciones sobre entidad).
 - **Auth**: requerido.
 - **Propósito**: crear una solicitud de análisis.
 - **Body (JSON)**:
-  - `region` (string, requerido).
-  - `email` (string, requerido, formato válido).
-  - `owner_contact_number` (string, opcional).
-  - `owner_name` (string, requerido).
-  - `temperature_sensation` (string, opcional).
-  - `bubbles` (boolean, opcional, por defecto `false`).
-  - `details` (string, opcional).
-  - `current_usage` (string, opcional).
-  - `latitude` (number, requerido).
-  - `longitude` (number, requerido).
+  - `region` (int, requerido): ID de la región.
+  - `email` (string, requerido, email válido).
+  - `owner_contact_number` (string, opcional): número de teléfono del propietario.
+  - `owner_name` (string, requerido): nombre del propietario/solicitante.
+  - `temperature_sensation` (ENUM, requerido): percepción térmica subjetiva. Valores permitidos:
+    - `Muy frío`
+    - `Frío`
+    - `Templado`
+    - `Cálido`
+    - `Muy Caliente`
+    - `caliente`
+  - `bubbles` (boolean, opcional, por defecto `false`): indica si hay burbujeo presente.
+  - `details` (string, opcional): detalles adicionales.
+  - `current_usage` (string, opcional): uso actual del terreno.
+  - `latitude` (number, requerido, -90 a 90): coordenada de latitud.
+  - `longitude` (number, requerido, -180 a 180): coordenada de longitud.
+  - `state` (ENUM, opcional): estado actual de la solicitud. Valores permitidos:
+    - `Registrada` (estado por defecto para nuevas solicitudes)
+    - `En revisión`
+    - `Verificación de campo`
+    - `Análisis en laboratorio`
+    - `Aprobada`
+    - `Rechazada`
+    - `Archivada`
 - **Respuesta (201)**:
   - `data`: `{ "message": "Analysis request created successfully" }`.
   - `meta`: `{}`.
 - **Errores y resolución**:
-  - `MISSING_FIELD_*` (422): completar campos.
-  - `INVALID_FIELD_email` (422): formato.
-  - `INVALID_JSON` (400).
-  - `INTERNAL_ERROR` (500): transacción/ID.
-  - `MISSING_AUTH_TOKEN` / `INVALID_TOKEN` (401).
+  - `MISSING_FIELD_*` (422): completar campos obligatorios.
+  - `INVALID_FIELD_email` (422): formato de email inválido.
+  - `INVALID_FIELD_temperature_sensation` (422): valor no permitido para temperature_sensation.
+  - `INVALID_FIELD_state` (422): valor no permitido para state si se proporciona.
+  - `INVALID_JSON` (400): JSON mal formado.
+  - `INTERNAL_ERROR` (500): error de transacción/ID.
+  - `MISSING_AUTH_TOKEN` / `INVALID_TOKEN` (401): autenticación requerida.
 - **Consideraciones**:
   - El `name` interno se genera automáticamente con prefijo `SOLI-`.
+  - `temperature_sensation` es obligatorio en el envío del cliente.
 
 ### GET /analysis-request
 - **Auth**: requerido.
@@ -226,23 +243,66 @@ Recurso: `registered-manifestations`.
 
 ### POST /registered-manifestations
 - **Auth**: requerido; rol `admin`.
-- **Propósito**: crear manifestación registrada.
+- **Propósito**: crear manifestación registrada con atributos físicos y químicos.
 - **Body (JSON)**:
-  - `name` (string, requerido, único por recurso).
-  - `region` (string, requerido; ver [AllowedRegions](../src/DTO/AllowedRegions.php)).
-  - `latitude` (number, requerido, -90..90).
-  - `longitude` (number, requerido, -180..180).
-  - Opcionales: `description`, `temperature`, `field_pH`, `field_conductivity`, `lab_pH`, `lab_conductivity`, `cl`, `ca`, `hco3`, `so4`, `fe`, `si`, `b`, `li`, `f`, `na`, `k`, `mg`.
+  - `name` (string, requerido, único): nombre descriptivo de la manifestación.
+  - `region_id` (int, requerido): ID de la región.
+  - `latitude` (number, requerido, -90 a 90): coordenada de latitud.
+  - `longitude` (number, requerido, -180 a 180): coordenada de longitud.
+  - `description` (string, opcional): descripción detallada.
+
+#### Atributos Físicos - Mediciones In Situ (Opcional)
+  - `temperature` (decimal, 8 decimales, °C): temperatura del agua en campo.
+    - Rango permitido: 0 a 250°C
+    - Restricción: No puede ser negativo.
+    - Observación: Alta entalpía comienza en 150°C.
+  - `field_pH` (decimal, 8 decimales): nivel de acidez/alcalinidad in situ.
+    - Rango permitido: 0 a 14
+    - Rango típico: 2 a 11
+    - Restricción: Fuera del rango 0-14 no es posible químicamente.
+  - `field_conductivity` (decimal, 8 decimales, µS/cm): sales disueltas in situ.
+    - Rango permitido: ≥ 0
+    - Rango típico: 50 a 200,000 µS/cm
+    - Observación: Aguas termales suelen ser altas en conductividad.
+
+#### Atributos Físicos - Mediciones en Laboratorio (Opcional)
+  - `lab_pH` (decimal, 8 decimales): nivel de acidez/alcalinidad en laboratorio.
+    - Rango permitido: 0 a 14
+    - Rango típico: 2 a 11
+  - `lab_conductivity` (decimal, 8 decimales, µS/cm): sales disueltas en laboratorio.
+    - Rango permitido: ≥ 0
+    - Rango típico: 50 a 200,000 µS/cm
+
+#### Atributos Químicos - Análisis Laboratorio (Opcional)
+  Los siguientes elementos químicos se miden en muestras de laboratorio. Todos son decimales con 8 decimales de precisión (mg/L o similar unidad):
+  - `cl` (Cloruros): restricción ≥ 0
+  - `ca` (Calcio): restricción ≥ 0
+  - `hco3` (Bicarbonatos): restricción ≥ 0
+  - `so4` (Sulfatos): restricción ≥ 0
+  - `fe` (Hierro): restricción ≥ 0
+  - `si` (Sílice): restricción ≥ 0
+  - `b` (Boro): restricción ≥ 0
+  - `li` (Litio): restricción ≥ 0
+  - `f` (Fluoruro): restricción ≥ 0
+  - `na` (Sodio): restricción ≥ 0
+  - `k` (Potasio): restricción ≥ 0
+  - `mg` (Magnesio): restricción ≥ 0
+
 - **Respuesta (201)**:
   - `data`: `{ "success": true }`.
 - **Errores y resolución**:
-  - `MISSING_FIELD_*` (422): campos requeridos.
-  - `INVALID_REGION` (422): ver lista permitida; usar `all` para todo.
-  - `INVALID_FIELD_latitude|longitude` (422): rangos.
-  - `CONFLICT_ERROR` (409): `namvdfctfgyre` duplicado.
-  - `MANIFESTATION_CREATE_FAILED` (500): persistencia.
-  - `FORBIDDEN_ACCESS` (403): rol insuficiente.
-  - Auth (401).
+  - `MISSING_FIELD_*` (422): campos requeridos incompletos.
+  - `INVALID_FIELD_latitude|longitude` (422): rangos inválidos (-90 a 90, -180 a 180).
+  - `INVALID_FIELD_temperature` (422): temperatura fuera rango 0-250°C.
+  - `INVALID_FIELD_field_pH` (422): pH fuera rango 0-14.
+  - `INVALID_FIELD_field_conductivity` (422): conductividad negativa.
+  - `INVALID_FIELD_lab_pH` (422): pH fuera rango 0-14.
+  - `INVALID_FIELD_lab_conductivity` (422): conductividad negativa.
+  - `INVALID_FIELD_*` (422): elemento químico negativo (Cl, Ca, HCO3, SO4, Fe, Si, B, Li, F, Na, K, Mg).
+  - `CONFLICT_ERROR` (409): `name` duplicado.
+  - `MANIFESTATION_CREATE_FAILED` (500): error de persistencia.
+  - `FORBIDDEN_ACCESS` (403): rol insuficiente (admin requerido).
+  - Auth (401): autenticación requerida.
 
 ### GET /registered-manifestations?region={region}
 - **Auth**: requerido.
