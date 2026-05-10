@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace Controllers;
 
-use DTO\AnalysisRequestDTO;
-use DTO\PermissionsDTO as Permissions;
 use Http\Request;
 use Http\Response;
-use Http\ApiException;
 use Http\ErrorType;
-use Services\AnalysisRequestService;
+use Http\ApiException;
+use DTO\AnalysisRequestDTO;
+use OpenApi\Attributes as OA;
 use Services\PermissionService;
+use Services\AnalysisRequestService;
+use DTO\PermissionsDTO as Permissions;
 
 /**
  * Controller for handling analysis request related endpoints.
  */
+#[OA\Tag(name: "Analysis Requests", description: "Gestión de solicitudes de análisis de puntos para GeoterRA")]
 final class AnalysisRequestController
 {
   private AnalysisRequestService $service;
@@ -28,6 +30,21 @@ final class AnalysisRequestController
    * POST /analysis-request
    * Creates a new analysis request for the authenticated user
    */
+  #[OA\Post(
+    path: "/analysis-request",
+    summary: "Crear una nueva solicitud de análisis",
+    description: "Crea una solicitud vinculada al usuario autenticado.",
+    security: [["cookieAuth" => []], ["tokenAuth" => []]],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(ref: "#/components/schemas/AnalysisRequestDTO")
+    ),
+    responses: [
+        new OA\Response(response: 201, description: "Solicitud creada exitosamente"),
+        new OA\Response(response: 400, description: "Datos de entrada inválidos"),
+        new OA\Response(response: 401, description: "No autenticado")
+    ]
+  )]
   public function store(): void
   {
     try {
@@ -46,6 +63,19 @@ final class AnalysisRequestController
    * GET /analysis-request
    * Returns all analysis requests created by the authenticated user
    */
+  #[OA\Get(
+    path: "/analysis-request",
+    summary: "Listar solicitudes del usuario",
+    description: "Retorna todas las solicitudes de análisis creadas por el usuario actual.",
+    security: [["cookieAuth" => []], ["tokenAuth" => []]],
+    responses: [
+        new OA\Response(
+            response: 200, 
+            description: "Lista de solicitudes",
+            content: new OA\JsonContent(type: "array", items: new OA\Items(ref: "#/components/schemas/AnalysisRequestDTO"))
+        )
+    ]
+  )]
   public function index(): void
   {
     try {
@@ -62,6 +92,16 @@ final class AnalysisRequestController
    * GET /analysis-request
    * Returns all analysis requests on the system, only if the authenticated user is an admin
    */
+  #[OA\Get(
+    path: "/admin/analysis-request",
+    summary: "Listar todas las solicitudes (Admin)",
+    description: "Endpoint exclusivo para administradores para visualizar el total de solicitudes en el sistema.",
+    security: [["cookieAuth" => []], ["tokenAuth" => []]],
+    responses: [
+        new OA\Response(response: 200, description: "Listado completo para administración"),
+        new OA\Response(response: 403, description: "Permisos insuficientes")
+    ]
+  )]
   public function adminIndex(): void
   {
     try {
@@ -111,6 +151,19 @@ final class AnalysisRequestController
    * PUT /analysis-request/{id}
    * Updates an existing user's analysis request by ID, only if the authenticated user is an admin
    */
+  #[OA\Put(
+    path: "/analysis-request/{id}",
+    summary: "Actualizar solicitud propia",
+    security: [["cookieAuth" => []], ["tokenAuth" => []]],
+    parameters: [
+        new OA\Parameter(name: "id", in: "path", required: true, description: "ULID o ID de la solicitud", schema: new OA\Schema(type: "string"))
+    ],
+    requestBody: new OA\RequestBody(content: new OA\JsonContent(ref: "#/components/schemas/AnalysisRequestDTO")),
+    responses: [
+        new OA\Response(response: 200, description: "Actualización exitosa"),
+        new OA\Response(response: 404, description: "Solicitud no encontrada")
+    ]
+  )]
   public function adminUpdate(string $id): void
   {
     try {
@@ -150,6 +203,17 @@ final class AnalysisRequestController
    * DELETE /analysis-request/{id}
    * Deletes an user's analysis request by ID, only if the authenticated user is an admin
    */
+  #[OA\Delete(
+        path: "/analysis-request/{id}",
+        summary: "Eliminar solicitud",
+        security: [["cookieAuth" => []], ["tokenAuth" => []]],
+        parameters: [
+            new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "string"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Eliminado correctamente")
+        ]
+  )]
   public function adminDelete(string $id): void
   {
     try {
