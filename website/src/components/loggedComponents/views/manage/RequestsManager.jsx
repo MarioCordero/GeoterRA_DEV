@@ -2,10 +2,10 @@ import '../../../../colorModule.css';
 import '../../../../fontsModule.css';
 import React, { useState, useEffect } from 'react';
 import { useSession } from '../../../../hooks/useSession';
-import { analysisRequest } from '../../../../config/apiConf';
+import { analysisRequestAdminIndex, analysisRequestAdminUpdate, analysisRequestAdminDelete } from '../../../../config/apiConf';
 import NotImplementedModal from '../../../common/NotImplementedModal';
 import { Spin, Tag, Button, Modal, Form, Input, InputNumber, Select, Checkbox, message } from 'antd';
-import { EyeOutlined, DeleteOutlined, EditOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { EyeOutlined, DeleteOutlined, EditOutlined, CheckOutlined } from '@ant-design/icons';
 
 const RequestsManager = () => {
   const [requests, setRequests] = useState([]);
@@ -34,22 +34,12 @@ const RequestsManager = () => {
 
   const fetchAllRequests = async () => {
     try {
-      // API CALL
-      const res = await fetch(analysisRequest.adminIndex(), {
-        method: 'GET',
-        credentials: 'include',
-        headers: { 'Accept': 'application/json' },
-      });
+      const result = await analysisRequestAdminIndex();
 
-      if (res.status === 401 || res.status === 403) {
-        throw new Error('No autorizado desde el backend para ver todas las solicitudes, por favor consulte a su administrador');
-      }
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+      if (!result.ok) {
+        throw new Error(result.error || 'No autorizado desde el backend para ver todas las solicitudes, por favor consulte a su administrador');
       }
 
-      const result = await res.json();
-      
       if (result.data && Array.isArray(result.data)) {
         return result.data.map(item => ({
           id_soli: item.id,
@@ -101,31 +91,13 @@ const RequestsManager = () => {
         state: 'Analizada',
       };
 
-      // API CALL
-      const res = await fetch(analysisRequest.update(pointData.id_soli), {
-        method: 'PUT',
-        credentials: 'include',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
+      const result = await analysisRequestAdminUpdate(pointData.id_soli, payload);
 
-      if (res.status === 401 || res.status === 403) {
-        throw new Error('No autorizado para actualizar solicitudes');
+      if (!result.ok) {
+        throw new Error(result.error || 'Error al actualizar solicitud');
       }
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.errors?.[0]?.message || `HTTP error! status: ${res.status}`);
-      }
-
-      const result = await res.json();
-      if (result.data || result.response === 'Ok') {
-        return true;
-      }
-      throw new Error(result.errors?.[0]?.message || 'Error al actualizar');
+      return true;
     } catch (error) {
       console.error('❌ [AdminRequests] Error submitting approved point:', error);
       throw error;
@@ -134,25 +106,13 @@ const RequestsManager = () => {
 
   const deleteRequest = async (requestId) => {
     try {
-      const res = await fetch(analysisRequest.delete(requestId), {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: { 'Accept': 'application/json' },
-      });
+      const result = await analysisRequestAdminDelete(requestId);
 
-      if (res.status === 401 || res.status === 403) {
-        throw new Error('No autorizado para eliminar solicitudes');
+      if (!result.ok) {
+        throw new Error(result.error || 'Error al eliminar solicitud');
       }
 
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-
-      const result = await res.json();
-      if (result.data || result.response === 'Ok') {
-        return true;
-      }
-      throw new Error(result.message || 'Error al eliminar');
+      return true;
     } catch (error) {
       console.error('❌ [AdminRequests] Error deleting request:', error);
       throw error;
@@ -260,29 +220,6 @@ const RequestsManager = () => {
     }
   };
 
-  // Handle refuse/reject
-  const handleRefuse = (record) => {
-    Modal.confirm({
-      title: '¿Rechazar solicitud?',
-      content: `¿Deseas rechazar la solicitud ${record.name}?`,
-      okText: 'Sí, rechazar',
-      cancelText: 'Cancelar',
-      okButtonProps: { danger: true },
-      onOk: async () => {
-        try {
-          await submitApprovedPoint({
-            id_soli: record.id_soli,
-            state: 'Eliminada',
-          });
-          message.success('✅ Solicitud rechazada');
-          await refreshRequests();
-        } catch (error) {
-          message.error('Error: ' + error.message);
-        }
-      },
-    });
-  };
-
   // Handle delete
   const handleDelete = (record) => {
     Modal.confirm({
@@ -340,16 +277,9 @@ const RequestsManager = () => {
           onClick={() => handleReviewAccept(request)}
           disabled={request.state !== 'Pendiente'}
           title="Revisar y aprobar"
-        />
-        <Button
-          size="small"
-          type="primary"
-          danger
-          icon={<CloseOutlined />}
-          onClick={() => handleRefuse(request)}
-          disabled={request.state !== 'Pendiente'}
-          title="Rechazar solicitud"
-        />
+        >
+          Revisar
+        </Button>
         <Button
           size="small"
           type="primary"
@@ -357,14 +287,18 @@ const RequestsManager = () => {
           icon={<DeleteOutlined />}
           onClick={() => handleDelete(request)}
           title="Eliminar solicitud"
-        />
+        >
+          Eliminar
+        </Button>
         <Button
           size="small"
           type="default"
           icon={<EyeOutlined />}
           onClick={() => handleViewDetails(request)}
           title="Ver detalles"
-        />
+        >
+          Ver
+        </Button>
       </div>
     </div>
   );
@@ -471,16 +405,9 @@ const RequestsManager = () => {
                               onClick={() => handleReviewAccept(request)}
                               disabled={request.state !== 'Pendiente'}
                               title="Revisar y aprobar"
-                            />
-                            <Button
-                              size="small"
-                              type="primary"
-                              danger
-                              icon={<CloseOutlined />}
-                              onClick={() => handleRefuse(request)}
-                              disabled={request.state !== 'Pendiente'}
-                              title="Rechazar solicitud"
-                            />
+                            >
+                              Revisar
+                            </Button>
                             <Button
                               size="small"
                               type="primary"
@@ -488,14 +415,18 @@ const RequestsManager = () => {
                               icon={<DeleteOutlined />}
                               onClick={() => handleDelete(request)}
                               title="Eliminar solicitud"
-                            />
+                            >
+                              Eliminar
+                            </Button>
                             <Button
                               size="small"
                               type="default"
                               icon={<EyeOutlined />}
                               onClick={() => handleViewDetails(request)}
                               title="Ver detalles"
-                            />
+                            >
+                              Ver
+                            </Button>
                           </div>
                         </td>
                       </tr>
