@@ -82,8 +82,8 @@ const config = {
         docsPluginId: "classic",
         config: {
           geoterra: {
-            specPath: "../API/public/openapi.json", // Ruta a tu JSON
-            outputDir: "docs/api", // Donde se generarán los archivos .md
+            specPath: "../API/public/openapi.json",
+            outputDir: "docs/api",
           }
         }
       },
