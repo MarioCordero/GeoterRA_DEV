@@ -5,7 +5,23 @@ namespace DTO;
 
 use Http\ApiException;
 use Http\ErrorType;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Schema(
+ *   schema="RegionDTO",
+ *   type="object",
+ *   description="Región de Costa Rica",
+ *   required={"name"},
+ *   @OA\Property(
+ *     property="name",
+ *     type="string",
+ *     enum={"Guanacaste", "Alajuela", "San José", "Puntarenas", "Limón", "Heredia", "Cartago"},
+ *     description="Nombre de la región de Costa Rica",
+ *     example="Guanacaste"
+ *   )
+ * )
+ */
 final class RegionDTO
 {
   private string $name;

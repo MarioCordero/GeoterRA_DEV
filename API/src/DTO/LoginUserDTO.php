@@ -5,8 +5,30 @@ namespace DTO;
 
 use Http\ErrorType;
 use Http\ApiException;
+use OpenApi\Annotations as OA;
 
-
+/**
+ * @OA\Schema(
+ *   schema="LoginUserDTO",
+ *   type="object",
+ *   description="Credenciales de usuario para autenticación",
+ *   required={"email", "password"},
+ *   @OA\Property(
+ *     property="email",
+ *     type="string",
+ *     format="email",
+ *     description="Correo electrónico del usuario",
+ *     example="user@example.com"
+ *   ),
+ *   @OA\Property(
+ *     property="password",
+ *     type="string",
+ *     format="password",
+ *     description="Contraseña del usuario (mínimo 8 caracteres)",
+ *     example="SecurePassword123"
+ *   )
+ * )
+ */
 final class LoginUserDTO
 {
   public function __construct(

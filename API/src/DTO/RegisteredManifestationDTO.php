@@ -6,9 +6,184 @@ namespace DTO;
 
 use Http\ApiException;
 use Http\ErrorType;
+use OpenApi\Annotations as OA;
 
 /**
- * Data Transfer Object for Registered Geothermal Manifestations
+ * @OA\Schema(
+ *   schema="RegisteredManifestationDTO",
+ *   type="object",
+ *   description="Manifestación geotérmica registrada con datos físicos y químicos",
+ *   required={"name", "region_id", "latitude", "longitude"},
+ *   @OA\Property(
+ *     property="name",
+ *     type="string",
+ *     description="Nombre del sitio geotérmico",
+ *     example="Fuente Termomineral Tabacón"
+ *   ),
+ *   @OA\Property(
+ *     property="region_id",
+ *     type="integer",
+ *     description="ID de la región de Costa Rica",
+ *     example=1
+ *   ),
+ *   @OA\Property(
+ *     property="latitude",
+ *     type="number",
+ *     format="float",
+ *     description="Latitud en grados decimales",
+ *     example=10.4606
+ *   ),
+ *   @OA\Property(
+ *     property="longitude",
+ *     type="number",
+ *     format="float",
+ *     description="Longitud en grados decimales",
+ *     example=-84.9677
+ *   ),
+ *   @OA\Property(
+ *     property="description",
+ *     type="string",
+ *     nullable=true,
+ *     description="Descripción detallada del sitio",
+ *     example="Fuente natural con agua caliente"
+ *   ),
+ *   @OA\Property(
+ *     property="temperature",
+ *     type="number",
+ *     format="float",
+ *     nullable=true,
+ *     description="Temperatura en grados Celsius (0-250°C)",
+ *     example=45.5
+ *   ),
+ *   @OA\Property(
+ *     property="field_pH",
+ *     type="number",
+ *     format="float",
+ *     nullable=true,
+ *     description="pH medido en campo (0-14)",
+ *     example=7.5
+ *   ),
+ *   @OA\Property(
+ *     property="field_conductivity",
+ *     type="number",
+ *     format="float",
+ *     nullable=true,
+ *     description="Conductividad en campo en µS/cm",
+ *     example=1200.5
+ *   ),
+ *   @OA\Property(
+ *     property="lab_pH",
+ *     type="number",
+ *     format="float",
+ *     nullable=true,
+ *     description="pH medido en laboratorio (0-14)",
+ *     example=7.4
+ *   ),
+ *   @OA\Property(
+ *     property="lab_conductivity",
+ *     type="number",
+ *     format="float",
+ *     nullable=true,
+ *     description="Conductividad en laboratorio en µS/cm",
+ *     example=1180.3
+ *   ),
+ *   @OA\Property(
+ *     property="cl",
+ *     type="number",
+ *     format="float",
+ *     nullable=true,
+ *     description="Cloruros (Cl) en mg/L",
+ *     example=250.5
+ *   ),
+ *   @OA\Property(
+ *     property="ca",
+ *     type="number",
+ *     format="float",
+ *     nullable=true,
+ *     description="Calcio (Ca) en mg/L",
+ *     example=45.2
+ *   ),
+ *   @OA\Property(
+ *     property="hco3",
+ *     type="number",
+ *     format="float",
+ *     nullable=true,
+ *     description="Bicarbonatos (HCO3) en mg/L",
+ *     example=120.8
+ *   ),
+ *   @OA\Property(
+ *     property="so4",
+ *     type="number",
+ *     format="float",
+ *     nullable=true,
+ *     description="Sulfatos (SO4) en mg/L",
+ *     example=30.1
+ *   ),
+ *   @OA\Property(
+ *     property="fe",
+ *     type="number",
+ *     format="float",
+ *     nullable=true,
+ *     description="Hierro (Fe) en mg/L",
+ *     example=0.5
+ *   ),
+ *   @OA\Property(
+ *     property="si",
+ *     type="number",
+ *     format="float",
+ *     nullable=true,
+ *     description="Sílice (Si) en mg/L",
+ *     example=80.2
+ *   ),
+ *   @OA\Property(
+ *     property="b",
+ *     type="number",
+ *     format="float",
+ *     nullable=true,
+ *     description="Boro (B) en mg/L",
+ *     example=1.2
+ *   ),
+ *   @OA\Property(
+ *     property="li",
+ *     type="number",
+ *     format="float",
+ *     nullable=true,
+ *     description="Litio (Li) en mg/L",
+ *     example=0.3
+ *   ),
+ *   @OA\Property(
+ *     property="f",
+ *     type="number",
+ *     format="float",
+ *     nullable=true,
+ *     description="Fluoruro (F) en mg/L",
+ *     example=0.8
+ *   ),
+ *   @OA\Property(
+ *     property="na",
+ *     type="number",
+ *     format="float",
+ *     nullable=true,
+ *     description="Sodio (Na) en mg/L",
+ *     example=150.5
+ *   ),
+ *   @OA\Property(
+ *     property="k",
+ *     type="number",
+ *     format="float",
+ *     nullable=true,
+ *     description="Potasio (K) en mg/L",
+ *     example=25.3
+ *   ),
+ *   @OA\Property(
+ *     property="mg",
+ *     type="number",
+ *     format="float",
+ *     nullable=true,
+ *     description="Magnesio (Mg) en mg/L",
+ *     example=10.5
+ *   )
+ * )
  */
 final class RegisteredManifestationDTO
 {
