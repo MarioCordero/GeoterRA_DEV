@@ -1,12 +1,26 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Modal, Button, Form, Input, Radio, DatePicker, Upload, message, Spin } from "antd";
-import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
-import { useNavigate } from 'react-router-dom';
-import { FullscreenOutlined, EnvironmentOutlined, LoadingOutlined } from "@ant-design/icons";
-import "leaflet/dist/leaflet.css";
+/**
+ * @deprecated Use RequestModal instead
+ * 
+ * This component has been superseded by RequestModal.jsx which provides:
+ * - Unified request list and creation interface
+ * - Modern API integration (/analysis-request)
+ * - All features from AddPointModal (map, geolocation, coordinates)
+ * - Better code organization and maintainability
+ * 
+ * Migration: Replace <AddPointModal /> with <RequestModal mode="create-only" />
+ * 
+ * @see RequestModal in website/src/components/common/RequestModal.jsx
+ */
+
 import dayjs from "dayjs";
-import { buildApiUrl } from '../../config/apiConf';
+import "leaflet/dist/leaflet.css";
 import PhoneInput from './PhoneInput';
+import { useNavigate } from 'react-router-dom';
+import { buildApiUrl } from '../../config/apiConf';
+import React, { useState, useEffect, useRef } from "react";
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
+import { Modal, Button, Form, Input, Radio, DatePicker, Upload, message, Spin } from "antd";
+import { FullscreenOutlined, EnvironmentOutlined, LoadingOutlined } from "@ant-design/icons";
 
 const defaultPosition = [9.93333, -84.08333];
 const FORM_CACHE_KEY = "addPointFormCache";

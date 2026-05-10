@@ -24,6 +24,7 @@ import {
 } from '@ant-design/icons';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import dayjs from 'dayjs';
+import PhoneInput from './PhoneInput';
 import {
   analysisRequestIndex,
   analysisRequestStore,
@@ -749,12 +750,7 @@ const RequestModal = ({
             <Input placeholder="Ej: Juan Pérez" />
           </Form.Item>
 
-          <Form.Item
-            name="owner_contact_number"
-            label="📞 Teléfono"
-          >
-            <Input placeholder="+506 8765 4321" />
-          </Form.Item>
+          <PhoneInput form={createForm} name="owner_contact_number" required={false} />
 
           <Form.Item
             name="region_id"
@@ -1170,12 +1166,7 @@ const RequestModal = ({
                 <Input placeholder="Ej: Juan Pérez" />
               </Form.Item>
 
-              <Form.Item
-                name="owner_contact_number"
-                label="📞 Teléfono"
-              >
-                <Input placeholder="+506 8765 4321" />
-              </Form.Item>
+              <PhoneInput form={createForm} name="owner_contact_number" required={false} />
 
               <Form.Item
                 name="region_id"
