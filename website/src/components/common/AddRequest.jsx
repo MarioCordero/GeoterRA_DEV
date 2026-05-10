@@ -1,22 +1,9 @@
-/**
- * @deprecated Use RequestModal instead
- * 
- * This component has been superseded by RequestModal.jsx which provides:
- * - Unified request list and creation interface
- * - Modern API integration (/analysis-request)
- * - All features from AddPointModal (map, geolocation, coordinates)
- * - Better code organization and maintainability
- * 
- * Migration: Replace <AddPointModal /> with <RequestModal mode="create-only" />
- * 
- * @see RequestModal in website/src/components/common/RequestModal.jsx
- */
-
 import dayjs from "dayjs";
 import "leaflet/dist/leaflet.css";
 import PhoneInput from './PhoneInput';
 import { useNavigate } from 'react-router-dom';
 import { buildApiUrl } from '../../config/apiConf';
+import MapCoordinatePicker from './MapCoordinatePicker';
 import React, { useState, useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import { Modal, Button, Form, Input, Radio, DatePicker, Upload, message, Spin } from "antd";
@@ -53,7 +40,7 @@ function MapResizeHandler() {
   return null;
 }
 
-const AddPointModal = ({ 
+const AddRequest = ({ 
   onRequestAdded,
   isAdmin = false,
   useTokenAuth = false 
@@ -65,8 +52,8 @@ const AddPointModal = ({
   const [loading, setLoading] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
   const [sessionLoading, setSessionLoading] = useState(false);
-  const [mapFullscreen, setMapFullscreen] = useState(false);
   const [gettingLocation, setGettingLocation] = useState(false);
+  const [mapPickerVisible, setMapPickerVisible] = useState(false);
   const navigate = useNavigate();
   const [manualLat, setManualLat] = useState('');
   const [manualLng, setManualLng] = useState('');
@@ -244,14 +231,14 @@ const AddPointModal = ({
   }, [visible, form]);
 
   useEffect(() => {
-    if (!visible && !mapFullscreen) {
+    if (!visible) {
       if (locationRequestRef.current !== null) {
         console.log('Modal closed - cancelling location request');
         locationRequestRef.current = null;
         setGettingLocation(false);
       }
     }
-  }, [visible, mapFullscreen]);
+  }, [visible]);
 
   useEffect(() => {
     componentMountedRef.current = true;
@@ -387,11 +374,12 @@ const AddPointModal = ({
     setManualLng('');
     
     setVisible(false);
-    setMapFullscreen(false);
   };
 
-  const toggleMapFullscreen = () => {
-    setMapFullscreen(!mapFullscreen);
+  const handleMapPickerConfirm = (coordinates) => {
+    setLatLng(coordinates);
+    setMapPickerVisible(false);
+    message.success('Coordenadas cargadas desde el mapa');
   };
 
   // Update lat/lng in form and cache when map is clicked
@@ -463,7 +451,7 @@ const AddPointModal = ({
       {/* Main Modal */}
       <Modal
         title={`Formulario de solicitud de puntos${isAdmin ? ' (Admin)' : ''}`}
-        open={visible && !mapFullscreen}
+        open={visible}
         onOk={handleOk}
         onCancel={handleCancel}
         width={700}
@@ -642,7 +630,7 @@ const AddPointModal = ({
                 <Button
                   type="primary"
                   icon={<FullscreenOutlined />}
-                  onClick={toggleMapFullscreen}
+                  onClick={() => setMapPickerVisible(true)}
                   style={{
                     backgroundColor: '#1890ff',
                     borderColor: '#1890ff',
@@ -672,176 +660,17 @@ const AddPointModal = ({
         )}
       </Modal>
 
-      {/* Fullscreen Map Modal */}
-      <Modal
-        title={
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>Seleccionar ubicación en el mapa</span>
-            <div>
-              {latLng.lat && latLng.lng && (
-                <span style={{ fontSize: '12px', color: '#666', marginRight: '16px' }}>
-                  Lat: {latLng.lat.toFixed(6)}, Lng: {latLng.lng.toFixed(6)}
-                </span>
-              )}
-            </div>
-          </div>
-        }
-        open={mapFullscreen}
-        onCancel={() => setMapFullscreen(false)}
-        width="95vw"
-        centered
-        footer={null} // Remove default footer
-        styles={{
-          body: { 
-            height: '80vh', 
-            padding: 0,
-            overflow: 'hidden',
-            position: 'relative'
-          }
-        }}
-      >
-        <div style={{ height: '100%', width: '100%', position: 'relative', display: 'flex', flexDirection: 'column' }}>
-          {/* Map Container - Takes remaining space */}
-          <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
-            <MapContainer 
-              center={latLng.lat ? [latLng.lat, latLng.lng] : defaultPosition} 
-              zoom={latLng.lat ? 15 : 8}
-              style={{ height: "100%", width: "100%" }}
-              key={`fullscreen-map-${mapFullscreen}`}
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
-              {/* Pass latLng as prop to LocationMarker in fullscreen too */}
-              <LocationMarker setLatLng={setLatLng} latLng={latLng} />
-              <MapResizeHandler />
-            </MapContainer>
-            
-            {/* Current Location Button in Top Right */}
-            <Button
-              type="primary"
-              icon={gettingLocation ? <LoadingOutlined /> : <EnvironmentOutlined />}
-              onClick={() => {
-                getCurrentLocation().catch(err => {
-                  console.error('Fullscreen location request failed:', err.message);
-                });
-              }}
-              loading={gettingLocation}
-              disabled={gettingLocation}
-              style={{
-                position: 'absolute',
-                top: 10,
-                right: 10,
-                zIndex: 1000,
-                backgroundColor: gettingLocation ? '#ffc107' : '#34d399',
-                borderColor: gettingLocation ? '#ffc107' : '#34d399',
-              }}
-              size="small"
-            >
-              {gettingLocation ? 'Obteniendo...' : 'Mi ubicación'}
-            </Button>
-          </div>
-
-          {/* Bottom Control Panel - Fixed at bottom */}
-          <div style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            backgroundColor: 'white',
-            borderTop: '1px solid #d9d9d9',
-            padding: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '12px',
-            boxShadow: '0 -2px 8px rgba(0,0,0,0.1)',
-            zIndex: 999
-          }}>
-            {/* Coordinate Input Section */}
-            <div style={{
-              display: 'flex',
-              gap: 12,
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexWrap: 'wrap'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <label style={{ fontSize: '12px', color: '#666', minWidth: 50 }}>Latitud:</label>
-                <Input
-                  placeholder="Lat"
-                  value={manualLat}
-                  onChange={(e) => setManualLat(e.target.value)}
-                  style={{ width: 100 }}
-                  size="small"
-                />
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <label style={{ fontSize: '12px', color: '#666', minWidth: 60 }}>Longitud:</label>
-                <Input
-                  placeholder="Lng"
-                  value={manualLng}
-                  onChange={(e) => setManualLng(e.target.value)}
-                  style={{ width: 100 }}
-                  size="small"
-                />
-              </div>
-              <Button 
-                type="primary"
-                size="small"
-                onClick={handleManualCoordinateChange}
-                disabled={!manualLat || !manualLng}
-                style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
-              >
-                Aplicar Coordenadas
-              </Button>
-            </div>
-
-            {/* Current Coordinates Display */}
-            {latLng.lat && latLng.lng && (
-              <div style={{
-                textAlign: 'center',
-                fontSize: '12px',
-                color: '#52c41a',
-                fontWeight: 500,
-                padding: '8px',
-                backgroundColor: '#f6ffed',
-                borderRadius: 4,
-                border: '1px solid #b7eb8f'
-              }}>
-                📍 Ubicación seleccionada: {latLng.lat.toFixed(6)}, {latLng.lng.toFixed(6)}
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div style={{
-              display: 'flex',
-              gap: 12,
-              justifyContent: 'center'
-            }}>
-              <Button 
-                onClick={() => setMapFullscreen(false)}
-                size="large"
-                style={{ minWidth: 120 }}
-              >
-                Cerrar
-              </Button>
-              <Button 
-                type="primary"
-                onClick={() => setMapFullscreen(false)}
-                disabled={!latLng.lat || !latLng.lng}
-                size="large"
-                style={{ minWidth: 150 }}
-              >
-                Confirmar ubicación
-              </Button>
-            </div>
-          </div>
-        </div>
-      </Modal>
+      {/* Map Coordinate Picker Modal */}
+      <MapCoordinatePicker
+        visible={mapPickerVisible}
+        latLng={latLng}
+        onConfirm={handleMapPickerConfirm}
+        onCancel={() => setMapPickerVisible(false)}
+        title="Seleccionar ubicación en el mapa"
+      />
     </>
   );
 };
 
 
-export default AddPointModal;
+export default AddRequest;

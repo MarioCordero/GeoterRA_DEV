@@ -1,5 +1,5 @@
 import React from 'react';
-import RequestModal from '../common/RequestModal';
+import MyRequests from '../common/MyRequests';
 import { useSession } from '../../hooks/useSession';
 import { usePermissions } from '../../hooks/usePermissions';
 import SystemLogs from '../loggedComponents/views/logs/SystemLogs';
@@ -28,8 +28,8 @@ const DashboardContentController = ({ selectedKey }) => {
     }
 
     case '2':
-      // My Requests - show to all users
-      return <RequestModal mode="list-and-create" />;
+      // My Requests - show list + add button
+      return <MyRequests />;
 
     case '3':
       // Manage Requests - admin/maintenance only
