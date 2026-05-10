@@ -21,9 +21,11 @@ const RequestsTable = ({ isAdmin = false }) => {
   const [viewModalVisible, setViewModalVisible] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [isNotImplementedOpen, setIsNotImplementedOpen] = useState(false);
-
   const userIsAdmin = user?.is_admin || user?.role === 'admin';
 
+  // ------------------------------------------------
+  //     Data fetching and state management logic
+  // ------------------------------------------------
   useEffect(() => {
     const checkScreenSize = () => setIsMobile(window.innerWidth <= 768);
     checkScreenSize();
@@ -267,6 +269,9 @@ const RequestsTable = ({ isAdmin = false }) => {
     );
   }
 
+  // --------------------------------------------------------
+  //        HTML, JSX, and component rendering logic
+  // --------------------------------------------------------
   return (
     <>
       <div className="w-full p-4 md:p-6">
@@ -626,34 +631,8 @@ const RequestsTable = ({ isAdmin = false }) => {
             />
           </Form.Item>
 
-          {/* Coordinates optional */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Form.Item
-              name="latitude"
-              label="📍 Latitud"
-              rules={[
-                {
-                  pattern: /^-?(\d+\.?\d*|\.\d+)$/,
-                  message: 'Ingresa una latitud válida (ej: -33.4569)'
-                }
-              ]}
-            >
-              <Input placeholder="-33.4569" type="number" step="0.0000001" />
-            </Form.Item>
-
-            <Form.Item
-              name="longitude"
-              label="📍 Longitud"
-              rules={[
-                {
-                  pattern: /^-?(\d+\.?\d*|\.\d+)$/,
-                  message: 'Ingresa una longitud válida (ej: -70.6483)'
-                }
-              ]}
-            >
-              <Input placeholder="-70.6483" type="number" step="0.0000001" />
-            </Form.Item>
-          </div>
+          {/* Add point modal */}
+          
 
           {/* Details optional */}
           <Form.Item
