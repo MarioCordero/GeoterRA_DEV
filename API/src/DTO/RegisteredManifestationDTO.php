@@ -37,23 +37,99 @@ final class RegisteredManifestationDTO
     public ?float $mg
   ) {}
 
-  
-
   /**
-   * Validate domain rules
+   * Validate domain rules for physical and chemical attributes
+   * 
+   * @throws ApiException
    */
   public function validate(): void
   { 
+    // Validate core geographic fields
     if (trim($this->name) === '') {
-      throw new ApiException(ErrorType::invalidField('name'));
+      throw new ApiException(ErrorType::invalidField('name'), 422);
     }
 
     if ($this->latitude < -90 || $this->latitude > 90) {
-      throw new ApiException(ErrorType::invalidField('latitude'));
+      throw new ApiException(ErrorType::invalidField('latitude (must be -90 to 90)'), 422);
     }
 
     if ($this->longitude < -180 || $this->longitude > 180) {
-      throw new ApiException(ErrorType::invalidField('longitude'));
+      throw new ApiException(ErrorType::invalidField('longitude (must be -180 to 180)'), 422);
+    }
+
+    // Validate In Situ Physical Attributes
+    if ($this->temperature !== null) {
+      if ($this->temperature < 0 || $this->temperature > 250) {
+        throw new ApiException(
+          ErrorType::invalidField('temperature (In Situ: must be 0-250°C)'),
+          422
+        );
+      }
+    }
+
+    if ($this->field_pH !== null) {
+      if ($this->field_pH < 0 || $this->field_pH > 14) {
+        throw new ApiException(
+          ErrorType::invalidField('field_pH (In Situ: must be 0-14)'),
+          422
+        );
+      }
+    }
+
+    if ($this->field_conductivity !== null) {
+      if ($this->field_conductivity < 0) {
+        throw new ApiException(
+          ErrorType::invalidField('field_conductivity (In Situ: must be ≥0 µS/cm)'),
+          422
+        );
+      }
+    }
+
+    // Validate Laboratory Physical Attributes
+    if ($this->lab_pH !== null) {
+      if ($this->lab_pH < 0 || $this->lab_pH > 14) {
+        throw new ApiException(
+          ErrorType::invalidField('lab_pH (Laboratory: must be 0-14)'),
+          422
+        );
+      }
+    }
+
+    if ($this->lab_conductivity !== null) {
+      if ($this->lab_conductivity < 0) {
+        throw new ApiException(
+          ErrorType::invalidField('lab_conductivity (Laboratory: must be ≥0 µS/cm)'),
+          422
+        );
+      }
+    }
+
+    // Validate Chemical Elements (all must be non-negative)
+    $chemicalElements = [
+      'cl' => 'Cl (Cloruros)',
+      'ca' => 'Ca (Calcio)',
+      'hco3' => 'HCO3 (Bicarbonatos)',
+      'so4' => 'SO4 (Sulfatos)',
+      'fe' => 'Fe (Hierro)',
+      'si' => 'Si (Sílice)',
+      'b' => 'B (Boro)',
+      'li' => 'Li (Litio)',
+      'f' => 'F (Fluoruro)',
+      'na' => 'Na (Sodio)',
+      'k' => 'K (Potasio)',
+      'mg' => 'Mg (Magnesio)'
+    ];
+
+    foreach ($chemicalElements as $field => $label) {
+      $value = $this->$field;
+      if ($value !== null) {
+        if ($value < 0) {
+          throw new ApiException(
+            ErrorType::invalidField("{$label} (must be ≥0)"),
+            422
+          );
+        }
+      }
     }
   }
 
