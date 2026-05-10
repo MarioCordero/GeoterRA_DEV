@@ -128,6 +128,36 @@ When creating components, maximize reusability:
    - Use custom hooks like `useSession` for shared auth state
    - Keep UI state (modals, forms) separate from data state
 
+#### Real-World Example: RequestModal (Request Management)
+**File**: `website/src/components/common/RequestModal.jsx`
+
+This is a reference implementation of consolidating related components into a single, reusable modal:
+- **What it does**: Manages all request operations (list, create, view details, delete) in one component
+- **Why it matters**: Eliminated duplication (UserRequests.jsx + AddPointModal.jsx + UserRequestsList.jsx merged)
+- **Key patterns used**:
+  - Tab-based navigation for different workflows (list vs create)
+  - Form state caching to localStorage
+  - Map integration with Leaflet for coordinate selection
+  - Modern API integration via centralized `apiConf.jsx` functions
+  - Mobile-responsive UI (Tailwind + Ant Design)
+  - Proper error handling with user-friendly messages
+
+**When to use RequestModal**:
+```jsx
+// In dashboard for listing + creating requests
+<RequestModal mode="list-and-create" />
+
+// In admin panel for only creating requests
+<RequestModal mode="create-only" isAdmin={true} />
+```
+
+**What NOT to do**:
+- ❌ Don't use deprecated `AddPointModal`, `UserRequests`, or `UserRequestsList` (see .github/instructions/frontend.md)
+- ❌ Don't duplicate the map + form logic; reuse RequestModal instead
+- ❌ Don't bypass the centralized API layer; use `analysisRequestStore()` etc. from `apiConf.jsx`
+
+See [frontend.md](./frontend.md#request-management-components) for detailed RequestModal documentation.
+
 #### API Integration Pattern (Frontend)
 
 All backend communication must go through centralized functions in `website/src/config/apiConf.jsx`:
