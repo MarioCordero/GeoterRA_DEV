@@ -1,17 +1,15 @@
 import React from 'react';
-import { usePermissions } from '../../hooks/usePermissions';
+import RequestModal from '../common/RequestModal';
 import { useSession } from '../../hooks/useSession';
-
-// Import all views
-import UserWelcome from '../loggedComponents/views/home/UserWelcome';
-import AdminDashboard from '../loggedComponents/views/home/AdminDashboard';
-import MaintenanceDashboard from '../loggedComponents/views/home/MaintenanceDashboard';
-import DatabaseViewer from '../loggedComponents/views/database/DatabaseViewer';
-import UserRequestsList from '../loggedComponents/views/requests/UserRequestsList';
-import RequestManager from '../loggedComponents/views/manage/RequestsManager';
-import ProfilePage from '../loggedComponents/views/profile/ProfilePage';
-import UserManagement from '../loggedComponents/views/users/UserManagement';
+import { usePermissions } from '../../hooks/usePermissions';
 import SystemLogs from '../loggedComponents/views/logs/SystemLogs';
+import UserWelcome from '../loggedComponents/views/home/UserWelcome';
+import ProfilePage from '../loggedComponents/views/profile/ProfilePage';
+import AdminDashboard from '../loggedComponents/views/home/AdminDashboard';
+import UserManagement from '../loggedComponents/views/users/UserManagement';
+import RequestManager from '../loggedComponents/views/manage/RequestsManager';
+import DatabaseViewer from '../loggedComponents/views/database/DatabaseViewer';
+import MaintenanceDashboard from '../loggedComponents/views/home/MaintenanceDashboard';
 
 const DashboardContentController = ({ selectedKey }) => {
   const { hasPermission, PERMISSIONS } = usePermissions();
@@ -31,7 +29,7 @@ const DashboardContentController = ({ selectedKey }) => {
 
     case '2':
       // My Requests - show to all users
-      return <UserRequestsList />;
+      return <RequestModal mode="list-and-create" />;
 
     case '3':
       // Manage Requests - admin/maintenance only
