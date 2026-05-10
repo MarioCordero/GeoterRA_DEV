@@ -158,6 +158,53 @@ This is a reference implementation of consolidating related components into a si
 
 See [frontend.md](./frontend.md#request-management-components) for detailed RequestModal documentation.
 
+#### PhoneInput Component Pattern
+**File**: `website/src/components/common/PhoneInput.jsx`
+
+A reusable, country-aware phone input with automatic formatting and validation:
+- **Supports multiple countries**: CR, US, MX, ES, AR, CO, PE, CL with localized formats
+- **Auto-formatting**: Applies country-specific phone number formatting (e.g., "(555) 123-4567" for US)
+- **Validation**: Checks digit count and format rules per country
+- **Customizable**: Control required status, field name, and form instance
+
+**Usage**:
+```javascript
+import PhoneInput from '../common/PhoneInput';
+
+// In form
+<PhoneInput 
+  form={form}              // Ant Form instance
+  name="phoneNumber"       // Field name
+  required={false}         // Make optional if needed
+/>
+```
+
+**Props**:
+- `form`: Ant Design Form instance (required for integration)
+- `name`: Field name in form data (default: "contactNumber")
+- `required`: Boolean to enforce validation (default: true)
+
+**Features**:
+- 🌍 Country selector with flag emoji
+- 📱 Auto-formatted phone display
+- ✅ Real-time validation with helpful error messages
+- 🎯 Format hint below input shows expected format for selected country
+
+**Example in RequestModal**:
+```javascript
+// Get phone from user during request creation
+<PhoneInput form={createForm} name="owner_contact_number" required={false} />
+
+// Stored as plain digits without formatting: "87654321", "5551234567", etc.
+```
+
+**When to Use**:
+Whenever a form needs phone input validation, always use PhoneInput instead of creating custom validation. This ensures:
+- Consistent phone number handling across the application
+- Single source of truth for supported countries and formats
+- Easier maintenance of validation rules (e.g., adding new countries)
+- Automatic formatting and user-friendly error messages
+
 #### API Integration Pattern (Frontend)
 
 All backend communication must go through centralized functions in `website/src/config/apiConf.jsx`:
