@@ -78,11 +78,36 @@ final class AnalysisRequestDTO
 	 */
 	public function validate(): void
 	{
+		// Validate email format
 		if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
 			throw new ApiException(
 				ErrorType::invalidField('email'),
 				422
 			);
+		}
+
+		// Validate temperature_sensation ENUM
+		$validTemperatureSensations = ['Muy frío', 'Frío', 'Templado', 'Cálido', 'Muy Caliente', 'caliente'];
+		if (!in_array($this->temperature_sensation, $validTemperatureSensations, true)) {
+			throw new ApiException(
+				ErrorType::invalidField(
+					"percepción térmica: debe ser uno de ['Muy frío', 'Frío', 'Templado', 'Cálido', 'Muy Caliente', 'caliente']"
+				),
+				422
+			);
+		}
+
+		// Validate state ENUM if provided
+		if ($this->state !== null) {
+			$validStates = ['Registrada', 'En revisión', 'Verificación de campo', 'Análisis en laboratorio', 'Aprobada', 'Rechazada', 'Archivada'];
+			if (!in_array($this->state, $validStates, true)) {
+				throw new ApiException(
+					ErrorType::invalidField(
+						"estado: debe ser uno de ['Registrada', 'En revisión', 'Verificación de campo', 'Análisis en laboratorio', 'Aprobada', 'Rechazada', 'Archivada']"
+					),
+					422
+				);
+			}
 		}
 	}
 }

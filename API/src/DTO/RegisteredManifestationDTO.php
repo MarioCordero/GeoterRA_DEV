@@ -50,18 +50,18 @@ final class RegisteredManifestationDTO
     }
 
     if ($this->latitude < -90 || $this->latitude > 90) {
-      throw new ApiException(ErrorType::invalidField('latitude (must be -90 to 90)'), 422);
+      throw new ApiException(ErrorType::invalidField('latitud (debe estar entre -90 y 90)'), 422);
     }
 
     if ($this->longitude < -180 || $this->longitude > 180) {
-      throw new ApiException(ErrorType::invalidField('longitude (must be -180 to 180)'), 422);
+      throw new ApiException(ErrorType::invalidField('longitud (debe estar entre -180 y 180)'), 422);
     }
 
     // Validate In Situ Physical Attributes
     if ($this->temperature !== null) {
       if ($this->temperature < 0 || $this->temperature > 250) {
         throw new ApiException(
-          ErrorType::invalidField('temperature (In Situ: must be 0-250°C)'),
+          ErrorType::invalidField('temperatura (In Situ: debe estar entre 0-250°C)'),
           422
         );
       }
@@ -70,7 +70,7 @@ final class RegisteredManifestationDTO
     if ($this->field_pH !== null) {
       if ($this->field_pH < 0 || $this->field_pH > 14) {
         throw new ApiException(
-          ErrorType::invalidField('field_pH (In Situ: must be 0-14)'),
+          ErrorType::invalidField('pH en campo (In Situ: debe estar entre 0-14)'),
           422
         );
       }
@@ -79,7 +79,7 @@ final class RegisteredManifestationDTO
     if ($this->field_conductivity !== null) {
       if ($this->field_conductivity < 0) {
         throw new ApiException(
-          ErrorType::invalidField('field_conductivity (In Situ: must be ≥0 µS/cm)'),
+          ErrorType::invalidField('conductividad en campo (In Situ: debe ser ≥0 µS/cm)'),
           422
         );
       }
@@ -89,7 +89,7 @@ final class RegisteredManifestationDTO
     if ($this->lab_pH !== null) {
       if ($this->lab_pH < 0 || $this->lab_pH > 14) {
         throw new ApiException(
-          ErrorType::invalidField('lab_pH (Laboratory: must be 0-14)'),
+          ErrorType::invalidField('pH en laboratorio (Laboratorio: debe estar entre 0-14)'),
           422
         );
       }
@@ -98,7 +98,7 @@ final class RegisteredManifestationDTO
     if ($this->lab_conductivity !== null) {
       if ($this->lab_conductivity < 0) {
         throw new ApiException(
-          ErrorType::invalidField('lab_conductivity (Laboratory: must be ≥0 µS/cm)'),
+          ErrorType::invalidField('conductividad en laboratorio (Laboratorio: debe ser ≥0 µS/cm)'),
           422
         );
       }
@@ -125,7 +125,7 @@ final class RegisteredManifestationDTO
       if ($value !== null) {
         if ($value < 0) {
           throw new ApiException(
-            ErrorType::invalidField("{$label} (must be ≥0)"),
+            ErrorType::invalidField("{$label} (debe ser ≥0)"),
             422
           );
         }
