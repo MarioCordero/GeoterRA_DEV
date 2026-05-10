@@ -74,6 +74,23 @@ const config = {
     ],
   ],
 
+  plugins: [
+    [
+      'docusaurus-plugin-openapi-docs',
+      {
+        id: "api",
+        docsPluginId: "classic",
+        config: {
+          geoterra: {
+            specPath: "../API/public/openapi.json", // Ruta a tu JSON
+            outputDir: "docs/api", // Donde se generarán los archivos .md
+          }
+        }
+      },
+    ],
+  ],
+  themes: ["docusaurus-theme-openapi-docs"],
+
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
