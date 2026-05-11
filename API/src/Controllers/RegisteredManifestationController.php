@@ -59,6 +59,22 @@ final class RegisteredManifestationController
   }
 
   /**
+   * GET /registered-manifestations/{id}
+   * Returns a single registered manifestation by ID (public access)
+   */
+  public function show(string $id): void
+  {
+    try {
+      $manifestation = $this->service->getById($id);
+      Response::success(data: $manifestation);
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getHttpStatus());
+    } catch (\Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
+
+  /**
    * PUT /registered-manifestations/{id}
    */
   public function update(string $id): void

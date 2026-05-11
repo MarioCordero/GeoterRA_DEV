@@ -84,6 +84,21 @@ final class RegisteredManifestationService
   }
 
   /**
+   * Retrieve a single manifestation by ID (public access)
+   */
+  public function getById(string $id): array
+  {
+    $manifestation = $this->repository->findById($id);
+    if (!$manifestation) {
+      throw new ApiException(
+        ErrorType::notFound('Registered manifestation'),
+        404
+      );
+    }
+    return $manifestation;
+  }
+
+  /**
    * Update an existing manifestation
    */
   public function update(RegisteredManifestationDTO $dto, string $id): void
