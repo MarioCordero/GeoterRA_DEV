@@ -1,8 +1,8 @@
 import dayjs from "dayjs";
 import "leaflet/dist/leaflet.css";
 import PhoneInput from './PhoneInput';
-import { useNavigate } from 'react-router-dom';
-import { buildApiUrl } from '../../config/apiConf';
+import { analysisRequestStore } from '../../config/apiConf';
+import { useSession } from '../../hooks/useSession';
 import MapCoordinatePicker from './MapCoordinatePicker';
 import React, { useState, useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
@@ -45,20 +45,18 @@ const AddRequest = ({
   isAdmin = false,
   useTokenAuth = false 
 }) => {
+  const { user, loading: sessionLoading } = useSession();
+  const userEmail = user?.email;
 
   const [visible, setVisible] = useState(false);
   const [latLng, setLatLng] = useState({});
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [userEmail, setUserEmail] = useState(null);
-  const [sessionLoading, setSessionLoading] = useState(false);
   const [gettingLocation, setGettingLocation] = useState(false);
   const [mapPickerVisible, setMapPickerVisible] = useState(false);
-  const navigate = useNavigate();
   const [manualLat, setManualLat] = useState('');
   const [manualLng, setManualLng] = useState('');
   const locationRequestRef = useRef(null);
-  const sessionLoadedRef = useRef(false);
   const componentMountedRef = useRef(true);
   const handleManualCoordinateChange = () => {
     const lat = parseFloat(manualLat);
@@ -190,31 +188,7 @@ const AddRequest = ({
     });
   };
 
-  useEffect(() => {
-    if (sessionLoadedRef.current || !componentMountedRef.current) {
-      return;
-    }
-    
-    const loadUserEmail = async () => {
-      if (sessionLoading) {
-        return;
-      }
-      sessionLoadedRef.current = true;
-      
-      try {
-        const email = await getUserSession();
-        if (componentMountedRef.current) {
-          setUserEmail(email);
-        }
-      } catch (error) {
-        if (componentMountedRef.current) {
-          sessionLoadedRef.current = false;
-        }
-      }
-    };
-    
-    loadUserEmail();
-  }, []);
+
   
   useEffect(() => {
     if (visible) {
@@ -244,7 +218,6 @@ const AddRequest = ({
     componentMountedRef.current = true;
     return () => {
       componentMountedRef.current = false;
-      sessionLoadedRef.current = false;
       locationRequestRef.current = null;
     };
   }, []);
@@ -259,54 +232,42 @@ const AddRequest = ({
 
   const handleOk = async () => {
     try {
-      // Verify session before submitting (especially important for admin)
-      const currentUserEmail = isAdmin ? await getUserSession() : userEmail;
-      if (!currentUserEmail) {
-        const errorMsg = isAdmin 
-          ? "Sesión expirada o sin privilegios de administrador"
-          : "Debes estar autenticado para enviar una solicitud";
-        message.error(errorMsg);
+      // Verify session before submitting
+      if (!userEmail) {
+        message.error("Debes estar autenticado para enviar una solicitud");
         return;
       }
 
       const values = await form.validateFields();
       setLoading(true);
 
+      // Map temperature sensation values
+      const temperatureSensationMap = {
+        "3": "Cálido",
+        "2": "Templado",
+        "1": "Frío"
+      };
 
+      // Prepare payload for API - using AnalysisRequestDTO structure
+      const payload = {
+        region: 1, // TODO: Make this selectable - add region selector to form
+        email: userEmail,
+        owner_contact_number: values.contactNumber,
+        owner_name: values.propietario || "",
+        temperature_sensation: temperatureSensationMap[values.sensTermica],
+        bubbles: values.burbujeo === "1",
+        details: values.direccion || "",
+        current_usage: values.usoActual || "",
+        latitude: latLng.lat || "",
+        longitude: latLng.lng || "",
+        state: "Registrada"
+        // TODO: Photo handling for future implementation
+        // photos: [] - Convert images from upload component and upload to separate endpoint
+      };
 
-      // Prepare form data for API
-      const formData = new FormData();
-      formData.append("pointId", values.pointId);
-      formData.append("email", currentUserEmail);
-      // TODO: REVIEW, SUPPORT MULTIPLE COUNTRY NUMBERS, ONLY WORKS FOR CR FOR NOW
-      const phoneDigitsOnly = values.contactNumber.replace(/\D/g, '');
-      const phoneNumber = phoneDigitsOnly.length > 8 
-        ? phoneDigitsOnly.slice(3) 
-        : phoneDigitsOnly;
-      formData.append("contactNumber", phoneNumber);
-      formData.append("fecha", values.fecha ? dayjs(values.fecha).format("YYYY-MM-DD") : "");
-      formData.append("sensTermica", values.sensTermica);
-      formData.append("propietario", values.propietario || "");
-      formData.append("usoActual", values.usoActual || "");
-      formData.append("burbujeo", values.burbujeo);
-      formData.append("direccion", values.direccion || "");
-      formData.append("lat", latLng.lat || "");
-      formData.append("lng", latLng.lng || "");
+      const result = await analysisRequestStore(payload);
 
-      // Handle file upload
-      if (values.foto && values.foto.length > 0) {
-        formData.append("foto", values.foto[0].originFileObj);
-      }
-
-      const response = await fetch(buildApiUrl("request.inc.php"), {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
-
-      const result = await response.json();
-
-      if (result.response === "Ok") {
+      if (result.ok) {
         setVisible(false);
         form.resetFields();
         localStorage.removeItem(FORM_CACHE_KEY);
@@ -320,37 +281,15 @@ const AddRequest = ({
         
         Modal.success({
           title: "¡Solicitud enviada!",
-          content: result.message || `${isAdmin ? 'La' : 'Tu'} solicitud fue enviada correctamente.`,
+          content: result.data?.message || "Tu solicitud fue enviada correctamente.",
         });
       } else {
-        const errorMessage = result.message || "Error al enviar la solicitud";
-        const errors = result.errors || [];
+        const errorMessage = result.error || "Error al enviar la solicitud";
         
-        // Better error logging
-        console.error("❌ API Response:", result);
+        console.error("❌ API Response Error:", result);
         console.error("❌ Error Message:", errorMessage);
-        console.error("❌ Errors Array:", errors);
         
-        // Log each error in detail
-        if (errors.length > 0) {
-          errors.forEach((err, index) => {
-            console.error(`Error ${index + 1}:`, err);
-            if (typeof err === 'object') {
-              console.error(`  - Message: ${err.message}`);
-              console.error(`  - Field: ${err.field || 'N/A'}`);
-              console.error(`  - Code: ${err.code || 'N/A'}`);
-            }
-          });
-        }
-        
-        let detailedError = errorMessage;
-        if (errors.length > 0) {
-          detailedError += "\n\nDetalles:\n" + errors.map(err => 
-            typeof err === 'object' ? (err.message || JSON.stringify(err)) : err
-          ).join("\n");
-        }
-        
-        message.error(detailedError);
+        message.error(errorMessage);
       }
     } catch (err) {
       console.error("Request error:", err);
@@ -404,7 +343,7 @@ const AddRequest = ({
           color: "#1890ff",
           textAlign: "center"
         }}>
-          <Spin size="small" /> {isAdmin ? 'Verificando privilegios de administrador...' : 'Verificando sesión de usuario...'}
+          <Spin size="small" /> Verificando sesión de usuario...
         </div>
       );
     }
@@ -419,22 +358,7 @@ const AddRequest = ({
           marginBottom: "16px",
           color: "#d46b08"
         }}>
-          ⚠️ {isAdmin ? 'No se pudo verificar la sesión de administrador' : 'Verificando sesión de usuario...'}
-        </div>
-      );
-    }
-
-    if (isAdmin) {
-      return (
-        <div style={{ 
-          padding: "10px", 
-          backgroundColor: "#f6ffed", 
-          border: "1px solid #b7eb8f", 
-          borderRadius: "4px", 
-          marginBottom: "16px",
-          color: "#389e0d"
-        }}>
-          ✅ Sesión de administrador verificada: {userEmail}
+          ⚠️ Debes iniciar sesión para agregar una solicitud
         </div>
       );
     }
@@ -444,20 +368,20 @@ const AddRequest = ({
 
   return (
     <>
-      <Button type="primary" onClick={() => setVisible(true)}>
+      <Button type="primary" onClick={() => setVisible(true)} disabled={!userEmail}>
         Agregar punto
       </Button>
       
       {/* Main Modal */}
       <Modal
-        title={`Formulario de solicitud de puntos${isAdmin ? ' (Admin)' : ''}`}
+        title="Formulario de solicitud de puntos"
         open={visible}
         onOk={handleOk}
         onCancel={handleCancel}
         width={700}
         confirmLoading={loading}
         footer={[
-          <Button key="back" onClick={handleCancel} disabled={loading || sessionLoading}>
+          <Button key="back" onClick={handleCancel} disabled={loading}>
             Cancelar
           </Button>,
           <Button 
@@ -465,7 +389,7 @@ const AddRequest = ({
             type="primary" 
             onClick={handleOk} 
             loading={loading}
-            disabled={!userEmail || sessionLoading}
+            disabled={!userEmail}
           >
             Enviar
           </Button>,
