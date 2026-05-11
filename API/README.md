@@ -86,7 +86,7 @@ Added `@OA\Schema` annotations to all Data Transfer Objects with:
 #### Phase 5: Docusaurus Integration ✓
 - Created documentation generation pipeline
 - Auto-generates markdown from OpenAPI spec
-- Integrated with `docWebsite` package
+- Integrated with `docApiWebsite` package
 
 ### 🚀 Quick Start
 
@@ -103,7 +103,7 @@ This will:
 
 #### Build Complete Documentation
 ```bash
-cd docWebsite
+cd docApiWebsite
 
 # Generate API docs + build site (recommended)
 npm run generate-all-docs
@@ -115,7 +115,7 @@ npm run build
 
 #### View Documentation Locally
 ```bash
-cd docWebsite
+cd docApiWebsite
 npm run serve
 # → Open http://localhost:3000
 ```
@@ -125,9 +125,9 @@ npm run serve
 | File | Purpose | Size |
 |------|---------|------|
 | `public/openapi.json` | Generated OpenAPI 3.0.0 specification | 827 lines |
-| `../docWebsite/docs/api/index.mdx` | API overview and authentication guide | Auto-generated |
-| `../docWebsite/docs/api/schemas.mdx` | Complete schema documentation | 9.7 KB |
-| `../docWebsite/build/` | Static HTML documentation | Ready to deploy |
+| `../docApiWebsite/docs/api/index.mdx` | API overview and authentication guide | Auto-generated |
+| `../docApiWebsite/docs/api/schemas.mdx` | Complete schema documentation | 9.7 KB |
+| `../docApiWebsite/build/` | Static HTML documentation | Ready to deploy |
 
 ### 📝 Updating Documentation
 
@@ -145,7 +145,7 @@ When you modify PHP annotations:
 
 3. **Rebuild** documentation:
    ```bash
-   cd docWebsite
+   cd docApiWebsite
    npm run generate-all-docs
    ```
 
@@ -162,7 +162,7 @@ API/
 │   └── openapi.json       → Generated OpenAPI 3.0.0 spec
 └── composer.json          → Contains "generate-api-docs" script
 
-docWebsite/
+docApiWebsite/
 ├── docs/
 │   ├── api/               → Auto-generated API documentation
 │   │   ├── index.mdx      → API overview
@@ -184,12 +184,12 @@ For GitHub Actions, add to your workflow:
     
 - name: Build Documentation Site
   run: |
-    cd docWebsite
+    cd docApiWebsite
     npm install
     npm run build
     
 - name: Deploy Documentation
-  # Deploy the docWebsite/build/ directory
+  # Deploy the docApiWebsite/build/ directory
 ```
 
 ### 📖 Annotation Examples
@@ -247,7 +247,7 @@ public function store(): void {}
 **Issue**: Generated docs don't show in build
 - **Fix**: Clear cache and rebuild:
   ```bash
-  cd docWebsite
+  cd docApiWebsite
   npm run clear
   npm run generate-all-docs
   ```

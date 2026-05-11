@@ -10,7 +10,7 @@ cat << 'EOF'
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ✨ Generate Everything (Recommended)
-  cd docWebsite
+  cd docApiWebsite
   npm run generate-all-docs
   
   This will:
@@ -28,17 +28,17 @@ Generate API spec only:
   ➜ Creates: API/public/openapi.json
 
 Generate Markdown docs from OpenAPI:
-  cd docWebsite
+  cd docApiWebsite
   npm run generate-api-docs
   ➜ Creates: docs/api/index.mdx and docs/api/schemas.mdx
 
 Build documentation site:
-  cd docWebsite
+  cd docApiWebsite
   npm run build
   ➜ Creates: build/ directory with static HTML
 
 Serve documentation locally:
-  cd docWebsite
+  cd docApiWebsite
   npm run serve
   ➜ Open: http://localhost:3000
 
@@ -56,7 +56,7 @@ When you modify PHP code (controllers, DTOs):
    @OA\Post(), @OA\Schema(), @OA\Property(), etc.
    
 3. Regenerate documentation
-   cd docWebsite
+   cd docApiWebsite
    npm run generate-all-docs
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -71,7 +71,7 @@ API Backend
 ├── public/openapi.json    → Generated OpenAPI 3.0.0 spec [DO NOT EDIT]
 └── composer.json          → Contains "generate-api-docs" script
 
-Documentation Website
+Documentation Website (docApiWebsite)
 ├── docs/
 │   ├── api/               → Auto-generated API documentation
 │   └── *.md               → Manual documentation pages
@@ -87,14 +87,14 @@ Documentation Website
 
 To customize API documentation generation:
 
-Edit: docWebsite/scripts/generate.mjs
+Edit: docApiWebsite/scripts/generate.mjs
 - Change output format
 - Add custom sections
 - Modify schema display
 
 To customize Docusaurus appearance:
 
-Edit: docWebsite/docusaurus.config.js
+Edit: docApiWebsite/docusaurus.config.js
 - Branding (title, logo, colors)
 - Navigation menu
 - Footer information
@@ -108,16 +108,16 @@ Edit: docWebsite/docusaurus.config.js
   ls -lh API/public/openapi.json
 
 ✓ API documentation created
-  ls -lh docWebsite/docs/api/
+  ls -lh docApiWebsite/docs/api/
 
 ✓ Documentation built
-  ls -lh docWebsite/build/
+  ls -lh docApiWebsite/build/
 
 ✓ Composer script configured
   grep "generate-api-docs" API/composer.json
 
 ✓ NPM scripts configured
-  grep "generate-api-docs" docWebsite/package.json
+  grep "generate-api-docs" docApiWebsite/package.json
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -135,7 +135,7 @@ Fix:   Install doctrine/annotations:
 
 Issue: generated docs don't show in build
 Fix:   Clear cache and rebuild:
-       cd docWebsite
+       cd docApiWebsite
        npm run clear
        npm run generate-all-docs
 
@@ -156,6 +156,6 @@ Or check individual files:
   cat API/src/Core/OpenApiConfig.php         → Global OpenAPI config
   cat API/src/DTO/AnalysisRequestDTO.php     → Example DTO schema
   cat API/src/Controllers/AnalysisRequestController.php  → Example endpoints
-  cat docWebsite/scripts/generate.mjs        → API→Markdown generator
+  cat docApiWebsite/scripts/generate.mjs        → API→Markdown generator
 
 EOF
