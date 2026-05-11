@@ -1,4 +1,5 @@
 import AddRequest from './AddRequest';
+import NotImplementedModal from './NotImplementedModal';
 import React, { useState, useEffect, useRef } from 'react';
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { Table, Button, Modal, Tag, message, Empty, Drawer, Divider } from 'antd';
@@ -28,6 +29,7 @@ const MyRequests = () => {
   // ─── Modal/Drawer state ───
   const [viewModalVisible, setViewModalVisible] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
+  const [notImplementedModalOpen, setNotImplementedModalOpen] = useState(false);
 
   // ─── Effects ───
 
@@ -87,14 +89,7 @@ const MyRequests = () => {
   };
 
   const handleDelete = (record) => {
-    Modal.confirm({
-      title: 'Eliminar solicitud',
-      content: `¿Estás seguro de que deseas eliminar la solicitud "${record.name}"?`,
-      okText: 'Eliminar',
-      cancelText: 'Cancelar',
-      okButtonProps: { danger: true },
-      onOk: () => deleteRequest(record.id_soli),
-    });
+    setNotImplementedModalOpen(true);
   };
 
   // ─── Render helpers ───
@@ -399,6 +394,12 @@ const MyRequests = () => {
           </div>
         )}
       </Drawer>
+
+      {/* Not Implemented Modal for delete action */}
+      <NotImplementedModal
+        isOpen={notImplementedModalOpen}
+        onClose={() => setNotImplementedModalOpen(false)}
+      />
     </div>
   );
 };
