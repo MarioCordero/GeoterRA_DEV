@@ -136,6 +136,85 @@ final class AnalysisRequestController
   }
 
   /**
+   * GET /analysis-request/{id}
+   * Returns a specific analysis request if it belongs to the authenticated user
+   *
+   * @OA\Get(
+   * path="/analysis-request/{id}",
+   * summary="Obtener solicitud específica",
+   * description="Retorna una solicitud de análisis específica si pertenece al usuario autenticado.",
+   * tags={"Analysis Requests"},
+   * security={{"cookieAuth": {}}, {"tokenAuth": {}}},
+   * @OA\Parameter(
+   * name="id",
+   * in="path",
+   * required=true,
+   * description="ULID o ID de la solicitud",
+   * @OA\Schema(type="string")
+   * ),
+   * @OA\Response(
+   * response=200,
+   * description="Solicitud encontrada",
+   * @OA\JsonContent(ref="#/components/schemas/AnalysisRequestDTO")
+   * ),
+   * @OA\Response(response=401, description="No autenticado"),
+   * @OA\Response(response=404, description="Solicitud no encontrada"),
+   * @OA\Response(response=500, description="Error interno del servidor")
+   * )
+   */
+  public function show(string $id): void
+  {
+    try {
+      $request = $this->service->getById($id);
+      Response::success(data: $request);
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getCode());
+    } catch (\Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
+
+  /**
+   * GET /admin/analysis-request/{id}
+   * Returns a specific analysis request for admin/maintenance users
+   *
+   * @OA\Get(
+   * path="/admin/analysis-request/{id}",
+   * summary="Obtener solicitud específica (Admin)",
+   * description="Retorna una solicitud de análisis específica. Requiere permisos de administrador.",
+   * tags={"Analysis Requests"},
+   * security={{"cookieAuth": {}}, {"tokenAuth": {}}},
+   * @OA\Parameter(
+   * name="id",
+   * in="path",
+   * required=true,
+   * description="ULID o ID de la solicitud",
+   * @OA\Schema(type="string")
+   * ),
+   * @OA\Response(
+   * response=200,
+   * description="Solicitud encontrada",
+   * @OA\JsonContent(ref="#/components/schemas/AnalysisRequestDTO")
+   * ),
+   * @OA\Response(response=401, description="No autenticado"),
+   * @OA\Response(response=403, description="Permisos insuficientes"),
+   * @OA\Response(response=404, description="Solicitud no encontrada"),
+   * @OA\Response(response=500, description="Error interno del servidor")
+   * )
+   */
+  public function adminShow(string $id): void
+  {
+    try {
+      $request = $this->service->adminGetById($id);
+      Response::success(data: $request);
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getCode());
+    } catch (\Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
+
+  /**
    * GET /admin/analysis-request
    * Returns all analysis requests on the system, only if the authenticated user is an admin
    *
