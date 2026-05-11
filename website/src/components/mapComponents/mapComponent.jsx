@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import { useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { FaExpand, FaCompress, FaChevronRight, FaChevronLeft, FaMapMarkerAlt } from "react-icons/fa";
-import { registeredManifestations } from '../../config/apiConf';
-import { useSession } from '../../hooks/useSession';
 import LindalDiagram from './LindalDiagram';
+import { useNavigate } from "react-router-dom";
+import { useSession } from '../../hooks/useSession';
+import React, { useEffect, useState, useRef } from "react";
+import { registeredManifestationsIndex, registeredManifestationsIndexByRegion, regionsIndex } from '../../config/apiConf';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { FaExpand, FaCompress, FaChevronRight, FaChevronLeft, FaMapMarkerAlt } from "react-icons/fa";
 
 // Fix Leaflet's default icon issue
 delete L.Icon.Default.prototype._getIconUrl;
@@ -16,26 +16,15 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png",
 });
 
-
-
 // Function to fetch all registered manifestations (points)
-const fetchAllManifestations = async (buildHeaders) => {
+const fetchAllManifestations = async () => {
   try {
-    const response = await fetch(registeredManifestations.index(), {
-      method: "GET",
-      headers: buildHeaders(),
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const result = await response.json();
+    const result = await registeredManifestationsIndex();
     
     console.log('API Response:', result);
     
     // Handle the API response structure
-    if (result.errors && result.errors.length === 0 && result.data) {
+    if (!result.error && result.data) {
       // ✅ Filter out soft-deleted records
       const activeManifestations = (result.data || []).filter(item => {
         return item.deleted_at === null || item.deleted_at === undefined;
@@ -45,11 +34,76 @@ const fetchAllManifestations = async (buildHeaders) => {
       
       return activeManifestations;
     } else {
-      console.error("API Error fetching manifestations:", result.errors);
-      throw new Error(result.errors?.[0]?.message || "Failed to fetch manifestations");
+      console.error("API Error fetching manifestations:", result.error);
+      throw new Error(result.error || "Failed to fetch manifestations");
     }
   } catch (error) {
     console.error("Error fetching manifestations:", error);
+    throw error;
+  }
+};
+
+// Function to fetch all regions
+const fetchAllRegions = async () => {
+  try {
+    const result = await regionsIndex();
+    
+    console.log('Regions API Response:', result);
+    
+    if (!result.error && result.data) {
+      // Return full region objects with id and name
+      const regions = (result.data || []).map(region => ({
+        id: region.id,
+        name: region.name
+      }));
+      
+      console.log(`✅ Loaded ${regions.length} regions`);
+      
+      return regions;
+    } else {
+      console.error("API Error fetching regions:", result.error);
+      throw new Error(result.error || "Failed to fetch regions");
+    }
+  } catch (error) {
+    console.error("Error fetching regions:", error);
+    throw error;
+  }
+};
+
+// Function to fetch manifestations by selected regions
+const fetchManifestationsByRegions = async (selectedRegionIds) => {
+  try {
+    if (!selectedRegionIds || selectedRegionIds.length === 0) {
+      return [];
+    }
+    
+    // Fetch manifestations for each selected region and combine results
+    const promises = selectedRegionIds.map(regionId => 
+      registeredManifestationsIndexByRegion(regionId)
+    );
+    
+    const results = await Promise.all(promises);
+    
+    // Combine all results, filtering out soft-deleted records
+    const allManifestations = results.flatMap(result => {
+      if (!result.error && result.data) {
+        return (result.data || []).filter(item => {
+          return item.deleted_at === null || item.deleted_at === undefined;
+        });
+      }
+      return [];
+    });
+    
+    // Remove duplicates by ID
+    const uniqueManifestations = Array.from(
+      new Map(allManifestations.map(m => [m.id, m])).values()
+    );
+    
+    console.log(`✅ Loaded ${uniqueManifestations.length} manifestations for ${selectedRegionIds.length} region(s)`);
+    
+    return uniqueManifestations;
+  } catch (error) {
+    console.error("Error fetching manifestations by regions:", error);
     throw error;
   }
 };
@@ -217,9 +271,8 @@ function FullscreenControl({ fullscreen, handleFullscreen }) {
 export default function MapComponent() {
   const navigate = useNavigate();
   const { isLogged, buildHeaders } = useSession();
-  const [allManifestations, setAllManifestations] = useState([]); // All fetched manifestations
   const [visiblePoints, setVisiblePoints] = useState([]); // Points to display based on selected regions
-  const [selectedRegions, setSelectedRegions] = useState([]);
+  const [selectedRegionIds, setSelectedRegionIds] = useState([]);
   const [regions, setRegions] = useState([]);
   const [fullscreen, setFullscreen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -227,32 +280,70 @@ export default function MapComponent() {
   const [error, setError] = useState(null);
   const mapContainerRef = useRef(null);
 
-  // Fetch all manifestations on mount - prevent double execution
+  // Fetch all regions on mount - prevent double execution
+  useEffect(() => {
+    let isMounted = true;
+    
+    const loadRegions = async () => {
+      if (!isMounted) return;
+      
+      try {
+        setError(null);
+        
+        // Fetch regions
+        const regionsList = await fetchAllRegions();
+        
+        if (isMounted) {
+          setRegions(regionsList);
+          
+          console.log('Available regions:', regionsList);
+          
+          // Auto-select first region if available
+          if (regionsList.length > 0) {
+            setSelectedRegionIds([regionsList[0].id]);
+          }
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError("Failed to load regions");
+          console.error("Error loading regions:", err);
+        }
+      }
+    };
+    
+    loadRegions();
+    
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Fetch and update visible points when selected regions change
   useEffect(() => {
     let isMounted = true;
     
     const loadManifestations = async () => {
-      if (!isMounted) return;
+      if (selectedRegionIds.length === 0) {
+        setVisiblePoints([]);
+        return;
+      }
       
       try {
         setLoading(true);
         setError(null);
         
-        const manifestations = await fetchAllManifestations(buildHeaders);
+        // Fetch manifestations for selected regions
+        const manifestations = await fetchManifestationsByRegions(selectedRegionIds);
         
         if (isMounted) {
-          setAllManifestations(manifestations);
+          setVisiblePoints(manifestations);
           
-          // Extract unique regions
-          const uniqueRegions = getRegionsFromManifestations(manifestations);
-          setRegions(uniqueRegions);
-          
-          console.log('Available regions:', uniqueRegions);
-          
-          // Auto-select first region if available
-          if (uniqueRegions.length > 0) {
-            setSelectedRegions([uniqueRegions[0]]);
-          }
+          const selectedRegionNames = regions
+            .filter(r => selectedRegionIds.includes(r.id))
+            .map(r => r.name)
+            .join(', ');
+          console.log(`Selected regions: ${selectedRegionNames}`);
+          console.log(`Visible points: ${manifestations.length}`);
         }
       } catch (err) {
         if (isMounted) {
@@ -271,33 +362,14 @@ export default function MapComponent() {
     return () => {
       isMounted = false;
     };
-  }, [buildHeaders]);
+  }, [selectedRegionIds, regions]);
 
-  // Update visible points when selected regions change
-  useEffect(() => {
-    if (selectedRegions.length === 0) {
-      setVisiblePoints([]);
-      return;
-    }
-
-    // Filter manifestations by selected regions (handle underscore vs space)
-    const filteredPoints = allManifestations.filter(point => {
-      const pointRegionDisplay = point.region.replace(/_/g, ' ');
-      return selectedRegions.includes(pointRegionDisplay);
-    });
-    
-    console.log(`Selected regions: ${selectedRegions.join(', ')}`);
-    console.log(`Visible points: ${filteredPoints.length}`);
-    
-    setVisiblePoints(filteredPoints);
-  }, [selectedRegions, allManifestations]);
-
-  const toggleRegion = (region) => {
-    console.log("Toggling region:", region);
-    setSelectedRegions(prev => 
-      prev.includes(region)
-        ? prev.filter(r => r !== region)
-        : [...prev, region]
+  const toggleRegion = (regionId) => {
+    console.log("Toggling region ID:", regionId);
+    setSelectedRegionIds(prev => 
+      prev.includes(regionId)
+        ? prev.filter(r => r !== regionId)
+        : [...prev, regionId]
     );
   };
 
@@ -306,16 +378,22 @@ export default function MapComponent() {
     
     try {
       setLoading(true);
-      const manifestations = await fetchAllManifestations(buildHeaders);
-      setAllManifestations(manifestations);
       
-      // Update regions
-      const uniqueRegions = getRegionsFromManifestations(manifestations);
-      setRegions(uniqueRegions);
+      // Fetch both regions and manifestations for selected regions
+      const regionsList = await fetchAllRegions();
+      setRegions(regionsList);
       
       // Keep current selections if they still exist
-      const validSelections = selectedRegions.filter(region => uniqueRegions.includes(region));
-      setSelectedRegions(validSelections);
+      const validSelections = selectedRegionIds.filter(id => 
+        regionsList.some(r => r.id === id)
+      );
+      setSelectedRegionIds(validSelections);
+      
+      // Refetch manifestations for selected regions
+      if (validSelections.length > 0) {
+        const manifestations = await fetchManifestationsByRegions(validSelections);
+        setVisiblePoints(manifestations);
+      }
       
       console.log('✅ Data refreshed successfully');
     } catch (err) {
@@ -405,14 +483,18 @@ export default function MapComponent() {
               navigate(`/point-details/${encodeURIComponent(point.id)}`, {
                 state: { 
                   pointData: point,
-                  region: point.region 
+                  region: displayRegion 
                 }
               });
             };
             
             // ✅ Parse temperature and handle null values
             const temperature = point.temperature ? parseFloat(point.temperature) : null;
-            const displayRegion = point.region.replace(/_/g, ' ');
+            
+            // ✅ Get region name from regions list using region_id, or fallback to point.region
+            const regionName = regions.find(r => r.id === point.region_id)?.name || 
+                               (point.region ? point.region.replace(/_/g, ' ') : 'Región desconocida');
+            const displayRegion = regionName;
             
             return (
               <Marker
@@ -496,7 +578,7 @@ export default function MapComponent() {
                 <h3 className="m-0 mb-2.5 text-gray-800 text-base flex items-center gap-2">
                   🗺️ Regiones 
                   <span className="text-xs text-gray-600 font-normal">
-                    ({selectedRegions.length} seleccionadas)
+                    ({selectedRegionIds.length} seleccionadas)
                   </span>
                 </h3>
                 
@@ -508,15 +590,11 @@ export default function MapComponent() {
                 
                 <div className="max-h-[calc(100%-50px)] overflow-y-auto">
                   {Array.isArray(regions) && regions.map((reg) => {
-                    const pointCount = allManifestations.filter(p => {
-                      const displayRegion = p.region.replace(/_/g, ' ');
-                      return displayRegion === reg;
-                    }).length;
-                    const isSelected = selectedRegions.includes(reg);
+                    const isSelected = selectedRegionIds.includes(reg.id);
                     
                     return (
                       <div 
-                        key={reg}
+                        key={reg.id}
                         className={`
                           flex items-center py-2 cursor-pointer rounded transition-colors duration-200
                           ${isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'}
@@ -524,7 +602,7 @@ export default function MapComponent() {
                         onClick={e => {
                           // Only toggle if not clicking the checkbox itself
                           if (e.target.type !== "checkbox") {
-                            toggleRegion(reg);
+                            toggleRegion(reg.id);
                           }
                         }}
                       >
@@ -533,7 +611,7 @@ export default function MapComponent() {
                           checked={isSelected}
                           onChange={e => {
                             // Only toggle from checkbox
-                            toggleRegion(reg);
+                            toggleRegion(reg.id);
                           }}
                           className="mr-2.5 cursor-pointer w-4 h-4"
                         />
@@ -543,19 +621,14 @@ export default function MapComponent() {
                             text-sm
                             ${isSelected ? 'text-blue-600 font-semibold' : 'text-gray-800 font-normal'}
                           `}>
-                            {reg}
+                            {reg.name}
                           </div>
-                          {pointCount > 0 && (
-                            <div className="text-xs text-gray-500 mt-0.5">
-                              {pointCount} punto{pointCount !== 1 ? 's' : ''}
-                            </div>
-                          )}
                         </div>
                       </div>
                     );
                   })}
                   
-                  {selectedRegions.length > 0 && (
+                  {selectedRegionIds.length > 0 && (
                     <div className="mt-4 p-2.5 bg-gray-50 rounded text-xs text-gray-600">
                       <div className="mb-2">
                         <strong>Total de puntos visibles:</strong> {visiblePoints.length}
