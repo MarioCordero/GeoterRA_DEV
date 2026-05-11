@@ -27,9 +27,11 @@ const API_CONFIG = {
       indexAll: '/analysis-request?all',
       index: '/analysis-request',
       store: '/analysis-request',
+      show: (id) => `/analysis-request/${id}`,
       update: (id) => `/analysis-request/${id}`,
       delete: (id) => `/analysis-request/${id}`,
       adminIndex: '/admin/analysis-requests',
+      adminShow: (id) => `/admin/analysis-request/${id}`,
       adminUpdate: (id) => `/admin/analysis-request/${id}`,
       adminDelete: (id) => `/admin/analysis-request/${id}`,
     },
@@ -90,9 +92,11 @@ export const users = {
 export const analysisRequest = {
   index: () => buildApiUrl(API_CONFIG.endpoints.analysisRequest.index),
   store: () => buildApiUrl(API_CONFIG.endpoints.analysisRequest.store),
+  show: (id) => buildApiUrl(API_CONFIG.endpoints.analysisRequest.show(id)),
   update: (id) => buildApiUrl(API_CONFIG.endpoints.analysisRequest.update(id)),
   delete: (id) => buildApiUrl(API_CONFIG.endpoints.analysisRequest.delete(id)),
   adminIndex: () => buildApiUrl(API_CONFIG.endpoints.analysisRequest.adminIndex),
+  adminShow: (id) => buildApiUrl(API_CONFIG.endpoints.analysisRequest.adminShow(id)),
   adminUpdate: (id) => buildApiUrl(API_CONFIG.endpoints.analysisRequest.adminUpdate(id)),
   adminDelete: (id) => buildApiUrl(API_CONFIG.endpoints.analysisRequest.adminDelete(id)),
 };
@@ -246,6 +250,10 @@ export const analysisRequestIndex = async () => {
   return callApi(analysisRequest.index(), 'GET');
 };
 
+export const analysisRequestShow = async (id) => {
+  return callApi(analysisRequest.show(id), 'GET');
+};
+
 export const analysisRequestStore = async (payload) => {
   return callApi(analysisRequest.store(), 'POST', payload);
 };
@@ -260,6 +268,10 @@ export const analysisRequestDelete = async (id) => {
 
 export const analysisRequestAdminIndex = async () => {
   return callApi(analysisRequest.adminIndex(), 'GET');
+};
+
+export const analysisRequestAdminShow = async (id) => {
+  return callApi(analysisRequest.adminShow(id), 'GET');
 };
 
 export const analysisRequestAdminUpdate = async (id, payload) => {

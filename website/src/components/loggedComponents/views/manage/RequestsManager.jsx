@@ -1,11 +1,48 @@
 import '../../../../colorModule.css';
 import '../../../../fontsModule.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import 'leaflet/dist/leaflet.css';
 import { useSession } from '../../../../hooks/useSession';
-import { analysisRequestAdminIndex, analysisRequestAdminUpdate, analysisRequestAdminDelete } from '../../../../config/apiConf';
+import { analysisRequestAdminIndex, analysisRequestAdminUpdate, analysisRequestAdminDelete, analysisRequestAdminShow, registeredManifestationsStore } from '../../../../config/apiConf';
 import NotImplementedModal from '../../../common/NotImplementedModal';
-import { Spin, Tag, Button, Modal, Form, Input, InputNumber, Select, Checkbox, message } from 'antd';
-import { EyeOutlined, DeleteOutlined, EditOutlined, CheckOutlined } from '@ant-design/icons';
+import { Spin, Tag, Button, Modal, Form, Input, InputNumber, message } from 'antd';
+import { EyeOutlined, DeleteOutlined, CheckOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
+
+const defaultPosition = [9.93333, -84.08333];
+
+// Inline marker component for map interaction
+function LocationMarker({ setLatLng, latLng }) {
+  const [position, setPosition] = useState(null);
+
+  useEffect(() => {
+    if (latLng && latLng.lat && latLng.lng) {
+      setPosition([latLng.lat, latLng.lng]);
+    }
+  }, [latLng]);
+
+  useMapEvents({
+    click(e) {
+      const newPosition = [e.latlng.lat, e.latlng.lng];
+      setPosition(newPosition);
+      setLatLng(e.latlng);
+    },
+  });
+
+  return position === null ? null : <Marker position={position} />;
+}
+
+// Map resize handler for inline map
+function MapResizeHandler() {
+  const map = useMap();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [map]);
+  return null;
+}
 
 const RequestsManager = () => {
   const [requests, setRequests] = useState([]);
@@ -18,6 +55,8 @@ const RequestsManager = () => {
   const [submitting, setSubmitting] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isNotImplementedOpen, setIsNotImplementedOpen] = useState(false);
+  const [confirmedCoordinates, setConfirmedCoordinates] = useState(null);
+  const [fetchingDetails, setFetchingDetails] = useState(false);
   const { user } = useSession();
 
   // Check if screen is mobile size
@@ -69,7 +108,12 @@ const RequestsManager = () => {
 
   const submitApprovedPoint = async (pointData) => {
     try {
-      const payload = {
+      // Step 1: Create registered manifestation with registeredManifestationsStore
+      const registeredManifestationPayload = {
+        name: selectedRequest.name,
+        region_id: selectedRequest.region_id || 1,
+        latitude: pointData.latitude,
+        longitude: pointData.longitude,
         description: pointData.description || null,
         temperature: pointData.temperature ? parseFloat(pointData.temperature) : null,
         field_pH: pointData.field_pH ? parseFloat(pointData.field_pH) : null,
@@ -88,13 +132,23 @@ const RequestsManager = () => {
         na: pointData.na ? parseFloat(pointData.na) : null,
         k: pointData.k ? parseFloat(pointData.k) : null,
         mg: pointData.mg ? parseFloat(pointData.mg) : null,
+      };
+
+      const result = await registeredManifestationsStore(registeredManifestationPayload);
+
+      if (!result.ok) {
+        throw new Error(result.error || 'Error creando manifestación registrada');
+      }
+
+      // Step 2: Update analysis request state to "Analizada"
+      const updatePayload = {
         state: 'Analizada',
       };
 
-      const result = await analysisRequestAdminUpdate(pointData.id_soli, payload);
+      const updateResult = await analysisRequestAdminUpdate(selectedRequest.id_soli, updatePayload);
 
-      if (!result.ok) {
-        throw new Error(result.error || 'Error al actualizar solicitud');
+      if (!updateResult.ok) {
+        throw new Error(updateResult.error || 'Error actualizando solicitud');
       }
 
       return true;
@@ -166,57 +220,108 @@ const RequestsManager = () => {
     setViewModalVisible(true);
   };
 
+  // Helper function to fetch and populate request details
+  const fetchAndPopulateRequestDetails = async (requestId) => {
+    try {
+      setFetchingDetails(true);
+      const response = await analysisRequestAdminShow(requestId);
+
+      if (!response.ok) {
+        throw new Error(response.error || 'Error fetching request details');
+      }
+
+      const requestData = response.data;
+
+      // Map temperature_sensation to numeric temperature value
+      const temperatureValueMap = {
+        'hot': 40,
+        'Cálido': 40,
+        'warm': 25,
+        'Templado': 25,
+        'cold': 15,
+        'Frío': 15,
+      };
+
+      const mappedTemperature = temperatureValueMap[requestData.temperature_sensation] || 25;
+
+      // Populate form with fetched data
+      reviewForm.setFieldsValue({
+        id_soli: requestData.id,
+        description: requestData.details || '',
+        temperature: mappedTemperature,
+        field_pH: 7.0,
+        field_conductivity: 500,
+        lab_pH: 7.0,
+        lab_conductivity: 500,
+        cl: 10,
+        ca: 20,
+        hco3: 30,
+        so4: 40,
+        fe: 0.07,
+        si: 50,
+        b: 1.0,
+        li: 1,
+        f: 0.5,
+        na: 60,
+        k: 70,
+        mg: 80,
+      });
+
+      // Set coordinates from fetched data
+      if (requestData.latitude && requestData.longitude) {
+        setConfirmedCoordinates({
+          lat: parseFloat(requestData.latitude),
+          lng: parseFloat(requestData.longitude),
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching request details:', err);
+      message.error('Error al cargar detalles de la solicitud: ' + err.message);
+    } finally {
+      setFetchingDetails(false);
+    }
+  };
+
   // Handle review and accept
   const handleReviewAccept = (record) => {
     setSelectedRequest(record);
-    reviewForm.setFieldsValue({
-      id_soli: record.id_soli,
-      description: record.details || '',
-      temperature: record.temperature_sensation === 'hot' ? 40 : record.temperature_sensation === 'warm' ? 25 : 15,
-      field_pH: 7.0,
-      field_conductivity: 500,
-      lab_pH: 7.0,
-      lab_conductivity: 500,
-      cl: 10,
-      ca: 20,
-      hco3: 30,
-      so4: 40,
-      fe: 0.07,
-      si: 50,
-      b: 1.0,
-      li: 1,
-      f: 0.5,
-      na: 60,
-      k: 70,
-      mg: 80,
-    });
+    setConfirmedCoordinates(null);
     setReviewModalVisible(true);
+    // Fetch and populate details after opening modal
+    fetchAndPopulateRequestDetails(record.id_soli);
   };
 
   // Handle form submission for approved point
   const handleSubmitApproval = async () => {
     try {
+      // Check if location was confirmed
+      if (!confirmedCoordinates) {
+        message.error('Por favor confirma la ubicación en el mapa');
+        return;
+      }
+
       const values = await reviewForm.validateFields();
       
-      setSubmitting(true);
-
-      await submitApprovedPoint(values);
+      // Merge form values with confirmed coordinates
+      const approvalData = {
+        ...values,
+        latitude: confirmedCoordinates.lat,
+        longitude: confirmedCoordinates.lng,
+      };
+      
+      // Submit approval
+      await submitApprovedPoint(approvalData);
       
       message.success('✅ Análisis completado y solicitud actualizada');
       setReviewModalVisible(false);
       reviewForm.resetFields();
       setSelectedRequest(null);
+      setConfirmedCoordinates(null);
       
       await refreshRequests();
       
     } catch (error) {
-      if (error.errorFields) {
-        message.error('Por favor complete todos los campos requeridos');
-      } else {
-        message.error('Error al procesar la solicitud: ' + error.message);
-      }
-    } finally {
-      setSubmitting(false);
+      message.error('Error: ' + error.message);
     }
   };
 
@@ -530,6 +635,7 @@ const RequestsManager = () => {
               setReviewModalVisible(false);
               reviewForm.resetFields();
             }}
+            disabled={fetchingDetails}
           >
             Cancelar
           </Button>,
@@ -538,6 +644,7 @@ const RequestsManager = () => {
             type="primary"
             loading={submitting}
             onClick={handleSubmitApproval}
+            disabled={fetchingDetails}
           >
             Procesar Análisis
           </Button>
@@ -551,11 +658,18 @@ const RequestsManager = () => {
           }
         }}
       >
-        <Form
-          form={reviewForm}
-          layout="vertical"
-          scrollToFirstError
-        >
+        {fetchingDetails ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <Spin size="large" />
+            <p className="mt-4 text-sm text-gray-600">Cargando detalles de la solicitud...</p>
+          </div>
+        ) : (
+          <Form
+            form={reviewForm}
+            layout="vertical"
+            scrollToFirstError
+            disabled={fetchingDetails}
+          >
           <Form.Item name="id_soli" hidden>
             <Input />
           </Form.Item>
@@ -567,6 +681,64 @@ const RequestsManager = () => {
           >
             <Input.TextArea rows={3} placeholder="Notas adicionales sobre el análisis..." />
           </Form.Item>
+
+          <hr className="my-4" />
+          <h3 className="font-semibold text-base mb-4">📍 Confirmar Ubicación (Haz clic en el mapa)</h3>
+          <div className="border border-gray-300 rounded-lg p-4 mb-4 bg-white">
+            {confirmedCoordinates ? (
+              <div className="bg-green-50 p-3 rounded-lg mb-3 border border-green-200">
+                <p className="text-green-700 font-semibold">✅ Ubicación confirmada:</p>
+                <p className="text-sm text-green-600">
+                  Lat: {confirmedCoordinates.lat.toFixed(6)}° | Lon: {confirmedCoordinates.lng.toFixed(6)}°
+                </p>
+              </div>
+            ) : (
+              <div className="bg-orange-50 p-3 rounded-lg mb-3 border border-orange-200">
+                <p className="text-orange-700 font-semibold">⚠️ Haz clic en el mapa para confirmar la ubicación</p>
+              </div>
+            )}
+            
+            {/* Inline Leaflet Map */}
+            <div style={{ height: '400px', borderRadius: '8px', overflow: 'hidden', marginBottom: '12px' }}>
+              <MapContainer
+                center={confirmedCoordinates ? [confirmedCoordinates.lat, confirmedCoordinates.lng] : [parseFloat(selectedRequest?.latitude) || defaultPosition[0], parseFloat(selectedRequest?.longitude) || defaultPosition[1]]}
+                zoom={confirmedCoordinates ? 15 : (selectedRequest?.latitude ? 15 : 8)}
+                style={{ height: '100%', width: '100%' }}
+                key={`inline-map-${selectedRequest?.id_soli}`}
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                <LocationMarker setLatLng={setConfirmedCoordinates} latLng={confirmedCoordinates || { lat: parseFloat(selectedRequest?.latitude) || 0, lng: parseFloat(selectedRequest?.longitude) || 0 }} />
+                <MapResizeHandler />
+              </MapContainer>
+            </div>
+
+            {/* Coordinate inputs below map */}
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <label style={{ fontSize: '12px', color: '#666', minWidth: 50 }}>Latitud:</label>
+                <Input
+                  placeholder="Lat"
+                  value={confirmedCoordinates?.lat?.toFixed(6) || ''}
+                  readOnly
+                  size="small"
+                  style={{ width: 120 }}
+                />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <label style={{ fontSize: '12px', color: '#666', minWidth: 60 }}>Longitud:</label>
+                <Input
+                  placeholder="Lng"
+                  value={confirmedCoordinates?.lng?.toFixed(6) || ''}
+                  readOnly
+                  size="small"
+                  style={{ width: 120 }}
+                />
+              </div>
+            </div>
+          </div>
 
           <hr className="my-4" />
           <h3 className="font-semibold text-base mb-4">🌡️ Mediciones de Campo</h3>
@@ -673,6 +845,7 @@ const RequestsManager = () => {
             </Form.Item>
           </div>
         </Form>
+        )}
       </Modal>
 
       <NotImplementedModal 
