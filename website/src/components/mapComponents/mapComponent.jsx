@@ -16,49 +16,17 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png",
 });
 
-// Function to fetch all registered manifestations (points)
-const fetchAllManifestations = async () => {
-  try {
-    const result = await registeredManifestationsIndex();
-    
-    console.log('API Response:', result);
-    
-    // Handle the API response structure
-    if (!result.error && result.data) {
-      // ✅ Filter out soft-deleted records
-      const activeManifestations = (result.data || []).filter(item => {
-        return item.deleted_at === null || item.deleted_at === undefined;
-      });
-      
-      console.log(`✅ Loaded ${activeManifestations.length} active manifestations (${result.data.length - activeManifestations.length} deleted)`);
-      
-      return activeManifestations;
-    } else {
-      console.error("API Error fetching manifestations:", result.error);
-      throw new Error(result.error || "Failed to fetch manifestations");
-    }
-  } catch (error) {
-    console.error("Error fetching manifestations:", error);
-    throw error;
-  }
-};
-
 // Function to fetch all regions
 const fetchAllRegions = async () => {
   try {
     const result = await regionsIndex();
-    
-    console.log('Regions API Response:', result);
     
     if (!result.error && result.data) {
       // Return full region objects with id and name
       const regions = (result.data || []).map(region => ({
         id: region.id,
         name: region.name
-      }));
-      
-      console.log(`✅ Loaded ${regions.length} regions`);
-      
+      }));    
       return regions;
     } else {
       console.error("API Error fetching regions:", result.error);
@@ -97,28 +65,12 @@ const fetchManifestationsByRegions = async (selectedRegionIds) => {
     // Remove duplicates by ID
     const uniqueManifestations = Array.from(
       new Map(allManifestations.map(m => [m.id, m])).values()
-    );
-    
-    console.log(`✅ Loaded ${uniqueManifestations.length} manifestations for ${selectedRegionIds.length} region(s)`);
-    
+    );    
     return uniqueManifestations;
   } catch (error) {
     console.error("Error fetching manifestations by regions:", error);
     throw error;
   }
-};
-
-// Function to get unique regions from manifestations
-const getRegionsFromManifestations = (manifestations) => {
-  const regions = new Set();
-  manifestations.forEach(point => {
-    if (point.region) {
-      // Replace underscores with spaces for display
-      const displayRegion = point.region.replace(/_/g, ' ');
-      regions.add(displayRegion);
-    }
-  });
-  return Array.from(regions).sort();
 };
 
 function CenterOnUser() {
@@ -295,9 +247,6 @@ export default function MapComponent() {
         
         if (isMounted) {
           setRegions(regionsList);
-          
-          console.log('Available regions:', regionsList);
-          
           // Auto-select first region if available
           if (regionsList.length > 0) {
             setSelectedRegionIds([regionsList[0].id]);
@@ -342,8 +291,6 @@ export default function MapComponent() {
             .filter(r => selectedRegionIds.includes(r.id))
             .map(r => r.name)
             .join(', ');
-          console.log(`Selected regions: ${selectedRegionNames}`);
-          console.log(`Visible points: ${manifestations.length}`);
         }
       } catch (err) {
         if (isMounted) {
@@ -365,7 +312,6 @@ export default function MapComponent() {
   }, [selectedRegionIds, regions]);
 
   const toggleRegion = (regionId) => {
-    console.log("Toggling region ID:", regionId);
     setSelectedRegionIds(prev => 
       prev.includes(regionId)
         ? prev.filter(r => r !== regionId)
@@ -394,8 +340,6 @@ export default function MapComponent() {
         const manifestations = await fetchManifestationsByRegions(validSelections);
         setVisiblePoints(manifestations);
       }
-      
-      console.log('✅ Data refreshed successfully');
     } catch (err) {
       setError("Failed to refresh data");
       console.error("Error refreshing data:", err);
