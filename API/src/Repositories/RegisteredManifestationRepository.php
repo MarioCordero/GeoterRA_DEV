@@ -53,6 +53,38 @@ final class RegisteredManifestationRepository
   }
 
   /**
+   * Fetch a single manifestation by ID (public access)
+   */
+  public function findById(string $id): ?array
+  {
+    $stmt = $this->db->prepare(
+      'SELECT
+        id,
+        name,
+        region_id,
+        latitude,
+        longitude,
+        description,
+        temperature,
+        field_pH,
+        field_conductivity,
+        lab_pH,
+        lab_conductivity,
+        cl, ca, hco3, so4, fe, si, b, li, f, na, k, mg,
+        created_at,
+        created_by,
+        modified_at,
+        modified_by
+      FROM registered_geothermal_manifestations
+      WHERE id = :id
+        AND deleted_at IS NULL'
+    );
+    $stmt->execute([':id' => $id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $result ?: null;
+  }
+
+  /**
    * Insert manifestation
    */
   public function create(RegisteredManifestationDTO $dto, string $userId): string

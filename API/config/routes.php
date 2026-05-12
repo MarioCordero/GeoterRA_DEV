@@ -15,11 +15,13 @@ return [
     // Analysis request routes
     ['method' => 'POST', 'path' => '/analysis-request', 'controller' => 'AnalysisRequestController', 'action' => 'store'],
     ['method' => 'GET', 'path' => '/analysis-request', 'controller' => 'AnalysisRequestController', 'action' => 'index'],
+    ['method' => 'GET', 'path' => '/analysis-request/{id}', 'controller' => 'AnalysisRequestController', 'action' => 'show'],
     ['method' => 'PUT', 'path' => '/analysis-request/{id}', 'controller' => 'AnalysisRequestController', 'action' => 'update'],
     ['method' => 'DELETE', 'path' => '/analysis-request/{id}', 'controller' => 'AnalysisRequestController', 'action' => 'delete'],
 
     // Admin-only analysis request routes
     ['method' => 'GET', 'path' => '/admin/analysis-requests', 'controller' => 'AnalysisRequestController', 'action' => 'adminIndex'],
+    ['method' => 'GET', 'path' => '/admin/analysis-request/{id}', 'controller' => 'AnalysisRequestController', 'action' => 'adminShow'],
     ['method' => 'DELETE', 'path' => '/admin/analysis-request/{id}', 'controller' => 'AnalysisRequestController', 'action' => 'adminDelete'],
     ['method' => 'PUT', 'path' => '/admin/analysis-request/{id}', 'controller' => 'AnalysisRequestController', 'action' => 'adminUpdate'],
     
@@ -33,6 +35,7 @@ return [
     // Registered manifestations routes
     ['method' => 'POST', 'path' => '/registered-manifestations', 'controller' => 'RegisteredManifestationController', 'action' => 'store'],
     ['method' => 'GET', 'path' => '/registered-manifestations', 'controller' => 'RegisteredManifestationController', 'action' => 'index'],
+    ['method' => 'GET', 'path' => '/registered-manifestations/{id}', 'controller' => 'RegisteredManifestationController', 'action' => 'show'],
     ['method' => 'PUT', 'path' => '/registered-manifestations/{id}', 'controller' => 'RegisteredManifestationController', 'action' => 'update'],
     ['method' => 'DELETE', 'path' => '/registered-manifestations/{id}', 'controller' => 'RegisteredManifestationController', 'action' => 'delete'],
     

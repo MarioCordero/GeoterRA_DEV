@@ -76,24 +76,24 @@ const PiperDiagram = ({ data }) => {
     return { percentages: p, points: { cation: catPt, anion: anPt, diamond: { x: dx, y: dy } } };
   }, [data, triH]);
 
-  useEffect(() => {
-      console.log('=== PORCENTAJES PIPER DIAGRAM ===');
-      console.log('CATIONES:');
-      console.log(`  Ca: ${percentages.Ca?.toFixed(2)}%`);
-      console.log(`  Mg: ${percentages.Mg?.toFixed(2)}%`);
-      console.log(`  Na+K: ${percentages.NaK?.toFixed(2)}%`);
-      console.log('ANIONES:');
-      console.log(`  Cl: ${percentages.Cl?.toFixed(2)}%`);
-      console.log(`  SO4: ${percentages.SO4?.toFixed(2)}%`);
-      console.log(`  HCO3: ${percentages.HCO3?.toFixed(2)}%`);
-      console.log('PUNTOS:');
-      if (points) {
-        console.log(`  Cation: (${points.cation.x.toFixed(0)}, ${points.cation.y.toFixed(0)})`);
-        console.log(`  Anion: (${points.anion.x.toFixed(0)}, ${points.anion.y.toFixed(0)})`);
-        console.log(`  Diamond: (${points.diamond.x.toFixed(0)}, ${points.diamond.y.toFixed(0)})`);
-      }
-      console.log('================================');
-    }, [percentages, points]);
+  // useEffect(() => {
+  //     console.log('=== PORCENTAJES PIPER DIAGRAM ===');
+  //     console.log('CATIONES:');
+  //     console.log(`  Ca: ${percentages.Ca?.toFixed(2)}%`);
+  //     console.log(`  Mg: ${percentages.Mg?.toFixed(2)}%`);
+  //     console.log(`  Na+K: ${percentages.NaK?.toFixed(2)}%`);
+  //     console.log('ANIONES:');
+  //     console.log(`  Cl: ${percentages.Cl?.toFixed(2)}%`);
+  //     console.log(`  SO4: ${percentages.SO4?.toFixed(2)}%`);
+  //     console.log(`  HCO3: ${percentages.HCO3?.toFixed(2)}%`);
+  //     console.log('PUNTOS:');
+  //     if (points) {
+  //       console.log(`  Cation: (${points.cation.x.toFixed(0)}, ${points.cation.y.toFixed(0)})`);
+  //       console.log(`  Anion: (${points.anion.x.toFixed(0)}, ${points.anion.y.toFixed(0)})`);
+  //       console.log(`  Diamond: (${points.diamond.x.toFixed(0)}, ${points.diamond.y.toFixed(0)})`);
+  //     }
+  //     console.log('================================');
+  //   }, [percentages, points]);
 
   const renderClippedGrid = (angle) => {
     const lines = [];

@@ -6,10 +6,91 @@ namespace DTO;
 
 use Http\ApiException;
 use Http\ErrorType;
+use OpenApi\Annotations as OA;
 
 /**
- * Data Transfer Object for creating an AnalysisRequest.
- * The request name is generated internally using the persisted ID.
+ * @OA\Schema(
+ *   schema="AnalysisRequestDTO",
+ *   type="object",
+ *   description="Solicitud de análisis de punto geotérmico",
+ *   required={"region", "email", "temperature_sensation", "latitude", "longitude"},
+ *   @OA\Property(
+ *     property="region",
+ *     type="integer",
+ *     description="ID de la región",
+ *     example=1
+ *   ),
+ *   @OA\Property(
+ *     property="email",
+ *     type="string",
+ *     format="email",
+ *     description="Email de contacto del solicitante",
+ *     example="contact@example.com"
+ *   ),
+ *   @OA\Property(
+ *     property="owner_contact_number",
+ *     type="string",
+ *     nullable=true,
+ *     description="Número de contacto del dueño",
+ *     example="87654321"
+ *   ),
+ *   @OA\Property(
+ *     property="owner_name",
+ *     type="string",
+ *     nullable=true,
+ *     description="Nombre del dueño del terreno",
+ *     example="Carlos Mendoza"
+ *   ),
+ *   @OA\Property(
+ *     property="temperature_sensation",
+ *     type="string",
+ *     enum={"Muy frío", "Frío", "Templado", "Cálido", "Muy Caliente", "caliente"},
+ *     description="Percepción térmica del lugar",
+ *     example="Cálido"
+ *   ),
+ *   @OA\Property(
+ *     property="bubbles",
+ *     type="boolean",
+ *     description="¿Hay burbujas de gas?",
+ *     example=false
+ *   ),
+ *   @OA\Property(
+ *     property="details",
+ *     type="string",
+ *     nullable=true,
+ *     description="Detalles adicionales del punto",
+ *     example="Zona con actividad geotérmica notable"
+ *   ),
+ *   @OA\Property(
+ *     property="current_usage",
+ *     type="string",
+ *     nullable=true,
+ *     description="Uso actual del terreno",
+ *     example="Agrícola"
+ *   ),
+ *   @OA\Property(
+ *     property="latitude",
+ *     type="number",
+ *     format="float",
+ *     description="Latitud del punto en grados decimales",
+ *     example=10.4630
+ *   ),
+ *   @OA\Property(
+ *     property="longitude",
+ *     type="number",
+ *     format="float",
+ *     description="Longitud del punto en grados decimales",
+ *     example=-85.4519
+ *   ),
+ *   @OA\Property(
+ *     property="state",
+ *     type="string",
+ *     nullable=true,
+ *     enum={"Registrada", "En revisión", "Verificación de campo", "Análisis en laboratorio", "Aprobada", "Rechazada", "Archivada"},
+ *     description="Estado actual de la solicitud",
+ *     example="Registrada"
+ *   )
+ * )
  */
 final class AnalysisRequestDTO
 {
@@ -78,11 +159,36 @@ final class AnalysisRequestDTO
 	 */
 	public function validate(): void
 	{
+		// Validate email format
 		if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
 			throw new ApiException(
 				ErrorType::invalidField('email'),
 				422
 			);
+		}
+
+		// Validate temperature_sensation ENUM
+		$validTemperatureSensations = ['Muy frío', 'Frío', 'Templado', 'Cálido', 'Muy Caliente', 'caliente'];
+		if (!in_array($this->temperature_sensation, $validTemperatureSensations, true)) {
+			throw new ApiException(
+				ErrorType::invalidField(
+					"percepción térmica: debe ser uno de ['Muy frío', 'Frío', 'Templado', 'Cálido', 'Muy Caliente', 'caliente']"
+				),
+				422
+			);
+		}
+
+		// Validate state ENUM if provided
+		if ($this->state !== null) {
+			$validStates = ['Registrada', 'En revisión', 'Verificación de campo', 'Análisis en laboratorio', 'Aprobada', 'Rechazada', 'Archivada'];
+			if (!in_array($this->state, $validStates, true)) {
+				throw new ApiException(
+					ErrorType::invalidField(
+						"estado: debe ser uno de ['Registrada', 'En revisión', 'Verificación de campo', 'Análisis en laboratorio', 'Aprobada', 'Rechazada', 'Archivada']"
+					),
+					422
+				);
+			}
 		}
 	}
 }

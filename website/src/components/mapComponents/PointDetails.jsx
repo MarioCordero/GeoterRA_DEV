@@ -1,31 +1,105 @@
+import PiperDiagram from './PiperDiagram';
 import React, { useState, useEffect } from 'react';
+import { registeredManifestationsShow, regionsIndex } from '../../config/apiConf';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaDownload, FaShare, FaPrint, FaMapMarkerAlt, FaFlask, FaThermometerHalf, FaFileCsv } from 'react-icons/fa';
-import { buildApiUrl } from '../../config/apiConf';
-import PiperDiagram from './PiperDiagram';
-import '../../colorModule.css';
-import '../../fontsModule.css';
 
-// Function to fetch single point data (if needed to refresh or get additional data)
-const fetchPointData = async (pointId, region) => {
+// Utility function to transform API response to component format
+const transformManifestationData = (apiData, regionName = 'Región desconocida') => {
+  if (!apiData) return null;
+  
+  // Helper to safely convert to float
+  const toFloat = (val) => {
+    const num = parseFloat(val);
+    return isNaN(num) ? 0 : num;
+  };
+  
+  return {
+    // Identity and location
+    id: apiData.id,
+    name: apiData.name,
+    region: regionName,
+    region_id: apiData.region_id,
+    
+    // Coordinates (rename latitude/longitude to coord_y/coord_x) - keep as strings for display
+    coord_x: String(apiData.longitude),
+    coord_y: String(apiData.latitude),
+    latitude: String(apiData.latitude),
+    longitude: String(apiData.longitude),
+    
+    // In Situ (Field Measurements) - convert to numbers
+    temp: toFloat(apiData.temperature),
+    temperature: toFloat(apiData.temperature),
+    pH_campo: toFloat(apiData.field_pH),
+    field_pH: toFloat(apiData.field_pH),
+    cond_campo: toFloat(apiData.field_conductivity),
+    field_conductivity: toFloat(apiData.field_conductivity),
+    
+    // Laboratory - convert to numbers
+    pH_lab: toFloat(apiData.lab_pH),
+    lab_pH: toFloat(apiData.lab_pH),
+    cond_lab: toFloat(apiData.lab_conductivity),
+    lab_conductivity: toFloat(apiData.lab_conductivity),
+    
+    // Major Ions (mg/L) - convert to numbers
+    Cl: toFloat(apiData.cl),
+    cl: toFloat(apiData.cl),
+    "Ca+": toFloat(apiData.ca),
+    ca: toFloat(apiData.ca),
+    HCO3: toFloat(apiData.hco3),
+    hco3: toFloat(apiData.hco3),
+    SO4: toFloat(apiData.so4),
+    so4: toFloat(apiData.so4),
+    Na: toFloat(apiData.na),
+    na: toFloat(apiData.na),
+    K: toFloat(apiData.k),
+    k: toFloat(apiData.k),
+    "MG+": toFloat(apiData.mg),
+    mg: toFloat(apiData.mg),
+    Si: toFloat(apiData.si),
+    si: toFloat(apiData.si),
+    
+    // Trace Elements (mg/L) - convert to numbers
+    Fe: toFloat(apiData.fe),
+    fe: toFloat(apiData.fe),
+    B: toFloat(apiData.b),
+    b: toFloat(apiData.b),
+    Li: toFloat(apiData.li),
+    li: toFloat(apiData.li),
+    F: toFloat(apiData.f),
+    f: toFloat(apiData.f),
+    
+    // Metadata
+    created_at: apiData.created_at,
+    created_by: apiData.created_by,
+    modified_at: apiData.modified_at,
+    modified_by: apiData.modified_by,
+  };
+};
+
+// Function to fetch single point data using the new API endpoint
+const fetchPointData = async (pointId) => {
   try {
-    const response = await fetch(buildApiUrl("map_data.inc.php"), {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `region=${encodeURIComponent(region)}`,
-    });
+    const result = await registeredManifestationsShow(pointId);
     
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const result = await response.json();
-    
-    if (result.response === "Ok") {
-      const points = result.data || [];
-      return points.find(point => point.id === pointId);
+    if (result.ok && result.data) {
+      const apiData = result.data;
+      
+      // Fetch regions to get region name from region_id
+      const regionsResult = await regionsIndex();
+      let regionName = 'Región desconocida';
+      
+      if (regionsResult.ok && regionsResult.data) {
+        const region = regionsResult.data.find(r => r.id === apiData.region_id);
+        if (region) {
+          regionName = region.name;
+        }
+      }
+      
+      const transformedData = transformManifestationData(apiData, regionName);
+      return transformedData;
     } else {
-      throw new Error(result.message || "Failed to fetch point data");
+      throw new Error(result.error || 'Failed to fetch point data');
     }
   } catch (error) {
     console.error(`Error fetching point data:`, error);
@@ -38,17 +112,22 @@ export default function PointDetails() {
   const location = useLocation();
   const navigate = useNavigate();
   
-  const [pointData, setPointData] = useState(location.state?.pointData || null);
-  const [loading, setLoading] = useState(!pointData);
+  // Transform navigation state data if it exists
+  const navStateData = location.state?.pointData 
+    ? transformManifestationData(location.state.pointData, location.state?.region || 'Región desconocida')
+    : null;
+
+  const [pointData, setPointData] = useState(navStateData || null);
+  const [loading, setLoading] = useState(!navStateData);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     // If we don't have point data from navigation state, fetch it
-    if (!pointData && pointId && location.state?.region) {
+    if (!navStateData && pointId) {
       const loadPointData = async () => {
         try {
           setLoading(true);
-          const data = await fetchPointData(pointId, location.state.region);
+          const data = await fetchPointData(pointId);
           setPointData(data);
         } catch (err) {
           setError(`Failed to load point data: ${err.message}`);
@@ -58,13 +137,13 @@ export default function PointDetails() {
       };
       
       loadPointData();
-    } else if (!pointData && !location.state?.region) {
+    } else if (navStateData) {
+      setLoading(false);
+    } else if (!navStateData && !pointId) {
       setError("No point data available. Please navigate from the map.");
       setLoading(false);
-    } else {
-      setLoading(false);
     }
-  }, [pointId, pointData, location.state]);
+  }, [pointId, navStateData]);
 
   const handlePrint = () => {
     window.print();

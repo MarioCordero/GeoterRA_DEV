@@ -4,7 +4,7 @@ import { Form, Input } from "antd";
 import PhoneInput from "../common/PhoneInput";
 import "../../colorModule.css";
 import "../../fontsModule.css";
-import { auth, users } from "../../config/apiConf";
+import { userRegister } from "../../config/apiConf";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -42,18 +42,12 @@ export default function Register() {
     };
 
     try {
-      const response = await fetch(users.register(), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const result = await userRegister(payload);
 
-      const data = await response.json();
-
-      if (response.ok && data?.data) {
+      if (result.ok && result.data) {
         setShowSuccessModal(true);
-      } else if (data?.errors?.length) {
-        alert(data.errors[0].message || data.errors[0]);
+      } else if (result.error) {
+        alert(result.error);
       } else {
         alert("Error en el registro");
       }
