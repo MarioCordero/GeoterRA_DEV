@@ -1,14 +1,12 @@
-import '../../../../colorModule.css';
-import '../../../../fontsModule.css';
-import React, { useState, useEffect, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { useSession } from '../../../../hooks/useSession';
-import { analysisRequestAdminIndex, analysisRequestAdminUpdate, analysisRequestAdminDelete, analysisRequestAdminShow, registeredManifestationsStore, regionsIndex } from '../../../../config/apiConf';
+import React, { useState, useEffect, useRef } from 'react';
 import MapCoordinatePicker from '../../../common/MapCoordinatePicker';
 import NotImplementedModal from '../../../common/NotImplementedModal';
-import { Spin, Tag, Button, Modal, Form, Input, InputNumber, message, Select } from 'antd';
-import { EyeOutlined, DeleteOutlined, CheckOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
+import { EyeOutlined, DeleteOutlined, CheckOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { Spin, Tag, Button, Modal, Form, Input, InputNumber, message, Select, Collapse } from 'antd';
+import { analysisRequestAdminIndex, analysisRequestAdminUpdate, analysisRequestAdminDelete, analysisRequestAdminShow, registeredManifestationsStore, regionsIndex } from '../../../../config/apiConf';
 
 const defaultPosition = [9.93333, -84.08333];
 
@@ -543,6 +541,70 @@ const RequestsManager = () => {
             Agregar Punto Manualmente
           </Button>
         </div>
+
+        {/* Collapsible Help Section */}
+        <Collapse
+          className="mb-8"
+          style={{ backgroundColor: '#fefce8', borderColor: '#fcd34d' }}
+          items={[
+            {
+              key: '1',
+              label: <span style={{ fontSize: '16px', fontWeight: 'bold' }}>💡 ¿Cómo revisar una solicitud y agregar puntos?</span>,
+              children: (
+                <div>
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-gray-800 mb-3">📝 Pasos para revisar y aceptar una solicitud:</h4>
+                    <ol style={{ margin: '0', paddingLeft: '20px', color: '#333', lineHeight: '1.8' }}>
+                      <li><strong>Selecciona una solicitud</strong> en estado "Pendiente" haciendo clic en el botón <strong>"Revisar"</strong></li>
+                      <li><strong>Se abrirá la ventana de procesamiento</strong> con los datos del usuario y la ubicación inicial</li>
+                      <li><strong>Haz clic en el mapa</strong> para confirmar o ajustar la ubicación GPS del punto geotérmico</li>
+                      <li><strong>Completa los datos de mediciones</strong>: temperatura, pH, conductividad y elementos químicos (si los tienes)</li>
+                      <li><strong>Revisión de campo y laboratorio</strong>: ingresa todas las mediciones disponibles</li>
+                      <li><strong>Agrega observaciones</strong> en la sección de descripción si es necesario</li>
+                      <li><strong>Haz clic en "Procesar Análisis"</strong> para completar la revisión y crear el registro de manifestación</li>
+                    </ol>
+                  </div>
+
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-gray-800 mb-3">➕ Pasos para agregar un punto manualmente desde cero:</h4>
+                    <ol style={{ margin: '0', paddingLeft: '20px', color: '#333', lineHeight: '1.8' }}>
+                      <li><strong>Haz clic en el botón "Agregar Punto Manualmente"</strong> en la esquina superior</li>
+                      <li><strong>Se abrirá un formulario</strong> con un mapa interactivo para seleccionar la ubicación</li>
+                      <li><strong>Haz clic en el mapa</strong> para marcar la ubicación precisa del punto geotérmico</li>
+                      <li><strong>Completa la información del punto</strong>: nombre único, región geotérmica y descripción</li>
+                      <li><strong>Ingresa las mediciones de campo</strong> (temperatura, pH, conductividad): estos son los datos registrados en sitio</li>
+                      <li><strong>Ingresa las mediciones de laboratorio</strong> (pH laboratorio, conductividad laboratorio): datos del análisis en laboratorio</li>
+                      <li><strong>Completa los elementos químicos</strong> (Cl, Ca, HCO3, SO4, Fe, Si, B, Li, F, Na, K, Mg) en mg/L si están disponibles</li>
+                      <li><strong>Haz clic en "Guardar"</strong> para crear el nuevo punto de manifestación registrada</li>
+                    </ol>
+                  </div>
+
+                  <h4 className="font-semibold text-gray-800 mb-3">📊 Estados y Flujo de Procesamiento:</h4>
+                  <div className="space-y-2">
+                    <div style={{ padding: '8px 12px', backgroundColor: '#fff7e6', borderLeftWidth: '3px', borderLeftColor: '#faad14', borderRadius: '4px' }}>
+                      <strong style={{ color: '#ad6800' }}>🟡 Pendiente:</strong>
+                      <span style={{ color: '#ad6800', marginLeft: '8px' }}>La solicitud acaba de ser creada por un usuario de campo. Está esperando revisión y aprobación por tu equipo.</span>
+                    </div>
+                    <div style={{ padding: '8px 12px', backgroundColor: '#f6f0ff', borderLeftWidth: '3px', borderLeftColor: '#52c41a', borderRadius: '4px' }}>
+                      <strong style={{ color: '#274a1c' }}>✅ Analizada:</strong>
+                      <span style={{ color: '#274a1c', marginLeft: '8px' }}>La solicitud ha sido revisada, procesada y convertida en una manifestación registrada. Ahora aparece en el mapa interactivo.</span>
+                    </div>
+                  </div>
+
+                  <h4 className="font-semibold text-gray-800 mb-3 mt-4">⚙️ Consejos para el Procesamiento:</h4>
+                  <ul style={{ margin: '0', paddingLeft: '20px', color: '#333', lineHeight: '1.8' }}>
+                    <li>✓ Verifica siempre las coordenadas GPS haciendo zoom en el mapa antes de confirmar</li>
+                    <li>✓ Si faltan mediciones, usa valores aproximados basados en la sensación térmica reportada</li>
+                    <li>✓ Los elementos químicos son opcionales pero ayudan para análisis geoquímicos más precisos</li>
+                    <li>✓ Revisa los comentarios del usuario para contexto adicional sobre el sitio</li>
+                    <li>✓ Puedes eliminar solicitudes erróneas directamente sin procesarlas</li>
+                    <li>✓ Todos los puntos agregados (manuales o procesados) aparecerán en el mapa de GeoterRA</li>
+                  </ul>
+                </div>
+              ),
+            },
+          ]}
+        />
         
         <hr className="my-4" />
         
