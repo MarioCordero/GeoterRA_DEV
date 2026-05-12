@@ -1,10 +1,9 @@
-import { Spin } from 'antd';
+import { Spin, Card, Row, Col, Statistic, Tag, Button } from 'antd';
 import "../../../../colorModule.css";
 import '../../../../fontsModule.css';
 import React, { useState, useEffect } from 'react';
 import { useSession } from '../../../../hooks/useSession';
 import { analysisRequest } from '../../../../config/apiConf';
-import { Card, Row, Col, Statistic, Tag, Button } from 'antd';
 import { usePermissions } from '../../../../hooks/usePermissions';
 import { FileTextOutlined, CheckCircleOutlined, ClockCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 
@@ -67,29 +66,27 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="w-full min-h-screen p-6">
-      {/* Welcome Section */}
+    <div className="w-full min-h-screen p-4 md:p-6">
+      {/* Welcome Header */}
       <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg p-8 mb-6">
         <h1 className="text-4xl font-bold mb-2">
           ¡Bienvenido, {sessionUser?.first_name || sessionUser?.email}!
         </h1>
-        <p className="text-blue-100">Panel de administración - GeoterRA</p>
+        <p className="text-blue-100">Panel de Administración - GeoterRA</p>
       </div>
 
-      {/* User Info */}
+      {/* User Info Cards */}
       <Row gutter={16} className="mb-8">
         <Col xs={24} sm={12} md={6}>
           <Card>
             <p className="text-gray-600 text-sm">Rol</p>
-            <Tag color={sessionUser?.role === 'admin' ? 'blue' : 'green'}>
-              {sessionUser?.role === 'admin' ? '👨‍💼 Administrador' : sessionUser?.role === 'maintenance' ? '🔧 Mantenimiento' : '👤 Usuario'}
-            </Tag>
+            <Tag color="blue">👨‍💼 Coordinador Científico</Tag>
           </Card>
         </Col>
         <Col xs={24} sm={12} md={6}>
           <Card>
             <p className="text-gray-600 text-sm">Email</p>
-            <p className="font-semibold">{sessionUser?.email}</p>
+            <p className="font-semibold text-sm">{sessionUser?.email}</p>
           </Card>
         </Col>
         <Col xs={24} sm={12} md={6}>
@@ -110,76 +107,100 @@ const AdminDashboard = () => {
         </Col>
       </Row>
 
-      {/* Statistics (Admin/Maintenance only) */}
-      {hasPermission(PERMISSIONS.REVIEW_REQUESTS) && (
-        <>
-          <h2 className="text-2xl font-bold mb-4">📊 Estadísticas de Solicitudes</h2>
-          <Row gutter={16} className="mb-8">
-            <Col xs={24} sm={12} md={6}>
-              <Card loading={statsLoading}>
-                <Statistic
-                  title="Total de Solicitudes"
-                  value={stats.total}
-                  icon={<FileTextOutlined />}
-                  valueStyle={{ color: '#1890ff' }}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Card loading={statsLoading}>
-                <Statistic
-                  title="Pendientes"
-                  value={stats.pending}
-                  icon={<ClockCircleOutlined />}
-                  valueStyle={{ color: '#faad14' }}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Card loading={statsLoading}>
-                <Statistic
-                  title="Analizadas"
-                  value={stats.analyzed}
-                  icon={<CheckCircleOutlined />}
-                  valueStyle={{ color: '#52c41a' }}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Card loading={statsLoading}>
-                <Statistic
-                  title="Rechazadas"
-                  value={stats.rejected}
-                  icon={<DeleteOutlined />}
-                  valueStyle={{ color: '#f5222d' }}
-                />
-              </Card>
-            </Col>
-          </Row>
-        </>
-      )}
+      {/* Role Description */}
+      <Card className="mb-8 bg-blue-50 border-l-4 border-blue-500">
+        <h3 className="text-xl font-bold mb-3">📋 Descripción del Rol: Coordinador Científico</h3>
+        <p className="text-gray-700 mb-4">
+          Como Coordinador Científico, eres responsable de revisar, validar y procesar las solicitudes de análisis geotérmico. 
+          Tu rol te permite evaluar la calidad de los datos, confirmar ubicaciones, completar análisis químicos y garantizar 
+          que solo los datos verificados se publiquen en el sistema.
+        </p>
+        <h4 className="font-semibold text-gray-800 mb-2">🎯 Responsabilidades Principales:</h4>
+        <ul style={{ margin: '0', paddingLeft: '20px', color: '#333' }}>
+          <li>Revisar todas las solicitudes de análisis pendientes</li>
+          <li>Validar la precisión de datos GPS y observaciones de campo</li>
+          <li>Completar mediciones de laboratorio (pH, conductividad, iones)</li>
+          <li>Procesar análisis y crear registros de manifestaciones verificadas</li>
+          <li>Publicar puntos en el mapa interactivo del sistema</li>
+          <li>Gestionar rechazos y coordinar con investigadores cuando sea necesario</li>
+        </ul>
+      </Card>
 
-      {/* Quick Actions */}
-      <h2 className="text-2xl font-bold mb-4">⚡ Acciones Rápidas</h2>
-      <Row gutter={16}>
+      {/* Statistics */}
+      <h2 className="text-2xl font-bold mb-4">📊 Estadísticas de Solicitudes</h2>
+      <Row gutter={16} className="mb-8">
         <Col xs={24} sm={12} md={6}>
-          <Button type="primary" block size="large">
-            📋 Ver Mis Solicitudes
-          </Button>
+          <Card loading={statsLoading}>
+            <Statistic
+              title="Total de Solicitudes"
+              value={stats.total}
+              icon={<FileTextOutlined />}
+              valueStyle={{ color: '#1890ff' }}
+            />
+          </Card>
         </Col>
-        {hasPermission(PERMISSIONS.REVIEW_REQUESTS) && (
-          <Col xs={24} sm={12} md={6}>
-            <Button type="primary" block size="large">
-              🔧 Gestionar Solicitudes
-            </Button>
-          </Col>
-        )}
         <Col xs={24} sm={12} md={6}>
-          <Button block size="large">
-            👤 Perfil
-          </Button>
+          <Card loading={statsLoading}>
+            <Statistic
+              title="Pendientes de Revisión"
+              value={stats.pending}
+              icon={<ClockCircleOutlined />}
+              valueStyle={{ color: '#faad14' }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card loading={statsLoading}>
+            <Statistic
+              title="Analizadas"
+              value={stats.analyzed}
+              icon={<CheckCircleOutlined />}
+              valueStyle={{ color: '#52c41a' }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card loading={statsLoading}>
+            <Statistic
+              title="Rechazadas"
+              value={stats.rejected}
+              icon={<DeleteOutlined />}
+              valueStyle={{ color: '#f5222d' }}
+            />
+          </Card>
         </Col>
       </Row>
+
+      {/* Capabilities */}
+      <Card className="mb-8 bg-blue-100 border-l-4 border-blue-500">
+        <h3 className="text-lg font-bold mb-4">🎯 ¿Qué puedes hacer aquí?</h3>
+        <Row gutter={16}>
+          <Col xs={24} sm={12} md={6}>
+            <div className="p-4 bg-white rounded border border-gray-200">
+              <h4 className="font-semibold text-blue-600 mb-2">📋 Revisar Solicitudes</h4>
+              <p className="text-sm text-gray-600">Accede al panel de gestión para revisar, validar y procesar todas las solicitudes pendientes de análisis.</p>
+            </div>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <div className="p-4 bg-white rounded border border-gray-200">
+              <h4 className="font-semibold text-blue-600 mb-2">🔬 Análisis Químico</h4>
+              <p className="text-sm text-gray-600">Ingresa mediciones de laboratorio (pH, conductividad, iones) para completar el análisis geoquímico.</p>
+            </div>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <div className="p-4 bg-white rounded border border-gray-200">
+              <h4 className="font-semibold text-blue-600 mb-2">📍 Confirmar Ubicación</h4>
+              <p className="text-sm text-gray-600">Verifica y ajusta las coordenadas GPS de los puntos antes de procesarlos al mapa.</p>
+            </div>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <div className="p-4 bg-white rounded border border-gray-200">
+              <h4 className="font-semibold text-blue-600 mb-2">🗺️ Ver Mapa</h4>
+              <p className="text-sm text-gray-600">Visualiza todas las manifestaciones geotermales aprobadas en el mapa interactivo.</p>
+            </div>
+          </Col>
+        </Row>
+      </Card>
     </div>
   );
 };
