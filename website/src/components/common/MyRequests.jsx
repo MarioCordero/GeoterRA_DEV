@@ -2,7 +2,7 @@ import AddRequest from './AddRequest';
 import NotImplementedModal from './NotImplementedModal';
 import React, { useState, useEffect, useRef } from 'react';
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import { Table, Button, Modal, Tag, message, Empty, Drawer, Divider } from 'antd';
+import { Table, Button, Modal, Tag, message, Empty, Drawer, Divider, Collapse } from 'antd';
 import { analysisRequestIndex, analysisRequestDelete } from '../../config/apiConf';
 
 
@@ -259,6 +259,61 @@ const MyRequests = () => {
           ⚠️ {error}
         </div>
       )}
+
+      {/* Collapsible Guidance */}
+      <Collapse
+        className="mb-8"
+        style={{ backgroundColor: '#fefce8', borderColor: '#fcd34d' }}
+        items={[
+          {
+            key: '1',
+            label: <span style={{ fontSize: '16px', fontWeight: 'bold' }}>💡 ¿Cómo crear una solicitud de análisis?</span>,
+            children: (
+              <div>
+                <div className="mb-6">
+                  <h4 className="font-semibold text-gray-800 mb-3">📝 Pasos para crear una nueva solicitud:</h4>
+                  <ol style={{ margin: '0', paddingLeft: '20px', color: '#333', lineHeight: '1.8' }}>
+                    <li><strong>Haz clic en "+ Nueva Solicitud"</strong> en la esquina superior derecha de esta pantalla</li>
+                    <li><strong>Completa el formulario</strong> con los datos del sitio: nombre, ubicación GPS, temperatura observada y otros detalles</li>
+                    <li><strong>Selecciona la región geotérmica</strong> donde se encuentra la manifestación</li>
+                    <li><strong>Proporciona tu información de contacto</strong> para que el equipo de revisión pueda comunicarse contigo si es necesario</li>
+                    <li><strong>Describe las observaciones</strong> sobre la actividad del sitio (burbujeo, uso actual del terreno, etc.)</li>
+                    <li><strong>Envía la solicitud</strong> y recibirás una confirmación con el número de seguimiento</li>
+                  </ol>
+                </div>
+                
+                <h4 className="font-semibold text-gray-800 mb-3">📊 Estados de tu solicitud - ¿Dónde está mi solicitud?</h4>
+                <div className="space-y-2">
+                  <div style={{ padding: '8px 12px', backgroundColor: '#e6f7ff', borderLeftWidth: '3px', borderLeftColor: '#1890ff', borderRadius: '4px' }}>
+                    <strong style={{ color: '#0050b3' }}>🔵 Registrada:</strong>
+                    <span style={{ color: '#0050b3', marginLeft: '8px' }}>Tu solicitud fue recibida. Ahora está en la cola esperando revisión por parte del equipo científico.</span>
+                  </div>
+                  <div style={{ padding: '8px 12px', backgroundColor: '#fff7e6', borderLeftWidth: '3px', borderLeftColor: '#faad14', borderRadius: '4px' }}>
+                    <strong style={{ color: '#ad6800' }}>🟡 En revisión:</strong>
+                    <span style={{ color: '#ad6800', marginLeft: '8px' }}>Un investigador está analizando tu solicitud y verificando los datos proporcionados.</span>
+                  </div>
+                  <div style={{ padding: '8px 12px', backgroundColor: '#f6f8fb', borderLeftWidth: '3px', borderLeftColor: '#faad14', borderRadius: '4px' }}>
+                    <strong style={{ color: '#ad6800' }}>🔍 Verificación de campo:</strong>
+                    <span style={{ color: '#ad6800', marginLeft: '8px' }}>Se realizará una verificación de campo para confirmar los datos y condiciones del sitio.</span>
+                  </div>
+                  <div style={{ padding: '8px 12px', backgroundColor: '#f6f8fb', borderLeftWidth: '3px', borderLeftColor: '#faad14', borderRadius: '4px' }}>
+                    <strong style={{ color: '#ad6800' }}>🧪 Análisis en laboratorio:</strong>
+                    <span style={{ color: '#ad6800', marginLeft: '8px' }}>Se están realizando análisis químicos y técnicos detallados de las muestras o datos recopilados.</span>
+                  </div>
+                  <div style={{ padding: '8px 12px', backgroundColor: '#f6f0ff', borderLeftWidth: '3px', borderLeftColor: '#52c41a', borderRadius: '4px' }}>
+                    <strong style={{ color: '#274a1c' }}>✅ Aprobada:</strong>
+                    <span style={{ color: '#274a1c', marginLeft: '8px' }}>¡Solicitud completada! Tu manifestación fue publicada en el mapa interactivo de GeoterRA.</span>
+                  </div>
+                  <div style={{ padding: '8px 12px', backgroundColor: '#fff1f0', borderLeftWidth: '3px', borderLeftColor: '#ff4d4f', borderRadius: '4px' }}>
+                    <strong style={{ color: '#7f0000' }}>❌ Rechazada:</strong>
+                    <span style={{ color: '#7f0000', marginLeft: '8px' }}>Lamentablemente, la solicitud fue rechazada. Revisa los comentarios del equipo para más información.</span>
+                  </div>
+                </div>
+              </div>
+            ),
+          },
+        ]}
+      />
 
       {/* Mobile view - Card layout */}
       {isMobile ? (
