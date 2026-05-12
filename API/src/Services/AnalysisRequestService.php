@@ -219,4 +219,47 @@ final class AnalysisRequestService
     // TODO: Consider adding a separate method for maintenance users if they should have different access than admins
     return $this->repository->getAll();
   }
+
+  /**
+   * Gets a specific analysis request by ID if it belongs to the authenticated user.
+   *
+   * @param string $id
+   * @return array
+   * @throws ApiException
+   */
+  public function getById(string $id): array
+  {
+    $auth = $this->authService->requireAuth();
+    $userId = (string)$auth['user_id'];
+
+    $request = $this->repository->findByIdAndUser($id, $userId);
+    if (!$request) {
+      throw new ApiException(ErrorType::analysisRequestNotFound(), 404);
+    }
+
+    return $request;
+  }
+
+  /**
+   * Gets a specific analysis request by ID for an admin or maintenance user.
+   *
+   * @param string $id
+   * @return array
+   * @throws ApiException
+   */
+  public function adminGetById(string $id): array
+  {
+    $auth = $this->authService->requireAuth();
+
+    if ($auth['role'] !== 'admin' && $auth['role'] !== 'maintenance') {
+      throw new ApiException(ErrorType::forbidden(), 403);
+    }
+
+    $request = $this->repository->findById($id);
+    if (!$request) {
+      throw new ApiException(ErrorType::analysisRequestNotFound(), 404);
+    }
+
+    return $request;
+  }
 }

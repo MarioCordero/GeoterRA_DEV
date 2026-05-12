@@ -5,9 +5,57 @@ namespace DTO;
 
 use Http\ApiException;
 use Http\ErrorType;
+use OpenApi\Annotations as OA;
 
 /**
- * DTO for updating user profile data.
+ * @OA\Schema(
+ *   schema="UpdateUserDTO",
+ *   type="object",
+ *   description="Datos para actualizar perfil de usuario",
+ *   required={"firstName", "lastName", "email"},
+ *   @OA\Property(
+ *     property="firstName",
+ *     type="string",
+ *     description="Nombre del usuario",
+ *     example="Juan"
+ *   ),
+ *   @OA\Property(
+ *     property="lastName",
+ *     type="string",
+ *     description="Apellido del usuario",
+ *     example="Pérez"
+ *   ),
+ *   @OA\Property(
+ *     property="email",
+ *     type="string",
+ *     format="email",
+ *     description="Correo electrónico",
+ *     example="juan.perez@example.com"
+ *   ),
+ *   @OA\Property(
+ *     property="phoneNumber",
+ *     type="string",
+ *     nullable=true,
+ *     description="Número telefónico (8-15 dígitos)",
+ *     example="87654321"
+ *   ),
+ *   @OA\Property(
+ *     property="currentPassword",
+ *     type="string",
+ *     format="password",
+ *     nullable=true,
+ *     description="Contraseña actual requerida para cambiar contraseña",
+ *     example="OldPassword123"
+ *   ),
+ *   @OA\Property(
+ *     property="password",
+ *     type="string",
+ *     format="password",
+ *     nullable=true,
+ *     description="Nueva contraseña (mínimo 8 caracteres)",
+ *     example="NewPassword123"
+ *   )
+ * )
  */
 final class UpdateUserDTO
 {

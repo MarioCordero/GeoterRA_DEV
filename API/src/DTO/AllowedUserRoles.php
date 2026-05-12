@@ -3,7 +3,16 @@ declare(strict_types=1);
 
 namespace DTO;
 
+use OpenApi\Annotations as OA;
+
 /**
+ * @OA\Schema(
+ *   schema="AllowedUserRoles",
+ *   type="string",
+ *   enum={"admin", "maintenance", "user"},
+ *   description="Roles permitidos en el sistema GeoterRA"
+ * )
+ * 
  * Allowed user roles list compatible with PHP 8.0
  */
 final class AllowedUserRoles
