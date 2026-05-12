@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Mar 24, 2026 at 07:55 PM
+-- Generation Time: May 12, 2026 at 01:40 AM
 -- Server version: 8.0.45-0ubuntu0.24.04.1
 -- PHP Version: 8.3.6
 
@@ -28,8 +28,8 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `access_tokens` (
-  `user_id` char(26) COLLATE utf8mb4_general_ci NOT NULL,
-  `token_hash` char(64) COLLATE utf8mb4_general_ci NOT NULL,
+  `user_id` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `token_hash` char(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `expires_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `revoked_at` timestamp NULL DEFAULT NULL,
@@ -41,8 +41,7 @@ CREATE TABLE `access_tokens` (
 --
 
 INSERT INTO `access_tokens` (`user_id`, `token_hash`, `expires_at`, `updated_at`, `revoked_at`, `created_at`) VALUES
-('06E0TGS8ZBFNSVB2J8KA01NSZC', 'b19527b931ec52dcac38ddf72565ef0c2858222ab51959be7c2ccc966ec90975', '2026-02-20 21:11:28', '2026-02-20 19:41:28', NULL, '2026-02-21 01:41:28'),
-('06EJ2JM5Z1QVHV5HFD64S07W5W', '3b62091249c4c08662c4006548bbfda4c9054ce56cbd1f51a5de60b22bc06184', '2026-03-24 15:21:53', '2026-03-24 13:51:53', NULL, '2026-03-24 19:51:53');
+('06E0TGS8ZBFNSVB2J8KA01NSZC', 'ef5bb3511835c8b499266d28267e1bee53057b7cefb93fdecae50f4c303211e1', '2026-04-24 14:43:06', '2026-04-24 13:13:06', NULL, '2026-02-21 01:41:28');
 
 -- --------------------------------------------------------
 
@@ -51,32 +50,24 @@ INSERT INTO `access_tokens` (`user_id`, `token_hash`, `expires_at`, `updated_at`
 --
 
 CREATE TABLE `analysis_requests` (
-  `id` char(26) COLLATE utf8mb4_general_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'SOLI-XXXXX',
-  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `owner_contact_number` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `owner_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `temperature_sensation` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `id` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'SOLI-XXXXX',
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `owner_contact_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `owner_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `temperature_sensation` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `bubbles` tinyint(1) DEFAULT '0',
-  `details` text COLLATE utf8mb4_general_ci,
-  `current_usage` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `details` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `current_usage` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `latitude` decimal(10,7) DEFAULT NULL,
   `longitude` decimal(10,7) DEFAULT NULL,
   `state` enum('Pendiente','En revisi?n','Analizada','Eliminada') CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL DEFAULT 'Pendiente',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `created_by` char(26) COLLATE utf8mb4_general_ci NOT NULL,
+  `created_by` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `modified_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` datetime DEFAULT NULL,
   `region_id` tinyint DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `analysis_requests`
---
-
-INSERT INTO `analysis_requests` (`id`, `name`, `email`, `owner_contact_number`, `owner_name`, `temperature_sensation`, `bubbles`, `details`, `current_usage`, `latitude`, `longitude`, `state`, `created_at`, `created_by`, `modified_at`, `deleted_at`, `region_id`) VALUES
-('06E0TWE4XKV5TX5NC6GZVKC9CG', 'SOLI-06E', 'propietario@example.com', '88881234', 'Juan Pérez', 'Frío', 1, 'Se observa presencia de burbujeo cerca del pozo', 'Riego agrícola', 9.9333300, -84.0833300, 'Pendiente', '2026-01-29 23:48:05', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-03-03 14:20:42', NULL, 3),
-('06EBAR4J053T4TS52TTJRMKM1W', 'SOLI-MKM1W', 'owner@example.com', '+56912345678', 'Juan Pérez', 'hot', 1, 'Some details about the manifestation', 'agricultural', -33.4569000, -70.6483000, 'Pendiente', '2026-03-03 14:25:30', '06E9GJ4K61A8H6CC3C5WRWJFY4', NULL, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -85,8 +76,8 @@ INSERT INTO `analysis_requests` (`id`, `name`, `email`, `owner_contact_number`, 
 --
 
 CREATE TABLE `refresh_tokens` (
-  `user_id` char(26) COLLATE utf8mb4_general_ci NOT NULL,
-  `token_hash` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `user_id` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `token_hash` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `expires_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `revoked_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -98,8 +89,7 @@ CREATE TABLE `refresh_tokens` (
 --
 
 INSERT INTO `refresh_tokens` (`user_id`, `token_hash`, `expires_at`, `revoked_at`, `updated_at`, `created_at`) VALUES
-('06E0TGS8ZBFNSVB2J8KA01NSZC', 'ceae1ccf2c7b3436a6e2a866fd35b6c7f98f58adcdcd3fd42af39be68c856332', '2026-03-22 19:41:28', NULL, '2026-02-20 19:41:28', '2026-02-21 01:41:28'),
-('06EJ2JM5Z1QVHV5HFD64S07W5W', '4a3535209f5e68c7cc3e73432f48b812deb008f0ec2a1aa882ac20cd0ea6e3ba', '2026-04-23 13:51:53', NULL, '2026-03-24 13:51:53', '2026-03-24 19:51:53');
+('06E0TGS8ZBFNSVB2J8KA01NSZC', 'e9b78bb15489268d7112dd728d26581f56340066ce3f7989a97a6c8858df137c', '2026-05-24 13:13:07', NULL, '2026-04-24 13:13:07', '2026-02-21 01:41:28');
 
 -- --------------------------------------------------------
 
@@ -109,7 +99,7 @@ INSERT INTO `refresh_tokens` (`user_id`, `token_hash`, `expires_at`, `revoked_at
 
 CREATE TABLE `regions` (
   `id` tinyint NOT NULL,
-  `name` enum('Guanacaste','Alajuela','San José','Puntarenas','Limón','Heredia','Cartago') COLLATE utf8mb4_general_ci NOT NULL,
+  `name` enum('Guanacaste','Alajuela','San José','Puntarenas','Limón','Heredia','Cartago') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -124,7 +114,7 @@ INSERT INTO `regions` (`id`, `name`, `created_at`) VALUES
 (4, 'Puntarenas', '2026-02-27 00:30:59'),
 (5, 'Limón', '2026-02-27 00:30:59'),
 (6, 'Heredia', '2026-02-27 00:30:59'),
-(8, 'Cartago', '2026-03-17 02:30:54');
+(7, 'Cartago', '2026-03-17 02:30:54');
 
 -- --------------------------------------------------------
 
@@ -133,11 +123,11 @@ INSERT INTO `regions` (`id`, `name`, `created_at`) VALUES
 --
 
 CREATE TABLE `registered_geothermal_manifestations` (
-  `id` char(26) COLLATE utf8mb4_general_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'SOLI-XXXXX',
+  `id` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'SOLI-XXXXX',
   `latitude` decimal(10,7) NOT NULL,
   `longitude` decimal(10,7) NOT NULL,
-  `description` text COLLATE utf8mb4_general_ci,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `temperature` decimal(6,2) DEFAULT NULL,
   `field_pH` decimal(4,2) DEFAULT NULL,
   `field_conductivity` decimal(10,2) DEFAULT NULL,
@@ -156,11 +146,11 @@ CREATE TABLE `registered_geothermal_manifestations` (
   `k` decimal(10,4) DEFAULT NULL,
   `mg` decimal(10,4) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `created_by` char(26) COLLATE utf8mb4_general_ci NOT NULL,
+  `created_by` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `modified_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `modified_by` char(26) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `modified_by` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `deleted_at` datetime DEFAULT NULL,
-  `deleted_by` char(26) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `deleted_by` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `region_id` tinyint DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -169,28 +159,17 @@ CREATE TABLE `registered_geothermal_manifestations` (
 --
 
 INSERT INTO `registered_geothermal_manifestations` (`id`, `name`, `latitude`, `longitude`, `description`, `temperature`, `field_pH`, `field_conductivity`, `lab_pH`, `lab_conductivity`, `cl`, `ca`, `hco3`, `so4`, `fe`, `si`, `b`, `li`, `f`, `na`, `k`, `mg`, `created_at`, `created_by`, `modified_at`, `modified_by`, `deleted_at`, `deleted_by`, `region_id`) VALUES
-('06E0V246K7DNDQQM9NXREH6FT0', 'RGM-007', 9.9333300, -84.0833300, 'Manifestación geotérmica superficial', 72.50, 6.80, 850.50, 6.90, 870.00, 120.4500, 35.2000, 180.7500, 45.1000, 0.8500, 32.4000, 1.2000, 0.4500, 0.9000, 95.6000, 8.2500, 18.4000, '2026-01-30 06:12:57', '06E0TGS8ZBFNSVB2J8KA01NSZC', NULL, NULL, NULL, '', NULL),
-('06E103HQ1PJRQ99B1T68P9SF14', 'Test Manifestation 002 - Updated', 10.5555550, -85.1111110, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-30 17:58:13', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-27 00:31:01', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-01-30 12:22:14', '06E0TGS8ZBFNSVB2J8KA01NSZC', 1),
-('06E10555Q4AFB4NZVK8E89SJ58', 'Test Manifestation 0111 - Updated', 10.5555550, -85.1111110, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-30 18:05:14', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-27 00:31:01', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-01-30 21:44:38', '06E0TGS8ZBFNSVB2J8KA01NSZC', 1),
-('06E106K4M6755SQVWA4PE5Q7YG', 'Test Manifestation 0112 - Updated', 10.5555550, -85.1111110, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-30 18:11:31', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-27 00:31:01', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-01-30 21:48:58', '06E0TGS8ZBFNSVB2J8KA01NSZC', 1),
-('06E107KVTS9FT4BT3S0N2ANGGC', 'Test Manifestation 02222 - Updated', 10.5555550, -85.1111110, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-30 18:15:59', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-27 00:31:01', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-03 17:42:48', '06E0TGS8ZBFNSVB2J8KA01NSZC', 1),
-('06E1091PJ1KGV44CZQXRPW13NC', 'Test Manifestation 99', 10.1234560, -85.6543210, 'Test geothermal manifestation', 95.50, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-30 18:22:14', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-27 00:31:01', NULL, NULL, NULL, 1),
-('06E143XZDYM1G3SRM9PK97EMDR', 'Test Manifestation 00056', 10.1234560, -85.6543210, 'Test geothermal manifestation', 95.50, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-31 03:19:07', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-27 00:31:01', NULL, NULL, NULL, 1),
-('06E1448N1F2KPK2AAZEHMY50Z8', 'Test Manifestation 00877S', 10.1234560, -85.6543210, 'Test geothermal manifestation', 95.50, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-31 03:20:35', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-27 00:31:01', NULL, NULL, NULL, 1),
-('06E144MVT0AV7M3YZSRS1BM610', 'Test Manifestation 088', 10.1234560, -85.6543210, 'Test geothermal manifestation', 95.50, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-31 03:22:15', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-27 00:31:01', NULL, NULL, NULL, 1),
-('06E145YNGPACVT37V793KB6KG4', 'Test Manifestation 0976', 10.1234560, -85.6543210, 'Test geothermal manifestation', 95.50, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-31 03:27:57', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-27 00:31:01', NULL, NULL, NULL, 1),
-('06E146JRGFD7X5MQ285SDD9HAG', 'Test Manifestation 0977', 10.1234560, -85.6543210, 'Test geothermal manifestation', 95.50, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-31 03:30:42', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-27 00:31:01', NULL, NULL, NULL, 1),
-('06E146JRQZ8H288EA7BCS25YKW', 'Test Manifestation 0977 - Updated', 10.0000000, -85.0000000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-31 03:30:42', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-27 00:31:01', NULL, NULL, NULL, 1),
-('06E146WZET4S99715W068RPP84', 'Test Manifestation 09888', 10.1234560, -85.6543210, 'Test geothermal manifestation', 95.50, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-31 03:32:06', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-27 00:31:01', NULL, NULL, NULL, 1),
-('06E146WZPYH3JYBK3NWWQ7EJ00', 'Test Manifestation 09888 - Updated', 10.0000000, -85.0000000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-31 03:32:06', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-27 00:31:01', NULL, NULL, NULL, 1),
-('06E147YP1A1AQZPZ34MVTNRJ5G', 'Test Manifestation 09889', 10.1234560, -85.6543210, 'Test geothermal manifestation', 95.50, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-31 03:36:42', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-27 00:31:01', NULL, NULL, NULL, 1),
-('06E147YP9J6QG0PFAQ8AR1T6JM', 'Test Manifestation 09889 - Updated', 10.0000000, -85.0000000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-31 03:36:42', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-27 00:31:01', NULL, NULL, NULL, 1),
-('06E14873XHXYMPGXRSK8490XAG', 'Test Manifestation 0100', 10.1234560, -85.6543210, 'Test geothermal manifestation', 95.50, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-31 03:37:51', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-27 00:31:01', NULL, NULL, NULL, 1),
-('06E149RV6FWSVGY0M3A521PZSR', 'Test Manifestation 0111', 10.1234560, -85.6543210, 'Test geothermal manifestation', 95.50, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-31 03:44:38', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-27 00:31:01', NULL, NULL, NULL, 1),
-('06E14ARHF9E3Y5D79WV94FR1ZW', 'Test Manifestation 0112', 10.1234560, -85.6543210, 'Test geothermal manifestation', 95.50, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-31 03:48:58', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-27 00:31:01', NULL, NULL, NULL, 1),
-('06E2BRS3KDM3ER76JV2W9PATMC', 'Test Manifestation 02222', 10.1234560, -85.6543210, 'Test geothermal manifestation', 95.50, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-02-03 23:42:48', '06E0TGS8ZBFNSVB2J8KA01NSZC', '2026-02-27 00:31:01', NULL, NULL, NULL, 1),
-('06EBCG9ABY9EZJZAQF28ZA9XKC', 'Manifestación Test Marito O por Dios pero otra vez', -20.1234000, -69.5678000, 'Test description marito updated', 45.50, 7.20, 1200.00, 7.00, 1150.00, 10.5000, 5.2000, 3.1000, 2.8000, 0.1000, 1.5000, 0.3000, 0.0500, 0.2000, 8.0000, 1.2000, 0.9000, '2026-03-04 00:30:49', '06E9GJ4K61A8H6CC3C5WRWJFY4', '2026-03-04 01:13:52', '06E9GJ4K61A8H6CC3C5WRWJFY4', NULL, NULL, 1),
-('06EBCGC9X1BA2V0JHAT10EAH9R', 'Manifestación Test Marito O por Dios', -20.1234000, -69.5678000, 'Test description marito', 45.50, 7.20, 1200.00, 7.00, 1150.00, 10.5000, 5.2000, 3.1000, 2.8000, 0.1000, 1.5000, 0.3000, 0.0500, 0.2000, 8.0000, 1.2000, 0.9000, '2026-03-04 00:31:14', '06E9GJ4K61A8H6CC3C5WRWJFY4', '2026-03-04 01:12:03', NULL, '2026-03-03 19:12:03', '06E9GJ4K61A8H6CC3C5WRWJFY4', 1);
+('06F1FA5F486WEWTCRGSVZYJT6R', 'Termal Sitio U1', 10.9401065, -85.1931900, 'Geothermal manifestation', 46.50, 6.80, 532.00, 6.95, 523.00, 9.8000, 58.9000, 246.0000, 60.8000, 0.0700, 157.0000, 1.0000, NULL, 0.5000, 57.7000, 11.2000, 16.9000, '2026-05-12 00:32:13', '06EXBJQHAGA0Y4ZRF3ZKZ7KPJ8', NULL, NULL, NULL, NULL, 1),
+('06F1FA5F486WEWTCRGSVZYJT6S', 'Termal CTP1', 9.8663925, -83.1830515, 'Geothermal manifestation', 41.00, 6.51, 685.00, 6.37, 665.00, 12.2000, 59.8000, 389.0000, 42.1000, 0.0700, 142.0000, 10.0000, NULL, 0.5000, 68.8000, 15.5000, 32.7000, '2026-05-12 00:32:13', '06EXBJQHAGA0Y4ZRF3ZKZ7KPJ8', NULL, NULL, NULL, NULL, 3),
+('06F1FA5F486WEWTCRGSVZYJT6T', 'Termal CTP2', 9.8812554, -83.1799590, 'Geothermal manifestation', 46.00, 6.70, 940.00, 6.74, 915.00, 16.2000, 78.4000, 578.0000, 58.1000, 0.0700, 150.0000, 10.0000, NULL, 0.5000, 104.2000, 10.6000, 46.3000, '2026-05-12 00:32:13', '06EXBJQHAGA0Y4ZRF3ZKZ7KPJ8', NULL, NULL, NULL, NULL, 3),
+('06F1FA5F486WEWTCRGSVZYJT6U', 'Termal CTP3', 9.8894680, -83.1796559, 'Geothermal manifestation', 46.00, 6.25, 1070.00, 6.33, 912.00, 15.9000, 73.2000, 551.5000, 57.4000, 0.0700, 150.0000, 10.0000, NULL, 0.5000, 107.1000, 14.1000, 45.9000, '2026-05-12 00:32:13', '06EXBJQHAGA0Y4ZRF3ZKZ7KPJ8', NULL, NULL, NULL, NULL, 3),
+('06F1FA5F486WEWTCRGSVZYJT6V', 'Termal Guayacan', 9.7016162, -83.1895091, 'Geothermal manifestation', 59.00, NULL, NULL, 2.17, 7460.00, 78.0000, 104.0000, 0.0000, 3944.0000, 103.0000, 266.0000, 4.0000, 1.0000, 0.5000, 55.0000, 3.0000, 37.0000, '2026-05-12 00:32:13', '06EXBJQHAGA0Y4ZRF3ZKZ7KPJ8', NULL, NULL, NULL, NULL, 7),
+('06F1FA5F486WEWTCRGSVZYJT6W', 'Termal Josue Ujate', 9.9498760, -83.1605745, 'Geothermal manifestation', 36.00, 2.83, NULL, 2.78, 2770.00, 188.0000, 213.0000, 0.0000, 1383.0000, 2.9200, 162.0000, 2.0000, 1.0000, 0.5000, 56.0000, 9.0000, 65.0000, '2026-05-12 00:32:13', '06EXBJQHAGA0Y4ZRF3ZKZ7KPJ8', NULL, NULL, NULL, NULL, 3),
+('06F1FA5F486WEWTCRGSVZYJT6X', 'Termal R Prados1', 9.8800241, -83.1718535, 'Geothermal manifestation', 42.00, 6.20, 1100.00, 6.17, 876.00, 75.9000, 58.8000, 443.5000, 14.3000, 0.0700, 156.0000, 4.0000, 1.0000, 0.5000, 157.0000, 17.5000, 28.7000, '2026-05-12 00:32:13', '06EXBJQHAGA0Y4ZRF3ZKZ7KPJ8', NULL, NULL, NULL, NULL, 7),
+('06F1FA5F486WEWTCRGSVZYJT6Y', 'Termal R Prados2', 9.8805682, -83.1718862, 'Geothermal manifestation', 44.60, 6.15, 1080.00, 6.24, 900.00, 80.1000, 59.4000, 447.0000, 14.2000, 0.0700, 150.0000, 10.0000, 1.0000, 0.5000, 184.3000, 15.6000, 26.8000, '2026-05-12 00:32:13', '06EXBJQHAGA0Y4ZRF3ZKZ7KPJ8', NULL, NULL, NULL, NULL, 7),
+('06F1FA5F486WEWTCRGSVZYJT6Z', 'Termal R Prados3', 9.8814163, -83.1752232, 'Geothermal manifestation', NULL, 6.05, NULL, 6.09, 482.00, 6.2000, 45.3000, 327.5000, 5.6000, 0.0700, 131.0000, 10.0000, 1.0000, 0.5000, 59.6000, 8.8000, 21.0000, '2026-05-12 00:32:13', '06EXBJQHAGA0Y4ZRF3ZKZ7KPJ8', NULL, NULL, NULL, NULL, 7),
+('06F1FA5F486WEWTCRGSVZYJT70', 'Termal R Prados4', 9.8807762, -83.1757882, 'Geothermal manifestation', 31.20, 6.04, NULL, 6.05, 368.00, 5.6000, 36.8000, 251.0000, 2.9000, 0.0700, 120.0000, 10.0000, 1.0000, 0.5000, 40.0000, 8.7000, 17.0000, '2026-05-12 00:32:13', '06EXBJQHAGA0Y4ZRF3ZKZ7KPJ8', NULL, NULL, NULL, NULL, 7),
+('06F1FA5F486WEWTCRGSVZYJT71', 'Termal Guayacan Alt', 9.9350359, -83.1853346, 'Geothermal manifestation', 39.00, 5.85, 420.00, 5.85, 416.00, 8.1000, 46.5000, 201.0000, 43.5000, 0.0700, 124.0000, 10.0000, 1.0000, 0.5000, 41.9000, 14.5000, 14.3000, '2026-05-12 00:32:13', '06EXBJQHAGA0Y4ZRF3ZKZ7KPJ8', NULL, NULL, NULL, NULL, 6);
 
 -- --------------------------------------------------------
 
@@ -199,12 +178,12 @@ INSERT INTO `registered_geothermal_manifestations` (`id`, `name`, `latitude`, `l
 --
 
 CREATE TABLE `users` (
-  `user_id` char(26) COLLATE utf8mb4_general_ci NOT NULL,
-  `first_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `last_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `phone_number` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `password_hash` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `user_id` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `first_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `last_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `phone_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `password_hash` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `role` enum('admin','user','maintenance') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'user',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `is_verified` tinyint(1) NOT NULL DEFAULT '0',
@@ -214,7 +193,7 @@ CREATE TABLE `users` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` datetime DEFAULT NULL,
-  `deleted_by` char(26) COLLATE utf8mb4_general_ci DEFAULT NULL
+  `deleted_by` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -222,9 +201,10 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `first_name`, `last_name`, `email`, `phone_number`, `password_hash`, `role`, `is_active`, `is_verified`, `failed_login_attempts`, `last_login_at`, `password_changed_at`, `created_at`, `updated_at`, `deleted_at`, `deleted_by`) VALUES
-('06E0TGS8ZBFNSVB2J8KA01NSZC', 'Carlos', 'Perez', 'test4@test.com', '88881234', '$2y$10$lS8KHIMbRLD.SK0f/R4e4e1X4cWyPiYJ6YITNB4Rn94KdCogjd6Fm', 'admin', 1, 0, 0, NULL, NULL, '2026-01-29 22:57:11', '2026-02-12 19:26:17', NULL, NULL),
-('06E9GJ4K61A8H6CC3C5WRWJFY4', 'Mario', 'Updated', 'mario@gmail.com', '87654321', '$2y$10$xbVsgsejIq/RLpdzq4jBR.CoZn.JDAk8nSIGMb3hxqOLKpc7kvevm', 'admin', 1, 0, 0, NULL, NULL, '2026-02-25 22:50:19', '2026-03-03 18:30:38', NULL, NULL),
-('06EJ2JM5Z1QVHV5HFD64S07W5W', 'Mario', 'Developer', 'mario@developer.com', '88888888', '$2y$10$xd567SWNynoikvNhM/z/yua0Thm2/sDygtA5jKdT5bMDZYn8cIQYu', 'maintenance', 1, 0, 0, NULL, NULL, '2026-03-24 13:20:25', '2026-03-24 13:22:01', NULL, NULL);
+('06E0TGS8ZBFNSVB2J8KA01NSZC', 'Carlos', 'PerezEdited', 'test4@test.com', '88881234', '$2y$10$xbVsgsejIq/RLpdzq4jBR.CoZn.JDAk8nSIGMb3hxqOLKpc7kvevm', 'admin', 0, 0, 0, NULL, NULL, '2026-01-29 22:57:11', '2026-04-24 13:12:25', '2026-04-24 13:12:25', '06E0TGS8ZBFNSVB2J8KA01NSZC'),
+('06E9GJ4K61A8H6CC3C5WRWJFY4', 'Mario', 'Updated', 'mario@user.com', '87654321', '$2y$10$hRvqu/lf9ghaWtNxNeuozuHRYE2LgjrGkg5Wjh1bgfdM6a/OtCSH.', 'user', 1, 0, 0, NULL, NULL, '2026-02-25 22:50:19', '2026-05-11 18:38:59', NULL, NULL),
+('06EJ2JM5Z1QVHV5HFD64S07W5W', 'MarioCo', 'DeveloperEdited', 'mario@developer.com', '888888889', '$2y$10$hRvqu/lf9ghaWtNxNeuozuHRYE2LgjrGkg5Wjh1bgfdM6a/OtCSH.', 'maintenance', 1, 0, 0, NULL, NULL, '2026-03-24 13:20:25', '2026-04-28 14:15:36', NULL, NULL),
+('06EXBJQHAGA0Y4ZRF3ZKZ7KPJ8', 'Mario', 'Admin', 'mario@admin.com', '84264310', '$2y$10$hRvqu/lf9ghaWtNxNeuozuHRYE2LgjrGkg5Wjh1bgfdM6a/OtCSH.', 'admin', 1, 0, 0, NULL, NULL, '2026-04-28 14:32:20', '2026-05-11 18:38:04', NULL, NULL);
 
 --
 -- Indexes for dumped tables
