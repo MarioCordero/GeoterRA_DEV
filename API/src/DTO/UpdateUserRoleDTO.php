@@ -5,10 +5,22 @@ namespace DTO;
 
 use Http\ApiException;
 use Http\ErrorType;
+use OpenApi\Annotations as OA;
 
 /**
- * DTO for updating a user's role.
- * Restricted to maintenance administrators.
+ * @OA\Schema(
+ *   schema="UpdateUserRoleDTO",
+ *   type="object",
+ *   description="Datos para actualizar el rol de un usuario (solo administradores)",
+ *   required={"role"},
+ *   @OA\Property(
+ *     property="role",
+ *     type="string",
+ *     enum={"admin", "maintenance", "user"},
+ *     description="Nuevo rol del usuario",
+ *     example="maintenance"
+ *   )
+ * )
  */
 final class UpdateUserRoleDTO
 {

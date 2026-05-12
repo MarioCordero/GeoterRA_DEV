@@ -82,7 +82,11 @@ final class AnalysisRequestRepository
 	public function findByIdAndUser(string $id, string $userId): ?array
 	{
 		$stmt = $this->pdo->prepare(
-			'SELECT id FROM analysis_requests WHERE id = :id AND created_by = :user_id'
+			'SELECT
+				id, name, region_id, email, owner_name, owner_contact_number,
+				current_usage, temperature_sensation, bubbles, details,
+				latitude, longitude, state, created_at, created_by
+			FROM analysis_requests WHERE id = :id AND created_by = :user_id'
 		);
 
 		$stmt->execute([
@@ -101,7 +105,11 @@ final class AnalysisRequestRepository
 	public function findById(string $id): ?array
 	{
 		$stmt = $this->pdo->prepare(
-			'SELECT id FROM analysis_requests WHERE id = :id'
+			'SELECT
+				id, name, region_id, email, owner_name, owner_contact_number,
+				current_usage, temperature_sensation, bubbles, details,
+				latitude, longitude, state, created_at, created_by
+			FROM analysis_requests WHERE id = :id'
 		);
 
 		$stmt->execute([

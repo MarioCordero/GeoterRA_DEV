@@ -4,8 +4,49 @@ declare(strict_types=1);
 namespace DTO;
 use Http\ErrorType;
 use Http\ApiException;
+use OpenApi\Annotations as OA;
 
-
+/**
+ * @OA\Schema(
+ *   schema="RegisterUserDTO",
+ *   type="object",
+ *   description="Datos de registro de nuevo usuario",
+ *   required={"name", "lastname", "email", "password"},
+ *   @OA\Property(
+ *     property="name",
+ *     type="string",
+ *     description="Nombre del usuario",
+ *     example="Juan"
+ *   ),
+ *   @OA\Property(
+ *     property="lastname",
+ *     type="string",
+ *     description="Apellido del usuario",
+ *     example="Pérez"
+ *   ),
+ *   @OA\Property(
+ *     property="email",
+ *     type="string",
+ *     format="email",
+ *     description="Correo electrónico único",
+ *     example="juan@example.com"
+ *   ),
+ *   @OA\Property(
+ *     property="phone_number",
+ *     type="string",
+ *     nullable=true,
+ *     description="Número telefónico (8-15 dígitos)",
+ *     example="87654321"
+ *   ),
+ *   @OA\Property(
+ *     property="password",
+ *     type="string",
+ *     format="password",
+ *     description="Contraseña (mínimo 8 caracteres)",
+ *     example="SecurePass123"
+ *   )
+ * )
+ */
 final class RegisterUserDTO
 {
   public function __construct(
