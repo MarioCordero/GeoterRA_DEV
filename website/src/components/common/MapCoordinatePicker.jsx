@@ -1,7 +1,7 @@
 import 'leaflet/dist/leaflet.css';
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal, Button, Input, message, Spin } from 'antd';
-import { EnvironmentOutlined, LoadingOutlined } from '@ant-design/icons';
+import { Button, Input, message } from 'antd';
+import { EnvironmentOutlined, LoadingOutlined, FullscreenOutlined } from '@ant-design/icons';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 
 const defaultPosition = [9.93333, -84.08333];
@@ -44,32 +44,36 @@ function MapResizeHandler() {
 }
 
 /**
- * Reusable fullscreen map component for coordinate selection
+ * Reusable embedded map component for coordinate selection
+ * Can be used inline within forms or as a standalone component
  * 
  * @component
  * @param {Object} props
- * @param {boolean} props.visible - Whether modal is visible
  * @param {Object} props.latLng - Current coordinates { lat, lng }
- * @param {Function} props.onConfirm - Callback on confirm: (latLng) => void
- * @param {Function} props.onCancel - Callback on cancel: () => void
- * @param {string} [props.title='Seleccionar ubicación en el mapa'] - Modal title
+ * @param {Function} props.onCoordinatesChange - Callback when coordinates change: (latLng) => void
+ * @param {string} [props.title='Coordenadas GPS'] - Title label
+ * @param {Function} [props.onFullscreen] - Optional callback for fullscreen button
+ * @param {string} [props.mapHeight='300px'] - Height of the map (default: 300px)
+ * @param {boolean} [props.showApplyButton=false] - Show apply button for manual coordinates
+ * @param {boolean} [props.showClearButton=true] - Show clear button
  * 
  * @example
  * <MapCoordinatePicker
- *   visible={mapOpen}
- *   latLng={selectedCoords}
- *   onConfirm={(coords) => setCoordinates(coords)}
- *   onCancel={() => setMapOpen(false)}
+ *   latLng={coordinates}
+ *   onCoordinatesChange={(coords) => setCoordinates(coords)}
+ *   onFullscreen={() => openFullscreenMap()}
  * />
  */
 const MapCoordinatePicker = ({
-  visible,
   latLng = {},
-  onConfirm,
-  onCancel,
-  title = 'Seleccionar ubicación en el mapa',
+  onCoordinatesChange,
+  title = 'Coordenadas GPS',
+  onFullscreen,
+  mapHeight = '300px',
+  showApplyButton = false,
+  showClearButton = true,
 }) => {
-  const [localLatLng, setLocalLatLng] = useState(latLng);
+  const [localLatLng, setLocalLatLng] = useState(latLng || {});
   const [manualLat, setManualLat] = useState('');
   const [manualLng, setManualLng] = useState('');
   const [gettingLocation, setGettingLocation] = useState(false);
@@ -78,12 +82,12 @@ const MapCoordinatePicker = ({
 
   // Sync external latLng to local state
   useEffect(() => {
-    if (visible && latLng && latLng.lat && latLng.lng) {
+    if (latLng && latLng.lat && latLng.lng) {
       setLocalLatLng(latLng);
       setManualLat(latLng.lat.toFixed(6));
       setManualLng(latLng.lng.toFixed(6));
     }
-  }, [visible, latLng]);
+  }, [latLng]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -94,22 +98,70 @@ const MapCoordinatePicker = ({
   }, []);
 
   /**
-   * Apply manual coordinates to map
+   * Validate coordinates
    */
-  const handleManualCoordinateChange = () => {
+  const isValidCoordinate = (lat, lng) => {
+    return !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+  };
+
+  /**
+   * Update coordinates and notify parent
+   */
+  const updateCoordinates = (newLatLng) => {
+    setLocalLatLng(newLatLng);
+    if (onCoordinatesChange) {
+      onCoordinatesChange(newLatLng);
+    }
+  };
+
+  /**
+   * Handle manual coordinate input (real-time)
+   */
+  const handleManualCoordinateChange = (newLat, newLng) => {
+    setManualLat(newLat);
+    setManualLng(newLng);
+
+    // Auto-update map if both coordinates are valid (when not using apply button)
+    if (!showApplyButton && newLat && newLng) {
+      const lat = parseFloat(newLat);
+      const lng = parseFloat(newLng);
+
+      if (isValidCoordinate(lat, lng)) {
+        updateCoordinates({ lat, lng });
+      }
+    }
+  };
+
+  /**
+   * Apply manual coordinates (button click for non-real-time mode)
+   */
+  const handleApplyCoordinates = () => {
     const lat = parseFloat(manualLat);
     const lng = parseFloat(manualLng);
 
     if (!isNaN(lat) && !isNaN(lng)) {
-      if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
-        setLocalLatLng({ lat, lng });
-        message.success('Coordenadas establecidas correctamente');
+      if (isValidCoordinate(lat, lng)) {
+        updateCoordinates({ lat, lng });
+        message.success('Coordenadas aplicadas correctamente');
       } else {
         message.error('Coordenadas inválidas. Lat: -90 a 90, Lng: -180 a 180');
       }
     } else {
       message.error('Por favor ingresa valores numéricos válidos');
     }
+  };
+
+  /**
+   * Clear coordinates
+   */
+  const handleClear = () => {
+    setLocalLatLng({});
+    setManualLat('');
+    setManualLng('');
+    if (onCoordinatesChange) {
+      onCoordinatesChange({});
+    }
+    message.info('Marcador eliminado');
   };
 
   /**
@@ -153,10 +205,9 @@ const MapCoordinatePicker = ({
 
           const { latitude, longitude } = position.coords;
           const newLatLng = { lat: latitude, lng: longitude };
-          setLocalLatLng(newLatLng);
           setManualLat(latitude.toFixed(6));
           setManualLng(longitude.toFixed(6));
-
+          updateCoordinates(newLatLng);
           message.success('Ubicación actual obtenida correctamente');
           setGettingLocation(false);
           locationRequestRef.current = null;
@@ -208,7 +259,11 @@ const MapCoordinatePicker = ({
    */
   const handleConfirm = () => {
     if (!localLatLng.lat || !localLatLng.lng) {
-      message.error('Por favor selecciona una ubicación');
+      message.error('Por favor selecciona una ubicación en el mapa o ingresa coordenadas válidas');
+      return;
+    }
+    if (!isValidCoordinate(localLatLng.lat, localLatLng.lng)) {
+      message.error('Las coordenadas ingresadas son inválidas. Verifica que Lat esté entre -90 y 90, y Lng entre -180 y 180.');
       return;
     }
     onConfirm(localLatLng);
@@ -225,51 +280,116 @@ const MapCoordinatePicker = ({
   };
 
   return (
-    <Modal
-      title={
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span>{title}</span>
-          <div>
-            {localLatLng.lat && localLatLng.lng && (
-              <span style={{ fontSize: '12px', color: '#666', marginRight: '16px' }}>
-                Lat: {localLatLng.lat.toFixed(6)}, Lng: {localLatLng.lng.toFixed(6)}
-              </span>
-            )}
-          </div>
+    <div style={{ width: '100%' }}>
+      {/* Coordinate Input Section */}
+      <div
+        style={{
+          marginBottom: 12,
+          padding: 12,
+          backgroundColor: '#fafafa',
+          border: '1px solid #d9d9d9',
+          borderRadius: 6,
+        }}
+      >
+        <div style={{ marginBottom: 8, fontWeight: 500, fontSize: '14px', display: 'flex', alignItems: 'center', gap: 8 }}>
+          📍 {title}
         </div>
-      }
-      open={visible}
-      onCancel={handleCancelClick}
-      width="95vw"
-      centered
-      footer={null}
-      styles={{
-        body: {
-          height: '80vh',
-          padding: 0,
-          overflow: 'hidden',
-          position: 'relative',
-        },
-      }}
-    >
-      <div style={{ height: '100%', width: '100%', position: 'relative', display: 'flex', flexDirection: 'column' }}>
-        {/* Map Container - Takes remaining space */}
-        <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <label style={{ minWidth: 60, fontSize: '12px', color: '#666' }}>Latitud:</label>
+            <Input
+              placeholder="9.933333"
+              value={manualLat}
+              onChange={(e) => handleManualCoordinateChange(e.target.value, manualLng)}
+              style={{ width: 120 }}
+              size="small"
+            />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <label style={{ minWidth: 65, fontSize: '12px', color: '#666' }}>Longitud:</label>
+            <Input
+              placeholder="-84.083333"
+              value={manualLng}
+              onChange={(e) => handleManualCoordinateChange(manualLat, e.target.value)}
+              style={{ width: 120 }}
+              size="small"
+            />
+          </div>
+          {showApplyButton && (
+            <Button
+              type="primary"
+              size="small"
+              onClick={handleApplyCoordinates}
+              disabled={!manualLat || !manualLng}
+              style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+            >
+              Aplicar
+            </Button>
+          )}
+          {showClearButton && (
+            <Button
+              type="default"
+              size="small"
+              onClick={handleClear}
+              disabled={!localLatLng.lat && !localLatLng.lng}
+              danger
+            >
+              Limpiar
+            </Button>
+          )}
+        </div>
+        {localLatLng.lat && localLatLng.lng && (
+          <div
+            style={{
+              marginTop: 8,
+              fontSize: '11px',
+              color: '#52c41a',
+              fontWeight: 500,
+            }}
+          >
+            ✅ Coordenadas actuales: {localLatLng.lat.toFixed(6)}, {localLatLng.lng.toFixed(6)}
+          </div>
+        )}
+      </div>
+
+      {/* Map Section */}
+      <div style={{ position: 'relative', marginBottom: 12 }}>
+        <div
+          style={{
+            height: mapHeight,
+            marginBottom: 8,
+            border: '1px solid #d9d9d9',
+            borderRadius: '6px',
+            overflow: 'hidden',
+          }}
+        >
           <MapContainer
             center={localLatLng.lat ? [localLatLng.lat, localLatLng.lng] : defaultPosition}
             zoom={localLatLng.lat ? 15 : 8}
             style={{ height: '100%', width: '100%' }}
-            key={`picker-map-${visible}`}
+            key={`map-${localLatLng.lat}`}
           >
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
-            <LocationMarker setLatLng={setLocalLatLng} latLng={localLatLng} />
+            <LocationMarker setLatLng={(coords) => updateCoordinates(coords)} latLng={localLatLng} />
             <MapResizeHandler />
           </MapContainer>
+        </div>
 
-          {/* Current Location Button in Top Right */}
+        {/* Map Control Buttons */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 10,
+            right: 10,
+            zIndex: 1000,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+          }}
+        >
           <Button
             type="primary"
             icon={gettingLocation ? <LoadingOutlined /> : <EnvironmentOutlined />}
@@ -281,119 +401,40 @@ const MapCoordinatePicker = ({
             loading={gettingLocation}
             disabled={gettingLocation}
             style={{
-              position: 'absolute',
-              top: 10,
-              right: 10,
-              zIndex: 1000,
               backgroundColor: gettingLocation ? '#ffc107' : '#34d399',
               borderColor: gettingLocation ? '#ffc107' : '#34d399',
             }}
             size="small"
-          >
-            {gettingLocation ? 'Obteniendo...' : 'Mi ubicación'}
-          </Button>
-        </div>
+            title={gettingLocation ? 'Obteniendo ubicación...' : 'Obtener ubicación actual'}
+          />
 
-        {/* Bottom Control Panel - Fixed at bottom */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            backgroundColor: 'white',
-            borderTop: '1px solid #d9d9d9',
-            padding: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '12px',
-            boxShadow: '0 -2px 8px rgba(0,0,0,0.1)',
-            zIndex: 999,
-          }}
-        >
-          {/* Coordinate Input Section */}
-          <div
-            style={{
-              display: 'flex',
-              gap: 12,
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <label style={{ fontSize: '12px', color: '#666', minWidth: 50 }}>Latitud:</label>
-              <Input
-                placeholder="Lat"
-                value={manualLat}
-                onChange={(e) => setManualLat(e.target.value)}
-                style={{ width: 100 }}
-                size="small"
-              />
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <label style={{ fontSize: '12px', color: '#666', minWidth: 60 }}>Longitud:</label>
-              <Input
-                placeholder="Lng"
-                value={manualLng}
-                onChange={(e) => setManualLng(e.target.value)}
-                style={{ width: 100 }}
-                size="small"
-              />
-            </div>
+          {onFullscreen && (
             <Button
               type="primary"
-              size="small"
-              onClick={handleManualCoordinateChange}
-              disabled={!manualLat || !manualLng}
-              style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
-            >
-              Aplicar Coordenadas
-            </Button>
-          </div>
-
-          {/* Current Coordinates Display */}
-          {localLatLng.lat && localLatLng.lng && (
-            <div
+              icon={<FullscreenOutlined />}
+              onClick={onFullscreen}
               style={{
-                textAlign: 'center',
-                fontSize: '12px',
-                color: '#52c41a',
-                fontWeight: 500,
-                padding: '8px',
-                backgroundColor: '#f6ffed',
-                borderRadius: 4,
-                border: '1px solid #b7eb8f',
+                backgroundColor: '#1890ff',
+                borderColor: '#1890ff',
               }}
-            >
-              📍 Ubicación seleccionada: {localLatLng.lat.toFixed(6)}, {localLatLng.lng.toFixed(6)}
-            </div>
+              size="small"
+              title="Pantalla completa"
+            />
           )}
-
-          {/* Action Buttons */}
-          <div
-            style={{
-              display: 'flex',
-              gap: 12,
-              justifyContent: 'center',
-            }}
-          >
-            <Button onClick={handleCancelClick} size="large" style={{ minWidth: 120 }}>
-              Cerrar
-            </Button>
-            <Button
-              type="primary"
-              onClick={handleConfirm}
-              disabled={!localLatLng.lat || !localLatLng.lng}
-              size="large"
-              style={{ minWidth: 150 }}
-            >
-              Confirmar ubicación
-            </Button>
-          </div>
         </div>
       </div>
-    </Modal>
+
+      {/* Instructions */}
+      <div
+        style={{
+          fontSize: '12px',
+          color: '#666',
+          fontStyle: 'italic',
+        }}
+      >
+        💡 Haz clic en el mapa para seleccionar una ubicación, usa tu ubicación actual, o ingresa las coordenadas manualmente.
+      </div>
+    </div>
   );
 };
 

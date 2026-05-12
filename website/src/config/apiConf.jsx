@@ -37,12 +37,18 @@ const API_CONFIG = {
     },
     registeredManifestations: {
       index: '/registered-manifestations?region=all',
+      indexByRegion: (regionId) => `/registered-manifestations?region=${regionId}`,
+      show: (id) => `/registered-manifestations/${id}`,
       store: '/registered-manifestations',
       update: (id) => `/registered-manifestations/${id}`,
       delete: (id) => `/registered-manifestations/${id}`,
     },
     Regions: {
       index: '/regions',
+      show: (id) => `/regions/${id}`,
+      store: '/regions',
+      update: (id) => `/regions/${id}`,
+      delete: (id) => `/regions/${id}`,
     },
     maintenance: {
       systemLogs: '/maintenance/system/logs',
@@ -106,9 +112,21 @@ export const analysisRequest = {
 // ============================================
 export const registeredManifestations = {
   index: () => buildApiUrl(API_CONFIG.endpoints.registeredManifestations.index),
+  indexByRegion: (regionId) => buildApiUrl(API_CONFIG.endpoints.registeredManifestations.indexByRegion(regionId)),
   store: () => buildApiUrl(API_CONFIG.endpoints.registeredManifestations.store),
   update: (id) => buildApiUrl(API_CONFIG.endpoints.registeredManifestations.update(id)),
   delete: (id) => buildApiUrl(API_CONFIG.endpoints.registeredManifestations.delete(id)),
+};
+
+// ============================================
+// REGIONS ENDPOINTS
+// ============================================
+export const regions = {
+  index: () => buildApiUrl(API_CONFIG.endpoints.Regions.index),
+  show: (id) => buildApiUrl(API_CONFIG.endpoints.Regions.show(id)),
+  store: () => buildApiUrl(API_CONFIG.endpoints.Regions.store),
+  update: (id) => buildApiUrl(API_CONFIG.endpoints.Regions.update(id)),
+  delete: (id) => buildApiUrl(API_CONFIG.endpoints.Regions.delete(id)),
 };
 
 // ============================================
@@ -289,6 +307,14 @@ export const registeredManifestationsIndex = async () => {
   return callApi(registeredManifestations.index(), 'GET');
 };
 
+export const registeredManifestationsIndexByRegion = async (regionId) => {
+  return callApi(registeredManifestations.indexByRegion(regionId), 'GET');
+};
+
+export const registeredManifestationsShow = async (id) => {
+  return callApi(registeredManifestations.show(id), 'GET');
+};
+
 export const registeredManifestationsStore = async (payload) => {
   return callApi(registeredManifestations.store(), 'POST', payload);
 };
@@ -299,6 +325,29 @@ export const registeredManifestationsUpdate = async (id, payload) => {
 
 export const registeredManifestationsDelete = async (id) => {
   return callApi(registeredManifestations.delete(id), 'DELETE');
+};
+
+// ============================================
+// REGIONS API FUNCTIONS
+// ============================================
+export const regionsIndex = async () => {
+  return callApi(regions.index(), 'GET');
+};
+
+export const regionsShow = async (id) => {
+  return callApi(regions.show(id), 'GET');
+};
+
+export const regionsStore = async (payload) => {
+  return callApi(regions.store(), 'POST', payload);
+};
+
+export const regionsUpdate = async (id, payload) => {
+  return callApi(regions.update(id), 'PUT', payload);
+};
+
+export const regionsDelete = async (id) => {
+  return callApi(regions.delete(id), 'DELETE');
 };
 
 // ============================================

@@ -3,9 +3,10 @@ import '../../../../fontsModule.css';
 import React, { useState, useEffect, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { useSession } from '../../../../hooks/useSession';
-import { analysisRequestAdminIndex, analysisRequestAdminUpdate, analysisRequestAdminDelete, analysisRequestAdminShow, registeredManifestationsStore } from '../../../../config/apiConf';
+import { analysisRequestAdminIndex, analysisRequestAdminUpdate, analysisRequestAdminDelete, analysisRequestAdminShow, registeredManifestationsStore, regionsIndex } from '../../../../config/apiConf';
+import MapCoordinatePicker from '../../../common/MapCoordinatePicker';
 import NotImplementedModal from '../../../common/NotImplementedModal';
-import { Spin, Tag, Button, Modal, Form, Input, InputNumber, message } from 'antd';
+import { Spin, Tag, Button, Modal, Form, Input, InputNumber, message, Select } from 'antd';
 import { EyeOutlined, DeleteOutlined, CheckOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 
@@ -57,6 +58,11 @@ const RequestsManager = () => {
   const [isNotImplementedOpen, setIsNotImplementedOpen] = useState(false);
   const [confirmedCoordinates, setConfirmedCoordinates] = useState(null);
   const [fetchingDetails, setFetchingDetails] = useState(false);
+  const [addManualPointModalVisible, setAddManualPointModalVisible] = useState(false);
+  const [addPointForm] = Form.useForm();
+  const [selectedCoordinates, setSelectedCoordinates] = useState(null);
+  const [regions, setRegions] = useState([]);
+  const [submittingManualPoint, setSubmittingManualPoint] = useState(false);
   const { user } = useSession();
 
   // Check if screen is mobile size
@@ -200,6 +206,22 @@ const RequestsManager = () => {
     loadAllRequests();
   }, [user]);
 
+  // Load regions for manual point form
+  useEffect(() => {
+    const loadRegions = async () => {
+      try {
+        const result = await regionsIndex();
+        if (result.ok && Array.isArray(result.data)) {
+          setRegions(result.data);
+        }
+      } catch (error) {
+        console.error('❌ Error loading regions:', error);
+      }
+    };
+    
+    loadRegions();
+  }, []);
+
   // Refresh requests
   const refreshRequests = async () => {
     try {
@@ -211,6 +233,68 @@ const RequestsManager = () => {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle manual point modal close
+  const handleAddManualPointModalClose = () => {
+    setAddManualPointModalVisible(false);
+    setSelectedCoordinates(null);
+    addPointForm.resetFields();
+  };
+
+  // Handle manual point form submission
+  const handleSubmitManualPoint = async (values) => {
+    try {
+      if (!selectedCoordinates) {
+        message.error('Por favor selecciona las coordenadas primero');
+        return;
+      }
+
+      setSubmittingManualPoint(true);
+
+      // Build the payload
+      const payload = {
+        name: values.name,
+        region_id: values.region_id || regions[0]?.id,
+        latitude: selectedCoordinates.lat,
+        longitude: selectedCoordinates.lng,
+        description: values.description || null,
+        temperature: values.temperature ? parseFloat(values.temperature) : null,
+        field_pH: values.field_pH ? parseFloat(values.field_pH) : null,
+        field_conductivity: values.field_conductivity ? parseFloat(values.field_conductivity) : null,
+        lab_pH: values.lab_pH ? parseFloat(values.lab_pH) : null,
+        lab_conductivity: values.lab_conductivity ? parseFloat(values.lab_conductivity) : null,
+        cl: values.cl ? parseFloat(values.cl) : null,
+        ca: values.ca ? parseFloat(values.ca) : null,
+        hco3: values.hco3 ? parseFloat(values.hco3) : null,
+        so4: values.so4 ? parseFloat(values.so4) : null,
+        fe: values.fe ? parseFloat(values.fe) : null,
+        si: values.si ? parseFloat(values.si) : null,
+        b: values.b ? parseFloat(values.b) : null,
+        li: values.li ? parseFloat(values.li) : null,
+        f: values.f ? parseFloat(values.f) : null,
+        na: values.na ? parseFloat(values.na) : null,
+        k: values.k ? parseFloat(values.k) : null,
+        mg: values.mg ? parseFloat(values.mg) : null,
+      };
+
+      const result = await registeredManifestationsStore(payload);
+
+      if (!result.ok) {
+        throw new Error(result.error || 'Error creando punto manual');
+      }
+
+      message.success('Punto agregado exitosamente');
+      handleAddManualPointModalClose();
+      
+      // Refresh requests to show new point
+      await refreshRequests();
+    } catch (error) {
+      console.error('❌ Error submitting manual point:', error);
+      message.error(error.message || 'Error al agregar punto');
+    } finally {
+      setSubmittingManualPoint(false);
     }
   };
 
@@ -449,7 +533,14 @@ const RequestsManager = () => {
             onClick={refreshRequests}
             className="w-full md:w-auto"
           >
-            🔄 Actualizar
+            Actualizar
+          </Button>
+          <Button 
+            type="primary"
+            onClick={() => setAddManualPointModalVisible(true)}
+            className="w-full md:w-auto"
+          >
+            Agregar Punto Manualmente
           </Button>
         </div>
         
@@ -846,6 +937,203 @@ const RequestsManager = () => {
           </div>
         </Form>
         )}
+      </Modal>
+
+      {/* Manual Point Form Modal with Embedded Map */}
+      <Modal
+        title="Agregar Punto Manualmente"
+        open={addManualPointModalVisible}
+        onOk={() => addPointForm.submit()}
+        onCancel={handleAddManualPointModalClose}
+        okText="Guardar"
+        cancelText="Cancelar"
+        confirmLoading={submittingManualPoint}
+        width={800}
+        style={{ maxHeight: '90vh' }}
+        centered
+        styles={{
+          body: {
+            maxHeight: 'calc(100vh - 200px)',
+            overflowY: 'auto'
+          }
+        }}
+      >
+        <Form
+          form={addPointForm}
+          layout="vertical"
+          onFinish={handleSubmitManualPoint}
+        >
+          {/* Map Coordinate Picker - Embedded */}
+          <Form.Item label="">
+            <MapCoordinatePicker
+              latLng={selectedCoordinates}
+              onCoordinatesChange={(coords) => {
+                setSelectedCoordinates(coords);
+                addPointForm.setFieldsValue({
+                  latitude: coords.lat,
+                  longitude: coords.lng,
+                });
+              }}
+              title="Coordenadas GPS"
+              mapHeight="350px"
+              showApplyButton={false}
+              showClearButton={true}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="latitude"
+            hidden
+          >
+            <InputNumber />
+          </Form.Item>
+
+          <Form.Item
+            name="longitude"
+            hidden
+          >
+            <InputNumber />
+          </Form.Item>
+
+          <hr className="my-4" />
+          <h3 className="font-semibold text-base mb-4">ℹ️ Información del Punto</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Form.Item
+              name="name"
+              label="Nombre del Punto"
+              rules={[{ required: true, message: 'El nombre es requerido' }]}
+            >
+              <Input placeholder="Ej: SOLI-1EVB8" />
+            </Form.Item>
+
+            <Form.Item
+              name="region_id"
+              label="Región"
+              rules={[{ required: true, message: 'Selecciona una región' }]}
+            >
+              <Select placeholder="Selecciona una región">
+                {regions.map(region => (
+                  <Select.Option key={region.id} value={region.id}>
+                    {region.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </div>
+
+          <Form.Item
+            name="description"
+            label="Descripción"
+          >
+            <Input.TextArea rows={2} placeholder="Descripción del punto" />
+          </Form.Item>
+
+          <hr className="my-4" />
+          <h3 className="font-semibold text-base mb-4">🌡️ Mediciones de Campo (Opcional)</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Form.Item
+              name="temperature"
+              label="Temperatura (°C)"
+              rules={[
+                { 
+                  pattern: /^-?\d+(\.\d{1,2})?$/, 
+                  message: 'Ingresa una temperatura válida'
+                }
+              ]}
+            >
+              <InputNumber style={{ width: '100%' }} placeholder="25.5" step={0.1} />
+            </Form.Item>
+
+            <Form.Item
+              name="field_pH"
+              label="pH Campo"
+              rules={[
+                {
+                  pattern: /^\d+(\.\d{1,2})?$/,
+                  message: 'pH debe estar entre 0 y 14'
+                }
+              ]}
+            >
+              <InputNumber style={{ width: '100%' }} placeholder="7.0" step={0.01} min={0} max={14} />
+            </Form.Item>
+
+            <Form.Item
+              name="field_conductivity"
+              label="Conductividad Campo (μS/cm)"
+            >
+              <InputNumber style={{ width: '100%' }} placeholder="500" step={0.01} />
+            </Form.Item>
+          </div>
+
+          <hr className="my-4" />
+          <h3 className="font-semibold text-base mb-4">🧪 Mediciones de Laboratorio (Opcional)</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Form.Item
+              name="lab_pH"
+              label="pH Laboratorio"
+              rules={[
+                {
+                  pattern: /^\d+(\.\d{1,2})?$/,
+                  message: 'pH debe estar entre 0 y 14'
+                }
+              ]}
+            >
+              <InputNumber style={{ width: '100%' }} placeholder="7.0" step={0.01} min={0} max={14} />
+            </Form.Item>
+
+            <Form.Item
+              name="lab_conductivity"
+              label="Conductividad Lab (μS/cm)"
+            >
+              <InputNumber style={{ width: '100%' }} placeholder="500" step={0.01} />
+            </Form.Item>
+          </div>
+
+          <hr className="my-4" />
+          <h3 className="font-semibold text-base mb-4">⚗️ Elementos Químicos (Opcional)</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Form.Item name="cl" label="Cl">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="10" />
+            </Form.Item>
+            <Form.Item name="ca" label="Ca">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="20" />
+            </Form.Item>
+            <Form.Item name="hco3" label="HCO3">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="30" />
+            </Form.Item>
+            <Form.Item name="so4" label="SO4">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="40" />
+            </Form.Item>
+            <Form.Item name="fe" label="Fe">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="0.5" />
+            </Form.Item>
+            <Form.Item name="si" label="Si">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="50" />
+            </Form.Item>
+            <Form.Item name="b" label="B">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="1.0" />
+            </Form.Item>
+            <Form.Item name="li" label="Li">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="1" />
+            </Form.Item>
+            <Form.Item name="f" label="F">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="0.5" />
+            </Form.Item>
+            <Form.Item name="na" label="Na">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="60" />
+            </Form.Item>
+            <Form.Item name="k" label="K">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="70" />
+            </Form.Item>
+            <Form.Item name="mg" label="Mg">
+              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="80" />
+            </Form.Item>
+          </div>
+        </Form>
       </Modal>
 
       <NotImplementedModal 
