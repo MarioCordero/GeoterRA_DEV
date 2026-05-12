@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { Card, Row, Col, Tag } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import { useSession } from '../../../../hooks/useSession';
-import { users } from '../../../../config/apiConf';
-import "../../../../colorModule.css";
-import '../../../../fontsModule.css';
 
 /**
  * UserWelcome Component
@@ -49,16 +47,94 @@ const UserWelcome = () => {
   }
 
   return (
-    <div className="w-full max-w-3xl min-h-96 flex flex-col items-center justify-center text-2xl text-gray-900 bg-gray-100 rounded-lg m-8 p-8">
-      <div className="mb-6 text-4xl font-bold text-center break-words">
-        ¡Bienvenido, {user?.name || 'Usuario'}!
+    <div className="w-full min-h-screen p-4 md:p-6">
+      {/* Welcome Header */}
+      <div className="bg-gradient-to-r from-amber-400 to-amber-500 text-white rounded-lg p-8 mb-6">
+        <h1 className="text-4xl font-bold mb-2">
+          ¡Bienvenido, {user?.name || 'Usuario'}!
+        </h1>
+        <p className="text-amber-100">Portal de Investigador de Campo - GeoterRA</p>
       </div>
-      <div className="flex flex-col items-center text-center gap-2">
-        <span className="font-bold">Puntos solicitados:</span>
-        <span className="text-amber-500 text-2xl md:text-3xl font-semibold">
-          {user?.requestedPoints ?? 0}
-        </span>
-      </div>
+
+      {/* User Info Cards */}
+      <Row gutter={16} className="mb-8">
+        <Col xs={24} sm={12} md={6}>
+          <Card>
+            <p className="text-gray-600 text-sm">Rol</p>
+            <Tag color="orange">👤 Investigador de Campo</Tag>
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card>
+            <p className="text-gray-600 text-sm">Email</p>
+            <p className="font-semibold text-sm">{sessionUser?.email}</p>
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card>
+            <p className="text-gray-600 text-sm">Estado</p>
+            <Tag color={sessionUser?.is_active ? 'green' : 'red'}>
+              {sessionUser?.is_active ? '✅ Activo' : '❌ Inactivo'}
+            </Tag>
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card>
+            <p className="text-gray-600 text-sm">Puntos Solicitados</p>
+            <p className="text-xl font-bold text-amber-500">{user?.requestedPoints ?? 0}</p>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Role Description */}
+      <Card className="mb-8 bg-blue-50 border-l-4 border-blue-500">
+        <h3 className="text-xl font-bold mb-3">📋 Descripción del Rol: Investigador de Campo</h3>
+        <p className="text-gray-700 mb-4">
+          Como Investigador de Campo, eres responsable de recopilar datos sobre manifestaciones geotermales. 
+          Tu rol te permite crear solicitudes de análisis, monitorear su estado en el proceso de revisión y 
+          contribuir datos fundamentales para la investigación científica del potencial geotérmico.
+        </p>
+        <h4 className="font-semibold text-gray-800 mb-2">🎯 Responsabilidades Principales:</h4>
+        <ul style={{ margin: '0', paddingLeft: '20px', color: '#333' }}>
+          <li>Crear solicitudes de análisis para manifestaciones geotermales</li>
+          <li>Proporcionar información precisa sobre temperatura, actividad de burbujeo y ubicación GPS</li>
+          <li>Monitorear el estado de tus solicitudes en el proceso de revisión</li>
+          <li>Editar o eliminar solicitudes pendientes de revisión</li>
+          <li>Acceder a información detallada sobre cada solicitud enviada</li>
+          <li>Exportar solicitudes en formato PDF cuando sea necesario</li>
+        </ul>
+      </Card>
+
+      {/* Capabilities */}
+      <Card className="mb-8 bg-amber-50 border-l-4 border-amber-500">
+        <h3 className="text-lg font-bold mb-4">🎯 ¿Qué puedes hacer aquí?</h3>
+        <Row gutter={16}>
+          <Col xs={24} sm={12} md={6}>
+            <div className="p-4 bg-white rounded border border-gray-200">
+              <h4 className="font-semibold text-blue-600 mb-2">✅ Nueva Solicitud</h4>
+              <p className="text-sm text-gray-600">Crea una nueva solicitud de análisis geotérmico indicando ubicación GPS, temperatura y características del sitio.</p>
+            </div>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <div className="p-4 bg-white rounded border border-gray-200">
+              <h4 className="font-semibold text-blue-600 mb-2">📊 Ver Estado</h4>
+              <p className="text-sm text-gray-600">Consulta el estado actual de todas tus solicitudes, desde registro inicial hasta aprobación final.</p>
+            </div>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <div className="p-4 bg-white rounded border border-gray-200">
+              <h4 className="font-semibold text-blue-600 mb-2">✏️ Editar o Eliminar</h4>
+              <p className="text-sm text-gray-600">Modifica o elimina tus solicitudes mientras estén en estado pendiente de revisión.</p>
+            </div>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <div className="p-4 bg-white rounded border border-gray-200">
+              <h4 className="font-semibold text-blue-600 mb-2">📥 Exportar PDF</h4>
+              <p className="text-sm text-gray-600">Descarga tus solicitudes en formato PDF con toda la información registrada.</p>
+            </div>
+          </Col>
+        </Row>
+      </Card>
     </div>
   );
 };

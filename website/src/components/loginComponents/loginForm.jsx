@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authLogin } from '../../config/apiConf';
 import { useSession } from "../../hooks/useSession";
+import NotImplementedModal from "../common/NotImplementedModal";
 import loginImage from "../../assets/images/login-background.png";
 
 function Login() {
@@ -19,6 +20,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showNotImplementedModal, setShowNotImplementedModal] = useState(false);
 
   // Handle form submit
   const handleSubmit = async (e) => {
@@ -141,9 +143,13 @@ function Login() {
 
               {/* RECOVERY PASSWORD AND REMEMBER */}
               <div className="flex flex-col sm:flex-row sm:justify-between gap-3 sm:gap-0 text-xs sm:text-sm text-gray-600">
-                <a href="#" className="text-blue-600 hover:underline poppins order-2 sm:order-1">
+                <button
+                  type="button"
+                  onClick={() => setShowNotImplementedModal(true)}
+                  className="text-blue-600 hover:underline poppins order-2 sm:order-1 bg-transparent border-none p-0 m-0 cursor-pointer"
+                >
                   Recuperar contraseña
-                </a>
+                </button>
                 <div className="flex items-center order-1 sm:order-2">
                   <input
                     id="remember"
@@ -187,6 +193,12 @@ function Login() {
           </div>
         </div>
       </div>
+
+      {/* Not Implemented Modal */}
+      <NotImplementedModal 
+        isOpen={showNotImplementedModal} 
+        onClose={() => setShowNotImplementedModal(false)} 
+      />
     </div>
   );
 }
