@@ -23,9 +23,9 @@ use Repositories\UserRepository;
 use Services\UserService;
 use Controllers\UserController;
 use Controllers\AuthController;
-use Controllers\AnalysisRequestController;
-use Repositories\AnalysisRequestRepository;
-use Services\AnalysisRequestService;
+use Controllers\InvestigationRequestController;
+use Repositories\InvestigationRequestRepository;
+use Services\InvestigationRequestService;
 use Services\AuthService;
 use Repositories\AuthRepository;
 use Services\RegisteredManifestationService;
@@ -132,7 +132,7 @@ $authRepository = new AuthRepository($db);
  *    - Routing (¿qué ruta? ¿qué método?)
  *    - Controller instantiation (new)
  *    - Service instantiation (new)
- *    - Repository instantiation (new AnalysisRequestRepository)
+ *    - Repository instantiation (new InvestigationRequestRepository)
  * 
  * 3. DIFICULTAD PARA TESTEAR:
  *    - No se puede testear routing sin hacer peticiones HTTP reales
@@ -226,10 +226,10 @@ if ($path === '/users/me') {
  */
 if ($path === '/analysis-request') {
     // Nuevas dependencias específicas
-    $repository = new AnalysisRequestRepository($db);
-    $service = new AnalysisRequestService($repository, $db);
+    $repository = new InvestigationRequestRepository($db);
+    $service = new InvestigationRequestService($repository, $db);
     $authService = new AuthService($authRepository, $userRepository);
-    $controller = new AnalysisRequestController($service, $authService);
+    $controller = new InvestigationRequestController($service, $authService);
 
     if ($method === 'POST') {
         $controller->store();

@@ -1,53 +1,66 @@
 <?php
 declare(strict_types=1);
 
-// 1. CORS (must be first)
-require __DIR__ . '/../config/cors.php';
-
-// 2. Autoloader (MUST be before using any classes)
-spl_autoload_register(function (string $class): void {
-    $baseDir = __DIR__ . '/../src/';
-    $file = $baseDir . str_replace('\\', '/', $class) . '.php';
-    if (file_exists($file)) {
-        require_once $file;
-    }
-});
-
-// 3. Configuración inicial (after autoloader)
-require __DIR__ . '/../config/init.php';
-
-use Http\RequestParser;
 use Http\Response;
+use Http\Request;
 use Http\ErrorType;
-use Core\ErrorHandler;
+use Core\GlobalErrorHandler;
 use Router\SimpleRouter;
 
-// 4. Manejo de errores
-ErrorHandler::register();
+$basePath = realpath(__DIR__ . '/../');
+$srcPath = $basePath . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR;
+$configPath = $basePath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
 
-// 5. Bootstrap
-$db = require __DIR__ . '/../config/database.php';
+require __DIR__ . '/../vendor/autoload.php';
 
-// 6. Validar sesión
-require __DIR__ . '/../config/session.php';
-validateSessionToken($db);
+$safeRequire = function (string $path) {
+  if (file_exists($path)) {
+    return require $path;
+  }
+  return null;
+};
 
-if (!Http\Request::isValidClient()) {
-    Http\Response::error(Http\ErrorType::unauthorized('Invalid API Key'), 403);
+// CORS Rules
+$safeRequire($configPath . 'cors.php');
+
+// Initial configurations
+$safeRequire($configPath . 'init.php');
+
+//// Autoloader
+//spl_autoload_register(function (string $class) use ($srcPath): void {
+//$file = realpath($srcPath . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php');
+//  if ($file && file_exists($file)) {
+//    require_once $file;
+//  }
+//});
+
+// Error handling
+GlobalErrorHandler::register();
+
+$db = $safeRequire($configPath . 'database.php');
+
+$safeRequire($configPath . 'session.php');
+if (function_exists('validateSessionToken')) {
+  validateSessionToken($db);
 }
 
-// 7. Parsear request
-$path = RequestParser::getPath();
-$method = RequestParser::getMethod();
+// Request parsing
+$path = Request::getPath();
+$method = Request::getMethod();
 
-// 8. Cargar rutas
-$routes = require __DIR__ . '/../config/routes.php';
+// Load routes
+$routes = $safeRequire($configPath . 'routes.php');
 
-// 9. Enrutar
+if (!$routes) {
+  Response::error(ErrorType::internal('Routes configuration missing'), 500);
+  exit;
+}
+
+// Route dispatching
 $router = new SimpleRouter($routes, $db);
 $response = $router->dispatch($method, $path);
 
-// 10. Respuesta o 404
+// If no route matched, return 404
 if ($response === null) {
-    Response::error(ErrorType::notFound('Route'), 404);
+  Response::error(ErrorType::notFound('Route'), 404);
 }

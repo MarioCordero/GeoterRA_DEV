@@ -1,23 +1,39 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Services;
 
 use PDO;
-use Http\Request;
-use Http\ErrorType;
+use DTO\AccessTokenDTO;
 use DTO\LoginUserDTO;
+use DTO\RefreshTokenDTO;
 use Http\ApiException;
-use Core\Logger;
-use Services\PasswordService;
-use Repositories\UserRepository;
+use Http\ErrorType;
+use Http\Request;
 use Repositories\AuthRepository;
+use Repositories\UserRepository;
+use Throwable;
 
+/**
+ * Service handling authentication logic including login, token refresh, logout,
+ * and token validation.
+ *
+ * Implements refresh token rotation with family detection and replay attack protection.
+ * On reuse of a refresh token, the entire token family is revoked.
+ *
+ * @package Services
+ */
 final class AuthService
 {
-  private AuthRepository $authRepository;
   private UserRepository $userRepository;
+  private AuthRepository $authRepository;
 
+  /**
+   * AuthService constructor.
+   *
+   * @param PDO $pdo Active PDO database connection.
+   */
   public function __construct(private PDO $pdo)
   {
     $this->userRepository = new UserRepository($this->pdo);
@@ -25,264 +41,248 @@ final class AuthService
   }
 
   /**
-   * Attempt to login a user.
+   * Authenticates a user and issues a new access/refresh token pair.
    *
-   * @throws ApiException if credentials invalid
+   * @param LoginUserDTO $dto Contains email and password.
+   * @return array<string, mixed> The new access and refresh tokens with user info.
+   * @throws ApiException When credentials are invalid or user not found.
    */
   public function login(LoginUserDTO $dto): array
   {
     $dto->validate();
+
     $user = $this->userRepository->findByEmail($dto->email);
-    if (!$user || !PasswordService::verify($dto->password, $user['password_hash'])) {
+    if (!$user || !password_verify($dto->password, $user['password_hash'])) {
       throw new ApiException(ErrorType::invalidCredentials(), 401);
     }
-    $userId = (string) $user['user_id'];
 
-    $accessToken = bin2hex(random_bytes(32));
-    $refreshToken = bin2hex(random_bytes(64));
+    $userId = $user['user_id'];
+    $accessTtl = 3600 + 1800;   // 1.5 hours
+    $refreshTtl = 3600 * 24 * 30; // 30 days
 
-    $accessExpires = 3600 + 1800;
-    $refreshExpires = 3600 * 24 * 30;
+    $rawAccessToken = bin2hex(random_bytes(32));
+    $rawRefreshToken = bin2hex(random_bytes(64));
 
-    $this->authRepository->upsertAccessToken(
-      $userId,
-      $accessToken,
-      $accessExpires
-    );
-    $this->authRepository->upsertRefreshToken(
-      $userId,
-      $refreshToken,
-      $refreshExpires
-    );
+    $accessHash = $this->hashToken($rawAccessToken);
+    $refreshHash = $this->hashToken($rawRefreshToken);
+
+    $refreshDto = new RefreshTokenDTO($userId, $refreshHash, $refreshTtl);
+    try {
+      $this->pdo->beginTransaction();
+      $this->authRepository->createRefreshToken($refreshDto);
+      $this->authRepository->upsertAccessToken(new AccessTokenDTO($userId, $accessHash, $accessTtl));
+      $this->pdo->commit();
+    } catch (Throwable $e) {
+      $this->pdo->rollBack();
+      throw new ApiException(ErrorType::internal('Login failed: ' . $e->getMessage()), 500);
+    }
 
     $userInfo = $this->userRepository->findById($userId);
-
     return [
       'data' => [
-        'access_token' => $accessToken,
-        'refresh_token' => $refreshToken,
-        'user_id' => $userId,
-        'email' => $userInfo['email'],
-        'name' => $userInfo['name'] ?? '',
-        'is_admin' => (bool) ($userInfo['role'] === 'admin'),
-        'role' => $userInfo['role'] ?? 'usr'
+        'access_token'  => $rawAccessToken,
+        'refresh_token' => $rawRefreshToken,
+        'user_id'       => $userId,
+        'email'         => $userInfo['email'],
+        'name'          => $userInfo['first_name'] . ' ' . $userInfo['last_name'],
+        'role'          => $userInfo['role'],
       ],
       'meta' => [
         'token_type' => 'Bearer',
-        'expires_in' => $accessExpires
-      ]
+        'expires_in' => $accessTtl,
+      ],
     ];
   }
 
   /**
-   * Rotate refresh token and issue new access + refresh tokens.
+   * Rotates an existing refresh token and issues a new pair.
    *
-   * @throws ApiException if refresh token is invalid or expired
+   * If the provided refresh token has already been used (replay attack),
+   * the entire family is revoked and an exception is thrown.
+   *
+   * @param string $rawRefreshToken The raw refresh token from the client.
+   * @return array<string, mixed> New access and refresh tokens.
+   * @throws ApiException When the refresh token is invalid, expired, or reused.
    */
   public function refreshTokens(string $rawRefreshToken): array
   {
-    $stored = $this->authRepository->findValidRefreshToken($rawRefreshToken);
+    $refreshHash = $this->hashToken($rawRefreshToken);
+    $stored = $this->authRepository->findValidRefreshToken($refreshHash);
 
     if (!$stored) {
+      // Check if the token exists but is used (possible replay)
+      $usedToken = $this->authRepository->findRefreshTokenByHash($refreshHash);
+      if ($usedToken && $usedToken['used_at'] !== null) {
+        // Revoke the entire family because a replay attack is suspected
+        $this->authRepository->revokeRefreshTokenFamily($usedToken['family_id']);
+      }
       throw new ApiException(ErrorType::invalidRefreshToken(), 401);
     }
 
-    $newAccessToken = bin2hex(random_bytes(32));
-    $newRefreshToken = bin2hex(random_bytes(64));
+    $userId = $stored['user_id'];
+    $oldTokenId = $stored['refresh_token_id'];
+    $familyId = $stored['family_id'];
+    $accessTtl = 3600 + 1800;
+    $refreshTtl = 3600 * 24 * 30;
 
-    $this->authRepository->beginTransaction();
+    $rawNewAccess = bin2hex(random_bytes(32));
+    $rawNewRefresh = bin2hex(random_bytes(64));
+    $newAccessHash = $this->hashToken($rawNewAccess);
+    $newRefreshHash = $this->hashToken($rawNewRefresh);
 
-    $this->authRepository->deleteUserTokens((string) $stored['user_id']);
-
-    $access = $this->authRepository->upsertAccessToken(
-      $stored['user_id'],
-      $newAccessToken,
-      3600 + 1800
-    );
-    $refresh = $this->authRepository->upsertRefreshToken(
-      $stored['user_id'],
-      $newRefreshToken,
-      3600 * 24 * 30
-    );
-
-    $this->authRepository->commit();
+    try {
+      $this->pdo->beginTransaction();
+      $newRefreshDto = new RefreshTokenDTO($userId, $newRefreshHash, $refreshTtl, $familyId);
+      $this->authRepository->rotateRefreshToken($newRefreshDto, $oldTokenId);
+      $this->authRepository->upsertAccessToken(new AccessTokenDTO($userId, $newAccessHash, $accessTtl));
+      $this->pdo->commit();
+    } catch (Throwable $e) {
+      $this->pdo->rollBack();
+      // If the old token was already marked as used (duplicate family detection), revoke family
+      if (str_contains($e->getMessage(), 'Duplicate entry') || $e->getCode() == 23000) {
+        $this->authRepository->revokeRefreshTokenFamily($familyId);
+        throw new ApiException(ErrorType::invalidRefreshToken(), 401);
+      }
+      throw new ApiException(ErrorType::internal('Token refresh failed: ' . $e->getMessage()), 500);
+    }
 
     return [
       'data' => [
-        'access_token' => $newAccessToken,
-        'access_expires_at' => $access['expires_at'],
-        'refresh_token' => $newRefreshToken,
-        'refresh_expires_at' => $refresh['expires_at']
+        'access_token'        => $rawNewAccess,
+        'access_expires_at'   => date('Y-m-d H:i:s', time() + $accessTtl),
+        'refresh_token'       => $rawNewRefresh,
+        'refresh_expires_at'  => date('Y-m-d H:i:s', time() + $refreshTtl),
       ],
-      'meta' => ['rotated' => true]
+      'meta' => [
+        'token_type' => 'Bearer',
+        'expires_in' => $accessTtl,
+      ],
     ];
   }
 
   /**
-   * Logout the current user by revoking the session token.
-   * 
-   * Attempts to validate the token first, but if it's expired or invalid,
-   * still allows logout as a fallback (clears the session).
+   * Logs out the currently authenticated user by deleting all their tokens.
    *
-   * @throws ApiException only for real server errors (DB issues)
+   * If the token is already invalid or no active session is found,
+   * an ApiException with status 400 is thrown.
+   *
+   * @return void
+   * @throws ApiException When no active session exists.
    */
   public function logout(): void
   {
+    $userId = null;
     try {
+      // Try to get authenticated user from context
       $auth = $this->requireAuth();
       $userId = $auth['user_id'];
-
     } catch (ApiException $e) {
-
-      $headers = getallheaders();
-      $authorization = $headers['Authorization'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-      
-      if (!str_starts_with($authorization, 'Bearer ')) {
-        return;
+      // No authenticated user in context, try to extract token
+      $rawToken = $this->extractTokenFromRequest();
+      if ($rawToken === null) {
+        throw new ApiException(ErrorType::from('NO_ACTIVE_SESSION', 'No active session found.'), 400);
       }
-      
-      $token = trim(substr($authorization, 7));
-      
-      if ($token === '') {
-        return;
+      $tokenHash = $this->hashToken($rawToken);
+      $tokenRecord = $this->authRepository->findAccessTokenByHash($tokenHash);
+      if ($tokenRecord === null) {
+        throw new ApiException(ErrorType::from('NO_ACTIVE_SESSION', 'No active session found.'), 400);
       }
-      $tokenRecord = $this->authRepository->findAccessTokenWithoutValidation($token);
-      
-      if (!$tokenRecord) {
-        return;
-      }
-      
       $userId = $tokenRecord['user_id'];
     }
 
+    if ($userId === null) {
+      throw new ApiException(ErrorType::from('NO_ACTIVE_SESSION', 'No active session found.'), 400);
+    }
+
+    // Delete all tokens for this user
     $this->authRepository->deleteUserTokens($userId);
   }
 
   /**
-   * Require authentication for an endpoint and return the authenticated user info.
+   * Ensures the current request is authenticated and returns user info.
    *
-   * @throws ApiException if authentication fails
+   * @return array<string, string> Authenticated user data (user_id, email, role).
+   * @throws ApiException When no valid authentication is present.
    */
   public function requireAuth(): array
   {
-    if (!Request::isValidClient()) {
-      throw new ApiException(ErrorType::unauthorized('Client identification required'), 403);
+    $existingUser = Request::getUser();
+    if ($existingUser) {
+      return $existingUser;
     }
-
-    $token = Request::isWeb() 
-        ? Request::getCookie('geoterra_session_token')
-        : Request::getBearerToken();
-
-    Logger::debug('info [AuthService] Authenticating request. Client type: ' . (Request::isWeb() ? 'web' : 'mobile') . ', Token: ' . ($token ? substr($token, 0, 8) . '...' : 'none'));
-
-    if (!$token) {
-      throw new ApiException(ErrorType::missingAuthToken(), 401);
+    $rawToken = $this->extractTokenFromRequest();
+    if ($rawToken === null) {
+      throw new ApiException(ErrorType::unauthorized(), 401);
     }
-
-    return $this->authenticate($token);
+    return $this->authenticate($rawToken);
   }
 
   /**
-   * Validate an access token.
-   * 
-   * @param string $rawToken the raw access token string from the Authorization header
-   * 
-   * @throws ApiException if token is invalid or expired
-   * @return array token record from database
+   * Validates a raw access token.
+   *
+   * @param string $rawAccessToken
+   * @return array<string, string> Token record.
+   * @throws ApiException
    */
-  public function validateAccessToken(string $rawToken): array
+  public function validateAccessToken(string $rawAccessToken): array
   {
-    $token = $this->authRepository->findValidAccessToken($rawToken);
-    if (!$token) {
+    $hash = $this->hashToken($rawAccessToken);
+    $token = $this->authRepository->findValidAccessToken($hash);
+    if ($token === null) {
       throw new ApiException(ErrorType::invalidAccessToken(), 401);
     }
     return $token;
   }
 
   /**
-   * Prepare login response for web clients (sets HTTP-only cookie).
+   * Hashes a raw token using SHA‑256 (hexadecimal).
    *
-   * @param array $result Login result from login()
-   * @return array Response data to send to client
+   * @param string $rawToken
+   * @return string
    */
-    public function prepareWebResponse(array $result): array
-    {
-      $accessToken = $result['data']['access_token'];
-      
-      // Dynamically determine cookie settings based on protocol and domain
-      $useSecureFlag = \Core\EnvironmentDetector::shouldUseSecureCookie();
-      $sameSite = \Core\EnvironmentDetector::getSameSiteValue();
-      $cookieDomain = \Core\EnvironmentDetector::getCookieDomain();
-      
-      setcookie(
-        'geoterra_session_token',
-        $accessToken,
-        [
-          'expires' => time() + 5400,
-          'path' => '/',
-          'domain' => $cookieDomain,
-          'secure' => $useSecureFlag,
-          'httponly' => true,
-          'samesite' => $sameSite,
-        ]
-      );
-
-      return [
-        'user_id' => $result['data']['user_id'],
-        'email' => $result['data']['email'],
-        'name' => $result['data']['name'],
-        'role' => $result['data']['role'],
-        'is_admin' => $result['data']['is_admin'],
-      ];
-    }
-
-  /**
-   * Prepare login response for mobile clients (returns bearer tokens).
-   *
-   * @param array $result Login result from login()
-   * @return array Response data to send to client
-   */
-  public function prepareMobileResponse(array $result): array
+  private function hashToken(string $rawToken): string
   {
-    return [
-      'access_token' => $result['data']['access_token'],
-      'refresh_token' => $result['data']['refresh_token'],
-      'user_id' => $result['data']['user_id'],
-    ];
-  }
-
-  // HELPERS
-
-  /**
-   * Find user by ID
-   * 
-   * @param string $userId the user ID to look up
-   * 
-   * @throws ApiException if user not found
-   * @return array user record from database
-   */
-  private function findUserById(string $userId): array
-  {
-    $user = $this->userRepository->findById($userId);
-    if (!$user) {
-      throw new ApiException(ErrorType::notFound("user"), 404);
-    }
-    return $user;
+    return hash('sha256', $rawToken);
   }
 
   /**
-   * Authenticate a user by access token.
+   * Extracts token from Authorization header or session cookie.
    *
-   * @throws ApiException if token is invalid or expired
+   * @return string|null
+   */
+  private function extractTokenFromRequest(): ?string
+  {
+    $headers = getallheaders();
+    $authorization = $headers['Authorization'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+    if (str_starts_with($authorization, 'Bearer ')) {
+      return trim(substr($authorization, 7));
+    }
+    $sessionCookie = $_COOKIE['geoterra_session_token'] ?? null;
+    if ($sessionCookie !== null && is_string($sessionCookie)) {
+      return $sessionCookie;
+    }
+    return null;
+  }
+
+  /**
+   * Authenticates a raw access token and returns user data.
+   *
+   * @param string $rawAccessToken
+   * @return array<string, string>
+   * @throws ApiException
    */
   private function authenticate(string $rawAccessToken): array
   {
-    $token = $this->validateAccessToken($rawAccessToken);
-    $user = $this->findUserById($token['user_id']);
+    $tokenRecord = $this->validateAccessToken($rawAccessToken);
+    $userId = $tokenRecord['user_id'];
+    $user = $this->userRepository->findById($userId);
+    if ($user === null) {
+      throw new ApiException(ErrorType::unauthorized('User not found'), 401);
+    }
     return [
-      'user_id' => (string) $user['user_id'],
-      'email' => $user['email'],
-      'role' => $user['role'],
+      'user_id' => $user['user_id'],
+      'email'   => $user['email'],
+      'role'    => $user['role'],
     ];
   }
 }
