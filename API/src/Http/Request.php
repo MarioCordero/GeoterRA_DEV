@@ -22,6 +22,48 @@ final class Request
   /** @var array<mixed>|null Cached parsed JSON body */
   private static ?array $jsonBody = null;
 
+  private static ?string $platform = null;
+  private static ?string $apiKey = null;
+
+  public static function init(): void
+  {
+    // Configure session cookie parameters early
+    session_set_cookie_params([
+      'lifetime' => 5400,  // 1.5 hours
+      'path' => '/',
+      'domain' => '',      // Empty domain = request host (works with IPs)
+      'secure' => \Core\EnvironmentDetector::shouldUseSecureCookie(),
+      'httponly' => true,
+      'samesite' => \Core\EnvironmentDetector::getSameSiteValue()
+    ]);
+
+    self::$apiKey = $headers['-x-api-key'] ?? $_SERVER['HTTP_X_API_KEY'] ?? null;
+
+    // Load API keys from environment-aware location
+    // Production: JOB/api-keys.php (outside project, on 163.178.171.105 or geoterra.com)
+    // Local: API/config/api-keys.php (on localhost or 127.0.0.1)
+    $productionKeysPath = dirname(__DIR__, 4) . '/api-keys.php';
+    $localKeysPath = dirname(__DIR__, 2) . '/config/api-keys.php';
+
+    // Detect by hostname/IP, not protocol (production is HTTP, not HTTPS)
+    $apiKeysPath = (\Core\EnvironmentDetector::isProduction() && file_exists($productionKeysPath))
+      ? $productionKeysPath
+      : $localKeysPath;
+
+    if (!file_exists($apiKeysPath)) {
+      throw new \RuntimeException('API keys configuration file not found at: ' . $apiKeysPath);
+    }
+
+    $apiKeys = require $apiKeysPath;
+    $allowedClients = $apiKeys;
+
+    if (self::$apiKey && isset($allowedClients[self::$apiKey])) {
+      self::$platform = $allowedClients[self::$apiKey];
+    } else {
+      self::$platform = 'unknown';
+    }
+  }
+
   /**
    * Retrieves the raw, unparsed request body.
    *
@@ -80,6 +122,21 @@ final class Request
     return $data;
   }
 
+  public static function getPlatform(): string
+  {
+    if (self::$platform === null) self::init();
+    return self::$platform;
+  }
+
+  public static function isValidClient(): bool
+  {
+    return self::getPlatform() !== 'unknown';
+  }
+
+  public static function isWeb(): bool { return self::getPlatform() === 'web'; }
+
+  public static function isMobile(): bool { return self::getPlatform() === 'mobile'; }
+
   /**
    * Sets the authenticated user context for the current request.
    *
@@ -109,6 +166,46 @@ final class Request
   public static function isAuthenticated(): bool
   {
     return self::$user !== null;
+  }
+
+  public static function getToken(): ?string
+  {
+    if (self::isWeb()) {
+      return $_COOKIE['geoterra_session_token'] ?? null;
+    }
+    return self::getBearerToken();
+  }
+
+  /**
+   * Extract Bearer token from Authorization header.
+   * Format: "Bearer <token>"
+   *
+   * @return string|null The token if present, null otherwise
+   */
+  public static function getBearerToken(): ?string
+  {
+    $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+
+    if (empty($authHeader) && function_exists('apache_request_headers')) {
+      $headers = apache_request_headers();
+      $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+    }
+
+    if (empty($authHeader)) return null;
+
+    if (!preg_match('/Bearer\s+([a-f0-9]+)$/i', $authHeader, $matches)) {
+      return null;
+    }
+
+    return $matches[1];
+  }
+
+  /**
+   * Check if request has a valid Bearer token in Authorization header.
+   */
+  public static function hasBearerToken(): bool
+  {
+    return self::getBearerToken() !== null;
   }
 
   /**

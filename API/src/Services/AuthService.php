@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Services;
 
+use Core\EnvironmentDetector;
+use Core\Logger;
 use PDO;
 use DTO\AccessTokenDTO;
 use DTO\LoginUserDTO;
@@ -199,22 +201,27 @@ final class AuthService
   }
 
   /**
-   * Ensures the current request is authenticated and returns user info.
+   * Ensures the current request has a valid client (API Key) and handles authentication
+   * strictly base on the platform type (Cookie for web, Bearer for mobile).
    *
    * @return array<string, string> Authenticated user data (user_id, email, role).
-   * @throws ApiException When no valid authentication is present.
+   * @throws ApiException When client validation or authentication fails.
    */
   public function requireAuth(): array
   {
-    $existingUser = Request::getUser();
-    if ($existingUser) {
-      return $existingUser;
+    if (!Request::isValidClient()) {
+      throw new ApiException(ErrorType::unauthorized('Client identification required'), 403);
     }
-    $rawToken = $this->extractTokenFromRequest();
-    if ($rawToken === null) {
-      throw new ApiException(ErrorType::unauthorized(), 401);
+
+    $token = Request::getToken();
+
+    Logger::debug('info [AuthService] Authenticating request. Client type: ' . (Request::isWeb() ? 'web' : 'mobile') . ', Token: ' . ($token ? substr($token, 0, 8) . '...' : 'none'));
+
+    if (!$token) {
+      throw new ApiException(ErrorType::missingAuthToken(), 401);
     }
-    return $this->authenticate($rawToken);
+
+    return $this->authenticate($token);
   }
 
   /**
@@ -283,6 +290,58 @@ final class AuthService
       'user_id' => $user['user_id'],
       'email'   => $user['email'],
       'role'    => $user['role'],
+    ];
+  }
+
+  /**
+   * Prepare login response for web clients (sets HTTP-only cookie).
+   *
+   * @param array $result Login result from login()
+   * @return array Response data to send to client
+   */
+  public function prepareWebResponse(array $result): array
+  {
+    $accessToken = $result['data']['access_token'];
+
+    // Dynamically determine cookie settings based on protocol and domain
+    $useSecureFlag = EnvironmentDetector::shouldUseSecureCookie();
+    $sameSite = EnvironmentDetector::getSameSiteValue();
+    $cookieDomain = EnvironmentDetector::getCookieDomain();
+
+    setcookie(
+      'geoterra_session_token',
+      $accessToken,
+      [
+        'expires' => time() + 5400,
+        'path' => '/',
+        'domain' => $cookieDomain,
+        'secure' => $useSecureFlag,
+        'httponly' => true,
+        'samesite' => $sameSite,
+      ]
+    );
+
+    return [
+      'user_id' => $result['data']['user_id'],
+      'email' => $result['data']['email'],
+      'name' => $result['data']['name'],
+      'role' => $result['data']['role'],
+      'is_admin' => $result['data']['is_admin'],
+    ];
+  }
+
+  /**
+   * Prepare login response for mobile clients (returns bearer tokens).
+   *
+   * @param array $result Login result from login()
+   * @return array Response data to send to client
+   */
+  public function prepareMobileResponse(array $result): array
+  {
+    return [
+      'access_token' => $result['data']['access_token'],
+      'refresh_token' => $result['data']['refresh_token'],
+      'user_id' => $result['data']['user_id'],
     ];
   }
 }

@@ -44,6 +44,10 @@ if (function_exists('validateSessionToken')) {
   validateSessionToken($db);
 }
 
+if (!Http\Request::isValidClient()) {
+  Http\Response::error(Http\ErrorType::unauthorized('Invalid API Key'), 403);
+}
+
 // Request parsing
 $path = Request::getPath();
 $method = Request::getMethod();
