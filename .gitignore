@@ -140,8 +140,14 @@ website/
 *.json
 *.klib
 
-website/node_modules/*
+API/vendor/
+vendor/
+API/.phpunit.cache/*
 API/config/config.ini
-.vscode
-website/.vite/deps/_metadata.json
-website/.vite/deps/package.json
+notes.txt
+GeoterRA_local.session.sql
+.vscode/*
+API/config/api-keys.php
+API/config/config.ini
+
+
