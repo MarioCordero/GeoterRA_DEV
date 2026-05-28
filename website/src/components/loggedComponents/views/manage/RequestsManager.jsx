@@ -3,45 +3,11 @@ import { useSession } from '../../../../hooks/useSession';
 import React, { useState, useEffect, useRef } from 'react';
 import MapCoordinatePicker from '../../../common/MapCoordinatePicker';
 import NotImplementedModal from '../../../common/NotImplementedModal';
-import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import { EyeOutlined, DeleteOutlined, CheckOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { Spin, Tag, Button, Modal, Form, Input, InputNumber, message, Select, Collapse } from 'antd';
 import { analysisRequestAdminIndex, analysisRequestAdminUpdate, analysisRequestAdminDelete, analysisRequestAdminShow, registeredManifestationsStore, regionsIndex } from '../../../../config/apiConf';
 
 const defaultPosition = [9.93333, -84.08333];
-
-// Inline marker component for map interaction
-function LocationMarker({ setLatLng, latLng }) {
-  const [position, setPosition] = useState(null);
-
-  useEffect(() => {
-    if (latLng && latLng.lat && latLng.lng) {
-      setPosition([latLng.lat, latLng.lng]);
-    }
-  }, [latLng]);
-
-  useMapEvents({
-    click(e) {
-      const newPosition = [e.latlng.lat, e.latlng.lng];
-      setPosition(newPosition);
-      setLatLng(e.latlng);
-    },
-  });
-
-  return position === null ? null : <Marker position={position} />;
-}
-
-// Map resize handler for inline map
-function MapResizeHandler() {
-  const map = useMap();
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      map.invalidateSize();
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [map]);
-  return null;
-}
 
 const RequestsManager = () => {
   const [requests, setRequests] = useState([]);
@@ -144,9 +110,22 @@ const RequestsManager = () => {
         throw new Error(result.error || 'Error creando manifestación registrada');
       }
 
+      // Show success message after point is added to map
+      message.success('📍 Punto agregado al mapa correctamente', 1.5);
+
       // Step 2: Update analysis request state to "Analizada"
       const updatePayload = {
+        region: selectedRequest.region_id || 1,
+        email: selectedRequest.email,
+        temperature_sensation: selectedRequest.temperature_sensation,
+        latitude: pointData.latitude,
+        longitude: pointData.longitude,
         state: 'Analizada',
+        owner_name: selectedRequest.owner_name || '',
+        owner_contact_number: selectedRequest.owner_contact_number || '',
+        bubbles: selectedRequest.bubbles ? 1 : 0,
+        details: selectedRequest.details || '',
+        current_usage: selectedRequest.current_usage || '',
       };
 
       const updateResult = await analysisRequestAdminUpdate(selectedRequest.id_soli, updatePayload);
@@ -394,7 +373,7 @@ const RequestsManager = () => {
       // Submit approval
       await submitApprovedPoint(approvalData);
       
-      message.success('✅ Análisis completado y solicitud actualizada');
+      message.success('✅ Solicitud procesada y estado actualizado a "Analizada"', 2);
       setReviewModalVisible(false);
       reviewForm.resetFields();
       setSelectedRequest(null);
@@ -836,62 +815,19 @@ const RequestsManager = () => {
           </Form.Item>
 
           <hr className="my-4" />
-          <h3 className="font-semibold text-base mb-4">📍 Confirmar Ubicación (Haz clic en el mapa)</h3>
-          <div className="border border-gray-300 rounded-lg p-4 mb-4 bg-white">
-            {confirmedCoordinates ? (
-              <div className="bg-green-50 p-3 rounded-lg mb-3 border border-green-200">
-                <p className="text-green-700 font-semibold">✅ Ubicación confirmada:</p>
-                <p className="text-sm text-green-600">
-                  Lat: {confirmedCoordinates.lat.toFixed(6)}° | Lon: {confirmedCoordinates.lng.toFixed(6)}°
-                </p>
-              </div>
-            ) : (
-              <div className="bg-orange-50 p-3 rounded-lg mb-3 border border-orange-200">
-                <p className="text-orange-700 font-semibold">⚠️ Haz clic en el mapa para confirmar la ubicación</p>
-              </div>
-            )}
-            
-            {/* Inline Leaflet Map */}
-            <div style={{ height: '400px', borderRadius: '8px', overflow: 'hidden', marginBottom: '12px' }}>
-              <MapContainer
-                center={confirmedCoordinates ? [confirmedCoordinates.lat, confirmedCoordinates.lng] : [parseFloat(selectedRequest?.latitude) || defaultPosition[0], parseFloat(selectedRequest?.longitude) || defaultPosition[1]]}
-                zoom={confirmedCoordinates ? 15 : (selectedRequest?.latitude ? 15 : 8)}
-                style={{ height: '100%', width: '100%' }}
-                key={`inline-map-${selectedRequest?.id_soli}`}
-              >
-                <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                />
-                <LocationMarker setLatLng={setConfirmedCoordinates} latLng={confirmedCoordinates || { lat: parseFloat(selectedRequest?.latitude) || 0, lng: parseFloat(selectedRequest?.longitude) || 0 }} />
-                <MapResizeHandler />
-              </MapContainer>
-            </div>
-
-            {/* Coordinate inputs below map */}
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <label style={{ fontSize: '12px', color: '#666', minWidth: 50 }}>Latitud:</label>
-                <Input
-                  placeholder="Lat"
-                  value={confirmedCoordinates?.lat?.toFixed(6) || ''}
-                  readOnly
-                  size="small"
-                  style={{ width: 120 }}
-                />
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <label style={{ fontSize: '12px', color: '#666', minWidth: 60 }}>Longitud:</label>
-                <Input
-                  placeholder="Lng"
-                  value={confirmedCoordinates?.lng?.toFixed(6) || ''}
-                  readOnly
-                  size="small"
-                  style={{ width: 120 }}
-                />
-              </div>
-            </div>
-          </div>
+          <h3 className="font-semibold text-base mb-4">📍 Confirmar Ubicación</h3>
+          <Form.Item label="">
+            <MapCoordinatePicker
+              latLng={confirmedCoordinates || { lat: parseFloat(selectedRequest?.latitude) || 0, lng: parseFloat(selectedRequest?.longitude) || 0 }}
+              onCoordinatesChange={(coords) => {
+                setConfirmedCoordinates(coords);
+              }}
+              title="Coordenadas GPS"
+              mapHeight="350px"
+              showApplyButton={false}
+              showClearButton={false}
+            />
+          </Form.Item>
 
           <hr className="my-4" />
           <h3 className="font-semibold text-base mb-4">🌡️ Mediciones de Campo</h3>
