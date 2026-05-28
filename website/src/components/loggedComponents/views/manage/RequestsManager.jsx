@@ -110,9 +110,22 @@ const RequestsManager = () => {
         throw new Error(result.error || 'Error creando manifestación registrada');
       }
 
+      // Show success message after point is added to map
+      message.success('📍 Punto agregado al mapa correctamente', 1.5);
+
       // Step 2: Update analysis request state to "Analizada"
       const updatePayload = {
+        region: selectedRequest.region_id || 1,
+        email: selectedRequest.email,
+        temperature_sensation: selectedRequest.temperature_sensation,
+        latitude: pointData.latitude,
+        longitude: pointData.longitude,
         state: 'Analizada',
+        owner_name: selectedRequest.owner_name || '',
+        owner_contact_number: selectedRequest.owner_contact_number || '',
+        bubbles: selectedRequest.bubbles ? 1 : 0,
+        details: selectedRequest.details || '',
+        current_usage: selectedRequest.current_usage || '',
       };
 
       const updateResult = await analysisRequestAdminUpdate(selectedRequest.id_soli, updatePayload);
@@ -360,7 +373,7 @@ const RequestsManager = () => {
       // Submit approval
       await submitApprovedPoint(approvalData);
       
-      message.success('✅ Análisis completado y solicitud actualizada');
+      message.success('✅ Solicitud procesada y estado actualizado a "Analizada"', 2);
       setReviewModalVisible(false);
       reviewForm.resetFields();
       setSelectedRequest(null);

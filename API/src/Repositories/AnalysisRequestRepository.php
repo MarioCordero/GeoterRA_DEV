@@ -185,7 +185,9 @@ final class AnalysisRequestRepository
 						details                 = :details,
 						current_usage           = :current_usage,
 						latitude                = :latitude,
-						longitude               = :longitude
+						longitude               = :longitude,
+						state                   = :state
+				WHERE id = :id
 		';
 
 		$stmt = $this->pdo->prepare($sql);
@@ -200,6 +202,7 @@ final class AnalysisRequestRepository
 				':current_usage'         => $dto->current_usage,
 				':latitude'              => $dto->latitude,
 				':longitude'             => $dto->longitude,
+				':state'                 => $dto->state,
 				':id'                    => $id,
 		]);
 	}

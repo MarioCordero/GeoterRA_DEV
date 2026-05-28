@@ -592,7 +592,7 @@ const MapCoordinatePicker = ({
         onCancel={closeFullscreenModal}
         width="90vw"
         style={{ top: 20 }}
-        bodyStyle={{ height: '85vh', padding: 24, display: 'flex', flexDirection: 'column' }}
+        styles={{ body: { height: '85vh', padding: 24, display: 'flex', flexDirection: 'column' } }}
         footer={[
           <Button key="cancel" onClick={closeFullscreenModal}>
             Cancelar

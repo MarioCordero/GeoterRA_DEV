@@ -180,11 +180,11 @@ final class AnalysisRequestDTO
 
 		// Validate state ENUM if provided
 		if ($this->state !== null) {
-			$validStates = ['Registrada', 'En revisión', 'Verificación de campo', 'Análisis en laboratorio', 'Aprobada', 'Rechazada', 'Archivada'];
+			$validStates = ['Analizada', 'Registrada', 'En revisión', 'Verificación de campo', 'Análisis en laboratorio', 'Aprobada', 'Rechazada', 'Archivada'];
 			if (!in_array($this->state, $validStates, true)) {
 				throw new ApiException(
 					ErrorType::invalidField(
-						"estado: debe ser uno de ['Registrada', 'En revisión', 'Verificación de campo', 'Análisis en laboratorio', 'Aprobada', 'Rechazada', 'Archivada']"
+						"estado: debe ser uno de ['Analizada', 'Registrada', 'En revisión', 'Verificación de campo', 'Análisis en laboratorio', 'Aprobada', 'Rechazada', 'Archivada']"
 					),
 					422
 				);
