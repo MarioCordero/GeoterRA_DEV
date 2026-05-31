@@ -1,0 +1,495 @@
+,CÓDIGO CATALOGO,CÓDIGO PROVINCIA,PROVINCIA,CÓDIGO CANTÓN,CANTÓN,CÓDIGO DISTRITO,DISTRITO,ÁREA (km2)
+,160105,1,San José,101,San José,10101,Carmen,1.5
+,160105,1,San José,101,San José,10102,Merced,2.2
+,160105,1,San José,101,San José,10103,Hospital,3.3
+,160105,1,San José,101,San José,10104,Catedral,2.4
+,160105,1,San José,101,San José,10105,Zapote,2.9
+,160105,1,San José,101,San José,10106,San Francisco de Dos Ríos,2.6
+,160105,1,San José,101,San José,10107,Uruca,8.4
+,160105,1,San José,101,San José,10108,Mata Redonda,3.7
+,160105,1,San José,101,San José,10109,Pavas,9.4
+,160105,1,San José,101,San José,10110,Hatillo,4.4
+,160105,1,San José,101,San José,10111,San Sebastián,4.0
+,160105,1,San José,102,Escazú,10201,Escazú,4.5
+,160105,1,San José,102,Escazú,10202,San Antonio,17.0
+,160105,1,San José,102,Escazú,10203,San Rafael,13.0
+,160105,1,San José,103,Desamparados,10301,Desamparados,3.3
+,160105,1,San José,103,Desamparados,10302,San Miguel,21.4
+,160105,1,San José,103,Desamparados,10303,San Juan de Dios,2.9
+,160105,1,San José,103,Desamparados,10304,San Rafael Arriba,3.2
+,160105,1,San José,103,Desamparados,10305,San Antonio,2.1
+,160105,1,San José,103,Desamparados,10306,Frailes,19.7
+,160105,1,San José,103,Desamparados,10307,Patarrá,15.9
+,160105,1,San José,103,Desamparados,10308,San Cristobal,25.0
+,160105,1,San José,103,Desamparados,10309,Rosario,14.9
+,160105,1,San José,103,Desamparados,10310,Damas,2.7
+,160105,1,San José,103,Desamparados,10311,San Rafael Abajo,2.0
+,160105,1,San José,103,Desamparados,10312,Gravilias,2.9
+,160105,1,San José,103,Desamparados,10313,Los Guido,3.1
+,160105,1,San José,104,Puriscal,10401,Santiago,34.5
+,160105,1,San José,104,Puriscal,10402,Mercedes Sur,181.8
+,160105,1,San José,104,Puriscal,10403,Barbacoas,18.6
+,160105,1,San José,104,Puriscal,10404,Grifo Alto,26.4
+,160105,1,San José,104,Puriscal,10405,San Rafael,15.5
+,160105,1,San José,104,Puriscal,10406,Candelarita,26.7
+,160105,1,San José,104,Puriscal,10407,Desamparaditos,7.2
+,160105,1,San José,104,Puriscal,10408,San Antonio,14.6
+,160105,1,San José,104,Puriscal,10409,Chires,229.7
+,160105,1,San José,105,Tarrazú,10501,San Marcos,46.0
+,160105,1,San José,105,Tarrazú,10502,San Lorenzo,186.3
+,160105,1,San José,105,Tarrazú,10503,San Carlos,59.0
+,160105,1,San José,106,Aserrí,10601,Aserrí,15.3
+,160105,1,San José,106,Aserrí,10602,Tarbaca,15.3
+,160105,1,San José,106,Aserrí,10603,Vuelta de Jorco,22.1
+,160105,1,San José,106,Aserrí,10604,San Gabriel,11.7
+,160105,1,San José,106,Aserrí,10605,Legua,81.3
+,160105,1,San José,106,Aserrí,10606,Monterrey,8.3
+,160105,1,San José,106,Aserrí,10607,Salitrillos,14.3
+,160105,1,San José,107,Mora,10701,Colón,39.9
+,160105,1,San José,107,Mora,10702,Guayabo,9.0
+,160105,1,San José,107,Mora,10703,Tabarcia,40.4
+,160105,1,San José,107,Mora,10704,Piedras Negras,14.9
+,160105,1,San José,107,Mora,10705,Picagres,27.2
+,160105,1,San José,107,Mora,10706,Jaris,5.5
+,160105,1,San José,107,Mora,10707,Quitirrisí,26.6
+,160105,1,San José,108,Goicoechea,10801,Guadalupe,2.4
+,160105,1,San José,108,Goicoechea,10802,San Francisco,0.6
+,160105,1,San José,108,Goicoechea,10803,Calle Blancos,2.4
+,160105,1,San José,108,Goicoechea,10804,Mata de Plátano,7.8
+,160105,1,San José,108,Goicoechea,10805,Ipís,2.5
+,160105,1,San José,108,Goicoechea,10806,Rancho Redondo,13.1
+,160105,1,San José,108,Goicoechea,10807,Purral,3.0
+,160105,1,San José,109,Santa Ana,10901,Santa Ana,5.4
+,160105,1,San José,109,Santa Ana,10902,Salitral,20.3
+,160105,1,San José,109,Santa Ana,10903,Pozos,13.4
+,160105,1,San José,109,Santa Ana,10904,Uruca,7.0
+,160105,1,San José,109,Santa Ana,10905,Piedades,12.1
+,160105,1,San José,109,Santa Ana,10906,Brasil,3.2
+,160105,1,San José,110,Alajuelita,11001,Alajuelita,1.3
+,160105,1,San José,110,Alajuelita,11002,San Josecito,2.4
+,160105,1,San José,110,Alajuelita,11003,San Antonio,10.3
+,160105,1,San José,110,Alajuelita,11004,Concepción,2.4
+,160105,1,San José,110,Alajuelita,11005,San Felipe,5.1
+,160105,1,San José,111,Vázquez de Coronado,11101,San Isidro,5.2
+,160105,1,San José,111,Vázquez de Coronado,11102,San Rafael,16.9
+,160105,1,San José,111,Vázquez de Coronado,11103,Dulce Nombre de Jesús,67.9
+,160105,1,San José,111,Vázquez de Coronado,11104,Patalillo,1.9
+,160105,1,San José,111,Vázquez de Coronado,11105,Cascajal,132.0
+,160105,1,San José,112,Acosta,11201,San Ignacio,22.7
+,160105,1,San José,112,Acosta,11202,Guaitil,44.0
+,160105,1,San José,112,Acosta,11203,Palmichal,34.1
+,160105,1,San José,112,Acosta,11204,Cangrejal,64.3
+,160105,1,San José,112,Acosta,11205,Sabanillas,177.4
+,160105,1,San José,113,Tibás,11301,San Juan,3.5
+,160105,1,San José,113,Tibás,11302,Cinco Esquinas,0.7
+,160105,1,San José,113,Tibás,11303,Anselmo Llorente,1.4
+,160105,1,San José,113,Tibás,11304,León XIII,0.7
+,160105,1,San José,113,Tibás,11305,Colima,2.0
+,160105,1,San José,114,Moravia,11401,San Vicente,5.4
+,160105,1,San José,114,Moravia,11402,San Jerónimo,18.5
+,160105,1,San José,114,Moravia,11403,La Trinidad,4.9
+,160105,1,San José,115,Montes de Oca,11501,San Pedro,4.7
+,160105,1,San José,115,Montes de Oca,11502,Sabanilla,1.8
+,160105,1,San José,115,Montes de Oca,11503,Mercedes,1.4
+,160105,1,San José,115,Montes de Oca,11504,San Rafael,7.8
+,160105,1,San José,116,Turrubares,11601,San Pablo,26.4
+,160105,1,San José,116,Turrubares,11602,San Pedro,39.2
+,160105,1,San José,116,Turrubares,11603,San Juan de Mata,86.3
+,160105,1,San José,116,Turrubares,11604,San Luis,43.8
+,160105,1,San José,116,Turrubares,11605,Carara,220.6
+,160105,1,San José,117,Dota,11701,Santa María,93.6
+,160105,1,San José,117,Dota,11702,Jardín,33.3
+,160105,1,San José,117,Dota,11703,Copey,277.6
+,160105,1,San José,118,Curridabat,11801,Curridabat,6.2
+,160105,1,San José,118,Curridabat,11802,Granadilla,3.5
+,160105,1,San José,118,Curridabat,11803,Sánchez,4.5
+,160105,1,San José,118,Curridabat,11804,Tirrases,1.9
+,160105,1,San José,119,Pérez Zeledón,11901,San Isidro de El General,191.8
+,160105,1,San José,119,Pérez Zeledón,11902,El General,76.9
+,160105,1,San José,119,Pérez Zeledón,11903,Daniel Flores,64.1
+,160105,1,San José,119,Pérez Zeledón,11904,Rivas,310.0
+,160105,1,San José,119,Pérez Zeledón,11905,San Pedro,206.1
+,160105,1,San José,119,Pérez Zeledón,11906,Platanares,80.9
+,160105,1,San José,119,Pérez Zeledón,11907,Pejivalle,141.2
+,160105,1,San José,119,Pérez Zeledón,11908,Cajón,118.6
+,160105,1,San José,119,Pérez Zeledón,11909,Barú,189.7
+,160105,1,San José,119,Pérez Zeledón,11910,Río Nuevo,242.2
+,160105,1,San José,119,Pérez Zeledón,11911,Páramo,203.3
+,160105,1,San José,119,Pérez Zeledón,11912,La  Amistad,76.3
+,160105,1,San José,120,León Cortés Castro,12001,San Pablo,20.8
+,160105,1,San José,120,León Cortés Castro,12002,San Andrés,16.1
+,160105,1,San José,120,León Cortés Castro,12003,Llano Bonito,34.1
+,160105,1,San José,120,León Cortés Castro,12004,San Isidro,19.0
+,160105,1,San José,120,León Cortés Castro,12005,Santa Cruz,21.8
+,160105,1,San José,120,León Cortés Castro,12006,San Antonio,10.1
+,160105,2,Alajuela,201,Alajuela,20101,Alajuela,10.6
+,160105,2,Alajuela,201,Alajuela,20102,San José,14.9
+,160105,2,Alajuela,201,Alajuela,20103,Carrizal,16.2
+,160105,2,Alajuela,201,Alajuela,20104,San Antonio,8.8
+,160105,2,Alajuela,201,Alajuela,20105,Guácima,28.1
+,160105,2,Alajuela,201,Alajuela,20106,San Isidro,34.7
+,160105,2,Alajuela,201,Alajuela,20107,Sabanilla,43.2
+,160105,2,Alajuela,201,Alajuela,20108,San Rafael,19.3
+,160105,2,Alajuela,201,Alajuela,20109,Río Segundo,5.5
+,160105,2,Alajuela,201,Alajuela,20110,Desamparados,13.0
+,160105,2,Alajuela,201,Alajuela,20111,Turrúcares,35.9
+,160105,2,Alajuela,201,Alajuela,20112,Tambor,13.9
+,160105,2,Alajuela,201,Alajuela,20113,Garita,33.9
+,160105,2,Alajuela,201,Alajuela,20114,Sarapiquí,113.8
+,160105,2,Alajuela,202,San Ramón,20201,San Ramón,1.3
+,160105,2,Alajuela,202,San Ramón,20202,Santiago,61.1
+,160105,2,Alajuela,202,San Ramón,20203,San Juan,5.1
+,160105,2,Alajuela,202,San Ramón,20204,Piedades Norte,47.7
+,160105,2,Alajuela,202,San Ramón,20205,Piedades Sur,115.6
+,160105,2,Alajuela,202,San Ramón,20206,San Rafael,30.7
+,160105,2,Alajuela,202,San Ramón,20207,San Isidro,8.7
+,160105,2,Alajuela,202,San Ramón,20208,Ángeles,84.9
+,160105,2,Alajuela,202,San Ramón,20209,Alfaro,17.8
+,160105,2,Alajuela,202,San Ramón,20210,Volio,20.7
+,160105,2,Alajuela,202,San Ramón,20211,Concepción,9.5
+,160105,2,Alajuela,202,San Ramón,20212,Zapotal,67.1
+,160105,2,Alajuela,202,San Ramón,20213,Peñas Blancas,246.8
+,160105,2,Alajuela,202,San Ramón,20214,San Lorenzo,304.7
+,160105,2,Alajuela,203,Grecia,20301,Grecia,7.6
+,160105,2,Alajuela,203,Grecia,20302,San Isidro,16.8
+,160105,2,Alajuela,203,Grecia,20303,San José,12.4
+,160105,2,Alajuela,203,Grecia,20304,San Roque,27.0
+,160105,2,Alajuela,203,Grecia,20305,Tacares,24.9
+,160105,2,Alajuela,203,Grecia,20307,Puente de Piedra,23.0
+,160105,2,Alajuela,203,Grecia,20308,Bolivar,30.8
+,160105,2,Alajuela,204,San Mateo,20401,San Mateo,64.9
+,160105,2,Alajuela,204,San Mateo,20402,Desmonte,20.2
+,160105,2,Alajuela,204,San Mateo,20403,Jesús María,18.7
+,160105,2,Alajuela,204,San Mateo,20404,Labrador,21.3
+,160105,2,Alajuela,205,Atenas,20501,Atenas,9.8
+,160105,2,Alajuela,205,Atenas,20502,Jesús,18.1
+,160105,2,Alajuela,205,Atenas,20503,Mercedes,7.8
+,160105,2,Alajuela,205,Atenas,20504,San Isidro,14.4
+,160105,2,Alajuela,205,Atenas,20505,Concepción,21.9
+,160105,2,Alajuela,205,Atenas,20506,San José,13.5
+,160105,2,Alajuela,205,Atenas,20507,Santa Eulalia,14.6
+,160105,2,Alajuela,205,Atenas,20508,Escobal,26.3
+,160105,2,Alajuela,206,Naranjo,20601,Naranjo,15.0
+,160105,2,Alajuela,206,Naranjo,20602,San Miguel,14.9
+,160105,2,Alajuela,206,Naranjo,20603,San José,20.9
+,160105,2,Alajuela,206,Naranjo,20604,Cirrí Sur,32.1
+,160105,2,Alajuela,206,Naranjo,20605,San Jerónimo,9.1
+,160105,2,Alajuela,206,Naranjo,20606,San Juan,7.5
+,160105,2,Alajuela,206,Naranjo,20607,El Rosario,17.2
+,160105,2,Alajuela,206,Naranjo,20608,Palmitos,10.5
+,160105,2,Alajuela,207,Palmares,20701,Palmares,1.2
+,160105,2,Alajuela,207,Palmares,20702,Zaragoza,8.4
+,160105,2,Alajuela,207,Palmares,20703,Buenos Aires,6.8
+,160105,2,Alajuela,207,Palmares,20704,Santiago,8.0
+,160105,2,Alajuela,207,Palmares,20705,Candelaria,4.7
+,160105,2,Alajuela,207,Palmares,20706,Esquipulas,5.4
+,160105,2,Alajuela,207,Palmares,20707,La Granja,4.4
+,160105,2,Alajuela,208,Poás,20801,San Pedro,13.6
+,160105,2,Alajuela,208,Poás,20802,San Juan,16.4
+,160105,2,Alajuela,208,Poás,20803,San Rafael,14.2
+,160105,2,Alajuela,208,Poás,20804,Carrillos,10.1
+,160105,2,Alajuela,208,Poás,20805,Sabana Redonda,20.2
+,160105,2,Alajuela,209,Orotina,20901,Orotina,21.6
+,160105,2,Alajuela,209,Orotina,20902,El Mastate,9.5
+,160105,2,Alajuela,209,Orotina,20903,Hacienda Vieja,16.9
+,160105,2,Alajuela,209,Orotina,20904,Coyolar,36.5
+,160105,2,Alajuela,209,Orotina,20905,La Ceiba,60.7
+,160105,2,Alajuela,210,San Carlos,21001,Quesada,143.5
+,160105,2,Alajuela,210,San Carlos,21002,Florencia,199.7
+,160105,2,Alajuela,210,San Carlos,21003,Buenavista,26.0
+,160105,2,Alajuela,210,San Carlos,21004,Aguas Zarcas,185.7
+,160105,2,Alajuela,210,San Carlos,21005,Venecia,132.5
+,160105,2,Alajuela,210,San Carlos,21006,Pital,379.3
+,160105,2,Alajuela,210,San Carlos,21007,La Fortuna,229.6
+,160105,2,Alajuela,210,San Carlos,21008,La Tigra,56.2
+,160105,2,Alajuela,210,San Carlos,21009,La Palmera,100.4
+,160105,2,Alajuela,210,San Carlos,21010,Venado,169.2
+,160105,2,Alajuela,210,San Carlos,21011,Cutris,849.1
+,160105,2,Alajuela,210,San Carlos,21012,Monterrey,220.6
+,160105,2,Alajuela,210,San Carlos,21013,Pocosol,660.5
+,160105,2,Alajuela,211,Zarcero,21101,Zarcero,11.8
+,160105,2,Alajuela,211,Zarcero,21102,Laguna,23.3
+,160105,2,Alajuela,211,Zarcero,21103,Tapesco,6.4
+,160105,2,Alajuela,211,Zarcero,21104,Guadalupe,22.6
+,160105,2,Alajuela,211,Zarcero,21105,Palmira,30.7
+,160105,2,Alajuela,211,Zarcero,21106,Zapote,44.8
+,160105,2,Alajuela,211,Zarcero,21107,Brisas,17.9
+,160105,2,Alajuela,212,Sarchí,21201,Sarchí Norte,21.1
+,160105,2,Alajuela,212,Sarchí,21202,Sarchí Sur,6.4
+,160105,2,Alajuela,212,Sarchí,21203,Toro Amarillo,91.1
+,160105,2,Alajuela,212,Sarchí,21204,San Pedro,10.9
+,160105,2,Alajuela,212,Sarchí,21205,Rodríguez,7.3
+,160105,2,Alajuela,213,Upala,21301,Upala,148.7
+,160105,2,Alajuela,213,Upala,21302,Aguas Claras,408.5
+,160105,2,Alajuela,213,Upala,21303,San José O Pizote,285.4
+,160105,2,Alajuela,213,Upala,21304,Bijagua,186.8
+,160105,2,Alajuela,213,Upala,21305,Delicias,98.5
+,160105,2,Alajuela,213,Upala,21306,Dos Ríos,218.7
+,160105,2,Alajuela,213,Upala,21307,Yolillal,139.6
+,160105,2,Alajuela,213,Upala,21308,Canalete,106.5
+,160105,2,Alajuela,214,Los Chiles,21401,Los Chiles,503.6
+,160105,2,Alajuela,214,Los Chiles,21402,Caño Negro,301.3
+,160105,2,Alajuela,214,Los Chiles,21403,El Amparo,312.9
+,160105,2,Alajuela,214,Los Chiles,21404,San Jorge,215.0
+,160105,2,Alajuela,215,Guatuso,21501,San Rafael,304.0
+,160105,2,Alajuela,215,Guatuso,21502,Buenavista,150.9
+,160105,2,Alajuela,215,Guatuso,21503,Cote,183.6
+,160105,2,Alajuela,215,Guatuso,21504,Katira,114.4
+,160105,2,Alajuela,216,Río Cuarto,21601,Río Cuarto,97.6
+,160105,2,Alajuela,216,Río Cuarto,21602,Santa Rita,53.2
+,160105,2,Alajuela,216,Río Cuarto,21603,Santa Isabel,104.1
+,160105,3,Cartago,301,Cartago,30101,Oriental,2.0
+,160105,3,Cartago,301,Cartago,30102,Occidental,2.0
+,160105,3,Cartago,301,Cartago,30103,Carmen,4.3
+,160105,3,Cartago,301,Cartago,30104,San Nicolás,29.2
+,160105,3,Cartago,301,Cartago,30105,Aguacaliente o San Francisco,99.3
+,160105,3,Cartago,301,Cartago,30106,Guadalupe o Arenilla,13.2
+,160105,3,Cartago,301,Cartago,30107,Corralillo,32.7
+,160105,3,Cartago,301,Cartago,30108,Tierra Blanca,12.8
+,160105,3,Cartago,301,Cartago,30109,Dulce Nombre,33.6
+,160105,3,Cartago,301,Cartago,30110,Llano Grande,30.4
+,160105,3,Cartago,301,Cartago,30111,Quebradilla,19.1
+,160105,3,Cartago,302,Paraíso,30201,Paraíso,18.3
+,160105,3,Cartago,302,Paraíso,30202,Santiago,25.6
+,160105,3,Cartago,302,Paraíso,30203,Orosi,376.5
+,160105,3,Cartago,302,Paraíso,30204,Cachí,41.1
+,160105,3,Cartago,302,Paraíso,30205,Llanos de Santa Lucía,6.5
+,160105,3,Cartago,302,Paraíso,30206,Birrisito,8.9
+,160105,3,Cartago,303,La Unión,30301,Tres Ríos,2.3
+,160105,3,Cartago,303,La Unión,30302,San Diego,8.1
+,160105,3,Cartago,303,La Unión,30303,San Juan,4.0
+,160105,3,Cartago,303,La Unión,30304,San Rafael,9.5
+,160105,3,Cartago,303,La Unión,30305,Concepción,3.8
+,160105,3,Cartago,303,La Unión,30306,Dulce Nombre,8.3
+,160105,3,Cartago,303,La Unión,30307,San Ramón,3.5
+,160105,3,Cartago,303,La Unión,30308,Río Azul,4.9
+,160105,3,Cartago,304,Jiménez,30401,Juan Viñas,28.3
+,160105,3,Cartago,304,Jiménez,30402,Tucurrique,33.5
+,160105,3,Cartago,304,Jiménez,30403,Pejibaye,173.2
+,160105,3,Cartago,304,Jiménez,30404,La Victoria,15.1
+,160105,3,Cartago,305,Turrialba,30501,Turrialba,56.6
+,160105,3,Cartago,305,Turrialba,30502,La Suiza,160.9
+,160105,3,Cartago,305,Turrialba,30503,Peralta,9.7
+,160105,3,Cartago,305,Turrialba,30504,Santa Cruz,140.9
+,160105,3,Cartago,305,Turrialba,30505,Santa Teresita,48.8
+,160105,3,Cartago,305,Turrialba,30506,Pavones,42.1
+,160105,3,Cartago,305,Turrialba,30507,Tuis,39.2
+,160105,3,Cartago,305,Turrialba,30508,Tayutic,74.8
+,160105,3,Cartago,305,Turrialba,30509,Santa Rosa,18.6
+,160105,3,Cartago,305,Turrialba,30510,Tres Equis,37.0
+,160105,3,Cartago,305,Turrialba,30511,La Isabel,19.8
+,160105,3,Cartago,305,Turrialba,30512,Chirripó,940.9
+,160105,3,Cartago,306,Alvarado,30601,Pacayas,29.6
+,160105,3,Cartago,306,Alvarado,30602,Cervantes,15.2
+,160105,3,Cartago,306,Alvarado,30603,Capellades,34.4
+,160105,3,Cartago,307,Oreamuno,30701,San Rafael,10.3
+,160105,3,Cartago,307,Oreamuno,30702,Cot,14.9
+,160105,3,Cartago,307,Oreamuno,30703,Potrero Cerrado,18.1
+,160105,3,Cartago,307,Oreamuno,30704,Cipreses,9.4
+,160105,3,Cartago,307,Oreamuno,30705,Santa Rosa,150.3
+,160105,3,Cartago,308,El Guarco,30801,El Tejar,6.1
+,160105,3,Cartago,308,El Guarco,30802,San Isidro,134.9
+,160105,3,Cartago,308,El Guarco,30803,Tobosi,20.1
+,160105,3,Cartago,308,El Guarco,30804,Patio de Agua,10.9
+,160105,4,Heredia,401,Heredia,40101,Heredia,2.9
+,160105,4,Heredia,401,Heredia,40102,Mercedes,4.2
+,160105,4,Heredia,401,Heredia,40103,San Francisco,6.6
+,160105,4,Heredia,401,Heredia,40104,Ulloa,11.4
+,160105,4,Heredia,401,Heredia,40105,Varablanca,258.2
+,160105,4,Heredia,402,Barva,40201,Barva,0.8
+,160105,4,Heredia,402,Barva,40202,San Pedro,2.5
+,160105,4,Heredia,402,Barva,40203,San Pablo,6.8
+,160105,4,Heredia,402,Barva,40204,San Roque,1.3
+,160105,4,Heredia,402,Barva,40205,Santa Lucía,2.9
+,160105,4,Heredia,402,Barva,40206,San José de la Montaña,37.0
+,160105,4,Heredia,402,Barva,40207,Puente Salas,4.7
+,160105,4,Heredia,403,Santo Domingo,40301,Santo Domingo,0.8
+,160105,4,Heredia,403,Santo Domingo,40302,San Vicente,2.9
+,160105,4,Heredia,403,Santo Domingo,40303,San Miguel,5.9
+,160105,4,Heredia,403,Santo Domingo,40304,Paracito,1.3
+,160105,4,Heredia,403,Santo Domingo,40305,Santo Tomás,3.5
+,160105,4,Heredia,403,Santo Domingo,40306,Santa Rosa,4.3
+,160105,4,Heredia,403,Santo Domingo,40307,Tures,3.9
+,160105,4,Heredia,403,Santo Domingo,40308,Pará,2.9
+,160105,4,Heredia,404,Santa Bárbara,40401,Santa Bárbara,1.3
+,160105,4,Heredia,404,Santa Bárbara,40402,San Pedro,2.6
+,160105,4,Heredia,404,Santa Bárbara,40403,San Juan,4.5
+,160105,4,Heredia,404,Santa Bárbara,40404,Jesús,11.2
+,160105,4,Heredia,404,Santa Bárbara,40405,Santo Domingo,26.5
+,160105,4,Heredia,404,Santa Bárbara,40406,Purabá,6.1
+,160105,4,Heredia,405,San Rafael,40501,San Rafael,1.3
+,160105,4,Heredia,405,San Rafael,40502,San Josecito,1.4
+,160105,4,Heredia,405,San Rafael,40503,Santiago,1.6
+,160105,4,Heredia,405,San Rafael,40504,Ángeles,21.2
+,160105,4,Heredia,405,San Rafael,40505,Concepción,22.8
+,160105,4,Heredia,406,San Isidro,40601,San Isidro,2.7
+,160105,4,Heredia,406,San Isidro,40602,San José,11.4
+,160105,4,Heredia,406,San Isidro,40603,Concepción,8.1
+,160105,4,Heredia,406,San Isidro,40604,San Francisco,4.6
+,160105,4,Heredia,407,Belén,40701,San Antonio,3.6
+,160105,4,Heredia,407,Belén,40702,La Ribera,4.3
+,160105,4,Heredia,407,Belén,40703,La Asunción,4.6
+,160105,4,Heredia,408,Flores,40801,San Joaquín,2.8
+,160105,4,Heredia,408,Flores,40802,Barrantes,2.1
+,160105,4,Heredia,408,Flores,40803,Llorente,1.9
+,160105,4,Heredia,409,San Pablo,40901,San Pablo,5.9
+,160105,4,Heredia,409,San Pablo,40902,Rincón de Sabanilla,2.4
+,160105,4,Heredia,410,Sarapiquí,41001,Puerto Viejo,428.5
+,160105,4,Heredia,410,Sarapiquí,41002,La Virgen,514.2
+,160105,4,Heredia,410,Sarapiquí,41003,Las Horquetas,564.6
+,160105,4,Heredia,410,Sarapiquí,41004,Llanuras del Gaspar,267.2
+,160105,4,Heredia,410,Sarapiquí,41005,Cureña,369.7
+,160105,5,Guanacaste,501,Liberia,50101,Liberia,563.0
+,160105,5,Guanacaste,501,Liberia,50102,Cañas Dulces,243.4
+,160105,5,Guanacaste,501,Liberia,50103,Mayorga,227.5
+,160105,5,Guanacaste,501,Liberia,50104,Nacascolo,326.9
+,160105,5,Guanacaste,501,Liberia,50105,Curubandé,81.3
+,160105,5,Guanacaste,502,Nicoya,50201,Nicoya,310.7
+,160105,5,Guanacaste,502,Nicoya,50202,Mansión,212.2
+,160105,5,Guanacaste,502,Nicoya,50203,San Antonio,339.5
+,160105,5,Guanacaste,502,Nicoya,50204,Quebrada Honda,109.2
+,160105,5,Guanacaste,502,Nicoya,50205,Sámara,109.4
+,160105,5,Guanacaste,502,Nicoya,50206,Nosara,133.7
+,160105,5,Guanacaste,502,Nicoya,50207,Belén de Nosarita,123.1
+,160105,5,Guanacaste,503,Santa Cruz,50301,Santa Cruz,288.9
+,160105,5,Guanacaste,503,Santa Cruz,50302,Bolsón,32.3
+,160105,5,Guanacaste,503,Santa Cruz,50303,Veintisiete de Abril,303.0
+,160105,5,Guanacaste,503,Santa Cruz,50304,Tempate,129.7
+,160105,5,Guanacaste,503,Santa Cruz,50305,Cartagena,82.9
+,160105,5,Guanacaste,503,Santa Cruz,50306,Cuajiniquil,218.0
+,160105,5,Guanacaste,503,Santa Cruz,50307,Diriá,66.2
+,160105,5,Guanacaste,503,Santa Cruz,50308,Cabo Velas,73.7
+,160105,5,Guanacaste,503,Santa Cruz,50309,Tamarindo,126.1
+,160105,5,Guanacaste,504,Bagaces,50401,Bagaces,798.1
+,160105,5,Guanacaste,504,Bagaces,50402,La Fortuna,163.5
+,160105,5,Guanacaste,504,Bagaces,50403,Mogote,181.8
+,160105,5,Guanacaste,504,Bagaces,50404,Río Naranjo,43.6
+,160105,5,Guanacaste,504,Bagaces,50405,Pijije,91.0
+,160105,5,Guanacaste,505,Carrillo,50501,Filadelfia,125.2
+,160105,5,Guanacaste,505,Carrillo,50502,Palmira,31.5
+,160105,5,Guanacaste,505,Carrillo,50503,Sardinal,260.2
+,160105,5,Guanacaste,505,Carrillo,50504,Belén,182.1
+,160105,5,Guanacaste,506,Cañas,50601,Cañas,193.1
+,160105,5,Guanacaste,506,Cañas,50602,Palmira,204.0
+,160105,5,Guanacaste,506,Cañas,50603,San Miguel,121.0
+,160105,5,Guanacaste,506,Cañas,50604,Bebedero,58.1
+,160105,5,Guanacaste,506,Cañas,50605,Porozal,110.9
+,160105,5,Guanacaste,507,Abangares,50701,Las Juntas,228.7
+,160105,5,Guanacaste,507,Abangares,50702,Sierra,112.0
+,160105,5,Guanacaste,507,Abangares,50703,San Juan,107.5
+,160105,5,Guanacaste,507,Abangares,50704,Colorado,197.8
+,160105,5,Guanacaste,508,Tilarán,50801,Tilarán,144.8
+,160105,5,Guanacaste,508,Tilarán,50802,Quebrada Grande,34.5
+,160105,5,Guanacaste,508,Tilarán,50803,Tronadora,139.9
+,160105,5,Guanacaste,508,Tilarán,50804,Santa Rosa,71.1
+,160105,5,Guanacaste,508,Tilarán,50805,Líbano,72.1
+,160105,5,Guanacaste,508,Tilarán,50806,Tierras Morenas,83.3
+,160105,5,Guanacaste,508,Tilarán,50807,Arenal,72.7
+,160105,5,Guanacaste,508,Tilarán,50808,Cabeceras,50.9
+,160105,5,Guanacaste,509,Nandayure,50901,Carmona,31.7
+,160105,5,Guanacaste,509,Nandayure,50902,Santa Rita,51.4
+,160105,5,Guanacaste,509,Nandayure,50903,Zapotal,105.1
+,160105,5,Guanacaste,509,Nandayure,50904,San Pablo,78.1
+,160105,5,Guanacaste,509,Nandayure,50905,Porvenir,40.2
+,160105,5,Guanacaste,509,Nandayure,50906,Bejuco,261.8
+,160105,5,Guanacaste,510,La Cruz,51001,La Cruz,344.4
+,160105,5,Guanacaste,510,La Cruz,51002,Santa Cecilia,258.0
+,160105,5,Guanacaste,510,La Cruz,51003,La Garita,273.4
+,160105,5,Guanacaste,510,La Cruz,51004,Santa Elena,509.6
+,160105,5,Guanacaste,511,Hojancha,51101,Hojancha,70.4
+,160105,5,Guanacaste,511,Hojancha,51102,Monte Romo,75.3
+,160105,5,Guanacaste,511,Hojancha,51103,Puerto Carrillo,76.9
+,160105,5,Guanacaste,511,Hojancha,51104,Huacas,31.7
+,160105,5,Guanacaste,511,Hojancha,51105,Matambú,8.7
+,160105,6,Puntarenas,601,Puntarenas,60101,Puntarenas,34.0
+,160105,6,Puntarenas,601,Puntarenas,60102,Pitahaya,109.6
+,160105,6,Puntarenas,601,Puntarenas,60103,Chomes,119.0
+,160105,6,Puntarenas,601,Puntarenas,60104,Lepanto,424.3
+,160105,6,Puntarenas,601,Puntarenas,60105,Paquera,335.6
+,160105,6,Puntarenas,601,Puntarenas,60106,Manzanillo,59.9
+,160105,6,Puntarenas,601,Puntarenas,60107,Guacimal,114.9
+,160105,6,Puntarenas,601,Puntarenas,60108,Barranca,36.2
+,160105,6,Puntarenas,601,Puntarenas,60110,Isla del Coco,23.0
+,160105,6,Puntarenas,601,Puntarenas,60111,Cóbano,319.3
+,160105,6,Puntarenas,601,Puntarenas,60112,Chacarita,4.9
+,160105,6,Puntarenas,601,Puntarenas,60113,Chira,42.0
+,160105,6,Puntarenas,601,Puntarenas,60114,Acapulco,110.9
+,160105,6,Puntarenas,601,Puntarenas,60115,El Roble,7.9
+,160105,6,Puntarenas,601,Puntarenas,60116,Arancibia,44.9
+,160105,6,Puntarenas,602,Esparza,60201,Espíritu Santo,18.9
+,160105,6,Puntarenas,602,Esparza,60202,San Juan Grande,18.7
+,160105,6,Puntarenas,602,Esparza,60203,Macacona,34.1
+,160105,6,Puntarenas,602,Esparza,60204,San Rafael,34.3
+,160105,6,Puntarenas,602,Esparza,60205,San Jerónimo,49.1
+,160105,6,Puntarenas,602,Esparza,60206,Caldera,62.0
+,160105,6,Puntarenas,603,Buenos Aires,60301,Buenos Aires,523.7
+,160105,6,Puntarenas,603,Buenos Aires,60302,Volcán,187.4
+,160105,6,Puntarenas,603,Buenos Aires,60303,Potrero Grande,368.2
+,160105,6,Puntarenas,603,Buenos Aires,60304,Boruca,125.8
+,160105,6,Puntarenas,603,Buenos Aires,60305,Pilas,114.3
+,160105,6,Puntarenas,603,Buenos Aires,60306,Colinas,128.8
+,160105,6,Puntarenas,603,Buenos Aires,60307,Chánguena,273.0
+,160105,6,Puntarenas,603,Buenos Aires,60308,Biolley,208.3
+,160105,6,Puntarenas,603,Buenos Aires,60309,Brunka,163.8
+,160105,6,Puntarenas,603,Buenos Aires,60310,Cabagra,289.6
+,160105,6,Puntarenas,604,Montes de Oro,60401,Miramar,111.0
+,160105,6,Puntarenas,604,Montes de Oro,60402,La Unión,78.9
+,160105,6,Puntarenas,604,Montes de Oro,60403,San Isidro,57.7
+,160105,6,Puntarenas,605,Osa,60501,Puerto Cortés,234.4
+,160105,6,Puntarenas,605,Osa,60502,Palmar,250.8
+,160105,6,Puntarenas,605,Osa,60503,Sierpe,634.2
+,160105,6,Puntarenas,605,Osa,60504,Bahía Ballena,158.3
+,160105,6,Puntarenas,605,Osa,60505,Piedras Blancas,262.6
+,160105,6,Puntarenas,605,Osa,60506,Bahía Drake,392.4
+,160105,6,Puntarenas,606,Quepos,60601,Quepos,236.1
+,160105,6,Puntarenas,606,Quepos,60602,Savegre,216.5
+,160105,6,Puntarenas,606,Quepos,60603,Naranjito,105.3
+,160105,6,Puntarenas,607,Golfito,60701,Golfito,355.9
+,160105,6,Puntarenas,607,Golfito,60703,Guaycará,323.1
+,160105,6,Puntarenas,607,Golfito,60704,Pavón,353.3
+,160105,6,Puntarenas,608,Coto Brus,60801,San Vito,74.6
+,160105,6,Puntarenas,608,Coto Brus,60802,Sabalito,186.9
+,160105,6,Puntarenas,608,Coto Brus,60803,Aguabuena,63.9
+,160105,6,Puntarenas,608,Coto Brus,60804,Limoncito,123.6
+,160105,6,Puntarenas,608,Coto Brus,60805,Pittier,257.1
+,160105,6,Puntarenas,608,Coto Brus,60806,Gutiérrez Braun,238.2
+,160105,6,Puntarenas,609,Parrita,60901,Parrita,483.2
+,160105,6,Puntarenas,610,Corredores,61001,Corredor,275.7
+,160105,6,Puntarenas,610,Corredores,61002,La Cuesta,37.1
+,160105,6,Puntarenas,610,Corredores,61003,Canoas,122.0
+,160105,6,Puntarenas,610,Corredores,61004,Laurel,188.9
+,160105,6,Puntarenas,611,Garabito,61101,Jacó,141.4
+,160105,6,Puntarenas,611,Garabito,61102,Tárcoles,93.6
+,160105,6,Puntarenas,611,Garabito,61103,Lagunillas,81.0
+,160105,6,Puntarenas,612,Monteverde,61201,Monteverde,53.5
+,160105,6,Puntarenas,613,Puerto Jiménez,61301,Puerto Jiménez,720.4
+,160105,7,Limón,701,Limón,70101,Limón,59.2
+,160105,7,Limón,701,Limón,70102,Valle La Estrella,1238.4
+,160105,7,Limón,701,Limón,70103,Río Blanco,131.3
+,160105,7,Limón,701,Limón,70104,Matama,340.5
+,160105,7,Limón,702,Pococí,70201,Guápiles,221.7
+,160105,7,Limón,702,Pococí,70202,Jiménez,108.2
+,160105,7,Limón,702,Pococí,70203,Rita,503.7
+,160105,7,Limón,702,Pococí,70204,Roxana,166.2
+,160105,7,Limón,702,Pococí,70205,Cariari,201.0
+,160105,7,Limón,702,Pococí,70206,Colorado,948.4
+,160105,7,Limón,702,Pococí,70207,La Colonia,38.8
+,160105,7,Limón,703,Siquirres,70301,Siquirres,184.2
+,160105,7,Limón,703,Siquirres,70302,Pacuarito,220.0
+,160105,7,Limón,703,Siquirres,70303,Florida,81.9
+,160105,7,Limón,703,Siquirres,70304,Germania,34.0
+,160105,7,Limón,703,Siquirres,70305,El Cairo,107.0
+,160105,7,Limón,703,Siquirres,70306,Alegría,38.1
+,160105,7,Limón,703,Siquirres,70307,Reventazón,190.0
+,160105,7,Limón,704,Talamanca,70401,Bratsi,180.9
+,160105,7,Limón,704,Talamanca,70402,Sixaola,169.0
+,160105,7,Limón,704,Talamanca,70403,Cahuita,234.1
+,160105,7,Limón,704,Talamanca,70404,Telire,2208.3
+,160105,7,Limón,705,Matina,70501,Matina,351.5
+,160105,7,Limón,705,Matina,70502,Batán,213.4
+,160105,7,Limón,705,Matina,70503,Carrandí,205.5
+,160105,7,Limón,706,Guácimo,70601,Guácimo,223.8
+,160105,7,Limón,706,Guácimo,70602,Mercedes,90.1
+,160105,7,Limón,706,Guácimo,70603,Pocora,72.9
+,160105,7,Limón,706,Guácimo,70604,Río Jiménez,333.7
+,160105,7,Limón,706,Guácimo,70605,Duacarí,81.1

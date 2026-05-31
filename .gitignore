@@ -149,7 +149,8 @@ website/.vite/deps/package.json
 # -----------------------------
 # Backend
 # -----------------------------
-API/vendor/*
+API/vendor/
+vendor/
 API/.phpunit.cache/*
 API/config/config.ini
 notes.txt
