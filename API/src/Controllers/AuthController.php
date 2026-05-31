@@ -1,40 +1,56 @@
 <?php
-// src/Controllers/AuthController.php
+
 declare(strict_types=1);
 
 namespace Controllers;
 
 use DTO\LoginUserDTO;
 use Http\ApiException;
+use Http\ErrorType;
 use Http\Request;
 use Http\Response;
-use Http\ErrorType;
 use Services\AuthService;
-use Core\Logger;
 
 /**
- * Handles authentication-related operations for both web and mobile clients.
+ * Handles authentication operations for the REST API.
  *
- * - Web Browsers: HTTP-only cookies for session persistence
- * - Mobile Apps (Kotlin): Bearer tokens in Authorization header
+ * This controller is responsible for user login, token refresh,
+ * and logout. It uses HTTP‑only cookies for access token storage
+ * (web client convenience) while expecting the refresh token to be
+ * sent in the JSON request body for rotation operations.
  *
- * Platform detection is automatic via User-Agent and custom headers.
+ * All methods return a standardised JSON response via the `Response`
+ * helper and propagate business exceptions through `ApiException`.
+ *
+ * @package Controllers
  */
 final class AuthController
 {
   private AuthService $authService;
 
+  /**
+   * AuthController constructor.
+   *
+   * @param \PDO $pdo Active database connection (injected by the router).
+   */
   public function __construct(private \PDO $pdo)
   {
     $this->authService = new AuthService($this->pdo);
   }
 
   /**
-   * POST /auth/login
-   * Authenticates a user and returns appropriate credentials based on client type.
+   * POST /login
    *
-   * - Web Browser: Sets HTTP-only cookie, returns minimal tokens in response
-   * - Mobile App: Returns both tokens in response body for local storage
+   * Authenticates a user with email and password.
+   *
+   * On success, returns the access token, refresh token, user details.
+   * It sets an HTTP‑only cookie (`sigecat_session_token`) containing
+   * the access token for web client convenience.
+   *
+   * @return void
+   *
+   * @throws ApiException Any authentication failure exception propagated from
+   * the service layer.
    */
   public function login(): void
   {
@@ -43,177 +59,109 @@ final class AuthController
       $dto = LoginUserDTO::fromArray($data);
       $result = $this->authService->login($dto);
 
-      if (Request::isMobile()) {
-        $responseData = $this->authService->prepareMobileResponse($result);
-        Response::success($responseData, [
-          'token_type' => 'Bearer',
-          'expires_in' => 5400,
-        ], 200);
-      } else {
-        $responseData = $this->authService->prepareWebResponse($result);
-        Response::success($responseData, [
-          'token_type' => 'Cookie',
-          'expires_in' => 5400,
-          'message' => 'Session set via HTTP-only cookie'
-        ], 200);
-      }
+      // Set HTTP‑only cookie for the access token for web client convenience.
+      $accessToken = $result['data']['access_token'] ?? '';
+      $expiresIn = $result['meta']['expires_in'] ?? 3600;
 
-    } catch (ApiException $e) {
-      Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
-      Response::error(ErrorType::internal($e->getMessage()), 500);
-    }
-  }
-
-  // ???? 
-
-  private function filterResponse(array $result, string $method): array
-  {
-    $data = $result['data'];
-    
-    $baseResponse = [];
-
-    if ($method === 'bearer') {
-      $baseResponse['access_token']  = $data['access_token'];
-      $baseResponse['refresh_token'] = $data['refresh_token'];
-    } else {
-      $baseResponse['user_id']      = $data['user_id'];
-      $baseResponse['email']        = $data['email'];
-      $baseResponse['name']         = $data['name'];
-      $baseResponse['role']         = $data['role'];
-      $baseResponse['is_admin']     = $data['is_admin'];
-      $baseResponse['access_token'] = $data['access_token'];
-    }
-
-    return $baseResponse;
-  }
-
-  /**
-   * POST /auth/logout
-   * Revokes current session and logs out user (both web and mobile).
-   * 
-   * The AuthService handles both cookie and bearer token authentication.
-   */
-  public function logout(): void
-  {
-    try {
-      // Logout handles both web (cookies) and mobile (bearer tokens)
-      $this->authService->logout();
-
-      // For web clients, delete the HTTP-only cookie
-      if (!Request::isMobile()) {
-        setcookie('geoterra_session_token', '', [
-          'expires' => time() - 3600,
+      // Secure is set to false for development.
+      setcookie(
+        'geoterra_session_token',
+        $accessToken,
+        [
+          'expires' => time() + $expiresIn,
           'path' => '/',
+          'domain' => '',
+          'secure' => false,
+          'httponly' => true,
           'samesite' => 'Lax'
-        ]);
+        ]
+      );
 
-        Logger::info('✅ [Auth] Browser logout successful');
-      } else {
-        Logger::info('✅ [Auth] Mobile app logout successful');
-      }
-
-      Response::success([
-        'logged_out' => true,
-        'message' => 'Successfully logged out'
-      ], null, 200);
-
+      Response::success($result['data'], $result['meta'], 200);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
-      Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
    * POST /auth/refresh
-   * Rotates tokens for both web and mobile clients.
+   *
+   * Rotates an existing refresh token and issues a new access/refresh token pair.
+   *
+   * The response contains the new tokens, and the caller should replace the
+   * stored tokens. It also updates the access token cookie for web clients convenience.
+   *
+   * @return void
+   * 
+   * @throws ApiException Any token validation or rotation failure exception propagated from the service layer.
    */
   public function refresh(): void
   {
     try {
-      // Detect client platform and handle accordingly
-      if (Request::isMobile()) {
-        $this->refreshMobileClient();
-      } else {
-        $this->refreshWebClient();
+      $body = Request::parseJsonRequest();
+      if (empty($body['refresh_token'])) {
+        throw new ApiException(ErrorType::missingField('refresh_token'), 400);
       }
 
+      $result = $this->authService->refreshTokens($body['refresh_token']);
+
+      //  Updates the access token cookie for web clients.
+      if (isset($result['data']['access_token'], $result['meta']['expires_in'])) {
+        setcookie(
+          'geoterra_session_token',
+          $result['data']['access_token'],
+          [
+            'expires' => time() + (int) $result['meta']['expires_in'],
+            'path' => '/',
+            'domain' => '',
+            'secure' => false,
+            'httponly' => true,
+            'samesite' => 'Lax'
+          ]
+        );
+      }
+
+      Response::success($result['data'], $result['meta'], 200);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
-      Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
-   * Handle token refresh for web browser.
-   * Browser typically doesn't refresh manually - this validates current session.
+   * POST /logout
+   *
+   * Revokes all tokens belonging to the currently authenticated user.
+   *
+   * The method first tries to resolve the user from the current request context
+   * If that fails, it attempts to extract the token from the Authorization
+   * header or the session cookie and deletes the corresponding tokens.
+   *
+   * The access token cookie is cleared unconditionally.
+   *
+   * @return void
+   * 
+   * @throws ApiException Any failure during the logout process, propagated from the service layer.
    */
-  private function refreshWebClient(): void
+  public function logout(): void
   {
-    // Web browser typically doesn't refresh manually
-    // Just validate current cookie is still valid
-    $user = Request::getUser();
-    if (!$user) {
-      throw new ApiException(
-        ErrorType::unauthorized('Session expired, please login again'),
-        401
+    try {
+      $this->authService->logout();
+      // Clear the access token cookie
+      setcookie(
+        'geoterra_session_token',
+        '',
+        [
+          'expires' => time() - 3600,
+          'path' => '/',
+          'domain' => '',
+          'secure' => false,
+          'httponly' => true,
+          'samesite' => 'Lax'
+        ]
       );
+      Response::success(['logged_out' => true], null, 200);
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getCode());
     }
-
-    error_log(sprintf(
-      '🔄 [Auth] Browser session refresh validated: %s',
-      $user['email']
-    ));
-
-    Response::success([
-      'message' => 'Session is still valid',
-      'user_id' => $user['user_id']
-    ], null, 200);
-  }
-
-  /**
-   * Handle token refresh for mobile app.
-   * Receives refresh token, issues new access token and new refresh token.
-   */
-  private function refreshMobileClient(): void
-  {
-    $data = Request::parseJsonRequest();
-    $refreshToken = $data['refresh_token'] ?? null;
-
-    if (!$refreshToken) {
-      throw new ApiException(
-        ErrorType::missingField('refresh_token'),
-        400
-      );
-    }
-
-    // Refresh tokens
-    $result = $this->authService->refreshTokens($refreshToken);
-
-    error_log(sprintf(
-      '🔄 [Auth] Mobile app tokens refreshed: %s',
-      $result['data']['user_id']
-    ));
-
-    Response::success([
-      'access_token' => $result['data']['access_token'],
-      'refresh_token' => $result['data']['refresh_token'],
-      'user_id' => $result['data']['user_id'],
-      'authentication_method' => 'bearer_token',
-    ], [
-      'token_type' => 'Bearer',
-      'expires_in' => 5400,
-      'refresh_expires_in' => 2592000,
-    ], 200);
-  }
-
-  /**
-   * Helper: Check if running in secure context (HTTPS).
-   */
-  private function isSecureContext(): bool
-  {
-    return isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
   }
 }
