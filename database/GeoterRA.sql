@@ -3,14 +3,13 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 25-05-2026 a las 20:14:52
+-- Tiempo de generación: 08-06-2026 a las 18:56:13
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.0.28
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
-SET FOREIGN_KEY_CHECKS=0;
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -50,7 +49,19 @@ INSERT INTO `access_tokens` (`access_token_id`, `user_id`, `access_token_hash`, 
 ('01KSDS4DW4E0M555XNRYP768Y0', '06F43H2S28KNWX71TSF7MWWTA4', '713b996c20c6a8552b41e2adb06c0b1e9b9b32507c8d37d4a7c48fc978844755', '2026-05-25 05:29:29', NULL, '2026-05-25 03:59:29'),
 ('01KSFS731MH3VSBAMVSQM6M4AN', '06F43H2S28KNWX71TSF7MWWTA4', '450ce6946bcb1ac3d24308405131c15c0e8640179835a8e9c59aac66e59628ef', '2026-05-26 00:09:25', NULL, '2026-05-25 22:39:25'),
 ('01KSFTN36W4NAT5GD0PZ1QZQM4', '06F43H2S28KNWX71TSF7MWWTA4', 'a5a7b28f1cefaf1aa84787ec3cf3a4137f1ce6385172ceaa3d73c964ef9d2f91', '2026-05-26 00:34:33', NULL, '2026-05-25 23:04:33'),
-('01KSG0ATJ0BKHGHEG8JV17H1KM', '06F43H2S28KNWX71TSF7MWWTA4', 'ad874f615f697fd87cda933b73c0d6e4b4af27f0a88e7ee7cc1e149ff2a9a63f', '2026-05-26 02:13:48', NULL, '2026-05-26 00:43:48');
+('01KSG0ATJ0BKHGHEG8JV17H1KM', '06F43H2S28KNWX71TSF7MWWTA4', 'ad874f615f697fd87cda933b73c0d6e4b4af27f0a88e7ee7cc1e149ff2a9a63f', '2026-05-26 02:13:48', NULL, '2026-05-26 00:43:48'),
+('01KSK5QGCDBDQZWABHKKXZAZVP', '06F43H2S28KNWX71TSF7MWWTA4', '2ba8b207023a62f16228e3801e6c667d9171292ad75b98230e06cbec23ffb34f', '2026-05-27 05:45:49', NULL, '2026-05-27 04:15:49'),
+('01KTJPWKC06Y3KX0AKVWZ0XZ9W', '06F43H2S28KNWX71TSF7MWWTA4', 'e6546596e66e06c0cb302e81df17db891100e9bca09554f8d9259e857633d4ae', '2026-06-08 11:42:09', NULL, '2026-06-08 10:12:09'),
+('01KTJQDCA8RTRZPRPNVXNSYN70', '06F43H2S28KNWX71TSF7MWWTA4', 'd4eebbdc201b0b7617818b6c11b7aaa20e1da6abbc8ab4029175e91186d5feea', '2026-06-08 11:51:19', NULL, '2026-06-08 10:21:19'),
+('01KTJQDFS3KE6Y3N137SEXEZXJ', '06F43H2S28KNWX71TSF7MWWTA4', '3f6c1c284137b8b7218064fe9530ee143a7053f6e9680d4cec50faf0d144d9ea', '2026-06-08 11:51:23', NULL, '2026-06-08 10:21:23'),
+('01KTJQDYE80CK0ZCV7B2DSNNHM', '06F43H2S28KNWX71TSF7MWWTA4', 'a8985d20f2407acac760f8a745b196a0301aff1e77f9dc3023a2e963e8bc08a6', '2026-06-08 11:51:38', NULL, '2026-06-08 10:21:38'),
+('01KTJQE2SC9YRF5JGF5JHCN7VS', '06F43H2S28KNWX71TSF7MWWTA4', 'bbcab92319f3ad5a514b172f186a2034c9b22b86b0315de56a1f362534446492', '2026-06-08 11:51:42', NULL, '2026-06-08 10:21:42'),
+('01KTJQEE7H3BSJ1GHTGXBCDYTW', '06F43H2S28KNWX71TSF7MWWTA4', '7a090112e2700bca49978ea0acfa6874b435a3d041663ab698710639a9721abd', '2026-06-08 11:51:54', NULL, '2026-06-08 10:21:54'),
+('01KTJQG3NWPKTKH3QGA8TYJ2KT', '06F43H2S28KNWX71TSF7MWWTA4', 'c5d335cd2b6093636da9547d6afb344ffd939eee7def352b0554ae4a6fd82d52', '2026-06-08 11:52:49', NULL, '2026-06-08 10:22:49'),
+('01KTJQJKGBJE34H00E2B7KV7FQ', '06F43H2S28KNWX71TSF7MWWTA4', 'ac1fb0c881333f9ddbbac5c88c5ed737cc29ee494ec73910fa4a239d00ab39a0', '2026-06-08 11:54:11', NULL, '2026-06-08 10:24:11'),
+('01KTJQK18HFQ0J0P2R9VK8XH8S', '06F43H2S28KNWX71TSF7MWWTA4', '29b991931ac661a266106a8f6a85423c4e0424a303ba7319f78e45f76265483a', '2026-06-08 11:54:25', NULL, '2026-06-08 10:24:25'),
+('01KTJQKYTNJ3ZRDT0EKKF8KM5N', '06F43H2S28KNWX71TSF7MWWTA4', 'c9867ca4525d9f1d00bd62864a2f0c23fd436e9acb1c710d9ec3c861b72ad1e7', '2026-06-08 11:54:55', NULL, '2026-06-08 10:24:55'),
+('01KTM20AA17HVPD4AVA2V0JBKB', '06F43H2S28KNWX71TSF7MWWTA4', '7324a78cbd443a4c4b0e9ac43d0d3445ab349c8b981056d7bc01e33fd31d5eba', '2026-06-09 00:15:40', NULL, '2026-06-08 22:45:40');
 
 -- --------------------------------------------------------
 
@@ -686,19 +697,12 @@ CREATE TABLE `geomanifestations` (
   `district_snit_code` mediumint(9) UNSIGNED DEFAULT NULL,
   `current_georeport_id` char(26) DEFAULT NULL,
   `geomanifestation_name` varchar(255) NOT NULL DEFAULT 'SOLI-XXXXX',
-  `latitude` float NOT NULL,
-  `longitude` float NOT NULL,
+  `latitude` double NOT NULL,
+  `longitude` double NOT NULL,
   `description` varchar(255) DEFAULT NULL,
   `visibility` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `created_by` char(26) NOT NULL,
-  PRIMARY KEY (`geomanifestation_id`),
-  KEY `fk_gm_created_by_user` (`created_by`) USING BTREE,
-  KEY `fk_gm_canton_snit_code` (`canton_snit_code`) USING BTREE,
-  KEY `fk_gm_province_snit_code` (`province_snit_code`) USING BTREE,
-  KEY `fk_gm_district_snit_code` (`district_snit_code`) USING BTREE,
-  KEY `idx_gm_visibility` (`visibility`) USING BTREE,
-  KEY `fk_gm_current_georeport_id` (`current_georeport_id`) USING BTREE
+  `created_by` char(26) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -706,16 +710,16 @@ CREATE TABLE `geomanifestations` (
 --
 
 INSERT INTO `geomanifestations` (`geomanifestation_id`, `province_snit_code`, `canton_snit_code`, `district_snit_code`, `current_georeport_id`, `geomanifestation_name`, `latitude`, `longitude`, `description`, `visibility`, `created_at`, `created_by`) VALUES
-('01KS1GQQFB2806DZH3Z3ZWED5W', 5, 504, 50401, '01KS1GQQFH54H061TR5J0XBEWJ', 'Termal Sitio U-1', 8.23061, -88.5212, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KS1GQQFR29SPWGPGMEM0QNPS', 5, 504, 50401, '01KS1GQQFWQB3YCM8CEKFEP0D4', 'Termal CTP-1', 8.21453, -85.5209, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KS1GQQG0YEQ8MM4F4J6QRD4J', 5, 504, 50401, '01KS1GQQG20BAEFEMFBNKYZ2D5', 'Termal CTP-2', 8.21167, -85.5214, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KS1GQQG3HVE0AWZ4YVE8Z56K', 5, 504, 50401, '01KS1GQQG4XMKEGJ6NG5DH00FS', 'Termal CTP-3', 8.21166, -85.5212, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KS1GQQG59TQQ1KKS57X4S8D0', 5, 504, 50401, '01KS1GQQG654QE46W5CDZ0HEDP', 'Termal Guayabal', 8.29462, -85.5007, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KS1GQQG7Y7827339A1NTHSEP', 5, 504, 50401, '01KS1GQQG80HSGC9Z1CCRSRN62', 'Termal Josue Ulate', 8.28042, -85.5055, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KS1GQQG9F68TKK82J8FR6CN2', 5, 504, 50401, '01KS1GQQGA9ZJRMMPQQ3B7HPTH', 'Termal R. Perdido-2', 8.13788, -85.514, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KS1GQQGCZTSM0JWVKPGFMXSS', 5, 504, 50401, '01KS1GQQGDSSQQ09JNBM18R05P', 'Termal R. Perdido-3', 8.13768, -85.5139, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KS1GQQGEGT626AE1ZRE719A0', 5, 504, 50401, '01KS1GQQGFRBJ6DXH4T1FHRBD5', 'Termal R. Perdido-4', 8.13736, -85.5139, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KS1GQQGFRBJ6DXH4T1FHRBD6', 5, 504, 50401, '01KS1GQQGGXA38WKA3CHTQM9JP', 'Termal Guayacan', 8.26039, -85.5074, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQFB2806DZH3Z3ZWED5W', 5, 504, 50401, '01KS1GQQFH54H061TR5J0XBEWJ', 'Termal Sitio U-1', 8.230613708496094, -88.52119445800781, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQFR29SPWGPGMEM0QNPS', 5, 504, 50401, '01KS1GQQFWQB3YCM8CEKFEP0D4', 'Termal CTP-1', 8.21452808380127, -85.52091979980469, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQG0YEQ8MM4F4J6QRD4J', 5, 504, 50401, '01KS1GQQG20BAEFEMFBNKYZ2D5', 'Termal CTP-2', 8.211665153503418, -85.52137756347656, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQG3HVE0AWZ4YVE8Z56K', 5, 504, 50401, '01KS1GQQG4XMKEGJ6NG5DH00FS', 'Termal CTP-3', 8.21165657043457, -85.52117919921875, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQG59TQQ1KKS57X4S8D0', 5, 504, 50401, '01KS1GQQG654QE46W5CDZ0HEDP', 'Termal Guayabal', 8.294615745544434, -85.50072479248047, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQG7Y7827339A1NTHSEP', 5, 504, 50401, '01KS1GQQG80HSGC9Z1CCRSRN62', 'Termal Josue Ulate', 8.280424118041992, -85.5054702758789, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQG9F68TKK82J8FR6CN2', 5, 504, 50401, '01KS1GQQGA9ZJRMMPQQ3B7HPTH', 'Termal R. Perdido-2', 8.137879371643066, -85.51396179199219, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQGCZTSM0JWVKPGFMXSS', 5, 504, 50401, '01KS1GQQGDSSQQ09JNBM18R05P', 'Termal R. Perdido-3', 8.137676239013672, -85.51388549804688, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQGEGT626AE1ZRE719A0', 5, 504, 50401, '01KS1GQQGFRBJ6DXH4T1FHRBD5', 'Termal R. Perdido-4', 8.137364387512207, -85.51394653320312, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQGFRBJ6DXH4T1FHRBD6', 5, 504, 50401, '01KS1GQQGGXA38WKA3CHTQM9JP', 'Termal Guayacan', 8.260390281677246, -85.50739288330078, 'Imported from Bagaces test data', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
 ('01KSDT9491ATWEXM5Q4MBVDZXQ', 5, 504, 50401, NULL, 'Geothermal 1 - TESTEO', 0, 0, 'Descripción actualizada', 1, '2026-05-24 20:19:32', '06F43H2S28KNWX71TSF7MWWTA4');
 
 -- --------------------------------------------------------
@@ -759,20 +763,20 @@ INSERT INTO `georeports` (`georeport_id`, `geomanifestation_id`, `insitu_test_id
 CREATE TABLE `inlab_tests` (
   `inlab_test_id` char(26) NOT NULL,
   `geomanifestation_id` char(26) NOT NULL,
-  `ph` decimal(10,2) NOT NULL DEFAULT 0.00,
-  `conductivity` decimal(10,4) NOT NULL DEFAULT 0.0000,
-  `cl` decimal(10,4) NOT NULL DEFAULT 0.0000,
+  `ph` double(10,2) NOT NULL DEFAULT 0.00,
+  `conductivity` double(10,4) NOT NULL DEFAULT 0.0000,
+  `cl` double(10,4) NOT NULL DEFAULT 0.0000,
   `ca` decimal(10,4) NOT NULL DEFAULT 0.0000,
-  `hco3` decimal(10,4) NOT NULL DEFAULT 0.0000,
+  `hco3` double(10,4) NOT NULL DEFAULT 0.0000,
   `so4` decimal(10,4) NOT NULL DEFAULT 0.0000,
-  `fe` decimal(10,4) NOT NULL DEFAULT 0.0000,
-  `si` decimal(10,4) NOT NULL DEFAULT 0.0000,
-  `b` decimal(10,4) NOT NULL DEFAULT 0.0000,
-  `li` decimal(10,4) NOT NULL DEFAULT 0.0000,
-  `f` decimal(10,4) NOT NULL DEFAULT 0.0000,
-  `na` decimal(10,4) NOT NULL DEFAULT 0.0000,
-  `k` decimal(10,4) NOT NULL DEFAULT 0.0000,
-  `mg` decimal(10,4) NOT NULL DEFAULT 0.0000,
+  `fe` double(10,4) NOT NULL DEFAULT 0.0000,
+  `si` double(10,4) NOT NULL DEFAULT 0.0000,
+  `b` double(10,4) NOT NULL DEFAULT 0.0000,
+  `li` double(10,4) NOT NULL DEFAULT 0.0000,
+  `f` double(10,4) NOT NULL DEFAULT 0.0000,
+  `na` double(10,4) NOT NULL DEFAULT 0.0000,
+  `k` double(10,4) NOT NULL DEFAULT 0.0000,
+  `mg` double(10,4) NOT NULL DEFAULT 0.0000,
   `description` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_by` char(26) NOT NULL
@@ -803,9 +807,9 @@ INSERT INTO `inlab_tests` (`inlab_test_id`, `geomanifestation_id`, `ph`, `conduc
 CREATE TABLE `insitu_tests` (
   `insitu_test_id` char(26) NOT NULL,
   `geomanifestation_id` char(26) NOT NULL,
-  `temperature` decimal(6,2) NOT NULL DEFAULT 0.00,
-  `conductivity` decimal(10,2) NOT NULL DEFAULT 0.00,
-  `ph` decimal(4,2) NOT NULL DEFAULT 0.00,
+  `temperature` double(6,2) NOT NULL DEFAULT 0.00,
+  `conductivity` double(10,2) NOT NULL DEFAULT 0.00,
+  `ph` double(4,2) NOT NULL DEFAULT 0.00,
   `description` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_by` char(26) NOT NULL
@@ -922,7 +926,19 @@ INSERT INTO `refresh_tokens` (`refresh_token_id`, `user_id`, `token_hash`, `fami
 ('01KSDS4DW2RWFEVTFN0SNRB573', '06F43H2S28KNWX71TSF7MWWTA4', '3a89fe223cafd1dcb19273da4e99d892e9634e72bc5855c76e3f5ae306a83410', '01KSDS4DW2RWFEVTFN0SNRB572', '2026-06-24 03:59:29', NULL, 0, NULL, NULL, '2026-05-25 03:59:29'),
 ('01KSFS731B80FNNRXPA762CF1X', '06F43H2S28KNWX71TSF7MWWTA4', '529c2298a54d20bef7a7213be62573dab8fcad2ebbbdc69f2fbcc015286bf846', '01KSFS731939QVQ5SSZB7JBMPP', '2026-06-24 22:39:25', NULL, 0, NULL, NULL, '2026-05-25 22:39:25'),
 ('01KSFTN36VN8CV8XX9TSV965NJ', '06F43H2S28KNWX71TSF7MWWTA4', '2c23b959c3c3cc98d688d4de3cefb258e24a37ef00ebb3f609be0e44b671056b', '01KSFTN36S0ZC9MKFE2Q7N8JN1', '2026-06-24 23:04:33', NULL, 0, NULL, NULL, '2026-05-25 23:04:33'),
-('01KSG0ATHYPPYM56S892YMKGE7', '06F43H2S28KNWX71TSF7MWWTA4', 'a3228a39ad20dee66582f68b3e9f83e7be78a83ad767049b63de81e95c2bd0a8', '01KSG0ATHYPPYM56S892YMKGE6', '2026-06-25 00:43:48', NULL, 0, NULL, NULL, '2026-05-26 00:43:48');
+('01KSG0ATHYPPYM56S892YMKGE7', '06F43H2S28KNWX71TSF7MWWTA4', 'a3228a39ad20dee66582f68b3e9f83e7be78a83ad767049b63de81e95c2bd0a8', '01KSG0ATHYPPYM56S892YMKGE6', '2026-06-25 00:43:48', NULL, 0, NULL, NULL, '2026-05-26 00:43:48'),
+('01KSK5QGC89H1GK8TGTFDVQ7CT', '06F43H2S28KNWX71TSF7MWWTA4', 'd4007f2d266cb45252186f261567635d88ac14900d51fc62d5bef3957586a604', '01KSK5QGC89H1GK8TGTFDVQ7CS', '2026-06-26 04:15:49', NULL, 0, NULL, NULL, '2026-05-27 04:15:49'),
+('01KTJPWKBSXQTYTGRG3EQETDBQ', '06F43H2S28KNWX71TSF7MWWTA4', 'fc49a1654aed5391c7f9d9c315da324ac21d748549703078600b5a360a6831a0', '01KTJPWKBSXQTYTGRG3EQETDBP', '2026-07-08 10:12:09', NULL, 0, NULL, NULL, '2026-06-08 10:12:09'),
+('01KTJQDCA6HWNF67SCSZR9MDZF', '06F43H2S28KNWX71TSF7MWWTA4', 'ffdbb4c04779f6593ff446ae5b33f8617ae03cc91efd7d39b116af68e52628b5', '01KTJQDCA6HWNF67SCSZR9MDZE', '2026-07-08 10:21:19', NULL, 0, NULL, NULL, '2026-06-08 10:21:19'),
+('01KTJQDFS1W9D0WX59YKAQ5XDG', '06F43H2S28KNWX71TSF7MWWTA4', '69375ef5fec937e938bbf6add6122cb0e179fe8694a798bde1f8140172c99340', '01KTJQDFS1W9D0WX59YKAQ5XDF', '2026-07-08 10:21:23', NULL, 0, NULL, NULL, '2026-06-08 10:21:23'),
+('01KTJQDYE80CK0ZCV7B2DSNNHK', '06F43H2S28KNWX71TSF7MWWTA4', 'b9176e1c71fab7f84661b42fff583183d5b87c5f2bd7e9060b6f47e34f528e57', '01KTJQDYE80CK0ZCV7B2DSNNHJ', '2026-07-08 10:21:38', NULL, 0, NULL, NULL, '2026-06-08 10:21:38'),
+('01KTJQE2SBFGVQGZM2EBK9749F', '06F43H2S28KNWX71TSF7MWWTA4', '797d86db2c3a01cae47c8f6f40a973b92ce7e93c654bbf8ff4e535d2d68e8e79', '01KTJQE2SBFGVQGZM2EBK9749E', '2026-07-08 10:21:42', NULL, 0, NULL, NULL, '2026-06-08 10:21:42'),
+('01KTJQEE7GJG97WBW3KWE71NCB', '06F43H2S28KNWX71TSF7MWWTA4', '3e873065ee3b995ab84faa6bd2cdeaef85cbe0122aafbf665cfaea80fb5554e0', '01KTJQEE7GJG97WBW3KWE71NCA', '2026-07-08 10:21:54', NULL, 0, NULL, NULL, '2026-06-08 10:21:54'),
+('01KTJQG3NVMBRZTASZ0BKJJYKV', '06F43H2S28KNWX71TSF7MWWTA4', 'b1be5333ed2e277df10ad0939cad0042a2f23a09771a113887b8566953c09f1d', '01KTJQG3NVMBRZTASZ0BKJJYKT', '2026-07-08 10:22:49', NULL, 0, NULL, NULL, '2026-06-08 10:22:49'),
+('01KTJQJKG9JJ859FR32DEZWYNJ', '06F43H2S28KNWX71TSF7MWWTA4', '9773b946941d2ef1d6f4c3fb69a2ecc1964cb687096865328e1304c6520a76ec', '01KTJQJKG9JJ859FR32DEZWYNH', '2026-07-08 10:24:11', NULL, 0, NULL, NULL, '2026-06-08 10:24:11'),
+('01KTJQK18FKQDFD9Y437Y28ZBA', '06F43H2S28KNWX71TSF7MWWTA4', '245705de160797c1b14c80a29499a199731384649624cad9c55f9565f6b3f1b9', '01KTJQK18FKQDFD9Y437Y28ZB9', '2026-07-08 10:24:25', NULL, 0, NULL, NULL, '2026-06-08 10:24:25'),
+('01KTJQKYTNJ3ZRDT0EKKF8KM5M', '06F43H2S28KNWX71TSF7MWWTA4', 'fdf9062757b5d3d328a0a2296db0a1deeaf834287fc5de31b02a496566ca4071', '01KTJQKYTNJ3ZRDT0EKKF8KM5K', '2026-07-08 10:24:55', NULL, 0, NULL, NULL, '2026-06-08 10:24:55'),
+('01KTM20A9Z83X98V4N965685R5', '06F43H2S28KNWX71TSF7MWWTA4', 'ace5eab44fa78ae79739c2e6289b2f9c259de9f463c83c90aa27899f1da2b6e1', '01KTM20A9Z83X98V4N965685R4', '2026-07-08 22:45:40', NULL, 0, NULL, NULL, '2026-06-08 22:45:40');
 
 --
 -- Disparadores `refresh_tokens`
@@ -957,10 +973,10 @@ CREATE TABLE `requests` (
   `bubbles` tinyint(1) DEFAULT 0,
   `details` varchar(255) DEFAULT NULL,
   `exact_address` varchar(500) DEFAULT NULL,
-  `latitude` decimal(10,7) DEFAULT NULL,
-  `longitude` decimal(10,7) DEFAULT NULL,
+  `latitude` double(10,7) DEFAULT NULL,
+  `longitude` double(10,7) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `relation_with_owner` enum('Familiar','Empleado','Socio','Conocido') DEFAULT NULL
+  `relation_with_owner` enum('Familiar','Empleado','Socio','Conocido','Titular') DEFAULT 'Titular'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -1025,7 +1041,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `email`, `phone_number`, `first_name`, `last_name`, `password_hash`, `role`, `is_active`, `is_verified`, `failed_login_attempts`, `last_login_at`, `deleted_at`, `deleted_by`, `created_at`) VALUES
 ('01KSDHAZHHKK02DG47168ZX7TV', 'juancarlos@example.com', '87654321', 'Juan Carlos', 'Pérez Gómez', '$2y$10$gRipQdtJbLdnA3DwaVQ/Y.2yNzJGZFzCx0aZZ3ZDuJFatK9cszA0S', 'user', 1, 0, 0, NULL, NULL, NULL, '2026-05-24 17:43:15'),
-('06F43H2S28KNWX71TSF7MWWTA4', 'system@GeoterRA.com', NULL, 'System', 'Importer', '$2y$12$maFlo43rQpKj8KpN4PAssu6CiBsWF3oqJRKwk.SPPzUxPf3Jemnbe', 'admin', 1, 1, 0, NULL, NULL, NULL, '2026-05-19 19:44:07');
+('06F43H2S28KNWX71TSF7MWWTA4', 'system@geoterra.com', NULL, 'System', 'Importer', '$2y$12$maFlo43rQpKj8KpN4PAssu6CiBsWF3oqJRKwk.SPPzUxPf3Jemnbe', 'admin', 1, 1, 0, NULL, NULL, NULL, '2026-05-19 19:44:07');
 
 -- --------------------------------------------------------
 
@@ -1036,8 +1052,8 @@ INSERT INTO `users` (`user_id`, `email`, `phone_number`, `first_name`, `last_nam
 CREATE TABLE `view_geomanifestations` (
 `geomanifestation_id` char(26)
 ,`geomanifestation_name` varchar(255)
-,`latitude` float
-,`longitude` float
+,`latitude` double
+,`longitude` double
 ,`manifestation_description` varchar(255)
 ,`visibility` tinyint(1)
 ,`manifestation_created_at` timestamp
@@ -1055,26 +1071,26 @@ CREATE TABLE `view_geomanifestations` (
 ,`report_creator_first_name` varchar(55)
 ,`report_creator_last_name` varchar(110)
 ,`insitu_test_id` char(26)
-,`temperature` decimal(6,2)
-,`insitu_conductivity` decimal(10,2)
-,`insitu_ph` decimal(4,2)
+,`temperature` double(6,2)
+,`insitu_conductivity` double(10,2)
+,`insitu_ph` double(4,2)
 ,`insitu_description` varchar(255)
 ,`insitu_created_at` timestamp
 ,`inlab_test_id` char(26)
-,`lab_ph` decimal(10,2)
-,`lab_conductivity` decimal(10,4)
-,`cl` decimal(10,4)
+,`lab_ph` double(10,2)
+,`lab_conductivity` double(10,4)
+,`cl` double(10,4)
 ,`ca` decimal(10,4)
-,`hco3` decimal(10,4)
+,`hco3` double(10,4)
 ,`so4` decimal(10,4)
-,`fe` decimal(10,4)
-,`si` decimal(10,4)
-,`b` decimal(10,4)
-,`li` decimal(10,4)
-,`f` decimal(10,4)
-,`na` decimal(10,4)
-,`k` decimal(10,4)
-,`mg` decimal(10,4)
+,`fe` double(10,4)
+,`si` double(10,4)
+,`b` double(10,4)
+,`li` double(10,4)
+,`f` double(10,4)
+,`na` double(10,4)
+,`k` double(10,4)
+,`mg` double(10,4)
 ,`lab_description` varchar(255)
 ,`lab_created_at` timestamp
 );
@@ -1105,7 +1121,7 @@ CREATE TABLE `view_logs_entries` (
 --
 DROP TABLE IF EXISTS `view_geomanifestations`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `GeoterRA`.`view_geomanifestations`  AS SELECT `gm`.`geomanifestation_id` AS `geomanifestation_id`, `gm`.`geomanifestation_name` AS `geomanifestation_name`, `gm`.`latitude` AS `latitude`, `gm`.`longitude` AS `longitude`, `gm`.`description` AS `manifestation_description`, `gm`.`visibility` AS `visibility`, `gm`.`created_at` AS `manifestation_created_at`, `gm_creator`.`first_name` AS `manifestation_creator_first_name`, `gm_creator`.`last_name` AS `manifestation_creator_last_name`, `p`.`province_name` AS `province_name`, `p`.`province_snit_code` AS `province_snit_code`, `c`.`canton_name` AS `canton_name`, `c`.`canton_snit_code` AS `canton_snit_code`, `d`.`district_name` AS `district_name`, `d`.`district_snit_code` AS `district_snit_code`, `gr`.`georeport_id` AS `georeport_id`, `gr`.`details` AS `report_details`, `gr`.`created_at` AS `report_created_at`, `report_creator`.`first_name` AS `report_creator_first_name`, `report_creator`.`last_name` AS `report_creator_last_name`, `ist`.`insitu_test_id` AS `insitu_test_id`, `ist`.`temperature` AS `temperature`, `ist`.`conductivity` AS `insitu_conductivity`, `ist`.`ph` AS `insitu_ph`, `ist`.`description` AS `insitu_description`, `ist`.`created_at` AS `insitu_created_at`, `ilt`.`inlab_test_id` AS `inlab_test_id`, `ilt`.`ph` AS `lab_ph`, `ilt`.`conductivity` AS `lab_conductivity`, `ilt`.`cl` AS `cl`, `ilt`.`ca` AS `ca`, `ilt`.`hco3` AS `hco3`, `ilt`.`so4` AS `so4`, `ilt`.`fe` AS `fe`, `ilt`.`si` AS `si`, `ilt`.`b` AS `b`, `ilt`.`li` AS `li`, `ilt`.`f` AS `f`, `ilt`.`na` AS `na`, `ilt`.`k` AS `k`, `ilt`.`mg` AS `mg`, `ilt`.`description` AS `lab_description`, `ilt`.`created_at` AS `lab_created_at` FROM ((((((((`GeoterRA`.`geomanifestations` `gm` left join `GeoterRA`.`users` `gm_creator` on(`gm`.`created_by` = `gm_creator`.`user_id`)) left join `GeoterRA`.`provinces` `p` on(`gm`.`province_snit_code` = `p`.`province_snit_code`)) left join `GeoterRA`.`cantons` `c` on(`gm`.`canton_snit_code` = `c`.`canton_snit_code`)) left join `GeoterRA`.`districts` `d` on(`gm`.`district_snit_code` = `d`.`district_snit_code`)) left join `GeoterRA`.`georeports` `gr` on(`gm`.`current_georeport_id` = `gr`.`georeport_id`)) left join `GeoterRA`.`users` `report_creator` on(`gr`.`created_by` = `report_creator`.`user_id`)) left join `GeoterRA`.`insitu_tests` `ist` on(`gr`.`insitu_test_id` = `ist`.`insitu_test_id`)) left join `GeoterRA`.`inlab_tests` `ilt` on(`gr`.`inlab_test_id` = `ilt`.`inlab_test_id`)) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `geoterra`.`view_geomanifestations`  AS SELECT `gm`.`geomanifestation_id` AS `geomanifestation_id`, `gm`.`geomanifestation_name` AS `geomanifestation_name`, `gm`.`latitude` AS `latitude`, `gm`.`longitude` AS `longitude`, `gm`.`description` AS `manifestation_description`, `gm`.`visibility` AS `visibility`, `gm`.`created_at` AS `manifestation_created_at`, `gm_creator`.`first_name` AS `manifestation_creator_first_name`, `gm_creator`.`last_name` AS `manifestation_creator_last_name`, `p`.`province_name` AS `province_name`, `p`.`province_snit_code` AS `province_snit_code`, `c`.`canton_name` AS `canton_name`, `c`.`canton_snit_code` AS `canton_snit_code`, `d`.`district_name` AS `district_name`, `d`.`district_snit_code` AS `district_snit_code`, `gr`.`georeport_id` AS `georeport_id`, `gr`.`details` AS `report_details`, `gr`.`created_at` AS `report_created_at`, `report_creator`.`first_name` AS `report_creator_first_name`, `report_creator`.`last_name` AS `report_creator_last_name`, `ist`.`insitu_test_id` AS `insitu_test_id`, `ist`.`temperature` AS `temperature`, `ist`.`conductivity` AS `insitu_conductivity`, `ist`.`ph` AS `insitu_ph`, `ist`.`description` AS `insitu_description`, `ist`.`created_at` AS `insitu_created_at`, `ilt`.`inlab_test_id` AS `inlab_test_id`, `ilt`.`ph` AS `lab_ph`, `ilt`.`conductivity` AS `lab_conductivity`, `ilt`.`cl` AS `cl`, `ilt`.`ca` AS `ca`, `ilt`.`hco3` AS `hco3`, `ilt`.`so4` AS `so4`, `ilt`.`fe` AS `fe`, `ilt`.`si` AS `si`, `ilt`.`b` AS `b`, `ilt`.`li` AS `li`, `ilt`.`f` AS `f`, `ilt`.`na` AS `na`, `ilt`.`k` AS `k`, `ilt`.`mg` AS `mg`, `ilt`.`description` AS `lab_description`, `ilt`.`created_at` AS `lab_created_at` FROM ((((((((`geoterra`.`geomanifestations` `gm` left join `geoterra`.`users` `gm_creator` on(`gm`.`created_by` = `gm_creator`.`user_id`)) left join `geoterra`.`provinces` `p` on(`gm`.`province_snit_code` = `p`.`province_snit_code`)) left join `geoterra`.`cantons` `c` on(`gm`.`canton_snit_code` = `c`.`canton_snit_code`)) left join `geoterra`.`districts` `d` on(`gm`.`district_snit_code` = `d`.`district_snit_code`)) left join `geoterra`.`georeports` `gr` on(`gm`.`current_georeport_id` = `gr`.`georeport_id`)) left join `geoterra`.`users` `report_creator` on(`gr`.`created_by` = `report_creator`.`user_id`)) left join `geoterra`.`insitu_tests` `ist` on(`gr`.`insitu_test_id` = `ist`.`insitu_test_id`)) left join `geoterra`.`inlab_tests` `ilt` on(`gr`.`inlab_test_id` = `ilt`.`inlab_test_id`)) ;
 
 -- --------------------------------------------------------
 
@@ -1114,7 +1130,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `view_logs_entries`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `GeoterRA`.`view_logs_entries`  AS SELECT `le`.`id` AS `id`, `le`.`log_id` AS `log_id`, `le`.`field_name` AS `field_name`, `le`.`old_value` AS `old_value`, `le`.`new_value` AS `new_value`, `l`.`auto_id` AS `auto_id`, `l`.`table_name` AS `table_name`, `l`.`updated_at` AS `updated_at`, `l`.`updated_by` AS `updated_by`, `l`.`updated_by_name` AS `updated_by_name` FROM (`GeoterRA`.`logs_entries` `le` left join `GeoterRA`.`logs` `l` on(`le`.`log_id` = `l`.`id`)) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `geoterra`.`view_logs_entries`  AS SELECT `le`.`id` AS `id`, `le`.`log_id` AS `log_id`, `le`.`field_name` AS `field_name`, `le`.`old_value` AS `old_value`, `le`.`new_value` AS `new_value`, `l`.`auto_id` AS `auto_id`, `l`.`table_name` AS `table_name`, `l`.`updated_at` AS `updated_at`, `l`.`updated_by` AS `updated_by`, `l`.`updated_by_name` AS `updated_by_name` FROM (`geoterra`.`logs_entries` `le` left join `geoterra`.`logs` `l` on(`le`.`log_id` = `l`.`id`)) ;
 
 --
 -- Índices para tablas volcadas
@@ -1145,6 +1161,18 @@ ALTER TABLE `districts`
   ADD UNIQUE KEY `unique_district_snit_code` (`district_snit_code`),
   ADD KEY `fk_district_created_by` (`created_by`),
   ADD KEY `fk_district_canton_snit_code` (`canton_snit_code`);
+
+--
+-- Indices de la tabla `geomanifestations`
+--
+ALTER TABLE `geomanifestations`
+  ADD PRIMARY KEY (`geomanifestation_id`),
+  ADD KEY `fk_gm_created_by_user` (`created_by`) USING BTREE,
+  ADD KEY `fk_gm_canton_snit_code` (`canton_snit_code`) USING BTREE,
+  ADD KEY `fk_gm_province_snit_code` (`province_snit_code`) USING BTREE,
+  ADD KEY `fk_gm_district_snit_code` (`district_snit_code`) USING BTREE,
+  ADD KEY `idx_gm_visibility` (`visibility`) USING BTREE,
+  ADD KEY `fk_gm_current_georeport_id` (`current_georeport_id`) USING BTREE;
 
 --
 -- Indices de la tabla `georeports`
@@ -1324,8 +1352,6 @@ ALTER TABLE `requests`
 --
 ALTER TABLE `requests_state`
   ADD CONSTRAINT `fk_rs_request_id` FOREIGN KEY (`request_id`) REFERENCES `requests` (`request_id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
-SET FOREIGN_KEY_CHECKS=1;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
