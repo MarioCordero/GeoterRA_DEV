@@ -1,0 +1,46 @@
+{
+  "name": "geoterradev/api",
+  "description": "GeoterRA API - RESTful Backend for Geological Manifestations Tracking",
+  "type": "project",
+  "require": {
+    "php": ">=8.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^11.0",
+    "mockery/mockery": "^1.6",
+    "fakerphp/faker": "^1.23"
+  },
+  "autoload": {
+    "psr-4": {
+      "": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "phpunit",
+    "test:web": "phpunit tests/Unit/DTO/ tests/Unit/Services/ tests/Unit/Platform/Web/",
+    "test:mobile": "phpunit tests/Unit/Platform/Mobile/ --coverage-text",
+    "test:all": "phpunit tests/Unit/ --coverage-text",
+    "test:unit": "phpunit tests/Unit/",
+    "test:coverage": "phpunit --coverage-html coverage/ --coverage-text",
+    "test:coverage:web": "phpunit tests/Unit/DTO/ tests/Unit/Services/ tests/Unit/Platform/Web/ --coverage-html coverage/web --coverage-text",
+    "test:coverage:mobile": "phpunit tests/Unit/Platform/Mobile/ --coverage-html coverage/mobile --coverage-text",
+    "test:watch": "phpunit --watch",
+    "test:services": "phpunit tests/Unit/Services/",
+    "test:services:web": "phpunit tests/Unit/Services/ --filter 'not.*Mobile'",
+    "test:services:mobile": "phpunit tests/Unit/Services/ --filter '.*Mobile'",
+    "test:dto": "phpunit tests/Unit/DTO/",
+    "test:repositories": "phpunit tests/Unit/Repositories/",
+    "test:http": "phpunit tests/Unit/Http/",
+    "test:platform:web": "phpunit tests/Unit/Platform/Web/",
+    "test:platform:mobile": "phpunit tests/Unit/Platform/Mobile/",
+    "test:verbose": "phpunit --verbose"
+  },
+  "config": {
+    "allow-plugins": true
+  }
+}
