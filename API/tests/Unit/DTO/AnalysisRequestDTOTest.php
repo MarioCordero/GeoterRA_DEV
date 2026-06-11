@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\DTO;
 
 use Tests\TestCase;
-use DTO\AnalysisRequestDTO;
+use DTO\InvestigationRequestDTO;
 use Http\ApiException;
 
 class AnalysisRequestDTOTest extends TestCase
@@ -20,7 +20,7 @@ class AnalysisRequestDTOTest extends TestCase
             'longitude' => -151.2093
         ];
 
-        $dto = AnalysisRequestDTO::fromArray($data);
+        $dto = InvestigationRequestDTO::fromArray($data);
         
         $this->assertNotNull($dto);
     }
@@ -36,9 +36,9 @@ class AnalysisRequestDTOTest extends TestCase
             'additional_information' => 'Test info'
         ];
 
-        $dto = AnalysisRequestDTO::fromArray($data);
+        $dto = InvestigationRequestDTO::fromArray($data);
         
-        $this->assertInstanceOf(AnalysisRequestDTO::class, $dto);
+        $this->assertInstanceOf(InvestigationRequestDTO::class, $dto);
     }
 
     public function testValidateThrowsOnMissingRegion(): void
@@ -51,7 +51,7 @@ class AnalysisRequestDTOTest extends TestCase
         ];
 
         $this->expectException(ApiException::class);
-        $dto = AnalysisRequestDTO::fromArray($data);
+        $dto = InvestigationRequestDTO::fromArray($data);
         $dto->validate();
     }
 
@@ -65,7 +65,7 @@ class AnalysisRequestDTOTest extends TestCase
         ];
 
         $this->expectException(ApiException::class);
-        $dto = AnalysisRequestDTO::fromArray($data);
+        $dto = InvestigationRequestDTO::fromArray($data);
         $dto->validate();
     }
 
@@ -80,7 +80,7 @@ class AnalysisRequestDTOTest extends TestCase
         ];
 
         $this->expectException(ApiException::class);
-        $dto = AnalysisRequestDTO::fromArray($data);
+        $dto = InvestigationRequestDTO::fromArray($data);
         $dto->validate();
     }
 
@@ -94,7 +94,7 @@ class AnalysisRequestDTOTest extends TestCase
         ];
 
         $this->expectException(ApiException::class);
-        $dto = AnalysisRequestDTO::fromArray($data);
+        $dto = InvestigationRequestDTO::fromArray($data);
         $dto->validate();
     }
 
@@ -108,7 +108,7 @@ class AnalysisRequestDTOTest extends TestCase
         ];
 
         $this->expectException(ApiException::class);
-        $dto = AnalysisRequestDTO::fromArray($data);
+        $dto = InvestigationRequestDTO::fromArray($data);
         $dto->validate();
     }
 
@@ -122,7 +122,7 @@ class AnalysisRequestDTOTest extends TestCase
         ];
 
         $this->expectException(ApiException::class);
-        $dto = AnalysisRequestDTO::fromArray($data);
+        $dto = InvestigationRequestDTO::fromArray($data);
         $dto->validate();
     }
 
@@ -137,7 +137,7 @@ class AnalysisRequestDTOTest extends TestCase
         ];
 
         $this->expectException(ApiException::class);
-        $dto = AnalysisRequestDTO::fromArray($data);
+        $dto = InvestigationRequestDTO::fromArray($data);
         $dto->validate();
     }
 
@@ -152,7 +152,7 @@ class AnalysisRequestDTOTest extends TestCase
         ];
 
         $this->expectException(ApiException::class);
-        $dto = AnalysisRequestDTO::fromArray($data);
+        $dto = InvestigationRequestDTO::fromArray($data);
         $dto->validate();
     }
 
@@ -167,7 +167,7 @@ class AnalysisRequestDTOTest extends TestCase
         ];
 
         $this->expectException(ApiException::class);
-        $dto = AnalysisRequestDTO::fromArray($data);
+        $dto = InvestigationRequestDTO::fromArray($data);
         $dto->validate();
     }
 
@@ -182,7 +182,7 @@ class AnalysisRequestDTOTest extends TestCase
         ];
 
         $this->expectException(ApiException::class);
-        $dto = AnalysisRequestDTO::fromArray($data);
+        $dto = InvestigationRequestDTO::fromArray($data);
         $dto->validate();
     }
 
@@ -199,7 +199,7 @@ class AnalysisRequestDTOTest extends TestCase
                 'longitude' => -151.2093
             ];
 
-            $dto = AnalysisRequestDTO::fromArray($data);
+            $dto = InvestigationRequestDTO::fromArray($data);
             $dto->validate(); // Should not throw
         }
 
@@ -227,7 +227,7 @@ class AnalysisRequestDTOTest extends TestCase
                 'longitude' => -151.2093
             ];
 
-            $dto = AnalysisRequestDTO::fromArray($data);
+            $dto = InvestigationRequestDTO::fromArray($data);
             $dto->validate(); // Should not throw
         }
 
@@ -245,23 +245,23 @@ class AnalysisRequestDTOTest extends TestCase
             'longitude' => -151.2093
         ];
 
-        $dto = AnalysisRequestDTO::fromArray($data);
+        $dto = InvestigationRequestDTO::fromArray($data);
         $dto->validate();
 
         // Test max latitude
         $data['latitude'] = 90.0;
-        $dto = AnalysisRequestDTO::fromArray($data);
+        $dto = InvestigationRequestDTO::fromArray($data);
         $dto->validate();
 
         // Test min longitude
         $data['latitude'] = -33.8688;
         $data['longitude'] = -180.0;
-        $dto = AnalysisRequestDTO::fromArray($data);
+        $dto = InvestigationRequestDTO::fromArray($data);
         $dto->validate();
 
         // Test max longitude
         $data['longitude'] = 180.0;
-        $dto = AnalysisRequestDTO::fromArray($data);
+        $dto = InvestigationRequestDTO::fromArray($data);
         $dto->validate();
 
         $this->assertTrue(true);
@@ -278,7 +278,7 @@ class AnalysisRequestDTOTest extends TestCase
             'additional_information' => 'Additional test info'
         ];
 
-        $dto = AnalysisRequestDTO::fromArray($data);
+        $dto = InvestigationRequestDTO::fromArray($data);
         $dto->validate(); // Should not throw
         
         $this->assertTrue(true);
@@ -294,7 +294,7 @@ class AnalysisRequestDTOTest extends TestCase
             'longitude' => -151.2093
         ];
 
-        $dto = AnalysisRequestDTO::fromArray($data);
+        $dto = InvestigationRequestDTO::fromArray($data);
         $dto->validate(); // Should not throw
         
         $this->assertTrue(true);
