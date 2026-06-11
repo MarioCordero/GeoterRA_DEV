@@ -1,4 +1,4 @@
-name: Distribución de API a Develop, Web y Mobile
+name: Distribución de API a Develop, Web y Mobile (Solo carpeta API/)
 
 on:
   workflow_dispatch:
@@ -10,7 +10,6 @@ jobs:
   test-and-sync:
     runs-on: ubuntu-latest
 
-    # 1. Le decimos a GitHub que levante un MySQL temporal
     services:
       mysql:
         image: mysql:8.0
@@ -25,32 +24,28 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 
+          token: ${{ secrets.GH_PAT }} # Requerido si tienes ramas protegidas
 
       - name: Configurar PHP 8.3
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          # Cambié pdo_sqlite por pdo_mysql
           extensions: pdo, pdo_mysql 
           
       - name: Instalar Dependencias
         working-directory: ./API
         run: composer install --no-interaction --prefer-dist
 
-      # 2. Creamos las BD e importamos tu esquema
       - name: Preparar Base de Datos MySQL
         working-directory: ./API
         run: |
           mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE GeoterRA;"
           mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE GeoterRA_test;"
-          # Inyectamos tu archivo de Fixtures a la BD de producción simulada
           mysql -h 127.0.0.1 -u root -proot GeoterRA < tests/Fixtures/database_schema.sql
 
-      # 3. EL GUARDIÁN
       - name: Ejecutar Pruebas Unitarias
         working-directory: ./API
         env:
-          # Inyectamos variables de entorno para que tu bootstrap.php pueda conectarse
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
           DB_USER: root
@@ -61,21 +56,45 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin # Nos aseguramos de tener todas las ramas remotas actualizadas
 
-      - name: Fusionar API en develop
-        run: |
-          git checkout develop
-          git merge origin/API --no-edit
-          git push origin develop
+      # --- SINCRONIZACIÓN EXCLUSIVA DE LA CARPETA API/ ---
 
-      - name: Fusionar API en web
+      - name: Sincronizar API en develop
         run: |
-          git checkout web
-          git merge origin/API --no-edit
-          git push origin web
+          git checkout develop || git checkout -b develop origin/develop
+          rm -rf API/
+          git checkout origin/API -- API/
+          git add API/
+          if ! git diff --cached --quiet; then
+            git commit -m "🚀 CI: Auto-sync de la carpeta API/ desde rama API"
+            git push origin develop
+          else
+            echo "No hay cambios nuevos en API para la rama develop."
+          fi
 
-      - name: Fusionar API en mobile
+      - name: Sincronizar API en web
         run: |
-          git checkout mobile
-          git merge origin/API --no-edit
-          git push origin mobile
+          git checkout web || git checkout -b web origin/web
+          rm -rf API/
+          git checkout origin/API -- API/
+          git add API/
+          if ! git diff --cached --quiet; then
+            git commit -m "🚀 CI: Auto-sync de la carpeta API/ desde rama API"
+            git push origin web
+          else
+            echo "No hay cambios nuevos en API para la rama web."
+          fi
+
+      - name: Sincronizar API en mobile
+        run: |
+          git checkout mobile || git checkout -b mobile origin/mobile
+          rm -rf API/
+          git checkout origin/API -- API/
+          git add API/
+          if ! git diff --cached --quiet; then
+            git commit -m "🚀 CI: Auto-sync de la carpeta API/ desde rama API"
+            git push origin mobile
+          else
+            echo "No hay cambios nuevos en API para la rama mobile."
+          fi
