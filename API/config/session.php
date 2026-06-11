@@ -2,30 +2,43 @@
 declare(strict_types=1);
 
 use Services\AuthService;
+use Repositories\UserRepository;
 use Http\Request;
-use Core\Logger;
 
+/**
+ * Validates the authentication state for the current request.
+ * 
+ * This function attempts to identify the user by checking for a session token 
+ * in the 'sigecat_session_token' cookie or a Bearer token in the 'Authorization' header.
+ * If a valid session is found, the user context is attached to the global Request state.
+ * 
+ * @param PDO $db The active database connection required by the AuthService.
+ * @return void
+ */
 function validateSessionToken(PDO $db): void
 {
-    Request::init();
+  $headers = getallheaders();
 
-    if (!Request::isValidClient()) {
-        return;
-    }
+  $authorization = $headers['Authorization'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+  $sessionToken = $_COOKIE['geoterra_session_token'] ?? null;
+  
+  error_log('[Session] Token exists: ' . ($sessionToken ? 'YES' : 'NO'));
+  error_log('[Session] All cookies: ' . json_encode($_COOKIE));
 
-    $token = Request::getToken();
-    if (!$token) return;
+  if (!$sessionToken && !str_starts_with($authorization, 'Bearer ')) {
+    return;
+  }
 
-    try {
-        $authService = new AuthService($db);
-        $userData = $authService->requireAuth(); 
-        
-        Request::setUser($userData);
-
-        Logger::info(sprintf('✅ [Session] User %s authenticated via %s', 
-            $userData['email'], Request::getPlatform()));
-
-    } catch (\Exception $e) {
-        Logger::debug('info [Session] Anonymous access or invalid token');
-    }
+  try {
+    $authService = new AuthService($db);
+    $user = $authService->requireAuth();
+    Request::setUser($user);
+  } catch (Exception $e) {
+    /**
+     * Authentication failures are logged but not fatal here, 
+     * as some endpoints might allow public access. 
+     * Protected routes should verify Request::isAuthenticated() later.
+     */
+    error_log('[Session] Invalid token: ' . $e->getMessage());
+  }
 }

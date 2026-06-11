@@ -58,10 +58,16 @@ final class EnvironmentDetector
   }
 
   /**
-   * Check if running on production server (163.178.171.105 or geoterra.com).
+   * Check if running on production server.
+   * Prioritizes the APP_ENV environment variable, falling back to hostname/IP check.
    */
   public static function isProduction(): bool
   {
+    $env = $_ENV['APP_ENV'] ?? getenv('APP_ENV') ?: null;
+    if ($env !== null) {
+      return $env === 'production';
+    }
+
     $host = self::getHost();
     return str_contains($host, '163.178.171.105') ||
            str_contains($host, 'geoterra.com');
