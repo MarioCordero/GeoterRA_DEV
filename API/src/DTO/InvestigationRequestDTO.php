@@ -175,67 +175,116 @@ final class InvestigationRequestDTO
   public function validate(array $userData): void
   {
     // SNIT codes must be positive
-    if ($this->provinceSnitCode <= 0 || $this->cantonSnitCode <= 0 || $this->districtSnitCode <= 0) {
-      throw new ApiException(ErrorType::invalidField('province/canton/district SNIT code must be positive'), 422);
+    if ($this->provinceSnitCode <= 0 || $this->cantonSnitCode <= 0
+      || $this->districtSnitCode <= 0) {
+      throw new ApiException(
+        ErrorType::invalidField(
+          'province/canton/district SNIT code must be positive'
+        ),
+      422
+      );
     }
 
     // Request name length
     if (strlen($this->requestName) > 110) {
-      throw new ApiException(ErrorType::invalidField('request_name (max 110 characters)'), 422);
+      throw new ApiException(
+        ErrorType::invalidField('request_name (max 110 characters)'), 422
+      );
     }
 
     // Current usage enum
-    $validUsages = ['Residencial', 'Comercial', 'Turístico', 'Conservación', 'Ganadería', 'Otro'];
+    $validUsages = [
+      'Residencial', 'Comercial',
+      'Turístico', 'Conservación',
+      'Ganadería', 'Otro'
+    ];
     if (!in_array($this->currentUsage, $validUsages, true)) {
-      throw new ApiException(ErrorType::invalidField('current_usage'), 422);
+      throw new ApiException(
+        ErrorType::invalidField('current_usage'), 422
+      );
     }
 
     // Temperature sensation enum
-    $validTemps = ['Hirviendo', 'Muy Caliente', 'Caliente', 'Templado', 'Natural', 'Sin Especificar'];
+    $validTemps = [
+      'Hirviendo', 'Muy Caliente',
+      'Caliente', 'Templado', 'Natural', 'Sin Especificar'
+    ];
     if (!in_array($this->temperatureSensation, $validTemps, true)) {
-      throw new ApiException(ErrorType::invalidField('temperature_sensation'), 422);
+      throw new ApiException(
+        ErrorType::invalidField('temperature_sensation'), 422
+      );
     }
 
     // Owner email format (if provided)
-    if ($this->ownerEmail !== null && !filter_var($this->ownerEmail, FILTER_VALIDATE_EMAIL)) {
+    if ($this->ownerEmail !== null &&
+      !filter_var($this->ownerEmail, FILTER_VALIDATE_EMAIL)) {
       throw new ApiException(ErrorType::invalidField('owner_email'), 422);
     }
 
     // Owner phone number format (Costa Rican: 8 digits or 1234-5678)
-    if ($this->ownerPhoneNumber !== null && !preg_match('/^[0-9]{8}$|^[0-9]{4}-[0-9]{4}$/', $this->ownerPhoneNumber)) {
-      throw new ApiException(ErrorType::invalidField('owner_phone_number (must be 8 digits or 1234-5678)'), 422);
+    if ($this->ownerPhoneNumber !== null &&
+      !preg_match('/^[0-9]{8}$|^[0-9]{4}-[0-9]{4}$/', $this->ownerPhoneNumber)) {
+      throw new ApiException(
+        ErrorType::invalidField(
+          'owner_phone_number (must be 8 digits or 1234-5678)'
+        ),
+        422
+      );
     }
 
     // Coordinates range
-    if ($this->latitude !== null && ($this->latitude < -90 || $this->latitude > 90)) {
+    if ($this->latitude !== null &&
+      ($this->latitude < -90 || $this->latitude > 90)) {
       throw new ApiException(ErrorType::invalidField('latitude'), 422);
     }
-    if ($this->longitude !== null && ($this->longitude < -180 || $this->longitude > 180)) {
+    if ($this->longitude !== null &&
+      ($this->longitude < -180 || $this->longitude > 180)) {
       throw new ApiException(ErrorType::invalidField('longitude'), 422);
     }
 
     // Check if owner differs from authenticated user
-    $fullName = trim(($userData['first_name'] ?? '') . ' ' . ($userData['last_name'] ?? ''));
+    $fullName = trim(
+      ($userData['first_name'] ?? '') . ' ' . ($userData['last_name'] ?? '')
+    );
     $ownerDiffers = false;
     if ($this->ownerName !== null && $this->ownerName !== $fullName) {
       $ownerDiffers = true;
     }
-    if ($this->ownerPhoneNumber !== null && $this->ownerPhoneNumber !== ($userData['phone_number'] ?? null)) {
+    if ($this->ownerPhoneNumber !== null
+      && $this->ownerPhoneNumber !== ($userData['phone_number'] ?? null)) {
       $ownerDiffers = true;
     }
-    if ($this->ownerEmail !== null && strtolower($this->ownerEmail) !== strtolower($userData['email'] ?? '')) {
+    if ($this->ownerEmail !== null
+      && strtolower($this->ownerEmail) !== strtolower($userData['email'] ?? '')) {
       $ownerDiffers = true;
     }
 
     if ($ownerDiffers && empty($this->relationWithOwner)) {
-      throw new ApiException(ErrorType::missingField('relation_with_owner (required when owner information differs from requester)'), 422);
+      throw new ApiException(
+        ErrorType::missingField(
+          'relation_with_owner (
+          required when owner information differs from requester
+          )'
+        ),
+        422
+      );
     }
 
     // Relation enum
     if ($this->relationWithOwner !== null) {
-      $validRelations = ['Familiar', 'Empleado', 'Socio', 'Conocido'];
+      $validRelations = [
+        'Familiar', 'Empleado',
+        'Socio', 'Conocido', 'Titular'
+      ];
       if (!in_array($this->relationWithOwner, $validRelations, true)) {
-        throw new ApiException(ErrorType::invalidField('relation_with_owner (must be Familiar, Empleado, Socio, Conocido)'), 422);
+        throw new ApiException(
+          ErrorType::invalidField(
+            'relation_with_owner (
+            must be Familiar, Empleado, Socio, Conocido, Titular
+            )'
+          ),
+          422
+        );
       }
     }
   }
