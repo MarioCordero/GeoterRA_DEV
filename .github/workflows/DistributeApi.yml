@@ -23,6 +23,7 @@ jobs:
       - name: Descargar el código
         uses: actions/checkout@v4
         with:
+          ref: API
           fetch-depth: 0 
           token: ${{ secrets.GH_PAT }} # Requerido si tienes ramas protegidas
 
