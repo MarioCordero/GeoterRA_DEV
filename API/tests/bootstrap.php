@@ -12,6 +12,18 @@ date_default_timezone_set('UTC');
 define('BASE_DIR', dirname(__DIR__));
 define('TESTS_DIR', dirname(__FILE__));
 
+// Ensure session starts correctly in CLI mode without throwing headers already sent
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Polyfill for getallheaders in CLI environment
+if (!function_exists('getallheaders')) {
+    function getallheaders() {
+        return [];
+    }
+}
+
 // Register PSR-4 autoloader
 spl_autoload_register(function (string $class): void {
     // Try src/ namespace (production code)
@@ -60,54 +72,45 @@ function initializeTestDatabase(): \PDO {
         exit(1);
     }
     
-    // Connect to test database
-    $testDsn = "mysql:host={$host};port={$port};dbname={$testDbName};charset=utf8mb4";
+    // Always drop and recreate test database to ensure clean schema load
     try {
+        $serverDsn = "mysql:host={$host};port={$port};charset=utf8mb4";
+        $serverPdo = new \PDO($serverDsn, $user, $password, [
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+        ]);
+        $serverPdo->exec("DROP DATABASE IF EXISTS `{$testDbName}`");
+        $serverPdo->exec("CREATE DATABASE `{$testDbName}`");
+        
+        $testDsn = "mysql:host={$host};port={$port};dbname={$testDbName};charset=utf8mb4";
         $testPdo = new \PDO($testDsn, $user, $password, [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
             \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
         ]);
-        echo "[✓] Connected to test database: {$testDbName}\n";
-    } catch (\PDOException $e) { // If not, create a test database
-        if ($e->getCode() == 1049 || strpos($e->getMessage(), 'Unknown database') !== false) {
-            echo "[!] Test database '{$testDbName}' not found. Attempting to create it automatically...\n";
-            try {
-                $serverDsn = "mysql:host={$host};port={$port};charset=utf8mb4";
-                $serverPdo = new \PDO($serverDsn, $user, $password, [
-                    \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-                ]);
-                $serverPdo->exec("CREATE DATABASE IF NOT EXISTS `{$testDbName}`");
-                echo "[✓] Successfully created test database: {$testDbName}\n";
-                
-                // Retry connection to the newly created database
-                $testPdo = new \PDO($testDsn, $user, $password, [
-                    \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-                    \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
-                ]);
-            } catch (\PDOException $createEx) {
-                echo "[✗] Failed to create test database: " . $createEx->getMessage() . "\n";
-                echo "Please ensure test database exists manually: CREATE DATABASE {$testDbName};\n";
-                exit(1);
-            }
-        } else {
-            echo "[✗] Failed to connect to test database: " . $e->getMessage() . "\n";
-            exit(1);
-        }
+        echo "[✓] Recreated and connected to test database: {$testDbName}\n";
+    } catch (\PDOException $e) {
+        echo "[✗] Failed to recreate test database: " . $e->getMessage() . "\n";
+        exit(1);
     }
     
-    // Initialize schema from database_schema.sql
-    loadTestSchema($testPdo);
+    // Initialize schema and initial DML from the master GeoterRA.sql dump
+    loadTestSchema();
     
     return $testPdo;
 }
 
 /**
- * Load database schema from fixtures
- * Does NOT copy data (starts empty for each test)
+ * Load database schema and initial data from the master GeoterRA.sql dump
+ * Includes both DDL and initial DML as the standard for the project
  */
-function loadTestSchema(\PDO $testPdo): void {
+function loadTestSchema(): void {
+    $host = getenv('DB_HOST') ?: '127.0.0.1';
+    $port = getenv('DB_PORT') ?: 3306;
+    $user = getenv('DB_USER') ?: 'mario';
+    $password = getenv('DB_PASS') !== false ? getenv('DB_PASS') : '2003';
+    $testDbName = 'GeoterRA_test';
+
     try {
-        $schemaPath = dirname(__DIR__) . '/tests/Fixtures/database_schema.sql';
+        $schemaPath = dirname(__DIR__, 2) . '/database/GeoterRA.sql';
         if (!file_exists($schemaPath)) {
             echo "[!] Warning: Schema file not found at {$schemaPath}\n";
             return;
@@ -115,16 +118,29 @@ function loadTestSchema(\PDO $testPdo): void {
 
         echo "\n[*] Loading test database schema from fixtures...\n";
         
-        $sql = file_get_contents($schemaPath);
+        $command = sprintf(
+            'sed "s/\`[gG]eoter[rR][aA]\`\.//g" %s | mysql -h %s -P %s -u %s -p%s %s 2>&1',
+            escapeshellarg($schemaPath),
+            escapeshellarg((string)$host),
+            escapeshellarg((string)$port),
+            escapeshellarg($user),
+            escapeshellarg($password),
+            escapeshellarg($testDbName)
+        );
         
-        // Execute the SQL dump
-        $testPdo->exec($sql);
+        $output = [];
+        $returnVar = 0;
+        exec($command, $output, $returnVar);
+        
+        if ($returnVar !== 0) {
+            echo "[✗] Failed to load schema via mysql CLI:\n" . implode("\n", $output) . "\n";
+            exit(1);
+        }
         
         echo "[✓] Schema successfully loaded\n";
         
-    } catch (\PDOException $e) {
+    } catch (\Exception $e) {
         echo "[✗] Failed to load schema: " . $e->getMessage() . "\n";
-        echo "SQL State: " . $e->getCode() . "\n";
         exit(1);
     }
 }
