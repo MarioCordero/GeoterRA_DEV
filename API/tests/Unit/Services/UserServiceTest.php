@@ -1,14 +1,16 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
 use Tests\TestCase;
 use Services\UserService;
+use Services\PasswordService;
 use DTO\RegisterUserDTO;
 use DTO\UpdateUserDTO;
+use DTO\UpdateUserRoleDTO;
 use Http\ApiException;
+use Http\Request;
 
 class UserServiceTest extends TestCase
 {
@@ -18,38 +20,53 @@ class UserServiceTest extends TestCase
     {
         parent::setUp();
         $this->userService = new UserService($this->pdo);
+        
+        // Setup mocked environment for auth via Request
+        $_SERVER['HTTP_X_API_KEY'] = 'web-secret-key-789';
+        Request::init();
     }
 
-    public function testRegisterUserCreatesNewUser(): void
+    protected function tearDown(): void
+    {
+        // Clean up mock state
+        unset($_SERVER['HTTP_X_API_KEY']);
+        unset($_COOKIE['geoterra_session_token']);
+        parent::tearDown();
+    }
+
+    private function authenticateUser(string $userId): void
+    {
+        $accessData = $this->createTestAccessToken($userId);
+        $_COOKIE['geoterra_session_token'] = $accessData['token'];
+    }
+
+    public function testRegisterUserSuccess(): void
     {
         $dto = RegisterUserDTO::fromArray([
             'name' => 'John',
             'lastname' => 'Doe',
-            'email' => 'john@example.com',
-            'password' => 'SecurePass123!',
-            'phone' => '+56912345678'
+            'email' => 'john.new@example.com',
+            'password' => 'SecurePass123!'
         ]);
 
         $result = $this->userService->registerUser($dto);
-
-        $this->assertIsArray($result);
+        
         $this->assertArrayHasKey('data', $result);
         $this->assertArrayHasKey('user_id', $result['data']);
-        $this->assertNotEmpty($result['data']['user_id']);
         
-        // Verify user is in database
-        $user = $this->getUserByEmail('john@example.com');
+        $user = $this->getUserById($result['data']['user_id']);
         $this->assertNotNull($user);
+        $this->assertEquals('john.new@example.com', $user['email']);
     }
 
-    public function testRegisterUserThrowsOnDuplicateEmail(): void
+    public function testRegisterUserFailsIfEmailExists(): void
     {
-        $this->createTestUser(['email' => 'existing@example.com']);
-
+        $user = $this->createTestUser();
+        
         $dto = RegisterUserDTO::fromArray([
-            'name' => 'Jane',
+            'name' => 'John',
             'lastname' => 'Doe',
-            'email' => 'existing@example.com',
+            'email' => $user['email'],
             'password' => 'SecurePass123!'
         ]);
 
@@ -57,140 +74,60 @@ class UserServiceTest extends TestCase
         $this->userService->registerUser($dto);
     }
 
-    public function testRegisterUserHashesPassword(): void
+    public function testUpdateUserSuccess(): void
     {
-        $dto = RegisterUserDTO::fromArray([
-            'name' => 'John',
+        $user = $this->createTestUser(['password' => 'SecurePass123!']);
+        $this->authenticateUser($user['user_id']);
+
+        $dto = UpdateUserDTO::fromArray([
+            'name' => 'Johnny',
             'lastname' => 'Doe',
-            'email' => 'john@example.com',
-            'password' => 'SecurePass123!'
-        ]);
+            'email' => $user['email'],
+            'currentPassword' => 'SecurePass123!',
+            'password' => 'NewSecurePass123!'
+        ], $user['user_id']);
 
-        $this->userService->registerUser($dto);
-
-        $user = $this->getUserByEmail('john@example.com');
+        $this->userService->updateUser($dto);
         
-        // Password should be hashed, not plaintext
-        $this->assertNotEquals('SecurePass123!', $user['password_hash']);
-        $this->assertGreaterThan(50, strlen($user['password_hash'])); // bcrypt hash length
+        $updatedUser = $this->getUserById($user['user_id']);
+        $this->assertEquals('Johnny', $updatedUser['first_name']);
+        $this->assertTrue(PasswordService::verify('NewSecurePass123!', $updatedUser['password_hash']));
     }
 
-    public function testRegisterUserAssignsUserRole(): void
+    public function testDeleteCurrentUserSuccess(): void
     {
-        $dto = RegisterUserDTO::fromArray([
-            'name' => 'John',
-            'lastname' => 'Doe',
-            'email' => 'john@example.com',
-            'password' => 'SecurePass123!'
-        ]);
+        $user = $this->createTestUser();
+        $this->authenticateUser($user['user_id']);
 
-        $result = $this->userService->registerUser($dto);
-        $this->assertNotNull($result['data']['user_id']);
-
-        $user = $this->getUserByEmail('john@example.com');
-        // UserRepository sets role, verify it was assigned
-        $this->assertNotNull($user['role'] ?? null);
+        $this->userService->deleteCurrentUser();
+        
+        $deletedUser = $this->getUserById($user['user_id']);
+        // getUserById has 'deleted_at IS NULL' condition, so it should be null
+        $this->assertNull($deletedUser); 
     }
 
-    public function testGetUserByIdReturnsUserData(): void
+    public function testGetCurrentUserSuccess(): void
     {
-        $testUser = $this->createTestUser(['name' => 'John', 'lastname' => 'Doe']);
+        $user = $this->createTestUser();
+        $this->authenticateUser($user['user_id']);
 
-        $user = $this->userService->findById($testUser['user_id']);
-
-        $this->assertNotNull($user);
-        $this->assertIsArray($user);
+        $result = $this->userService->getCurrentUser();
+        
+        $this->assertArrayHasKey('data', $result);
+        $this->assertEquals($user['email'], $result['data']['email']);
     }
 
-    public function testGetUserByIdThrowsOnNonexistentUser(): void
+    public function testUpdateUserRoleSuccess(): void
     {
-        // UserService uses requireAuth() which relies on HTTP headers
-        // For now, we'll verify that findById throws when user doesn't exist
-        $this->expectException(ApiException::class);
-        $this->userService->findById('nonexistent_user_id');
-    }
+        $user = $this->createTestUser(['role' => 'user']);
+        
+        $dto = UpdateUserRoleDTO::fromArray([
+            'role' => 'admin'
+        ], $user['user_id']);
 
-    /**
-     * Requires HTTP context (updateUser gets user_id from Request context)
-     * This is an integration test, not a unit test
-     */
-    public function testUpdateUserModifiesUserData(): void
-    {
-        $this->markTestSkipped('Requires HTTP context - updateUser gets user_id from authenticated request context');
-    }
-
-    /**
-     * Requires HTTP context (updateUser gets user_id from Request context)
-     * This is an integration test, not a unit test
-     */
-    public function testUpdateUserThrowsOnDuplicateEmail(): void
-    {
-        $this->markTestSkipped('Requires HTTP context - updateUser gets user_id from authenticated request context');
-    }
-
-    /**
-     * Requires HTTP context (Request::getUser() needs getallheaders())
-     * This is an integration test, not a unit test
-     */
-    public function testDeleteUserSetsDeletedAtFlag(): void
-    {
-        $this->markTestSkipped('Requires HTTP context with getallheaders() - integration test only');
-    }
-
-    /**
-     * Requires HTTP context (Request::getUser() needs getallheaders())
-     * This is an integration test, not a unit test
-     */
-    public function testDeleteUserThrowsOnNonexistentUser(): void
-    {
-        $this->markTestSkipped('Requires HTTP context with getallheaders() - integration test only');
-        $this->expectException(ApiException::class);
-        $this->userService->deleteCurrentUser('nonexistent_user_id');
-    }
-
-    /**
-     * Requires HTTP context (Request::getUser() needs getallheaders())
-     * This is an integration test, not a unit test
-     */
-    public function testGetCurrentUserReturnsAuthenticatedUser(): void
-    {
-        $this->markTestSkipped('Requires HTTP context with getallheaders() - integration test only');
-    }
-
-    /**
-     * Requires HTTP context (Request::getUser() needs getallheaders())
-     * This is an integration test, not a unit test
-     */
-    public function testDeletedUserIsNotReturned(): void
-    {
-        $this->markTestSkipped('Requires HTTP context with getallheaders() - integration test only');
-    }
-
-    public function testRegisterMultipleUsersWithDifferentEmails(): void
-    {
-        for ($i = 0; $i < 3; $i++) {
-            $dto = RegisterUserDTO::fromArray([
-                'name' => 'User',
-                'lastname' => "Num$i",
-                'email' => "user$i@example.com",
-                'password' => 'SecurePass123!'
-            ]);
-
-            $result = $this->userService->registerUser($dto);
-            $this->assertNotNull($result['data']['user_id']);
-        }
-
-        // Verify users were created
-        $countAfter = $this->getUserCount();
-        $this->assertGreaterThanOrEqual(3, $countAfter);
-    }
-
-    /**
-     * Requires HTTP context (updateUser gets user_id from Request context)
-     * This is an integration test, not a unit test
-     */
-    public function testUpdateUserPreservesUserRole(): void
-    {
-        $this->markTestSkipped('Requires HTTP context - updateUser gets user_id from authenticated request context');
+        $this->userService->updateUserRole($dto);
+        
+        $updatedUser = $this->getUserById($user['user_id']);
+        $this->assertEquals('admin', $updatedUser['role']);
     }
 }

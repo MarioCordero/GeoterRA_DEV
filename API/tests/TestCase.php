@@ -32,37 +32,18 @@ abstract class TestCase extends PHPUnitTestCase
      */
     protected function resetDatabase(): void
     {
-        // Delete data in reverse order of foreign key dependencies
-        $this->pdo->exec('DELETE FROM registered_geothermal_manifestations');
-        $this->pdo->exec('DELETE FROM analysis_requests');
+        $this->pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
+        $this->pdo->exec('DELETE FROM logs_entries');
+        $this->pdo->exec('DELETE FROM logs');
+        $this->pdo->exec('DELETE FROM insitu_tests');
+        $this->pdo->exec('DELETE FROM inlab_tests');
+        $this->pdo->exec('DELETE FROM georeports');
+        $this->pdo->exec('DELETE FROM geomanifestations');
+        $this->pdo->exec('DELETE FROM requests');
         $this->pdo->exec('DELETE FROM refresh_tokens');
         $this->pdo->exec('DELETE FROM access_tokens');
         $this->pdo->exec('DELETE FROM users');
-        $this->pdo->exec('DELETE FROM regions');
-        
-        // Insert default regions
-        $this->insertDefaultRegions();
-    }
-
-    /**
-     * Insert default regions for tests
-     */
-    protected function insertDefaultRegions(): void
-    {
-        $regions = [
-            'Guanacaste',
-            'San José',
-            'Heredia',
-            'Cartago',
-            'Alajuela',
-            'Puntarenas'
-        ];
-
-        foreach ($regions as $region) {
-            // Use INSERT IGNORE to skip if region already exists
-            $stmt = $this->pdo->prepare('INSERT IGNORE INTO regions (name) VALUES (?)');
-            $stmt->execute([$region]);
-        }
+        $this->pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
     }
 
     /**
@@ -71,7 +52,7 @@ abstract class TestCase extends PHPUnitTestCase
     protected function createTestUser(array $overrides = []): array
     {
         // Mapeamos los campos a los nombres reales de tu base de datos
-        $userId = $overrides['user_id'] ?? $overrides['id'] ?? \Core\Ulid::generate();
+        $userId = $overrides['user_id'] ?? $overrides['id'] ?? \Core\UlidGenerator::generate();
         $firstName = $overrides['first_name'] ?? $overrides['name'] ?? 'Test';
         $lastName = $overrides['last_name'] ?? $overrides['lastname'] ?? 'User';
         $email = $overrides['email'] ?? 'testuser' . rand(1000, 9999) . '@example.com';
@@ -113,11 +94,11 @@ abstract class TestCase extends PHPUnitTestCase
         $tokenHash = hash('sha256', $token);
 
         $stmt = $this->pdo->prepare(
-            'INSERT INTO access_tokens (user_id, token_hash, expires_at) 
-             VALUES (?, ?, ?)'
+            'INSERT INTO access_tokens (access_token_id, user_id, access_token_hash, expires_at) 
+             VALUES (?, ?, ?, ?)'
         );
         
-        $stmt->execute([$userId, $tokenHash, $expiresAt->format('Y-m-d H:i:s')]);
+        $stmt->execute([\Core\UlidGenerator::generate(), $userId, $tokenHash, $expiresAt->format('Y-m-d H:i:s')]);
 
         return [
             'user_id' => $userId,
@@ -140,11 +121,11 @@ abstract class TestCase extends PHPUnitTestCase
         $tokenHash = hash('sha256', $token);
 
         $stmt = $this->pdo->prepare(
-            'INSERT INTO refresh_tokens (user_id, token_hash, expires_at) 
-             VALUES (?, ?, ?)'
+            'INSERT INTO refresh_tokens (refresh_token_id, user_id, token_hash, family_id, expires_at) 
+             VALUES (?, ?, ?, ?, ?)'
         );
         
-        $stmt->execute([$userId, $tokenHash, $expiresAt->format('Y-m-d H:i:s')]);
+        $stmt->execute([\Core\UlidGenerator::generate(), $userId, $tokenHash, \Core\UlidGenerator::generate(), $expiresAt->format('Y-m-d H:i:s')]);
 
         return [
             'user_id' => $userId,
@@ -197,7 +178,7 @@ abstract class TestCase extends PHPUnitTestCase
     protected function getAccessToken(string $tokenHash): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT * FROM access_tokens WHERE token_hash = ? AND revoked_at IS NULL'
+            'SELECT * FROM access_tokens WHERE access_token_hash = ? AND revoked_at IS NULL'
         );
         $stmt->execute([$tokenHash]);
         return $stmt->fetch() ?: null;

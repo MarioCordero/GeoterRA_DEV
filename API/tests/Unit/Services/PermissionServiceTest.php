@@ -1,130 +1,73 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
-use Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 use Services\PermissionService;
 use DTO\AllowedUserRoles;
+use DTO\PermissionsDTO as Permissions;
 
 class PermissionServiceTest extends TestCase
 {
-    private PermissionService $permissionService;
-
-    protected function setUp(): void
+    public function testGetPermissionsForRoleReturnsCorrectPermissions(): void
     {
-        parent::setUp();
-        $this->permissionService = new PermissionService();
+        $userPermissions = PermissionService::getPermissionsForRole(AllowedUserRoles::USER);
+        $this->assertContains(Permissions::CREATE_REQUESTS, $userPermissions);
+        $this->assertContains(Permissions::VIEW_OWN_REQUESTS, $userPermissions);
+        $this->assertNotContains(Permissions::MANAGE_USERS, $userPermissions);
+
+        $adminPermissions = PermissionService::getPermissionsForRole(AllowedUserRoles::ADMIN);
+        $this->assertContains(Permissions::MANAGE_USERS, $adminPermissions);
+        $this->assertContains(Permissions::MANAGE_GEOMANIFESTATIONS, $adminPermissions);
     }
 
-    public function testGetPermissionsForAdminRole(): void
+    public function testGetPermissionsForInvalidRoleReturnsEmptyArray(): void
     {
-        $permissions = $this->permissionService->getPermissionsForRole(AllowedUserRoles::ADMIN);
-        
-        $this->assertIsArray($permissions);
-        $this->assertNotEmpty($permissions);
+        $permissions = PermissionService::getPermissionsForRole('invalid_role');
+        $this->assertEmpty($permissions);
     }
 
-    public function testGetPermissionsForUserRole(): void
+    public function testHasPermissionReturnsTrueForValidPermission(): void
     {
-        $permissions = $this->permissionService->getPermissionsForRole(AllowedUserRoles::USER);
-        
-        $this->assertIsArray($permissions);
-        // User should have fewer permissions than admin
-        $adminPerms = $this->permissionService->getPermissionsForRole(AllowedUserRoles::ADMIN);
-        $this->assertLessThanOrEqual(count($adminPerms), count($permissions));
+        $this->assertTrue(PermissionService::hasPermission(AllowedUserRoles::USER, Permissions::CREATE_REQUESTS));
+        $this->assertTrue(PermissionService::hasPermission(AllowedUserRoles::ADMIN, Permissions::MANAGE_USERS));
     }
 
-    public function testGetPermissionsForMaintenanceRole(): void
+    public function testHasPermissionReturnsFalseForInvalidPermissionOrRole(): void
     {
-        $permissions = $this->permissionService->getPermissionsForRole(AllowedUserRoles::MAINTENANCE);
-        
-        $this->assertIsArray($permissions);
+        $this->assertFalse(PermissionService::hasPermission(AllowedUserRoles::USER, Permissions::MANAGE_USERS));
+        $this->assertFalse(PermissionService::hasPermission('invalid_role', Permissions::CREATE_REQUESTS));
+        $this->assertFalse(PermissionService::hasPermission(AllowedUserRoles::ADMIN, 'invalid_permission'));
     }
 
-    public function testHasPermissionReturnsTrueForAllowedPermission(): void
+    public function testHasAnyPermission(): void
     {
-        $role = AllowedUserRoles::ADMIN;
-        $permissions = $this->permissionService->getPermissionsForRole($role);
+        $permissionsToCheck = [Permissions::MANAGE_USERS, Permissions::CREATE_REQUESTS];
         
-        if (count($permissions) > 0) {
-            $permission = reset($permissions);
-            $result = $this->permissionService->hasPermission($role, $permission);
-            $this->assertTrue($result);
-        }
+        // User has CREATE_REQUESTS
+        $this->assertTrue(PermissionService::hasAnyPermission(AllowedUserRoles::USER, $permissionsToCheck));
+        
+        // Admin has both
+        $this->assertTrue(PermissionService::hasAnyPermission(AllowedUserRoles::ADMIN, $permissionsToCheck));
+        
+        // User does not have either of these
+        $this->assertFalse(PermissionService::hasAnyPermission(AllowedUserRoles::USER, [Permissions::MANAGE_USERS, Permissions::ASSIGN_ROLES]));
     }
 
-    public function testHasPermissionReturnsFalseOnMissing(): void
+    public function testHasAllPermissions(): void
     {
-        $role = AllowedUserRoles::USER;
+        $permissionsToCheck = [Permissions::CREATE_REQUESTS, Permissions::VIEW_OWN_REQUESTS];
         
-        // Try a permission unlikely to be in USER role
-        $result = $this->permissionService->hasPermission($role, 'nonexistent_permission');
+        // User has both
+        $this->assertTrue(PermissionService::hasAllPermissions(AllowedUserRoles::USER, $permissionsToCheck));
         
-        // Note: This test may vary based on actual permissions
-        // Adjust if actual permissions structure is different
-        $this->assertIsBool($result);
-    }
-
-    public function testHasAnyPermissionReturnsTrueIfAnyMatch(): void
-    {
-        $role = AllowedUserRoles::ADMIN;
-        $adminPerms = $this->permissionService->getPermissionsForRole($role);
+        $adminPermissionsToCheck = [Permissions::CREATE_REQUESTS, Permissions::MANAGE_USERS];
         
-        if (count($adminPerms) >= 2) {
-            $testPerms = [array_values($adminPerms)[0], 'nonexistent_permission'];
-            $result = $this->permissionService->hasAnyPermission($role, $testPerms);
-            $this->assertTrue($result);
-        }
-    }
-
-    public function testHasAnyPermissionReturnsFalseIfNoneMatch(): void
-    {
-        $role = AllowedUserRoles::USER;
-        $testPerms = ['nonexistent_perm1', 'nonexistent_perm2'];
+        // Admin has both
+        $this->assertTrue(PermissionService::hasAllPermissions(AllowedUserRoles::ADMIN, $adminPermissionsToCheck));
         
-        $result = $this->permissionService->hasAnyPermission($role, $testPerms);
-        
-        $this->assertFalse($result);
-    }
-
-    public function testHasAllPermissionsReturnsTrueIfAllMatch(): void
-    {
-        $role = AllowedUserRoles::ADMIN;
-        $adminPerms = $this->permissionService->getPermissionsForRole($role);
-        
-        // All permissions of a role should match
-        if (count($adminPerms) > 0) {
-            $result = $this->permissionService->hasAllPermissions($role, array_values($adminPerms));
-            $this->assertTrue($result);
-        }
-    }
-
-    public function testHasAllPermissionsReturnsFalseIfNotAllMatch(): void
-    {
-        $role = AllowedUserRoles::USER;
-        $testPerms = ['nonexistent_perm1', 'nonexistent_perm2'];
-        
-        $result = $this->permissionService->hasAllPermissions($role, $testPerms);
-        
-        $this->assertFalse($result);
-    }
-
-    public function testAdminHasMorePermissionsThanUser(): void
-    {
-        $adminPerms = $this->permissionService->getPermissionsForRole(AllowedUserRoles::ADMIN);
-        $userPerms = $this->permissionService->getPermissionsForRole(AllowedUserRoles::USER);
-        
-        $this->assertGreaterThanOrEqual(count($userPerms), count($adminPerms));
-    }
-
-    public function testRolePermissionsAreConsistent(): void
-    {
-        // Multiple calls should return same permissions for same role
-        $perms1 = $this->permissionService->getPermissionsForRole(AllowedUserRoles::ADMIN);
-        $perms2 = $this->permissionService->getPermissionsForRole(AllowedUserRoles::ADMIN);
-        
-        $this->assertEquals($perms1, $perms2);
+        // User lacks MANAGE_USERS
+        $this->assertFalse(PermissionService::hasAllPermissions(AllowedUserRoles::USER, $adminPermissionsToCheck));
     }
 }
