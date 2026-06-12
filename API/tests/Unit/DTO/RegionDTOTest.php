@@ -14,7 +14,7 @@ class RegionDTOTest extends TestCase
     {
         $data = ['name' => 'Los Andes'];
 
-        $dto = RegionDTO::fromArray($data);
+        $dto = new RegionDTO($data);
         
         $this->assertNotNull($dto);
     }
@@ -23,7 +23,7 @@ class RegionDTOTest extends TestCase
     {
         $data = ['name' => 'Zona Sur'];
 
-        $dto = RegionDTO::fromArray($data);
+        $dto = new RegionDTO($data);
         
         $this->assertInstanceOf(RegionDTO::class, $dto);
     }
@@ -33,7 +33,7 @@ class RegionDTOTest extends TestCase
         $data = [];
 
         $this->expectException(ApiException::class);
-        $dto = RegionDTO::fromArray($data);
+        $dto = new RegionDTO($data);
         $dto->validate();
     }
 
@@ -42,7 +42,7 @@ class RegionDTOTest extends TestCase
         $data = ['name' => 'Invalid Region'];
 
         $this->expectException(ApiException::class);
-        $dto = RegionDTO::fromArray($data);
+        $dto = new RegionDTO($data);
         $dto->validate();
     }
 
@@ -51,25 +51,25 @@ class RegionDTOTest extends TestCase
         $data = ['name' => ''];
 
         $this->expectException(ApiException::class);
-        $dto = RegionDTO::fromArray($data);
+        $dto = new RegionDTO($data);
         $dto->validate();
     }
 
     public function testValidateAcceptsAllValidRegions(): void
     {
         $validRegions = [
-            'Los Andes',
-            'Zona Sur',
-            'Pacifico',
-            'Zona Central',
-            'Araucanía',
-            'Los Lagos',
-            'Zona Austral'
+            'Guanacaste',
+            'Alajuela',
+            'San José',
+            'Puntarenas',
+            'Limón',
+            'Heredia',
+            'Cartago'
         ];
 
         foreach ($validRegions as $region) {
             $data = ['name' => $region];
-            $dto = RegionDTO::fromArray($data);
+            $dto = new RegionDTO($data);
             $dto->validate(); // Should not throw
         }
 

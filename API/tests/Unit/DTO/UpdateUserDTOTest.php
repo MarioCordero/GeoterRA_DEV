@@ -29,7 +29,7 @@ class UpdateUserDTOTest extends TestCase
             'name' => 'Jane',
             'lastname' => 'Smith',
             'email' => 'jane@example.com',
-            'phone' => '+56912345678'
+            'phone_number' => '+56912345678'
         ];
 
         $dto = UpdateUserDTO::fromArray($data);
@@ -92,7 +92,7 @@ class UpdateUserDTOTest extends TestCase
             'name' => 'John',
             'lastname' => 'Doe',
             'email' => 'john@example.com',
-            'phone' => 'invalid'
+            'phone_number' => 'invalid'
         ];
 
         $this->expectException(ApiException::class);
@@ -120,7 +120,7 @@ class UpdateUserDTOTest extends TestCase
             'name' => 'John',
             'lastname' => 'Doe',
             'email' => 'john@example.com',
-            'phone' => '+56912345678'
+            'phone_number' => '56912345678'
         ];
 
         $dto = UpdateUserDTO::fromArray($data);
@@ -135,7 +135,7 @@ class UpdateUserDTOTest extends TestCase
             'name' => 'John',
             'lastname' => 'Doe',
             'email' => 'john.doe@example.com',
-            'phone' => '+56912345678'
+            'phone_number' => '56912345678'
         ];
 
         $dto = UpdateUserDTO::fromArray($data);

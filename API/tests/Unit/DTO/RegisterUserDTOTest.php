@@ -31,7 +31,7 @@ class RegisterUserDTOTest extends TestCase
             'lastname' => 'Smith',
             'email' => 'jane@example.com',
             'password' => 'SecurePass456!',
-            'phone' => '+56912345678'
+            'phone_number' => '+56912345678'
         ];
 
         $dto = RegisterUserDTO::fromArray($data);
@@ -181,8 +181,7 @@ class RegisterUserDTOTest extends TestCase
         $data = [
             'name' => 'John',
             'lastname' => 'Doe',
-            'email' => $email,
-            'password' => 'JohnExample.com1' // Contains email components
+            'password' => 'john@example.com1' // Contains email components
         ];
 
         $this->expectException(ApiException::class);
@@ -197,7 +196,7 @@ class RegisterUserDTOTest extends TestCase
             'lastname' => 'Doe',
             'email' => 'john@example.com',
             'password' => 'SecurePass123!',
-            'phone' => 'invalid'
+            'phone_number' => 'invalid'
         ];
 
         $this->expectException(ApiException::class);
@@ -212,7 +211,7 @@ class RegisterUserDTOTest extends TestCase
             'lastname' => 'Doe',
             'email' => 'john@example.com',
             'password' => 'SecurePass123!',
-            'phone' => '123456789012345678' // More than 15 characters
+            'phone_number' => '123456789012345678' // More than 15 characters
         ];
 
         $this->expectException(ApiException::class);
@@ -227,7 +226,7 @@ class RegisterUserDTOTest extends TestCase
             'lastname' => 'Doe',
             'email' => 'john@example.com',
             'password' => 'SecurePass123!',
-            'phone' => '1234567' // Less than 8 characters
+            'phone_number' => '1234567' // Less than 8 characters
         ];
 
         $this->expectException(ApiException::class);
@@ -242,7 +241,7 @@ class RegisterUserDTOTest extends TestCase
             'lastname' => 'Doe',
             'email' => 'john@example.com',
             'password' => 'SecurePass123!',
-            'phone' => '+56912345678'
+            'phone_number' => '56912345678'
         ];
 
         $dto = RegisterUserDTO::fromArray($data);
@@ -273,7 +272,7 @@ class RegisterUserDTOTest extends TestCase
             'lastname' => 'Doe',
             'email' => 'john.doe@example.com',
             'password' => 'SecurePass123!',
-            'phone' => '+56912345678'
+            'phone_number' => '56912345678'
         ];
 
         $dto = RegisterUserDTO::fromArray($data);
