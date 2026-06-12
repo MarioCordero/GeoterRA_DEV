@@ -9,7 +9,7 @@ Documentación completa de la arquitectura y endpoints de la carpeta `API/src` s
 1. [Estructura General](#estructura-general)
 2. [Requisitos](#requisitos)
 3. [Testing](#testing)
-4. [📚 API Documentation Generation](#-api-documentation-generation)
+4. [📚 Generar doc de la API](#-api-documentation-generation) (PROCESO)
 5. [Arquitectura en Capas](#arquitectura-en-capas)
 6. [Endpoints Disponibles](#endpoints-disponibles)
 7. [Repositorios](#repositorios)
@@ -19,9 +19,72 @@ Documentación completa de la arquitectura y endpoints de la carpeta `API/src` s
 
 ---
 
+## Estructura General
+
+<dd>
+
+```
+API/
+├── config/               # Archivos de configuración (OBLIGATORIO SE REQUIERE DE "config.ini")
+├── Controllers/          # Capa de presentación - Manejo de requests/responses (Endpoints)
+├── DTO/                  # Objetos de transferencia de datos
+├── Http/                 # Utilidades HTTP (Response, Request, Errores)
+├── legacy/               # Código viejo (Borrar después)
+├── public/               # No sé aún
+├── Repositories/         # Capa de persistencia - Acceso a datos
+├── Services/             # Capa de lógica de negocio
+├── tests/                # No sé aún
+└── DTO/
+```
+
+</dd>
+
+---
+
+## Requisitos
+
+<dd> 
+
+Para el correcto funcionamiento de la API de GeoterRA, el entorno debe cumplir con los siguientes requerimientos técnicos y de configuración:
+
+### 🛠 Entorno de Ejecución 
+* **PHP 8.1+**: Necesario para el soporte de tipos estrictos, DTOs y funcionalidades modernas utilizadas en la arquitectura.
+* **Servidor Web**: Apache (con `mod_rewrite` habilitado para el manejo de rutas) o Nginx.
+* **Base de Datos**: MySQL / MariaDB.
+* **Composer**: Requerido para la gestión de dependencias y el autoloader de clases.
+
+### 📦 Extensiones de PHP
+
+* `pdo_mysql`: Para la comunicación con el motor de base de datos.
+* `json`: Fundamental para el procesamiento de los bodies de las peticiones y las respuestas.
+* `mbstring`: Para el manejo correcto de strings en las validaciones.
+
+### ⚙️ Archivo de Configuración (Obligatorio)
+
+La aplicación **requiere estrictamente** de un archivo `config.ini` ubicado en el directorio `config/`. Este archivo contiene las credenciales sensibles y parámetros de conexión.
+
+**Formato de `config/config.ini`:**
+
+```ini
+[database]
+host = localhost
+name = GeoterRA
+user = mario
+pass = 2003
+
+```
+
+> **Nota:** Por seguridad, este archivo está incluido en el `.gitignore` para evitar subir credenciales al repositorio.
+
+</dd>
+
+---
+
 ## Testing
 
-### Running All Unit Tests
+<dd>
+
+### Correr todas las pruebas unitarias
 
 ```bash
 cd API
@@ -29,34 +92,25 @@ composer install
 composer test
 ```
 
-**Expected Output**: ~200 tests passing in 5-10 seconds with 80%+ code coverage
+**Salida esperada**: ~200 pruebas pasando en 5-10 segundos con 80%+ de cobertura de código
 
-### Comprehensive Testing Guide
-
-See [docs/UNIT_TESTING.md](docs/UNIT_TESTING.md) for:
-- **Quick start** - Get testing in 2 minutes
-- **Running tests** - All commands and options
-- **Writing tests** - Best practices and patterns
-- **Test organization** - How tests are structured
-- **Fixtures** - Creating test data
-- **Troubleshooting** - Common issues and solutions
-- **CI/CD Integration** - GitHub Actions setup
-
-### Quick Test Commands
+### Comandos rapidos para ejecutar pruebas
 
 ```bash
-composer test                  # All tests
-composer run test:dto          # DTO validation only
-composer run test:services     # Service layer only
-composer run test:repositories # Data access layer only
-composer run test:coverage     # With code coverage report
+composer test                  # Todas las pruebas
+composer run test:dto          # Solo las pruebas de DTO
+composer run test:services     # Solo las pruebas de servicios
+composer run test:repositories # Solo las pruebas de repositorios
+composer run test:coverage     # Con reporte de cobertura de código
 ```
+
+</dd>
 
 ---
 
 ## 📚 API Documentation Generation
 
-### ✅ What's Been Completed
+<!-- ### ✅ What's Been Completed
 
 Your GeoterRA backend API is fully documented with an automated OpenAPI documentation pipeline!
 
@@ -263,63 +317,7 @@ public function store(): void {}
 - [swagger-php Documentation](https://github.com/zircote/swagger-php)
 - [Docusaurus Documentation](https://docusaurus.io)
 
----
-
-## Estructura General
-
-```
-API/
-├── config/               # Archivos de configuración (OBLIGATORIO SE REQUIERE DE "config.ini")
-├── Controllers/          # Capa de presentación - Manejo de requests/responses (Endpoints)
-├── DTO/                  # Objetos de transferencia de datos
-├── Http/                 # Utilidades HTTP (Response, Request, Errores)
-├── legacy/               # Código viejo (Borrar después)
-├── public/               # No sé aún
-├── Repositories/         # Capa de persistencia - Acceso a datos
-├── Services/             # Capa de lógica de negocio
-├── tests/                # No sé aún
-└── DTO/
-```
-
----
-
-## Requisitos
-
-<dd> 
-
-Para el correcto funcionamiento de la API de GeoterRA, el entorno debe cumplir con los siguientes requerimientos técnicos y de configuración:
-
-### 🛠 Entorno de Ejecución 
-* **PHP 8.1+**: Necesario para el soporte de tipos estrictos, DTOs y funcionalidades modernas utilizadas en la arquitectura.
-* **Servidor Web**: Apache (con `mod_rewrite` habilitado para el manejo de rutas) o Nginx.
-* **Base de Datos**: MySQL / MariaDB.
-* **Composer**: Requerido para la gestión de dependencias y el autoloader de clases.
-
-### 📦 Extensiones de PHP
-
-* `pdo_mysql`: Para la comunicación con el motor de base de datos.
-* `json`: Fundamental para el procesamiento de los bodies de las peticiones y las respuestas.
-* `mbstring`: Para el manejo correcto de strings en las validaciones.
-
-### ⚙️ Archivo de Configuración (Obligatorio)
-
-La aplicación **requiere estrictamente** de un archivo `config.ini` ubicado en el directorio `config/`. Este archivo contiene las credenciales sensibles y parámetros de conexión.
-
-**Formato de `config/config.ini`:**
-
-```ini
-[database]
-host = localhost
-name = GeoterRA
-user = mario
-pass = 2003
-
-```
-
-> **Nota:** Por seguridad, este archivo está incluido en el `.gitignore` para evitar subir credenciales al repositorio.
-
-</dd>
-
+--- -->
 
 
 ## Arquitectura en Capas
