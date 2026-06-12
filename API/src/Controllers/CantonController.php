@@ -68,10 +68,11 @@ final class CantonController
    *
    * @param int $code
    */
-  public function showBySnitCode(int $code): void
+  public function showBySnitCode(string $code): void
   {
     try {
-      $canton = $this->service->getBySnitCode($code);
+      $codeInt = (int) $code;
+      $canton = $this->service->getBySnitCode($codeInt);
       Response::success($canton);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());

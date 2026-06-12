@@ -68,10 +68,11 @@ final class DistrictController
    *
    * @param int $code
    */
-  public function showBySnitCode(int $code): void
+  public function showBySnitCode(string $code): void
   {
     try {
-      $district = $this->service->getBySnitCode($code);
+      $codeInt = (int) $code;
+      $district = $this->service->getBySnitCode($codeInt);
       Response::success($district);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
