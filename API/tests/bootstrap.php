@@ -36,14 +36,14 @@ spl_autoload_register(function (string $class): void {
  * Initialize test database - copies schema from production
  */
 function initializeTestDatabase(): \PDO {
-    // Leemos las variables de entorno (GitHub Actions) o usamos los defaults (Local)
-    // Nota: Es mejor usar 127.0.0.1 en lugar de 'localhost' para forzar conexión TCP y evitar el error 2002
+    // Read the environment variables (GitHub Actions) or use the defaults (Local)
+    // Note: It is better to use 127.0.0.1 instead of 'localhost' to force TCP connection and avoid error 2002
     $host = getenv('DB_HOST') ?: '127.0.0.1';
     $port = getenv('DB_PORT') ?: 3306;
     $user = getenv('DB_USER') ?: 'mario';
     $password = getenv('DB_PASS') !== false ? getenv('DB_PASS') : '2003';
     
-    // Nombres de las bases de datos
+    // Names of the databases
     $prodDbName = 'GeoterRA';
     $testDbName = 'GeoterRA_test';
     
@@ -68,83 +68,62 @@ function initializeTestDatabase(): \PDO {
             \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
         ]);
         echo "[✓] Connected to test database: {$testDbName}\n";
-    } catch (\PDOException $e) {
-        echo "[✗] Failed to connect to test database: " . $e->getMessage() . "\n";
-        echo "Please ensure test database exists: CREATE DATABASE {$testDbName};\n";
-        exit(1);
+    } catch (\PDOException $e) { // If not, create a test database
+        if ($e->getCode() == 1049 || strpos($e->getMessage(), 'Unknown database') !== false) {
+            echo "[!] Test database '{$testDbName}' not found. Attempting to create it automatically...\n";
+            try {
+                $serverDsn = "mysql:host={$host};port={$port};charset=utf8mb4";
+                $serverPdo = new \PDO($serverDsn, $user, $password, [
+                    \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                ]);
+                $serverPdo->exec("CREATE DATABASE IF NOT EXISTS `{$testDbName}`");
+                echo "[✓] Successfully created test database: {$testDbName}\n";
+                
+                // Retry connection to the newly created database
+                $testPdo = new \PDO($testDsn, $user, $password, [
+                    \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                    \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                ]);
+            } catch (\PDOException $createEx) {
+                echo "[✗] Failed to create test database: " . $createEx->getMessage() . "\n";
+                echo "Please ensure test database exists manually: CREATE DATABASE {$testDbName};\n";
+                exit(1);
+            }
+        } else {
+            echo "[✗] Failed to connect to test database: " . $e->getMessage() . "\n";
+            exit(1);
+        }
     }
     
-    // Copy schema from production to test database
-    copySchemaFromProduction($prodPdo, $testPdo, $prodDbName, $testDbName);
+    // Initialize schema from database_schema.sql
+    loadTestSchema($testPdo);
     
     return $testPdo;
 }
 
 /**
- * Copy database schema from production to test database
- * Copies: Tables, columns, indexes, foreign keys, constraints
- * Does NOT copy: Data (starts empty for each test)
+ * Load database schema from fixtures
+ * Does NOT copy data (starts empty for each test)
  */
-function copySchemaFromProduction(\PDO $prodPdo, \PDO $testPdo, string $prodDb, string $testDb): void {
+function loadTestSchema(\PDO $testPdo): void {
     try {
-        // Step 1: Drop all existing test tables
-        echo "\n[*] Resetting test database schema...\n";
-        $tables = $testPdo->query("
-            SELECT TABLE_NAME 
-            FROM INFORMATION_SCHEMA.TABLES 
-            WHERE TABLE_SCHEMA = DATABASE()
-        ")->fetchAll(\PDO::FETCH_COLUMN);
-        
-        if (!empty($tables)) {
-            $testPdo->exec('SET FOREIGN_KEY_CHECKS=0');
-            foreach ($tables as $table) {
-                $testPdo->exec("DROP TABLE IF EXISTS `{$table}`");
-                echo "    [✓] Dropped table: {$table}\n";
-            }
-            $testPdo->exec('SET FOREIGN_KEY_CHECKS=1');
-        }
-        
-        // Step 2: Get list of tables from production
-        $productionTables = $prodPdo->query("
-            SELECT TABLE_NAME 
-            FROM INFORMATION_SCHEMA.TABLES 
-            WHERE TABLE_SCHEMA = '{$prodDb}'
-            ORDER BY TABLE_NAME
-        ")->fetchAll(\PDO::FETCH_COLUMN);
-        
-        if (empty($productionTables)) {
-            echo "[!] Warning: No tables found in production database '{$prodDb}'\n";
+        $schemaPath = dirname(__DIR__) . '/tests/Fixtures/database_schema.sql';
+        if (!file_exists($schemaPath)) {
+            echo "[!] Warning: Schema file not found at {$schemaPath}\n";
             return;
         }
+
+        echo "\n[*] Loading test database schema from fixtures...\n";
         
-        echo "[*] Copying " . count($productionTables) . " tables from production...\n";
+        $sql = file_get_contents($schemaPath);
         
-        // Step 3: For each table, copy CREATE TABLE statement
-        $testPdo->exec('SET FOREIGN_KEY_CHECKS=0');
+        // Execute the SQL dump
+        $testPdo->exec($sql);
         
-        foreach ($productionTables as $table) {
-            // Get CREATE TABLE statement from production
-            $createTableResult = $prodPdo->query("SHOW CREATE TABLE `{$table}`")->fetch();
-            $createTableSql = $createTableResult['Create Table'];
-            
-            // Replace database name references
-            $createTableSql = str_replace(
-                "CREATE TABLE `{$table}`",
-                "CREATE TABLE IF NOT EXISTS `{$table}`",
-                $createTableSql
-            );
-            
-            // Execute CREATE TABLE in test database
-            $testPdo->exec($createTableSql);
-            echo "    [✓] Copied table: {$table}\n";
-        }
-        
-        $testPdo->exec('SET FOREIGN_KEY_CHECKS=1');
-        
-        echo "[✓] Schema successfully copied from production database\n";
+        echo "[✓] Schema successfully loaded\n";
         
     } catch (\PDOException $e) {
-        echo "[✗] Failed to copy schema: " . $e->getMessage() . "\n";
+        echo "[✗] Failed to load schema: " . $e->getMessage() . "\n";
         echo "SQL State: " . $e->getCode() . "\n";
         exit(1);
     }
