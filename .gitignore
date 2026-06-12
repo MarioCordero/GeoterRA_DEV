@@ -162,3 +162,4 @@ GeoterRA_local.session.sql
 API/config/api-keys.php
 API/config/config.ini
 docApiWebsite/node_modules
+API/coverage
