@@ -12,6 +12,8 @@ class AllowedUserRolesTest extends TestCase
         $this->assertTrue(defined('DTO\AllowedUserRoles::ADMIN'));
         $this->assertTrue(defined('DTO\AllowedUserRoles::USER'));
         $this->assertTrue(defined('DTO\AllowedUserRoles::MAINTENANCE'));
+        $this->assertTrue(defined('DTO\AllowedUserRoles::FIELD_INVESTIGATOR'));
+        $this->assertTrue(defined('DTO\AllowedUserRoles::INVESTIGATOR'));
     }
 
     public function testAllowedRolesHaveCorrectValues(): void
