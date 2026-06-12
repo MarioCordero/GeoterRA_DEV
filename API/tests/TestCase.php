@@ -103,7 +103,7 @@ abstract class TestCase extends PHPUnitTestCase
     /**
      * Generate test access token
      */
-    protected function createTestAccessToken(string $userId, \DateTime $expiresAt = null): array
+    protected function createTestAccessToken(string $userId, ?\DateTime $expiresAt = null): array
     {
         if ($expiresAt === null) {
             $expiresAt = new \DateTime('+1 hour');
@@ -130,7 +130,7 @@ abstract class TestCase extends PHPUnitTestCase
     /**
      * Generate test refresh token
      */
-    protected function createTestRefreshToken(string $userId, \DateTime $expiresAt = null): array
+    protected function createTestRefreshToken(string $userId, ?\DateTime $expiresAt = null): array
     {
         if ($expiresAt === null) {
             $expiresAt = new \DateTime('+30 days');
@@ -219,7 +219,7 @@ abstract class TestCase extends PHPUnitTestCase
     protected function assertDTOValidationThrows(
         string $dtoClass,
         array $data,
-        string $expectedErrorCode = null
+        ?string $expectedErrorCode = null
     ): void {
         try {
             $dto = $dtoClass::fromArray($data);
