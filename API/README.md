@@ -104,6 +104,16 @@ composer run test:repositories # Solo las pruebas de repositorios
 composer run test:coverage     # Con reporte de cobertura de código
 ```
 
+### Comando para ejecutar pruebas por carpeta
+
+```bash
+# Para ejecutar pruebas por función específica 
+vendor/bin/phpunit tests/Unit/DTO
+
+# Para ejecutar pruebas por función con Code Coverage (Se necesita libreria xdebug)
+XDEBUG_MODE=coverage vendor/bin/phpunit tests/Unit/DTO
+```
+
 ### Comando para ejecutar pruebas por archivo 
 
 ```bash
