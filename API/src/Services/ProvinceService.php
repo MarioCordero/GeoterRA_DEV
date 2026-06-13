@@ -131,6 +131,7 @@ final class ProvinceService
 
     // If SNIT code changed, ensure it's not taken by another province
     if ($existing->provinceSnitCode !== $dto->provinceSnitCode) {
+      error_log("Province SNIT code change detected for province ID {$provinceId}: {$existing->provinceSnitCode} -> {$dto->provinceSnitCode}");
       if ($this->repository->existsBySnitCode($dto->provinceSnitCode)) {
         throw new ApiException(
           ErrorType::conflict("Province SNIT code {$dto->provinceSnitCode} already exists"),

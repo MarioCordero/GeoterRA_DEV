@@ -65,10 +65,11 @@ final class ProvinceController
    *
    * @param int $code
    */
-  public function showBySnitCode(int $code): void
+  public function showBySnitCode(string $code): void
   {
     try {
-      $province = $this->service->getBySnitCode($code);
+      $codeInt = (int) $code;
+      $province = $this->service->getBySnitCode($codeInt);
       Response::success($province);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());

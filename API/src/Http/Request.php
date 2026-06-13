@@ -220,7 +220,7 @@ final class Request
     if ($path === false || $path === null) {
       $path = '/';
     }
-    $basePath = '/api/public';
+    $basePath = '/API/public';
     if (stripos($path, $basePath) === 0) {
       $path = substr($path, strlen($basePath));
     }
