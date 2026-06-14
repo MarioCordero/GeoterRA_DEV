@@ -128,8 +128,6 @@ final class InvestigationRequestController
     }
   }
 
-  // -------------------- ADMIN ENDPOINTS --------------------
-
   /**
    * GET /admin/analysis-request
    * Returns all analysis requests in the system (admin only).
@@ -137,11 +135,6 @@ final class InvestigationRequestController
   public function adminIndex(): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::VIEW_ALL_REQUESTS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
 
       $requests = $this->service->getAll();
       Response::success($requests);
@@ -159,12 +152,6 @@ final class InvestigationRequestController
   public function adminShow(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::VIEW_ALL_REQUESTS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $request = $this->service->adminGetById($id);
       Response::success($request->toArray());
     } catch (ApiException $e) {
@@ -181,12 +168,6 @@ final class InvestigationRequestController
   public function adminUpdate(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_ALL_REQUESTS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $body = Request::parseJsonRequest();
       $dto = InvestigationRequestDTO::fromArray($body);
       $this->service->adminUpdate($id, $dto);
@@ -206,12 +187,6 @@ final class InvestigationRequestController
   public function adminAddState(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_ALL_REQUESTS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $body = Request::parseJsonRequest();
       if (!isset($body['state']) || trim($body['state']) === '') {
         throw new ApiException(ErrorType::missingField('state'), 422);
@@ -234,12 +209,6 @@ final class InvestigationRequestController
   public function adminDelete(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_ALL_REQUESTS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $this->service->adminDelete($id);
       Response::success(['message' => 'Analysis request deleted successfully']);
     } catch (ApiException $e) {

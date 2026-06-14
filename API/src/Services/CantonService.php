@@ -6,6 +6,7 @@ namespace Services;
 use PDO;
 use Http\ApiException;
 use Http\ErrorType;
+use Http\Request;
 use DTO\CantonDTO;
 use DTO\AllowedUserRoles;
 use Repositories\CantonRepository;
@@ -18,13 +19,11 @@ final class CantonService
 {
   private CantonRepository $repository;
   private ProvinceRepository $provinceRepository;
-  private AuthService $authService;
 
-  public function __construct(private PDO $pdo)
+  public function __construct(private readonly PDO $pdo)
   {
-    $this->repository = new CantonRepository($pdo);
-    $this->provinceRepository = new ProvinceRepository($pdo);
-    $this->authService = new AuthService($pdo);
+    $this->repository = new CantonRepository($this->pdo);
+    $this->provinceRepository = new ProvinceRepository($this->pdo);
   }
 
   /**
@@ -70,6 +69,14 @@ final class CantonService
    */
   public function getById(string $cantonId): array
   {
+
+    Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR,
+      AllowedUserRoles::MAINTENANCE
+    ]);
+
     $canton = $this->repository->findById($cantonId);
     if (!$canton) {
       throw new ApiException(ErrorType::notFound('Canton'), 404);
@@ -92,6 +99,13 @@ final class CantonService
    */
   public function getBySnitCode(int $snitCode): array
   {
+    Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR,
+      AllowedUserRoles::MAINTENANCE
+    ]);
+
     $canton = $this->repository->findBySnitCode($snitCode);
     if (!$canton) {
       throw new ApiException(ErrorType::notFound('Canton'), 404);
@@ -113,17 +127,20 @@ final class CantonService
    */
   public function create(CantonDTO $dto): void
   {
-    $auth = $this->authService->requireAuth();
-    if (($auth['role'] ?? '') !== AllowedUserRoles::ADMIN) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
+    $auth = Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
 
     $dto->validate();
     $this->requireValidProvince($dto->provinceSnitCode);
 
     if ($this->repository->existsBySnitCode($dto->cantonSnitCode)) {
       throw new ApiException(
-        ErrorType::conflict("Canton SNIT code {$dto->cantonSnitCode} already exists"),
+        ErrorType::conflict(
+          "Canton SNIT code {$dto->cantonSnitCode} already exists"
+        ),
         409
       );
     }
@@ -140,10 +157,11 @@ final class CantonService
    */
   public function update(string $cantonId, CantonDTO $dto): void
   {
-    $auth = $this->authService->requireAuth();
-    if (($auth['role'] ?? '') !== AllowedUserRoles::ADMIN) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
+    Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
 
     $dto->validate();
     $this->requireValidProvince($dto->provinceSnitCode);
@@ -157,7 +175,9 @@ final class CantonService
     if ($existing->cantonSnitCode !== $dto->cantonSnitCode) {
       if ($this->repository->existsBySnitCode($dto->cantonSnitCode)) {
         throw new ApiException(
-          ErrorType::conflict("Canton SNIT code {$dto->cantonSnitCode} already exists"),
+          ErrorType::conflict(
+            "Canton SNIT code {$dto->cantonSnitCode} already exists"
+          ),
           409
         );
       }
@@ -165,7 +185,10 @@ final class CantonService
 
     $updated = $this->repository->update($cantonId, $dto);
     if (!$updated) {
-      throw new ApiException(ErrorType::internal('Failed to update canton'), 500);
+      throw new ApiException(
+        ErrorType::internal('Failed to update canton'),
+        500
+      );
     }
   }
 
@@ -177,10 +200,11 @@ final class CantonService
    */
   public function delete(string $cantonId): void
   {
-    $auth = $this->authService->requireAuth();
-    if (($auth['role'] ?? '') !== AllowedUserRoles::ADMIN) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
+    Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
 
     $canton = $this->repository->findById($cantonId);
     if (!$canton) {
@@ -189,7 +213,10 @@ final class CantonService
 
     $deleted = $this->repository->delete($cantonId);
     if (!$deleted) {
-      throw new ApiException(ErrorType::internal('Failed to delete canton'), 500);
+      throw new ApiException(
+        ErrorType::internal('Failed to delete canton'),
+        500
+      );
     }
   }
 }

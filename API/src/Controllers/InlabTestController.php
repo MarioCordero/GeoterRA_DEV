@@ -33,12 +33,6 @@ final class InlabTestController
   public function index(): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_INLAB_TESTS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $geomanifestationId = $_GET['geomanifestation_id'] ?? '';
       if (empty($geomanifestationId)) {
         throw new ApiException(ErrorType::missingField('geomanifestation_id'), 422);
@@ -61,12 +55,6 @@ final class InlabTestController
   public function show(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_INLAB_TESTS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $test = $this->service->getById($id);
       Response::success($test);
     } catch (ApiException $e) {
@@ -83,12 +71,6 @@ final class InlabTestController
   public function store(): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_INLAB_TESTS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $body = Request::parseJsonRequest();
       $dto = InlabTestDTO::fromArray($body);
       $this->service->create($dto);
@@ -109,12 +91,6 @@ final class InlabTestController
   public function update(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_INLAB_TESTS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $body = Request::parseJsonRequest();
       $dto = InlabTestDTO::fromArray($body);
       $this->service->update($id, $dto);
@@ -135,12 +111,6 @@ final class InlabTestController
   public function delete(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_INLAB_TESTS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $this->service->delete($id);
       Response::success(['deleted' => true]);
     } catch (ApiException $e) {

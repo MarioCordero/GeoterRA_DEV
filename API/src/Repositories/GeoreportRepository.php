@@ -52,8 +52,9 @@ final class GeoreportRepository extends Repository
    * @param string $geomanifestationId
    * @return GeoreportDTO|null
    */
-  public function getCurrentByManifestation(string $geomanifestationId): ?GeoreportDTO
-  {
+  public function getCurrentByManifestation(
+    string $geomanifestationId
+  ): ?GeoreportDTO {
     // The current georeport ID is stored in geomanifestations.current_georeport_id
     $sql = "SELECT gr.*
                 FROM georeports gr
@@ -134,11 +135,13 @@ final class GeoreportRepository extends Repository
    * Updates the current_georeport_id in the associated geomanifestation.
    *
    * @param string $geomanifestationId
-   * @param string $georeportId
+   * @param string|null $georeportId
    * @return bool
    */
-  public function setAsCurrentForManifestation(string $geomanifestationId, string $georeportId): bool
-  {
+  public function setAsCurrentForManifestation(
+    string $geomanifestationId,
+    ?string $georeportId
+  ): bool {
     $sql = "UPDATE geomanifestations
                 SET current_georeport_id = :georeport_id
                 WHERE geomanifestation_id = :gm_id";

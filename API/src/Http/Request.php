@@ -158,6 +158,16 @@ final class Request
     return self::$user;
   }
 
+  public static function requireRole(array $allowedRoles): array
+  {
+    $user = self::getUser();
+    if ($user === null || !isset($user['role'])
+      || !in_array($user['role'], $allowedRoles, true)) {
+      throw new ApiException(ErrorType::forbidden());
+    }
+    return $user;
+  }
+
   /**
    * Determines whether the current request has an associated authenticated user.
    *

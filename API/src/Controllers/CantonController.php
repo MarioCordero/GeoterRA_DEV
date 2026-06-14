@@ -66,7 +66,7 @@ final class CantonController
    * GET /cantons/snit/{code}
    * Retrieves a canton by its SNIT code.
    *
-   * @param int $code
+   * @param string $code
    */
   public function showBySnitCode(string $code): void
   {
@@ -88,12 +88,6 @@ final class CantonController
   public function store(): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_TERRITORIES)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $body = Request::parseJsonRequest();
       $dto = CantonDTO::fromArray($body);
       $this->service->create($dto);
@@ -114,12 +108,6 @@ final class CantonController
   public function update(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_TERRITORIES)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $body = Request::parseJsonRequest();
       $dto = CantonDTO::fromArray($body);
       $this->service->update($id, $dto);
@@ -140,12 +128,6 @@ final class CantonController
   public function delete(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_TERRITORIES)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $this->service->delete($id);
       Response::success(['deleted' => true]);
     } catch (ApiException $e) {

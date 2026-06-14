@@ -78,24 +78,25 @@ return [
     'controller' => 'GeomanifestationController', 'action' => 'setVisibility'],
 
   // Insitu Tests
-  ['method' => 'GET', 'path' => '/insitu-tests', 'controller' => 'InsituTestController', 'action' => 'index'],
-  ['method' => 'GET', 'path' => '/insitu-tests/{id}', 'controller' => 'InsituTestController', 'action' => 'show'],
-  ['method' => 'POST', 'path' => '/insitu-tests', 'controller' => 'InsituTestController', 'action' => 'store'],
-  ['method' => 'PUT', 'path' => '/insitu-tests/{id}', 'controller' => 'InsituTestController', 'action' => 'update'],
-  ['method' => 'DELETE', 'path' => '/insitu-tests/{id}', 'controller' => 'InsituTestController', 'action' => 'delete'],
+  ['method' => 'GET', 'path' => '/admin/insitu-tests', 'controller' => 'InsituTestController', 'action' => 'index'],
+  ['method' => 'GET', 'path' => '/admin/insitu-tests/{id}', 'controller' => 'InsituTestController', 'action' => 'show'],
+  ['method' => 'POST', 'path' => '/admin/insitu-tests', 'controller' => 'InsituTestController', 'action' => 'store'],
+  ['method' => 'PUT', 'path' => '/admin/insitu-tests/{id}', 'controller' => 'InsituTestController', 'action' => 'update'],
+  ['method' => 'DELETE', 'path' => '/admin/insitu-tests/{id}', 'controller' => 'InsituTestController', 'action' => 'delete'],
 
-// Inlab Tests
-  ['method' => 'GET', 'path' => '/inlab-tests', 'controller' => 'InlabTestController', 'action' => 'index'],
-  ['method' => 'GET', 'path' => '/inlab-tests/{id}', 'controller' => 'InlabTestController', 'action' => 'show'],
-  ['method' => 'POST', 'path' => '/inlab-tests', 'controller' => 'InlabTestController', 'action' => 'store'],
-  ['method' => 'PUT', 'path' => '/inlab-tests/{id}', 'controller' => 'InlabTestController', 'action' => 'update'],
-  ['method' => 'DELETE', 'path' => '/inlab-tests/{id}', 'controller' => 'InlabTestController', 'action' => 'delete'],
+  // Inlab Tests
+  ['method' => 'GET', 'path' => '/admin/inlab-tests', 'controller' => 'InlabTestController', 'action' => 'index'],
+  ['method' => 'GET', 'path' => '/admin/inlab-tests/{id}', 'controller' => 'InlabTestController', 'action' => 'show'],
+  ['method' => 'POST', 'path' => '/admin/inlab-tests', 'controller' => 'InlabTestController', 'action' => 'store'],
+  ['method' => 'PUT', 'path' => '/admin/inlab-tests/{id}', 'controller' => 'InlabTestController', 'action' => 'update'],
+  ['method' => 'DELETE', 'path' => '/admin/inlab-tests/{id}', 'controller' => 'InlabTestController', 'action' => 'delete'],
 
-// Georeports
-  ['method' => 'GET', 'path' => '/georeports', 'controller' => 'GeoreportController', 'action' => 'index'],
+  // Georeports`
   ['method' => 'GET', 'path' => '/georeports/current', 'controller' => 'GeoreportController', 'action' => 'current'],
-  ['method' => 'GET', 'path' => '/georeports/{id}', 'controller' => 'GeoreportController', 'action' => 'show'],
-  ['method' => 'POST', 'path' => '/georeports', 'controller' => 'GeoreportController', 'action' => 'store'],
-  ['method' => 'PUT', 'path' => '/georeports/{id}', 'controller' => 'GeoreportController', 'action' => 'update'],
-  ['method' => 'DELETE', 'path' => '/georeports/{id}', 'controller' => 'GeoreportController', 'action' => 'delete'],
+
+  ['method' => 'GET', 'path' => '/admin/georeports', 'controller' => 'GeoreportController', 'action' => 'index'],
+  ['method' => 'GET', 'path' => '/admin/georeports/{id}', 'controller' => 'GeoreportController', 'action' => 'show'],
+  ['method' => 'POST', 'path' => '/admin/georeports', 'controller' => 'GeoreportController', 'action' => 'store'],
+  ['method' => 'PUT', 'path' => '/admin/georeports/{id}', 'controller' => 'GeoreportController', 'action' => 'update'],
+  ['method' => 'DELETE', 'path' => '/admin/georeports/{id}', 'controller' => 'GeoreportController', 'action' => 'delete'],
 ];

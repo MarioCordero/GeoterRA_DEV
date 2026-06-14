@@ -6,6 +6,7 @@ namespace Services;
 use PDO;
 use Http\ApiException;
 use Http\ErrorType;
+use Http\Request;
 use DTO\InsituTestDTO;
 use DTO\AllowedUserRoles;
 use Repositories\InsituTestRepository;
@@ -28,27 +29,17 @@ final class InsituTestService
   }
 
   /**
-   * Ensures the authenticated user has admin role.
-   *
-   * @param string $role
-   * @throws ApiException
-   */
-  private function requireAdmin(string $role): void
-  {
-    if ($role !== AllowedUserRoles::ADMIN) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
-  }
-
-  /**
    * Validates that the referenced geomanifestation exists.
    *
    * @param string $geomanifestationId
    * @throws ApiException
    */
-  private function validateGeomanifestationExists(string $geomanifestationId): void
-  {
-    $manifestation = $this->geomanifestationRepository->findById($geomanifestationId);
+  private function validateGeomanifestationExists(
+    string $geomanifestationId
+  ): void {
+    $manifestation = $this->geomanifestationRepository->findById(
+      $geomanifestationId
+    );
     if (!$manifestation) {
       throw new ApiException(
         ErrorType::invalidField('geomanifestation_id'),
@@ -65,8 +56,11 @@ final class InsituTestService
    */
   public function create(InsituTestDTO $dto): void
   {
-    $auth = $this->authService->requireAuth();
-    $this->requireAdmin($auth['role'] ?? '');
+    $auth = Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
 
     $dto->validate();
     $this->validateGeomanifestationExists($dto->geomanifestationId);
@@ -83,6 +77,13 @@ final class InsituTestService
    */
   public function getById(string $id): array
   {
+    Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR,
+      AllowedUserRoles::MAINTENANCE
+    ]);
+
     $test = $this->repository->findById($id);
     if (!$test) {
       throw new ApiException(ErrorType::notFound('In-situ test'), 404);
@@ -110,22 +111,24 @@ final class InsituTestService
   public function getByManifestation(string $geomanifestationId): array
   {
     // Optionally check if manifestation exists and is visible (or admin)
-    $manifestation = $this->geomanifestationRepository->findById($geomanifestationId);
+    $manifestation = $this->geomanifestationRepository->findById(
+      $geomanifestationId
+    );
     if (!$manifestation) {
-      throw new ApiException(ErrorType::notFound('Geothermal manifestation'), 404);
+      throw new ApiException(
+        ErrorType::notFound('Geothermal manifestation'),
+        404
+      );
     }
 
     // If manifestation is hidden, only admin can see its tests
-    if (!$manifestation->visibility) {
-      try {
-        $auth = $this->authService->requireAuth();
-        $isAdmin = ($auth['role'] ?? '') === AllowedUserRoles::ADMIN;
-      } catch (\Exception $e) {
-        $isAdmin = false;
-      }
-      if (!$isAdmin) {
-        throw new ApiException(ErrorType::notFound('Geothermal manifestation'), 404);
-      }
+    if (!$manifestation['visibility']) {
+      Request::requireRole([
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR,
+        AllowedUserRoles::MAINTENANCE
+      ]);
     }
 
     $tests = $this->repository->getByManifestation($geomanifestationId);
@@ -148,8 +151,10 @@ final class InsituTestService
    */
   public function update(string $id, InsituTestDTO $dto): void
   {
-    $auth = $this->authService->requireAuth();
-    $this->requireAdmin($auth['role'] ?? '');
+    Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
 
     $dto->validate();
     $this->validateGeomanifestationExists($dto->geomanifestationId);
@@ -161,7 +166,10 @@ final class InsituTestService
 
     $updated = $this->repository->update($id, $dto);
     if (!$updated) {
-      throw new ApiException(ErrorType::internal('Failed to update in-situ test'), 500);
+      throw new ApiException(
+        ErrorType::internal('Failed to update in-situ test'),
+        500
+      );
     }
   }
 
@@ -173,8 +181,11 @@ final class InsituTestService
    */
   public function delete(string $id): void
   {
-    $auth = $this->authService->requireAuth();
-    $this->requireAdmin($auth['role'] ?? '');
+    Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
 
     $existing = $this->repository->findById($id);
     if (!$existing) {
@@ -183,7 +194,10 @@ final class InsituTestService
 
     $deleted = $this->repository->delete($id);
     if (!$deleted) {
-      throw new ApiException(ErrorType::internal('Failed to delete in-situ test'), 500);
+      throw new ApiException(
+        ErrorType::internal('Failed to delete in-situ test'),
+        500
+      );
     }
   }
 }

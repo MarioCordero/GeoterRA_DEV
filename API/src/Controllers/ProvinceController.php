@@ -63,7 +63,7 @@ final class ProvinceController
    * GET /provinces/snit/{code}
    * Retrieves a province by its SNIT code (public access).
    *
-   * @param int $code
+   * @param string $code
    */
   public function showBySnitCode(string $code): void
   {
@@ -85,11 +85,6 @@ final class ProvinceController
   public function store(): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_TERRITORIES)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
 
       $body = Request::parseJsonRequest();
       $dto = ProvinceDTO::fromArray($body);
@@ -111,12 +106,6 @@ final class ProvinceController
   public function update(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_TERRITORIES)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $body = Request::parseJsonRequest();
       $dto = ProvinceDTO::fromArray($body);
       $this->service->update($id, $dto);
@@ -137,12 +126,6 @@ final class ProvinceController
   public function delete(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_TERRITORIES)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $this->service->delete($id);
       Response::success(['deleted' => true]);
     } catch (ApiException $e) {

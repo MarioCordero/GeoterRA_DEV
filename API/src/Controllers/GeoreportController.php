@@ -33,12 +33,6 @@ final class GeoreportController
   public function index(): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_GEOREPORTS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $geomanifestationId = $_GET['geomanifestation_id'] ?? '';
       if (empty($geomanifestationId)) {
         throw new ApiException(ErrorType::missingField('geomanifestation_id'), 422);
@@ -60,12 +54,6 @@ final class GeoreportController
   public function current(): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_GEOREPORTS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $geomanifestationId = $_GET['geomanifestation_id'] ?? '';
       if (empty($geomanifestationId)) {
         throw new ApiException(ErrorType::missingField('geomanifestation_id'), 422);
@@ -109,12 +97,6 @@ final class GeoreportController
   public function store(): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_GEOREPORTS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $body = Request::parseJsonRequest();
       $dto = GeoreportDTO::fromArray($body);
       $setAsCurrent = $body['set_as_current'] ?? true;
@@ -137,12 +119,6 @@ final class GeoreportController
   public function update(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_GEOREPORTS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $body = Request::parseJsonRequest();
       $dto = GeoreportDTO::fromArray($body);
       $setAsCurrent = $body['set_as_current'] ?? false;
@@ -164,12 +140,6 @@ final class GeoreportController
   public function delete(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_GEOREPORTS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $this->service->delete($id);
       Response::success(['deleted' => true]);
     } catch (ApiException $e) {

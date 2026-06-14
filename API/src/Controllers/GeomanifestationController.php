@@ -33,12 +33,18 @@ final class GeomanifestationController
   public function index(): void
   {
     try {
-      $page = (int)($_GET['page'] ?? 1);
-      $limit = (int)($_GET['limit'] ?? 20);
-      $provinceSnitCode = isset($_GET['province_snit_code']) ? (int)$_GET['province_snit_code'] : null;
+      $page = (int) ($_GET['page'] ?? 1);
+      $limit = (int) ($_GET['limit'] ?? 20);
+      $provinceSnitCode = isset(
+        $_GET['province_snit_code']
+      ) ? (int) $_GET['province_snit_code'] : null;
 
       if ($provinceSnitCode !== null) {
-        $result = $this->service->getByProvince($provinceSnitCode, $page, $limit);
+        $result = $this->service->getByProvince(
+          $provinceSnitCode,
+          $page,
+          $limit
+        );
       } else {
         $result = $this->service->getAllVisible($page, $limit);
       }
@@ -57,14 +63,8 @@ final class GeomanifestationController
   public function adminIndex(): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_GEOMANIFESTATIONS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
-      $page = (int)($_GET['page'] ?? 1);
-      $limit = (int)($_GET['limit'] ?? 20);
+      $page = (int) ($_GET['page'] ?? 1);
+      $limit = (int) ($_GET['limit'] ?? 20);
       $result = $this->service->getAll($page, $limit);
       Response::success($result);
     } catch (ApiException $e) {
@@ -104,11 +104,6 @@ final class GeomanifestationController
   public function store(): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_GEOMANIFESTATIONS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
 
       $body = Request::parseJsonRequest();
       $dto = RegisterGeomanifestationDTO::fromArray($body);
@@ -128,12 +123,6 @@ final class GeomanifestationController
   public function update(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_GEOMANIFESTATIONS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $body = Request::parseJsonRequest();
       $dto = UpdateGeomanifestationDTO::fromArray($body);
       $this->service->update($id, $dto);
@@ -152,12 +141,6 @@ final class GeomanifestationController
   public function delete(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_GEOMANIFESTATIONS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $this->service->delete($id);
       Response::success(['deleted' => true]);
     } catch (ApiException $e) {
@@ -174,12 +157,6 @@ final class GeomanifestationController
   public function setVisibility(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_GEOMANIFESTATIONS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $body = Request::parseJsonRequest();
       $visible = isset($body['visible']) && $body['visible'];
       $this->service->setVisibility($id, $visible);
@@ -201,17 +178,22 @@ final class GeomanifestationController
   public function viewIndex(): void
   {
     try {
-      $page = (int)($_GET['page'] ?? 1);
-      $limit = (int)($_GET['limit'] ?? 20);
-      $provinceSnitCode = isset($_GET['province_snit_code']) ? (int)$_GET['province_snit_code'] : null;
-      $tempMin = isset($_GET['temp_min']) ? (float)$_GET['temp_min'] : null;
-      $tempMax = isset($_GET['temp_max']) ? (float)$_GET['temp_max'] : null;
+      $page = (int) ($_GET['page'] ?? 1);
+      $limit = (int) ($_GET['limit'] ?? 20);
+      $provinceSnitCode = isset($_GET['province_snit_code']) ? (int) $_GET['province_snit_code'] : null;
+      $tempMin = isset($_GET['temp_min']) ? (float) $_GET['temp_min'] : null;
+      $tempMax = isset($_GET['temp_max']) ? (float) $_GET['temp_max'] : null;
       $showAll = isset($_GET['show_all']) ? filter_var($_GET['show_all'], FILTER_VALIDATE_BOOLEAN) : false;
 
       $onlyVisible = !$showAll;
 
       $result = $this->service->getViewAllPaginated(
-        $page, $limit, $provinceSnitCode, $tempMin, $tempMax, $onlyVisible
+        $page,
+        $limit,
+        $provinceSnitCode,
+        $tempMin,
+        $tempMax,
+        $onlyVisible
       );
 
       Response::success($result);

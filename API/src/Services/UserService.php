@@ -45,7 +45,10 @@ final class UserService
       // If user exists but is soft‑deleted, suggest restoration
       if ($existing['deleted_at'] !== null) {
         throw new ApiException(
-          ErrorType::from('ACCOUNT_DELETED', 'This account was deleted. Please use the account restoration endpoint.'),
+          ErrorType::from(
+            'ACCOUNT_DELETED',
+            'This account was deleted. Please use the account restoration endpoint.'
+          ),
           400
         );
       }
@@ -75,13 +78,19 @@ final class UserService
     }
     if ($user['deleted_at'] === null) {
       throw new ApiException(
-        ErrorType::from('ACCOUNT_ACTIVE', 'Account is already active and not deleted.'),
+        ErrorType::from(
+          'ACCOUNT_ACTIVE',
+          'Account is already active and not deleted.'
+        ),
         400
       );
     }
     $restored = $this->repository->restoreUser($user['user_id']);
     if (!$restored) {
-      throw new ApiException(ErrorType::internal('Failed to restore account.'), 500);
+      throw new ApiException(
+        ErrorType::internal('Failed to restore account.'),
+        500
+      );
     }
   }
 
@@ -103,8 +112,16 @@ final class UserService
       if (!$currentUser) {
         throw new ApiException(ErrorType::notFound('User'), 404);
       }
-      if (!PasswordService::verify($dto->currentPassword, $currentUser['password_hash'])) {
-        throw new ApiException(ErrorType::validationError('Current password is incorrect'), 400);
+      if (
+        !PasswordService::verify(
+          $dto->currentPassword,
+          $currentUser['password_hash']
+        )
+      ) {
+        throw new ApiException(
+          ErrorType::validationError('Current password is incorrect'),
+          400
+        );
       }
       $dto->password = PasswordService::hash($dto->password);
     }
@@ -165,7 +182,10 @@ final class UserService
     }
     $updated = $this->repository->updateRole($dto->userId, $dto->role);
     if (!$updated) {
-      throw new ApiException(ErrorType::internal('Failed to update user role'), 500);
+      throw new ApiException(
+        ErrorType::internal('Failed to update user role'),
+        500
+      );
     }
   }
 
@@ -180,7 +200,10 @@ final class UserService
   {
     $user = $this->repository->findActiveUserById($userId);
     if (!$user) {
-      throw new ApiException(ErrorType::notFound('User'), 404);
+      throw new ApiException(
+        ErrorType::notFound('User'),
+        404
+      );
     }
     return $user;
   }

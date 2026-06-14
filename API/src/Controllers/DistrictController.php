@@ -66,7 +66,7 @@ final class DistrictController
    * GET /districts/snit/{code}
    * Retrieves a district by its SNIT code.
    *
-   * @param int $code
+   * @param string $code
    */
   public function showBySnitCode(string $code): void
   {
@@ -88,12 +88,6 @@ final class DistrictController
   public function store(): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_TERRITORIES)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $body = Request::parseJsonRequest();
       $dto = DistrictDTO::fromArray($body);
       $this->service->create($dto);
@@ -114,11 +108,6 @@ final class DistrictController
   public function update(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_TERRITORIES)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
 
       $body = Request::parseJsonRequest();
       $dto = DistrictDTO::fromArray($body);
@@ -140,11 +129,6 @@ final class DistrictController
   public function delete(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_TERRITORIES)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
 
       $this->service->delete($id);
       Response::success(['deleted' => true]);

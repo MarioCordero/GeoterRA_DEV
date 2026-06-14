@@ -5,8 +5,10 @@ namespace Services;
 
 use PDO;
 use Http\ApiException;
+use Http\Request;
 use Http\ErrorType;
 use DTO\InvestigationRequestDTO;
+use DTO\AllowedUserRoles;
 use Repositories\InvestigationRequestRepository;
 use Repositories\UserRepository;
 
@@ -27,51 +29,42 @@ final class InvestigationRequestService
   }
 
   /**
-   * Helper to get the authenticated user ID and full data.
-   *
-   * @return array{user_id: string, role: string, email: string, first_name: string, last_name: string, phone_number: string|null}
-   * @throws ApiException
-   */
-  private function getAuthenticatedUser(): array
-  {
-    $auth = $this->authService->requireAuth();
-    $user = $this->userRepository->findById($auth['user_id']);
-    if (!$user) {
-      throw new ApiException(ErrorType::unauthorized('User not found'), 401);
-    }
-    return [
-      'user_id' => $auth['user_id'],
-      'role' => $auth['role'],
-      'email' => $user['email'],
-      'first_name' => $user['first_name'],
-      'last_name' => $user['last_name'],
-      'phone_number' => $user['phone_number'] ?? null
-    ];
-  }
-
-  /**
    * Validates that relation_with_owner is provided if owner differs from requester.
    *
    * @param InvestigationRequestDTO $dto
    * @param array $userData
    * @throws ApiException
    */
-  private function validateOwnerRelation(InvestigationRequestDTO $dto, array $userData): void
-  {
+  private function validateOwnerRelation(
+    InvestigationRequestDTO $dto,
+    array $userData
+  ): void {
+
     $fullName = trim($userData['first_name'] . ' ' . $userData['last_name']);
     $ownerDiffers = false;
-    if ($dto->ownerName !== null && $dto->ownerName !== $fullName) {
+    if (
+      $dto->ownerName !== null
+      && $dto->ownerName !== $fullName
+    ) {
       $ownerDiffers = true;
     }
-    if ($dto->ownerPhoneNumber !== null && $dto->ownerPhoneNumber !== ($userData['phone_number'] ?? null)) {
+    if (
+      $dto->ownerPhoneNumber !== null
+      && $dto->ownerPhoneNumber !== ($userData['phone_number'] ?? null)
+    ) {
       $ownerDiffers = true;
     }
-    if ($dto->ownerEmail !== null && strtolower($dto->ownerEmail) !== strtolower($userData['email'])) {
+    if (
+      $dto->ownerEmail !== null
+      && strtolower($dto->ownerEmail) !== strtolower($userData['email'])
+    ) {
       $ownerDiffers = true;
     }
     if ($ownerDiffers && empty($dto->relationWithOwner)) {
       throw new ApiException(
-        ErrorType::missingField('relation_with_owner (required because owner is different from requester)'),
+        ErrorType::missingField(
+          'relation_with_owner (required because owner is different from requester)'
+        ),
         422
       );
     }
@@ -82,7 +75,7 @@ final class InvestigationRequestService
    */
   public function create(InvestigationRequestDTO $dto): string
   {
-    $user = $this->getAuthenticatedUser();
+    $user = Request::getUser();
     $dto->validate($user);
     $this->validateOwnerRelation($dto, $user);
 
@@ -93,7 +86,10 @@ final class InvestigationRequestService
       return $id;
     } catch (\Throwable $e) {
       $this->pdo->rollBack();
-      throw new ApiException(ErrorType::internal('Failed to create request: ' . $e->getMessage()), 500);
+      throw new ApiException(
+        ErrorType::internal('Failed to create request: ' . $e->getMessage()),
+        500
+      );
     }
   }
 
@@ -102,7 +98,7 @@ final class InvestigationRequestService
    */
   public function update(string $id, InvestigationRequestDTO $dto): void
   {
-    $user = $this->getAuthenticatedUser();
+    $user = Request::getUser();
     $dto->validate($user);
     $this->validateOwnerRelation($dto, $user);
 
@@ -114,7 +110,9 @@ final class InvestigationRequestService
     // Restriction: only 'Pendiente' can be edited by the owner
     if (($existing['current_state'] ?? '') !== 'Pendiente') {
       throw new ApiException(
-        ErrorType::invalidField('Only requests in "Pendiente" state can be modified'),
+        ErrorType::invalidField(
+          'Only requests in "Pendiente" state can be modified'
+        ),
         422
       );
     }
@@ -127,10 +125,11 @@ final class InvestigationRequestService
    */
   public function adminUpdate(string $id, InvestigationRequestDTO $dto): void
   {
-    $user = $this->getAuthenticatedUser();
-    if ($user['role'] !== 'admin') {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
+    $user = Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
 
     $dto->validate($user);
     $this->validateOwnerRelation($dto, $user);
@@ -151,19 +150,29 @@ final class InvestigationRequestService
    * @param string $description Optional description.
    * @throws ApiException
    */
-  public function addState(string $id, string $stateValue, string $description): void
-  {
-    $user = $this->getAuthenticatedUser();
-    if ($user['role'] !== 'admin') {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
+  public function addState(
+    string $id,
+    string $stateValue,
+    string $description
+  ): void {
+
+    $user = Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
 
     $request = $this->repository->findById($id);
     if (!$request) {
       throw new ApiException(ErrorType::analysisRequestNotFound(), 404);
     }
 
-    $this->repository->addState($id, $stateValue, $description, $user['user_id']);
+    $this->repository->addState(
+      $id,
+      $stateValue,
+      $description,
+      $user['user_id']
+    );
   }
 
   /**
@@ -175,7 +184,13 @@ final class InvestigationRequestService
    */
   public function getStates(string $id): array
   {
-    $user = $this->getAuthenticatedUser();
+    $user = Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR,
+      AllowedUserRoles::MAINTENANCE
+    ]);
+
     $request = $this->repository->findById($id);
     if (!$request) {
       throw new ApiException(ErrorType::analysisRequestNotFound(), 404);
@@ -196,7 +211,12 @@ final class InvestigationRequestService
    */
   public function delete(string $id): void
   {
-    $user = $this->getAuthenticatedUser();
+    $user = Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
+
     $existing = $this->repository->findByIdAndUser($id, $user['user_id']);
     if (!$existing) {
       throw new ApiException(ErrorType::analysisRequestNotFound(), 404);
@@ -209,10 +229,12 @@ final class InvestigationRequestService
    */
   public function adminDelete(string $id): void
   {
-    $user = $this->getAuthenticatedUser();
-    if ($user['role'] !== 'admin') {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
+    Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
+
     $existing = $this->repository->findById($id);
     if (!$existing) {
       throw new ApiException(ErrorType::analysisRequestNotFound(), 404);
@@ -227,10 +249,11 @@ final class InvestigationRequestService
    */
   public function getAllByUser(): array
   {
-    $user = $this->getAuthenticatedUser();
+    $user = Request::getUser();
     $rows = $this->repository->findAllByUser($user['user_id']);
     return array_map(
-      fn($row) => InvestigationRequestDTO::fromDatabase($row)->toArray(), $rows
+      fn($row) => InvestigationRequestDTO::fromDatabase($row)->toArray(),
+      $rows
     );
   }
 
@@ -242,13 +265,16 @@ final class InvestigationRequestService
    */
   public function getAll(): array
   {
-    $user = $this->getAuthenticatedUser();
-    if (!in_array($user['role'], ['admin', 'maintenance'], true)) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
+    $user = Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
+
     $rows = $this->repository->getAll();
     return array_map(
-      fn($row) => InvestigationRequestDTO::fromDatabase($row)->toArray(), $rows
+      fn($row) => InvestigationRequestDTO::fromDatabase($row)->toArray(),
+      $rows
     );
   }
 
@@ -260,7 +286,7 @@ final class InvestigationRequestService
    */
   public function getById(string $id): InvestigationRequestDTO
   {
-    $user = $this->getAuthenticatedUser();
+    $user = Request::getUser();
     $row = $this->repository->findByIdAndUser($id, $user['user_id']);
     if (!$row) {
       throw new ApiException(ErrorType::analysisRequestNotFound(), 404);
@@ -276,10 +302,12 @@ final class InvestigationRequestService
    */
   public function adminGetById(string $id): InvestigationRequestDTO
   {
-    $user = $this->getAuthenticatedUser();
-    if (!in_array($user['role'], ['admin', 'maintenance'], true)) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
+    $user = Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
+    
     $row = $this->repository->findById($id);
     if (!$row) {
       throw new ApiException(ErrorType::analysisRequestNotFound(), 404);

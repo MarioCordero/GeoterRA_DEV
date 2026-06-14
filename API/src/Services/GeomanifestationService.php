@@ -6,6 +6,7 @@ namespace Services;
 use PDO;
 use Http\ApiException;
 use Http\ErrorType;
+use Http\Request;
 use DTO\RegisterGeomanifestationDTO;
 use DTO\UpdateGeomanifestationDTO;
 use DTO\AllowedUserRoles;
@@ -27,7 +28,7 @@ final class GeomanifestationService
   private DistrictRepository $districtRepository;
   private AuthService $authService;
 
-  public function __construct(private PDO $pdo)
+  public function __construct(private readonly PDO $pdo)
   {
     $this->repository = new GeomanifestationRepository($pdo);
     $this->viewRepository = new GeomanifestationViewRepository($pdo);
@@ -38,19 +39,6 @@ final class GeomanifestationService
   }
 
   /**
-   * Ensures the authenticated user has admin role.
-   *
-   * @throws ApiException
-   */
-  private function ensureAdmin(): void
-  {
-    $auth = $this->authService->requireAuth();
-    if (($auth['role'] ?? '') !== AllowedUserRoles::ADMIN) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
-  }
-
-  /**
    * Validates that the provided province/canton/district SNIT codes exist (if given).
    *
    * @param int|null $provinceSnitCode
@@ -58,16 +46,37 @@ final class GeomanifestationService
    * @param int|null $districtSnitCode
    * @throws ApiException
    */
-  private function validateLocationReferences(?int $provinceSnitCode, ?int $cantonSnitCode, ?int $districtSnitCode): void
-  {
-    if ($provinceSnitCode !== null && !$this->provinceRepository->existsBySnitCode($provinceSnitCode)) {
-      throw new ApiException(ErrorType::invalidField('province_snit_code'), 422);
+  private function validateLocationReferences(
+    ?int $provinceSnitCode,
+    ?int $cantonSnitCode,
+    ?int $districtSnitCode
+  ): void {
+    if (
+      $provinceSnitCode !== null
+      && !$this->provinceRepository->existsBySnitCode($provinceSnitCode)
+    ) {
+      throw new ApiException(
+        ErrorType::invalidField('province_snit_code'),
+        422
+      );
     }
-    if ($cantonSnitCode !== null && !$this->cantonRepository->existsBySnitCode($cantonSnitCode)) {
-      throw new ApiException(ErrorType::invalidField('canton_snit_code'), 422);
+    if (
+      $cantonSnitCode !== null
+      && !$this->cantonRepository->existsBySnitCode($cantonSnitCode)
+    ) {
+      throw new ApiException(
+        ErrorType::invalidField('canton_snit_code'),
+        422
+      );
     }
-    if ($districtSnitCode !== null && !$this->districtRepository->existsBySnitCode($districtSnitCode)) {
-      throw new ApiException(ErrorType::invalidField('district_snit_code'), 422);
+    if (
+      $districtSnitCode !== null
+      && !$this->districtRepository->existsBySnitCode($districtSnitCode)
+    ) {
+      throw new ApiException(
+        ErrorType::invalidField('district_snit_code'),
+        422
+      );
     }
   }
 
@@ -85,10 +94,12 @@ final class GeomanifestationService
       'province_snit_code' => $row['province_snit_code'],
       'canton_snit_code' => $row['canton_snit_code'],
       'district_snit_code' => $row['district_snit_code'],
-      'latitude' => $row['latitude'] !== null ? round((float)$row['latitude'], 7) : null,
-      'longitude' => $row['longitude'] !== null ? round((float)$row['longitude'], 7) : null,
+      'latitude' => $row['latitude'] !== null
+        ? round((float) $row['latitude'], 7) : null,
+      'longitude' => $row['longitude'] !== null
+        ? round((float) $row['longitude'], 7) : null,
       'description' => $row['description'],
-      'visibility' => (bool)$row['visibility'],
+      'visibility' => (bool) $row['visibility'],
       'created_at' => $row['created_at'],
       'created_by' => $row['created_by'],
     ];
@@ -103,20 +114,23 @@ final class GeomanifestationService
    * @param int $limit
    * @return array{data: array, pagination: array}
    */
-  private function buildPaginationResponse(array $data, int $total, int $page, int $limit): array
-  {
+  private function buildPaginationResponse(
+    array $data,
+    int $total,
+    int $page,
+    int $limit
+  ): array {
     return [
       'data' => $data,
       'pagination' => [
         'current_page' => $page,
         'per_page' => $limit,
         'total' => $total,
-        'last_page' => (int)ceil($total / $limit),
+        'last_page' => (int) ceil($total / $limit),
       ],
     ];
   }
 
-  // ==================== CRUD operations ====================
 
   /**
    * Creates a new geothermal manifestation.
@@ -126,9 +140,18 @@ final class GeomanifestationService
    */
   public function create(RegisterGeomanifestationDTO $dto): void
   {
-    $this->ensureAdmin();
+    Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
+
     $dto->validate();
-    $this->validateLocationReferences($dto->provinceSnitCode, $dto->cantonSnitCode, $dto->districtSnitCode);
+    $this->validateLocationReferences(
+      $dto->provinceSnitCode,
+      $dto->cantonSnitCode,
+      $dto->districtSnitCode
+    );
     $auth = $this->authService->requireAuth();
     $this->repository->create($dto->toDatabaseArray(), $auth['user_id']);
   }
@@ -145,11 +168,19 @@ final class GeomanifestationService
   {
     $manifestation = $this->repository->findById($id);
     if (!$manifestation) {
-      throw new ApiException(ErrorType::notFound('Geothermal manifestation'), 404);
+      throw new ApiException(
+        ErrorType::notFound('Geothermal manifestation'),
+        404
+      );
     }
 
     if (!$manifestation['visibility'] && !$includeHidden) {
-      $this->ensureAdmin(); // will throw 403 if not admin
+      Request::requireRole([
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR,
+        AllowedUserRoles::MAINTENANCE
+      ]);
     }
 
     return $this->formatManifestation($manifestation);
@@ -165,17 +196,27 @@ final class GeomanifestationService
    */
   public function update(string $id, UpdateGeomanifestationDTO $dto): void
   {
-    $this->ensureAdmin();
+    Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
 
     $existing = $this->repository->findById($id);
     if (!$existing) {
-      throw new ApiException(ErrorType::notFound('Geothermal manifestation'), 404);
+      throw new ApiException(
+        ErrorType::notFound('Geothermal manifestation'),
+        404
+      );
     }
 
     $dto->validate();
 
     // Validate location references only if they are being updated
-    if ($dto->provinceSnitCode !== null || $dto->cantonSnitCode !== null || $dto->districtSnitCode !== null) {
+    if (
+      $dto->provinceSnitCode !== null
+      || $dto->cantonSnitCode !== null || $dto->districtSnitCode !== null
+    ) {
       $this->validateLocationReferences(
         $dto->provinceSnitCode ?? $existing['province_snit_code'],
         $dto->cantonSnitCode ?? $existing['canton_snit_code'],
@@ -202,14 +243,24 @@ final class GeomanifestationService
    */
   public function delete(string $id): void
   {
-    $this->ensureAdmin();
+    Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
 
     if (!$this->repository->findById($id)) {
-      throw new ApiException(ErrorType::notFound('Geothermal manifestation'), 404);
+      throw new ApiException(
+        ErrorType::notFound('Geothermal manifestation'),
+        404
+      );
     }
 
     if (!$this->repository->delete($id)) {
-      throw new ApiException(ErrorType::manifestationDeleteFailed(), 500);
+      throw new ApiException(
+        ErrorType::manifestationDeleteFailed(),
+        500
+      );
     }
   }
 
@@ -222,18 +273,26 @@ final class GeomanifestationService
    */
   public function setVisibility(string $id, bool $visible): void
   {
-    $this->ensureAdmin();
+    Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
 
     if (!$this->repository->findById($id)) {
-      throw new ApiException(ErrorType::notFound('Geothermal manifestation'), 404);
+      throw new ApiException(
+        ErrorType::notFound('Geothermal manifestation'),
+        404
+      );
     }
 
     if (!$this->repository->updateVisibility($id, $visible)) {
-      throw new ApiException(ErrorType::internal('Failed to update visibility'), 500);
+      throw new ApiException(
+        ErrorType::internal('Failed to update visibility'),
+        500
+      );
     }
   }
-
-  // ==================== List methods with pagination ====================
 
   /**
    * Returns paginated list of visible manifestations (public).
@@ -247,7 +306,12 @@ final class GeomanifestationService
   {
     $result = $this->repository->getAllVisible($page, $limit);
     $data = array_map([$this, 'formatManifestation'], $result['data']);
-    return $this->buildPaginationResponse($data, $result['total'], $page, $limit);
+    return $this->buildPaginationResponse(
+      $data,
+      $result['total'],
+      $page,
+      $limit
+    );
   }
 
   /**
@@ -260,10 +324,22 @@ final class GeomanifestationService
    */
   public function getAll(int $page = 1, int $limit = 20): array
   {
-    $this->ensureAdmin();
+    Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR,
+      AllowedUserRoles::MAINTENANCE
+    ]);
+
     $result = $this->repository->getAll($page, $limit);
     $data = array_map([$this, 'formatManifestation'], $result['data']);
-    return $this->buildPaginationResponse($data, $result['total'], $page, $limit);
+
+    return $this->buildPaginationResponse(
+      $data,
+      $result['total'],
+      $page,
+      $limit
+    );
   }
 
   /**
@@ -275,18 +351,32 @@ final class GeomanifestationService
    * @return array
    * @throws ApiException
    */
-  public function getByProvince(int $provinceSnitCode, int $page = 1, int $limit = 20): array
-  {
+  public function getByProvince(
+    int $provinceSnitCode,
+    int $page = 1,
+    int $limit = 20
+  ): array {
     if (!$this->provinceRepository->existsBySnitCode($provinceSnitCode)) {
-      throw new ApiException(ErrorType::invalidField('province_snit_code'), 422);
+      throw new ApiException(
+        ErrorType::invalidField('province_snit_code'),
+        422
+      );
     }
 
-    $result = $this->repository->getByProvince($provinceSnitCode, $page, $limit);
-    $data = array_map([$this, 'formatManifestation'], $result['data']);
-    return $this->buildPaginationResponse($data, $result['total'], $page, $limit);
-  }
+    $result = $this->repository->getByProvince(
+      $provinceSnitCode,
+      $page,
+      $limit
+    );
 
-  // ==================== View (enriched) methods ====================
+    $data = array_map([$this, 'formatManifestation'], $result['data']);
+    return $this->buildPaginationResponse(
+      $data,
+      $result['total'],
+      $page,
+      $limit
+    );
+  }
 
   /**
    * Returns a single enriched manifestation from the view.
@@ -299,11 +389,19 @@ final class GeomanifestationService
   {
     $viewData = $this->viewRepository->findById($id);
     if (!$viewData) {
-      throw new ApiException(ErrorType::notFound('Geothermal manifestation'), 404);
+      throw new ApiException(
+        ErrorType::notFound('Geothermal manifestation'),
+        404
+      );
     }
 
     if (!$viewData->visibility) {
-      $this->ensureAdmin(); // throws if not admin
+      Request::requireRole([
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR,
+        AllowedUserRoles::MAINTENANCE
+      ]);
     }
 
     return $viewData->toArray();
@@ -330,11 +428,21 @@ final class GeomanifestationService
     bool $onlyVisible = true
   ): array {
     if (!$onlyVisible) {
-      $this->ensureAdmin();
+      Request::requireRole([
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR,
+        AllowedUserRoles::MAINTENANCE
+      ]);
     }
 
     $result = $this->viewRepository->getAllPaginated(
-      $page, $limit, $provinceSnitCode, $temperatureMin, $temperatureMax, $onlyVisible
+      $page,
+      $limit,
+      $provinceSnitCode,
+      $temperatureMin,
+      $temperatureMax,
+      $onlyVisible
     );
 
     $data = array_map(
@@ -342,6 +450,11 @@ final class GeomanifestationService
       $result['data']
     );
 
-    return $this->buildPaginationResponse($data, $result['total'], $page, $limit);
+    return $this->buildPaginationResponse(
+      $data,
+      $result['total'],
+      $page,
+      $limit
+    );
   }
 }

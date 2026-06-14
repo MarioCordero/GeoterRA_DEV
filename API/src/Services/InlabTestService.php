@@ -6,6 +6,7 @@ namespace Services;
 use PDO;
 use Http\ApiException;
 use Http\ErrorType;
+use Http\Request;
 use DTO\InlabTestDTO;
 use DTO\AllowedUserRoles;
 use Repositories\InlabTestRepository;
@@ -28,27 +29,17 @@ final class InlabTestService
   }
 
   /**
-   * Ensures the authenticated user has admin role.
-   *
-   * @param string $role
-   * @throws ApiException
-   */
-  private function requireAdmin(string $role): void
-  {
-    if ($role !== AllowedUserRoles::ADMIN) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
-  }
-
-  /**
    * Validates that the referenced geomanifestation exists.
    *
    * @param string $geomanifestationId
    * @throws ApiException
    */
-  private function validateGeomanifestationExists(string $geomanifestationId): void
-  {
-    $manifestation = $this->geomanifestationRepository->findById($geomanifestationId);
+  private function validateGeomanifestationExists(
+    string $geomanifestationId
+  ): void {
+    $manifestation = $this->geomanifestationRepository->findById(
+      $geomanifestationId
+    );
     if (!$manifestation) {
       throw new ApiException(
         ErrorType::invalidField('geomanifestation_id'),
@@ -65,8 +56,10 @@ final class InlabTestService
    */
   public function create(InlabTestDTO $dto): void
   {
-    $auth = $this->authService->requireAuth();
-    $this->requireAdmin($auth['role'] ?? '');
+    $auth = Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
 
     $dto->validate();
     $this->validateGeomanifestationExists($dto->geomanifestationId);
@@ -75,7 +68,7 @@ final class InlabTestService
   }
 
   /**
-   * Retrieves an in-lab test by its ID (public access, with visibility check via manifestation).
+   * Retrieves an in-lab test by its ID (admin access, with visibility check via manifestation).
    *
    * @param string $id
    * @return array
@@ -83,6 +76,12 @@ final class InlabTestService
    */
   public function getById(string $id): array
   {
+    Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
+
     $test = $this->repository->findById($id);
     if (!$test) {
       throw new ApiException(ErrorType::notFound('In-lab test'), 404);
@@ -90,8 +89,10 @@ final class InlabTestService
 
     // Check manifestation visibility if needed (optional – tests might be considered sensitive)
     // For consistency, we can allow public access to test data if manifestation is visible.
-    $manifestation = $this->geomanifestationRepository->findById($test->geomanifestationId);
-    if ($manifestation && !$manifestation->visibility) {
+    $manifestation = $this->geomanifestationRepository->findById(
+      $test->geomanifestationId
+    );
+    if ($manifestation && !$manifestation['visibility']) {
       try {
         $auth = $this->authService->requireAuth();
         $isAdmin = ($auth['role'] ?? '') === AllowedUserRoles::ADMIN;
@@ -135,21 +136,23 @@ final class InlabTestService
    */
   public function getByManifestation(string $geomanifestationId): array
   {
-    $manifestation = $this->geomanifestationRepository->findById($geomanifestationId);
+    $manifestation = $this->geomanifestationRepository->findById(
+      $geomanifestationId
+    );
     if (!$manifestation) {
-      throw new ApiException(ErrorType::notFound('Geothermal manifestation'), 404);
+      throw new ApiException(
+        ErrorType::notFound('Geothermal manifestation'),
+        404
+      );
     }
 
-    if (!$manifestation->visibility) {
-      try {
-        $auth = $this->authService->requireAuth();
-        $isAdmin = ($auth['role'] ?? '') === AllowedUserRoles::ADMIN;
-      } catch (\Exception $e) {
-        $isAdmin = false;
-      }
-      if (!$isAdmin) {
-        throw new ApiException(ErrorType::notFound('Geothermal manifestation'), 404);
-      }
+    if (!$manifestation['visibility']) {
+      Request::requireRole([
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR,
+        AllowedUserRoles::MAINTENANCE
+      ]);
     }
 
     $tests = $this->repository->getByManifestation($geomanifestationId);
@@ -183,8 +186,10 @@ final class InlabTestService
    */
   public function update(string $id, InlabTestDTO $dto): void
   {
-    $auth = $this->authService->requireAuth();
-    $this->requireAdmin($auth['role'] ?? '');
+    Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
 
     $dto->validate();
     $this->validateGeomanifestationExists($dto->geomanifestationId);
@@ -196,7 +201,10 @@ final class InlabTestService
 
     $updated = $this->repository->update($id, $dto);
     if (!$updated) {
-      throw new ApiException(ErrorType::internal('Failed to update in-lab test'), 500);
+      throw new ApiException(
+        ErrorType::internal('Failed to update in-lab test'),
+        500
+      );
     }
   }
 
@@ -208,8 +216,11 @@ final class InlabTestService
    */
   public function delete(string $id): void
   {
-    $auth = $this->authService->requireAuth();
-    $this->requireAdmin($auth['role'] ?? '');
+
+    Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::INVESTIGATOR
+    ]);
 
     $existing = $this->repository->findById($id);
     if (!$existing) {
@@ -218,7 +229,10 @@ final class InlabTestService
 
     $deleted = $this->repository->delete($id);
     if (!$deleted) {
-      throw new ApiException(ErrorType::internal('Failed to delete in-lab test'), 500);
+      throw new ApiException(
+        ErrorType::internal('Failed to delete in-lab test'),
+        500
+      );
     }
   }
 }

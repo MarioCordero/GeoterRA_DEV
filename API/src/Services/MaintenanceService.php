@@ -5,9 +5,11 @@ namespace Services;
 
 use PDO;
 use Http\ErrorType;
+use Http\Request;
 use Http\ApiException;
 use Core\Logger;
 use DTO\UpdateUserRoleDTO;
+use DTO\AllowedUserRoles;
 use Repositories\UserRepository;
 
 /**
@@ -31,6 +33,11 @@ final class MaintenanceService
   public function getSystemLogs(): array
   {
     try {
+      Request::requireRole([
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::MAINTENANCE
+      ]);
+
       $logFile = __DIR__ . '/../../logs/system.log';
 
       if (!file_exists($logFile)) {
@@ -59,6 +66,11 @@ final class MaintenanceService
   public function getDashboardInfo(): array
   {
     try {
+      Request::requireRole([
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::MAINTENANCE
+      ]);
+
       return [
         'serverStatus' => 'Online',
         'activeUsers' => $this->userRepository->getActiveUsersCount(),
@@ -79,8 +91,13 @@ final class MaintenanceService
   public function getAllUsers(): array
   {
     try {
+      Request::requireRole([
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::MAINTENANCE
+      ]);
+
       $users = $this->userRepository->getAllUsers();
-      
+
       return [
         'data' => $users,
         'meta' => [
@@ -102,22 +119,27 @@ final class MaintenanceService
   public function getAllDatabaseTables(): array
   {
     try {
+      Request::requireRole([
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::MAINTENANCE
+      ]);
+
       // Get all tables in current database
       $stmt = $this->pdo->query("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE()");
       $tables = $stmt->fetchAll(\PDO::FETCH_COLUMN);
-      
+
       $result = [];
-      
+
       foreach ($tables as $table) {
         try {
           // Get table columns info
           $columnsStmt = $this->pdo->query("DESCRIBE $table");
           $columns = $columnsStmt->fetchAll(\PDO::FETCH_ASSOC);
-          
+
           // Get table data (limit 1000 rows for performance)
           $dataStmt = $this->pdo->query("SELECT * FROM $table LIMIT 1000");
           $data = $dataStmt->fetchAll(\PDO::FETCH_ASSOC);
-          
+
           $result[$table] = [
             'columns' => $columns,
             'data' => $data,
@@ -129,7 +151,7 @@ final class MaintenanceService
           continue;
         }
       }
-      
+
       return $result;
     } catch (\Throwable $e) {
       throw new ApiException(ErrorType::internal($e->getMessage()), 500);
@@ -149,6 +171,12 @@ final class MaintenanceService
    */
   public function updateUserRole(UpdateUserRoleDTO $dto, string $actorRole): array
   {
+
+    Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::MAINTENANCE
+    ]);
+    
     $dto->validate();
 
     // Check if target user exists
@@ -188,7 +216,7 @@ final class MaintenanceService
       'tokens' => 'Tokens',
       'sessions' => 'Sesiones',
     ];
-    
+
     return $translations[$tableName] ?? ucfirst(str_replace('_', ' ', $tableName));
   }
 }

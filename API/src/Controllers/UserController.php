@@ -93,13 +93,6 @@ final class UserController
   public function adminUpdateRole(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'],
-          PermissionsDTO::MANAGE_USERS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $body = Request::parseJsonRequest();
       $dto = UpdateUserRoleDTO::fromArray($body, $id);
       $this->userService->updateUserRole($dto);
