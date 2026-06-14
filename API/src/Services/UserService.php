@@ -226,7 +226,7 @@ final class UserService
       'id' => $user['user_id'],
       'role' => $user['role'] ?? 'user',
       'email' => $user['email'] ?? null,
-      'is_active' => $user['is_active'] ?? null,
+      'is_deleted' => $user['is_deleted'] ?? null,
       'first_name' => $user['first_name'] ?? null,
       'last_name' => $user['last_name'] ?? null,
       'phone_number' => $user['phone_number'] ?? null,

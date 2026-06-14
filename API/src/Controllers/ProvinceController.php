@@ -43,7 +43,7 @@ final class ProvinceController
 
   /**
    * GET /provinces/{id}
-   * Retrieves a single province by its ULID (public access).
+   * Retrieves a single province by its ULID (administrative access).
    *
    * @param string $id
    */
@@ -61,7 +61,7 @@ final class ProvinceController
 
   /**
    * GET /provinces/snit/{code}
-   * Retrieves a province by its SNIT code (public access).
+   * Retrieves a province by its SNIT code (administrative access).
    *
    * @param string $code
    */
@@ -80,7 +80,7 @@ final class ProvinceController
 
   /**
    * POST /provinces
-   * Creates a new province (admin only).
+   * Creates a new province (administrative access only).
    */
   public function store(): void
   {
@@ -99,7 +99,7 @@ final class ProvinceController
 
   /**
    * PUT /provinces/{id}
-   * Updates an existing province (admin only).
+   * Updates an existing province (administrative access only).
    *
    * @param string $id
    */
@@ -119,7 +119,7 @@ final class ProvinceController
 
   /**
    * DELETE /provinces/{id}
-   * Deletes a province (admin only). Cascades to cantons and districts.
+   * Deletes a province (administrative access only). Cascades to cantons and districts.
    *
    * @param string $id
    */
