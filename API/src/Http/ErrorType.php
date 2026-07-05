@@ -22,6 +22,15 @@ final class ErrorType implements JsonSerializable
   }
 
 	/**
+	 * Set or override the error message.
+	 */
+	public function setMessage(string $message): self
+	{
+			$this->message = $message;
+			return $this;
+	}
+
+	/**
 	 * Generic constructor from code and message.
 	 */
 	public static function from(string $code, string $message): self

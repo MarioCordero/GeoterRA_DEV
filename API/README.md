@@ -8,16 +8,20 @@ Documentación completa de la arquitectura y endpoints de la carpeta `API/src` s
 
 1. [Estructura General](#estructura-general)
 2. [Requisitos](#requisitos)
-3. [Arquitectura en Capas](#arquitectura-en-capas)
-4. [Endpoints Disponibles](#endpoints-disponibles)
-5. [Repositorios](#repositorios)
-6. [Servicios](#servicios)
-7. [DTOs (Data Transfer Objects)](#dtos-data-transfer-objects)
-8. [Manejo de Errores](#manejo-de-errores)
+3. [Testing](#testing)
+4. [📚 Generar doc de la API](#-api-documentation-generation) (PROCESO)
+5. [Arquitectura en Capas](#arquitectura-en-capas)
+6. [Endpoints Disponibles](#endpoints-disponibles)
+7. [Repositorios](#repositorios)
+8. [Servicios](#servicios)
+9. [DTOs (Data Transfer Objects)](#dtos-data-transfer-objects)
+10. [Manejo de Errores](#manejo-de-errores)
 
 ---
 
 ## Estructura General
+
+<dd>
 
 ```
 API/
@@ -32,6 +36,8 @@ API/
 ├── tests/                # No sé aún
 └── DTO/
 ```
+
+</dd>
 
 ---
 
@@ -72,6 +78,276 @@ pass = 2003
 
 </dd>
 
+---
+
+## Testing
+
+<dd>
+
+### Correr todas las pruebas unitarias
+
+```bash
+cd API
+composer install
+composer test
+```
+
+**Salida esperada**: ~200 pruebas pasando en 5-10 segundos con 80%+ de cobertura de código
+
+### Comandos rapidos para ejecutar pruebas
+
+```bash
+composer test                  # Todas las pruebas
+composer run test:dto          # Solo las pruebas de DTO
+composer run test:services     # Solo las pruebas de servicios
+composer run test:repositories # Solo las pruebas de repositorios
+composer run test:coverage     # Con reporte de cobertura de código
+```
+
+### Comando para ejecutar pruebas por carpeta
+
+```bash
+# Para ejecutar pruebas por función específica 
+vendor/bin/phpunit tests/Unit/DTO
+
+# Para ejecutar pruebas por función con Code Coverage (Se necesita libreria xdebug)
+XDEBUG_MODE=coverage vendor/bin/phpunit tests/Unit/DTO
+```
+
+### Comando para ejecutar pruebas por archivo 
+
+```bash
+# Para ejecutar pruebas por archivo 
+vendor/bin/phpunit  ruta/al/archivo.php
+
+# Para ejecutar pruebas por archivo con Code Coverage (Se necesita libreria xdebug)
+XDEBUG_MODE=coverage vendor/bin/phpunit  ruta/al/archivo.php
+```
+
+### Comando para ejecutar pruebas por función
+
+```bash
+# Para ejecutar pruebas por función específica 
+vendor/bin/phpunit --filter testNombreDeLaFuncion ruta/al/archivo.php
+
+# Para ejecutar pruebas por función con Code Coverage (Se necesita libreria xdebug)
+XDEBUG_MODE=coverage vendor/bin/phpunit --filter testNombreDeLaFuncion ruta/al/archivo.php
+```
+
+</dd>
+
+---
+
+## 📚 API Documentation Generation
+
+<!-- ### ✅ What's Been Completed
+
+Your GeoterRA backend API is fully documented with an automated OpenAPI documentation pipeline!
+
+#### Phase 1: Global OpenAPI Configuration ✓
+- **File**: `src/Core/OpenApiConfig.php`
+- Configured with complete OpenAPI 3.0.0 metadata including:
+  - API title, version, and description
+  - Contact and license information
+  - Development and production server URLs
+  - Security schemes (Cookie Auth and Bearer Token)
+
+#### Phase 2: DTO Schema Annotations ✓
+Added `@OA\Schema` annotations to all Data Transfer Objects with:
+- Property descriptions and types
+- Required fields specification
+- Example values for API testing
+- Enum values where applicable
+
+#### Phase 3: Controller Annotations with Examples ✓
+- Detailed request/response examples for key endpoints
+- Realistic sample data for all operations
+
+#### Phase 4: Composer Build Script ✓
+- Added `generate-api-docs` script to `composer.json`
+- Generates complete `public/openapi.json` (827 lines)
+
+#### Phase 5: Docusaurus Integration ✓
+- Created documentation generation pipeline
+- Auto-generates markdown from OpenAPI spec
+- Integrated with `docApiWebsite` package
+
+### 🚀 Quick Start
+
+#### Generate API Documentation
+```bash
+cd API
+composer generate-api-docs
+```
+
+This will:
+1. Scan all PHP annotations in `src/`
+2. Generate `public/openapi.json` with full OpenAPI 3.0.0 spec
+3. Create complete schema definitions from DTOs
+
+#### Build Complete Documentation
+```bash
+cd docApiWebsite
+
+# Generate API docs + build site (recommended)
+npm run generate-all-docs
+
+# OR manually generate then build
+npm run generate-api-docs
+npm run build
+```
+
+#### View Documentation Locally
+```bash
+cd docApiWebsite
+npm run serve
+# → Open http://localhost:3000
+```
+
+### 📋 Key Generated Files
+
+| File | Purpose | Size |
+|------|---------|------|
+| `public/openapi.json` | Generated OpenAPI 3.0.0 specification | 827 lines |
+| `../docApiWebsite/docs/api/index.mdx` | API overview and authentication guide | Auto-generated |
+| `../docApiWebsite/docs/api/schemas.mdx` | Complete schema documentation | 9.7 KB |
+| `../docApiWebsite/build/` | Static HTML documentation | Ready to deploy |
+
+### 📝 Updating Documentation
+
+When you modify PHP annotations:
+
+1. **Update** PHP files in `src/Controllers/` or `src/DTO/`
+   - Add/modify `@OA\Post()`, `@OA\Schema()`, `@OA\Property()` annotations
+   - Include examples in request/response definitions
+
+2. **Regenerate** the OpenAPI spec:
+   ```bash
+   cd API
+   composer generate-api-docs
+   ```
+
+3. **Rebuild** documentation:
+   ```bash
+   cd docApiWebsite
+   npm run generate-all-docs
+   ```
+
+### 📚 Documentation Structure
+
+```
+API/
+├── src/
+│   ├── Controllers/        → Endpoint definitions (@OA\Get, @OA\Post, etc)
+│   ├── DTO/               → Request/response schemas (@OA\Schema)
+│   └── Core/
+│       └── OpenApiConfig.php  → Global OpenAPI metadata
+├── public/
+│   └── openapi.json       → Generated OpenAPI 3.0.0 spec
+└── composer.json          → Contains "generate-api-docs" script
+
+docApiWebsite/
+├── docs/
+│   ├── api/               → Auto-generated API documentation
+│   │   ├── index.mdx      → API overview
+│   │   └── schemas.mdx    → Data schemas
+│   └── *.md               → Manual documentation pages
+├── scripts/
+│   └── generate.mjs       → Converts OpenAPI→Markdown
+└── package.json           → npm scripts
+```
+
+### 🔄 CI/CD Integration
+
+For GitHub Actions, add to your workflow:
+```yaml
+- name: Generate API Documentation
+  run: |
+    cd API
+    composer generate-api-docs
+    
+- name: Build Documentation Site
+  run: |
+    cd docApiWebsite
+    npm install
+    npm run build
+    
+- name: Deploy Documentation
+  # Deploy the docApiWebsite/build/ directory
+```
+
+### 📖 Annotation Examples
+
+**DTO Schema Example:**
+```php
+/**
+ * @OA\Schema(
+ *   schema="AnalysisRequestDTO",
+ *   type="object",
+ *   description="Solicitud de análisis",
+ *   required={"region", "email"},
+ *   @OA\Property(
+ *     property="region",
+ *     type="integer",
+ *     description="Región ID",
+ *     example=1
+ *   )
+ * )
+ */
+class AnalysisRequestDTO {}
+```
+
+**Endpoint with Example:**
+```php
+/**
+ * @OA\Post(
+ *   path="/analysis-request",
+ *   summary="Crear solicitud",
+ *   @OA\RequestBody(
+ *     required=true,
+ *     @OA\JsonContent(
+ *       ref="#/components/schemas/AnalysisRequestDTO",
+ *       example={"region": 1, "email": "user@example.com"}
+ *     )
+ *   ),
+ *   @OA\Response(response=201, description="Created")
+ * )
+ */
+public function store(): void {}
+```
+
+### 🐛 Troubleshooting
+
+**Issue**: OpenAPI generation produces empty JSON
+- **Fix**: Ensure `composer.json` has PSR-4 autoload section with namespace mappings
+- Then run: `composer dump-autoload`
+
+**Issue**: `openapi.json` is empty (only `{"openapi": "3.0.0"}`)
+- **Fix**: Install doctrine/annotations:
+  ```bash
+  composer require doctrine/annotations:^2.0
+  ```
+
+**Issue**: Generated docs don't show in build
+- **Fix**: Clear cache and rebuild:
+  ```bash
+  cd docApiWebsite
+  npm run clear
+  npm run generate-all-docs
+  ```
+
+**Issue**: "Skipping unknown" warnings from swagger-php
+- **Fix**: Verify PSR-4 autoloading is properly configured in `composer.json`
+- Check that your namespaces match the directory structure
+- Run: `composer dump-autoload`
+
+### 📚 Related Resources
+
+- [OpenAPI 3.0.0 Specification](https://spec.openapis.org/oas/v3.0.3)
+- [swagger-php Documentation](https://github.com/zircote/swagger-php)
+- [Docusaurus Documentation](https://docusaurus.io)
+
+--- -->
 
 
 ## Arquitectura en Capas
@@ -197,7 +473,7 @@ GeoterRA API sigue una arquitectura **en tres capas**:
 >    "email": "juan@example.com",
 >    "phone_number": "1234567890",
 >    "role": "user",
->    "is_active": true,
+>    "is_deleted": false,
 >    "is_verified": true,
 >    "created_at": "2026-01-20 14:30:00"
 >  },

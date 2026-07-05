@@ -1,0 +1,129 @@
+<?php
+declare(strict_types=1);
+
+namespace Core;
+
+/**
+ * Detects server environment and protocol at runtime.
+ * Does not rely on .env files - uses $_SERVER inspection and hostname detection.
+ * 
+ * Production: http://163.178.171.105 (public IPv4)
+ * Local/Dev:  http://localhost or http://127.0.0.1
+ */
+final class EnvironmentDetector
+{
+  /**
+   * Check if the current request is using HTTPS/TLS.
+   */
+  public static function isHttps(): bool
+  {
+    return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
+           (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443) ||
+           (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+  }
+
+  /**
+   * Get the current server scheme (http or https).
+   */
+  public static function getScheme(): string
+  {
+    return self::isHttps() ? 'https' : 'http';
+  }
+
+  /**
+   * Get the current server host (without port).
+   */
+  public static function getHost(): string
+  {
+    return $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
+  }
+
+  /**
+   * Get the full request origin (scheme + host).
+   */
+  public static function getCurrentOrigin(): string
+  {
+    return self::getScheme() . '://' . self::getHost();
+  }
+
+  /**
+   * Check if running on localhost/127.0.0.1 (development/local).
+   */
+  public static function isLocalhost(): bool
+  {
+    $host = self::getHost();
+    return str_contains($host, 'localhost') ||
+           str_starts_with($host, '127.') ||
+           $host === '[::1]';  // IPv6 loopback
+  }
+
+  /**
+   * Check if running on production server.
+   * Prioritizes the APP_ENV environment variable, falling back to hostname/IP check.
+   */
+  public static function isProduction(): bool
+  {
+    $env = $_ENV['APP_ENV'] ?? getenv('APP_ENV') ?: null;
+    if ($env !== null) {
+      return $env === 'production';
+    }
+
+    $host = self::getHost();
+    return str_contains($host, '163.178.171.105') ||
+           str_contains($host, 'geoterra.com');
+  }
+
+  /**
+   * Determine if secure cookie flag should be set.
+   * Cookie security is ONLY determined by protocol, not environment.
+   * 
+   * Returns true:  Only if running HTTPS
+   * Returns false: All HTTP environments (dev, staging, production IPs)
+   */
+  public static function shouldUseSecureCookie(): bool
+  {
+    return self::isHttps();
+  }
+
+  /**
+   * Get appropriate SameSite attribute value.
+   * SameSite policy depends on protocol, not environment.
+   * 
+   * For HTTP: 'Lax' (allows cookies in top-level navigation)
+   * For HTTPS: 'None' (requires Secure flag, allows cross-site cookies)
+   */
+  public static function getSameSiteValue(): string
+  {
+    return self::isHttps() ? 'None' : 'Lax';
+  }
+
+  /**
+   * Get the appropriate domain for setting cookies.
+   * Detects the current host and returns the correct domain for cookie storage.
+   * 
+   * Returns:
+   * - '.geoterra.com' for geoterra.com (allows all subdomains)
+   * - '163.178.171.105' for the production IP
+   * - '' for localhost/127.0.0.1 (no domain restriction)
+   */
+  public static function getCookieDomain(): string
+  {
+    $host = self::getHost();
+    
+    // Remove port if present (e.g., 'geoterra.com:5173' -> 'geoterra.com')
+    $domain = explode(':', $host)[0];
+    
+    // For geoterra.com, allow all subdomains
+    if ($domain === 'geoterra.com') {
+      return '.geoterra.com';
+    }
+    
+    // For production IP address
+    if ($domain === '163.178.171.105') {
+      return '163.178.171.105';
+    }
+    
+    // For localhost/127.0.0.1 - no domain restriction
+    return '';
+  }
+}

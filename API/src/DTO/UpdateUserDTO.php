@@ -5,9 +5,57 @@ namespace DTO;
 
 use Http\ApiException;
 use Http\ErrorType;
+use OpenApi\Annotations as OA;
 
 /**
- * DTO for updating user profile data.
+ * @OA\Schema(
+ *   schema="UpdateUserDTO",
+ *   type="object",
+ *   description="Datos para actualizar perfil de usuario",
+ *   required={"firstName", "lastName", "email"},
+ *   @OA\Property(
+ *     property="firstName",
+ *     type="string",
+ *     description="Nombre del usuario",
+ *     example="Juan"
+ *   ),
+ *   @OA\Property(
+ *     property="lastName",
+ *     type="string",
+ *     description="Apellido del usuario",
+ *     example="Pérez"
+ *   ),
+ *   @OA\Property(
+ *     property="email",
+ *     type="string",
+ *     format="email",
+ *     description="Correo electrónico",
+ *     example="juan.perez@example.com"
+ *   ),
+ *   @OA\Property(
+ *     property="phoneNumber",
+ *     type="string",
+ *     nullable=true,
+ *     description="Número telefónico (8-15 dígitos)",
+ *     example="87654321"
+ *   ),
+ *   @OA\Property(
+ *     property="currentPassword",
+ *     type="string",
+ *     format="password",
+ *     nullable=true,
+ *     description="Contraseña actual requerida para cambiar contraseña",
+ *     example="OldPassword123"
+ *   ),
+ *   @OA\Property(
+ *     property="password",
+ *     type="string",
+ *     format="password",
+ *     nullable=true,
+ *     description="Nueva contraseña (mínimo 8 caracteres)",
+ *     example="NewPassword123"
+ *   )
+ * )
  */
 final class UpdateUserDTO
 {
@@ -16,17 +64,21 @@ final class UpdateUserDTO
     public string $firstName,
     public string $lastName,
     public string $email,
-    public ?string $phoneNumber
+    public ?string $phoneNumber,
+    public ?string $currentPassword,
+    public ?string $password,  
   ) {}
 
   public static function fromArray(array $data, string $userId = ''): self
   {
     return new self(
       $userId,
-      trim($data['firstName'] ?? $data['name'] ?? ''),
-      trim($data['lastName'] ?? $data['lastname'] ?? ''),
+      trim($data['first_name'] ?? ''),
+      trim($data['last_name'] ?? ''),
       trim($data['email'] ?? ''),
-      $data['phoneNumber'] ?? $data['phone_number'] ?? null
+      $data['phone_number'] ?? null,
+      $data['current_password'] ?? null,
+      $data['password'] ?? null
     );
   }
 
@@ -45,12 +97,33 @@ final class UpdateUserDTO
    */
   public function validate(): void
   {
+    if ($this->password && !$this->currentPassword) {
+      throw new ApiException(
+        ErrorType::validationError('Current password is required to change password'),
+        400
+      );
+    }
+
+    if ($this->email && !filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+      throw new ApiException(
+        ErrorType::invalidEmail(),
+        422
+      );
+    }
+
+    if ($this->password && strlen($this->password) < 8) {
+      throw new ApiException(
+        ErrorType::validationError('Password must be at least 8 characters'),
+        400
+      );
+    }
+
     if ($this->firstName === '') {
-      throw new ApiException(ErrorType::missingField('name'), 422);
+      throw new ApiException(ErrorType::missingField('firstName'), 422);
     }
 
     if ($this->lastName === '') {
-      throw new ApiException(ErrorType::missingField('lastname'), 422);
+      throw new ApiException(ErrorType::missingField('lastName'), 422);
     }
 
     if ($this->email === '') {
@@ -66,7 +139,7 @@ final class UpdateUserDTO
       !preg_match('/^\d{8,15}$/', $this->phoneNumber)
     ) {
       throw new ApiException(
-        ErrorType::invalidField('phone_number'),
+        ErrorType::invalidField('phoneNumber'),
         422
       );
     }

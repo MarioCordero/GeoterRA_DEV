@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace Router;
 
+use Exception;
 use Http\Response;
 use Http\ErrorType;
+use PDO;
 
 class SimpleRouter
 {
@@ -12,7 +14,7 @@ class SimpleRouter
     private array $controllers = [];
     private $db;
 
-    public function __construct(array $routes, \PDO $db)
+    public function __construct(array $routes, PDO $db)
     {
         $this->routes = $routes;
         $this->db = $db;
@@ -29,7 +31,7 @@ class SimpleRouter
                 $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
                 try {
                     $controller = $this->getController($route['controller']);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $error = ErrorType::notFound('Controller');
                     return Response::error($error, $error->getStatusCode());
                 }
@@ -40,7 +42,9 @@ class SimpleRouter
                 return $controller->$action();
             }
         }
-        return null;
+        $error = ErrorType::notFound('Route');
+        $error->setMessage("No endpoint found for {$method} {$path}. Please check the request method and path.");
+        return Response::error($error, 404);
     }
 
     private function pathToRegex(string $path): string

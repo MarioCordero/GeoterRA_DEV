@@ -4,8 +4,49 @@ declare(strict_types=1);
 namespace DTO;
 use Http\ErrorType;
 use Http\ApiException;
+use OpenApi\Annotations as OA;
 
-
+/**
+ * @OA\Schema(
+ *   schema="RegisterUserDTO",
+ *   type="object",
+ *   description="Datos de registro de nuevo usuario",
+ *   required={"first_name", "last_name", "email", "password"},
+ *   @OA\Property(
+ *     property="first_name",
+ *     type="string",
+ *     description="Nombre del usuario",
+ *     example="Juan"
+ *   ),
+ *   @OA\Property(
+ *     property="last_name",
+ *     type="string",
+ *     description="Apellido del usuario",
+ *     example="Pérez"
+ *   ),
+ *   @OA\Property(
+ *     property="email",
+ *     type="string",
+ *     format="email",
+ *     description="Correo electrónico único",
+ *     example="juan@example.com"
+ *   ),
+ *   @OA\Property(
+ *     property="phone_number",
+ *     type="string",
+ *     nullable=true,
+ *     description="Número telefónico (8-15 dígitos)",
+ *     example="87654321"
+ *   ),
+ *   @OA\Property(
+ *     property="password",
+ *     type="string",
+ *     format="password",
+ *     description="Contraseña (mínimo 8 caracteres)",
+ *     example="SecurePass123"
+ *   )
+ * )
+ */
 final class RegisterUserDTO
 {
   public function __construct(
@@ -19,8 +60,8 @@ final class RegisterUserDTO
   public static function fromArray(array $data): self
   {
     return new self(
-      trim($data['name'] ?? ''),
-      trim($data['lastname'] ?? ''),
+      trim($data['first_name'] ?? ''),
+      trim($data['last_name'] ?? ''),
       strtolower(trim($data['email'] ?? '')),
       $data['phone_number'] ?? null,
       $data['password'] ?? ''
@@ -33,11 +74,11 @@ final class RegisterUserDTO
   public function validate(): void
   {
     if ($this->firstName === '') {
-      throw new ApiException(ErrorType::missingField('name'), 422);
+      throw new ApiException(ErrorType::missingField('first_name'), 422);
     }
 
     if ($this->lastName === '') {
-      throw new ApiException(ErrorType::missingField('lastname'), 422);
+      throw new ApiException(ErrorType::missingField('last_name'), 422);
     }
 
     if ($this->email === '') {

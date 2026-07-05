@@ -18,6 +18,7 @@ gradle-app.setting
 
 # --- Android Studio configuration (user-specific) ---
 .idea/
+.kotlin
 *.iml
 .idea/workspace.xml
 .idea/tasks.xml
@@ -135,11 +136,22 @@ secrets.defaults.properties
 
 # Configuración de VSCode (si usás)
 .vscode/
-.github/
 website/
 *.json
+!composer.json
+!package.json
+!package-lock.json
 *.klib
 
+website/node_modules/*
+API/config/config.ini
+.vscode
+website/.vite/deps/_metadata.json
+website/.vite/deps/package.json
+
+# -----------------------------
+# Backend
+# -----------------------------
 API/vendor/
 vendor/
 API/.phpunit.cache/*
@@ -149,5 +161,5 @@ GeoterRA_local.session.sql
 .vscode/*
 API/config/api-keys.php
 API/config/config.ini
-
-
+docApiWebsite/node_modules
+API/coverage/

@@ -3,52 +3,42 @@ declare(strict_types=1);
 
 use Services\AuthService;
 use Repositories\UserRepository;
+use Http\Request;
 
 /**
- * Validate session token from cookie and attach user to Request.
- * Call this after autoloader is registered but before routing.
+ * Validates the authentication state for the current request.
+ * 
+ * This function attempts to identify the user by checking for a session token 
+ * in the 'sigecat_session_token' cookie or a Bearer token in the 'Authorization' header.
+ * If a valid session is found, the user context is attached to the global Request state.
+ * 
+ * @param PDO $db The active database connection required by the AuthService.
+ * @return void
  */
 function validateSessionToken(PDO $db): void
 {
-    $sessionToken = $_COOKIE['geoterra_session_token'] ?? null;
-    
-    error_log('🔍 [Session] Token exists: ' . ($sessionToken ? 'YES' : 'NO'));
-    error_log('🔍 [Session] All cookies: ' . json_encode($_COOKIE));
+  $headers = getallheaders();
 
-    if (!$sessionToken) {
-        error_log('🔴 [Session] No token in cookie');
-        return;
-    }
+  $authorization = $headers['Authorization'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+  $sessionToken = $_COOKIE['geoterra_session_token'] ?? null;
+  
+  error_log('[Session] Token exists: ' . ($sessionToken ? 'YES' : 'NO'));
+  error_log('[Session] All cookies: ' . json_encode($_COOKIE));
 
-    try {
-        $authService = new AuthService($db);
-        $tokenData = $authService->validateAccessToken($sessionToken);
-        
-        error_log('✅ [Session] Token validated: ' . json_encode($tokenData));
-        
-        if (!$tokenData) {
-            error_log('🔴 [Session] validateAccessToken returned null');
-            return;
-        }
+  if (!$sessionToken && !str_starts_with($authorization, 'Bearer ')) {
+    return;
+  }
 
-        if (!isset($tokenData['user_id'])) {
-            error_log('🔴 [Session] No user_id in tokenData: ' . json_encode($tokenData));
-            return;
-        }
-
-        $userRepository = new UserRepository($db);
-        $user = $userRepository->findById($tokenData['user_id']);
-        
-        if (!$user) {
-            error_log('🔴 [Session] User not found: ' . $tokenData['user_id']);
-            return;
-        }
-
-        \Http\Request::setUser($user);
-        error_log('✅ [Session] User SET: ' . $user['user_id']);
-        
-    } catch (\Exception $e) {
-        error_log('🔴 [Session] Exception: ' . $e->getMessage());
-        error_log('🔴 [Session] Trace: ' . $e->getTraceAsString());
-    }
+  try {
+    $authService = new AuthService($db);
+    $user = $authService->requireAuth();
+    Request::setUser($user);
+  } catch (Exception $e) {
+    /**
+     * Authentication failures are logged but not fatal here, 
+     * as some endpoints might allow public access. 
+     * Protected routes should verify Request::isAuthenticated() later.
+     */
+    error_log('[Session] Invalid token: ' . $e->getMessage());
+  }
 }
