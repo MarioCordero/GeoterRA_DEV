@@ -139,7 +139,6 @@ secrets.defaults.properties
 
 # Configuración de VSCode
 .vscode/
-website/
 *.json
 !composer.json
 !package.json
