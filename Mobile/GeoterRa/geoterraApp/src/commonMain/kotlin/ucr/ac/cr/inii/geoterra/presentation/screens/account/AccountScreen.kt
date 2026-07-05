@@ -34,10 +34,6 @@ class AccountScreen : Screen {
     val state by viewModel.state.collectAsState()
     val navigator = LocalNavigator.currentOrThrow
 
-    LaunchedEffect(Unit) {
-      viewModel.loadUserProfile()
-    }
-
     Scaffold(
       topBar = {
         Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)) {
@@ -65,7 +61,8 @@ class AccountScreen : Screen {
         },
         onThemeToggle = { isDark ->
           viewModel.toggleTheme(isDark)
-        }
+        },
+        clearError = { viewModel.clearError() }
       )
     }
   }

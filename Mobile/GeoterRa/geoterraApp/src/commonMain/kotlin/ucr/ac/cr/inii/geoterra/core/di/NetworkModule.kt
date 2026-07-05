@@ -1,4 +1,3 @@
-// core/di/NetworkModule.kt
 package ucr.ac.cr.inii.geoterra.core.di
 
 import io.ktor.client.*
@@ -13,6 +12,10 @@ import io.ktor.http.*
 import io.ktor.client.engine.cio.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.utils.io.InternalAPI
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
@@ -28,56 +31,55 @@ import ucr.ac.cr.inii.geoterra.domain.auth.AuthEventBus
 val networkModule = module {
   single { AuthEventBus() }
   single { TokenManager(get()) }
-  
+
   single<HttpClient> {
-    fun HttpClient.invalidateAuthTokens() {
-      authProvider<BearerAuthProvider>()?.clearToken()
-    }
-    
+//    fun HttpClient.invalidateAuthTokens() {
+//      authProvider<BearerAuthProvider>()?.clearToken()
+//    }
+
+    val networkScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+
     val authEventBus = get<AuthEventBus>()
-    HttpClient(CIO) {
+    val client = HttpClient(CIO) {
       install(HttpTimeout) {
         requestTimeoutMillis = 30_000
         connectTimeoutMillis = 30_000
         socketTimeoutMillis = 30_000
       }
-      
+
       install(ContentNegotiation) {
         json(Json {
           ignoreUnknownKeys = true
           coerceInputValues = true
         })
       }
-      
+
       install(Logging) {
         logger = object : Logger {
           override fun log(message: String) {
-            // "KtorClient" es el tag que buscarás en el Logcat
             println("KtorClient: $message")
           }
         }
-        
+
         level = LogLevel.ALL
-        
       }
-      
+
       install(Auth) {
-        
         bearer {
           sendWithoutRequest { request ->
             val path = request.url.encodedPath
             val isPublic = path.contains("/auth/login") ||
               path.contains("/auth/register") ||
               path.contains("/auth/refresh")
-            
+
             !isPublic
           }
-          
+
           loadTokens {
             val tokenManager = get<TokenManager>()
             val access = tokenManager.getAccessToken()
             val refresh = tokenManager.getRefreshToken()
-            
+
             if (access != null && refresh != null) {
               println("Cargando tokens: $access, $refresh")
               BearerTokens(access, refresh)
@@ -85,11 +87,11 @@ val networkModule = module {
               null
             }
           }
-          
+
           refreshTokens {
             val tm = get<TokenManager>()
             val refreshToken = tm.getRefreshToken() ?: return@refreshTokens null
-            
+
             try {
               // Client for refreshing tokens
               val response = client.post("auth/refresh") {
@@ -97,7 +99,7 @@ val networkModule = module {
                 contentType(ContentType.Application.Json)
                 setBody(RefreshAccessTokenRequest(refreshToken))
               }.body<ApiResponseModel<RefreshAccessTokenResponse>>()
-              
+
               val data = response.data
               val errors = response.errors
 
@@ -110,12 +112,12 @@ val networkModule = module {
                 authEventBus.emit(AuthEvent.Unauthorized)
                 return@refreshTokens null
               }
-              
+
               // Save new tokens
               tm.saveTokens(data.access_token, data.refresh_token)
               println("Refrescando tokens: ${data.access_token}, ${data.refresh_token}")
               BearerTokens(data.access_token, data.refresh_token)
-              
+
             } catch (e: Exception) {
               tm.clearTokens()
               authEventBus.emit(AuthEvent.Unauthorized)
@@ -124,11 +126,22 @@ val networkModule = module {
           }
         }
       }
-      
+
       defaultRequest {
-        url(NetworkConfig.BASE_URL)
+        url(NetworkConfig.API_URL)
         header(HttpHeaders.ContentType, ContentType.Application.Json)
+        header("x-api-key", NetworkConfig.API_KEY)
       }
     }
+
+    networkScope.launch {
+      authEventBus.events.collect { event ->
+        if (event is AuthEvent.LoginSuccess) {
+          client.authProvider<BearerAuthProvider>()?.clearToken()
+        }
+      }
+    }
+
+    client
   }
 }

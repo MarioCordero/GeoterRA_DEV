@@ -27,7 +27,8 @@ final class UpdateUserRoleDTO
   public function __construct(
     public string $userId,
     public string $role,
-  ) {}
+  ) {
+  }
 
   public static function fromArray(array $data, string $userId = ''): self
   {
@@ -68,7 +69,11 @@ final class UpdateUserRoleDTO
 
     if (!AllowedUserRoles::isValid($this->role)) {
       throw new ApiException(
-        ErrorType::validationError('Invalid role. Allowed values: ' . implode(', ', AllowedUserRoles::values())),
+        ErrorType::validationError(
+          'Invalid role. Allowed values: ' . implode(
+            ', ', AllowedUserRoles::values()
+          )
+        ),
         422
       );
     }

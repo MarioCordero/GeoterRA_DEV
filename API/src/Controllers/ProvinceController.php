@@ -12,6 +12,7 @@ use Http\Response;
 use Services\PermissionService;
 use Services\ProvinceService;
 use PDO;
+use Throwable;
 
 /**
  * Controller for province endpoints.
@@ -36,14 +37,14 @@ final class ProvinceController
       Response::success($provinces);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
    * GET /provinces/{id}
-   * Retrieves a single province by its ULID (public access).
+   * Retrieves a single province by its ULID (administrative access).
    *
    * @param string $id
    */
@@ -54,41 +55,37 @@ final class ProvinceController
       Response::success($province);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
    * GET /provinces/snit/{code}
-   * Retrieves a province by its SNIT code (public access).
+   * Retrieves a province by its SNIT code (administrative access).
    *
-   * @param int $code
+   * @param string $code
    */
-  public function showBySnitCode(int $code): void
+  public function showBySnitCode(string $code): void
   {
     try {
-      $province = $this->service->getBySnitCode($code);
+      $codeInt = (int) $code;
+      $province = $this->service->getBySnitCode($codeInt);
       Response::success($province);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
    * POST /provinces
-   * Creates a new province (admin only).
+   * Creates a new province (administrative access only).
    */
   public function store(): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_TERRITORIES)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
 
       $body = Request::parseJsonRequest();
       $dto = ProvinceDTO::fromArray($body);
@@ -96,57 +93,45 @@ final class ProvinceController
       Response::success(['success' => true], null, 201);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
    * PUT /provinces/{id}
-   * Updates an existing province (admin only).
+   * Updates an existing province (administrative access only).
    *
    * @param string $id
    */
   public function update(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_TERRITORIES)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $body = Request::parseJsonRequest();
       $dto = ProvinceDTO::fromArray($body);
       $this->service->update($id, $dto);
       Response::success(['updated' => true]);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
    * DELETE /provinces/{id}
-   * Deletes a province (admin only). Cascades to cantons and districts.
+   * Deletes a province (administrative access only). Cascades to cantons and districts.
    *
    * @param string $id
    */
   public function delete(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_TERRITORIES)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $this->service->delete($id);
       Response::success(['deleted' => true]);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }

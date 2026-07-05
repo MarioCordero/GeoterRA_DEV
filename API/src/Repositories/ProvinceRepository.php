@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Repositories;
 
-use PDO;
 use DTO\ProvinceDTO;
+use PDO;
 
 /**
  * Repository for managing provinces.
@@ -23,22 +23,6 @@ final class ProvinceRepository extends Repository
                 FROM provinces
                 WHERE province_snit_code = :snit_code";
     $stmt = $this->execute($sql, [':snit_code' => $snitCode]);
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    return $row ? ProvinceDTO::fromDatabase($row) : null;
-  }
-
-  /**
-   * Finds a province by its ULID.
-   *
-   * @param string $provinceId
-   * @return ProvinceDTO|null
-   */
-  public function findById(string $provinceId): ?ProvinceDTO
-  {
-    $sql = "SELECT province_id, province_snit_code, province_name, created_by, created_at
-                FROM provinces
-                WHERE province_id = :id";
-    $stmt = $this->execute($sql, [':id' => $provinceId]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     return $row ? ProvinceDTO::fromDatabase($row) : null;
   }
@@ -84,7 +68,7 @@ final class ProvinceRepository extends Repository
   {
     $sql = "SELECT 1 FROM provinces WHERE province_snit_code = :snit_code LIMIT 1";
     $stmt = $this->execute($sql, [':snit_code' => $snitCode]);
-    return (bool) $stmt->fetchColumn();
+    return (bool)$stmt->fetchColumn();
   }
 
   /**
@@ -99,13 +83,24 @@ final class ProvinceRepository extends Repository
     $provinceId = $this->generateUlid();
     $sql = "INSERT INTO provinces (province_id, province_snit_code, province_name, created_by, created_at)
                 VALUES (:id, :snit, :name, :created_by, NOW())";
-    $this->execute($sql, [
-      ':id' => $provinceId,
-      ':snit' => $dto->provinceSnitCode,
-      ':name' => $dto->provinceName,
-      ':created_by' => $createdBy
-    ]);
+    $this->execute($sql, [':id' => $provinceId, ':snit' => $dto->provinceSnitCode, ':name' => $dto->provinceName, ':created_by' => $createdBy]);
     return $this->findById($provinceId);
+  }
+
+  /**
+   * Finds a province by its ULID.
+   *
+   * @param string $provinceId
+   * @return ProvinceDTO|null
+   */
+  public function findById(string $provinceId): ?ProvinceDTO
+  {
+    $sql = "SELECT province_id, province_snit_code, province_name, created_by, created_at
+                FROM provinces
+                WHERE province_id = :id";
+    $stmt = $this->execute($sql, [':id' => $provinceId]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $row ? ProvinceDTO::fromDatabase($row) : null;
   }
 
   /**
@@ -119,11 +114,7 @@ final class ProvinceRepository extends Repository
   {
     $sql = "UPDATE provinces SET province_name = :name, province_snit_code = :snit
                 WHERE province_id = :id";
-    $stmt = $this->execute($sql, [
-      ':name' => $dto->provinceName,
-      ':snit' => $dto->provinceSnitCode,
-      ':id' => $provinceId
-    ]);
+    $stmt = $this->execute($sql, [':name' => $dto->provinceName, ':snit' => $dto->provinceSnitCode, ':id' => $provinceId]);
     return $stmt->rowCount() > 0;
   }
 

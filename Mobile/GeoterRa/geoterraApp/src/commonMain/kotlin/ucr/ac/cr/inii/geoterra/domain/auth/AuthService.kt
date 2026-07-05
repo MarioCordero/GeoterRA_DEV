@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepositoryInterface
 
 class AuthService(
@@ -24,10 +25,11 @@ class AuthService(
         when (event) {
           is AuthEvent.Login -> {
             val result = authRepository.login(event.request)
-            event.response.complete(result)
             if (result.isSuccess) {
+              authEventBus.emit(AuthEvent.LoginSuccess)
               loginSuccess()
             }
+            event.response.complete(result)
           }
 
           is AuthEvent.Register -> {

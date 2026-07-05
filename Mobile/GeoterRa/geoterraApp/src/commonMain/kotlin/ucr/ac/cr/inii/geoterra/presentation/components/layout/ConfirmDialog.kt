@@ -83,7 +83,7 @@ fun ConfirmDialog(
       ) {
         Text(
           "Cancelar",
-          color = MaterialTheme.colorScheme.error,
+          color = MaterialTheme.colorScheme.onSurface,
           fontWeight = FontWeight.Medium,
         )
       }

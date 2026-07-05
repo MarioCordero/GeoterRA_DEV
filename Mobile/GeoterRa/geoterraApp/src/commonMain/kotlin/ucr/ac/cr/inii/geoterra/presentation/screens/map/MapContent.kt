@@ -60,13 +60,14 @@ fun MapContent(
     
     LaunchedEffect(state.selectedManifestation) {
       state.selectedManifestation?.let { manifestation ->
+        val targetZoom = cameraState.position.zoom.coerceAtLeast(14.0)
         cameraState.animateTo(
           CameraPosition(
             target = Position(
               latitude = manifestation.latitude.toDouble(),
               longitude = manifestation.longitude.toDouble()
             ),
-            zoom = 12.0
+            zoom = targetZoom
           )
         )
       }

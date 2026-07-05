@@ -125,7 +125,7 @@ fun RequestCardItem(
           Text(
             "Editar",
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.secondary
+            color = MaterialTheme.colorScheme.onSurface
           )
         }
         
@@ -138,7 +138,7 @@ fun RequestCardItem(
           Text(
             "Eliminar",
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.error
+            color = MaterialTheme.colorScheme.onSurface
           )
         }
       }

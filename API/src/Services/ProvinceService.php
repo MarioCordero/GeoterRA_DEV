@@ -3,11 +3,12 @@ declare(strict_types=1);
 
 namespace Services;
 
-use PDO;
+use DTO\AllowedUserRoles;
+use DTO\ProvinceDTO;
 use Http\ApiException;
 use Http\ErrorType;
-use DTO\ProvinceDTO;
-use DTO\AllowedUserRoles;
+use Http\Request;
+use PDO;
 use Repositories\ProvinceRepository;
 
 /**
@@ -16,12 +17,10 @@ use Repositories\ProvinceRepository;
 final class ProvinceService
 {
   private ProvinceRepository $repository;
-  private AuthService $authService;
 
-  public function __construct(private PDO $pdo)
+  public function __construct(private readonly PDO $pdo)
   {
-    $this->repository = new ProvinceRepository($pdo);
-    $this->authService = new AuthService($pdo);
+    $this->repository = new ProvinceRepository($this->pdo);
   }
 
   /**
@@ -49,6 +48,13 @@ final class ProvinceService
    */
   public function getById(string $provinceId): array
   {
+    $auth = Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR,
+      AllowedUserRoles::MAINTENANCE
+    ]);
+
     $province = $this->repository->findById($provinceId);
     if (!$province) {
       throw new ApiException(ErrorType::notFound('Province'), 404);
@@ -70,9 +76,17 @@ final class ProvinceService
    */
   public function getBySnitCode(int $snitCode): array
   {
+    $auth = Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR,
+      AllowedUserRoles::MAINTENANCE
+    ]);
+
     $province = $this->repository->findBySnitCode($snitCode);
     if (!$province) {
-      throw new ApiException(ErrorType::notFound('Province'), 404);
+      throw new ApiException(
+        ErrorType::notFound('Province'), 404);
     }
     return [
       'province_id' => $province->provinceId,
@@ -90,10 +104,12 @@ final class ProvinceService
    */
   public function create(ProvinceDTO $dto): void
   {
-    $auth = $this->authService->requireAuth();
-    if (($auth['role'] ?? '') !== AllowedUserRoles::ADMIN) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
+    $auth = Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR,
+      AllowedUserRoles::MAINTENANCE
+    ]);
 
     $dto->validate();
 
@@ -117,10 +133,12 @@ final class ProvinceService
    */
   public function update(string $provinceId, ProvinceDTO $dto): void
   {
-    $auth = $this->authService->requireAuth();
-    if (($auth['role'] ?? '') !== AllowedUserRoles::ADMIN) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
+    $auth = Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR,
+      AllowedUserRoles::MAINTENANCE
+    ]);
 
     $dto->validate();
 
@@ -131,6 +149,7 @@ final class ProvinceService
 
     // If SNIT code changed, ensure it's not taken by another province
     if ($existing->provinceSnitCode !== $dto->provinceSnitCode) {
+      error_log("Province SNIT code change detected for province ID {$provinceId}: {$existing->provinceSnitCode} -> {$dto->provinceSnitCode}");
       if ($this->repository->existsBySnitCode($dto->provinceSnitCode)) {
         throw new ApiException(
           ErrorType::conflict("Province SNIT code {$dto->provinceSnitCode} already exists"),
@@ -153,10 +172,12 @@ final class ProvinceService
    */
   public function delete(string $provinceId): void
   {
-    $auth = $this->authService->requireAuth();
-    if (($auth['role'] ?? '') !== AllowedUserRoles::ADMIN) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
+    $auth = Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR,
+      AllowedUserRoles::MAINTENANCE
+    ]);
 
     $province = $this->repository->findById($provinceId);
     if (!$province) {

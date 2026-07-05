@@ -1,5 +1,8 @@
 # Generate Documentation for all formats
 ./gradlew :geoterraApp:dokkaGenerate
 
+# Uses a new process
+./gradlew clean :geoterraApp:dokkaGenerate --no-daemon
+
 # Displays all available commands
 ./gradlew tasks --all | Select-String "dokka"

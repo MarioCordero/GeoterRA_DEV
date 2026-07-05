@@ -1,7 +1,6 @@
 # Archivos y carpetas generadas
-# =========================================
-# 🔧 ANDROID / KOTLIN .GITIGNORE TEMPLATE
-# =========================================
+# KOTLIN MULTIPLATFORM
+# =======================
 
 # --- Gradle build cache and outputs ---
 .gradle/
@@ -16,8 +15,9 @@ local.properties
 gradle-app.setting
 .gradle-build-cache/
 
-# --- Android Studio configuration (user-specific) ---
+# --- Android Studio configuration ---
 .idea/
+.kotlin
 *.iml
 .idea/workspace.xml
 .idea/tasks.xml
@@ -29,6 +29,10 @@ gradle-app.setting
 .idea/navEditor.xml
 .idea/assetWizardSettings.xml
 .idea/deploymentTargetDropDown.xml
+
+# -- Cococa Pods --
+**/Pods/
+Podfile.lock
 
 # --- Log files ---
 *.log
@@ -133,110 +137,32 @@ secrets.defaults.properties
 # Cache de Kotlin DSL
 /.kts_cache
 
-# Configuración de VSCode (si usás)
+# Configuración de VSCode
 .vscode/
+website/
 *.json
+!composer.json
+!package.json
+!package-lock.json
 *.klib
 
-# -----------------------------
-# Frontend
-# -----------------------------
-# Playwright
-website/test-results/
-website/playwright-report/
-website/blob-report/
-website/playwright/.cache/
-website/playwright/.auth/
-# Standart
 website/node_modules/*
 API/config/config.ini
 .vscode
 website/.vite/deps/_metadata.json
 website/.vite/deps/package.json
-GeoterRA_Local.session.sql
-GeoterRA.session.sql
-website/.vite/deps/_metadata.json
-website/.vite/deps/package.json
-website/dist/
 
 # -----------------------------
 # Backend
 # -----------------------------
-API/vendor/*
+API/vendor/
+vendor/
 API/.phpunit.cache/*
-API/config/api-keys.php
-
-
-# -----------------------------
-# Android / Gradle
-# -----------------------------
-.gradle/
-build/
-local.properties
-.idea/
-*.iml
-captures/
-
-# -----------------------------
-# Kotlin Multiplatform
-# -----------------------------
-**/build/
-
-# -----------------------------
-# iOS / Xcode
-# -----------------------------
-DerivedData/
-*.xcworkspace
-!default.xcworkspace
-*.xcuserdata
-*.xcuserstate
-
-# CocoaPods
-Pods/
-iosApp/Pods/
-Podfile.lock
-
-# -----------------------------
-# macOS
-# -----------------------------
-.DS_Store
-
-# -----------------------------
-# Logs
-# -----------------------------
-*.log
-
+API/config/config.ini
 notes.txt
 GeoterRA_local.session.sql
-website/.vite/deps/@ant-design_icons.js
-website/.vite/deps/@ant-design_icons.js.map
-website/.vite/deps/antd.js
-website/.vite/deps/antd.js.map
-website/.vite/deps/chunk-DC5AMYBS.js
-website/.vite/deps/chunk-DC5AMYBS.js.map
-website/.vite/deps/chunk-DHEDLUXT.js
-website/.vite/deps/chunk-DHEDLUXT.js.map
-website/.vite/deps/chunk-KVREVINV.js
-website/.vite/deps/chunk-KVREVINV.js.map
-website/.vite/deps/chunk-TWJRYSII.js
-website/.vite/deps/chunk-TWJRYSII.js.map
-website/.vite/deps/chunk-UP6LQVYV.js
-website/.vite/deps/chunk-UP6LQVYV.js.map
-website/.vite/deps/chunk-WHC732NP.js
-website/.vite/deps/chunk-WHC732NP.js.map
-website/.vite/deps/dayjs.js
-website/.vite/deps/dayjs.js.map
-website/.vite/deps/leaflet.js
-website/.vite/deps/leaflet.js.map
-website/.vite/deps/lucide-react.js
-website/.vite/deps/lucide-react.js.map
-website/.vite/deps/react-dom_client.js
-website/.vite/deps/react-dom_client.js.map
-website/.vite/deps/react-icons_fa.js
-website/.vite/deps/react-icons_fa.js.map
-website/.vite/deps/react-leaflet.js
-website/.vite/deps/react-leaflet.js.map
-website/.vite/deps/react-router-dom.js
-website/.vite/deps/react-router-dom.js.map
-website/.vite/deps/react.js
-website/.vite/deps/react.js.map
+.vscode/*
+API/config/api-keys.php
+API/config/config.ini
+docApiWebsite/node_modules
+API/coverage/

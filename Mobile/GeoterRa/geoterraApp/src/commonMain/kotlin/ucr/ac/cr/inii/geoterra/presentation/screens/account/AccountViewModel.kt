@@ -12,9 +12,17 @@ class AccountViewModel(
   private val userRepository: UserRepositoryInterface,
   private val authEventBus: AuthEventBus
 ) : BaseScreenModel<AccountState>(AccountState()) {
-  
+
   init {
-    loadUserProfile()
+    screenModelScope.launch {
+      authEventBus.isLoggedIn.collect { isLogged ->
+        when (isLogged) {
+          true -> loadUserProfile()
+          false -> _state.update { it.copy(user = null, error = null) }
+          null -> {}
+        }
+      }
+    }
   }
   
   fun loadUserProfile() {
@@ -44,5 +52,9 @@ class AccountViewModel(
     screenModelScope.launch {
       authEventBus.emit(AuthEvent.Logout)
     }
+  }
+
+  fun clearError() {
+    _state.update { it.copy(error = null) }
   }
 }

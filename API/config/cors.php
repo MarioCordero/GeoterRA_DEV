@@ -1,13 +1,15 @@
 <?php
 declare(strict_types=1);
 
+use Core\EnvironmentDetector;
+
 require_once __DIR__ . '/../src/Core/EnvironmentDetector.php';
 
 // Extract origin from request
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
 // Dynamic origin detection - allow same-origin requests + whitelisted hosts
-$currentOrigin = \Core\EnvironmentDetector::getCurrentOrigin();
+$currentOrigin = EnvironmentDetector::getCurrentOrigin();
 
 $allowedOrigins = [
     // Development/localhost
@@ -33,7 +35,7 @@ $isAllowedOrigin = in_array($origin, $allowedOrigins) || $origin === $currentOri
 if ($isAllowedOrigin) {
     header("Access-Control-Allow-Origin: {$origin}");
     header('Access-Control-Allow-Credentials: true');  // Critical for cookies
-    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, Authorization, x-api-key');
     header('Access-Control-Max-Age: 86400');
 }

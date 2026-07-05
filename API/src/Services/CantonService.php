@@ -3,11 +3,12 @@ declare(strict_types=1);
 
 namespace Services;
 
-use PDO;
+use DTO\AllowedUserRoles;
+use DTO\CantonDTO;
 use Http\ApiException;
 use Http\ErrorType;
-use DTO\CantonDTO;
-use DTO\AllowedUserRoles;
+use Http\Request;
+use PDO;
 use Repositories\CantonRepository;
 use Repositories\ProvinceRepository;
 
@@ -18,29 +19,11 @@ final class CantonService
 {
   private CantonRepository $repository;
   private ProvinceRepository $provinceRepository;
-  private AuthService $authService;
 
-  public function __construct(private PDO $pdo)
+  public function __construct(private readonly PDO $pdo)
   {
-    $this->repository = new CantonRepository($pdo);
-    $this->provinceRepository = new ProvinceRepository($pdo);
-    $this->authService = new AuthService($pdo);
-  }
-
-  /**
-   * Ensures the referenced province exists.
-   *
-   * @param int $provinceSnitCode
-   * @throws ApiException
-   */
-  private function requireValidProvince(int $provinceSnitCode): void
-  {
-    if (!$this->provinceRepository->existsBySnitCode($provinceSnitCode)) {
-      throw new ApiException(
-        ErrorType::invalidField('province_snit_code'),
-        422
-      );
-    }
+    $this->repository = new CantonRepository($this->pdo);
+    $this->provinceRepository = new ProvinceRepository($this->pdo);
   }
 
   /**
@@ -52,13 +35,15 @@ final class CantonService
   public function getAll(?int $provinceSnitCode = null): array
   {
     $cantons = $this->repository->getAll($provinceSnitCode);
-    return array_map(fn($dto) => [
-      'canton_id' => $dto->cantonId,
-      'province_snit_code' => $dto->provinceSnitCode,
-      'canton_snit_code' => $dto->cantonSnitCode,
-      'canton_name' => $dto->cantonName,
-      'created_at' => $dto->createdAt,
-    ], $cantons);
+    return array_map(
+      fn($dto) => [
+        'canton_id' => $dto->cantonId,
+        'province_snit_code' => $dto->provinceSnitCode,
+        'canton_snit_code' => $dto->cantonSnitCode,
+        'canton_name' => $dto->cantonName,
+        'created_at' => $dto->createdAt,
+      ], $cantons
+    );
   }
 
   /**
@@ -70,6 +55,16 @@ final class CantonService
    */
   public function getById(string $cantonId): array
   {
+
+    Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR,
+        AllowedUserRoles::MAINTENANCE
+      ]
+    );
+
     $canton = $this->repository->findById($cantonId);
     if (!$canton) {
       throw new ApiException(ErrorType::notFound('Canton'), 404);
@@ -92,6 +87,15 @@ final class CantonService
    */
   public function getBySnitCode(int $snitCode): array
   {
+    Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR,
+        AllowedUserRoles::MAINTENANCE
+      ]
+    );
+
     $canton = $this->repository->findBySnitCode($snitCode);
     if (!$canton) {
       throw new ApiException(ErrorType::notFound('Canton'), 404);
@@ -113,22 +117,43 @@ final class CantonService
    */
   public function create(CantonDTO $dto): void
   {
-    $auth = $this->authService->requireAuth();
-    if (($auth['role'] ?? '') !== AllowedUserRoles::ADMIN) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
+    $auth = Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR
+      ]
+    );
 
     $dto->validate();
     $this->requireValidProvince($dto->provinceSnitCode);
 
     if ($this->repository->existsBySnitCode($dto->cantonSnitCode)) {
       throw new ApiException(
-        ErrorType::conflict("Canton SNIT code {$dto->cantonSnitCode} already exists"),
+        ErrorType::conflict(
+          "Canton SNIT code {$dto->cantonSnitCode} already exists"
+        ),
         409
       );
     }
 
     $this->repository->create($dto, $auth['user_id']);
+  }
+
+  /**
+   * Ensures the referenced province exists.
+   *
+   * @param int $provinceSnitCode
+   * @throws ApiException
+   */
+  private function requireValidProvince(int $provinceSnitCode): void
+  {
+    if (!$this->provinceRepository->existsBySnitCode($provinceSnitCode)) {
+      throw new ApiException(
+        ErrorType::invalidField('province_snit_code'),
+        422
+      );
+    }
   }
 
   /**
@@ -140,10 +165,13 @@ final class CantonService
    */
   public function update(string $cantonId, CantonDTO $dto): void
   {
-    $auth = $this->authService->requireAuth();
-    if (($auth['role'] ?? '') !== AllowedUserRoles::ADMIN) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
+    Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR
+      ]
+    );
 
     $dto->validate();
     $this->requireValidProvince($dto->provinceSnitCode);
@@ -157,7 +185,9 @@ final class CantonService
     if ($existing->cantonSnitCode !== $dto->cantonSnitCode) {
       if ($this->repository->existsBySnitCode($dto->cantonSnitCode)) {
         throw new ApiException(
-          ErrorType::conflict("Canton SNIT code {$dto->cantonSnitCode} already exists"),
+          ErrorType::conflict(
+            "Canton SNIT code {$dto->cantonSnitCode} already exists"
+          ),
           409
         );
       }
@@ -165,7 +195,10 @@ final class CantonService
 
     $updated = $this->repository->update($cantonId, $dto);
     if (!$updated) {
-      throw new ApiException(ErrorType::internal('Failed to update canton'), 500);
+      throw new ApiException(
+        ErrorType::internal('Failed to update canton'),
+        500
+      );
     }
   }
 
@@ -177,10 +210,13 @@ final class CantonService
    */
   public function delete(string $cantonId): void
   {
-    $auth = $this->authService->requireAuth();
-    if (($auth['role'] ?? '') !== AllowedUserRoles::ADMIN) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
+    Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR
+      ]
+    );
 
     $canton = $this->repository->findById($cantonId);
     if (!$canton) {
@@ -189,7 +225,10 @@ final class CantonService
 
     $deleted = $this->repository->delete($cantonId);
     if (!$deleted) {
-      throw new ApiException(ErrorType::internal('Failed to delete canton'), 500);
+      throw new ApiException(
+        ErrorType::internal('Failed to delete canton'),
+        500
+      );
     }
   }
 }

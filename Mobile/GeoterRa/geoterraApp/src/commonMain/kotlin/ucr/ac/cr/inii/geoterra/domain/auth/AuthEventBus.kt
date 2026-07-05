@@ -14,6 +14,8 @@ sealed class AuthEvent {
 
   object RefreshToken : AuthEvent()
 
+  object LoginSuccess : AuthEvent()
+
   object Logout : AuthEvent()
 
   data class Login(

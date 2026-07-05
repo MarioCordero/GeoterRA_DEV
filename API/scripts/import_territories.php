@@ -13,6 +13,7 @@
  * skipping those that already exist (based on SNIT codes).
  * Uses repositories directly to avoid authentication requirements.
  */
+use Core\UlidGenerator;
 
 // Locate Composer autoloader
 $autoloadPaths = [
@@ -69,7 +70,7 @@ $stmt = $pdo->query("SELECT user_id FROM users WHERE role = 'admin' LIMIT 1");
 $systemUserId = $stmt->fetchColumn();
 if (!$systemUserId) {
   $passwordHash = password_hash('System@123', PASSWORD_DEFAULT);
-  $userId = \DTO\Ulid::generate();
+  $userId = UlidGenerator::generate();
   $stmt = $pdo->prepare("INSERT INTO users (user_id, email, first_name, last_name, password_hash, role, is_active, is_verified) 
                            VALUES (:id, 'system@geoterra.com', 'System', 'Importer', :hash, 'admin', 1, 1)");
   $stmt->execute([':id' => $userId, ':hash' => $passwordHash]);
@@ -116,7 +117,8 @@ $cantons = [];
 $districts = [];
 
 while (($row = fgetcsv($handle, 0, ',', '"', "\\")) !== false) {
-  if (count($row) < 8) continue;
+  if (count($row) < 8)
+    continue;
 
   $provSnit = (int) trim($row[2]);
   $provName = trim($row[3]);
@@ -125,9 +127,12 @@ while (($row = fgetcsv($handle, 0, ',', '"', "\\")) !== false) {
   $districtSnit = (int) trim($row[6]);
   $districtName = trim($row[7]);
 
-  if ($provSnit <= 0 || $provName === '') continue;
-  if ($cantonSnit <= 0 || $cantonName === '') continue;
-  if ($districtSnit <= 0 || $districtName === '') continue;
+  if ($provSnit <= 0 || $provName === '')
+    continue;
+  if ($cantonSnit <= 0 || $cantonName === '')
+    continue;
+  if ($districtSnit <= 0 || $districtName === '')
+    continue;
 
   if (!isset($provinces[$provSnit])) {
     $provinces[$provSnit] = $provName;
