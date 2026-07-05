@@ -12,6 +12,7 @@ use Http\Response;
 use Services\DistrictService;
 use Services\PermissionService;
 use PDO;
+use Throwable;
 
 /**
  * Controller for district endpoints.
@@ -39,7 +40,7 @@ final class DistrictController
       Response::success($districts);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -57,7 +58,7 @@ final class DistrictController
       Response::success($district);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -66,16 +67,17 @@ final class DistrictController
    * GET /districts/snit/{code}
    * Retrieves a district by its SNIT code.
    *
-   * @param int $code
+   * @param string $code
    */
-  public function showBySnitCode(int $code): void
+  public function showBySnitCode(string $code): void
   {
     try {
-      $district = $this->service->getBySnitCode($code);
+      $codeInt = (int) $code;
+      $district = $this->service->getBySnitCode($codeInt);
       Response::success($district);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -87,19 +89,13 @@ final class DistrictController
   public function store(): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_TERRITORIES)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $body = Request::parseJsonRequest();
       $dto = DistrictDTO::fromArray($body);
       $this->service->create($dto);
       Response::success(['success' => true], null, 201);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -113,11 +109,6 @@ final class DistrictController
   public function update(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_TERRITORIES)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
 
       $body = Request::parseJsonRequest();
       $dto = DistrictDTO::fromArray($body);
@@ -125,7 +116,7 @@ final class DistrictController
       Response::success(['updated' => true]);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -139,17 +130,12 @@ final class DistrictController
   public function delete(string $id): void
   {
     try {
-      $user = Request::getUser();
-      if (!$user || !PermissionService::hasPermission($user['role'], PermissionsDTO::MANAGE_TERRITORIES)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
 
       $this->service->delete($id);
       Response::success(['deleted' => true]);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }

@@ -37,7 +37,7 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
     return false;
 });
 
-set_exception_handler(function(\Throwable $e) {
+set_exception_handler(function(Throwable $e) {
     Logger::logError($e, 'Uncaught Exception');
     http_response_code(500);
     echo json_encode(['error' => 'Internal Server Error']);

@@ -3,15 +3,17 @@ declare(strict_types=1);
 
 namespace Services;
 
-use PDO;
+use DTO\AllowedUserRoles;
+use DTO\RegisterGeoreportDTO;
+use DTO\UpdateGeoreportDTO;
 use Http\ApiException;
 use Http\ErrorType;
-use DTO\GeoreportDTO;
-use DTO\AllowedUserRoles;
-use Repositories\GeoreportRepository;
+use Http\Request;
+use PDO;
 use Repositories\GeomanifestationRepository;
-use Repositories\InsituTestRepository;
+use Repositories\GeoreportRepository;
 use Repositories\InlabTestRepository;
+use Repositories\InsituTestRepository;
 
 /**
  * Business logic for geothermal reports (georeports table).
@@ -34,16 +36,49 @@ final class GeoreportService
   }
 
   /**
-   * Ensures the authenticated user has admin role.
+   * Creates a new georeport and optionally sets it as the current report for the manifestation.
    *
-   * @param string $role
+   * @param RegisterGeoreportDTO $dto
+   * @param bool $setAsCurrent If true, updates the manifestation's current_georeport_id.
+   * @return array The created report (formatted)
    * @throws ApiException
    */
-  private function requireAdmin(string $role): void
-  {
-    if ($role !== AllowedUserRoles::ADMIN) {
-      throw new ApiException(ErrorType::forbidden(), 403);
+  public function create(RegisterGeoreportDTO $dto, bool $setAsCurrent = true
+  ): array {
+    $auth = Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR
+      ]
+    );
+
+    $dto->validate();
+    $this->validateGeomanifestationExists($dto->geomanifestationId);
+    $this->validateTestsExist($dto->insituTestId, $dto->inlabTestId);
+
+    $created = $this->repository->create($dto, $auth['user_id']);
+    if (!$created) {
+      throw new ApiException(
+        ErrorType::internal('Failed to create georeport'), 500
+      );
     }
+
+    if ($setAsCurrent) {
+      $updated = $this->repository->setAsCurrentForManifestation(
+        $dto->geomanifestationId,
+        $created['georeport_id']
+      );
+      if (!$updated) {
+        // Log or ignore; report already created.
+        // We throw exception to inform the client.
+        throw new ApiException(
+          ErrorType::internal('Failed to set as current georeport'), 500
+        );
+      }
+    }
+
+    return $this->formatReport($created);
   }
 
   /**
@@ -52,13 +87,14 @@ final class GeoreportService
    * @param string $geomanifestationId
    * @throws ApiException
    */
-  private function validateGeomanifestationExists(string $geomanifestationId): void
-  {
-    $manifestation = $this->geomanifestationRepository->findById($geomanifestationId);
+  private function validateGeomanifestationExists(string $geomanifestationId
+  ): void {
+    $manifestation = $this->geomanifestationRepository->findById(
+      $geomanifestationId
+    );
     if (!$manifestation) {
       throw new ApiException(
-        ErrorType::invalidField('geomanifestation_id'),
-        422
+        ErrorType::invalidField('geomanifestation_id'), 422
       );
     }
   }
@@ -70,8 +106,8 @@ final class GeoreportService
    * @param string $inlabTestId
    * @throws ApiException
    */
-  private function validateTestsExist(string $insituTestId, string $inlabTestId): void
-  {
+  private function validateTestsExist(string $insituTestId, string $inlabTestId
+  ): void {
     $insitu = $this->insituTestRepository->findById($insituTestId);
     if (!$insitu) {
       throw new ApiException(ErrorType::invalidField('insitu_test_id'), 422);
@@ -83,31 +119,26 @@ final class GeoreportService
   }
 
   /**
-   * Creates a new georeport and optionally sets it as the current report for the manifestation.
+   * Formats a raw database row into the API response structure.
+   * - Removes created_by (ULID)
+   * - Includes created_by_first_name and created_by_last_name
    *
-   * @param GeoreportDTO $dto
-   * @param bool $setAsCurrent If true, updates the manifestation's current_georeport_id.
-   * @throws ApiException
+   * @param array<string,mixed> $row
+   * @return array<string,mixed>
    */
-  public function create(GeoreportDTO $dto, bool $setAsCurrent = true): void
+  private function formatReport(array $row): array
   {
-    $auth = $this->authService->requireAuth();
-    $this->requireAdmin($auth['role'] ?? '');
-
-    $dto->validate();
-    $this->validateGeomanifestationExists($dto->geomanifestationId);
-    $this->validateTestsExist($dto->insituTestId, $dto->inlabTestId);
-
-    $georeportId = $this->repository->create($dto, $auth['user_id']);
-
-    if ($setAsCurrent) {
-      $updated = $this->repository->setAsCurrentForManifestation($dto->geomanifestationId, $georeportId);
-      if (!$updated) {
-        // Not critical, but we can log or ignore; report already created.
-        // Throw exception if required.
-        throw new ApiException(ErrorType::internal('Failed to set as current georeport'), 500);
-      }
-    }
+    unset($row['created_by']);
+    return [
+      'georeport_id' => $row['georeport_id'],
+      'geomanifestation_id' => $row['geomanifestation_id'],
+      'insitu_test_id' => $row['insitu_test_id'],
+      'inlab_test_id' => $row['inlab_test_id'],
+      'details' => $row['details'],
+      'created_at' => $row['created_at'],
+      'created_by_first_name' => $row['created_by_first_name'] ?? null,
+      'created_by_last_name' => $row['created_by_last_name'] ?? null,
+    ];
   }
 
   /**
@@ -119,70 +150,154 @@ final class GeoreportService
    */
   public function getById(string $id): array
   {
+    $user = Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR,
+        AllowedUserRoles::MAINTENANCE
+      ]
+    );
+
     $georeport = $this->repository->findById($id);
     if (!$georeport) {
       throw new ApiException(ErrorType::notFound('Georeport'), 404);
     }
 
     // Check manifestation visibility
-    $manifestation = $this->geomanifestationRepository->findById($georeport->geomanifestationId);
-    if ($manifestation && !$manifestation->visibility) {
-      try {
-        $auth = $this->authService->requireAuth();
-        $isAdmin = ($auth['role'] ?? '') === AllowedUserRoles::ADMIN;
-      } catch (\Exception $e) {
-        $isAdmin = false;
-      }
+    $manifestation = $this->geomanifestationRepository->findById(
+      $georeport['geomanifestation_id']
+    );
+    if ($manifestation && !$manifestation['visibility']) {
+      $isAdmin = ($user['role'] ?? '') === AllowedUserRoles::ADMIN;
       if (!$isAdmin) {
         throw new ApiException(ErrorType::notFound('Georeport'), 404);
       }
     }
 
-    return [
-      'georeport_id' => $georeport->georeportId,
-      'geomanifestation_id' => $georeport->geomanifestationId,
-      'insitu_test_id' => $georeport->insituTestId,
-      'inlab_test_id' => $georeport->inlabTestId,
-      'details' => $georeport->details,
-      'created_at' => $georeport->createdAt,
-      'created_by' => $georeport->createdBy,
-    ];
+    return $this->formatReport($georeport);
   }
 
   /**
    * Returns all georeports for a given geomanifestation (with visibility check).
    *
    * @param string $geomanifestationId
-   * @return array
+   * @return array[]
    * @throws ApiException
    */
   public function getByManifestation(string $geomanifestationId): array
   {
-    $manifestation = $this->geomanifestationRepository->findById($geomanifestationId);
+    $manifestation = $this->geomanifestationRepository->findById(
+      $geomanifestationId
+    );
     if (!$manifestation) {
-      throw new ApiException(ErrorType::notFound('Geothermal manifestation'), 404);
+      throw new ApiException(
+        ErrorType::notFound('Geothermal manifestation'), 404
+      );
     }
 
-    if (!$manifestation->visibility) {
-      try {
-        $auth = $this->authService->requireAuth();
-        $isAdmin = ($auth['role'] ?? '') === AllowedUserRoles::ADMIN;
-      } catch (\Exception $e) {
-        $isAdmin = false;
-      }
-      if (!$isAdmin) {
-        throw new ApiException(ErrorType::notFound('Geothermal manifestation'), 404);
-      }
+    if (!$manifestation['visibility']) {
+      Request::requireRole(
+        [
+          AllowedUserRoles::ADMIN,
+          AllowedUserRoles::FIELD_INVESTIGATOR,
+          AllowedUserRoles::INVESTIGATOR,
+          AllowedUserRoles::MAINTENANCE
+        ]
+      );
     }
 
     $georeports = $this->repository->getByManifestation($geomanifestationId);
-    return array_map(fn($dto) => [
-      'georeport_id' => $dto->georeportId,
-      'insitu_test_id' => $dto->insituTestId,
-      'inlab_test_id' => $dto->inlabTestId,
-      'details' => $dto->details,
-      'created_at' => $dto->createdAt,
-    ], $georeports);
+    return array_map([$this, 'formatReport'], $georeports);
+  }
+
+  /**
+   * Updates an existing georeport and optionally sets it as current.
+   *
+   * @param string $id
+   * @param UpdateGeoreportDTO $dto
+   * @param bool $setAsCurrent Optionally set this report as current after update.
+   * @return array The updated report (formatted)
+   * @throws ApiException
+   */
+  public function update(
+    string $id, UpdateGeoreportDTO $dto, bool $setAsCurrent = false
+  ): array {
+    $user = Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR
+      ]
+    );
+
+    $dto->validate();
+
+    // Check if the georeport exists
+    $existing = $this->repository->findById($id);
+    if (!$existing) {
+      throw new ApiException(ErrorType::notFound('Georeport'), 404);
+    }
+
+    // Validate references if they are being updated
+    $manifestationId = $dto->geomanifestationId ?? $existing['geomanifestation_id'];
+    $insituId = $dto->insituTestId ?? $existing['insitu_test_id'];
+    $inlabId = $dto->inlabTestId ?? $existing['inlab_test_id'];
+
+    $this->validateGeomanifestationExists($manifestationId);
+    $this->validateTestsExist($insituId, $inlabId);
+
+    $updated = $this->repository->update($id, $dto);
+    if (!$updated) {
+      throw new ApiException(
+        ErrorType::internal('Failed to update georeport'), 500
+      );
+    }
+
+    if ($setAsCurrent) {
+      $this->repository->setAsCurrentForManifestation($manifestationId, $id);
+    }
+
+    return $this->formatReport($updated);
+  }
+
+  /**
+   * Deletes a georeport. Also resets current_georeport_id if it was the current one.
+   *
+   * @param string $id
+   * @throws ApiException
+   */
+  public function delete(string $id): void
+  {
+    Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR
+      ]
+    );
+
+    $georeport = $this->repository->findById($id);
+    if (!$georeport) {
+      throw new ApiException(ErrorType::notFound('Georeport'), 404);
+    }
+
+    // If this georeport is the current one for its manifestation, clear the reference.
+    $current = $this->repository->getCurrentByManifestation(
+      $georeport['geomanifestation_id']
+    );
+    if ($current && $current['georeport_id'] === $id) {
+      $this->repository->setAsCurrentForManifestation(
+        $georeport['geomanifestation_id'], null
+      );
+    }
+
+    $deleted = $this->repository->delete($id);
+    if (!$deleted) {
+      throw new ApiException(
+        ErrorType::internal('Failed to delete georeport'), 500
+      );
+    }
   }
 
   /**
@@ -194,94 +309,29 @@ final class GeoreportService
    */
   public function getCurrentByManifestation(string $geomanifestationId): ?array
   {
-    $manifestation = $this->geomanifestationRepository->findById($geomanifestationId);
+    $manifestation = $this->geomanifestationRepository->findById(
+      $geomanifestationId
+    );
     if (!$manifestation) {
-      throw new ApiException(ErrorType::notFound('Geothermal manifestation'), 404);
+      throw new ApiException(
+        ErrorType::notFound('Geothermal manifestation'), 404
+      );
     }
 
-    if (!$manifestation->visibility) {
-      try {
-        $auth = $this->authService->requireAuth();
-        $isAdmin = ($auth['role'] ?? '') === AllowedUserRoles::ADMIN;
-      } catch (\Exception $e) {
-        $isAdmin = false;
-      }
-      if (!$isAdmin) {
-        throw new ApiException(ErrorType::notFound('Geothermal manifestation'), 404);
-      }
+    if (!$manifestation['visibility']) {
+      Request::requireRole(
+        [
+          AllowedUserRoles::ADMIN,
+          AllowedUserRoles::FIELD_INVESTIGATOR,
+          AllowedUserRoles::INVESTIGATOR,
+          AllowedUserRoles::MAINTENANCE
+        ]
+      );
     }
 
-    $georeport = $this->repository->getCurrentByManifestation($geomanifestationId);
-    if (!$georeport) {
-      return null;
-    }
-
-    return [
-      'georeport_id' => $georeport->georeportId,
-      'insitu_test_id' => $georeport->insituTestId,
-      'inlab_test_id' => $georeport->inlabTestId,
-      'details' => $georeport->details,
-      'created_at' => $georeport->createdAt,
-    ];
-  }
-
-  /**
-   * Updates an existing georeport (admin only). Note: does not automatically update current_georeport_id.
-   *
-   * @param string $id
-   * @param GeoreportDTO $dto
-   * @param bool $setAsCurrent Optionally set this report as current after update.
-   * @throws ApiException
-   */
-  public function update(string $id, GeoreportDTO $dto, bool $setAsCurrent = false): void
-  {
-    $auth = $this->authService->requireAuth();
-    $this->requireAdmin($auth['role'] ?? '');
-
-    $dto->validate();
-    $this->validateGeomanifestationExists($dto->geomanifestationId);
-    $this->validateTestsExist($dto->insituTestId, $dto->inlabTestId);
-
-    $existing = $this->repository->findById($id);
-    if (!$existing) {
-      throw new ApiException(ErrorType::notFound('Georeport'), 404);
-    }
-
-    $updated = $this->repository->update($id, $dto);
-    if (!$updated) {
-      throw new ApiException(ErrorType::internal('Failed to update georeport'), 500);
-    }
-
-    if ($setAsCurrent) {
-      $this->repository->setAsCurrentForManifestation($dto->geomanifestationId, $id);
-    }
-  }
-
-  /**
-   * Deletes a georeport (admin only). Also resets current_georeport_id if it was the current one.
-   *
-   * @param string $id
-   * @throws ApiException
-   */
-  public function delete(string $id): void
-  {
-    $auth = $this->authService->requireAuth();
-    $this->requireAdmin($auth['role'] ?? '');
-
-    $georeport = $this->repository->findById($id);
-    if (!$georeport) {
-      throw new ApiException(ErrorType::notFound('Georeport'), 404);
-    }
-
-    // If this georeport is the current one for its manifestation, clear the reference.
-    $current = $this->repository->getCurrentByManifestation($georeport->geomanifestationId);
-    if ($current && $current->georeportId === $id) {
-      $this->repository->setAsCurrentForManifestation($georeport->geomanifestationId, null);
-    }
-
-    $deleted = $this->repository->delete($id);
-    if (!$deleted) {
-      throw new ApiException(ErrorType::internal('Failed to delete georeport'), 500);
-    }
+    $georeport = $this->repository->getCurrentByManifestation(
+      $geomanifestationId
+    );
+    return $georeport ? $this->formatReport($georeport) : null;
   }
 }

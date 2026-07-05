@@ -14,10 +14,7 @@ final class GeomanifestationViewDTO
     public float   $latitude,
     public float   $longitude,
     public ?string $manifestationDescription,
-    public bool    $visibility,
     public string  $manifestationCreatedAt,
-    public string  $manifestationCreatorFirstName,
-    public string  $manifestationCreatorLastName,
     public ?string $provinceName,
     public ?int  $provinceSnitCode,
     public ?string $cantonName,
@@ -27,8 +24,6 @@ final class GeomanifestationViewDTO
     public ?string $georeportId,
     public ?string $reportDetails,
     public ?string $reportCreatedAt,
-    public ?string $reportCreatorFirstName,
-    public ?string $reportCreatorLastName,
     public ?string $insituTestId,
     public ?float $temperature,
     public ?float $insituConductivity,
@@ -68,10 +63,7 @@ final class GeomanifestationViewDTO
       latitude: (float) $row['latitude'],
       longitude: (float) $row['longitude'],
       manifestationDescription: $row['manifestation_description'] ?? null,
-      visibility: (bool) $row['visibility'],
       manifestationCreatedAt: $row['manifestation_created_at'],
-      manifestationCreatorFirstName: $row['manifestation_creator_first_name'],
-      manifestationCreatorLastName: $row['manifestation_creator_last_name'],
       provinceName: $row['province_name'] ?? null,
       provinceSnitCode: $row['province_snit_code'] ?? null,
       cantonName: $row['canton_name'] ?? null,
@@ -81,8 +73,6 @@ final class GeomanifestationViewDTO
       georeportId: $row['georeport_id'] ?? null,
       reportDetails: $row['report_details'] ?? null,
       reportCreatedAt: $row['report_created_at'] ?? null,
-      reportCreatorFirstName: $row['report_creator_first_name'] ?? null,
-      reportCreatorLastName: $row['report_creator_last_name'] ?? null,
       insituTestId: $row['insitu_test_id'] ?? null,
       temperature: isset($row['temperature']) ? (float) $row['temperature'] : null,
       insituConductivity: isset($row['insitu_conductivity']) ? (float) $row['insitu_conductivity'] : null,
@@ -122,12 +112,7 @@ final class GeomanifestationViewDTO
       'latitude' => $this->latitude !== null ? round($this->latitude, 7) : null,
       'longitude' => $this->longitude !== null ? round($this->longitude, 7) : null,
       'description' => $this->manifestationDescription,
-      'visibility' => $this->visibility,
       'created_at' => $this->manifestationCreatedAt,
-      'created_by' => [
-        'first_name' => $this->manifestationCreatorFirstName,
-        'last_name' => $this->manifestationCreatorLastName,
-      ],
       'location' => [
         'province' => $this->provinceName,
         'province_snit_code' => $this->provinceSnitCode,
@@ -139,10 +124,7 @@ final class GeomanifestationViewDTO
       'current_georeport' => $this->georeportId ? [
         'georeport_id' => $this->georeportId,
         'details' => $this->reportDetails,
-        'created_at' => $this->reportCreatedAt,
-        'created_by' => $this->reportCreatorFirstName && $this->reportCreatorLastName
-          ? "{$this->reportCreatorFirstName} {$this->reportCreatorLastName}"
-          : null,
+        'created_at' => $this->reportCreatedAt
       ] : null,
       'insitu_test' => $this->insituTestId ? [
         'insitu_test_id' => $this->insituTestId,

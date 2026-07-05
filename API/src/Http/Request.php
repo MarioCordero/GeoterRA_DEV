@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace Http;
 
+use Core\EnvironmentDetector;
+use RuntimeException;
+
 /**
  * Class Request
  *
@@ -27,15 +30,18 @@ final class Request
 
   public static function init(): void
   {
-    // Configure session cookie parameters early
-    session_set_cookie_params([
-      'lifetime' => 5400,  // 1.5 hours
-      'path' => '/',
-      'domain' => '',      // Empty domain = request host (works with IPs)
-      'secure' => \Core\EnvironmentDetector::shouldUseSecureCookie(),
-      'httponly' => true,
-      'samesite' => \Core\EnvironmentDetector::getSameSiteValue()
-    ]);
+
+    if (session_status() !== PHP_SESSION_ACTIVE && !headers_sent()) {
+      // Configure session cookie parameters early
+      session_set_cookie_params([
+        'lifetime' => 5400, // 1.5 hours
+        'path' => '/',
+        'domain' => '', // Empty domain = request host (works with IPs)
+        'secure' => EnvironmentDetector::shouldUseSecureCookie(),
+        'httponly' => true,
+        'samesite' => EnvironmentDetector::getSameSiteValue()
+      ]);
+    }
 
     self::$apiKey = $headers['-x-api-key'] ?? $_SERVER['HTTP_X_API_KEY'] ?? null;
 
@@ -46,12 +52,12 @@ final class Request
     $localKeysPath = dirname(__DIR__, 2) . '/config/api-keys.php';
 
     // Detect by hostname/IP, not protocol (production is HTTP, not HTTPS)
-    $apiKeysPath = (\Core\EnvironmentDetector::isProduction() && file_exists($productionKeysPath))
+    $apiKeysPath = (EnvironmentDetector::isProduction() && file_exists($productionKeysPath))
       ? $productionKeysPath
       : $localKeysPath;
 
     if (!file_exists($apiKeysPath)) {
-      throw new \RuntimeException('API keys configuration file not found at: ' . $apiKeysPath);
+      throw new RuntimeException('API keys configuration file not found at: ' . $apiKeysPath);
     }
 
     $apiKeys = require $apiKeysPath;
@@ -151,11 +157,25 @@ final class Request
   /**
    * Retrieves the authenticated user data.
    *
-   * @return array<mixed>|null The user details or null if the request is unauthenticated.
+   * @return array<mixed>|null The user details or null if the request is
+   * unauthenticated.
    */
   public static function getUser(): ?array
   {
+    if (!self::$user === null) {
+      throw new ApiException(ErrorType::unauthorized());
+    }
     return self::$user;
+  }
+
+  public static function requireRole(array $allowedRoles): array
+  {
+    $user = self::getUser();
+    if ($user === null || !isset($user['role'])
+      || !in_array($user['role'], $allowedRoles, true)) {
+      throw new ApiException(ErrorType::forbidden());
+    }
+    return $user;
   }
 
   /**
@@ -220,7 +240,7 @@ final class Request
     if ($path === false || $path === null) {
       $path = '/';
     }
-    $basePath = '/api/public';
+    $basePath = '/API/public';
     if (stripos($path, $basePath) === 0) {
       $path = substr($path, strlen($basePath));
     }

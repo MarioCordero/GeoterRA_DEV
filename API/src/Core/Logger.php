@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Core;
 
+use Throwable;
+
 final class Logger
 {
     private static string $logFile = '';
@@ -61,7 +63,7 @@ final class Logger
         self::info("REQUEST: {$method} {$uri} from {$clientIp}");
     }
 
-    public static function logError(\Throwable $e, ?string $context = null): void
+    public static function logError(Throwable $e, ?string $context = null): void
     {
         $message = "Exception: " . $e->getMessage();
         if ($context) {
