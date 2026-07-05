@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Controllers;
@@ -9,48 +8,21 @@ use Http\ApiException;
 use Http\ErrorType;
 use Http\Request;
 use Http\Response;
+use PDO;
 use Services\AuthService;
+use Throwable;
 
-/**
- * Handles authentication operations for the REST API.
- *
- * This controller is responsible for user login, token refresh,
- * and logout. It uses HTTP‑only cookies for access token storage
- * (web client convenience) while expecting the refresh token to be
- * sent in the JSON request body for rotation operations.
- *
- * All methods return a standardised JSON response via the `Response`
- * helper and propagate business exceptions through `ApiException`.
- *
- * @package Controllers
- */
 final class AuthController
 {
   private AuthService $authService;
 
-  /**
-   * AuthController constructor.
-   *
-   * @param \PDO $pdo Active database connection (injected by the router).
-   */
-  public function __construct(private \PDO $pdo)
+  public function __construct(private PDO $pdo)
   {
     $this->authService = new AuthService($this->pdo);
   }
 
   /**
-   * POST /login
-   *
-   * Authenticates a user with email and password.
-   *
-   * On success, returns the access token, refresh token, user details.
-   * It sets an HTTP‑only cookie (`sigecat_session_token`) containing
-   * the access token for web client convenience.
-   *
-   * @return void
-   *
-   * @throws ApiException Any authentication failure exception propagated from
-   * the service layer.
+   * POST /auth/login
    */
   public function login(): void
   {
@@ -59,41 +31,32 @@ final class AuthController
       $dto = LoginUserDTO::fromArray($data);
       $result = $this->authService->login($dto);
 
-      // Set HTTP‑only cookie for the access token for web client convenience.
-      $accessToken = $result['data']['access_token'] ?? '';
-      $expiresIn = $result['meta']['expires_in'] ?? 3600;
+      if (Request::isWeb()) {
+        $responseData = $this->authService->prepareWebResponse($result);
+        $meta = [
+          'token_type' => 'Cookie',
+          'expires_in' => $result['meta']['expires_in'] ?? 5400,
+          'message' => 'Session set via HTTP-only cookie',
+        ];
+      } else {
+        $responseData = $this->authService->prepareMobileResponse($result);
+        $meta = [
+          'token_type' => 'Bearer',
+          'expires_in' => $result['meta']['expires_in'] ?? 5400,
+        ];
+      }
 
-      // Secure is set to false for development.
-      setcookie(
-        'geoterra_session_token',
-        $accessToken,
-        [
-          'expires' => time() + $expiresIn,
-          'path' => '/',
-          'domain' => '',
-          'secure' => false,
-          'httponly' => true,
-          'samesite' => 'Lax'
-        ]
-      );
+      Response::success($responseData, $meta, 200);
 
-      Response::success($result['data'], $result['meta'], 200);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
+    } catch (Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
    * POST /auth/refresh
-   *
-   * Rotates an existing refresh token and issues a new access/refresh token pair.
-   *
-   * The response contains the new tokens, and the caller should replace the
-   * stored tokens. It also updates the access token cookie for web clients convenience.
-   *
-   * @return void
-   * 
-   * @throws ApiException Any token validation or rotation failure exception propagated from the service layer.
    */
   public function refresh(): void
   {
@@ -105,63 +68,82 @@ final class AuthController
 
       $result = $this->authService->refreshTokens($body['refresh_token']);
 
-      //  Updates the access token cookie for web clients.
-      if (isset($result['data']['access_token'], $result['meta']['expires_in'])) {
+      if (Request::isWeb()) {
+        // Update cookie with new access token
+        $accessToken = $result['data']['access_token'];
+        $expiresIn = $result['meta']['expires_in'] ?? 5400;
         setcookie(
           'geoterra_session_token',
-          $result['data']['access_token'],
+          $accessToken,
           [
-            'expires' => time() + (int) $result['meta']['expires_in'],
+            'expires' => time() + $expiresIn,
             'path' => '/',
             'domain' => '',
-            'secure' => false,
+            'secure' => false, // configurable via EnvironmentDetector
             'httponly' => true,
-            'samesite' => 'Lax'
+            'samesite' => 'Lax',
           ]
         );
+
+        // Return only user data (tokens are in cookie)
+        $responseData = [
+          'user_id' => $result['data']['user_id'],
+          'message' => 'Session renewed',
+        ];
+        $meta = [
+          'token_type' => 'Cookie',
+          'expires_in' => $expiresIn,
+        ];
+      } else {
+        // Mobile: return tokens in body
+        $responseData = [
+          'access_token' => $result['data']['access_token'],
+          'refresh_token' => $result['data']['refresh_token'],
+          'user_id' => $result['data']['user_id'],
+        ];
+        $meta = [
+          'token_type' => 'Bearer',
+          'expires_in' => $result['meta']['expires_in'] ?? 5400,
+        ];
       }
 
-      Response::success($result['data'], $result['meta'], 200);
+      Response::success($responseData, $meta, 200);
+
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
+    } catch (Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
-   * POST /logout
-   *
-   * Revokes all tokens belonging to the currently authenticated user.
-   *
-   * The method first tries to resolve the user from the current request context
-   * If that fails, it attempts to extract the token from the Authorization
-   * header or the session cookie and deletes the corresponding tokens.
-   *
-   * The access token cookie is cleared unconditionally.
-   *
-   * @return void
-   * 
-   * @throws ApiException Any failure during the logout process, propagated from the service layer.
+   * POST /auth/logout
    */
   public function logout(): void
   {
     try {
       $this->authService->logout();
-      // Clear the access token cookie
-      setcookie(
-        'geoterra_session_token',
-        '',
-        [
+
+      // Clear cookie for web clients
+      if (Request::isWeb()) {
+        setcookie(
+          'geoterra_session_token', '', [
           'expires' => time() - 3600,
           'path' => '/',
           'domain' => '',
           'secure' => false,
           'httponly' => true,
-          'samesite' => 'Lax'
+          'samesite' => 'Lax',
         ]
-      );
+        );
+      }
+
       Response::success(['logged_out' => true], null, 200);
+
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
+    } catch (Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 }

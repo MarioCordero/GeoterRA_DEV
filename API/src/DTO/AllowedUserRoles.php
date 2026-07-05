@@ -9,7 +9,7 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(
  *   schema="AllowedUserRoles",
  *   type="string",
- *   enum={"admin", "maintenance", "investigator", "user"},
+ *   enum={"admin", "maintenance", "fieldInvestigator", "investigator", "user"},
  *   description="Roles permitidos en el sistema GeoterRA"
  * )
  *
@@ -19,6 +19,7 @@ final class AllowedUserRoles
 {
   public const ADMIN = 'admin';
   public const MAINTENANCE = 'maintenance';
+  public const FIELD_INVESTIGATOR = 'fieldInvestigator';
   public const INVESTIGATOR = 'investigator';
   public const USER = 'user';
 
@@ -30,6 +31,7 @@ final class AllowedUserRoles
     return [
       self::ADMIN,
       self::MAINTENANCE,
+      self::FIELD_INVESTIGATOR,
       self::INVESTIGATOR,
       self::USER,
     ];

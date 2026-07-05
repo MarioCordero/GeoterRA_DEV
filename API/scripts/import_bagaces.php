@@ -12,8 +12,8 @@
 
 // Autoloader
 $autoloadPaths = [
-        __DIR__ . '/../vendor/autoload.php',
-        __DIR__ . '/vendor/autoload.php',
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/vendor/autoload.php',
 ];
 $autoloadFound = false;
 foreach ($autoloadPaths as $path) {
@@ -32,7 +32,9 @@ use Repositories\GeomanifestationRepository;
 use Repositories\InsituTestRepository;
 use Repositories\InlabTestRepository;
 use Repositories\GeoreportRepository;
+use Core\UlidGenerator;
 use DTO\RegisterGeomanifestationDTO;
+use DTO\UpdateGeomanifestationDTO;
 use DTO\InsituTestDTO;
 use DTO\InlabTestDTO;
 use DTO\GeoreportDTO;
@@ -48,8 +50,8 @@ $projWGS84 = new Proj('EPSG:4326', $proj4);
 
 // Database connection
 $configPaths = [
-        __DIR__ . '/../config/database.php',
-        __DIR__ . '/config/database.php',
+    __DIR__ . '/../config/database.php',
+    __DIR__ . '/config/database.php',
 ];
 $pdo = null;
 foreach ($configPaths as $path) {
@@ -68,8 +70,8 @@ $stmt = $pdo->query("SELECT user_id FROM users WHERE role = 'admin' LIMIT 1");
 $systemUserId = $stmt->fetchColumn();
 if (!$systemUserId) {
     $passwordHash = password_hash('System@123', PASSWORD_DEFAULT);
-    $userId = \DTO\Ulid::generate();
-    $stmt = $pdo->prepare("INSERT INTO users (user_id, email, first_name, last_name, password_hash, role, is_active, is_verified) 
+    $userId = UlidGenerator::generate();
+    $stmt = $pdo->prepare("INSERT INTO users (user_id, email, first_name, last_name, password_hash, role, is_deleted, is_verified) 
                            VALUES (:id, 'system@geoterra.com', 'System', 'Importer', :hash, 'admin', 1, 1)");
     $stmt->execute([':id' => $userId, ':hash' => $passwordHash]);
     $systemUserId = $userId;
@@ -126,27 +128,31 @@ $skipped = 0;
 // Process remaining lines
 while (($line = fgets($handle)) !== false) {
     $line = rtrim($line, "\r\n");
-    if (empty($line)) continue;
+    if (empty($line))
+        continue;
     $row = str_getcsv($line, $delimiter, '"', "\\");
     if (count($row) < 20) {
         // Some rows may be malformed; skip
         continue;
     }
     $siteName = trim($row[0]);
-    if ($siteName === '') continue;
+    if ($siteName === '')
+        continue;
 
     // Check if manifestation already exists
-    if ($geomanifestationRepo->existsByName($siteName)) {
+    if ($geomanifestationRepo->findByName($siteName)) {
         echo "Skipping '$siteName' (already exists).\n";
         $skipped++;
         continue;
     }
 
     // Helper to clean numeric values with comma as decimal, returns 0.0 if invalid or missing (because DB NOT NULL)
-    $cleanNumber = function($val) {
-        if ($val === null || $val === '***' || $val === '') return 0.0;
+    $cleanNumber = function ($val) {
+        if ($val === null || $val === '***' || $val === '')
+            return 0.0;
         $val = trim($val);
-        if (strpos($val, '<') === 0) return 0.0;
+        if (strpos($val, '<') === 0)
+            return 0.0;
         $val = str_replace(',', '.', $val);
         $val = preg_replace('/[^0-9.-]/', '', $val);
         return $val !== '' ? (float) $val : 0.0;
@@ -163,7 +169,7 @@ while (($line = fgets($handle)) !== false) {
         $point = new Point($x, $y, $projCRTM05);
         $converted = $proj4->transform($projWGS84, $point);
         $longitude = $converted->x;
-        $latitude  = $converted->y;
+        $latitude = $converted->y;
     } catch (Exception $e) {
         echo "Error converting coordinates for '$siteName': " . $e->getMessage() . "\n";
         continue;
@@ -195,37 +201,32 @@ while (($line = fgets($handle)) !== false) {
     try {
         // Create Geomanifestation with fixed territorial codes (Bagaces: 5, 504, 50401)
         $dtoManifest = new RegisterGeomanifestationDTO(
-                null,
-                5,
-                504,
-                50401,
-                null,
-                $siteName,
-                $latitude,
-                $longitude,
-                "Imported from Bagaces test data",
-                false
+            $siteName,
+            $latitude,
+            $longitude,
+            5,
+            504,
+            50401,
+            "Imported from Bagaces test data",
+            false
         );
-        $manifestationId = $geomanifestationRepo->create($dtoManifest, $systemUserId);
+        $manifestationId = $geomanifestationRepo->create($dtoManifest->toArray(), $systemUserId);
 
         // Ensure the name is correctly stored (in case the repository overwrote it)
         $current = $geomanifestationRepo->findById($manifestationId);
-        if ($current && $current->name !== $siteName) {
-            $updateDto = new RegisterGeomanifestationDTO(
-                    $manifestationId,
-                    5,
-                    504,
-                    50401,
-                    $current->currentGeoreportId,
-                    $siteName,
-                    $latitude,
-                    $longitude,
-                    $current->description,
-                    $current->visibility,
-                    $current->createdBy,
-                    $current->createdAt
+        if ($current && $current['name'] !== $siteName) {
+            $updateDto = new UpdateGeomanifestationDTO(
+                name: $siteName,
+                latitude: $latitude,
+                longitude: $longitude,
+                provinceSnitCode: 5,
+                cantonSnitCode: 504,
+                districtSnitCode: 50401,
+                currentGeoreportId: $current['current_georeport_id'] ?? null,
+                description: $current['description'] ?? null,
+                visibility: $current['visibility'] ?? false
             );
-            $geomanifestationRepo->update($manifestationId, $updateDto);
+            $geomanifestationRepo->update($manifestationId, $updateDto->toArray());
             echo "Updated manifestation name to: $siteName\n";
         }
 
@@ -233,44 +234,44 @@ while (($line = fgets($handle)) !== false) {
 
         // Create Insitu Test
         $insituDto = new InsituTestDTO(
-                null,
-                $manifestationId,
-                $temp,
-                $condField,
-                $phField,
-                "Field measurement"
+            null,
+            $manifestationId,
+            $temp,
+            $condField,
+            $phField,
+            "Field measurement"
         );
         $insituId = $insituRepo->create($insituDto, $systemUserId);
 
         // Create Inlab Test
         $inlabDto = new InlabTestDTO(
-                null,
-                $manifestationId,
-                $phLab,
-                $condLab,
-                $cl,
-                $ca,
-                $hco3,
-                $so4,
-                $fe,
-                $si,
-                $b,
-                $li,
-                $f,
-                $na,
-                $k,
-                $mg,
-                "Laboratory analysis"
+            null,
+            $manifestationId,
+            $phLab,
+            $condLab,
+            $cl,
+            $ca,
+            $hco3,
+            $so4,
+            $fe,
+            $si,
+            $b,
+            $li,
+            $f,
+            $na,
+            $k,
+            $mg,
+            "Laboratory analysis"
         );
         $inlabId = $inlabRepo->create($inlabDto, $systemUserId);
 
         // Create Georeport
         $georeportDto = new GeoreportDTO(
-                null,
-                $manifestationId,
-                $insituId,
-                $inlabId,
-                "Initial import from Bagaces data"
+            null,
+            $manifestationId,
+            $insituId,
+            $inlabId,
+            "Initial import from Bagaces data"
         );
         $georeportId = $georeportRepo->create($georeportDto, $systemUserId);
 

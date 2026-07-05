@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Platform\Web;
 
+use DateTime;
+use Services\AuthService;
 use Tests\TestCase;
 use DTO\LoginUserDTO;
 use Http\ApiException;
@@ -16,12 +18,12 @@ use Http\ApiException;
  */
 class AuthWebTest extends TestCase
 {
-    private \Services\AuthService $authService;
+    private AuthService $authService;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->authService = new \Services\AuthService($this->pdo);
+        $this->authService = new AuthService($this->pdo);
     }
     public function testLoginResultsInSessionCookie(): void
     {
@@ -68,7 +70,7 @@ class AuthWebTest extends TestCase
         // Create token that expires in future
         $futureToken = $this->createTestAccessToken(
             $user['id'],
-            new \DateTime('+1 hour')
+            new DateTime('+1 hour')
         );
 
         // Should be valid
@@ -78,7 +80,7 @@ class AuthWebTest extends TestCase
         // Create expired token
         $expiredToken = $this->createTestAccessToken(
             $user['id'],
-            new \DateTime('-1 hour')
+            new DateTime('-1 hour')
         );
 
         // Should throw when validating expired token
@@ -179,7 +181,7 @@ class AuthWebTest extends TestCase
         $user = $this->createTestUser();
         $expiredToken = $this->createTestAccessToken(
             $user['id'],
-            new \DateTime('-1 day')
+            new DateTime('-1 day')
         );
 
         $this->expectException(ApiException::class);

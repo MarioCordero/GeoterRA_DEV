@@ -3,8 +3,9 @@ declare(strict_types=1);
 
 namespace Repositories;
 
+use DTO\RegisterInlabTestDTO;
+use DTO\UpdateInlabTestDTO;
 use PDO;
-use DTO\InlabTestDTO;
 
 /**
  * Repository for in-lab tests (inlab_tests table).
@@ -12,50 +13,50 @@ use DTO\InlabTestDTO;
 final class InlabTestRepository extends Repository
 {
   /**
-   * Finds an in-lab test by its ULID.
+   * Finds an in-lab test by its ULID, including creator user info.
    *
    * @param string $id
-   * @return InlabTestDTO|null
+   * @return array|null Associative array or null if not found
    */
-  public function findById(string $id): ?InlabTestDTO
+  public function findById(string $id): ?array
   {
-    $sql = "SELECT inlab_test_id, geomanifestation_id, ph, conductivity,
-                       cl, ca, hco3, so4, fe, si, b, li, f, na, k, mg,
-                       description, created_at, created_by
-                FROM inlab_tests
-                WHERE inlab_test_id = :id";
+    $sql = "SELECT t.*,
+                       u.first_name AS created_by_first_name,
+                       u.last_name AS created_by_last_name
+                FROM inlab_tests t
+                LEFT JOIN users u ON t.created_by = u.user_id
+                WHERE t.inlab_test_id = :id";
     $stmt = $this->execute($sql, [':id' => $id]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    return $row ? InlabTestDTO::fromDatabase($row) : null;
+    return $row ?: null;
   }
 
   /**
-   * Returns all in-lab tests for a given geomanifestation.
+   * Returns all in-lab tests for a given geomanifestation, including creator user info.
    *
    * @param string $geomanifestationId
-   * @return InlabTestDTO[]
+   * @return array[]
    */
   public function getByManifestation(string $geomanifestationId): array
   {
-    $sql = "SELECT inlab_test_id, geomanifestation_id, ph, conductivity,
-                       cl, ca, hco3, so4, fe, si, b, li, f, na, k, mg,
-                       description, created_at, created_by
-                FROM inlab_tests
-                WHERE geomanifestation_id = :gm_id
-                ORDER BY created_at DESC";
-    $stmt = $this->execute($sql, [':gm_id' => $geomanifestationId]);
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    return array_map([InlabTestDTO::class, 'fromDatabase'], $rows);
+    $sql = "SELECT t.*,
+                       u.first_name AS created_by_first_name,
+                       u.last_name AS created_by_last_name
+                FROM inlab_tests t
+                LEFT JOIN users u ON t.created_by = u.user_id
+                WHERE t.geomanifestation_id = :gm_id
+                ORDER BY t.created_at DESC";
+    return $this->execute($sql, [':gm_id' => $geomanifestationId])->fetchAll(PDO::FETCH_ASSOC);
   }
 
   /**
    * Creates a new in-lab test.
    *
-   * @param InlabTestDTO $dto
-   * @param string $createdBy
+   * @param RegisterInlabTestDTO $dto
+   * @param string $createdBy User ULID
    * @return string The generated ULID
    */
-  public function create(InlabTestDTO $dto, string $createdBy): string
+  public function create(RegisterInlabTestDTO $dto, string $createdBy): ?array
   {
     $id = $this->generateUlid();
     $sql = "INSERT INTO inlab_tests (
@@ -67,7 +68,8 @@ final class InlabTestRepository extends Repository
                     :ph, :cond, :cl, :ca, :hco3, :so4, :fe, :si, :b, :li, :f, :na, :k, :mg,
                     :desc, :created_by, NOW()
                 )";
-    $this->execute($sql, [
+    $this->execute(
+      $sql, [
       ':id' => $id,
       ':gm_id' => $dto->geomanifestationId,
       ':ph' => $dto->ph,
@@ -86,57 +88,41 @@ final class InlabTestRepository extends Repository
       ':mg' => $dto->mg,
       ':desc' => $dto->description,
       ':created_by' => $createdBy
-    ]);
-    return $id;
+    ]
+    );
+
+    $row = $this->findById($id);
+    return $row ?: null;
   }
 
   /**
-   * Updates an existing in-lab test.
+   * Updates an existing in-lab test using only provided fields.
    *
    * @param string $id
-   * @param InlabTestDTO $dto
-   * @return bool
+   * @param UpdateInlabTestDTO $dto
+   * @return array|null Not null if at least one row was affected
    */
-  public function update(string $id, InlabTestDTO $dto): bool
+  public function update(string $id, UpdateInlabTestDTO $dto): ?array
   {
-    $sql = "UPDATE inlab_tests SET
-                    geomanifestation_id = :gm_id,
-                    ph = :ph,
-                    conductivity = :cond,
-                    cl = :cl,
-                    ca = :ca,
-                    hco3 = :hco3,
-                    so4 = :so4,
-                    fe = :fe,
-                    si = :si,
-                    b = :b,
-                    li = :li,
-                    f = :f,
-                    na = :na,
-                    k = :k,
-                    mg = :mg,
-                    description = :desc
-                WHERE inlab_test_id = :id";
-    $stmt = $this->execute($sql, [
-      ':gm_id' => $dto->geomanifestationId,
-      ':ph' => $dto->ph,
-      ':cond' => $dto->conductivity,
-      ':cl' => $dto->cl,
-      ':ca' => $dto->ca,
-      ':hco3' => $dto->hco3,
-      ':so4' => $dto->so4,
-      ':fe' => $dto->fe,
-      ':si' => $dto->si,
-      ':b' => $dto->b,
-      ':li' => $dto->li,
-      ':f' => $dto->f,
-      ':na' => $dto->na,
-      ':k' => $dto->k,
-      ':mg' => $dto->mg,
-      ':desc' => $dto->description,
-      ':id' => $id
-    ]);
-    return $stmt->rowCount() > 0;
+    $updateData = $dto->toArray();
+    if (empty($updateData)) {
+      return null;
+    }
+
+    $sql = "UPDATE inlab_tests SET ";
+    $params = [];
+    $setParts = [];
+    foreach ($updateData as $field => $value) {
+      $setParts[] = "$field = :$field";
+      $params[":$field"] = $value;
+    }
+    $sql .= implode(', ', $setParts);
+    $sql .= " WHERE inlab_test_id = :id";
+    $params[':id'] = $id;
+
+    $this->execute($sql, $params);
+    $row = $this->findById($id);
+    return $row ?: null;
   }
 
   /**

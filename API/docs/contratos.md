@@ -34,7 +34,7 @@ Las referencias a códigos de error corresponden a [src/Http/ErrorType.php](../s
   - `INVALID_JSON` (400): revisar `Content-Type` y JSON.
   - `INTERNAL_ERROR` (500): revisar logs.
 - **Consideraciones**:
-  - El usuario se crea con rol `user` y `is_active=1`.
+  - El usuario se crea con rol `user` y `is_deleted=0`.
 
 ### POST /auth/login
 - **Auth**: no requiere.
@@ -92,7 +92,7 @@ Las referencias a códigos de error corresponden a [src/Http/ErrorType.php](../s
 - **Auth**: requerido (`Authorization: Bearer <access_token>`).
 - **Propósito**: obtener perfil del usuario autenticado.
 - **Respuesta (200)**:
-  - `data`: `{ "user_id", "first_name", "last_name", "email", "phone_number", "role", "is_active", "is_verified", "created_at" }`.
+  - `data`: `{ "user_id", "first_name", "last_name", "email", "phone_number", "role", "is_deleted", "is_verified", "created_at" }`.
   - `meta`: `null`.
 - **Errores y resolución**:
   - `MISSING_AUTH_TOKEN` / `INVALID_TOKEN` (401): validar sesión.
@@ -358,7 +358,7 @@ Endpoints administrativos para gestión del sistema.
       "email": "john@example.com",
       "phone_number": "555-1234",
       "role": "admin",
-      "is_active": 1,
+      "is_deleted": 0,
       "is_verified": 1,
       "created_at": "2026-04-24 10:30:00"
     },

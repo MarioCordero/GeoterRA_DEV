@@ -73,12 +73,12 @@ final class UpdateUserDTO
   {
     return new self(
       $userId,
-      trim($data['firstName'] ?? $data['name'] ?? ''),
-      trim($data['lastName'] ?? $data['lastname'] ?? ''),
+      trim($data['first_name'] ?? ''),
+      trim($data['last_name'] ?? ''),
       trim($data['email'] ?? ''),
-      $data['phoneNumber'] ?? $data['phone_number'] ?? null,
-      $data['currentPassword'] ?? $data['current_password'] ?? null,
-      $data['password'] ?? $data['password'] ?? null
+      $data['phone_number'] ?? null,
+      $data['current_password'] ?? null,
+      $data['password'] ?? null
     );
   }
 

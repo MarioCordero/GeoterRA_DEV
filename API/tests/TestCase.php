@@ -2,9 +2,13 @@
 declare(strict_types=1);
 namespace Tests;
 
+use Core\UlidGenerator;
+use DateTime;
+use PDO;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 use Http\ApiException;
 use Http\ErrorType;
+use Throwable;
 
 /**
  * Base TestCase for all GeoterRA API tests
@@ -16,7 +20,7 @@ use Http\ErrorType;
  */
 abstract class TestCase extends PHPUnitTestCase
 {
-    protected \PDO $pdo;
+    protected PDO $pdo;
 
     protected function setUp(): void
     {
@@ -32,37 +36,18 @@ abstract class TestCase extends PHPUnitTestCase
      */
     protected function resetDatabase(): void
     {
-        // Delete data in reverse order of foreign key dependencies
-        $this->pdo->exec('DELETE FROM registered_geothermal_manifestations');
-        $this->pdo->exec('DELETE FROM analysis_requests');
+        $this->pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
+        $this->pdo->exec('DELETE FROM logs_entries');
+        $this->pdo->exec('DELETE FROM logs');
+        $this->pdo->exec('DELETE FROM insitu_tests');
+        $this->pdo->exec('DELETE FROM inlab_tests');
+        $this->pdo->exec('DELETE FROM georeports');
+        $this->pdo->exec('DELETE FROM geomanifestations');
+        $this->pdo->exec('DELETE FROM requests');
         $this->pdo->exec('DELETE FROM refresh_tokens');
         $this->pdo->exec('DELETE FROM access_tokens');
         $this->pdo->exec('DELETE FROM users');
-        $this->pdo->exec('DELETE FROM regions');
-        
-        // Insert default regions
-        $this->insertDefaultRegions();
-    }
-
-    /**
-     * Insert default regions for tests
-     */
-    protected function insertDefaultRegions(): void
-    {
-        $regions = [
-            'Guanacaste',
-            'San José',
-            'Heredia',
-            'Cartago',
-            'Alajuela',
-            'Puntarenas'
-        ];
-
-        foreach ($regions as $region) {
-            // Use INSERT IGNORE to skip if region already exists
-            $stmt = $this->pdo->prepare('INSERT IGNORE INTO regions (name) VALUES (?)');
-            $stmt->execute([$region]);
-        }
+        $this->pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
     }
 
     /**
@@ -71,7 +56,7 @@ abstract class TestCase extends PHPUnitTestCase
     protected function createTestUser(array $overrides = []): array
     {
         // Mapeamos los campos a los nombres reales de tu base de datos
-        $userId = $overrides['user_id'] ?? $overrides['id'] ?? \Core\Ulid::generate();
+        $userId = $overrides['user_id'] ?? $overrides['id'] ?? UlidGenerator::generate();
         $firstName = $overrides['first_name'] ?? $overrides['name'] ?? 'Test';
         $lastName = $overrides['last_name'] ?? $overrides['lastname'] ?? 'User';
         $email = $overrides['email'] ?? 'testuser' . rand(1000, 9999) . '@example.com';
@@ -103,21 +88,21 @@ abstract class TestCase extends PHPUnitTestCase
     /**
      * Generate test access token
      */
-    protected function createTestAccessToken(string $userId, \DateTime $expiresAt = null): array
+    protected function createTestAccessToken(string $userId, ?DateTime $expiresAt = null): array
     {
         if ($expiresAt === null) {
-            $expiresAt = new \DateTime('+1 hour');
+            $expiresAt = new DateTime('+1 hour');
         }
 
         $token = bin2hex(random_bytes(32));
         $tokenHash = hash('sha256', $token);
 
         $stmt = $this->pdo->prepare(
-            'INSERT INTO access_tokens (user_id, token_hash, expires_at) 
-             VALUES (?, ?, ?)'
+            'INSERT INTO access_tokens (access_token_id, user_id, access_token_hash, expires_at) 
+             VALUES (?, ?, ?, ?)'
         );
         
-        $stmt->execute([$userId, $tokenHash, $expiresAt->format('Y-m-d H:i:s')]);
+        $stmt->execute([UlidGenerator::generate(), $userId, $tokenHash, $expiresAt->format('Y-m-d H:i:s')]);
 
         return [
             'user_id' => $userId,
@@ -130,21 +115,21 @@ abstract class TestCase extends PHPUnitTestCase
     /**
      * Generate test refresh token
      */
-    protected function createTestRefreshToken(string $userId, \DateTime $expiresAt = null): array
+    protected function createTestRefreshToken(string $userId, ?DateTime $expiresAt = null): array
     {
         if ($expiresAt === null) {
-            $expiresAt = new \DateTime('+30 days');
+            $expiresAt = new DateTime('+30 days');
         }
 
         $token = bin2hex(random_bytes(64));
         $tokenHash = hash('sha256', $token);
 
         $stmt = $this->pdo->prepare(
-            'INSERT INTO refresh_tokens (user_id, token_hash, expires_at) 
-             VALUES (?, ?, ?)'
+            'INSERT INTO refresh_tokens (refresh_token_id, user_id, token_hash, family_id, expires_at) 
+             VALUES (?, ?, ?, ?, ?)'
         );
         
-        $stmt->execute([$userId, $tokenHash, $expiresAt->format('Y-m-d H:i:s')]);
+        $stmt->execute([UlidGenerator::generate(), $userId, $tokenHash, UlidGenerator::generate(), $expiresAt->format('Y-m-d H:i:s')]);
 
         return [
             'user_id' => $userId,
@@ -158,7 +143,7 @@ abstract class TestCase extends PHPUnitTestCase
      * Assert that an exception is ApiException with specific error
      */
     protected function assertApiException(
-        \Throwable $exception,
+        Throwable $exception,
         string $expectedErrorType,
         int $expectedStatus
     ): void {
@@ -185,7 +170,6 @@ abstract class TestCase extends PHPUnitTestCase
      */
     protected function getUserById(string $userId): ?array
     {
-        // Cambiado de 'id' a 'user_id'
         $stmt = $this->pdo->prepare('SELECT * FROM users WHERE user_id = ? AND deleted_at IS NULL');
         $stmt->execute([$userId]);
         return $stmt->fetch() ?: null;
@@ -197,7 +181,7 @@ abstract class TestCase extends PHPUnitTestCase
     protected function getAccessToken(string $tokenHash): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT * FROM access_tokens WHERE token_hash = ? AND revoked_at IS NULL'
+            'SELECT * FROM access_tokens WHERE access_token_hash = ? AND revoked_at IS NULL'
         );
         $stmt->execute([$tokenHash]);
         return $stmt->fetch() ?: null;
@@ -219,7 +203,7 @@ abstract class TestCase extends PHPUnitTestCase
     protected function assertDTOValidationThrows(
         string $dtoClass,
         array $data,
-        string $expectedErrorCode = null
+        ?string $expectedErrorCode = null
     ): void {
         try {
             $dto = $dtoClass::fromArray($data);

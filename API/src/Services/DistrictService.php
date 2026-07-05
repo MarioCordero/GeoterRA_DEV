@@ -6,6 +6,7 @@ namespace Services;
 use PDO;
 use Http\ApiException;
 use Http\ErrorType;
+use Http\Request;
 use DTO\DistrictDTO;
 use DTO\AllowedUserRoles;
 use Repositories\DistrictRepository;
@@ -18,13 +19,11 @@ final class DistrictService
 {
   private DistrictRepository $repository;
   private CantonRepository $cantonRepository;
-  private AuthService $authService;
 
-  public function __construct(private PDO $pdo)
+  public function __construct(private readonly PDO $pdo)
   {
-    $this->repository = new DistrictRepository($pdo);
-    $this->cantonRepository = new CantonRepository($pdo);
-    $this->authService = new AuthService($pdo);
+    $this->repository = new DistrictRepository($this->pdo);
+    $this->cantonRepository = new CantonRepository($this->pdo);
   }
 
   /**
@@ -74,6 +73,13 @@ final class DistrictService
    */
   public function getById(string $districtId): array
   {
+    $auth = Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR,
+      AllowedUserRoles::MAINTENANCE
+    ]);
+
     $district = $this->repository->findById($districtId);
     if (!$district) {
       throw new ApiException(ErrorType::notFound('District'), 404);
@@ -96,6 +102,13 @@ final class DistrictService
    */
   public function getBySnitCode(int $snitCode): array
   {
+    $auth = Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR,
+      AllowedUserRoles::MAINTENANCE
+    ]);
+
     $district = $this->repository->findBySnitCode($snitCode);
     if (!$district) {
       throw new ApiException(ErrorType::notFound('District'), 404);
@@ -117,17 +130,21 @@ final class DistrictService
    */
   public function create(DistrictDTO $dto): void
   {
-    $auth = $this->authService->requireAuth();
-    if (($auth['role'] ?? '') !== AllowedUserRoles::ADMIN) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
+    $auth = Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR,
+      AllowedUserRoles::MAINTENANCE
+    ]);
 
     $dto->validate();
     $this->requireValidCanton($dto->cantonSnitCode);
 
     if ($this->repository->existsBySnitCode($dto->districtSnitCode)) {
       throw new ApiException(
-        ErrorType::conflict("District SNIT code {$dto->districtSnitCode} already exists"),
+        ErrorType::conflict(
+          "District SNIT code {$dto->districtSnitCode} already exists"
+        ),
         409
       );
     }
@@ -144,10 +161,12 @@ final class DistrictService
    */
   public function update(string $districtId, DistrictDTO $dto): void
   {
-    $auth = $this->authService->requireAuth();
-    if (($auth['role'] ?? '') !== AllowedUserRoles::ADMIN) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
+    $auth = Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR,
+      AllowedUserRoles::MAINTENANCE
+    ]);
 
     $dto->validate();
     $this->requireValidCanton($dto->cantonSnitCode);
@@ -160,7 +179,9 @@ final class DistrictService
     if ($existing->districtSnitCode !== $dto->districtSnitCode) {
       if ($this->repository->existsBySnitCode($dto->districtSnitCode)) {
         throw new ApiException(
-          ErrorType::conflict("District SNIT code {$dto->districtSnitCode} already exists"),
+          ErrorType::conflict(
+            "District SNIT code {$dto->districtSnitCode} already exists"
+          ),
           409
         );
       }
@@ -168,7 +189,10 @@ final class DistrictService
 
     $updated = $this->repository->update($districtId, $dto);
     if (!$updated) {
-      throw new ApiException(ErrorType::internal('Failed to update district'), 500);
+      throw new ApiException(
+        ErrorType::internal('Failed to update district'),
+        500
+      );
     }
   }
 
@@ -180,10 +204,12 @@ final class DistrictService
    */
   public function delete(string $districtId): void
   {
-    $auth = $this->authService->requireAuth();
-    if (($auth['role'] ?? '') !== AllowedUserRoles::ADMIN) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
+    $auth = Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::FIELD_INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR,
+      AllowedUserRoles::MAINTENANCE
+    ]);
 
     $district = $this->repository->findById($districtId);
     if (!$district) {
@@ -192,7 +218,10 @@ final class DistrictService
 
     $deleted = $this->repository->delete($districtId);
     if (!$deleted) {
-      throw new ApiException(ErrorType::internal('Failed to delete district'), 500);
+      throw new ApiException(
+        ErrorType::internal('Failed to delete district'),
+        500
+      );
     }
   }
 }

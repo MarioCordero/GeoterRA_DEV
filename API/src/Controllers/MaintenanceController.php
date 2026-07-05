@@ -8,11 +8,11 @@ use Http\Response;
 use Http\ErrorType;
 use Http\ApiException;
 use Core\Logger;
+use PDO;
 use Services\AuthService;
 use DTO\UpdateUserRoleDTO;
-use Services\PermissionService;
 use Services\MaintenanceService;
-use DTO\PermissionsDTO as Permissions;
+use Throwable;
 
 
 final class MaintenanceController
@@ -20,29 +20,24 @@ final class MaintenanceController
   private MaintenanceService $service;
   private AuthService $authService;
 
-  public function __construct(private \PDO $pdo)
+  public function __construct(private PDO $pdo)
   {
     $this->service = new MaintenanceService($pdo);
     $this->authService = new AuthService($pdo);
   }
-  
+
   // GET /maintenance/system/logs
   public function getSystemLogs(): void
   {
     try {
-      $user = $this->authService->requireAuth();
-
-      if (!PermissionService::hasPermission($user['role'], Permissions::VIEW_SYSTEM_LOGS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $logs = $this->service->getSystemLogs();
       Response::success(['logs' => $logs]);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
-      Logger::error('❌ [MaintenanceController::getSystemLogs] Error: ' . $e->getMessage());
+    } catch (Throwable $e) {
+      Logger::error(
+        '❌ [MaintenanceController::getSystemLogs] Error: ' . $e->getMessage()
+      );
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -51,18 +46,16 @@ final class MaintenanceController
   public function getDashboardInfo(): void
   {
     try {
-      $user = $this->authService->requireAuth();
-      if (!PermissionService::hasPermission($user['role'], Permissions::VIEW_INFRASTRUCTURE)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $dashboardInfo = $this->service->getDashboardInfo();
-      Response::success($dashboardInfo);
+      Response::success(
+        $dashboardInfo
+      );
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
-      Logger::error('❌ [MaintenanceController::getDashboardInfo] Error: ' . $e->getMessage());
+    } catch (Throwable $e) {
+      Logger::error(
+        '❌ [MaintenanceController::getDashboardInfo] Error: ' . $e->getMessage()
+      );
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -71,19 +64,18 @@ final class MaintenanceController
   public function showAllUsers(): void
   {
     try {
-      $user = $this->authService->requireAuth();
-
-      if (!PermissionService::hasPermission($user['role'], Permissions::VIEW_USERS)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $result = $this->service->getAllUsers();
-      Response::success($result['data'], $result['meta'], 200);
+      Response::success(
+        $result['data'],
+        $result['meta'],
+        200
+      );
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
-      Logger::error('❌ [MaintenanceController::showAllUsers] Error: ' . $e->getMessage());
+    } catch (Throwable $e) {
+      Logger::error(
+        '❌ [MaintenanceController::showAllUsers] Error: ' . $e->getMessage()
+      );
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -92,19 +84,14 @@ final class MaintenanceController
   public function getAllDatabaseTables(): void
   {
     try {
-      $user = $this->authService->requireAuth();
-
-      if (!PermissionService::hasPermission($user['role'], Permissions::VIEW_INFRASTRUCTURE)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
-
       $tables = $this->service->getAllDatabaseTables();
       Response::success($tables);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
-      Logger::error('❌ [MaintenanceController::getAllDatabaseTables] Error: ' . $e->getMessage());
+    } catch (Throwable $e) {
+      Logger::error(
+        '❌ [MaintenanceController::getAllDatabaseTables] Error: ' . $e->getMessage()
+      );
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -113,13 +100,7 @@ final class MaintenanceController
   public function updateUserRole(string $id): void
   {
     try {
-      $user = $this->authService->requireAuth();
-
-      // Check if user has permission to assign roles
-      if (!PermissionService::hasPermission($user['role'], Permissions::ASSIGN_ROLES)) {
-        Response::error(ErrorType::forbidden(), 403);
-        return;
-      }
+      $user = Request::getUser();
 
       // Validate user ID parameter
       if (empty($id)) {
@@ -136,8 +117,10 @@ final class MaintenanceController
       Response::success($result['data'], $result['meta'], 200);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
-      Logger::error('❌ [MaintenanceController::updateUserRole] Error: ' . $e->getMessage());
+    } catch (Throwable $e) {
+      Logger::error(
+        '❌ [MaintenanceController::updateUserRole] Error: ' . $e->getMessage()
+      );
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
