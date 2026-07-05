@@ -26,8 +26,7 @@ return [
   // Admin-only analysis request routes
   ['method' => 'GET', 'path' => '/admin/analysis-requests', 'controller' => 'InvestigationRequestController', 'action' => 'adminIndex'],
   ['method' => 'GET', 'path' => '/admin/analysis-requests/{id}', 'controller' => 'InvestigationRequestController', 'action' => 'adminShow'],
-
-  ['method' => 'GET', 'path' => '/admin/analysis-requests/{id}/states', 'controller' => 'InvestigationRequestController', 'action' => 'states'],
+  ['method' => 'GET', 'path' => '/admin/analysis-requests/{id}/states', 'controller' => 'InvestigationRequestController', 'action' => 'adminStates'],
   ['method' => 'POST', 'path' => '/admin/analysis-requests/{id}/states', 'controller' => 'InvestigationRequestController', 'action' => 'adminAddState'],
 
   // Maintenance routes
@@ -67,7 +66,7 @@ return [
   ['method' => 'GET', 'path' => '/geomanifestations/{id}', 'controller' => 'GeomanifestationController', 'action' => 'viewShow'],
 
   // Geomanifestations admin
-  ['method' => 'GET', 'path' => '/admin/geomanifestations', 'controller' => 'GeomanifestationController', 'action' => 'adminIndex'],
+  ['method' => 'GET', 'path' => '/admin/geomanifestations', 'controller' => 'GeomanifestationController', 'action' => 'index'],
   ['method' => 'GET', 'path' => '/admin/geomanifestations/{id}', 'controller'
   => 'GeomanifestationController', 'action' => 'show'],
   ['method' => 'POST', 'path' => '/admin/geomanifestations', 'controller' => 'GeomanifestationController', 'action' => 'store'],
@@ -92,7 +91,7 @@ return [
   ['method' => 'DELETE', 'path' => '/admin/inlab-tests/{id}', 'controller' => 'InlabTestController', 'action' => 'delete'],
 
   // Georeports`
-  ['method' => 'GET', 'path' => '/georeports/current', 'controller' => 'GeoreportController', 'action' => 'current'],
+  ['method' => 'GET', 'path' => '/georeports', 'controller' => 'GeoreportController', 'action' => 'current'],
 
   ['method' => 'GET', 'path' => '/admin/georeports', 'controller' => 'GeoreportController', 'action' => 'index'],
   ['method' => 'GET', 'path' => '/admin/georeports/{id}', 'controller' => 'GeoreportController', 'action' => 'show'],

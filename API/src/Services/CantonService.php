@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Services;
 
-use PDO;
+use DTO\AllowedUserRoles;
+use DTO\CantonDTO;
 use Http\ApiException;
 use Http\ErrorType;
 use Http\Request;
-use DTO\CantonDTO;
-use DTO\AllowedUserRoles;
+use PDO;
 use Repositories\CantonRepository;
 use Repositories\ProvinceRepository;
 
@@ -27,22 +27,6 @@ final class CantonService
   }
 
   /**
-   * Ensures the referenced province exists.
-   *
-   * @param int $provinceSnitCode
-   * @throws ApiException
-   */
-  private function requireValidProvince(int $provinceSnitCode): void
-  {
-    if (!$this->provinceRepository->existsBySnitCode($provinceSnitCode)) {
-      throw new ApiException(
-        ErrorType::invalidField('province_snit_code'),
-        422
-      );
-    }
-  }
-
-  /**
    * Retrieves all cantons, optionally filtered by province SNIT code.
    *
    * @param int|null $provinceSnitCode
@@ -51,13 +35,15 @@ final class CantonService
   public function getAll(?int $provinceSnitCode = null): array
   {
     $cantons = $this->repository->getAll($provinceSnitCode);
-    return array_map(fn($dto) => [
-      'canton_id' => $dto->cantonId,
-      'province_snit_code' => $dto->provinceSnitCode,
-      'canton_snit_code' => $dto->cantonSnitCode,
-      'canton_name' => $dto->cantonName,
-      'created_at' => $dto->createdAt,
-    ], $cantons);
+    return array_map(
+      fn($dto) => [
+        'canton_id' => $dto->cantonId,
+        'province_snit_code' => $dto->provinceSnitCode,
+        'canton_snit_code' => $dto->cantonSnitCode,
+        'canton_name' => $dto->cantonName,
+        'created_at' => $dto->createdAt,
+      ], $cantons
+    );
   }
 
   /**
@@ -70,12 +56,14 @@ final class CantonService
   public function getById(string $cantonId): array
   {
 
-    Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::FIELD_INVESTIGATOR,
-      AllowedUserRoles::INVESTIGATOR,
-      AllowedUserRoles::MAINTENANCE
-    ]);
+    Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR,
+        AllowedUserRoles::MAINTENANCE
+      ]
+    );
 
     $canton = $this->repository->findById($cantonId);
     if (!$canton) {
@@ -99,12 +87,14 @@ final class CantonService
    */
   public function getBySnitCode(int $snitCode): array
   {
-    Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::FIELD_INVESTIGATOR,
-      AllowedUserRoles::INVESTIGATOR,
-      AllowedUserRoles::MAINTENANCE
-    ]);
+    Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR,
+        AllowedUserRoles::MAINTENANCE
+      ]
+    );
 
     $canton = $this->repository->findBySnitCode($snitCode);
     if (!$canton) {
@@ -127,11 +117,13 @@ final class CantonService
    */
   public function create(CantonDTO $dto): void
   {
-    $auth = Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::FIELD_INVESTIGATOR,
-      AllowedUserRoles::INVESTIGATOR
-    ]);
+    $auth = Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR
+      ]
+    );
 
     $dto->validate();
     $this->requireValidProvince($dto->provinceSnitCode);
@@ -149,6 +141,22 @@ final class CantonService
   }
 
   /**
+   * Ensures the referenced province exists.
+   *
+   * @param int $provinceSnitCode
+   * @throws ApiException
+   */
+  private function requireValidProvince(int $provinceSnitCode): void
+  {
+    if (!$this->provinceRepository->existsBySnitCode($provinceSnitCode)) {
+      throw new ApiException(
+        ErrorType::invalidField('province_snit_code'),
+        422
+      );
+    }
+  }
+
+  /**
    * Updates an existing canton (admin only).
    *
    * @param string $cantonId
@@ -157,11 +165,13 @@ final class CantonService
    */
   public function update(string $cantonId, CantonDTO $dto): void
   {
-    Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::FIELD_INVESTIGATOR,
-      AllowedUserRoles::INVESTIGATOR
-    ]);
+    Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR
+      ]
+    );
 
     $dto->validate();
     $this->requireValidProvince($dto->provinceSnitCode);
@@ -200,11 +210,13 @@ final class CantonService
    */
   public function delete(string $cantonId): void
   {
-    Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::FIELD_INVESTIGATOR,
-      AllowedUserRoles::INVESTIGATOR
-    ]);
+    Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR
+      ]
+    );
 
     $canton = $this->repository->findById($cantonId);
     if (!$canton) {

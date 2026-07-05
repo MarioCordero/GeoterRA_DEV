@@ -8,9 +8,11 @@ use Http\Response;
 use Http\ErrorType;
 use Http\ApiException;
 use Core\Logger;
+use PDO;
 use Services\AuthService;
 use DTO\UpdateUserRoleDTO;
 use Services\MaintenanceService;
+use Throwable;
 
 
 final class MaintenanceController
@@ -18,7 +20,7 @@ final class MaintenanceController
   private MaintenanceService $service;
   private AuthService $authService;
 
-  public function __construct(private \PDO $pdo)
+  public function __construct(private PDO $pdo)
   {
     $this->service = new MaintenanceService($pdo);
     $this->authService = new AuthService($pdo);
@@ -32,8 +34,10 @@ final class MaintenanceController
       Response::success(['logs' => $logs]);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
-      Logger::error('❌ [MaintenanceController::getSystemLogs] Error: ' . $e->getMessage());
+    } catch (Throwable $e) {
+      Logger::error(
+        '❌ [MaintenanceController::getSystemLogs] Error: ' . $e->getMessage()
+      );
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -43,10 +47,12 @@ final class MaintenanceController
   {
     try {
       $dashboardInfo = $this->service->getDashboardInfo();
-      Response::success($dashboardInfo);
+      Response::success(
+        $dashboardInfo
+      );
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Logger::error(
         '❌ [MaintenanceController::getDashboardInfo] Error: ' . $e->getMessage()
       );
@@ -59,10 +65,14 @@ final class MaintenanceController
   {
     try {
       $result = $this->service->getAllUsers();
-      Response::success($result['data'], $result['meta'], 200);
+      Response::success(
+        $result['data'],
+        $result['meta'],
+        200
+      );
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Logger::error(
         '❌ [MaintenanceController::showAllUsers] Error: ' . $e->getMessage()
       );
@@ -78,7 +88,7 @@ final class MaintenanceController
       Response::success($tables);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Logger::error(
         '❌ [MaintenanceController::getAllDatabaseTables] Error: ' . $e->getMessage()
       );
@@ -91,7 +101,7 @@ final class MaintenanceController
   {
     try {
       $user = Request::getUser();
-    
+
       // Validate user ID parameter
       if (empty($id)) {
         Response::error(ErrorType::missingField('id'), 400);
@@ -107,7 +117,7 @@ final class MaintenanceController
       Response::success($result['data'], $result['meta'], 200);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Logger::error(
         '❌ [MaintenanceController::updateUserRole] Error: ' . $e->getMessage()
       );

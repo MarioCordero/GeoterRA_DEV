@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace Controllers;
 
-use DTO\InlabTestDTO;
-use DTO\PermissionsDTO;
+use DTO\RegisterInlabTestDTO;
+use DTO\UpdateInlabTestDTO;
 use Http\ApiException;
 use Http\ErrorType;
 use Http\Request;
 use Http\Response;
-use Services\InlabTestService;
-use Services\PermissionService;
 use PDO;
+use Services\InlabTestService;
+use Throwable;
 
 /**
  * Controller for in‑lab test endpoints.
@@ -26,29 +26,34 @@ final class InlabTestController
   }
 
   /**
-   * GET /inlab-tests
-   * Returns all in‑lab tests for a given geomanifestation (public, respects visibility).
+   * GET /admin/inlab-tests
+   * Returns all in‑lab tests for a given geomanifestation.
    * Query parameter: geomanifestation_id (required)
    */
   public function index(): void
   {
     try {
-      $geomanifestationId = $_GET['geomanifestation_id'] ?? '';
+      $body = Request::parseJsonRequest();
+      $geomanifestationId = $body['geomanifestation_id'] ?? '';
+
       if (empty($geomanifestationId)) {
-        throw new ApiException(ErrorType::missingField('geomanifestation_id'), 422);
+        throw new ApiException(
+          ErrorType::missingField('geomanifestation_id'), 422
+        );
       }
+
       $tests = $this->service->getByManifestation($geomanifestationId);
       Response::success($tests);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
-   * GET /inlab-tests/{id}
-   * Returns a single in‑lab test (public, respects manifestation visibility).
+   * GET /admin/inlab-tests/{id}
+   * Returns a single in‑lab test.
    *
    * @param string $id
    */
@@ -59,32 +64,32 @@ final class InlabTestController
       Response::success($test);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
-   * POST /inlab-tests
-   * Creates a new in‑lab test (admin only).
+   * POST /admin/inlab-tests
+   * Creates a new in‑lab test.
    */
   public function store(): void
   {
     try {
       $body = Request::parseJsonRequest();
-      $dto = InlabTestDTO::fromArray($body);
-      $this->service->create($dto);
-      Response::success(['success' => true], null, 201);
+      $dto = RegisterInlabTestDTO::fromArray($body);
+      $result = $this->service->create($dto);
+      Response::success($result, null, 201);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
-   * PUT /inlab-tests/{id}
-   * Updates an existing in‑lab test (admin only).
+   * PUT /admin/inlab-tests/{id}
+   * Updates an existing in‑lab test.
    *
    * @param string $id
    */
@@ -92,19 +97,19 @@ final class InlabTestController
   {
     try {
       $body = Request::parseJsonRequest();
-      $dto = InlabTestDTO::fromArray($body);
-      $this->service->update($id, $dto);
-      Response::success(['updated' => true]);
+      $dto = UpdateInlabTestDTO::fromArray($body);
+      $result = $this->service->update($id, $dto);
+      Response::success($result, null, 201);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
-   * DELETE /inlab-tests/{id}
-   * Deletes an in‑lab test (admin only).
+   * DELETE /admin/inlab-tests/{id}
+   * Deletes an in‑lab test.
    *
    * @param string $id
    */
@@ -115,7 +120,7 @@ final class InlabTestController
       Response::success(['deleted' => true]);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }

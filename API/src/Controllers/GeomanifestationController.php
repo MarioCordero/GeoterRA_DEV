@@ -5,14 +5,13 @@ namespace Controllers;
 
 use DTO\RegisterGeomanifestationDTO;
 use DTO\UpdateGeomanifestationDTO;
-use DTO\PermissionsDTO;
 use Http\ApiException;
 use Http\ErrorType;
 use Http\Request;
 use Http\Response;
-use Services\GeomanifestationService;
-use Services\PermissionService;
 use PDO;
+use Services\GeomanifestationService;
+use Throwable;
 
 /**
  * Controller for geothermal manifestation endpoints.
@@ -27,116 +26,104 @@ final class GeomanifestationController
   }
 
   /**
-   * GET /geomanifestations
-   * Returns all visible manifestations (public) with pagination and optional province filter.
+   * GET /admin/geomanifestations
+   * Returns all manifestations (including hidden) with pagination and optional filters.
    */
   public function index(): void
   {
     try {
-      $page = (int) ($_GET['page'] ?? 1);
-      $limit = (int) ($_GET['limit'] ?? 20);
-      $provinceSnitCode = isset(
-        $_GET['province_snit_code']
-      ) ? (int) $_GET['province_snit_code'] : null;
+      $page = (int)($_GET['page'] ?? 1);
+      $limit = (int)($_GET['limit'] ?? 20);
 
-      if ($provinceSnitCode !== null) {
-        $result = $this->service->getByProvince(
-          $provinceSnitCode,
+      $provinceSnitCode = isset($_GET['province_snit_code']) ? (int)$_GET['province_snit_code'] : null;
+      $cantonSnitCode = isset($_GET['canton_snit_code']) ? (int)$_GET['canton_snit_code'] : null;
+      $districtSnitCode = isset($_GET['district_snit_code']) ? (int)$_GET['district_snit_code'] : null;
+
+      // If any filter is provided, use the filtered method; otherwise getAll.
+      if ($provinceSnitCode !== null || $cantonSnitCode !== null || $districtSnitCode !== null) {
+        $result = $this->service->getViewAllPaginated(
           $page,
-          $limit
+          $limit,
+          $provinceSnitCode,
+          $cantonSnitCode,
+          $districtSnitCode,
+          null,
+          null,
+          false // admin: show all, including hidden
         );
       } else {
-        $result = $this->service->getAllVisible($page, $limit);
+        $result = $this->service->getAll($page, $limit);
       }
+
       Response::success($result);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
-   * GET /admin/geomanifestations
-   * Returns all manifestations (including hidden) – admin only, with pagination.
-   */
-  public function adminIndex(): void
-  {
-    try {
-      $page = (int) ($_GET['page'] ?? 1);
-      $limit = (int) ($_GET['limit'] ?? 20);
-      $result = $this->service->getAll($page, $limit);
-      Response::success($result);
-    } catch (ApiException $e) {
-      Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
-      Response::error(ErrorType::internal($e->getMessage()), 500);
-    }
-  }
-
-  /**
-   * GET /geomanifestations/{id}
-   * Returns a single manifestation from base table.
+   * GET /admin/geomanifestations/{id}
+   * Returns a single manifestation (admin, includes hidden).
+   *
+   * @param string $id
    */
   public function show(string $id): void
   {
     try {
-      $includeHidden = false;
-      try {
-        $user = Request::getUser();
-        $includeHidden = ($user['role'] ?? '') === 'admin';
-      } catch (\Exception $e) {
-        // Not authenticated
-      }
-      $manifestation = $this->service->getById($id, $includeHidden);
+      $manifestation = $this->service->getById($id, true);
       Response::success($manifestation);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
    * POST /admin/geomanifestations
-   * Creates a new geothermal manifestation (admin only).
+   * Creates a new geothermal manifestation.
    */
   public function store(): void
   {
     try {
-
       $body = Request::parseJsonRequest();
       $dto = RegisterGeomanifestationDTO::fromArray($body);
-      $this->service->create($dto);
-      Response::success(['success' => true], null, 201);
+      $result = $this->service->create($dto);
+      Response::success($result, null, 201);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
    * PUT /admin/geomanifestations/{id}
-   * Updates an existing manifestation (admin only).
+   * Updates an existing manifestation.
+   *
+   * @param string $id
    */
   public function update(string $id): void
   {
     try {
       $body = Request::parseJsonRequest();
       $dto = UpdateGeomanifestationDTO::fromArray($body);
-      $this->service->update($id, $dto);
-      Response::success(['updated' => true]);
+      $result = $this->service->update($id, $dto);
+      Response::success($result, null, 200);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
    * DELETE /admin/geomanifestations/{id}
-   * Permanently deletes a manifestation (admin only).
+   * Permanently deletes a manifestation.
+   *
+   * @param string $id
    */
   public function delete(string $id): void
   {
@@ -145,52 +132,63 @@ final class GeomanifestationController
       Response::success(['deleted' => true]);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
    * PATCH /admin/geomanifestations/{id}/visibility
-   * Toggles the visibility of a manifestation (admin only).
+   * Toggles the visibility of a manifestation.
+   *
+   * @param string $id
    */
   public function setVisibility(string $id): void
   {
     try {
       $body = Request::parseJsonRequest();
-      $visible = isset($body['visible']) && $body['visible'];
-      $this->service->setVisibility($id, $visible);
-      Response::success(['visibility_updated' => true]);
+      $visible = isset($body['visibility']) ? filter_var(
+        $body['visibility'],
+        FILTER_VALIDATE_BOOLEAN
+      ) : false;
+      $result = $this->service->setVisibility($id, $visible);
+      Response::success($result, null, 200);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
-  // ==================== New endpoints for enriched view ====================
-
   /**
-   * GET /geomanifestations/view
-   * Returns paginated enriched data from view_geomanifestations.
-   * Public: only visible ones. Admin can see all by passing `?show_all=1`.
+   * GET /geomanifestations
+   * Returns paginated enriched data from view_geomanifestations (public).
+   * Only visible manifestations. Admin can see all by passing `?show_all=1`.
    */
   public function viewIndex(): void
   {
     try {
-      $page = (int) ($_GET['page'] ?? 1);
-      $limit = (int) ($_GET['limit'] ?? 20);
-      $provinceSnitCode = isset($_GET['province_snit_code']) ? (int) $_GET['province_snit_code'] : null;
-      $tempMin = isset($_GET['temp_min']) ? (float) $_GET['temp_min'] : null;
-      $tempMax = isset($_GET['temp_max']) ? (float) $_GET['temp_max'] : null;
-      $showAll = isset($_GET['show_all']) ? filter_var($_GET['show_all'], FILTER_VALIDATE_BOOLEAN) : false;
+      $page = (int)($_GET['page'] ?? 1);
+      $limit = (int)($_GET['limit'] ?? 20);
 
+      $provinceSnitCode = isset($_GET['province_snit_code']) ? (int)$_GET['province_snit_code'] : null;
+      $cantonSnitCode = isset($_GET['canton_snit_code']) ? (int)$_GET['canton_snit_code'] : null;
+      $districtSnitCode = isset($_GET['district_snit_code']) ? (int)$_GET['district_snit_code'] : null;
+      $tempMin = isset($_GET['temp_min']) ? (float)$_GET['temp_min'] : null;
+      $tempMax = isset($_GET['temp_max']) ? (float)$_GET['temp_max'] : null;
+
+      $showAll = isset($_GET['show_all']) ? filter_var(
+        $_GET['show_all'],
+        FILTER_VALIDATE_BOOLEAN
+      ) : false;
       $onlyVisible = !$showAll;
 
       $result = $this->service->getViewAllPaginated(
         $page,
         $limit,
         $provinceSnitCode,
+        $cantonSnitCode,
+        $districtSnitCode,
         $tempMin,
         $tempMax,
         $onlyVisible
@@ -199,14 +197,16 @@ final class GeomanifestationController
       Response::success($result);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
-   * GET /geomanifestations/view/{id}
-   * Returns a single enriched manifestation from the view.
+   * GET /geomanifestations/{id}
+   * Returns a single enriched manifestation from the view (public).
+   *
+   * @param string $id
    */
   public function viewShow(string $id): void
   {
@@ -215,7 +215,7 @@ final class GeomanifestationController
       Response::success($data);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }

@@ -12,6 +12,7 @@ use Http\Response;
 use Services\DistrictService;
 use Services\PermissionService;
 use PDO;
+use Throwable;
 
 /**
  * Controller for district endpoints.
@@ -39,7 +40,7 @@ final class DistrictController
       Response::success($districts);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -57,7 +58,7 @@ final class DistrictController
       Response::success($district);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -76,7 +77,7 @@ final class DistrictController
       Response::success($district);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -94,7 +95,7 @@ final class DistrictController
       Response::success(['success' => true], null, 201);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -115,7 +116,7 @@ final class DistrictController
       Response::success(['updated' => true]);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -134,7 +135,7 @@ final class DistrictController
       Response::success(['deleted' => true]);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }

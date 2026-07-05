@@ -3,14 +3,15 @@ declare(strict_types=1);
 
 namespace Services;
 
-use PDO;
+use DTO\AllowedUserRoles;
+use DTO\RegisterInlabTestDTO;
+use DTO\UpdateInlabTestDTO;
 use Http\ApiException;
 use Http\ErrorType;
 use Http\Request;
-use DTO\InlabTestDTO;
-use DTO\AllowedUserRoles;
-use Repositories\InlabTestRepository;
+use PDO;
 use Repositories\GeomanifestationRepository;
+use Repositories\InlabTestRepository;
 
 /**
  * Business logic for in-lab tests (inlab_tests table).
@@ -29,46 +30,93 @@ final class InlabTestService
   }
 
   /**
+   * Creates a new in-lab test (admin/investigator only).
+   *
+   * @param RegisterInlabTestDTO $dto
+   * @throws ApiException
+   */
+  public function create(RegisterInlabTestDTO $dto): array
+  {
+    $auth = Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::INVESTIGATOR
+      ]
+    );
+
+    $dto->validate();
+    $this->validateGeomanifestationExists($dto->geomanifestationId);
+
+    return $this->formatTest($this->repository->create($dto, $auth['user_id']));
+  }
+
+  /**
    * Validates that the referenced geomanifestation exists.
    *
    * @param string $geomanifestationId
    * @throws ApiException
    */
-  private function validateGeomanifestationExists(
-    string $geomanifestationId
+  private function validateGeomanifestationExists(string $geomanifestationId
   ): void {
     $manifestation = $this->geomanifestationRepository->findById(
       $geomanifestationId
     );
     if (!$manifestation) {
       throw new ApiException(
-        ErrorType::invalidField('geomanifestation_id'),
-        422
+        ErrorType::invalidField('geomanifestation_id'), 422
       );
     }
   }
 
   /**
-   * Creates a new in-lab test (admin only).
+   * Formats a raw database row into the API response structure.
+   * - Removes created_by (ULID)
+   * - Includes created_by_first_name and created_by_last_name
+   * - Rounds numeric values to 2 decimal places
    *
-   * @param InlabTestDTO $dto
-   * @throws ApiException
+   * @param array<string,mixed> $row
+   * @return array<string,mixed>
    */
-  public function create(InlabTestDTO $dto): void
+  private function formatTest(array $row): array
   {
-    $auth = Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::INVESTIGATOR
-    ]);
+    // Round numeric fields
+    $numericFields = ['ph', 'conductivity', 'cl', 'ca', 'hco3', 'so4', 'fe', 'si', 'b', 'li', 'f', 'na', 'k', 'mg'];
+    foreach ($numericFields as $field) {
+      if (isset($row[$field]) && is_numeric($row[$field])) {
+        $row[$field] = round((float)$row[$field], 2);
+      }
+    }
 
-    $dto->validate();
-    $this->validateGeomanifestationExists($dto->geomanifestationId);
+    // Build response without created_by
+    $result = [
+      'inlab_test_id' => $row['inlab_test_id'],
+      'geomanifestation_id' => $row['geomanifestation_id'],
+      'ph' => $row['ph'] ?? null,
+      'conductivity' => $row['conductivity'] ?? null,
+      'cl' => $row['cl'] ?? null,
+      'ca' => $row['ca'] ?? null,
+      'hco3' => $row['hco3'] ?? null,
+      'so4' => $row['so4'] ?? null,
+      'fe' => $row['fe'] ?? null,
+      'si' => $row['si'] ?? null,
+      'b' => $row['b'] ?? null,
+      'li' => $row['li'] ?? null,
+      'f' => $row['f'] ?? null,
+      'na' => $row['na'] ?? null,
+      'k' => $row['k'] ?? null,
+      'mg' => $row['mg'] ?? null,
+      'description' => $row['description'],
+      'created_at' => $row['created_at'],
+      'created_by_first_name' => $row['created_by_first_name'] ?? null,
+      'created_by_last_name' => $row['created_by_last_name'] ?? null,
+    ];
 
-    $this->repository->create($dto, $auth['user_id']);
+    return $result;
   }
 
   /**
-   * Retrieves an in-lab test by its ID (admin access, with visibility check via manifestation).
+   * Retrieves an in-lab test by its ID.
+   * Requires authentication; visibility is handled via the manifestation check.
    *
    * @param string $id
    * @return array
@@ -76,62 +124,40 @@ final class InlabTestService
    */
   public function getById(string $id): array
   {
-    Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::FIELD_INVESTIGATOR,
-      AllowedUserRoles::INVESTIGATOR
-    ]);
+    $user = Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR,
+        AllowedUserRoles::MAINTENANCE
+      ]
+    );
 
     $test = $this->repository->findById($id);
     if (!$test) {
       throw new ApiException(ErrorType::notFound('In-lab test'), 404);
     }
 
-    // Check manifestation visibility if needed (optional – tests might be considered sensitive)
-    // For consistency, we can allow public access to test data if manifestation is visible.
+    // Check manifestation visibility (if hidden, only admin can see it)
     $manifestation = $this->geomanifestationRepository->findById(
-      $test->geomanifestationId
+      $test['geomanifestation_id']
     );
     if ($manifestation && !$manifestation['visibility']) {
-      try {
-        $auth = $this->authService->requireAuth();
-        $isAdmin = ($auth['role'] ?? '') === AllowedUserRoles::ADMIN;
-      } catch (\Exception $e) {
-        $isAdmin = false;
-      }
+      $isAdmin = ($user['role'] ?? '') === AllowedUserRoles::ADMIN;
       if (!$isAdmin) {
         throw new ApiException(ErrorType::notFound('In-lab test'), 404);
       }
     }
 
-    return [
-      'inlab_test_id' => $test->inlabTestId,
-      'geomanifestation_id' => $test->geomanifestationId,
-      'ph' => $test->ph,
-      'conductivity' => $test->conductivity,
-      'cl' => $test->cl,
-      'ca' => $test->ca,
-      'hco3' => $test->hco3,
-      'so4' => $test->so4,
-      'fe' => $test->fe,
-      'si' => $test->si,
-      'b' => $test->b,
-      'li' => $test->li,
-      'f' => $test->f,
-      'na' => $test->na,
-      'k' => $test->k,
-      'mg' => $test->mg,
-      'description' => $test->description,
-      'created_at' => $test->createdAt,
-      'created_by' => $test->createdBy,
-    ];
+    return $this->formatTest($test);
   }
 
   /**
-   * Returns all in-lab tests for a given geomanifestation (with visibility check).
+   * Returns all in-lab tests for a given geomanifestation.
+   * Checks manifestation visibility: if hidden, only allowed roles can access.
    *
    * @param string $geomanifestationId
-   * @return array
+   * @return array[]
    * @throws ApiException
    */
   public function getByManifestation(string $geomanifestationId): array
@@ -141,58 +167,42 @@ final class InlabTestService
     );
     if (!$manifestation) {
       throw new ApiException(
-        ErrorType::notFound('Geothermal manifestation'),
-        404
+        ErrorType::notFound('Geothermal manifestation'), 404
       );
     }
 
     if (!$manifestation['visibility']) {
-      Request::requireRole([
-        AllowedUserRoles::ADMIN,
-        AllowedUserRoles::FIELD_INVESTIGATOR,
-        AllowedUserRoles::INVESTIGATOR,
-        AllowedUserRoles::MAINTENANCE
-      ]);
+      Request::requireRole(
+        [
+          AllowedUserRoles::ADMIN,
+          AllowedUserRoles::FIELD_INVESTIGATOR,
+          AllowedUserRoles::INVESTIGATOR,
+          AllowedUserRoles::MAINTENANCE
+        ]
+      );
     }
 
     $tests = $this->repository->getByManifestation($geomanifestationId);
-    return array_map(fn($dto) => [
-      'inlab_test_id' => $dto->inlabTestId,
-      'ph' => $dto->ph,
-      'conductivity' => $dto->conductivity,
-      'cl' => $dto->cl,
-      'ca' => $dto->ca,
-      'hco3' => $dto->hco3,
-      'so4' => $dto->so4,
-      'fe' => $dto->fe,
-      'si' => $dto->si,
-      'b' => $dto->b,
-      'li' => $dto->li,
-      'f' => $dto->f,
-      'na' => $dto->na,
-      'k' => $dto->k,
-      'mg' => $dto->mg,
-      'description' => $dto->description,
-      'created_at' => $dto->createdAt,
-    ], $tests);
+    return array_map([$this, 'formatTest'], $tests);
   }
 
   /**
-   * Updates an existing in-lab test (admin only).
+   * Updates an existing in-lab test (admin/investigator only).
    *
    * @param string $id
-   * @param InlabTestDTO $dto
+   * @param UpdateInlabTestDTO $dto
    * @throws ApiException
    */
-  public function update(string $id, InlabTestDTO $dto): void
+  public function update(string $id, UpdateInlabTestDTO $dto): array
   {
-    Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::INVESTIGATOR
-    ]);
+    $user = Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::INVESTIGATOR
+      ]
+    );
 
     $dto->validate();
-    $this->validateGeomanifestationExists($dto->geomanifestationId);
 
     $existing = $this->repository->findById($id);
     if (!$existing) {
@@ -202,25 +212,27 @@ final class InlabTestService
     $updated = $this->repository->update($id, $dto);
     if (!$updated) {
       throw new ApiException(
-        ErrorType::internal('Failed to update in-lab test'),
-        500
+        ErrorType::internal('Failed to update in-lab test'), 500
       );
     }
+
+    return $this->formatTest($updated);
   }
 
   /**
-   * Deletes an in-lab test (admin only).
+   * Deletes an in-lab test (admin/investigator only).
    *
    * @param string $id
    * @throws ApiException
    */
   public function delete(string $id): void
   {
-
-    Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::INVESTIGATOR
-    ]);
+    Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::INVESTIGATOR
+      ]
+    );
 
     $existing = $this->repository->findById($id);
     if (!$existing) {
@@ -230,8 +242,7 @@ final class InlabTestService
     $deleted = $this->repository->delete($id);
     if (!$deleted) {
       throw new ApiException(
-        ErrorType::internal('Failed to delete in-lab test'),
-        500
+        ErrorType::internal('Failed to delete in-lab test'), 500
       );
     }
   }

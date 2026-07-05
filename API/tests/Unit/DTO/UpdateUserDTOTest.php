@@ -10,176 +10,293 @@ use Http\ApiException;
 
 class UpdateUserDTOTest extends TestCase
 {
-    public function testValidUpdateUserDTOCreation(): void
-    {
-        $data = [
-            'name' => 'John',
-            'lastname' => 'Doe',
-            'email' => 'john@example.com'
-        ];
+  private const USER_ID = '01H8X5B4G5N6J7K8L9M0P1Q2R3';
 
-        $dto = UpdateUserDTO::fromArray($data);
-        
-        $this->assertNotNull($dto);
-    }
+  public function testFromArrayWithValidData(): void
+  {
+    $data = [
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      'email' => 'john@example.com',
+      'phone_number' => '87654321',
+      'current_password' => 'OldPass123!',
+      'password' => 'NewPass123!',
+    ];
 
-    public function testFromArrayCreatesInstance(): void
-    {
-        $data = [
-            'name' => 'Jane',
-            'lastname' => 'Smith',
-            'email' => 'jane@example.com',
-            'phone_number' => '+56912345678'
-        ];
+    $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
 
-        $dto = UpdateUserDTO::fromArray($data);
-        
-        $this->assertInstanceOf(UpdateUserDTO::class, $dto);
-    }
+    $this->assertSame(self::USER_ID, $dto->userId);
+    $this->assertSame('John', $dto->firstName);
+    $this->assertSame('Doe', $dto->lastName);
+    $this->assertSame('john@example.com', $dto->email);
+    $this->assertSame('87654321', $dto->phoneNumber);
+    $this->assertSame('OldPass123!', $dto->currentPassword);
+    $this->assertSame('NewPass123!', $dto->password);
+  }
 
-    public function testValidateThrowsOnMissingName(): void
-    {
-        $data = [
-            'lastname' => 'Doe',
-            'email' => 'john@example.com'
-        ];
+  public function testFromArrayWithPartialData(): void
+  {
+    $data = [
+      'phone_number' => '87654321',
+      'password' => 'NewPass123!',
+    ];
 
-        $this->expectException(ApiException::class);
-        $dto = UpdateUserDTO::fromArray($data);
-        $dto->validate();
-    }
+    $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
 
-    public function testValidateThrowsOnMissingLastname(): void
-    {
-        $data = [
-            'name' => 'John',
-            'email' => 'john@example.com'
-        ];
+    $this->assertSame(self::USER_ID, $dto->userId);
+    // Los campos no proporcionados se asignan como string vacío
+    $this->assertSame('', $dto->firstName);
+    $this->assertSame('', $dto->lastName);
+    $this->assertSame('', $dto->email);
+    $this->assertSame('87654321', $dto->phoneNumber);
+    $this->assertNull($dto->currentPassword);
+    $this->assertSame('NewPass123!', $dto->password);
+  }
 
-        $this->expectException(ApiException::class);
-        $dto = UpdateUserDTO::fromArray($data);
-        $dto->validate();
-    }
+  public function testSetUserId(): void
+  {
+    $dto = UpdateUserDTO::fromArray([], '');
+    $this->assertSame('', $dto->userId);
 
-    public function testValidateThrowsOnMissingEmail(): void
-    {
-        $data = [
-            'name' => 'John',
-            'lastname' => 'Doe'
-        ];
+    $dto->setUserId('new-id');
+    $this->assertSame('new-id', $dto->userId);
+  }
 
-        $this->expectException(ApiException::class);
-        $dto = UpdateUserDTO::fromArray($data);
-        $dto->validate();
-    }
+  public function testValidatePassesWithValidData(): void
+  {
+    $data = [
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      'email' => 'john@example.com',
+      'phone_number' => '87654321',
+    ];
 
-    public function testValidateThrowsOnInvalidEmailFormat(): void
-    {
-        $data = [
-            'name' => 'John',
-            'lastname' => 'Doe',
-            'email' => 'not-an-email'
-        ];
+    $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
+    $this->expectNotToPerformAssertions();
+    $dto->validate();
+  }
 
-        $this->expectException(ApiException::class);
-        $dto = UpdateUserDTO::fromArray($data);
-        $dto->validate();
-    }
+  public function testValidateThrowsExceptionWhenChangingPasswordWithoutCurrentPassword(): void
+  {
+    $data = [
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      'email' => 'john@example.com',
+      'password' => 'NewPass123!', // password provided, but no current_password
+    ];
 
-    public function testValidateThrowsOnInvalidPhoneFormat(): void
-    {
-        $data = [
-            'name' => 'John',
-            'lastname' => 'Doe',
-            'email' => 'john@example.com',
-            'phone_number' => 'invalid'
-        ];
+    $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
 
-        $this->expectException(ApiException::class);
-        $dto = UpdateUserDTO::fromArray($data);
-        $dto->validate();
-    }
+    $this->expectException(ApiException::class);
+    $this->expectExceptionCode(400);
+    $this->expectExceptionMessage('Current password is required to change password');
 
-    public function testValidateAcceptsOptionalPhone(): void
-    {
-        $data = [
-            'name' => 'John',
-            'lastname' => 'Doe',
-            'email' => 'john@example.com'
-        ];
+    $dto->validate();
+  }
 
-        $dto = UpdateUserDTO::fromArray($data);
-        $dto->validate(); // Should not throw
-        
-        $this->assertTrue(true);
-    }
+  public function testValidateThrowsExceptionForInvalidEmail(): void
+  {
+    $data = [
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      'email' => 'not-an-email',
+    ];
 
-    public function testValidateAcceptsValidPhoneNumber(): void
-    {
-        $data = [
-            'name' => 'John',
-            'lastname' => 'Doe',
-            'email' => 'john@example.com',
-            'phone_number' => '56912345678'
-        ];
+    $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
 
-        $dto = UpdateUserDTO::fromArray($data);
-        $dto->validate(); // Should not throw
-        
-        $this->assertTrue(true);
-    }
+    $this->expectException(ApiException::class);
+    $this->expectExceptionCode(422);
 
-    public function testValidateAcceptsValidData(): void
-    {
-        $data = [
-            'name' => 'John',
-            'lastname' => 'Doe',
-            'email' => 'john.doe@example.com',
-            'phone_number' => '56912345678'
-        ];
+    $dto->validate();
+  }
 
-        $dto = UpdateUserDTO::fromArray($data);
-        $dto->validate(); // Should not throw
-        
-        $this->assertTrue(true);
-    }
+  public function testValidateThrowsExceptionForNewPasswordTooShort(): void
+  {
+    $data = [
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      'email' => 'john@example.com',
+      'current_password' => 'OldPass123!',
+      'password' => 'Short1!', // 7 characters
+    ];
 
-    public function testValidateThrowsOnEmptyName(): void
-    {
-        $data = [
-            'name' => '',
-            'lastname' => 'Doe',
-            'email' => 'john@example.com'
-        ];
+    $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
 
-        $this->expectException(ApiException::class);
-        $dto = UpdateUserDTO::fromArray($data);
-        $dto->validate();
-    }
+    $this->expectException(ApiException::class);
+    $this->expectExceptionCode(400);
+    $this->expectExceptionMessage('Password must be at least 8 characters');
 
-    public function testValidateThrowsOnEmptyLastname(): void
-    {
-        $data = [
-            'name' => 'John',
-            'lastname' => '',
-            'email' => 'john@example.com'
-        ];
+    $dto->validate();
+  }
 
-        $this->expectException(ApiException::class);
-        $dto = UpdateUserDTO::fromArray($data);
-        $dto->validate();
-    }
+  public function testValidateThrowsExceptionForMissingFirstName(): void
+  {
+    $data = [
+      'last_name' => 'Doe',
+      'email' => 'john@example.com',
+    ];
 
-    public function testValidateThrowsOnEmptyEmail(): void
-    {
-        $data = [
-            'name' => 'John',
-            'lastname' => 'Doe',
-            'email' => ''
-        ];
+    $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
 
-        $this->expectException(ApiException::class);
-        $dto = UpdateUserDTO::fromArray($data);
-        $dto->validate();
-    }
+    $this->expectException(ApiException::class);
+    $this->expectExceptionCode(422);
+
+    $dto->validate();
+  }
+
+  public function testValidateThrowsExceptionForMissingLastName(): void
+  {
+    $data = [
+      'first_name' => 'John',
+      'email' => 'john@example.com',
+    ];
+
+    $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
+
+    $this->expectException(ApiException::class);
+    $this->expectExceptionCode(422);
+
+    $dto->validate();
+  }
+
+  public function testValidateThrowsExceptionForMissingEmail(): void
+  {
+    $data = [
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+    ];
+
+    $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
+
+    $this->expectException(ApiException::class);
+    $this->expectExceptionCode(422);
+
+    $dto->validate();
+  }
+
+  public function testValidateThrowsExceptionForEmptyFirstName(): void
+  {
+    $data = [
+      'first_name' => '',
+      'last_name' => 'Doe',
+      'email' => 'john@example.com',
+    ];
+
+    $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
+
+    $this->expectException(ApiException::class);
+    $this->expectExceptionCode(422);
+
+    $dto->validate();
+  }
+
+  public function testValidateThrowsExceptionForEmptyLastName(): void
+  {
+    $data = [
+      'first_name' => 'John',
+      'last_name' => '',
+      'email' => 'john@example.com',
+    ];
+
+    $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
+
+    $this->expectException(ApiException::class);
+    $this->expectExceptionCode(422);
+
+    $dto->validate();
+  }
+
+  public function testValidateThrowsExceptionForEmptyEmail(): void
+  {
+    $data = [
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      'email' => '',
+    ];
+
+    $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
+
+    $this->expectException(ApiException::class);
+    $this->expectExceptionCode(422);
+
+    $dto->validate();
+  }
+
+  public function testValidateThrowsExceptionForInvalidPhoneNumber(): void
+  {
+    $data = [
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      'email' => 'john@example.com',
+      'phone_number' => 'invalid',
+    ];
+
+    $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
+
+    $this->expectException(ApiException::class);
+    $this->expectExceptionCode(422);
+
+    $dto->validate();
+  }
+
+  public function testValidateThrowsExceptionForPhoneNumberTooShort(): void
+  {
+    $data = [
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      'email' => 'john@example.com',
+      'phone_number' => '1234567', // 7 digits
+    ];
+
+    $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
+
+    $this->expectException(ApiException::class);
+    $this->expectExceptionCode(422);
+
+    $dto->validate();
+  }
+
+  public function testValidateThrowsExceptionForPhoneNumberTooLong(): void
+  {
+    $data = [
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      'email' => 'john@example.com',
+      'phone_number' => '123456789012345678', // 18 digits
+    ];
+
+    $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
+
+    $this->expectException(ApiException::class);
+    $this->expectExceptionCode(422);
+
+    $dto->validate();
+  }
+
+  public function testValidateAcceptsNullPhoneNumber(): void
+  {
+    $data = [
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      'email' => 'john@example.com',
+    ];
+
+    $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
+    $this->expectNotToPerformAssertions();
+    $dto->validate();
+  }
+
+  public function testValidateAcceptsValidPhoneNumber(): void
+  {
+    $data = [
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      'email' => 'john@example.com',
+      'phone_number' => '87654321',
+    ];
+
+    $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
+    $this->expectNotToPerformAssertions();
+    $dto->validate();
+  }
 }

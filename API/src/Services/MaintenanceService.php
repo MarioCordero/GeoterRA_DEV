@@ -11,6 +11,7 @@ use Core\Logger;
 use DTO\UpdateUserRoleDTO;
 use DTO\AllowedUserRoles;
 use Repositories\UserRepository;
+use Throwable;
 
 /**
  * Service for handling maintenance and infrastructure operations
@@ -53,7 +54,7 @@ final class MaintenanceService
       return array_slice($logs, -500);
     } catch (ApiException $e) {
       throw $e;
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       throw new ApiException(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -77,7 +78,7 @@ final class MaintenanceService
         'pendingRequests' => 5,
         'systemLoad' => 'Moderate',
       ];
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       throw new ApiException(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -105,7 +106,7 @@ final class MaintenanceService
           'count' => count($users),
         ],
       ];
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       throw new ApiException(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -126,7 +127,7 @@ final class MaintenanceService
 
       // Get all tables in current database
       $stmt = $this->pdo->query("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE()");
-      $tables = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+      $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
       $result = [];
 
@@ -134,11 +135,11 @@ final class MaintenanceService
         try {
           // Get table columns info
           $columnsStmt = $this->pdo->query("DESCRIBE $table");
-          $columns = $columnsStmt->fetchAll(\PDO::FETCH_ASSOC);
+          $columns = $columnsStmt->fetchAll(PDO::FETCH_ASSOC);
 
           // Get table data (limit 1000 rows for performance)
           $dataStmt = $this->pdo->query("SELECT * FROM $table LIMIT 1000");
-          $data = $dataStmt->fetchAll(\PDO::FETCH_ASSOC);
+          $data = $dataStmt->fetchAll(PDO::FETCH_ASSOC);
 
           $result[$table] = [
             'columns' => $columns,
@@ -146,14 +147,14 @@ final class MaintenanceService
             'count' => count($data),
             'displayName' => $this->humanizeTableName($table),
           ];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
           Logger::error("Error reading table $table: " . $e->getMessage());
           continue;
         }
       }
 
       return $result;
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       throw new ApiException(ErrorType::internal($e->getMessage()), 500);
     }
   }

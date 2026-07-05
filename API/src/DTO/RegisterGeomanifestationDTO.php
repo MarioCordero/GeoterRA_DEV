@@ -30,8 +30,8 @@ final class RegisterGeomanifestationDTO
     public ?int $provinceSnitCode = null,
     public ?int $cantonSnitCode = null,
     public ?int $districtSnitCode = null,
-    public ?string $currentGeoreportId = null,
     public ?string $description = null,
+    public ?string $currentGeoreportId = null,
     public bool $visibility = false
   ) {}
 
@@ -55,15 +55,15 @@ final class RegisterGeomanifestationDTO
     }
 
     return new self(
-      name: trim((string)$data['name']),
-      latitude: (float)$data['latitude'],
-      longitude: (float)$data['longitude'],
-      provinceSnitCode: isset($data['province_snit_code']) ? (int)$data['province_snit_code'] : null,
-      cantonSnitCode: isset($data['canton_snit_code']) ? (int)$data['canton_snit_code'] : null,
-      districtSnitCode: isset($data['district_snit_code']) ? (int)$data['district_snit_code'] : null,
-      currentGeoreportId: $data['current_georeport_id'] ?? null,
-      description: $data['description'] ?? null,
-      visibility: isset($data['visibility']) ? (bool)$data['visibility'] : false
+      name : trim((string)$data['name']),
+      latitude : (float)$data['latitude'],
+      longitude : (float)$data['longitude'],
+      provinceSnitCode : isset($data['province_snit_code']) ? (int)$data['province_snit_code'] : null,
+      cantonSnitCode : isset($data['canton_snit_code']) ? (int)$data['canton_snit_code'] : null,
+      districtSnitCode : isset($data['district_snit_code']) ? (int)$data['district_snit_code'] : null,
+      description : $data['description'] ?? null,
+      currentGeoreportId : $data['current_georeport_id'] ?? null,
+      visibility : isset($data['visibility']) ? (bool)$data['visibility'] : false
     );
   }
 
@@ -72,7 +72,7 @@ final class RegisterGeomanifestationDTO
    *
    * @return array<string,mixed>
    */
-  public function toDatabaseArray(): array
+  public function toArray(): array
   {
     return [
       'name' => $this->name,

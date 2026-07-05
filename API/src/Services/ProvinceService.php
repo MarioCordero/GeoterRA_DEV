@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Services;
 
-use PDO;
+use DTO\AllowedUserRoles;
+use DTO\ProvinceDTO;
 use Http\ApiException;
 use Http\ErrorType;
 use Http\Request;
-use DTO\ProvinceDTO;
-use DTO\AllowedUserRoles;
+use PDO;
 use Repositories\ProvinceRepository;
 
 /**
@@ -85,7 +85,8 @@ final class ProvinceService
 
     $province = $this->repository->findBySnitCode($snitCode);
     if (!$province) {
-      throw new ApiException(ErrorType::notFound('Province'), 404);
+      throw new ApiException(
+        ErrorType::notFound('Province'), 404);
     }
     return [
       'province_id' => $province->provinceId,

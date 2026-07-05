@@ -43,8 +43,8 @@ class UserServiceTest extends TestCase
     public function testRegisterUserSuccess(): void
     {
         $dto = RegisterUserDTO::fromArray([
-            'name' => 'John',
-            'lastname' => 'Doe',
+            'first_name' => 'John',
+            'last_name' => 'Doe',
             'email' => 'john.new@example.com',
             'password' => 'SecurePass123!'
         ]);
@@ -64,8 +64,8 @@ class UserServiceTest extends TestCase
         $user = $this->createTestUser();
         
         $dto = RegisterUserDTO::fromArray([
-            'name' => 'John',
-            'lastname' => 'Doe',
+            'first_name' => 'John',
+            'last_name' => 'Doe',
             'email' => $user['email'],
             'password' => 'SecurePass123!'
         ]);
@@ -80,10 +80,10 @@ class UserServiceTest extends TestCase
         $this->authenticateUser($user['user_id']);
 
         $dto = UpdateUserDTO::fromArray([
-            'name' => 'Johnny',
-            'lastname' => 'Doe',
+            'first_name' => 'Johnny',
+            'last_name' => 'Doe',
             'email' => $user['email'],
-            'currentPassword' => 'SecurePass123!',
+            'current_password' => 'SecurePass123!',
             'password' => 'NewSecurePass123!'
         ], $user['user_id']);
 

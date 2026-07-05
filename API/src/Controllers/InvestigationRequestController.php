@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace Controllers;
 
-use DTO\PermissionsDTO;
+use DTO\RegisterInvestigationRequestDTO;
+use DTO\UpdateInvestigationRequestDTO;
+use Http\ApiException;
+use Http\ErrorType;
 use Http\Request;
 use Http\Response;
-use Http\ErrorType;
-use Http\ApiException;
-use DTO\InvestigationRequestDTO;
-use Services\InvestigationRequestService;
-use Services\PermissionService;
 use PDO;
+use Services\InvestigationRequestService;
+use Throwable;
 
 /**
  * Controller for handling analysis request (geothermal manifestation request) endpoints.
@@ -33,15 +33,15 @@ final class InvestigationRequestController
   {
     try {
       $body = Request::parseJsonRequest();
-      $dto = InvestigationRequestDTO::fromArray($body);
-      $id = $this->service->create($dto);
-      Response::success([
-        'message' => 'Analysis request created successfully',
-        'request_id' => $id
-      ], null, 201);
+      $dto = RegisterInvestigationRequestDTO::fromArray($body);
+
+      $result = $this->service->create($dto);
+      Response::success(
+        $result, null, 201
+      );
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -57,7 +57,7 @@ final class InvestigationRequestController
       Response::success($requests);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -70,17 +70,17 @@ final class InvestigationRequestController
   {
     try {
       $request = $this->service->getById($id);
-      Response::success($request->toArray());
+      Response::success($request);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
 
   /**
    * GET /analysis-request/{id}/states
-   * Returns all state history for a request (accessible by owner or admin).
+   * Returns all state history for a request (accessible for owner).
    */
   public function states(string $id): void
   {
@@ -89,7 +89,23 @@ final class InvestigationRequestController
       Response::success($states);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
+
+  /**
+   * GET /admin/analysis-request/{id}/states
+   * Returns all state history for a request (accessible by admin).
+   */
+  public function adminStates(string $id): void
+  {
+    try {
+      $states = $this->service->adminGetStates($id);
+      Response::success($states);
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getCode());
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -102,12 +118,13 @@ final class InvestigationRequestController
   {
     try {
       $body = Request::parseJsonRequest();
-      $dto = InvestigationRequestDTO::fromArray($body);
-      $this->service->update($id, $dto);
-      Response::success(['message' => 'Analysis request updated successfully']);
+      $dto = UpdateInvestigationRequestDTO::fromArray($body);
+
+      $result = $this->service->update($id, $dto);
+      Response::success($result, null, 201);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -123,7 +140,7 @@ final class InvestigationRequestController
       Response::success(['message' => 'Analysis request deleted successfully']);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -135,12 +152,11 @@ final class InvestigationRequestController
   public function adminIndex(): void
   {
     try {
-
       $requests = $this->service->getAll();
       Response::success($requests);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -153,31 +169,31 @@ final class InvestigationRequestController
   {
     try {
       $request = $this->service->adminGetById($id);
-      Response::success($request->toArray());
+      Response::success($request);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
-
-  /**
-   * PUT /admin/analysis-request/{id}
-   * Updates any analysis request (admin only, no state restriction).
-   */
-  public function adminUpdate(string $id): void
-  {
-    try {
-      $body = Request::parseJsonRequest();
-      $dto = InvestigationRequestDTO::fromArray($body);
-      $this->service->adminUpdate($id, $dto);
-      Response::success(['message' => 'Analysis request updated successfully']);
-    } catch (ApiException $e) {
-      Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
-      Response::error(ErrorType::internal($e->getMessage()), 500);
-    }
-  }
+//
+//  /**
+//   * PUT /admin/analysis-request/{id}
+//   * Updates any analysis request (admin only, no state restriction).
+//   */
+//  public function adminUpdate(string $id): void
+//  {
+//    try {
+//      $body = Request::parseJsonRequest();
+//      $dto = UpdateInvestigationRequestDTO::fromArray($body);
+//      $this->service->adminUpdate($id, $dto);
+//      Response::success(['message' => 'Analysis request updated successfully']);
+//    } catch (ApiException $e) {
+//      Response::error($e->getError(), $e->getCode());
+//    } catch (Throwable $e) {
+//      Response::error(ErrorType::internal($e->getMessage()), 500);
+//    }
+//  }
 
   /**
    * POST /admin/analysis-request/{id}/states
@@ -197,7 +213,7 @@ final class InvestigationRequestController
       Response::success(['message' => 'State added successfully']);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -213,7 +229,7 @@ final class InvestigationRequestController
       Response::success(['message' => 'Analysis request deleted successfully']);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }

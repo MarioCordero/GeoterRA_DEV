@@ -2,9 +2,13 @@
 declare(strict_types=1);
 namespace Tests;
 
+use Core\UlidGenerator;
+use DateTime;
+use PDO;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 use Http\ApiException;
 use Http\ErrorType;
+use Throwable;
 
 /**
  * Base TestCase for all GeoterRA API tests
@@ -16,7 +20,7 @@ use Http\ErrorType;
  */
 abstract class TestCase extends PHPUnitTestCase
 {
-    protected \PDO $pdo;
+    protected PDO $pdo;
 
     protected function setUp(): void
     {
@@ -52,7 +56,7 @@ abstract class TestCase extends PHPUnitTestCase
     protected function createTestUser(array $overrides = []): array
     {
         // Mapeamos los campos a los nombres reales de tu base de datos
-        $userId = $overrides['user_id'] ?? $overrides['id'] ?? \Core\UlidGenerator::generate();
+        $userId = $overrides['user_id'] ?? $overrides['id'] ?? UlidGenerator::generate();
         $firstName = $overrides['first_name'] ?? $overrides['name'] ?? 'Test';
         $lastName = $overrides['last_name'] ?? $overrides['lastname'] ?? 'User';
         $email = $overrides['email'] ?? 'testuser' . rand(1000, 9999) . '@example.com';
@@ -84,10 +88,10 @@ abstract class TestCase extends PHPUnitTestCase
     /**
      * Generate test access token
      */
-    protected function createTestAccessToken(string $userId, ?\DateTime $expiresAt = null): array
+    protected function createTestAccessToken(string $userId, ?DateTime $expiresAt = null): array
     {
         if ($expiresAt === null) {
-            $expiresAt = new \DateTime('+1 hour');
+            $expiresAt = new DateTime('+1 hour');
         }
 
         $token = bin2hex(random_bytes(32));
@@ -98,7 +102,7 @@ abstract class TestCase extends PHPUnitTestCase
              VALUES (?, ?, ?, ?)'
         );
         
-        $stmt->execute([\Core\UlidGenerator::generate(), $userId, $tokenHash, $expiresAt->format('Y-m-d H:i:s')]);
+        $stmt->execute([UlidGenerator::generate(), $userId, $tokenHash, $expiresAt->format('Y-m-d H:i:s')]);
 
         return [
             'user_id' => $userId,
@@ -111,10 +115,10 @@ abstract class TestCase extends PHPUnitTestCase
     /**
      * Generate test refresh token
      */
-    protected function createTestRefreshToken(string $userId, ?\DateTime $expiresAt = null): array
+    protected function createTestRefreshToken(string $userId, ?DateTime $expiresAt = null): array
     {
         if ($expiresAt === null) {
-            $expiresAt = new \DateTime('+30 days');
+            $expiresAt = new DateTime('+30 days');
         }
 
         $token = bin2hex(random_bytes(64));
@@ -125,7 +129,7 @@ abstract class TestCase extends PHPUnitTestCase
              VALUES (?, ?, ?, ?, ?)'
         );
         
-        $stmt->execute([\Core\UlidGenerator::generate(), $userId, $tokenHash, \Core\UlidGenerator::generate(), $expiresAt->format('Y-m-d H:i:s')]);
+        $stmt->execute([UlidGenerator::generate(), $userId, $tokenHash, UlidGenerator::generate(), $expiresAt->format('Y-m-d H:i:s')]);
 
         return [
             'user_id' => $userId,
@@ -139,7 +143,7 @@ abstract class TestCase extends PHPUnitTestCase
      * Assert that an exception is ApiException with specific error
      */
     protected function assertApiException(
-        \Throwable $exception,
+        Throwable $exception,
         string $expectedErrorType,
         int $expectedStatus
     ): void {
@@ -166,7 +170,6 @@ abstract class TestCase extends PHPUnitTestCase
      */
     protected function getUserById(string $userId): ?array
     {
-        // Cambiado de 'id' a 'user_id'
         $stmt = $this->pdo->prepare('SELECT * FROM users WHERE user_id = ? AND deleted_at IS NULL');
         $stmt->execute([$userId]);
         return $stmt->fetch() ?: null;

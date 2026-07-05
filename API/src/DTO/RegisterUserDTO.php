@@ -11,15 +11,15 @@ use OpenApi\Annotations as OA;
  *   schema="RegisterUserDTO",
  *   type="object",
  *   description="Datos de registro de nuevo usuario",
- *   required={"name", "lastname", "email", "password"},
+ *   required={"first_name", "last_name", "email", "password"},
  *   @OA\Property(
- *     property="name",
+ *     property="first_name",
  *     type="string",
  *     description="Nombre del usuario",
  *     example="Juan"
  *   ),
  *   @OA\Property(
- *     property="lastname",
+ *     property="last_name",
  *     type="string",
  *     description="Apellido del usuario",
  *     example="Pérez"
@@ -60,8 +60,8 @@ final class RegisterUserDTO
   public static function fromArray(array $data): self
   {
     return new self(
-      trim($data['name'] ?? ''),
-      trim($data['lastname'] ?? ''),
+      trim($data['first_name'] ?? ''),
+      trim($data['last_name'] ?? ''),
       strtolower(trim($data['email'] ?? '')),
       $data['phone_number'] ?? null,
       $data['password'] ?? ''
@@ -74,11 +74,11 @@ final class RegisterUserDTO
   public function validate(): void
   {
     if ($this->firstName === '') {
-      throw new ApiException(ErrorType::missingField('name'), 422);
+      throw new ApiException(ErrorType::missingField('first_name'), 422);
     }
 
     if ($this->lastName === '') {
-      throw new ApiException(ErrorType::missingField('lastname'), 422);
+      throw new ApiException(ErrorType::missingField('last_name'), 422);
     }
 
     if ($this->email === '') {

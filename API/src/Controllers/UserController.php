@@ -11,9 +11,9 @@ use Http\Response;
 use Http\Request;
 use Http\ErrorType;
 use Http\ApiException;
-use Services\PermissionService;
 use Services\UserService;
 use PDO;
+use Throwable;
 
 final class UserController
 {
@@ -37,7 +37,7 @@ final class UserController
       Response::success($result['data'], $result['meta'], 201);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -55,10 +55,12 @@ final class UserController
         throw new ApiException(ErrorType::missingField('email'), 422);
       }
       $this->userService->restoreAccount($data['email']);
-      Response::success(['message' => 'Account restored successfully. You can now log in.']);
+      Response::success(
+        ['message' => 'Account restored successfully. You can now log in.']
+      );
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -73,10 +75,14 @@ final class UserController
       $body = Request::parseJsonRequest();
       $dto = UpdateUserDTO::fromArray($body);
       $this->userService->updateUser($dto);
-      Response::success(['message' => 'User profile updated successfully'], null, 200);
+      Response::success(
+        ['message' => 'User profile updated successfully'],
+        null,
+        200
+      );
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -96,10 +102,14 @@ final class UserController
       $body = Request::parseJsonRequest();
       $dto = UpdateUserRoleDTO::fromArray($body, $id);
       $this->userService->updateUserRole($dto);
-      Response::success(['message' => 'User role updated successfully']);
+      Response::success(
+        ['message' => 'User role updated successfully'],
+        null,
+        200
+      );
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -112,10 +122,14 @@ final class UserController
   {
     try {
       $this->userService->deleteCurrentUser();
-      Response::success(['message' => 'User account deleted successfully'], null, 200);
+      Response::success(
+        ['message' => 'User account deleted successfully'],
+        null,
+        200
+      );
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -128,10 +142,14 @@ final class UserController
   {
     try {
       $result = $this->userService->getCurrentUser();
-      Response::success($result['data'], $result['meta'], 200);
+      Response::success(
+        $result['data'],
+        $result['meta'],
+        200
+      );
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
@@ -147,7 +165,7 @@ final class UserController
       Response::success($user, null, 200);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
