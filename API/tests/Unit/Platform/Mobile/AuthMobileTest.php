@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Platform\Mobile;
 
+use DateTime;
+use Services\AuthService;
 use Tests\TestCase;
 use DTO\LoginUserDTO;
 use Http\ApiException;
@@ -16,12 +18,12 @@ use Http\ApiException;
  */
 class AuthMobileTest extends TestCase
 {
-    private \Services\AuthService $authService;
+    private AuthService $authService;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->authService = new \Services\AuthService($this->pdo);
+        $this->authService = new AuthService($this->pdo);
     }
     public function testMobileLoginReturnsBearerToken(): void
     {
@@ -160,7 +162,7 @@ class AuthMobileTest extends TestCase
         // Create expired refresh token (older than 30 days)
         $expiredRefresh = $this->createTestRefreshToken(
             $user['id'],
-            new \DateTime('-31 days')
+            new DateTime('-31 days')
         );
 
         // Should not be able to refresh with expired token

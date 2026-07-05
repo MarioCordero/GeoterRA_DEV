@@ -1,0 +1,460 @@
+---
+sidebar_position: 2
+---
+
+# Data Schemas
+
+## Available Schemas
+
+### AllowedUserRoles
+
+```json
+{
+  "description": "Roles permitidos en el sistema GeoterRA",
+  "type": "string",
+  "enum": [
+    "admin",
+    "maintenance",
+    "user"
+  ]
+}
+```
+
+### AnalysisRequestDTO
+
+```json
+{
+  "description": "Solicitud de análisis de punto geotérmico",
+  "required": [
+    "region",
+    "email",
+    "temperature_sensation",
+    "latitude",
+    "longitude"
+  ],
+  "properties": {
+    "region": {
+      "description": "ID de la región",
+      "type": "integer",
+      "example": 1
+    },
+    "email": {
+      "description": "Email de contacto del solicitante",
+      "type": "string",
+      "format": "email",
+      "example": "contact@example.com"
+    },
+    "owner_contact_number": {
+      "description": "Número de contacto del dueño",
+      "type": "string",
+      "example": "87654321",
+      "nullable": true
+    },
+    "owner_name": {
+      "description": "Nombre del dueño del terreno",
+      "type": "string",
+      "example": "Carlos Mendoza",
+      "nullable": true
+    },
+    "temperature_sensation": {
+      "description": "Percepción térmica del lugar",
+      "type": "string",
+      "example": "Cálido",
+      "enum": [
+        "Muy frío",
+        "Frío",
+        "Templado",
+        "Cálido",
+        "Muy Caliente",
+        "caliente"
+      ]
+    },
+    "bubbles": {
+      "description": "¿Hay burbujas de gas?",
+      "type": "boolean",
+      "example": false
+    },
+    "details": {
+      "description": "Detalles adicionales del punto",
+      "type": "string",
+      "example": "Zona con actividad geotérmica notable",
+      "nullable": true
+    },
+    "current_usage": {
+      "description": "Uso actual del terreno",
+      "type": "string",
+      "example": "Agrícola",
+      "nullable": true
+    },
+    "latitude": {
+      "description": "Latitud del punto en grados decimales",
+      "type": "number",
+      "format": "float",
+      "example": 10.463
+    },
+    "longitude": {
+      "description": "Longitud del punto en grados decimales",
+      "type": "number",
+      "format": "float",
+      "example": -85.4519
+    },
+    "state": {
+      "description": "Estado actual de la solicitud",
+      "type": "string",
+      "example": "Registrada",
+      "nullable": true,
+      "enum": [
+        "Registrada",
+        "En revisión",
+        "Verificación de campo",
+        "Análisis en laboratorio",
+        "Aprobada",
+        "Rechazada",
+        "Archivada"
+      ]
+    }
+  },
+  "type": "object"
+}
+```
+
+### LoginUserDTO
+
+```json
+{
+  "description": "Credenciales de usuario para autenticación",
+  "required": [
+    "email",
+    "password"
+  ],
+  "properties": {
+    "email": {
+      "description": "Correo electrónico del usuario",
+      "type": "string",
+      "format": "email",
+      "example": "user@example.com"
+    },
+    "password": {
+      "description": "Contraseña del usuario (mínimo 8 caracteres)",
+      "type": "string",
+      "format": "password",
+      "example": "SecurePassword123"
+    }
+  },
+  "type": "object"
+}
+```
+
+### RegionDTO
+
+```json
+{
+  "description": "Región de Costa Rica",
+  "required": [
+    "name"
+  ],
+  "properties": {
+    "name": {
+      "description": "Nombre de la región de Costa Rica",
+      "type": "string",
+      "example": "Guanacaste",
+      "enum": [
+        "Guanacaste",
+        "Alajuela",
+        "San José",
+        "Puntarenas",
+        "Limón",
+        "Heredia",
+        "Cartago"
+      ]
+    }
+  },
+  "type": "object"
+}
+```
+
+### RegisterUserDTO
+
+```json
+{
+  "description": "Datos de registro de nuevo usuario",
+  "required": [
+    "name",
+    "lastname",
+    "email",
+    "password"
+  ],
+  "properties": {
+    "name": {
+      "description": "Nombre del usuario",
+      "type": "string",
+      "example": "Juan"
+    },
+    "lastname": {
+      "description": "Apellido del usuario",
+      "type": "string",
+      "example": "Pérez"
+    },
+    "email": {
+      "description": "Correo electrónico único",
+      "type": "string",
+      "format": "email",
+      "example": "juan@example.com"
+    },
+    "phone_number": {
+      "description": "Número telefónico (8-15 dígitos)",
+      "type": "string",
+      "example": "87654321",
+      "nullable": true
+    },
+    "password": {
+      "description": "Contraseña (mínimo 8 caracteres)",
+      "type": "string",
+      "format": "password",
+      "example": "SecurePass123"
+    }
+  },
+  "type": "object"
+}
+```
+
+### RegisteredManifestationDTO
+
+```json
+{
+  "description": "Manifestación geotérmica registrada con datos físicos y químicos",
+  "required": [
+    "name",
+    "region_id",
+    "latitude",
+    "longitude"
+  ],
+  "properties": {
+    "name": {
+      "description": "Nombre del sitio geotérmico",
+      "type": "string",
+      "example": "Fuente Termomineral Tabacón"
+    },
+    "region_id": {
+      "description": "ID de la región de Costa Rica",
+      "type": "integer",
+      "example": 1
+    },
+    "latitude": {
+      "description": "Latitud en grados decimales",
+      "type": "number",
+      "format": "float",
+      "example": 10.4606
+    },
+    "longitude": {
+      "description": "Longitud en grados decimales",
+      "type": "number",
+      "format": "float",
+      "example": -84.9677
+    },
+    "description": {
+      "description": "Descripción detallada del sitio",
+      "type": "string",
+      "example": "Fuente natural con agua caliente",
+      "nullable": true
+    },
+    "temperature": {
+      "description": "Temperatura en grados Celsius (0-250°C)",
+      "type": "number",
+      "format": "float",
+      "example": 45.5,
+      "nullable": true
+    },
+    "field_pH": {
+      "description": "pH medido en campo (0-14)",
+      "type": "number",
+      "format": "float",
+      "example": 7.5,
+      "nullable": true
+    },
+    "field_conductivity": {
+      "description": "Conductividad en campo en µS/cm",
+      "type": "number",
+      "format": "float",
+      "example": 1200.5,
+      "nullable": true
+    },
+    "lab_pH": {
+      "description": "pH medido en laboratorio (0-14)",
+      "type": "number",
+      "format": "float",
+      "example": 7.4,
+      "nullable": true
+    },
+    "lab_conductivity": {
+      "description": "Conductividad en laboratorio en µS/cm",
+      "type": "number",
+      "format": "float",
+      "example": 1180.3,
+      "nullable": true
+    },
+    "cl": {
+      "description": "Cloruros (Cl) en mg/L",
+      "type": "number",
+      "format": "float",
+      "example": 250.5,
+      "nullable": true
+    },
+    "ca": {
+      "description": "Calcio (Ca) en mg/L",
+      "type": "number",
+      "format": "float",
+      "example": 45.2,
+      "nullable": true
+    },
+    "hco3": {
+      "description": "Bicarbonatos (HCO3) en mg/L",
+      "type": "number",
+      "format": "float",
+      "example": 120.8,
+      "nullable": true
+    },
+    "so4": {
+      "description": "Sulfatos (SO4) en mg/L",
+      "type": "number",
+      "format": "float",
+      "example": 30.1,
+      "nullable": true
+    },
+    "fe": {
+      "description": "Hierro (Fe) en mg/L",
+      "type": "number",
+      "format": "float",
+      "example": 0.5,
+      "nullable": true
+    },
+    "si": {
+      "description": "Sílice (Si) en mg/L",
+      "type": "number",
+      "format": "float",
+      "example": 80.2,
+      "nullable": true
+    },
+    "b": {
+      "description": "Boro (B) en mg/L",
+      "type": "number",
+      "format": "float",
+      "example": 1.2,
+      "nullable": true
+    },
+    "li": {
+      "description": "Litio (Li) en mg/L",
+      "type": "number",
+      "format": "float",
+      "example": 0.3,
+      "nullable": true
+    },
+    "f": {
+      "description": "Fluoruro (F) en mg/L",
+      "type": "number",
+      "format": "float",
+      "example": 0.8,
+      "nullable": true
+    },
+    "na": {
+      "description": "Sodio (Na) en mg/L",
+      "type": "number",
+      "format": "float",
+      "example": 150.5,
+      "nullable": true
+    },
+    "k": {
+      "description": "Potasio (K) en mg/L",
+      "type": "number",
+      "format": "float",
+      "example": 25.3,
+      "nullable": true
+    },
+    "mg": {
+      "description": "Magnesio (Mg) en mg/L",
+      "type": "number",
+      "format": "float",
+      "example": 10.5,
+      "nullable": true
+    }
+  },
+  "type": "object"
+}
+```
+
+### UpdateUserDTO
+
+```json
+{
+  "description": "Datos para actualizar perfil de usuario",
+  "required": [
+    "firstName",
+    "lastName",
+    "email"
+  ],
+  "properties": {
+    "firstName": {
+      "description": "Nombre del usuario",
+      "type": "string",
+      "example": "Juan"
+    },
+    "lastName": {
+      "description": "Apellido del usuario",
+      "type": "string",
+      "example": "Pérez"
+    },
+    "email": {
+      "description": "Correo electrónico",
+      "type": "string",
+      "format": "email",
+      "example": "juan.perez@example.com"
+    },
+    "phoneNumber": {
+      "description": "Número telefónico (8-15 dígitos)",
+      "type": "string",
+      "example": "87654321",
+      "nullable": true
+    },
+    "currentPassword": {
+      "description": "Contraseña actual requerida para cambiar contraseña",
+      "type": "string",
+      "format": "password",
+      "example": "OldPassword123",
+      "nullable": true
+    },
+    "password": {
+      "description": "Nueva contraseña (mínimo 8 caracteres)",
+      "type": "string",
+      "format": "password",
+      "example": "NewPassword123",
+      "nullable": true
+    }
+  },
+  "type": "object"
+}
+```
+
+### UpdateUserRoleDTO
+
+```json
+{
+  "description": "Datos para actualizar el rol de un usuario (solo administradores)",
+  "required": [
+    "role"
+  ],
+  "properties": {
+    "role": {
+      "description": "Nuevo rol del usuario",
+      "type": "string",
+      "example": "maintenance",
+      "enum": [
+        "admin",
+        "maintenance",
+        "user"
+      ]
+    }
+  },
+  "type": "object"
+}
+```
+

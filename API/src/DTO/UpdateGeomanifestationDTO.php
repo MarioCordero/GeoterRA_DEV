@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace DTO;
@@ -44,15 +45,15 @@ final class UpdateGeomanifestationDTO
   public static function fromArray(array $data): self
   {
     return new self(
-      name: isset($data['name']) ? trim((string)$data['name']) : null,
-      latitude: isset($data['latitude']) ? (float)$data['latitude'] : null,
-      longitude: isset($data['longitude']) ? (float)$data['longitude'] : null,
-      provinceSnitCode: isset($data['province_snit_code']) ? (int)$data['province_snit_code'] : null,
-      cantonSnitCode: isset($data['canton_snit_code']) ? (int)$data['canton_snit_code'] : null,
-      districtSnitCode: isset($data['district_snit_code']) ? (int)$data['district_snit_code'] : null,
+      name: isset($data['name']) ? trim((string) $data['name']) : null,
+      latitude: isset($data['latitude']) ? (float) $data['latitude'] : null,
+      longitude: isset($data['longitude']) ? (float) $data['longitude'] : null,
+      provinceSnitCode: isset($data['province_snit_code']) ? (int) $data['province_snit_code'] : null,
+      cantonSnitCode: isset($data['canton_snit_code']) ? (int) $data['canton_snit_code'] : null,
+      districtSnitCode: isset($data['district_snit_code']) ? (int) $data['district_snit_code'] : null,
       currentGeoreportId: $data['current_georeport_id'] ?? null,
       description: $data['description'] ?? null,
-      visibility: isset($data['visibility']) ? (bool)$data['visibility'] : null
+      visibility: isset($data['visibility']) ? (bool) $data['visibility'] : null
     );
   }
 
@@ -62,7 +63,7 @@ final class UpdateGeomanifestationDTO
    *
    * @return array<string,mixed>
    */
-  public function toUpdateArray(): array
+  public function toArray(): array
   {
     $update = [];
 
@@ -105,22 +106,43 @@ final class UpdateGeomanifestationDTO
   public function validate(): void
   {
     if ($this->name !== null && strlen($this->name) > 255) {
-      throw new ApiException(ErrorType::invalidField('name (max 255 characters)'), 422);
+      throw new ApiException(
+        ErrorType::invalidField('name (max 255 characters)'),
+        422
+      );
     }
     if ($this->latitude !== null && ($this->latitude < -90 || $this->latitude > 90)) {
-      throw new ApiException(ErrorType::invalidField('latitude'), 422);
+      throw new ApiException(
+        ErrorType::invalidField('latitude'),
+        422
+      );
     }
-    if ($this->longitude !== null && ($this->longitude < -180 || $this->longitude > 180)) {
-      throw new ApiException(ErrorType::invalidField('longitude'), 422);
+    if (
+      $this->longitude !== null
+      && ($this->longitude < -180 || $this->longitude > 180)
+    ) {
+      throw new ApiException(
+        ErrorType::invalidField('longitude'),
+        422
+      );
     }
     if ($this->provinceSnitCode !== null && $this->provinceSnitCode <= 0) {
-      throw new ApiException(ErrorType::invalidField('province_snit_code'), 422);
+      throw new ApiException(
+        ErrorType::invalidField('province_snit_code'),
+        422
+      );
     }
     if ($this->cantonSnitCode !== null && $this->cantonSnitCode <= 0) {
-      throw new ApiException(ErrorType::invalidField('canton_snit_code'), 422);
+      throw new ApiException(
+        ErrorType::invalidField('canton_snit_code'),
+        422
+      );
     }
     if ($this->districtSnitCode !== null && $this->districtSnitCode <= 0) {
-      throw new ApiException(ErrorType::invalidField('district_snit_code'), 422);
+      throw new ApiException(
+        ErrorType::invalidField('district_snit_code'),
+        422
+      );
     }
   }
 }
