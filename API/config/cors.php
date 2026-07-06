@@ -5,6 +5,12 @@ use Core\EnvironmentDetector;
 
 require_once __DIR__ . '/../src/Core/EnvironmentDetector.php';
 
+// Normalization for Reverse Proxies / SSL termination before doing any calculation
+if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+    $_SERVER['HTTPS'] = 'on';
+    $_SERVER['SERVER_PORT'] = 443;
+}
+
 // Extract origin from request
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
@@ -17,14 +23,12 @@ $allowedOrigins = [
     'http://localhost:3000',
     'http://127.0.0.1:5173',
     'http://127.0.0.1:3000',
-    
-    // Production domain (both HTTP and HTTPS)
-    'http://geoterra.com',
-    'http://geoterra.com:5173',
-    'https://geoterra.com',
-    'https://geoterra.com:5173',
-    
-    // Remote server (your public IP - adjust as needed)
+
+    // Production UCR Institutional domain (both HTTP and HTTPS)
+    'http://geoterra.inii.ucr.ac.cr',
+    'https://geoterra.inii.ucr.ac.cr',
+
+    // Remote server (Public IP fallback - adjust as needed)
     'http://163.178.171.105',
     'https://163.178.171.105',
 ];
