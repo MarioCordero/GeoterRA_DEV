@@ -154,19 +154,19 @@ final class Request
         self::$user = $user;
     }
 
-    /**
-     * Retrieves the authenticated user data.
-     *
-     * @return array<mixed>|null The user details or null if the request is
-     * unauthenticated.
-     */
-    public static function getUser(): ?array
-    {
-        if (!self::$user === null) {
-            throw new ApiException(ErrorType::unauthorized());
-        }
-        return self::$user;
+  /**
+   * Retrieves the authenticated user data.
+   *
+   * @return array<mixed>|null The user details or null if the request is
+   * unauthenticated.
+   */
+  public static function getUser(): ?array
+  {
+    if (self::$user === null) {
+      throw new ApiException(ErrorType::unauthorized());
     }
+    return self::$user;
+  }
 
     public static function requireRole(array $allowedRoles): array
     {
