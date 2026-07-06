@@ -1,8 +1,12 @@
 RewriteEngine On
 
-# If the requested file or directory exists, serve it directly
+# BACKEND
+RewriteCond %{REQUEST_URI} ^/API/public/ [NC]
+RewriteRule ^API/public/(.*)$ API/public/index.php [QSA,L]
+
+# REACT SPA
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-# Redirect all other requests to index.php
+# OTHERS FROM FRONTEND.
 RewriteRule ^ index.php [QSA,L]
