@@ -24,12 +24,10 @@ $allowedOrigins = [
     'http://127.0.0.1:5173',
     'http://127.0.0.1:3000',
 
-    // Production UCR Institutional domain (both HTTP and HTTPS)
-    'http://geoterra.inii.ucr.ac.cr',
+    // Production UCR Institutional domain (HTTPS only)
     'https://geoterra.inii.ucr.ac.cr',
 
-    // Remote server (Public IP fallback - adjust as needed)
-    'http://163.178.171.105',
+    // Remote server (HTTPS only)
     'https://163.178.171.105',
 ];
 
@@ -38,10 +36,15 @@ $isAllowedOrigin = in_array($origin, $allowedOrigins) || $origin === $currentOri
 
 if ($isAllowedOrigin) {
     header("Access-Control-Allow-Origin: {$origin}");
-    header('Access-Control-Allow-Credentials: true');  // Critical for cookies
+    header('Access-Control-Allow-Credentials: true');
     header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, Authorization, x-api-key');
     header('Access-Control-Max-Age: 86400');
+    
+    // For HTTPS with credentials, SameSite must be None
+    if (EnvironmentDetector::isHttps()) {
+        header('Access-Control-Allow-Private-Network: true');
+    }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {

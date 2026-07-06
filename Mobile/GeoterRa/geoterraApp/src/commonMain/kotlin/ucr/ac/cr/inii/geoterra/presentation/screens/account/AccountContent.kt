@@ -106,7 +106,10 @@ fun AccountContent(
           DangerActionItem(
             Icons.AutoMirrored.Filled.Logout,
             "Cerrar sesión",
-            onClick = { showLogoutDialog = true })
+            onClick = {
+              showLogoutDialog = true
+            }
+          )
           DangerActionItem(
             Icons.Default.DeleteForever,
             "Eliminar cuenta",
@@ -129,7 +132,9 @@ fun AccountContent(
       title = "¿Cerrar sesión?",
       message = "Tu sesión actual finalizará. Deberás ingresar tus credenciales la próxima vez.",
       confirmText = "Salir",
-      onConfirm = onLogoutClick,
+      onConfirm = {
+        onLogoutClick()
+        showLogoutDialog = false },
       onDismiss = { showLogoutDialog = false }
     )
   }
@@ -140,7 +145,9 @@ fun AccountContent(
       message = "Esta acción es irreversible. Se borrarán todas tus solicitudes y datos de campo permanentemente.",
       confirmText = "Eliminar",
       isDanger = true,
-      onConfirm = onDeleteAccountClick,
+      onConfirm = {
+//        onDeleteAccountClick()
+        showDeleteDialog = false },
       onDismiss = { showDeleteDialog = false }
     )
   }

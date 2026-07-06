@@ -19,6 +19,7 @@ import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ucr.ac.cr.inii.geoterra.presentation.screens.editProfile.EditProfileScreen
+import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginScreen
 
 /**
  * Voyager Screen implementation for Home.
@@ -51,6 +52,7 @@ class AccountScreen : Screen {
         state = state,
         onLogoutClick = {
           viewModel.logout()
+          navigator.replaceAll(LoginScreen())
         },
         onDeleteAccountClick = {
           viewModel.deleteAccount()
