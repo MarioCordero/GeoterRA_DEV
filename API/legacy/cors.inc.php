@@ -5,8 +5,8 @@
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost",
-        "http://geoterra.com:5173",
-        "http://geoterra.com",
+        "https://geoterra.inii.ucr.ac.cr:5173",
+        "https://geoterra.inii.ucr.ac.cr",
         "https://163.178.171.105",
         "http://163.178.171.105",
         'http://localhost:3000',    // Keep for backward compatibility
@@ -20,7 +20,7 @@
         $cookie_domain = '';
     } else {
         // For production domains
-        $cookie_domain = 'geoterra.com';
+        $cookie_domain = 'geoterra.inii.ucr.ac.cr"';
     }
 
     // Session configuration - dynamic based on environment
