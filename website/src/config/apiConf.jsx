@@ -2,8 +2,8 @@ const API_CONFIG = {
   environment: import.meta.env.MODE === 'production' ? 'production' : 'local',
   
   baseUrls: {
-    production: 'http://163.178.171.105/API/public',
-    local: 'http://localhost:8000/API/public'
+    production: 'https://geoterra.inii.ucr.ac.cr/api/public',
+    local: 'http://localhost:8000/api/public'
   },
 
   // TODO: HIDE THE APIKEY
