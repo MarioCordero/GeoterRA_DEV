@@ -328,7 +328,7 @@ final class GeomanifestationService
   }
 
   /**
-   * Returns paginated list of all manifestations (admin only).
+   * Returns a paginated list of all manifestations (admin only).
    *
    * @param int $page
    * @param int $limit
@@ -410,41 +410,29 @@ final class GeomanifestationService
     ?int $cantonSnitCode,
     ?int $districtSnitCode
   ): void {
-    // If any is provided, all must be provided
-    $provided = array_filter(
-      [$provinceSnitCode, $cantonSnitCode, $districtSnitCode],
-      fn($v) => $v !== null
-    );
-    if (!empty($provided) && count($provided) !== 3) {
+    if ($districtSnitCode !== null && ($cantonSnitCode === null || $provinceSnitCode === null)) {
       throw new ApiException(
         ErrorType::invalidField(
-          'SNIT codes: province, canton and district must be provided together'
+          'District filter requires Canton and Province SNIT codes'
         ),
         422
       );
     }
 
-    if ($provinceSnitCode === null) {
-      return; // nothing to validate
-    }
-
-    // Validate existence (already done in repositories, but we double-check)
-    if (!$this->provinceRepository->existsBySnitCode($provinceSnitCode)) {
+    if ($cantonSnitCode !== null && $provinceSnitCode === null) {
       throw new ApiException(
-        ErrorType::invalidField('province_snit_code'), 422
-      );
-    }
-    if (!$this->cantonRepository->existsBySnitCode($cantonSnitCode)) {
-      throw new ApiException(ErrorType::invalidField('canton_snit_code'), 422);
-    }
-    if (!$this->districtRepository->existsBySnitCode($districtSnitCode)) {
-      throw new ApiException(
-        ErrorType::invalidField('district_snit_code'), 422
+        ErrorType::invalidField('Canton filter requires Province SNIT code'),
+        422
       );
     }
 
-    // Hierarchy: canton must start with province digits
-    if (!str_starts_with((string)$cantonSnitCode, (string)$provinceSnitCode)) {
+    $this->validateLocationReferences(
+      $provinceSnitCode, $cantonSnitCode, $districtSnitCode
+    );
+
+    if ($cantonSnitCode !== null && $provinceSnitCode !== null && !str_starts_with(
+        (string)$cantonSnitCode, (string)$provinceSnitCode
+      )) {
       throw new ApiException(
         ErrorType::invalidField(
           'canton_snit_code does not belong to the given province'
@@ -452,8 +440,10 @@ final class GeomanifestationService
         422
       );
     }
-    // District must start with canton digits
-    if (!str_starts_with((string)$districtSnitCode, (string)$cantonSnitCode)) {
+
+    if ($districtSnitCode !== null && $cantonSnitCode !== null && !str_starts_with(
+        (string)$districtSnitCode, (string)$cantonSnitCode
+      )) {
       throw new ApiException(
         ErrorType::invalidField(
           'district_snit_code does not belong to the given canton'
@@ -490,7 +480,8 @@ final class GeomanifestationService
   }
 
   /**
-   * Returns paginated list of visible manifestations filtered by province (public).
+   * Returns a paginated list of visible manifestations filtered by province
+   * (public).
    *
    * @param int $provinceSnitCode
    * @param int $page
@@ -514,7 +505,7 @@ final class GeomanifestationService
   }
 
   /**
-   * Returns paginated list of visible manifestations (public).
+   * Returns a paginated list of visible manifestations (public).
    *
    * @param int $page
    * @param int $limit
