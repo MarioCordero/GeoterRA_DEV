@@ -43,6 +43,8 @@ final class Request
             ]);
         }
 
+        $headers = self::getHeaders();
+
         self::$apiKey = $headers['-x-api-key'] ?? $_SERVER['HTTP_X_API_KEY'] ?? null;
 
         // Load API keys from environment-aware location
