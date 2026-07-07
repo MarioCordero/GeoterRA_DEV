@@ -1,12 +1,13 @@
 RewriteEngine On
 
+# Force HTTPS on production
 RewriteCond %{HTTP_HOST} ^(geoterra\.inii\.ucr\.ac\.cr|163\.178\.171\.105)$ [NC]
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-RewriteCond %{REQUEST_URI} ^/api/public/(.*)
-RewriteRule ^api/public/(.*)$ /api/$1 [L,R=301]
-
+# If the requested file or directory exists, serve it directly
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ public/index.php [QSA,L]
+
+# Redirect all other requests to index.php
+RewriteRule ^ index.php [QSA,L]
