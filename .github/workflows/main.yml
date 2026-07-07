@@ -130,4 +130,4 @@ jobs:
       # ---------------- TRIGGER REMOTE DEPLOY ----------------
       - name: Trigger remote deploy
         run: |
-          curl -X GET "http://163.178.171.105/pull.sh"
+          curl -X GET "https://geoterra.inii.ucr.ac.cr/pull.sh"
