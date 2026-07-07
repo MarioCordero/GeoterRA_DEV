@@ -241,7 +241,7 @@ final class Request
             $path = '/';
         }
 
-        $basePath = '/API/public';
+        $basePath = '/api';
         $pos = stripos($path, $basePath);
 
         if ($pos === 0) {
