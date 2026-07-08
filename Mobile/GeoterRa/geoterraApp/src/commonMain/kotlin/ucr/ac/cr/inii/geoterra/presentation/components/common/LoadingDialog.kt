@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.components.layout
+package ucr.ac.cr.inii.geoterra.presentation.components.common
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape

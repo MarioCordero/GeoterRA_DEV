@@ -1,21 +1,12 @@
-package ucr.ac.cr.inii.geoterra.presentation.components.layout
+package ucr.ac.cr.inii.geoterra.presentation.components.common
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Error
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -24,9 +15,12 @@ import androidx.compose.ui.unit.dp
 import ucr.ac.cr.inii.geoterra.themes.SuccessGreen
 
 @Composable
-fun StatusDialog(
-  isSuccess: Boolean,
+fun SuccessActionDialog(
+  title: String = "¡Éxito!",
   message: String,
+  confirmText: String = "Aceptar",
+  dismissText: String = "Cerrar",
+  onConfirm: () -> Unit,
   onDismiss: () -> Unit
 ) {
   AlertDialog(
@@ -34,23 +28,22 @@ fun StatusDialog(
     shape = RoundedCornerShape(28.dp),
     containerColor = MaterialTheme.colorScheme.surface,
     icon = {
-      val color = if (isSuccess) SuccessGreen else MaterialTheme.colorScheme.error
       Surface(
-        color = color.copy(alpha = 0.1f),
+        color = SuccessGreen.copy(alpha = 0.1f),
         shape = CircleShape,
         modifier = Modifier.size(64.dp)
       ) {
         Icon(
-          imageVector = if (isSuccess) Icons.Default.CheckCircle else Icons.Default.Error,
+          imageVector = Icons.Default.CheckCircle,
           contentDescription = null,
-          tint = color,
+          tint = SuccessGreen,
           modifier = Modifier.padding(12.dp)
         )
       }
     },
     title = {
       Text(
-        text = if (isSuccess) "¡Éxito!" else "Hubo un problema",
+        text = title,
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.ExtraBold,
         textAlign = TextAlign.Center,
@@ -69,18 +62,20 @@ fun StatusDialog(
     },
     confirmButton = {
       Button(
-        onClick = onDismiss,
-        modifier = Modifier.fillMaxWidth(),
-        colors = ButtonDefaults.buttonColors(
-          containerColor = MaterialTheme.colorScheme.primary
-        ),
-        shape = RoundedCornerShape(12.dp)
+        onClick = onConfirm,
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
       ) {
-        Text(
-          "Aceptar",
-          fontWeight = FontWeight.Bold,
-          color = MaterialTheme.colorScheme.onPrimary
-        )
+        Text(confirmText, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary)
+      }
+    },
+    dismissButton = {
+      OutlinedButton(
+        onClick = onDismiss,
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+      ) {
+        Text(dismissText, color = MaterialTheme.colorScheme.onSurface)
       }
     }
   )

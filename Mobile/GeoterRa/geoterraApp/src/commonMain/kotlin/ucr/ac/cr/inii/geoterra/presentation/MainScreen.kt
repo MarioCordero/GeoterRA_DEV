@@ -22,7 +22,7 @@ import ucr.ac.cr.inii.geoterra.presentation.navigation.HomeTab
 import ucr.ac.cr.inii.geoterra.presentation.navigation.MapTab
 import ucr.ac.cr.inii.geoterra.presentation.navigation.RequestTab
 
-class MainScreen() : Screen {
+class MainScreen : Screen {
   @Composable
   override fun Content() {
     TabNavigator(HomeTab) { tabNavigator ->

@@ -1,55 +1,46 @@
-package ucr.ac.cr.inii.geoterra.presentation.components.layout
+package ucr.ac.cr.inii.geoterra.presentation.components.common
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun PasswordField(
+fun CustomTextField(
   value: String,
   onValueChange: (String) -> Unit,
   label: String,
-  isVisible: Boolean,
-  onToggleVisibility: () -> Unit,
+  icon: ImageVector? = null,
   isError: Boolean = false,
   errorMessage: String? = null,
-  modifier: Modifier = Modifier
+  modifier: Modifier = Modifier,
+  keyboardType: KeyboardType = KeyboardType.Text,
+  singleLine: Boolean = true,
+  minLines: Int = 1,
+  readOnly: Boolean = false
 ) {
   OutlinedTextField(
     value = value,
     onValueChange = onValueChange,
     label = { Text(label) },
+    leadingIcon = icon?.let { { Icon(it, contentDescription = null) } },
     isError = isError,
     supportingText = { if (isError && errorMessage != null) Text(errorMessage) },
     modifier = modifier.fillMaxWidth(),
     shape = RoundedCornerShape(12.dp),
-    singleLine = true,
-    visualTransformation = if (isVisible) VisualTransformation.None else PasswordVisualTransformation(),
-    trailingIcon = {
-      IconButton(onClick = onToggleVisibility) {
-        Icon(
-          imageVector = if (isVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-          contentDescription = null,
-          tint = MaterialTheme.colorScheme.primary
-        )
-      }
-    },
-    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+    keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+    singleLine = singleLine,
+    minLines = minLines,
+    readOnly = readOnly,
     colors = OutlinedTextFieldDefaults.colors(
       unfocusedLabelColor = MaterialTheme.colorScheme.outline,
       focusedLabelColor = MaterialTheme.colorScheme.primary,

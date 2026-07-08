@@ -6,12 +6,16 @@ import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
 import ucr.ac.cr.inii.geoterra.data.model.remote.UserRemote
 import ucr.ac.cr.inii.geoterra.data.repository.AnalysisRequestRepository
 import ucr.ac.cr.inii.geoterra.data.repository.AuthRepository
+import ucr.ac.cr.inii.geoterra.data.repository.CantonRepository
+import ucr.ac.cr.inii.geoterra.data.repository.DistrictRepository
 import ucr.ac.cr.inii.geoterra.data.repository.ManifestationRepository
 import ucr.ac.cr.inii.geoterra.data.repository.ProvinceRepository
 import ucr.ac.cr.inii.geoterra.data.repository.UserRepository
 import ucr.ac.cr.inii.geoterra.domain.pdf.PDFManager
 import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepositoryInterface
+import ucr.ac.cr.inii.geoterra.domain.repository.CantonRepositoryInterface
+import ucr.ac.cr.inii.geoterra.domain.repository.DistrictRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.ManifestationsRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
@@ -30,7 +34,7 @@ val appModule = module {
   // Tabs ViewModels (ScreenModels)
   single { AuthService(get(), get()) }
   single { HomeViewModel() }
-  single { MapViewModel(get(), get(), get(), get()) }
+  single { MapViewModel(get(), get(), get(), get(), get(), get()) }
   single { AccountViewModel(get(), get()) }
   single { RequestViewModel(get(), get()) }
 
@@ -63,6 +67,8 @@ val appModule = module {
   single<AuthRepositoryInterface> { AuthRepository(get(), get()) }
   single<UserRepositoryInterface> { UserRepository(get()) }
   single<ProvinceRepositoryInterface> { ProvinceRepository(get()) }
+  single<CantonRepositoryInterface> { CantonRepository(get()) }
+  single<DistrictRepositoryInterface> { DistrictRepository(get()) }
   single<AnalysisRequestRepositoryInterface> { AnalysisRequestRepository(get()) }
   single<ManifestationsRepositoryInterface> { ManifestationRepository(get()) }
 
@@ -70,5 +76,7 @@ val appModule = module {
   single { ManifestationRepository(get()) }
   single { UserRepository(get()) }
   single { ProvinceRepository(get()) }
+  single { CantonRepository(get()) }
+  single { DistrictRepository(get()) }
   single { AnalysisRequestRepository(get()) }
 }

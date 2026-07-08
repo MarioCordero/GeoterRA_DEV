@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.InfoChip
+import ucr.ac.cr.inii.geoterra.presentation.components.common.InfoChip
 
 @Composable
 fun RequestCardItem(

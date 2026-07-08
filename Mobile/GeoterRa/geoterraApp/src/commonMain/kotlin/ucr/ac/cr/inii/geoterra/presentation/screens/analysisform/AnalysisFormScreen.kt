@@ -11,7 +11,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -27,9 +26,9 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import org.koin.core.parameter.parametersOf
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.AdaptiveBackButton
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.LoadingDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.StatusDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
+import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.StatusDialog
 
 data class AnalysisFormScreen(
   val requestToEdit: AnalysisRequestRemote? = null

@@ -15,9 +15,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,8 +24,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.ActionButton
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.SectionHeader
+import ucr.ac.cr.inii.geoterra.data.model.remote.CantonRemote
+import ucr.ac.cr.inii.geoterra.data.model.remote.DistrictRemote
+import ucr.ac.cr.inii.geoterra.data.model.remote.ProvinceRemote
+import ucr.ac.cr.inii.geoterra.presentation.components.common.ActionButton
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SecondaryActionButton
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SearchableDropdown
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SectionHeader
 import ucr.ac.cr.inii.geoterra.presentation.screens.map.MapLayer
 import ucr.ac.cr.inii.geoterra.presentation.screens.map.MapState
 
@@ -36,14 +39,29 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.map.MapState
 fun FilterBottomModal(
   isVisible: Boolean,
   state: MapState,
-  onProvinceSelected: (Int) -> Unit,
-  onLayerSelected: (String) -> Unit,
-  onClearSelectedProvince: () -> Unit,
+  onProvinceSelected: (Int?) -> Unit,
+  onCantonSelected: (Int?) -> Unit,
+  onDistrictSelected: (Int?) -> Unit,
+  toggleLayer: (String) -> Unit,
   onDismiss: () -> Unit,
   onApplyFilters: () -> Unit,
+  onClearFilters: () -> Unit,
   sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 ) {
   val scope = rememberCoroutineScope()
+
+  // Helpers to resolve geographical models from selected SNIT identifiers
+  fun findProvince(snitCode: Int?) = state.availableProvinces.find { it.province_snit_code == snitCode }
+  fun findCanton(snitCode: Int?) = state.availableCantons.find { it.canton_snit_code == snitCode }
+  fun findDistrict(snitCode: Int?) = state.availableDistricts.find { it.district_snit_code == snitCode }
+
+  // Hierarchical cascading filtering logic for downstream entities
+  val filteredCantons = state.availableCantons.filter {
+    it.canton_snit_code.toString().startsWith(state.selectedProvinceSnitCode.toString())
+  }
+  val filteredDistricts = state.availableDistricts.filter {
+    it.district_snit_code.toString().startsWith(state.selectedCantonSnitCode.toString())
+  }
 
   if (isVisible) {
     ModalBottomSheet(
@@ -78,62 +96,111 @@ fun FilterBottomModal(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // --- Layer selection ---
         SectionHeader(title = "Capas", icon = Icons.Default.Map)
-
         Spacer(modifier = Modifier.height(12.dp))
 
-        LazyRow(
+        Row(
+          modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.spacedBy(12.dp),
-          contentPadding = PaddingValues(horizontal = 24.dp)
+          verticalAlignment = Alignment.CenterVertically
         ) {
-          items(state.availableStyleLayers) { layer ->
+          state.availableStyleLayers.forEach { layer ->
             TileCard(
               layer = layer,
-              isSelected = layer.id == state.selectedLayerId,
-              onSelect = { onLayerSelected(layer.id) }
+              isSelected = state.selectedLayerIds.contains(layer.id),
+              onSelect = { toggleLayer(layer.id) },
+              modifier = Modifier.weight(1f)
             )
           }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // --- Sección: Provincias ---
-        SectionHeader(title = "Provincias", icon = Icons.Default.Map)
+        // --- Geographical filters ---
+        SectionHeader(title = "Filtros Geográficos", icon = Icons.Default.Map)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Province dropdown
+        SearchableDropdown(
+          label = "Provincia",
+          items = state.availableProvinces,
+          selectedItem = findProvince(state.selectedProvinceSnitCode),
+          itemToString = { it.province_name },
+          onItemSelected = { province ->
+            onProvinceSelected(province?.province_snit_code)
+          },
+          modifier = Modifier.fillMaxWidth(),
+          enabled = state.availableProvinces.isNotEmpty()
+        )
+
         Spacer(modifier = Modifier.height(12.dp))
 
-        LazyRow(
-          horizontalArrangement = Arrangement.spacedBy(12.dp),
-          contentPadding = PaddingValues(horizontal = 24.dp),
-          modifier = Modifier.fillMaxWidth()
-        ) {
-          items(state.availableProvinces) { province ->
-            ProvinceChip(
-              region = province.province_name,
-              isSelected = state.selectedProvinceSnitCode == province.province_snit_code,
-              onSelect = { onProvinceSelected(province.province_snit_code) }
-            )
-          }
-        }
+        // Canton dropdown – enabled only when a province is selected
+        SearchableDropdown(
+          label = "Cantón",
+          items = filteredCantons,
+          selectedItem = findCanton(state.selectedCantonSnitCode),
+          itemToString = { it.canton_name },
+          onItemSelected = { canton ->
+            onCantonSelected(canton?.canton_snit_code)
+          },
+          modifier = Modifier.fillMaxWidth(),
+          enabled = state.selectedProvinceSnitCode != null && filteredCantons.isNotEmpty()
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // District dropdown – enabled only when a canton is selected
+        SearchableDropdown(
+          label = "Distrito",
+          items = filteredDistricts,
+          selectedItem = findDistrict(state.selectedDistrictSnitCode),
+          itemToString = { it.district_name },
+          onItemSelected = { district ->
+            onDistrictSelected(district?.district_snit_code)
+          },
+          modifier = Modifier.fillMaxWidth(),
+          enabled = state.selectedCantonSnitCode != null && filteredDistricts.isNotEmpty()
+        )
+
         Spacer(modifier = Modifier.height(32.dp))
 
-        ActionButton(
-          onClick = {
-            scope.launch { sheetState.hide() }.invokeOnCompletion { onApplyFilters() }
-          },
-          text = "Aplicar",
-          isLoading = false,
-          modifier = Modifier.fillMaxWidth()
-        )
+        // --- Action Buttons Layout ---
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.spacedBy(12.dp),
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          SecondaryActionButton(
+            text = "Limpiar",
+            onClick = onClearFilters,
+            modifier = Modifier.weight(1f)
+          )
+
+          ActionButton(
+            onClick = {
+              scope.launch { sheetState.hide() }.invokeOnCompletion { onApplyFilters() }
+            },
+            text = "Aplicar",
+            isLoading = false,
+            modifier = Modifier.weight(1f)
+          )
+        }
       }
     }
   }
 }
 
+/**
+ * A downscaled map style layer indicator card optimized for balanced horizontal distribution.
+ */
 @Composable
 fun TileCard(
   layer: MapLayer,
   isSelected: Boolean,
-  onSelect: () -> Unit
+  onSelect: () -> Unit,
+  modifier: Modifier = Modifier
 ) {
   val borderWidth by animateDpAsState(if (isSelected) 2.dp else 1.dp, label = "borderWidth")
   val borderColor by animateColorAsState(
@@ -143,26 +210,25 @@ fun TileCard(
 
   Column(
     horizontalAlignment = Alignment.CenterHorizontally,
-    modifier = Modifier
-      .width(110.dp)
-      .clip(RoundedCornerShape(20.dp))
+    modifier = modifier
+      .clip(RoundedCornerShape(16.dp))
       .clickable { onSelect() }
   ) {
     Box(
       modifier = Modifier
-        .size(90.dp)
+        .size(76.dp)
         .background(
           if (isSelected) MaterialTheme.colorScheme.primaryContainer
           else MaterialTheme.colorScheme.surfaceVariant,
-          RoundedCornerShape(20.dp)
+          RoundedCornerShape(16.dp)
         )
-        .border(borderWidth, borderColor, RoundedCornerShape(20.dp)),
+        .border(borderWidth, borderColor, RoundedCornerShape(16.dp)),
       contentAlignment = Alignment.Center
     ) {
       Icon(
         imageVector = Icons.Default.Layers,
         contentDescription = null,
-        modifier = Modifier.size(32.dp),
+        modifier = Modifier.size(26.dp),
         tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
       )
 
@@ -172,66 +238,21 @@ fun TileCard(
           contentDescription = null,
           modifier = Modifier
             .align(Alignment.TopEnd)
-            .padding(8.dp)
-            .size(20.dp),
+            .padding(6.dp)
+            .size(16.dp),
           tint = MaterialTheme.colorScheme.primary
         )
       }
     }
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(6.dp))
     Text(
       text = layer.name,
       style = MaterialTheme.typography.bodySmall.copy(
         fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Medium,
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
+        fontSize = 11.sp
       ),
       color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
     )
-  }
-}
-
-@Composable
-fun ProvinceChip(
-  region: String,
-  isSelected: Boolean,
-  onSelect: () -> Unit
-) {
-  val containerColor by animateColorAsState(
-    if (isSelected) MaterialTheme.colorScheme.primary
-    else MaterialTheme.colorScheme.surfaceVariant,
-    label = "containerColor"
-  )
-  val contentColor by animateColorAsState(
-    if (isSelected) MaterialTheme.colorScheme.onPrimary
-    else MaterialTheme.colorScheme.outline,
-    label = "contentColor"
-  )
-  // Animación de elevación sutil para el feedback táctil
-  val elevation by animateDpAsState(if (isSelected) 4.dp else 0.dp)
-
-  Surface(
-    modifier = Modifier
-      .wrapContentWidth()
-      .height(48.dp)
-      .clickable { onSelect() },
-    color = containerColor,
-    shape = RoundedCornerShape(12.dp),
-    shadowElevation = elevation,
-    border = if (!isSelected) BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)) else null
-  ) {
-    Box(
-      contentAlignment = Alignment.Center,
-      modifier = Modifier.padding(horizontal = 20.dp)
-    ) {
-      Text(
-        text = region,
-        style = MaterialTheme.typography.labelLarge.copy(
-          fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Medium,
-          letterSpacing = 0.2.sp
-        ),
-        color = contentColor,
-        textAlign = TextAlign.Center
-      )
-    }
   }
 }

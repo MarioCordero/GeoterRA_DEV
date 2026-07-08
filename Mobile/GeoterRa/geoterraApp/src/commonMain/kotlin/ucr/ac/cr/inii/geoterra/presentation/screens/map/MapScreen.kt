@@ -31,8 +31,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import ucr.ac.cr.inii.geoterra.presentation.components.map.FilterBottomModal
 import ucr.ac.cr.inii.geoterra.presentation.screens.manifestation.ManifestationDetailScreen
 
-class MapScreen(
-) : Screen {
+class MapScreen : Screen {
   override val key: ScreenKey = uniqueScreenKey
 
 
@@ -92,11 +91,13 @@ class MapScreen(
       FilterBottomModal(
         isVisible = state.isFilterModalVisible,
         state = state,
-        onProvinceSelected = viewModel::toggleProvince,
-        onLayerSelected = viewModel::selectLayer,
-        onClearSelectedProvince = viewModel::clearSelectedProvince,
+        onProvinceSelected = viewModel::selectProvince,
+        onCantonSelected = viewModel::selectCanton,
+        onDistrictSelected = viewModel::selectDistrict,
+        toggleLayer = viewModel::toggleLayer,
         onDismiss = viewModel::hideFilterModal,
-        onApplyFilters = viewModel::applyFilters
+        onApplyFilters = viewModel::applyFilters,
+        onClearFilters = viewModel::clearAllFilters
       )
     }
   }

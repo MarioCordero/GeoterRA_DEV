@@ -5,22 +5,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -37,13 +29,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import geoterra.geoterraapp.generated.resources.Res
 import geoterra.geoterraapp.generated.resources.logo_GeoterRA
-import geoterra.geoterraapp.generated.resources.logo_GeoterRA_exp
 import geoterra.geoterraapp.generated.resources.rocks
 import org.jetbrains.compose.resources.painterResource
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.ActionButton
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.CustomTextField
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.FormSection
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.PasswordField
+import ucr.ac.cr.inii.geoterra.presentation.components.common.ActionButton
+import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomTextField
+import ucr.ac.cr.inii.geoterra.presentation.components.common.FormSection
+import ucr.ac.cr.inii.geoterra.presentation.components.common.PasswordField
 
 @Composable
 fun LoginContent(
@@ -122,7 +113,7 @@ fun LoginContent(
             modifier = Modifier.padding(bottom = 24.dp)
           )
 
-          FormSection() {
+          FormSection {
             CustomTextField(
               value = state.email,
               onValueChange = onEmailChanged,

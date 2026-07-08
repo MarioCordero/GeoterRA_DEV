@@ -1,52 +1,57 @@
-package ucr.ac.cr.inii.geoterra.presentation.components.layout
+package ucr.ac.cr.inii.geoterra.presentation.components.common
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import ucr.ac.cr.inii.geoterra.themes.SuccessGreen
 
 @Composable
-fun ConfirmDialog(
-  title: String,
+fun StatusDialog(
+  isSuccess: Boolean,
   message: String,
-  confirmText: String,
-  onConfirm: () -> Unit,
-  onDismiss: () -> Unit,
-  isDanger: Boolean = false
+  onDismiss: () -> Unit
 ) {
   AlertDialog(
     onDismissRequest = onDismiss,
     shape = RoundedCornerShape(28.dp),
     containerColor = MaterialTheme.colorScheme.surface,
     icon = {
-      Icon(
-        imageVector = if (isDanger) Icons.Default.Warning else Icons.Default.Info,
-        contentDescription = null,
-        tint = if (isDanger) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-        modifier = Modifier.size(32.dp)
-      )
+      val color = if (isSuccess) SuccessGreen else MaterialTheme.colorScheme.error
+      Surface(
+        color = color.copy(alpha = 0.1f),
+        shape = CircleShape,
+        modifier = Modifier.size(64.dp)
+      ) {
+        Icon(
+          imageVector = if (isSuccess) Icons.Default.CheckCircle else Icons.Default.Error,
+          contentDescription = null,
+          tint = color,
+          modifier = Modifier.padding(12.dp)
+        )
+      }
     },
     title = {
       Text(
-        text = title,
+        text = if (isSuccess) "¡Éxito!" else "Hubo un problema",
         style = MaterialTheme.typography.headlineSmall,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.ExtraBold,
         textAlign = TextAlign.Center,
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.onSurface
@@ -63,28 +68,17 @@ fun ConfirmDialog(
     },
     confirmButton = {
       Button(
-        onClick = {
-          onConfirm()
-          onDismiss()
-        },
+        onClick = onDismiss,
+        modifier = Modifier.fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(
-          containerColor = if (isDanger) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+          containerColor = MaterialTheme.colorScheme.primary
         ),
         shape = RoundedCornerShape(12.dp)
       ) {
-        Text(confirmText, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary)
-      }
-    },
-    dismissButton = {
-      OutlinedButton(
-        onClick = onDismiss,
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
-      ) {
         Text(
-          "Cancelar",
-          color = MaterialTheme.colorScheme.onSurface,
-          fontWeight = FontWeight.Medium,
+          "Aceptar",
+          fontWeight = FontWeight.Bold,
+          color = MaterialTheme.colorScheme.onPrimary
         )
       }
     }

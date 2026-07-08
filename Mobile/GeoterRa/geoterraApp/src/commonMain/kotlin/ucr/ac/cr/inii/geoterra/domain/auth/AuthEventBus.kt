@@ -29,7 +29,7 @@ sealed class AuthEvent {
   ) : AuthEvent()
 }
 
-class AuthEventBus() {
+class AuthEventBus {
   private val _events = MutableSharedFlow<AuthEvent>(replay = 1)
   val events = _events.asSharedFlow()
 

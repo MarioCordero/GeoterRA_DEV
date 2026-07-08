@@ -1,6 +1,5 @@
 package ucr.ac.cr.inii.geoterra.presentation.components.manifestation
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,11 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.AdaptiveBackButton
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.DataBox
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.SectionHeader
+import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
+import ucr.ac.cr.inii.geoterra.presentation.components.common.DataBox
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SectionHeader
 import ucr.ac.cr.inii.geoterra.presentation.screens.manifestation.ChemicalGroupCard
 
 @Composable

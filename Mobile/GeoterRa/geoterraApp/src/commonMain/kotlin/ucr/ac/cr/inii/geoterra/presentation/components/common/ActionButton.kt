@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.components.layout
+package ucr.ac.cr.inii.geoterra.presentation.components.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -20,10 +21,11 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun ActionButton(
-  isLoading : Boolean,
+  isLoading : Boolean = false,
   text: String,
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
+  colors : ButtonColors? = null
 ) {
   Button(
     onClick = onClick,
@@ -31,9 +33,9 @@ fun ActionButton(
       .fillMaxWidth()
       .height(58.dp),
     shape = RoundedCornerShape(16.dp),
-    colors = ButtonDefaults.buttonColors(
-      containerColor = MaterialTheme.colorScheme.primary,
-      contentColor = MaterialTheme.colorScheme.onPrimary
+    colors = colors ?: ButtonDefaults.buttonColors(
+				containerColor = MaterialTheme.colorScheme.primary,
+				contentColor = MaterialTheme.colorScheme.onPrimary
     ),
     elevation = ButtonDefaults.buttonElevation(
       defaultElevation = 4.dp,

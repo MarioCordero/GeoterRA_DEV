@@ -96,7 +96,7 @@ fun MapContent(
     
     MaplibreMap(
       modifier = Modifier.fillMaxSize(),
-      baseStyle = BaseStyle.Uri(state.styleUrl),
+      baseStyle = BaseStyle.Uri(state.baseStyleUrl),
       cameraState = cameraState,
       onMapClick = { pos, offset ->
         onDismissPanel()
@@ -109,18 +109,19 @@ fun MapContent(
     
     ) {
 
-      val activeLayer = state.availableStyleLayers.find { it.id == state.selectedLayerId }
+      state.availableStyleLayers.filter { it.id in state.selectedLayerIds }.forEach { layer ->
+        layer.snitRasterUrl?.let { rasterUrl ->
 
-      activeLayer?.snitRasterUrl?.let { rasterUrl ->
-        val snitRasterSource = rememberRasterSource(
-          tiles = listOf(rasterUrl),
-          tileSize = 256
-        )
+          val snitRasterSource = rememberRasterSource(
+            tiles = listOf(rasterUrl),
+            tileSize = 256
+          )
 
-        RasterLayer(
-          id = "snit-raster-layer",
-          source = snitRasterSource
-        )
+          RasterLayer(
+            id = "snit-raster-layer-${layer.id}",
+            source = snitRasterSource
+          )
+        }
       }
       
       val manifestationSource = rememberGeoJsonSource(

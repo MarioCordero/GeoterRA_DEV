@@ -15,10 +15,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.CustomTextField
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.FormSection
+import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomTextField
+import ucr.ac.cr.inii.geoterra.presentation.components.common.FormSection
 import ucr.ac.cr.inii.geoterra.presentation.components.camera.GalleryPickerButton
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.RegionSelector
+import ucr.ac.cr.inii.geoterra.presentation.components.common.RegionSelector
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

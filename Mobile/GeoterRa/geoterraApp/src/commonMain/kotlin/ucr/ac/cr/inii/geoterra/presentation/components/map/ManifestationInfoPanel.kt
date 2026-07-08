@@ -17,7 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.InfoBadge
+import ucr.ac.cr.inii.geoterra.presentation.components.common.InfoBadge
 
 @Composable
 fun ManifestationInfoPanel(
