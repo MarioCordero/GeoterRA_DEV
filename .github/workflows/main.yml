@@ -1,7 +1,6 @@
-name: Force Deploy (Manual)
+name: Deploy API, Mobile, Website, Database to Main
 
 on:
-  # Manual desde Actions
   workflow_dispatch:
 
 permissions:
@@ -12,154 +11,123 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ---------------- DETERMINAR RAMA ORIGEN ----------------
+      # ---------------- SET SOURCE BRANCH ----------------
       - name: Set source branch
         run: |
-          # Para ejecución manual usamos headerWeb por defecto
-          echo "SOURCE_BRANCH=headerWeb" >> $GITHUB_ENV
+          echo "SOURCE_BRANCH=develop" >> $GITHUB_ENV
 
-      # ---------------- CHECKOUT RAMA ORIGEN (headerWeb) ----------------
+      # ---------------- CHECKOUT SOURCE (develop) ----------------
       - name: Checkout source branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.SOURCE_BRANCH }}
+          ref: develop
           fetch-depth: 0
 
-      # ---------------- BUILD FRONTEND EN headerWeb ----------------
+      # ---------------- BUILD FRONTEND ----------------
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Install frontend dependencies
+      - name: Install and Build Frontend
         run: |
           cd website
           npm install
-
-      - name: Build frontend
-        run: |
-          cd website
           npm run build
 
-      # ---------------- CHECKOUT MAIN (CON PAT) ----------------
+      # ---------------- CHECKOUT MAIN (into subdirectory) ----------------
       - name: Checkout main branch
         uses: actions/checkout@v4
         with:
           ref: main
           path: main-branch
           fetch-depth: 0
-          token: ${{ secrets.GH_PAT }}   # usa tu PAT para el remote
+          token: ${{ secrets.GH_PAT }}
 
-      # ---------------- PREPARAR ARTEFACTOS ----------------
-      - name: Prepare deployment artifacts
+      # ---------------- CLEAN & SYNC REQUIRED FOLDERS ----------------
+      - name: Clean main-branch and copy only API, Mobile, website, database
         run: |
-          mkdir -p deploy/API
-          mkdir -p deploy/database
-          mkdir -p deploy/website/dist
+          # 1. Limpieza total de main-branch (excepto .git)
+          find main-branch -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
 
-          # Usamos rsync en lugar de cp para garantizar un clon exacto (incluso de carpetas y archivos ocultos)
-          if [ -d "API" ]; then
-            rsync -av API/ deploy/API/
-          fi
+          # 2. Copiar carpetas permitidas
+          # Añadimos 'database' al bucle para que se sincronice
+          for dir in API Mobile website database; do
+            if [ -d "$dir" ]; then
+              echo "Copiando carpeta: $dir"
+              rsync -av --exclude 'node_modules' --exclude 'dist' "$dir/" "main-branch/$dir/"
+            fi
+          done
 
-          if [ -d "database" ]; then
-            rsync -av database/ deploy/database/
-          fi
+          # 3. Copiar archivos esenciales de la raíz
+          for file in .env.example pull.sh .htaccess .gitignore; do
+            if [ -f "$file" ]; then
+              cp -v "$file" main-branch/
+            fi
+          done
 
+      # ---------------- INJECT FRESH BUILD (dist) ----------------
+      - name: Inject fresh build into main-branch/website/dist
+        run: |
           if [ -d "website/dist" ]; then
-            rsync -av website/dist/ deploy/website/dist/
-          fi
-
-      - name: Remove forbidden files
-        run: |
-          if [ -d "deploy/API" ]; then
-            cd deploy/API
-            rm -f "(DELETE)"*.php 2>/dev/null || true
-          fi
-
-      # ---------------- SYNC HACIA main-branch ----------------
-      - name: Sync deploy folders into main
-        run: |
-          # API y database: reemplazo completo
-          if [ -d "deploy/API" ]; then
-            mkdir -p main-branch/API
-            rsync -av --delete \
-              --exclude 'config/config.ini' \
-              deploy/API/ main-branch/API/
-          fi
-
-          if [ -d "deploy/database" ]; then
-            mkdir -p main-branch/database
-            rsync -av --delete deploy/database/ main-branch/database/
-          fi
-
-          # website/dist: BORRAR TODO y copiar lo nuevo del build
-          if [ -d "deploy/website/dist" ]; then
+            echo "Inyectando build de producción en website/dist..."
             mkdir -p main-branch/website/dist
-            rm -rf main-branch/website/dist/* # limpia dist por completo
-            rsync -av deploy/website/dist/ main-branch/website/dist/
+            rsync -av --delete website/dist/ main-branch/website/dist/
           fi
 
-          # NUEVO: Copiar pull.sh a la raíz de main
-          if [ -f "pull.sh" ]; then
-            echo "Copiando pull.sh a main-branch..."
-            cp pull.sh main-branch/pull.sh
-            chmod +x main-branch/pull.sh # Le da permisos de ejecución
-          else
-            echo "⚠️ No se encontró pull.sh en la raíz de ${{ env.SOURCE_BRANCH }}"
-          fi
-
-      # Inject .env file for production
-      - name: Create .env for production
+      # ---------------- PRODUCTION CONFIG & CLEANUP ----------------
+      - name: Production configuration
         run: |
+          # Crear .env de producción
           echo "APP_ENV=${{ secrets.APP_ENV }}" > main-branch/.env
 
-      # ---------------- FORZAR .htaccess EN dist ----------------
-      - name: Ensure .htaccess in dist
-        run: |
-          mkdir -p main-branch/website/dist
+          # Limpiar archivos prohibidos
+          find main-branch/API -name "(DELETE)*.php" -delete 2>/dev/null || true
 
-          # Prioridad: si existe en website/dist, úsalo
-          if [ -f "website/dist/.htaccess" ]; then
-            echo "Found website/dist/.htaccess, copying to main-branch..."
-            cp website/dist/.htaccess main-branch/website/dist/.htaccess
-          # Si no, intenta website/.htaccess
-          elif [ -f "website/.htaccess" ]; then
-            echo "Found website/.htaccess, copying to main-branch/dist..."
-            cp website/.htaccess main-branch/website/dist/.htaccess
-          else
-            echo "⚠️ No .htaccess found in website/dist or website/"
+          # Asegurar .htaccess en la carpeta dist (priorizando el de website/public)
+          if [ -f "main-branch/website/dist/.htaccess" ]; then
+             echo ".htaccess ya existe en dist"
+          elif [ -f "main-branch/.htaccess" ]; then
+             cp main-branch/.htaccess main-branch/website/dist/.htaccess
           fi
 
-      # ---------------- COMMIT & PUSH CON PAT ----------------
+          # Dar permisos al pull.sh
+          if [ -f "main-branch/pull.sh" ]; then
+            chmod +x main-branch/pull.sh
+          fi
+
+      # ---------------- COMMIT & PUSH TO MAIN ----------------
       - name: Commit and push changes to main
         run: |
           cd main-branch
+          
           git config user.name "MarioCordero (CI)"
           git config user.email "ci+${{ github.repository_owner }}@users.noreply.github.com"
-          
-          # Agregamos todo normalmente
+
+          # Registra cambios, nuevos archivos y ELIMINACIONES (limpia carpetas como .idea o Doc)
           git add -A
 
-          git add -f .env 2>/dev/null || true  # Force add .env
+          # Forzamos dist y config por seguridad
+          if [ -d "website/dist" ]; then
+            git add -f website/dist/
+          fi
           
-          # FORZAMOS a Git a observar la carpeta config para esquivar el .gitignore
-          # (Es seguro porque el config.ini ya fue excluido en el rsync anterior)
           if [ -d "API/config" ]; then
-            git add -f API/config/* 2>/dev/null || true
+            git add -f API/config/ 2>/dev/null || true
           fi
 
           if git diff --cached --quiet; then
-            echo "⚠️ No changes to deploy"
+            echo "No changes to deploy"
             exit 0
           fi
 
-          git commit -m "🚀 Auto-deploy from ${{ env.SOURCE_BRANCH }}"
-
-          # Push usando tu PAT (identidad de tu usuario)
-          git push "https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git" HEAD:main
+          # Commit actualizado con 'database' en el mensaje
+          git commit -m "🚀 Clean Deploy: API, Mobile, Website, Database [$(date +'%Y-%m-%d %H:%M:%S')]"
+          
+          # Push forzado para garantizar que main sea idéntico al build actual
+          git push "https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git" HEAD:main --force
 
       # ---------------- TRIGGER REMOTE DEPLOY ----------------
       - name: Trigger remote deploy
         run: |
-          curl -X GET "http://163.178.171.105/pull.sh"
+          curl -X GET "https://geoterra.inii.ucr.ac.cr/pull.sh"
