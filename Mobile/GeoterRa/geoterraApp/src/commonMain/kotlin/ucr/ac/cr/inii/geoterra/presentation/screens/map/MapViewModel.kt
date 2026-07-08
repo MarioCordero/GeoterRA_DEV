@@ -7,30 +7,47 @@ import kotlinx.datetime.Clock
 import ucr.ac.cr.inii.geoterra.domain.location.LocationProvider
 import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
 import ucr.ac.cr.inii.geoterra.domain.repository.ManifestationsRepositoryInterface
+import ucr.ac.cr.inii.geoterra.domain.repository.ProvinceRepositoryInterface
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 class MapViewModel(
   private val manifestationsRepository: ManifestationsRepositoryInterface,
+  private val provinceRepository: ProvinceRepositoryInterface,
   private val locationProvider: LocationProvider,
   private val permissionManager: PermissionManager
 ) : BaseScreenModel<MapState>(MapState()) {
+  init {
+    loadProvinces()
+  }
 
-  fun loadMapMarkers(regionId: UInt? = null) {
+  private fun loadProvinces() {
+    screenModelScope.launch {
+      provinceRepository.getProvinces()
+        .onSuccess { provinces ->
+          _state.update { it.copy(availableProvinces = provinces) }
+        }
+        .onFailure {
+          _state.update { it.copy(snackBarMessage = it.snackBarMessage) }
+        }
+    }
+  }
+
+  fun loadMapMarkers(provinceSnitCode: Int? = null) {
     screenModelScope.launch {
       _state.update { it.copy(isLoading = true) }
 
-      manifestationsRepository.getManifestations(regionId)
-        .onSuccess { data ->
-          _state.update {
-            it.copy(
-              markers = data,
-              isLoading = false
-            )
-          }
-        }
-        .onFailure { exception ->
-          _state.update { it.copy(isLoading = false, snackBarMessage = exception.message) }
-        }
+//      manifestationsRepository.getManifestations(regionId)
+//        .onSuccess { data ->
+//          _state.update {
+//            it.copy(
+//              markers = data,
+//              isLoading = false
+//            )
+//          }
+//        }
+//        .onFailure { exception ->
+//          _state.update { it.copy(isLoading = false, snackBarMessage = exception.message) }
+//        }
     }
   }
   
@@ -93,15 +110,16 @@ class MapViewModel(
     _state.update { it.copy(isFilterModalVisible = false) }
   }
 
-  fun toggleRegion(regionId: UInt) {
+  fun toggleProvince(snitCode: Int) {
     _state.update { state ->
-      val newSelected = if (state.selectedRegionId == regionId) null else regionId
-      state.copy(selectedRegionId = newSelected)
+      val newSelected = if (state.selectedProvinceSnitCode == snitCode) null else snitCode
+      loadMapMarkers(newSelected)
+      state.copy(selectedProvinceSnitCode = newSelected)
     }
   }
 
-  fun clearSelectedRegion() {
-    _state.update { it.copy(selectedRegionId = null) }
+  fun clearSelectedProvince() {
+    _state.update { it.copy(selectedProvinceSnitCode = null) }
   }
 
   fun applyFilters() {
@@ -113,6 +131,6 @@ class MapViewModel(
       isFilterModalVisible = false,
       styleUrl = newLayer?.styleUrl ?: it.styleUrl
     )}
-    loadMapMarkers(state.value.selectedRegionId)
+    loadMapMarkers(state.value.selectedProvinceSnitCode)
   }
 }

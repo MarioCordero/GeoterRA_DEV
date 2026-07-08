@@ -36,9 +36,9 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.map.MapState
 fun FilterBottomModal(
   isVisible: Boolean,
   state: MapState,
-  onRegionSelected: (UInt) -> Unit,
+  onProvinceSelected: (Int) -> Unit,
   onLayerSelected: (String) -> Unit,
-  onClearSelectedRegion: () -> Unit,
+  onClearSelectedProvince: () -> Unit,
   onDismiss: () -> Unit,
   onApplyFilters: () -> Unit,
   sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -97,8 +97,8 @@ fun FilterBottomModal(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // --- Sección: Regiones ---
-        SectionHeader(title = "Región", icon = Icons.Default.Map)
+        // --- Sección: Provincias ---
+        SectionHeader(title = "Provincias", icon = Icons.Default.Map)
         Spacer(modifier = Modifier.height(12.dp))
 
         LazyRow(
@@ -106,11 +106,11 @@ fun FilterBottomModal(
           contentPadding = PaddingValues(horizontal = 24.dp),
           modifier = Modifier.fillMaxWidth()
         ) {
-          items(state.availableRegions) { region ->
-            ModernRegionChip(
-              region = region.first,
-              isSelected = region.second == state.selectedRegionId,
-              onSelect = { onRegionSelected(region.second) }
+          items(state.availableProvinces) { province ->
+            ProvinceChip(
+              region = province.province_name,
+              isSelected = state.selectedProvinceSnitCode == province.province_snit_code,
+              onSelect = { onProvinceSelected(province.province_snit_code) }
             )
           }
         }
@@ -191,7 +191,7 @@ fun TileCard(
 }
 
 @Composable
-fun ModernRegionChip(
+fun ProvinceChip(
   region: String,
   isSelected: Boolean,
   onSelect: () -> Unit

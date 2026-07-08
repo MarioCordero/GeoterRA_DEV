@@ -2,6 +2,7 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.map
 
 import ucr.ac.cr.inii.geoterra.data.model.local.UserLocation
 import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
+import ucr.ac.cr.inii.geoterra.data.model.remote.ProvinceRemote
 
 data class MapLayer(
   val id: String,
@@ -24,16 +25,8 @@ data class MapState(
   val snackBarMessage: String? = null,
 
   val isFilterModalVisible: Boolean = false,
-  val selectedRegionId: UInt? = null,
-  val availableRegions: List<Pair<String, UInt>> = listOf(
-    Pair("San José", 1u),
-    Pair("Alajuela", 2u),
-    Pair("Cartago", 3u),
-    Pair("Heredia", 4u),
-    Pair("Guanacaste", 5u),
-    Pair("Puntarenas", 6u),
-    Pair("Limón", 7u)
-  ),
+  val availableProvinces: List<ProvinceRemote> = emptyList(),
+  val selectedProvinceSnitCode: Int? = null,
   val isLayerSelectionVisible: Boolean = false,
   val availableStyleLayers: List<MapLayer> = listOf(
     MapLayer("hybrid", "Híbrido", "https://raw.githubusercontent.com/go2garret/maps/main/src/assets/json/arcgis_hybrid.json"),

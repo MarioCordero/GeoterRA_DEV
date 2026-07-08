@@ -3,10 +3,8 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.map
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,9 +28,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import org.koin.compose.koinInject
 import ucr.ac.cr.inii.geoterra.presentation.components.map.FilterBottomModal
-import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisFormScreen
 import ucr.ac.cr.inii.geoterra.presentation.screens.manifestation.ManifestationDetailScreen
 
 class MapScreen(
@@ -51,7 +47,7 @@ class MapScreen(
     
     LaunchedEffect(Unit) {
       viewModel.requestLocationIfNeeded()
-      viewModel.loadMapMarkers(state.selectedRegionId)
+      viewModel.loadMapMarkers(state.selectedProvinceSnitCode)
     }
 
     Scaffold(
@@ -96,9 +92,9 @@ class MapScreen(
       FilterBottomModal(
         isVisible = state.isFilterModalVisible,
         state = state,
-        onRegionSelected = viewModel::toggleRegion,
+        onProvinceSelected = viewModel::toggleProvince,
         onLayerSelected = viewModel::selectLayer,
-        onClearSelectedRegion = viewModel::clearSelectedRegion,
+        onClearSelectedProvince = viewModel::clearSelectedProvince,
         onDismiss = viewModel::hideFilterModal,
         onApplyFilters = viewModel::applyFilters
       )
