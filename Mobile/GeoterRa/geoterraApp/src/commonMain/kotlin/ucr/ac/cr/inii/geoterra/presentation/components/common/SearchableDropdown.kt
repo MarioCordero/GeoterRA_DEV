@@ -6,6 +6,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -22,6 +24,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 
 @Composable
 fun <T> SearchableDropdown(
@@ -38,6 +41,7 @@ fun <T> SearchableDropdown(
 
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
+	val bringIntoViewRequester = remember { BringIntoViewRequester() }
 
 	val filteredItems = remember(items, searchQuery) {
 		items.filter { itemToString(it).contains(searchQuery, ignoreCase = true) }
@@ -109,10 +113,18 @@ fun <T> SearchableDropdown(
 			enter = fadeIn() + expandVertically(),
 			exit = fadeOut() + shrinkVertically()
 		) {
+			LaunchedEffect(expanded) {
+				if (expanded) {
+					delay(200)
+					bringIntoViewRequester.bringIntoView()
+				}
+			}
+
 			Card(
 				modifier = Modifier
 					.fillMaxWidth()
-					.padding(top = 4.dp),
+					.padding(top = 4.dp)
+					.bringIntoViewRequester(bringIntoViewRequester),
 				shape = RoundedCornerShape(12.dp),
 				colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
 				elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
