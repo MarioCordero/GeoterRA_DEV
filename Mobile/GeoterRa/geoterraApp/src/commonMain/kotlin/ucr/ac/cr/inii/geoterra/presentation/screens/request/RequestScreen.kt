@@ -1,7 +1,6 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.request
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,10 +23,10 @@ import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
 import ucr.ac.cr.inii.geoterra.domain.pdf.PDFUtil
 import ucr.ac.cr.inii.geoterra.presentation.components.request.RequestBottomModalContent
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.ConfirmDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.LoadingDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.StatusDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.SuccessActionDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.ConfirmDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.StatusDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
 import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisFormScreen
 
 class RequestsScreen : Screen {

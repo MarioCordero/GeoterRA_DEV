@@ -77,11 +77,16 @@ final class InvestigationRequestRepository
   public function findByIdAndUser(string $id, string $userId): ?array
   {
     $sql = "SELECT r.*, 
-                       r.created_at,
+                       p.province_name,
+                  		 c.canton_name,
+                   		 d.district_name,
                        rs.value AS current_state, 
                        rs.description AS state_description,
                        rs.created_at AS state_created_at
                 FROM requests r
+        		    LEFT JOIN provinces p ON r.province_snit_code = p.province_snit_code
+            		LEFT JOIN cantons c ON r.canton_snit_code = c.canton_snit_code
+            		LEFT JOIN districts d ON r.district_snit_code = d.district_snit_code
                 LEFT JOIN (
                     SELECT request_id, value, description, created_at,
                            ROW_NUMBER() OVER (PARTITION BY request_id ORDER BY created_at DESC) as rn
@@ -167,13 +172,16 @@ final class InvestigationRequestRepository
   public function findById(string $id): ?array
   {
     $sql = "SELECT r.*,
-                       r.created_at,
+                       p.province_name,
+                  		 c.canton_name,
+                   		 d.district_name,
                        rs.value AS current_state, 
                        rs.description AS state_description,
-                       rs.created_at AS state_created_at,
-                       u.first_name AS user_first_name,
-                       u.last_name AS user_last_name
+                       rs.created_at AS state_created_at
                 FROM requests r
+        		    LEFT JOIN provinces p ON r.province_snit_code = p.province_snit_code
+            		LEFT JOIN cantons c ON r.canton_snit_code = c.canton_snit_code
+            		LEFT JOIN districts d ON r.district_snit_code = d.district_snit_code
                 LEFT JOIN users u ON r.user_id = u.user_id
                 LEFT JOIN (
                     SELECT request_id, value, description, created_at,
@@ -215,11 +223,16 @@ final class InvestigationRequestRepository
   public function findAllByUser(string $userId): array
   {
     $sql = "SELECT r.*, 
-                       r.created_at,
+                       p.province_name,
+                  		 c.canton_name,
+                   		 d.district_name,
                        rs.value AS current_state, 
                        rs.description AS state_description,
                        rs.created_at AS state_created_at
                 FROM requests r
+        		    LEFT JOIN provinces p ON r.province_snit_code = p.province_snit_code
+            		LEFT JOIN cantons c ON r.canton_snit_code = c.canton_snit_code
+            		LEFT JOIN districts d ON r.district_snit_code = d.district_snit_code
                 LEFT JOIN (
                     SELECT request_id, value, description, created_at,
                            ROW_NUMBER() OVER (PARTITION BY request_id ORDER BY created_at DESC) as rn
@@ -238,13 +251,16 @@ final class InvestigationRequestRepository
   public function getAll(): array
   {
     $sql = "SELECT r.*, 
-                       r.created_at,
+                       p.province_name,
+                  		 c.canton_name,
+                   		 d.district_name,
                        rs.value AS current_state, 
                        rs.description AS state_description,
-                       rs.created_at AS state_created_at,
-                       u.first_name AS user_first_name,
-                       u.last_name AS user_last_name
+                       rs.created_at AS state_created_at
                 FROM requests r
+        		    LEFT JOIN provinces p ON r.province_snit_code = p.province_snit_code
+            		LEFT JOIN cantons c ON r.canton_snit_code = c.canton_snit_code
+            		LEFT JOIN districts d ON r.district_snit_code = d.district_snit_code
                 LEFT JOIN users u ON r.user_id = u.user_id
                 LEFT JOIN (
                     SELECT request_id, value, description, created_at,

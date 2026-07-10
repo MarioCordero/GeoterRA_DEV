@@ -22,10 +22,10 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.koin.core.parameter.parametersOf
 import ucr.ac.cr.inii.geoterra.data.model.remote.UserRemote
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.AdaptiveBackButton
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.LoadingDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.StatusDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.SuccessActionDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
+import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.StatusDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
 
 class EditProfileScreen(
   private val userProfile: UserRemote

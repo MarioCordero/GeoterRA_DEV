@@ -292,9 +292,6 @@ final class InvestigationRequestService
     $result = [
       'request_id' => $row['request_id'],
       'request_name' => $row['request_name'],
-      'province_snit_code' => $row['province_snit_code'],
-      'canton_snit_code' => $row['canton_snit_code'],
-      'district_snit_code' => $row['district_snit_code'],
       'owner_name' => $row['owner_name'],
       'owner_phone_number' => $row['owner_phone_number'],
       'owner_email' => $row['owner_email'],
@@ -303,14 +300,18 @@ final class InvestigationRequestService
       'bubbles' => (bool)$row['bubbles'],
       'details' => $row['details'],
       'exact_address' => $row['exact_address'],
-      'latitude' => $row['latitude'] !== null ? round(
-        (float)$row['latitude'], 7
-      ) : null,
-      'longitude' => $row['longitude'] !== null ? round(
-        (float)$row['longitude'], 7
-      ) : null,
       'relation_with_owner' => $row['relation_with_owner'],
       'created_at' => $row['created_at'],
+			'location' => [
+				'province' => $row['province_name'],
+				'province_snit_code' => $row['province_snit_code'],
+				'canton' => $row['canton_name'],
+				'canton_snit_code' => $row['canton_snit_code'],
+				'district' => $row['district_name'],
+				'district_snit_code' => $row['district_snit_code'],
+				'latitude' => round((float)$row['latitude'], 7),
+				'longitude' => round((float)$row['longitude'], 7),
+			],
       'current_state' => $currentState,
     ];
 

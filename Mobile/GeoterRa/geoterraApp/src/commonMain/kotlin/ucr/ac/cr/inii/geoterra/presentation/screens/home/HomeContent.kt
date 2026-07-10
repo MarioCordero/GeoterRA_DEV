@@ -23,10 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import geoterra.geoterraapp.generated.resources.Res
 import geoterra.geoterraapp.generated.resources.logo_GeoterRA
-import geoterra.geoterraapp.generated.resources.logo_GeoterRA_exp
 import geoterra.geoterraapp.generated.resources.rocks
 import org.jetbrains.compose.resources.painterResource
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.StepItem
+import ucr.ac.cr.inii.geoterra.presentation.components.common.StepItem
 
 /**
  * Pure UI composable for Home screen.

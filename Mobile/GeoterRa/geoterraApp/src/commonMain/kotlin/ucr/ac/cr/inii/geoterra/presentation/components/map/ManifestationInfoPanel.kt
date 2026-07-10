@@ -16,13 +16,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.InfoBadge
+import ucr.ac.cr.inii.geoterra.data.model.remote.GeomanifestationRemote
+import ucr.ac.cr.inii.geoterra.presentation.components.common.InfoBadge
 
 @Composable
 fun ManifestationInfoPanel(
   modifier: Modifier = Modifier,
-  manifestation: ManifestationRemote,
+  manifestation: GeomanifestationRemote,
   onViewFullDetails: () -> Unit
 ) {
   Card(
@@ -67,7 +67,7 @@ fun ManifestationInfoPanel(
             color = MaterialTheme.colorScheme.onSurface
           )
           Text(
-            text = manifestation.regionName(),
+            text = manifestation.location.province,
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
           )
@@ -94,19 +94,19 @@ fun ManifestationInfoPanel(
       ) {
         InfoBadge(
           label = "Temperatura",
-          value = "${manifestation.temperature ?: "--"}°C",
+          value = "${manifestation.insitu_test?.temperature ?: "--"}°C",
           icon = Icons.Default.Thermostat,
           color = Color(0xFFFF5722)
         )
         InfoBadge(
           label = "pH",
-          value = "${manifestation.field_pH ?: "--"}",
+          value = "${manifestation.insitu_test?.ph ?: "--"}",
           icon = Icons.Default.WaterDrop,
           color = Color(0xff2196f6)
         )
         InfoBadge(
           label = "Conductividad",
-          value = "${manifestation.field_conductivity ?: "--"}",
+          value = "${manifestation.insitu_test?.conductivity ?: "--"}",
           icon = Icons.Default.Info,
           color = Color(0xFF4CAF50)
         )

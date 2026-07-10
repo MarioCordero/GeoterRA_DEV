@@ -2,6 +2,7 @@ package ucr.ac.cr.inii.geoterra.core.di
 
 import io.ktor.client.*
 import io.ktor.client.call.body
+import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.auth.*
 import io.ktor.client.plugins.auth.providers.*
@@ -27,20 +28,18 @@ import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenResponse
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthEventBus
 
+expect fun getHttpClientEngine(): HttpClientEngine
+
 @OptIn(InternalAPI::class)
 val networkModule = module {
   single { AuthEventBus() }
   single { TokenManager(get()) }
 
   single<HttpClient> {
-//    fun HttpClient.invalidateAuthTokens() {
-//      authProvider<BearerAuthProvider>()?.clearToken()
-//    }
-
     val networkScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     val authEventBus = get<AuthEventBus>()
-    val client = HttpClient(CIO) {
+    val client = HttpClient(getHttpClientEngine()) {
       install(HttpTimeout) {
         requestTimeoutMillis = 30_000
         connectTimeoutMillis = 30_000

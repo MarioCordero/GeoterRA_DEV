@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun ChemicalRow(label: String, value: Float?) {
+fun ChemicalRow(label: String, value: Double?) {
   Row(
     modifier = Modifier
       .fillMaxWidth()

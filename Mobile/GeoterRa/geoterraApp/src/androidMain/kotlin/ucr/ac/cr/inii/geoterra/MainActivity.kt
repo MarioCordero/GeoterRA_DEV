@@ -9,12 +9,11 @@ import androidx.compose.runtime.Composable
 import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 import ucr.ac.cr.inii.geoterra.domain.pdf.PDFManager
-import ucr.ac.cr.inii.geoterra.domain.permissions.AndroidPermissionManager
 import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
 
 @Suppress("DEPRECATION") class MainActivity : ComponentActivity() {
   
-  private lateinit var permissionManager: AndroidPermissionManager
+  private lateinit var permissionManager: PermissionManager
   
   override fun onCreate(savedInstanceState: Bundle?) {
     enableEdgeToEdge()
@@ -22,7 +21,7 @@ import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
 
     ActivityContext.mContext = this
 
-    permissionManager = AndroidPermissionManager(this)
+    permissionManager = PermissionManager(this)
 
     loadKoinModules(
       module {

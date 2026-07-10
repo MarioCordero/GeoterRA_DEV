@@ -1,12 +1,12 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.manifestation
 
-import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
+import ucr.ac.cr.inii.geoterra.data.model.remote.GeomanifestationRemote
 
 data class ManifestationDetailState(
-  val manifestation: ManifestationRemote? = null,
-  val isLoading: Boolean = false,
-  val isPdfGenerating: Boolean = false,
-  val lastGeneratedPdfPath: String? = null,
-  val pdfError: String? = null,
-  val error: String? = null
+	val manifestation: GeomanifestationRemote? = null,
+	val isLoading: Boolean = false,
+	val isPdfGenerating: Boolean = false,
+	val lastGeneratedPdfPath: String? = null,
+	val pdfError: String? = null,
+	val error: String? = null
 )

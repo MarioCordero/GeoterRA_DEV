@@ -30,10 +30,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import geoterra.geoterraapp.generated.resources.Res
 import geoterra.geoterraapp.generated.resources.logo_GeoterRA
-import geoterra.geoterraapp.generated.resources.logo_GeoterRA_exp
 import org.jetbrains.compose.resources.painterResource
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.CustomTextField
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.FormSection
+import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomTextField
+import ucr.ac.cr.inii.geoterra.presentation.components.common.FormSection
 
 @Composable
 fun EditProfileContent(
