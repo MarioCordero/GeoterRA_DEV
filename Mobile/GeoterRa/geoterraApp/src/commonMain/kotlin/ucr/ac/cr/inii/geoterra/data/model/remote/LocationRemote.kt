@@ -8,5 +8,7 @@ data class LocationRemote(
 	val canton: String,
 	val canton_snit_code: Int,
 	val district: String,
-	val district_snit_code: Int
+	val district_snit_code: Int,
+	val latitude: Double,
+	val longitude: Double
 ) {}

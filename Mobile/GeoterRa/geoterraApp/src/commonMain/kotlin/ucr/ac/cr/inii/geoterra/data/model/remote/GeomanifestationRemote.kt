@@ -30,8 +30,6 @@ data class PaginatedManifestationsRemote(
 data class GeomanifestationRemote(
 	val geomanifestation_id: String,
 	val name: String,
-	val latitude: Double,
-	val longitude: Double,
 	val description: String?,
 	val created_at: String,
 	val location: LocationRemote,
@@ -50,15 +48,15 @@ fun List<GeomanifestationRemote>.toGeoJsonString(): String {
           "type": "Feature",
           "geometry": {
             "type": "Point",
-            "coordinates": [${manifestation.longitude}, ${manifestation.latitude}]
+            "coordinates": [${manifestation.location.longitude}, ${manifestation.location.latitude}]
           },
           "properties": {
             "id": "${manifestation.geomanifestation_id}",
             "name": "${manifestation.name}",
             "description": "${manifestation.description}",
             "temp": $temperature,
-						"latitude": ${manifestation.latitude},
-			    	"longitude": ${manifestation.longitude},
+						"latitude": ${manifestation.location.latitude},
+			    	"longitude": ${manifestation.location.longitude},
 					  "province": "${manifestation.location.province}",
 						"province_snit_code": ${manifestation.location.province_snit_code},
 						"canton": "${manifestation.location.canton}",
