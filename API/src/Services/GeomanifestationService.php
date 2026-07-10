@@ -128,8 +128,6 @@ final class GeomanifestationService
     $response = [
       'geomanifestation_id' => $row['geomanifestation_id'],
       'name' => $row['geomanifestation_name'],
-      'latitude' => round((float)$row['latitude'], 7),
-      'longitude' => round((float)$row['longitude'], 7),
       'description' => $row['manifestation_description'],
       'created_at' => $row['manifestation_created_at'],
       'location' => [
@@ -139,6 +137,8 @@ final class GeomanifestationService
         'canton_snit_code' => $row['canton_snit_code'],
         'district' => $row['district_name'],
         'district_snit_code' => $row['district_snit_code'],
+				'latitude' => round((float)$row['latitude'], 7),
+				'longitude' => round((float)$row['longitude'], 7),
       ],
       'current_georeport' => $row['georeport_id'] ? [
         'georeport_id' => $row['georeport_id'],
