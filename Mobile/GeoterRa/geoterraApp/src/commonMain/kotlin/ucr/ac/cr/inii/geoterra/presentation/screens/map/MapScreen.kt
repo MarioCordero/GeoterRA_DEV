@@ -46,7 +46,7 @@ class MapScreen : Screen {
     
     LaunchedEffect(Unit) {
       viewModel.requestLocationIfNeeded()
-      viewModel.loadMapMarkers(state.selectedProvinceSnitCode)
+      viewModel.loadMapMarkers()
     }
 
     Scaffold(
@@ -94,6 +94,8 @@ class MapScreen : Screen {
         onProvinceSelected = viewModel::selectProvince,
         onCantonSelected = viewModel::selectCanton,
         onDistrictSelected = viewModel::selectDistrict,
+        onTempMinChange = viewModel::selectTempMin,
+        onTempMaxChange = viewModel::selectTempMax,
         toggleLayer = viewModel::toggleLayer,
         onDismiss = viewModel::hideFilterModal,
         onApplyFilters = viewModel::applyFilters,

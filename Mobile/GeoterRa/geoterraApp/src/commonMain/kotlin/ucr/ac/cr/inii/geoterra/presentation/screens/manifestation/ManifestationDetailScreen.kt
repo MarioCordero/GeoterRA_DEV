@@ -12,13 +12,13 @@ import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.koin.core.parameter.parametersOf
-import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
+import ucr.ac.cr.inii.geoterra.data.model.remote.GeomanifestationRemote
 import ucr.ac.cr.inii.geoterra.domain.pdf.PDFUtil
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.StatusDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
 
-class ManifestationDetailScreen(val manifestation: ManifestationRemote) : Screen {
+class ManifestationDetailScreen(val manifestation: GeomanifestationRemote) : Screen {
   override val key: ScreenKey = uniqueScreenKey
 
   @OptIn(ExperimentalMaterial3Api::class)

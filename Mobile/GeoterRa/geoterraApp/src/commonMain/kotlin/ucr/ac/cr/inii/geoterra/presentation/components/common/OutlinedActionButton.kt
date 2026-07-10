@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -28,7 +27,7 @@ import androidx.compose.ui.unit.dp
  * @param modifier Custom layouts modifiers passed down from the parent composable.
  */
 @Composable
-fun SecondaryActionButton(
+fun OutlinedActionButton(
   isLoading: Boolean = false,
   text: String,
   onClick: () -> Unit,

@@ -3,7 +3,8 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.map
 import ucr.ac.cr.inii.geoterra.data.model.local.UserLocation
 import ucr.ac.cr.inii.geoterra.data.model.remote.CantonRemote
 import ucr.ac.cr.inii.geoterra.data.model.remote.DistrictRemote
-import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
+import ucr.ac.cr.inii.geoterra.data.model.remote.GeomanifestationRemote
+import ucr.ac.cr.inii.geoterra.data.model.remote.PaginationRemote
 import ucr.ac.cr.inii.geoterra.data.model.remote.ProvinceRemote
 
 /**
@@ -22,9 +23,12 @@ data class MapLayer(
 data class MapState(
 	val baseStyleUrl: String = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
 	val selectedLayerIds: Set<String> = emptySet(),
-	val markers: List<ManifestationRemote> = emptyList(),
+	val markers: List<GeomanifestationRemote> = emptyList(),
+	val pagination: PaginationRemote? = null,
+	val selectedTempMin: Double? = null,
+	val selectedTempMax: Double? = null,
 	val userLocation: UserLocation? = null,
-	val selectedManifestation: ManifestationRemote? = null,
+	val selectedManifestation: GeomanifestationRemote? = null,
 	val isUserLocationSelected: Boolean = false,
 	val userLocationTrigger: Long = 0L,
 	val isLoading: Boolean = false,

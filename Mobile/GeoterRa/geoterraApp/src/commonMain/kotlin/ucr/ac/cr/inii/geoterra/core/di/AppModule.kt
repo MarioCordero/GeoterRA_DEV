@@ -8,7 +8,7 @@ import ucr.ac.cr.inii.geoterra.data.repository.AnalysisRequestRepository
 import ucr.ac.cr.inii.geoterra.data.repository.AuthRepository
 import ucr.ac.cr.inii.geoterra.data.repository.CantonRepository
 import ucr.ac.cr.inii.geoterra.data.repository.DistrictRepository
-import ucr.ac.cr.inii.geoterra.data.repository.ManifestationRepository
+import ucr.ac.cr.inii.geoterra.data.repository.GeomanifestationsRepository
 import ucr.ac.cr.inii.geoterra.data.repository.ProvinceRepository
 import ucr.ac.cr.inii.geoterra.data.repository.UserRepository
 import ucr.ac.cr.inii.geoterra.domain.pdf.PDFManager
@@ -16,9 +16,9 @@ import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepositoryInterf
 import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.CantonRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.DistrictRepositoryInterface
-import ucr.ac.cr.inii.geoterra.domain.repository.ManifestationsRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
+import ucr.ac.cr.inii.geoterra.domain.repository.GeomanifestationsRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.ProvinceRepositoryInterface
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisFormViewModel
@@ -70,10 +70,10 @@ val appModule = module {
   single<CantonRepositoryInterface> { CantonRepository(get()) }
   single<DistrictRepositoryInterface> { DistrictRepository(get()) }
   single<AnalysisRequestRepositoryInterface> { AnalysisRequestRepository(get()) }
-  single<ManifestationsRepositoryInterface> { ManifestationRepository(get()) }
+  single<GeomanifestationsRepositoryInterface> { GeomanifestationsRepository(get()) }
 
   single { AuthRepository(get(), get())}
-  single { ManifestationRepository(get()) }
+  single { GeomanifestationsRepository(get()) }
   single { UserRepository(get()) }
   single { ProvinceRepository(get()) }
   single { CantonRepository(get()) }

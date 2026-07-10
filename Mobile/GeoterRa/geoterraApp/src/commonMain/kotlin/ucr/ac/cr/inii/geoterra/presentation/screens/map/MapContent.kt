@@ -31,7 +31,7 @@ import org.maplibre.compose.sources.rememberRasterSource
 import org.maplibre.compose.style.BaseStyle
 import org.maplibre.compose.util.ClickResult
 import org.maplibre.spatialk.geojson.Position
-import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
+import ucr.ac.cr.inii.geoterra.data.model.remote.GeomanifestationRemote
 import ucr.ac.cr.inii.geoterra.data.model.remote.toGeoJsonString
 import ucr.ac.cr.inii.geoterra.presentation.components.map.ManifestationInfoPanel
 import ucr.ac.cr.inii.geoterra.presentation.components.map.UserLocationInfoPanel
@@ -43,7 +43,7 @@ fun MapContent(
   state: MapState,
   onManifestationMarkerClick: (String) -> Unit,
   onUserMarkerClick: () -> Unit,
-  onDetailsClick: (ManifestationRemote) -> Unit,
+  onDetailsClick: (GeomanifestationRemote) -> Unit,
   onDismissPanel: () -> Unit
 ) {
   Box(modifier = modifier.fillMaxSize()) {

@@ -61,7 +61,7 @@ fun <T> SearchableDropdown(
 			placeholder = {
 				Text(
 					text = selectedItem?.let { itemToString(it) } ?: "Buscar...",
-					color = MaterialTheme.colorScheme.onSurface
+					color = MaterialTheme.colorScheme.outline
 				)
 			},
 			singleLine = true,

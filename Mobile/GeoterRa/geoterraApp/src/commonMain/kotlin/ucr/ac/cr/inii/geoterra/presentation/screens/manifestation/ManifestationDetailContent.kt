@@ -24,17 +24,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
+import ucr.ac.cr.inii.geoterra.data.model.remote.GeomanifestationRemote
 import ucr.ac.cr.inii.geoterra.presentation.components.manifestation.ChemicalRow
 import ucr.ac.cr.inii.geoterra.presentation.components.manifestation.ManifestationReport
 
 @Composable
 fun ManifestationDetailContent(
-  modifier: Modifier,
-  state : ManifestationDetailState,
-  manifestation: ManifestationRemote,
-  onDownload: () -> Unit,
-  onBack: () -> Unit
+	modifier: Modifier,
+	state : ManifestationDetailState,
+	manifestation: GeomanifestationRemote,
+	onDownload: () -> Unit,
+	onBack: () -> Unit
 ) {
   Column(
     modifier = modifier
@@ -79,9 +79,9 @@ fun ManifestationDetailContent(
 
 @Composable
 fun ChemicalGroupCard(
-  title: String,
-  color: Color,
-  elements: List<Pair<String, Float?>>
+	title: String,
+	color: Color,
+	elements: List<Pair<String, Double?>>
 ) {
   Card(
     modifier = Modifier.fillMaxWidth(),
