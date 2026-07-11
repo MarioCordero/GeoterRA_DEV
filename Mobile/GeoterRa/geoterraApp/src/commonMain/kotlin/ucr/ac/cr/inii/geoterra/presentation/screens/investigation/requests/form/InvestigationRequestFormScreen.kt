@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.analysisform
+package ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.form
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ucr.ac.cr.inii.geoterra.data.model.responses.AnalysisRequestRemote
+import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -30,8 +30,8 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.StatusDialog
 
-data class AnalysisFormScreen(
-  val requestToEdit: AnalysisRequestRemote? = null
+data class InvestigationRequestFormScreen(
+  val requestToEdit: InvestigationRequestResponse? = null
 ) : Screen {
 
   override val key: ScreenKey = uniqueScreenKey
@@ -39,7 +39,7 @@ data class AnalysisFormScreen(
   @Composable
   override fun Content() {
     val navigator = LocalNavigator.currentOrThrow
-    val viewModel = getScreenModel<AnalysisFormViewModel>(
+    val viewModel = getScreenModel<InvestigationRequestFormViewModel>(
       parameters = { parametersOf(requestToEdit) }
     )
 
@@ -52,9 +52,10 @@ data class AnalysisFormScreen(
     )
 
     if (state.isSuccess) {
+      val successMessage = state.snackBarMessage ?: "Operación completada correctamente."
       StatusDialog(
-        isSuccess = state.isSuccess,
-        message = "La solicitud se ha creado correctamente.",
+        isSuccess = true,
+        message = successMessage,
         onDismiss = {
           viewModel.clearSuccess()
           navigator.pop()
@@ -62,7 +63,6 @@ data class AnalysisFormScreen(
       )
     }
 
-    // 3. DIÁLOGO DE ERROR
     state.error?.let { errorMessage ->
       StatusDialog(
         isSuccess = false,
@@ -72,7 +72,7 @@ data class AnalysisFormScreen(
     }
 
     Scaffold(
-      snackbarHost = {SnackbarHost(snackBarHost)},
+      snackbarHost = { SnackbarHost(snackBarHost) },
       modifier = Modifier.fillMaxSize(),
       containerColor = MaterialTheme.colorScheme.background,
       topBar = {
@@ -84,18 +84,17 @@ data class AnalysisFormScreen(
           horizontalArrangement = Arrangement.Start
         ) {
           Text(
-            text = "Nueva solicitud",
+            text = if (requestToEdit != null) "Editar Solicitud" else "Nueva Solicitud",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.weight(1f)
           )
-          AdaptiveBackButton(onBack = {navigator.pop()})
+          AdaptiveBackButton(onBack = { navigator.pop() })
         }
       }
     ) { paddingValues ->
-
-      AnalysisFormContent(
+      InvestigationRequestFormContent(
         modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
         state = state,
         onEvent = viewModel::onEvent,

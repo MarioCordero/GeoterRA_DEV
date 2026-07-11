@@ -49,6 +49,8 @@ val networkModule = module {
         json(Json {
           ignoreUnknownKeys = true
           coerceInputValues = true
+          explicitNulls = true
+          encodeDefaults = true
         })
       }
 

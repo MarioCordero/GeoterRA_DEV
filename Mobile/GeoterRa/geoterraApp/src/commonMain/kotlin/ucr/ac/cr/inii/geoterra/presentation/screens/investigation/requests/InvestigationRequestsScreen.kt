@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.request
+package ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -20,14 +20,14 @@ import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
-import ucr.ac.cr.inii.geoterra.data.model.responses.AnalysisRequestRemote
+import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 import ucr.ac.cr.inii.geoterra.domain.pdf.PDFUtil
 import ucr.ac.cr.inii.geoterra.presentation.components.request.RequestBottomModalContent
 import ucr.ac.cr.inii.geoterra.presentation.components.common.ConfirmDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.StatusDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
-import ucr.ac.cr.inii.geoterra.presentation.screens.analysisform.AnalysisFormScreen
+import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.form.InvestigationRequestFormScreen
 
 class RequestsScreen : Screen {
   override val key: ScreenKey = uniqueScreenKey
@@ -35,12 +35,12 @@ class RequestsScreen : Screen {
   @OptIn(ExperimentalMaterial3Api::class)
   @Composable
   override fun Content() {
-    val viewModel = getScreenModel<RequestViewModel>()
+    val viewModel = getScreenModel<InvestigationRequestsViewModel>()
     val state by viewModel.state.collectAsState()
     val navigator = LocalNavigator.currentOrThrow
 
     val snackbarHostState = remember { SnackbarHostState() }
-    var selectedRequest by remember { mutableStateOf<AnalysisRequestRemote?>(null) }
+    var selectedRequest by remember { mutableStateOf<InvestigationRequestResponse?>(null) }
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
 
@@ -70,7 +70,7 @@ class RequestsScreen : Screen {
         title = "Eliminar solicitud",
         message = "¿Estás seguro de que deseas eliminar esta solicitud? Esta acción no se puede deshacer.",
         confirmText = "Eliminar",
-        onConfirm = { viewModel.deleteRequest(request.id) },
+        onConfirm = { viewModel.deleteRequest(request.request_id) },
         onDismiss = { viewModel.setRequestToDelete(null) },
         isDanger = true
       )
@@ -124,7 +124,7 @@ class RequestsScreen : Screen {
             scope.launch {
               try {
                 viewModel.setPdfGenerating(true)
-                val fileName = "Reporte_Solicitud_${req.name}"
+                val fileName = "Reporte_Solicitud_${req.request_name}"
 
                 // Call the generator and capture the path
                 val resultPath = PDFUtil.generateRequestPdf(req, fileName)
@@ -149,7 +149,7 @@ class RequestsScreen : Screen {
       snackbarHost = { SnackbarHost(snackbarHostState) },
       floatingActionButton = {
         FloatingActionButton(
-          onClick = { navigator.push(AnalysisFormScreen()) },
+          onClick = { navigator.push(InvestigationRequestFormScreen()) },
           containerColor = MaterialTheme.colorScheme.primary,
           contentColor = MaterialTheme.colorScheme.onPrimary
         ) {
@@ -177,7 +177,7 @@ class RequestsScreen : Screen {
         modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
         state = state,
         onView = { req -> selectedRequest = req },
-        onEdit = { req -> navigator.push(AnalysisFormScreen(requestToEdit = req)) },
+        onEdit = { req -> navigator.push(InvestigationRequestFormScreen(requestToEdit = req)) },
         onDelete = { req -> viewModel.setRequestToDelete(req) }
       )
     }

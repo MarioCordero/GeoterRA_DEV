@@ -6,20 +6,20 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
-import ucr.ac.cr.inii.geoterra.data.model.responses.AnalysisRequestDTO
-import ucr.ac.cr.inii.geoterra.data.model.responses.AnalysisRequestRemote
-import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepositoryInterface
+import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestRequest
+import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
+import ucr.ac.cr.inii.geoterra.domain.repository.InvestigationRequestsRepositoryInterface
 
-class AnalysisRequestRepository(
+class InvestigationRequestsRepository(
   private val client: HttpClient
-) : AnalysisRequestRepositoryInterface {
+) : InvestigationRequestsRepositoryInterface {
 
-  override suspend fun getMyRequests(): Result<List<AnalysisRequestRemote>> {
+  override suspend fun getMyRequests(): Result<List<InvestigationRequestResponse>> {
     return try {
       val response = client.get("analysis-requests")
 
       if (response.status.isSuccess()) {
-        val envelope = response.body<ApiResponseModel<List<AnalysisRequestRemote>>>()
+        val envelope = response.body<ApiResponseModel<List<InvestigationRequestResponse>>>()
         Result.success(envelope.data ?: emptyList())
       } else {
         handleErrorResponse(response)
@@ -29,7 +29,7 @@ class AnalysisRequestRepository(
     }
   }
 
-  override suspend fun createRequest(form: AnalysisRequestDTO): Result<Unit> {
+  override suspend fun createRequest(form: InvestigationRequestRequest): Result<Unit> {
     return try {
       val response = client.post("analysis-requests") {
         contentType(ContentType.Application.Json)
@@ -42,7 +42,7 @@ class AnalysisRequestRepository(
     }
   }
 
-  override suspend fun updateRequest(id: String, form: AnalysisRequestDTO): Result<Unit> {
+  override suspend fun updateRequest(id: String, form: InvestigationRequestRequest): Result<Unit> {
     return try {
       val response = client.put("analysis-requests/$id") {
         contentType(ContentType.Application.Json)

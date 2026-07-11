@@ -3,11 +3,11 @@ package ucr.ac.cr.inii.geoterra.data.model.responses
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AnalysisRequestRemote(
+data class InvestigationRequestResponse(
   val request_id: String,
   val request_name: String,
   val owner_name: String,
-  val owner_phone_number: String,
+  val owner_phone_number: String?,
   val owner_email: String,
   val current_usage: String,
   val temperature_sensation: String,
@@ -16,31 +16,19 @@ data class AnalysisRequestRemote(
   val exact_address: String,
   val relation_with_owner: String,
   val created_at: String,
-  val location: LocationRemote,
-  val current_state: CurrentStateRemote
+  val location: LocationResponse,
+  val current_state: StateResponse
 )
 
 @Serializable
-data class LocationRemote(
-  val province: String,
-  val province_snit_code: Int,
-  val canton: String,
-  val canton_snit_code: Int,
-  val district: String,
-  val district_snit_code: Int,
-  val latitude: Double,
-  val longitude: Double
-)
-
-@Serializable
-data class CurrentStateRemote(
+data class StateResponse(
   val value: String,
   val description: String,
   val created_at: String
 )
 
 @Serializable
-data class AnalysisRequestDTO(
+data class InvestigationRequestRequest(
   val province_snit_code: Int = 0,
   val canton_snit_code: Int = 0,
   val district_snit_code: Int = 0,
@@ -48,7 +36,7 @@ data class AnalysisRequestDTO(
   val owner_phone_number: String? = null,
   val owner_email: String? = null,
   val current_usage: String = "Otro",
-  val temperature_sensation: String = "Sin especificar",
+  val temperature_sensation: String = "Sin Especificar",
   val bubbles: Boolean = false,
   val details: String = "",
   val exact_address: String = "",
@@ -56,12 +44,12 @@ data class AnalysisRequestDTO(
   val longitude: Double = 0.0,
   val relation_with_owner: String = "Titular"
 ) {
-  companion object {
+  companion object Companion {
     /**
      * Maps a remote AnalysisRequest to a DTO.
      */
-    fun fromRemote(remote: AnalysisRequestRemote): AnalysisRequestDTO {
-      return AnalysisRequestDTO(
+    fun fromRemote(remote: InvestigationRequestResponse): InvestigationRequestRequest {
+      return InvestigationRequestRequest(
         province_snit_code = remote.location.province_snit_code,
         canton_snit_code = remote.location.canton_snit_code,
         district_snit_code = remote.location.district_snit_code,

@@ -26,12 +26,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ucr.ac.cr.inii.geoterra.data.model.responses.AnalysisRequestRemote
+import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.common.InfoChip
 
 @Composable
 fun RequestCardItem(
-  request: AnalysisRequestRemote,
+  request: InvestigationRequestResponse,
   onView: () -> Unit,
   onEdit: () -> Unit,
   onDelete: () -> Unit
@@ -52,7 +52,7 @@ fun RequestCardItem(
       ) {
         Column(modifier = Modifier.weight(1f)) {
           Text(
-            text = request.name,
+            text = request.request_name,
             style = MaterialTheme.typography.titleLarge.copy(
               fontWeight = FontWeight.ExtraBold,
               letterSpacing = (-0.5).sp
@@ -67,14 +67,14 @@ fun RequestCardItem(
             color = MaterialTheme.colorScheme.onSurface
           )
         }
-        StatusBadge(request.state)
+        StatusBadge(request.current_state.value)
       }
       
       Spacer(modifier = Modifier.height(16.dp))
       InfoChip(
         icon = Icons.Default.LocationOn,
-        label = "Región",
-        value = request.regionName() ,
+        label = "Ubicación",
+        value = "${request.location.province}, ${request.location.canton}, ${request.location.district}" ,
         modifier = Modifier.fillMaxWidth()
       )
 
@@ -87,14 +87,14 @@ fun RequestCardItem(
         InfoChip(
           icon = Icons.Default.Explore,
           label = "Latitud",
-          value = request.latitude.take(10),
+          value = request.location.latitude.toString(),
           modifier = Modifier.weight(1f),
           iconColor = MaterialTheme.colorScheme.secondary
         )
         InfoChip(
           icon = Icons.Default.Explore,
           label = "Longitud",
-          value = request.longitude.take(10),
+          value = request.location.longitude.toString(),
           modifier = Modifier.weight(1f),
           iconColor = MaterialTheme.colorScheme.secondary
         )

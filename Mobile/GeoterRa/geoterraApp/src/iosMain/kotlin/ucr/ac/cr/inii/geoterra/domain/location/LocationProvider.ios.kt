@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import platform.CoreLocation.*
 import platform.Foundation.NSError
 import platform.darwin.NSObject
-import ucr.ac.cr.inii.geoterra.data.model.local.UserLocation
 
 class IosLocationProvider : LocationProvider {
 
