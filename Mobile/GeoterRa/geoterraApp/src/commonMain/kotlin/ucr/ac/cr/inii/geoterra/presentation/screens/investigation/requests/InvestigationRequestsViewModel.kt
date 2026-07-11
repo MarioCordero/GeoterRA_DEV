@@ -1,18 +1,18 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.request
+package ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
-import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepositoryInterface
+import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
+import ucr.ac.cr.inii.geoterra.domain.repository.InvestigationRequestsRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthEventBus
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
-class RequestViewModel(
-  private val requestRepository: AnalysisRequestRepositoryInterface,
+class InvestigationRequestsViewModel(
+  private val requestRepository: InvestigationRequestsRepositoryInterface,
   private val authEventBus: AuthEventBus
-) : BaseScreenModel<RequestState>(RequestState()) {
+) : BaseScreenModel<InvestigationRequestsState>(InvestigationRequestsState()) {
   
   init {
     screenModelScope.launch {
@@ -53,7 +53,7 @@ class RequestViewModel(
     }
   }
 
-  fun setRequestToDelete(request: AnalysisRequestRemote?) {
+  fun setRequestToDelete(request: InvestigationRequestResponse?) {
     _state.update { it.copy(requestToDelete = request) }
   }
 

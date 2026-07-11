@@ -1,9 +1,9 @@
-package ucr.ac.cr.inii.geoterra.data.model.remote
+package ucr.ac.cr.inii.geoterra.data.model.responses
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class DistrictRemote(
+data class DistrictResponse(
 	val district_id: String,
 	val district_snit_code: Int,
 	val district_name: String,

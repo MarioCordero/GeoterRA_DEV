@@ -2,7 +2,7 @@ package ucr.ac.cr.inii.geoterra.presentation.components.camera
 
 import androidx.compose.runtime.Composable
 import io.github.ismoy.imagepickerkmp.presentation.ui.components.GalleryPickerLauncher
-import ucr.ac.cr.inii.geoterra.data.model.local.UserLocation
+import ucr.ac.cr.inii.geoterra.domain.location.UserLocation
 
 @Composable
 fun GalleryLauncher(

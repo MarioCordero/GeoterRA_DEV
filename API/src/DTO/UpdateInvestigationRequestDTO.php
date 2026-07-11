@@ -54,22 +54,20 @@ final class UpdateInvestigationRequestDTO
   public static function fromArray(array $data): self
   {
     return new self(
-      provinceSnitCode : isset($data['province_snit_code']) ? (int)$data['province_snit_code'] : null,
-      cantonSnitCode : isset($data['canton_snit_code']) ? (int)$data['canton_snit_code'] : null,
-      districtSnitCode : isset($data['district_snit_code']) ? (int)$data['district_snit_code'] : null,
-      currentUsage : isset($data['current_usage']) ? (string)$data['current_usage'] : null,
-      temperatureSensation : isset($data['temperature_sensation']) ? (string)$data['temperature_sensation'] : null,
-      ownerName : isset($data['owner_name']) ? trim(
-        (string)$data['owner_name']
-      ) : null,
-      ownerPhoneNumber : $data['owner_phone_number'] ?? null,
-      ownerEmail : $data['owner_email'] ?? null,
-      bubbles : isset($data['bubbles']) ? (bool)$data['bubbles'] : null,
-      details : $data['details'] ?? null,
-      exactAddress : $data['exact_address'] ?? null,
-      latitude : isset($data['latitude']) ? (float)$data['latitude'] : null,
-      longitude : isset($data['longitude']) ? (float)$data['longitude'] : null,
-      relationWithOwner : $data['relation_with_owner'] ?? null
+      provinceSnitCode: isset($data['province_snit_code']) ? (int)$data['province_snit_code'] : null,
+      cantonSnitCode: isset($data['canton_snit_code']) ? (int)$data['canton_snit_code'] : null,
+      districtSnitCode: isset($data['district_snit_code']) ? (int)$data['district_snit_code'] : null,
+      currentUsage: isset($data['current_usage']) ? (string)$data['current_usage'] : null,
+      temperatureSensation: isset($data['temperature_sensation']) ? (string)$data['temperature_sensation'] : null,
+      ownerName: isset($data['owner_name']) ? trim((string)$data['owner_name']) : null,
+      ownerPhoneNumber: $data['owner_phone_number'] ?? null,
+      ownerEmail: $data['owner_email'] ?? null,
+      bubbles: isset($data['bubbles']) ? (bool)$data['bubbles'] : null,
+      details: $data['details'] ?? null,
+      exactAddress: $data['exact_address'] ?? null,
+      latitude: isset($data['latitude']) ? (float)$data['latitude'] : null,
+      longitude: isset($data['longitude']) ? (float)$data['longitude'] : null,
+      relationWithOwner: $data['relation_with_owner'] ?? null
     );
   }
 
@@ -132,24 +130,20 @@ final class UpdateInvestigationRequestDTO
   /**
    * Validates business rules for the fields that are being updated.
    *
-   * @param array<string,mixed> $userData Authenticated user data
+   * @param array<string,mixed> $userData Authenticated user data (not used in validation anymore, kept for signature compatibility)
    * @throws ApiException
    */
   public function validate(array $userData): void
   {
     // SNIT codes must be positive if provided
     if ($this->provinceSnitCode !== null && $this->provinceSnitCode <= 0) {
-      throw new ApiException(
-        ErrorType::invalidField('province_snit_code'), 422
-      );
+      throw new ApiException(ErrorType::invalidField('province_snit_code'), 422);
     }
     if ($this->cantonSnitCode !== null && $this->cantonSnitCode <= 0) {
       throw new ApiException(ErrorType::invalidField('canton_snit_code'), 422);
     }
     if ($this->districtSnitCode !== null && $this->districtSnitCode <= 0) {
-      throw new ApiException(
-        ErrorType::invalidField('district_snit_code'), 422
-      );
+      throw new ApiException(ErrorType::invalidField('district_snit_code'), 422);
     }
 
     // Current usage enum
@@ -164,28 +158,8 @@ final class UpdateInvestigationRequestDTO
     if ($this->temperatureSensation !== null) {
       $validTemps = ['Hirviendo', 'Muy Caliente', 'Caliente', 'Templado', 'Natural', 'Sin Especificar'];
       if (!in_array($this->temperatureSensation, $validTemps, true)) {
-        throw new ApiException(
-          ErrorType::invalidField('temperature_sensation'), 422
-        );
+        throw new ApiException(ErrorType::invalidField('temperature_sensation'), 422);
       }
-    }
-
-    // Owner email format (if provided)
-    if ($this->ownerEmail !== null && !filter_var(
-        $this->ownerEmail, FILTER_VALIDATE_EMAIL
-      )) {
-      throw new ApiException(ErrorType::invalidField('owner_email'), 422);
-    }
-
-    // Owner phone number format (if provided)
-    if ($this->ownerPhoneNumber !== null && !preg_match(
-        '/^[0-9]{8}$|^[0-9]{4}-[0-9]{4}$/', $this->ownerPhoneNumber
-      )) {
-      throw new ApiException(
-        ErrorType::invalidField(
-          'owner_phone_number (must be 8 digits or 1234-5678)'
-        ), 422
-      );
     }
 
     // Coordinates range (if provided)
@@ -196,51 +170,25 @@ final class UpdateInvestigationRequestDTO
       throw new ApiException(ErrorType::invalidField('longitude'), 422);
     }
 
-    // Check if owner differs (only if any owner field is being updated)
-    $ownerDiffers = false;
-    $fullName = trim(
-      ($userData['first_name'] ?? '') . ' ' . ($userData['last_name'] ?? '')
-    );
-    if ($this->ownerName !== null && $this->ownerName !== $fullName) {
-      $ownerDiffers = true;
-    }
-    if ($this->ownerPhoneNumber !== null && $this->ownerPhoneNumber !== ($userData['phone_number'] ?? null)) {
-      $ownerDiffers = true;
-    }
-    if ($this->ownerEmail !== null && strtolower(
-        $this->ownerEmail
-      ) !== strtolower($userData['email'] ?? '')) {
-      $ownerDiffers = true;
-    }
-
-    // If owner differs and relation is provided, validate it; if relation not provided, throw error
-    if ($ownerDiffers) {
-      if (empty($this->relationWithOwner)) {
-        throw new ApiException(
-          ErrorType::missingField(
-            'relation_with_owner (required because owner information differs from requester)'
-          ),
-          422
-        );
-      }
-      // Validate relation enum
+    // Relation with owner: if provided, must be valid enum
+    if ($this->relationWithOwner !== null) {
       $validRelations = ['Familiar', 'Empleado', 'Socio', 'Conocido', 'Titular'];
       if (!in_array($this->relationWithOwner, $validRelations, true)) {
         throw new ApiException(
-          ErrorType::invalidField(
-            'relation_with_owner (must be Familiar, Empleado, Socio, Conocido, Titular)'
-          ), 422
+          ErrorType::invalidField('relation_with_owner (must be Familiar, Empleado, Socio, Conocido, Titular)'),
+          422
         );
       }
-    } else {
-      // If owner does not differ, relation is not required, but if provided it must be valid
-      if ($this->relationWithOwner !== null) {
-        $validRelations = ['Familiar', 'Empleado', 'Socio', 'Conocido', 'Titular'];
-        if (!in_array($this->relationWithOwner, $validRelations, true)) {
+
+      // Only validate owner email and phone if relation is not 'Titular'
+      if ($this->relationWithOwner !== 'Titular') {
+        if ($this->ownerEmail !== null && !filter_var($this->ownerEmail, FILTER_VALIDATE_EMAIL)) {
+          throw new ApiException(ErrorType::invalidField('owner_email'), 422);
+        }
+        if ($this->ownerPhoneNumber !== null && !preg_match('/^[0-9]{8}$|^[0-9]{4}-[0-9]{4}$/', $this->ownerPhoneNumber)) {
           throw new ApiException(
-            ErrorType::invalidField(
-              'relation_with_owner (must be Familiar, Empleado, Socio, Conocido, Titular)'
-            ), 422
+            ErrorType::invalidField('owner_phone_number (must be 8 digits or 1234-5678)'),
+            422
           );
         }
       }

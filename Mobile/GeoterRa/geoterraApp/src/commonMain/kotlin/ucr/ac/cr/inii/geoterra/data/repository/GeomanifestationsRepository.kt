@@ -7,9 +7,9 @@ import io.ktor.client.request.parameter
 import io.ktor.http.isSuccess
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
-import ucr.ac.cr.inii.geoterra.data.model.remote.GeomanifestationFilters
-import ucr.ac.cr.inii.geoterra.data.model.remote.GeomanifestationRemote
-import ucr.ac.cr.inii.geoterra.data.model.remote.PaginatedManifestationsRemote
+import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationFilters
+import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.PaginatedManifestationsRemote
 import ucr.ac.cr.inii.geoterra.domain.repository.GeomanifestationsRepositoryInterface
 
 /**
@@ -51,12 +51,12 @@ class GeomanifestationsRepository(private val client: HttpClient) : Geomanifesta
   /**
    * Retrieves detailed information of a single geothermal manifestation by its unique [id].
    */
-  override suspend fun getManifestationById(id: String): Result<GeomanifestationRemote> {
+  override suspend fun getManifestationById(id: String): Result<GeomanifestationResponse> {
     return try {
       val response = client.get("geomanifestations/$id")
 
       if (response.status.isSuccess()) {
-        val envelope = response.body<ApiResponseModel<GeomanifestationRemote>>()
+        val envelope = response.body<ApiResponseModel<GeomanifestationResponse>>()
         Result.success(envelope.data ?: throw Exception("Empty response body received."))
       } else {
         handleErrorResponse(response)

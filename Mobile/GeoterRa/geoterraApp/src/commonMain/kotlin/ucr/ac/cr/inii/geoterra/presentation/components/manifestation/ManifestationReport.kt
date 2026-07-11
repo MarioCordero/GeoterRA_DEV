@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import ucr.ac.cr.inii.geoterra.data.model.remote.GeomanifestationRemote
+import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.DataBox
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SectionHeader
@@ -32,7 +32,7 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.manifestation.ChemicalGroupC
 
 @Composable
 fun ManifestationReport(
-	manifestation: GeomanifestationRemote,
+	manifestation: GeomanifestationResponse,
 	isForPdf: Boolean,
 	onBack: () -> Unit
 ) {

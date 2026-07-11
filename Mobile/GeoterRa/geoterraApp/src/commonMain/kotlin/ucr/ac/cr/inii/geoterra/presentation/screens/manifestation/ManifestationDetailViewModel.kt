@@ -3,12 +3,12 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.manifestation
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ucr.ac.cr.inii.geoterra.data.model.remote.GeomanifestationRemote
+import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
 import ucr.ac.cr.inii.geoterra.domain.pdf.PDFUtil
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 class ManifestationDetailViewModel(
-  private val initialManifestation: GeomanifestationRemote
+  private val initialManifestation: GeomanifestationResponse
 ) : BaseScreenModel<ManifestationDetailState>(ManifestationDetailState(manifestation = initialManifestation)) {
   
   fun downloadReport() {

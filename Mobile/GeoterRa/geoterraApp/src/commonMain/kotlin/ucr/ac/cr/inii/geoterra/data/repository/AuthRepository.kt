@@ -10,15 +10,14 @@ import io.ktor.http.ContentType.*
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
-import ucr.ac.cr.inii.geoterra.core.network.ErrorMapper
 import ucr.ac.cr.inii.geoterra.core.network.TokenManager
 import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
-import ucr.ac.cr.inii.geoterra.data.model.remote.LoginRequest
-import ucr.ac.cr.inii.geoterra.data.model.remote.LoginResponse
-import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenRequest
-import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenResponse
-import ucr.ac.cr.inii.geoterra.data.model.remote.RegisterRequest
-import ucr.ac.cr.inii.geoterra.data.model.remote.RegisterResponse
+import ucr.ac.cr.inii.geoterra.data.model.requests.LoginRequest
+import ucr.ac.cr.inii.geoterra.data.model.responses.LoginResponse
+import ucr.ac.cr.inii.geoterra.data.model.requests.RefreshAccessTokenRequest
+import ucr.ac.cr.inii.geoterra.data.model.responses.RefreshAccessTokenResponse
+import ucr.ac.cr.inii.geoterra.data.model.requests.RegisterRequest
+import ucr.ac.cr.inii.geoterra.data.model.responses.RegisterResponse
 import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepositoryInterface
 
 class AuthRepository(

@@ -1,11 +1,11 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.map
 
-import ucr.ac.cr.inii.geoterra.data.model.local.UserLocation
-import ucr.ac.cr.inii.geoterra.data.model.remote.CantonRemote
-import ucr.ac.cr.inii.geoterra.data.model.remote.DistrictRemote
-import ucr.ac.cr.inii.geoterra.data.model.remote.GeomanifestationRemote
-import ucr.ac.cr.inii.geoterra.data.model.remote.PaginationRemote
-import ucr.ac.cr.inii.geoterra.data.model.remote.ProvinceRemote
+import ucr.ac.cr.inii.geoterra.data.model.responses.CantonResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.DistrictResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.PaginationResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.ProvinceResponse
+import ucr.ac.cr.inii.geoterra.domain.location.UserLocation
 
 /**
  * Represents a visual style layer configuration for the map view.
@@ -23,20 +23,20 @@ data class MapLayer(
 data class MapState(
 	val baseStyleUrl: String = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
 	val selectedLayerIds: Set<String> = emptySet(),
-	val markers: List<GeomanifestationRemote> = emptyList(),
-	val pagination: PaginationRemote? = null,
+	val markers: List<GeomanifestationResponse> = emptyList(),
+	val pagination: PaginationResponse? = null,
 	val selectedTempMin: Double? = null,
 	val selectedTempMax: Double? = null,
 	val userLocation: UserLocation? = null,
-	val selectedManifestation: GeomanifestationRemote? = null,
+	val selectedManifestation: GeomanifestationResponse? = null,
 	val isUserLocationSelected: Boolean = false,
 	val userLocationTrigger: Long = 0L,
 	val isLoading: Boolean = false,
 	val snackBarMessage: String? = null,
 	val isFilterModalVisible: Boolean = false,
-	val availableProvinces: List<ProvinceRemote> = emptyList(),
-	val availableCantons: List<CantonRemote> = emptyList(),
-	val availableDistricts: List<DistrictRemote> = emptyList(),
+	val availableProvinces: List<ProvinceResponse> = emptyList(),
+	val availableCantons: List<CantonResponse> = emptyList(),
+	val availableDistricts: List<DistrictResponse> = emptyList(),
 	val selectedProvinceSnitCode: Int? = null,
 	val selectedCantonSnitCode: Int? = null,
 	val selectedDistrictSnitCode: Int? = null,

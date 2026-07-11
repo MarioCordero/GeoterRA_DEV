@@ -6,19 +6,17 @@ import io.ktor.client.request.get
 import io.ktor.http.isSuccess
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
-import ucr.ac.cr.inii.geoterra.data.model.remote.CantonRemote
-import ucr.ac.cr.inii.geoterra.data.model.remote.ProvinceRemote
+import ucr.ac.cr.inii.geoterra.data.model.responses.CantonResponse
 import ucr.ac.cr.inii.geoterra.domain.repository.CantonRepositoryInterface
-import ucr.ac.cr.inii.geoterra.domain.repository.ProvinceRepositoryInterface
 
 class CantonRepository(private val client: HttpClient) : CantonRepositoryInterface {
 
-  override suspend fun getCantons(): Result<List<CantonRemote>> {
+  override suspend fun getCantons(): Result<List<CantonResponse>> {
     return try {
       val response = client.get("cantons")
 
       if (response.status.isSuccess()) {
-        val envelope = response.body<ApiResponseModel<List<CantonRemote>>>()
+        val envelope = response.body<ApiResponseModel<List<CantonResponse>>>()
         Result.success(envelope.data ?: emptyList())
       } else {
         handleErrorResponse(response)

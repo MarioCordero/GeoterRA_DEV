@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.data.model.local
+package ucr.ac.cr.inii.geoterra.domain.location
 
 data class UserLocation(
   val latitude: Double,
