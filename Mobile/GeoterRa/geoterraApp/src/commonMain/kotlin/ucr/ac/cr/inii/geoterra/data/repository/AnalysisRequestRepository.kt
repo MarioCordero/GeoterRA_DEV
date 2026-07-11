@@ -13,11 +13,11 @@ import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepositoryInterf
 class AnalysisRequestRepository(
   private val client: HttpClient
 ) : AnalysisRequestRepositoryInterface {
-  
+
   override suspend fun getMyRequests(): Result<List<AnalysisRequestRemote>> {
     return try {
-      val response = client.get("analysis-request")
-      
+      val response = client.get("analysis-requests")
+
       if (response.status.isSuccess()) {
         val envelope = response.body<ApiResponseModel<List<AnalysisRequestRemote>>>()
         Result.success(envelope.data ?: emptyList())
@@ -28,10 +28,10 @@ class AnalysisRequestRepository(
       Result.failure(Exception("Error de conexión: ${e.message}"))
     }
   }
-  
+
   override suspend fun createRequest(form: AnalysisRequestDTO): Result<Unit> {
     return try {
-      val response = client.post("analysis-request") {
+      val response = client.post("analysis-requests") {
         contentType(ContentType.Application.Json)
         setBody(form)
       }
@@ -41,10 +41,10 @@ class AnalysisRequestRepository(
       Result.failure(e)
     }
   }
-  
+
   override suspend fun updateRequest(id: String, form: AnalysisRequestDTO): Result<Unit> {
     return try {
-      val response = client.put("analysis-request/$id") {
+      val response = client.put("analysis-requests/$id") {
         contentType(ContentType.Application.Json)
         setBody(form)
       }
@@ -54,10 +54,10 @@ class AnalysisRequestRepository(
       Result.failure(Exception("Error de red: verifica tu conexión."))
     }
   }
-  
+
   override suspend fun deleteRequest(id: String): Result<Unit> {
     return try {
-      val response = client.delete("analysis-request/$id")
+      val response = client.delete("analysis-requests/$id")
       if (response.status.isSuccess()) Result.success(Unit)
       else handleErrorResponse(response)
     } catch (e: Exception) {

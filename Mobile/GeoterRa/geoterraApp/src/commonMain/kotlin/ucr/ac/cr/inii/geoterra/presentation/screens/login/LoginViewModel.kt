@@ -11,8 +11,7 @@ import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 /**
  * Updated ViewModel to handle real API authentication.
- * @param authRepository Handles the HTTP calls to /auth/login
- * @param authViewModel Handles the global app session state
+ * 
  */
 class LoginViewModel(
   private val authEventBus: AuthEventBus,

@@ -4,70 +4,78 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AnalysisRequestRemote(
-  val id: String,
-  val name: String,
-  val region_id: UInt,
-  val email: String,
-  val owner_contact_number: String?,
-  val owner_name: String?,
-  val temperature_sensation: String?,
-  val bubbles: Int?,
-  val details: String?,
-  val current_usage: String?,
-  val latitude: String,
-  val longitude: String,
-  val state: String,
+  val request_id: String,
+  val request_name: String,
+  val owner_name: String,
+  val owner_phone_number: String,
+  val owner_email: String,
+  val current_usage: String,
+  val temperature_sensation: String,
+  val bubbles: Boolean,
+  val details: String,
+  val exact_address: String,
+  val relation_with_owner: String,
   val created_at: String,
-) {
-  fun regionName(): String {
-    return when (region_id) {
-      1u -> "San José"
-      2u -> "Alajuela"
-      3u -> "Cartago"
-      4u -> "Heredia"
-      5u -> "Guanacaste"
-      6u -> "Puntarenas"
-      7u -> "Limón"
-      else -> "Desconocida"
-    }
-  }
-}
+  val location: LocationRemote,
+  val current_state: CurrentStateRemote
+)
+
+@Serializable
+data class LocationRemote(
+  val province: String,
+  val province_snit_code: Int,
+  val canton: String,
+  val canton_snit_code: Int,
+  val district: String,
+  val district_snit_code: Int,
+  val latitude: Double,
+  val longitude: Double
+)
+
+@Serializable
+data class CurrentStateRemote(
+  val value: String,
+  val description: String,
+  val created_at: String
+)
 
 @Serializable
 data class AnalysisRequestDTO(
-  val region: String,
-  val email: String,
-  val owner_contact_number: String?,
-  val owner_name: String?,
-  val temperature_sensation: String?,
-  val bubbles: Int?,
-  val details: String?,
-  val current_usage: String?,
-  val latitude: Float,
-  val longitude: Float,
+  val province_snit_code: Int = 0,
+  val canton_snit_code: Int = 0,
+  val district_snit_code: Int = 0,
+  val owner_name: String? = null,
+  val owner_phone_number: String? = null,
+  val owner_email: String? = null,
+  val current_usage: String = "Otro",
+  val temperature_sensation: String = "Sin especificar",
+  val bubbles: Boolean = false,
+  val details: String = "",
+  val exact_address: String = "",
+  val latitude: Double = 0.0,
+  val longitude: Double = 0.0,
+  val relation_with_owner: String = "Titular"
 ) {
   companion object {
     /**
      * Maps a remote AnalysisRequest to a DTO.
-     *
-     * @param remote The remote AnalysisRequest to map.
-     * @return A DTO AnalysisRequest.
      */
     fun fromRemote(remote: AnalysisRequestRemote): AnalysisRequestDTO {
       return AnalysisRequestDTO(
-        region = remote.regionName(),
-        email = remote.email,
-        owner_contact_number = remote.owner_contact_number,
+        province_snit_code = remote.location.province_snit_code,
+        canton_snit_code = remote.location.canton_snit_code,
+        district_snit_code = remote.location.district_snit_code,
         owner_name = remote.owner_name,
-        temperature_sensation = remote.temperature_sensation,
-
-        bubbles = remote.bubbles ?: 0,
-
-        details = remote.details,
+        owner_phone_number = remote.owner_phone_number,
+        owner_email = remote.owner_email,
         current_usage = remote.current_usage,
-
-        latitude = remote.latitude.toFloatOrNull() ?: 0f,
-        longitude = remote.longitude.toFloatOrNull() ?: 0f
+        temperature_sensation = remote.temperature_sensation,
+        bubbles = remote.bubbles,
+        details = remote.details,
+        exact_address = remote.exact_address,
+        latitude = remote.location.latitude,
+        longitude = remote.location.longitude,
+        relation_with_owner = remote.relation_with_owner
       )
     }
   }
