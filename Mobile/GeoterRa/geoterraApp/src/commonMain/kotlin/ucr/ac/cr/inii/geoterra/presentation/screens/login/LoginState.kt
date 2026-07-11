@@ -1,6 +1,5 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.login
 
-// LoginState.kt
 data class LoginState(
   val email: String = "",
   val password: String = "",

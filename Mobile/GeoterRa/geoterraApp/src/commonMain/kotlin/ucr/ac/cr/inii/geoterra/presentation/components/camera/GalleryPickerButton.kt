@@ -18,9 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import ucr.ac.cr.inii.geoterra.data.model.local.UserLocation
-
-// ucr.ac.cr.inii.geoterra.presentation.components.media.MediaButtons.kt
+import ucr.ac.cr.inii.geoterra.domain.location.UserLocation
 
 @Composable
 fun GalleryPickerButton(

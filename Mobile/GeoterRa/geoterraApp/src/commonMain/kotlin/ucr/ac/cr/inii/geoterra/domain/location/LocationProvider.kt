@@ -1,8 +1,6 @@
 package ucr.ac.cr.inii.geoterra.domain.location
 
 import kotlinx.coroutines.flow.Flow
-import org.maplibre.compose.location.Location
-import ucr.ac.cr.inii.geoterra.data.model.local.UserLocation
 
 interface LocationProvider {
   

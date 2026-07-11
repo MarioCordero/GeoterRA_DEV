@@ -4,8 +4,8 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestDTO
-import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
+import ucr.ac.cr.inii.geoterra.data.model.responses.AnalysisRequestDTO
+import ucr.ac.cr.inii.geoterra.data.model.responses.AnalysisRequestRemote
 import ucr.ac.cr.inii.geoterra.domain.location.LocationProvider
 import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
 import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepositoryInterface

@@ -16,14 +16,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ucr.ac.cr.inii.geoterra.data.model.remote.GeomanifestationRemote
+import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.common.InfoBadge
 
 @Composable
 fun ManifestationInfoPanel(
-  modifier: Modifier = Modifier,
-  manifestation: GeomanifestationRemote,
-  onViewFullDetails: () -> Unit
+	modifier: Modifier = Modifier,
+	manifestation: GeomanifestationResponse,
+	onViewFullDetails: () -> Unit
 ) {
   Card(
     modifier = modifier

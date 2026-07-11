@@ -6,11 +6,7 @@ import io.github.ismoy.imagepickerkmp.domain.config.CameraCaptureConfig
 import io.github.ismoy.imagepickerkmp.domain.config.ImagePickerConfig
 import io.github.ismoy.imagepickerkmp.presentation.ui.components.ImagePickerLauncher
 import kotlinx.coroutines.launch
-import ucr.ac.cr.inii.geoterra.data.model.local.UserLocation
-
-// ucr.ac.cr.inii.geoterra.presentation.components.media.MediaLaunchers.kt
-
-// ucr.ac.cr.inii.geoterra.domain.camera.CameraPickerLauncher.kt
+import ucr.ac.cr.inii.geoterra.domain.location.UserLocation
 
 @Composable
 fun CameraLauncher(

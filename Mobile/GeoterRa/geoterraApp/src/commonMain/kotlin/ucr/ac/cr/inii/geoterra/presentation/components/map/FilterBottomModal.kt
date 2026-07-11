@@ -180,21 +180,6 @@ fun FilterBottomModal(
 					enabled = state.selectedCantonSnitCode != null && filteredDistricts.isNotEmpty()
 				)
 
-				Spacer(modifier = Modifier.height(12.dp))
-
-				// District dropdown – enabled only when a canton is selected
-				SearchableDropdown(
-					label = "Distrito",
-					items = filteredDistricts,
-					selectedItem = findDistrict(state.selectedDistrictSnitCode),
-					itemToString = { it.district_name },
-					onItemSelected = { district ->
-						onDistrictSelected(district?.district_snit_code)
-					},
-					modifier = Modifier.fillMaxWidth(),
-					enabled = state.selectedCantonSnitCode != null && filteredDistricts.isNotEmpty()
-				)
-
 				Spacer(modifier = Modifier.height(32.dp))
 
 				// --- Temperature filters ---

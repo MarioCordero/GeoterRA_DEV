@@ -2,8 +2,8 @@ package ucr.ac.cr.inii.geoterra.core.di
 
 import com.russhwolf.settings.Settings
 import org.koin.dsl.module
-import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
-import ucr.ac.cr.inii.geoterra.data.model.remote.UserRemote
+import ucr.ac.cr.inii.geoterra.data.model.responses.AnalysisRequestRemote
+import ucr.ac.cr.inii.geoterra.data.model.responses.UserResponse
 import ucr.ac.cr.inii.geoterra.data.repository.AnalysisRequestRepository
 import ucr.ac.cr.inii.geoterra.data.repository.AuthRepository
 import ucr.ac.cr.inii.geoterra.data.repository.CantonRepository
@@ -45,7 +45,7 @@ val appModule = module {
 
   factory { params ->
     EditProfileViewModel(
-      userProfile = params.get<UserRemote>(),
+      userProfile = params.get<UserResponse>(),
       get(),
     )
   }

@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.mp.KoinPlatform.getKoin
-import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
-import ucr.ac.cr.inii.geoterra.data.model.remote.GeomanifestationRemote
+import ucr.ac.cr.inii.geoterra.data.model.responses.AnalysisRequestRemote
+import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.manifestation.ManifestationReport
 import ucr.ac.cr.inii.geoterra.presentation.components.request.RequestBottomModalContent
 
@@ -50,8 +50,8 @@ object PDFUtil {
   }
 
   suspend fun generateManifestationReportPdf(
-    manifestation: GeomanifestationRemote,
-    fileName: String
+		manifestation: GeomanifestationResponse,
+	  fileName: String
   ) : String? {
     return generatePdf(
       fileName = fileName,

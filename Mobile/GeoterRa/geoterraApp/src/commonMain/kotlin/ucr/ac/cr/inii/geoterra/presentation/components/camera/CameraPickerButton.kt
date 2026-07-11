@@ -16,7 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ucr.ac.cr.inii.geoterra.data.model.local.UserLocation
+import ucr.ac.cr.inii.geoterra.domain.location.UserLocation
 
 @Composable
 fun CameraPickerButton(

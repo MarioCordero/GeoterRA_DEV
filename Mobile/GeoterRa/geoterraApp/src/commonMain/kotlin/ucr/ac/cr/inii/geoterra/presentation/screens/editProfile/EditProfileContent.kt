@@ -83,21 +83,21 @@ fun EditProfileContent(
 
         FormSection {
           CustomTextField(
-            value = state.name,
+            value = state.payload.first_name,
             onValueChange = onEvent::onNameChanged,
             label = "Nombre",
             isError = state.fieldErrors["name"] != null,
             errorMessage = state.fieldErrors["name"]
           )
           CustomTextField(
-            value = state.lastname,
+            value = state.payload.last_name,
             onValueChange = onEvent::onLastnameChanged,
             label = "Apellidos",
             isError = state.fieldErrors["lastname"] != null,
             errorMessage = state.fieldErrors["lastname"]
           )
           CustomTextField(
-            value = state.email,
+            value = state.payload.email,
             onValueChange = onEvent::onEmailChanged,
             label = "Correo Electrónico",
             keyboardType = KeyboardType.Email,
@@ -105,7 +105,7 @@ fun EditProfileContent(
             errorMessage = state.fieldErrors["email"]
           )
           CustomTextField(
-            value = state.phoneNumber,
+            value = state.payload.phone_number ?: "",
             onValueChange = onEvent::onPhoneChanged,
             label = "Teléfono",
             keyboardType = KeyboardType.Phone,

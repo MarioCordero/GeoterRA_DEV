@@ -1,6 +1,6 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.request
 
-import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
+import ucr.ac.cr.inii.geoterra.data.model.responses.AnalysisRequestRemote
 
 data class RequestState(
   val isLoading: Boolean = false,

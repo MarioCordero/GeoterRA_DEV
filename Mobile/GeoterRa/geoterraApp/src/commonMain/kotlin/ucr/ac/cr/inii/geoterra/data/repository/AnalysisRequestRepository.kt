@@ -6,8 +6,8 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
-import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestDTO
-import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
+import ucr.ac.cr.inii.geoterra.data.model.responses.AnalysisRequestDTO
+import ucr.ac.cr.inii.geoterra.data.model.responses.AnalysisRequestRemote
 import ucr.ac.cr.inii.geoterra.domain.repository.AnalysisRequestRepositoryInterface
 
 class AnalysisRequestRepository(

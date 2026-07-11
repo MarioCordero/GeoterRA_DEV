@@ -4,7 +4,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import ucr.ac.cr.inii.geoterra.data.model.remote.GeomanifestationFilters
+import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationFilters
 import ucr.ac.cr.inii.geoterra.domain.location.LocationProvider
 import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
 import ucr.ac.cr.inii.geoterra.domain.repository.CantonRepositoryInterface

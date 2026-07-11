@@ -1,7 +1,7 @@
 package ucr.ac.cr.inii.geoterra.domain.repository
 
-import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestDTO
-import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
+import ucr.ac.cr.inii.geoterra.data.model.responses.AnalysisRequestDTO
+import ucr.ac.cr.inii.geoterra.data.model.responses.AnalysisRequestRemote
 
 interface AnalysisRequestRepositoryInterface {
   suspend fun getMyRequests(): Result<List<AnalysisRequestRemote>>
