@@ -1,13 +1,13 @@
 package ucr.ac.cr.inii.geoterra.domain.repository
 
-import ucr.ac.cr.inii.geoterra.data.model.remote.GeomanifestationFilters
-import ucr.ac.cr.inii.geoterra.data.model.remote.GeomanifestationRemote
-import ucr.ac.cr.inii.geoterra.data.model.remote.PaginatedManifestationsRemote
+import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationFilters
+import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.PaginatedManifestationsRemote
 
 interface GeomanifestationsRepositoryInterface {
   suspend fun getManifestations(
     filters: GeomanifestationFilters = GeomanifestationFilters()
   ): Result<PaginatedManifestationsRemote>
 
-  suspend fun getManifestationById(id: String): Result<GeomanifestationRemote>
+  suspend fun getManifestationById(id: String): Result<GeomanifestationResponse>
 }

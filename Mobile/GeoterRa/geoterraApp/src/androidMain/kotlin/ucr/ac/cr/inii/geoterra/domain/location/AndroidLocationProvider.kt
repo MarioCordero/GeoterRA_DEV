@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
-import ucr.ac.cr.inii.geoterra.data.model.local.UserLocation
 
 class AndroidLocationProvider(
   private val context: Context

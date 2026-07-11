@@ -1,6 +1,5 @@
-package ucr.ac.cr.inii.geoterra.data.model.remote
+package ucr.ac.cr.inii.geoterra.data.model.responses
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -23,26 +22,24 @@ data class GeomanifestationFilters(
  */
 @Serializable
 data class PaginatedManifestationsRemote(
-	val data: List<GeomanifestationRemote>, val pagination: PaginationRemote
+	val data: List<GeomanifestationResponse>, val pagination: PaginationResponse
 )
 
 @Serializable
-data class GeomanifestationRemote(
+data class GeomanifestationResponse(
 	val geomanifestation_id: String,
 	val name: String,
-	val latitude: Double,
-	val longitude: Double,
 	val description: String?,
 	val created_at: String,
-	val location: LocationRemote,
-	val current_georeport: GeoreportRemote? = null,
-	val insitu_test: InsituTestRemote? = null,
-	val inlab_test: InlabTestRemote? = null
+	val location: LocationResponse,
+	val current_georeport: GeoreportResponse? = null,
+	val insitu_test: InsituTestResponse? = null,
+	val inlab_test: InlabTestResponse? = null
 ) {
 
 }
 
-fun List<GeomanifestationRemote>.toGeoJsonString(): String {
+fun List<GeomanifestationResponse>.toGeoJsonString(): String {
 	val featuresJson = joinToString(",") { manifestation ->
 		val temperature = manifestation.insitu_test?.temperature
 		"""
@@ -50,15 +47,15 @@ fun List<GeomanifestationRemote>.toGeoJsonString(): String {
           "type": "Feature",
           "geometry": {
             "type": "Point",
-            "coordinates": [${manifestation.longitude}, ${manifestation.latitude}]
+            "coordinates": [${manifestation.location.longitude}, ${manifestation.location.latitude}]
           },
           "properties": {
             "id": "${manifestation.geomanifestation_id}",
             "name": "${manifestation.name}",
             "description": "${manifestation.description}",
             "temp": $temperature,
-						"latitude": ${manifestation.latitude},
-			    	"longitude": ${manifestation.longitude},
+						"latitude": ${manifestation.location.latitude},
+			    	"longitude": ${manifestation.location.longitude},
 					  "province": "${manifestation.location.province}",
 						"province_snit_code": ${manifestation.location.province_snit_code},
 						"canton": "${manifestation.location.canton}",

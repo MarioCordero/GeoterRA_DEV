@@ -1,7 +1,7 @@
 package ucr.ac.cr.inii.geoterra.domain.repository
 
-import ucr.ac.cr.inii.geoterra.data.model.remote.LoginRequest
-import ucr.ac.cr.inii.geoterra.data.model.remote.RegisterRequest
+import ucr.ac.cr.inii.geoterra.data.model.requests.LoginRequest
+import ucr.ac.cr.inii.geoterra.data.model.requests.RegisterRequest
 
 interface AuthRepositoryInterface {
   suspend fun register(request: RegisterRequest): Result<Unit>

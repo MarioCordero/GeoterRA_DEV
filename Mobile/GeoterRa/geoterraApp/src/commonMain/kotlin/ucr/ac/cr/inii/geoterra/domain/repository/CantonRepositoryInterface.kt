@@ -1,7 +1,7 @@
 package ucr.ac.cr.inii.geoterra.domain.repository
 
-import ucr.ac.cr.inii.geoterra.data.model.remote.CantonRemote
+import ucr.ac.cr.inii.geoterra.data.model.responses.CantonResponse
 
 interface CantonRepositoryInterface {
-  suspend fun getCantons(): Result<List<CantonRemote>>
+  suspend fun getCantons(): Result<List<CantonResponse>>
 }

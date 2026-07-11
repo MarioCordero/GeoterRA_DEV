@@ -10,7 +10,6 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.client.engine.cio.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.utils.io.InternalAPI
 import kotlinx.coroutines.CoroutineScope
@@ -23,8 +22,8 @@ import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.ErrorMapper
 import ucr.ac.cr.inii.geoterra.core.network.NetworkConfig
 import ucr.ac.cr.inii.geoterra.core.network.TokenManager
-import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenRequest
-import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenResponse
+import ucr.ac.cr.inii.geoterra.data.model.requests.RefreshAccessTokenRequest
+import ucr.ac.cr.inii.geoterra.data.model.responses.RefreshAccessTokenResponse
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthEventBus
 
@@ -50,6 +49,8 @@ val networkModule = module {
         json(Json {
           ignoreUnknownKeys = true
           coerceInputValues = true
+          explicitNulls = true
+          encodeDefaults = true
         })
       }
 

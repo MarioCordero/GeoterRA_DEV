@@ -1,9 +1,9 @@
-package ucr.ac.cr.inii.geoterra.data.model.remote
+package ucr.ac.cr.inii.geoterra.data.model.responses
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class InlabTestRemote(
+data class InlabTestResponse(
 	val inlab_test_id: String,
 	val ph: Double?,
 	val conductivity: Double?,
