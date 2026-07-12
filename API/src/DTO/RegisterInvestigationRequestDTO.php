@@ -46,7 +46,7 @@ final class RegisterInvestigationRequestDTO
   ) {}
 
   /**
-   * Creates DTO from HTTP request payload.
+   * Creates DTO from the HTTP request payload.
    *
    * @param array<string,mixed> $data
    * @return self
@@ -103,10 +103,9 @@ final class RegisterInvestigationRequestDTO
   /**
    * Validates business rules for creation.
    *
-   * @param array<string,mixed> $userData Authenticated user data (keys: first_name, last_name, phone_number, email, user_id)
    * @throws ApiException
    */
-  public function validate(array $userData): void
+  public function validate(): void
   {
     // SNIT codes must be positive
     if ($this->provinceSnitCode <= 0 || $this->cantonSnitCode <= 0 || $this->districtSnitCode <= 0) {
