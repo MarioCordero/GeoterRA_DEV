@@ -123,7 +123,7 @@ fun InvestigationRequestFormContent(
           icon = Icons.Default.AccountCircle
         )
         CustomTextField(
-          value = state.request.owner_phone_number ?: "¨",
+          value = state.request.owner_phone_number ?: "",
           onValueChange = { onEvent(AnalysisFormEvent.OwnerPhoneChanged(it)) },
           label = "Teléfono",
           icon = Icons.Default.Phone,
@@ -198,8 +198,6 @@ fun InvestigationRequestFormContent(
         singleLine = false,
         minLines = 1
       )
-
-      Spacer(Modifier.width(4.dp))
 
       CustomTextField(
         value = state.request.details,

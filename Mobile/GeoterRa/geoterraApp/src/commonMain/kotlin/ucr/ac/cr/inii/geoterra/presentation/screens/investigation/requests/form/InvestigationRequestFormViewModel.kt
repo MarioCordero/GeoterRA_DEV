@@ -151,10 +151,16 @@ class InvestigationRequestFormViewModel(
 
   private fun submitForm() {
     if (!validateFields()) return
-
     _state.update { it.copy(isLoading = true, error = null) }
+
     screenModelScope.launch {
-      val currentRequest = _state.value.request
+      val currentState = _state.value
+
+      val currentRequest = currentState.request.copy(
+        owner_name = currentState.request.owner_name.takeIf { it?.isNotBlank() ?: true  },
+        owner_email = currentState.request.owner_email.takeIf { it?.isNotBlank() ?: true },
+        owner_phone_number = currentState.request.owner_phone_number.takeIf { it?.isNotBlank() ?: true }
+      )
 
       val result = if (requestId != null) {
         analysisRequestRepository.updateRequest(requestId, currentRequest)
