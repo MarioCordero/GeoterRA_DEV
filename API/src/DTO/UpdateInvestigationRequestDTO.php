@@ -12,6 +12,9 @@ use Http\ErrorType;
  */
 final class UpdateInvestigationRequestDTO
 {
+  /** @var string[] List of field names that were explicitly set via fromArray */
+  private array $setFields = [];
+
   /**
    * @param int|null $provinceSnitCode New province SNIT code
    * @param int|null $cantonSnitCode New canton SNIT code
@@ -46,34 +49,80 @@ final class UpdateInvestigationRequestDTO
   ) {}
 
   /**
-   * Creates DTO from HTTP request payload (only fields that exist in the array).
+   * Creates DTO from the HTTP request payload (only fields that exist in the
+   * array).
    *
    * @param array<string,mixed> $data
    * @return self
    */
   public static function fromArray(array $data): self
   {
-    return new self(
-      provinceSnitCode: isset($data['province_snit_code']) ? (int)$data['province_snit_code'] : null,
-      cantonSnitCode: isset($data['canton_snit_code']) ? (int)$data['canton_snit_code'] : null,
-      districtSnitCode: isset($data['district_snit_code']) ? (int)$data['district_snit_code'] : null,
-      currentUsage: isset($data['current_usage']) ? (string)$data['current_usage'] : null,
-      temperatureSensation: isset($data['temperature_sensation']) ? (string)$data['temperature_sensation'] : null,
-      ownerName: isset($data['owner_name']) ? trim((string)$data['owner_name']) : null,
-      ownerPhoneNumber: $data['owner_phone_number'] ?? null,
-      ownerEmail: $data['owner_email'] ?? null,
-      bubbles: isset($data['bubbles']) ? (bool)$data['bubbles'] : null,
-      details: $data['details'] ?? null,
-      exactAddress: $data['exact_address'] ?? null,
-      latitude: isset($data['latitude']) ? (float)$data['latitude'] : null,
-      longitude: isset($data['longitude']) ? (float)$data['longitude'] : null,
-      relationWithOwner: $data['relation_with_owner'] ?? null
-    );
+    $dto = new self();
+    $dto->setFields = [];
+
+    if (array_key_exists('province_snit_code', $data)) {
+      $dto->provinceSnitCode = $data['province_snit_code'] !== null ? (int)$data['province_snit_code'] : null;
+      $dto->setFields[] = 'province_snit_code';
+    }
+    if (array_key_exists('canton_snit_code', $data)) {
+      $dto->cantonSnitCode = $data['canton_snit_code'] !== null ? (int)$data['canton_snit_code'] : null;
+      $dto->setFields[] = 'canton_snit_code';
+    }
+    if (array_key_exists('district_snit_code', $data)) {
+      $dto->districtSnitCode = $data['district_snit_code'] !== null ? (int)$data['district_snit_code'] : null;
+      $dto->setFields[] = 'district_snit_code';
+    }
+    if (array_key_exists('current_usage', $data)) {
+      $dto->currentUsage = $data['current_usage'] !== null ? (string)$data['current_usage'] : null;
+      $dto->setFields[] = 'current_usage';
+    }
+    if (array_key_exists('temperature_sensation', $data)) {
+      $dto->temperatureSensation = $data['temperature_sensation'] !== null ? (string)$data['temperature_sensation'] : null;
+      $dto->setFields[] = 'temperature_sensation';
+    }
+    if (array_key_exists('owner_name', $data)) {
+      $dto->ownerName = $data['owner_name'] !== null ? trim((string)$data['owner_name']) : null;
+      $dto->setFields[] = 'owner_name';
+    }
+    if (array_key_exists('owner_phone_number', $data)) {
+      $dto->ownerPhoneNumber = $data['owner_phone_number'] !== null ? (string)$data['owner_phone_number'] : null;
+      $dto->setFields[] = 'owner_phone_number';
+    }
+    if (array_key_exists('owner_email', $data)) {
+      $dto->ownerEmail = $data['owner_email'] !== null ? (string)$data['owner_email'] : null;
+      $dto->setFields[] = 'owner_email';
+    }
+    if (array_key_exists('bubbles', $data)) {
+      $dto->bubbles = $data['bubbles'] !== null ? (bool)$data['bubbles'] : null;
+      $dto->setFields[] = 'bubbles';
+    }
+    if (array_key_exists('details', $data)) {
+      $dto->details = $data['details'] !== null ? (string)$data['details'] : null;
+      $dto->setFields[] = 'details';
+    }
+    if (array_key_exists('exact_address', $data)) {
+      $dto->exactAddress = $data['exact_address'] !== null ? (string)$data['exact_address'] : null;
+      $dto->setFields[] = 'exact_address';
+    }
+    if (array_key_exists('latitude', $data)) {
+      $dto->latitude = $data['latitude'] !== null ? (float)$data['latitude'] : null;
+      $dto->setFields[] = 'latitude';
+    }
+    if (array_key_exists('longitude', $data)) {
+      $dto->longitude = $data['longitude'] !== null ? (float)$data['longitude'] : null;
+      $dto->setFields[] = 'longitude';
+    }
+    if (array_key_exists('relation_with_owner', $data)) {
+      $dto->relationWithOwner = $data['relation_with_owner'] !== null ? (string)$data['relation_with_owner'] : null;
+      $dto->setFields[] = 'relation_with_owner';
+    }
+
+    return $dto;
   }
 
   /**
    * Returns an array with only the fields that should be updated.
-   * Excludes null values; includes false for bubbles if provided.
+   * Excludes fields that were not explicitly set; includes null values for fields set to null.
    *
    * @return array<string,mixed>
    */
@@ -81,47 +130,12 @@ final class UpdateInvestigationRequestDTO
   {
     $update = [];
 
-    if ($this->provinceSnitCode !== null) {
-      $update['province_snit_code'] = $this->provinceSnitCode;
-    }
-    if ($this->cantonSnitCode !== null) {
-      $update['canton_snit_code'] = $this->cantonSnitCode;
-    }
-    if ($this->districtSnitCode !== null) {
-      $update['district_snit_code'] = $this->districtSnitCode;
-    }
-    if ($this->currentUsage !== null) {
-      $update['current_usage'] = $this->currentUsage;
-    }
-    if ($this->temperatureSensation !== null) {
-      $update['temperature_sensation'] = $this->temperatureSensation;
-    }
-    if ($this->ownerName !== null) {
-      $update['owner_name'] = $this->ownerName;
-    }
-    if ($this->ownerPhoneNumber !== null) {
-      $update['owner_phone_number'] = $this->ownerPhoneNumber;
-    }
-    if ($this->ownerEmail !== null) {
-      $update['owner_email'] = $this->ownerEmail;
-    }
-    if ($this->bubbles !== null) {
-      $update['bubbles'] = $this->bubbles ? 1 : 0;
-    }
-    if ($this->details !== null) {
-      $update['details'] = $this->details;
-    }
-    if ($this->exactAddress !== null) {
-      $update['exact_address'] = $this->exactAddress;
-    }
-    if ($this->latitude !== null) {
-      $update['latitude'] = $this->latitude;
-    }
-    if ($this->longitude !== null) {
-      $update['longitude'] = $this->longitude;
-    }
-    if ($this->relationWithOwner !== null) {
-      $update['relation_with_owner'] = $this->relationWithOwner;
+    foreach ($this->setFields as $field) {
+      $value = $this->$field;
+      if ($field === 'bubbles' && $value !== null) {
+        $value = $value ? 1 : 0;
+      }
+      $update[$field] = $value;
     }
 
     return $update;
@@ -130,10 +144,9 @@ final class UpdateInvestigationRequestDTO
   /**
    * Validates business rules for the fields that are being updated.
    *
-   * @param array<string,mixed> $userData Authenticated user data (not used in validation anymore, kept for signature compatibility)
    * @throws ApiException
    */
-  public function validate(array $userData): void
+  public function validate(): void
   {
     // SNIT codes must be positive if provided
     if ($this->provinceSnitCode !== null && $this->provinceSnitCode <= 0) {
