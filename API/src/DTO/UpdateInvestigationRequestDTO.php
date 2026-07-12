@@ -12,7 +12,7 @@ use Http\ErrorType;
  */
 final class UpdateInvestigationRequestDTO
 {
-  /** @var string[] List of field names that were explicitly set via fromArray */
+  /** @var string[] List of field names (snake_case) that were explicitly set via fromArray */
   private array $setFields = [];
 
   /**
@@ -49,8 +49,7 @@ final class UpdateInvestigationRequestDTO
   ) {}
 
   /**
-   * Creates DTO from the HTTP request payload (only fields that exist in the
-   * array).
+   * Creates DTO from HTTP request payload (only fields that exist in the array).
    *
    * @param array<string,mixed> $data
    * @return self
@@ -129,13 +128,33 @@ final class UpdateInvestigationRequestDTO
   public function toArray(): array
   {
     $update = [];
+    $fieldMap = [
+      'province_snit_code'     => 'provinceSnitCode',
+      'canton_snit_code'       => 'cantonSnitCode',
+      'district_snit_code'     => 'districtSnitCode',
+      'current_usage'          => 'currentUsage',
+      'temperature_sensation'  => 'temperatureSensation',
+      'owner_name'             => 'ownerName',
+      'owner_phone_number'     => 'ownerPhoneNumber',
+      'owner_email'            => 'ownerEmail',
+      'bubbles'                => 'bubbles',
+      'details'                => 'details',
+      'exact_address'          => 'exactAddress',
+      'latitude'               => 'latitude',
+      'longitude'              => 'longitude',
+      'relation_with_owner'    => 'relationWithOwner',
+    ];
 
-    foreach ($this->setFields as $field) {
-      $value = $this->$field;
-      if ($field === 'bubbles' && $value !== null) {
+    foreach ($this->setFields as $fieldKey) {
+      $property = $fieldMap[$fieldKey] ?? null;
+      if ($property === null) {
+        continue;
+      }
+      $value = $this->$property;
+      if ($fieldKey === 'bubbles' && $value !== null) {
         $value = $value ? 1 : 0;
       }
-      $update[$field] = $value;
+      $update[$fieldKey] = $value;
     }
 
     return $update;
