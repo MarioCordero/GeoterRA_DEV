@@ -79,7 +79,7 @@ fun RequestBottomModalContent(
     InfoChip(
       Icons.Default.Person,
       "Nombre Completo",
-      request.owner_name,
+      request.owner_name ?: "No especificado",
       fillMaxWidth,
       MaterialTheme.colorScheme.primary
     )
@@ -89,7 +89,7 @@ fun RequestBottomModalContent(
     InfoChip(
       Icons.Default.Phone,
       "Teléfono",
-      request.owner_phone_number ?: "Sin especificar",
+      request.owner_phone_number ?: "No especificado",
       fillMaxWidth,
       MaterialTheme.colorScheme.secondary
     )
@@ -99,7 +99,7 @@ fun RequestBottomModalContent(
     InfoChip(
       Icons.Default.Email,
       "Correo Electrónico",
-      request.owner_email,
+      request.owner_email ?: "No especificado",
       fillMaxWidth,
       MaterialTheme.colorScheme.primary
     )
@@ -165,6 +165,8 @@ fun RequestBottomModalContent(
       "Dirección Exacta", request.exact_address.ifBlank { "No especificado" },
       Modifier.fillMaxWidth()
     )
+
+    Spacer(modifier = Modifier.height(chipSpacing))
 
     InfoChip(
       Icons.Default.Description,

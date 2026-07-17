@@ -176,7 +176,7 @@ fun InvestigationRequestFormContent(
       }
     }
 
-    FormSection(title = "Información Adicional", icon = Icons.Default.Home) {
+    FormSection(title = "Información ", icon = Icons.Default.Home) {
       // Current usage dropdown
       SearchableDropdown(
         label = "Uso actual",
@@ -191,6 +191,18 @@ fun InvestigationRequestFormContent(
       )
 
       CustomTextField(
+        value = state.request.details,
+        onValueChange = { onEvent(AnalysisFormEvent.DetailsChanged(it)) },
+        label = "Detalles adicionales",
+        icon = Icons.Default.Description,
+        singleLine = false,
+        minLines = 1
+      )
+
+    }
+
+    FormSection(title = "Información de Ubicación Exacta", icon = Icons.Default.Map) {
+      CustomTextField(
         value = state.request.exact_address,
         onValueChange = { onEvent(AnalysisFormEvent.ExactAddressChanged(it)) },
         label = "Dirección exacta",
@@ -199,17 +211,6 @@ fun InvestigationRequestFormContent(
         minLines = 1
       )
 
-      CustomTextField(
-        value = state.request.details,
-        onValueChange = { onEvent(AnalysisFormEvent.DetailsChanged(it)) },
-        label = "Detalles adicionales",
-        icon = Icons.Default.Description,
-        singleLine = false,
-        minLines = 1
-      )
-    }
-
-    FormSection(title = "Ubicación GPS", icon = Icons.Default.Map) {
       Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
           CustomTextField(
