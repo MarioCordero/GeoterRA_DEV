@@ -7,8 +7,8 @@ import kotlinx.serialization.json.JsonElement
 
 @Serializable
 data class ApiError(
-  val code: String,
-  val message: String
+	val code: String,
+	val message: String
 ) {
 
 	fun isAuthError(): Boolean = code in authErrorCodes
@@ -43,9 +43,6 @@ data class ApiError(
 			INVALID_REFRESH_TOKEN,
 			UNAUTHORIZED
 		)
-
-		fun resolveMessage(errorMessage: String?): String =
-			errorMessage?.takeIf { it.isNotBlank() } ?: DEFAULT_MESSAGE
 	}
 }
 
@@ -63,9 +60,9 @@ fun Throwable.isInvalidAccess(): Boolean =
 
 @Serializable
 data class ApiResponseModel<T>(
-  val data: T? = null,
-  val meta: Map<String, JsonElement>? = null,
-  val errors: List<ApiError> = emptyList()
+	val data: T? = null,
+	val meta: Map<String, JsonElement>? = null,
+	val errors: List<ApiError> = emptyList()
 )
 
 suspend fun <T> handleErrorResponse(response: HttpResponse): Result<T> {
@@ -74,7 +71,8 @@ suspend fun <T> handleErrorResponse(response: HttpResponse): Result<T> {
 		val firstError = errorEnvelope.errors.firstOrNull()
 
 		val errorCode = firstError?.code ?: ApiError.INTERNAL_ERROR
-		val errorMessage = ApiError.resolveMessage(firstError?.message)
+		val errorMessage = firstError?.message
+			?: "Ocurrió un error inesperado. Por favor, intenta de nuevo."
 
 		val apiError = ApiError(errorCode, errorMessage)
 		Result.failure(ApiException(apiError))
