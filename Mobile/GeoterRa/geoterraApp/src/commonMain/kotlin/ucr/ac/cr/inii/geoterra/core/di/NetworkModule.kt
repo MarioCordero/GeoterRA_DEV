@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
-import ucr.ac.cr.inii.geoterra.core.network.ErrorMapper
 import ucr.ac.cr.inii.geoterra.core.network.NetworkConfig
 import ucr.ac.cr.inii.geoterra.core.network.TokenManager
 import ucr.ac.cr.inii.geoterra.data.model.requests.RefreshAccessTokenRequest
@@ -104,12 +103,12 @@ val networkModule = module {
               val errors = response.errors
 
               val hasRefreshTokenError = errors.any { error ->
-                error.code == ErrorMapper.INVALID_REFRESH_TOKEN || ErrorMapper.isAuthError(error.code)
+                error.isAuthError()
               }
 
               if (hasRefreshTokenError || data == null) {
                 tm.clearTokens()
-                authEventBus.emit(AuthEvent.Unauthorized)
+                authEventBus.emit(AuthEvent.Logout)
                 return@refreshTokens null
               }
 
@@ -120,7 +119,7 @@ val networkModule = module {
 
             } catch (e: Exception) {
               tm.clearTokens()
-              authEventBus.emit(AuthEvent.Unauthorized)
+              authEventBus.emit(AuthEvent.Logout)
               null
             }
           }
