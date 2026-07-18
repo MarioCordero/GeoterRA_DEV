@@ -67,11 +67,10 @@ final class AuthController
       }
 
       $result = $this->authService->refreshTokens($body['refresh_token']);
-
       if (Request::isWeb()) {
         // Update cookie with new access token
         $accessToken = $result['data']['access_token'];
-        $expiresIn = $result['meta']['expires_in'] ?? 5400;
+        $expiresIn = $result['meta']['expires_in'] ?? 60 * 5;
         setcookie(
           'geoterra_session_token',
           $accessToken,
@@ -103,7 +102,7 @@ final class AuthController
         ];
         $meta = [
           'token_type' => 'Bearer',
-          'expires_in' => $result['meta']['expires_in'] ?? 5400,
+          'expires_in' => $result['meta']['expires_in'] ?? 60 * 5,
         ];
       }
 
@@ -128,7 +127,7 @@ final class AuthController
       if (Request::isWeb()) {
         setcookie(
           'geoterra_session_token', '', [
-          'expires' => time() - 3600,
+          'expires' => time() - 60 * 5,
           'path' => '/',
           'domain' => '',
           'secure' => false,
