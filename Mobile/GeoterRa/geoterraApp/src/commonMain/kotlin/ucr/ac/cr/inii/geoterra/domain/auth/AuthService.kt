@@ -4,7 +4,8 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.yield
+import ucr.ac.cr.inii.geoterra.data.model.requests.LoginRequest
+import ucr.ac.cr.inii.geoterra.data.model.requests.RegisterRequest
 import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepositoryInterface
 
 class AuthService(
@@ -12,61 +13,52 @@ class AuthService(
   private val authEventBus: AuthEventBus
 ) : ScreenModel {
   val isLoggedIn: StateFlow<Boolean?> = authEventBus.isLoggedIn
+  val events = authEventBus.events
 
   init {
-    // Coroutine scope for the ViewModel
     screenModelScope.launch {
-      // Check if the user is logged in when the ViewModel is created
       val isUserLogged = authRepository.isUserLoggedIn()
       authEventBus.updateLoginState(isUserLogged)
 
-      // Subscribe to unauthorized events
+      if (isUserLogged) {
+        authEventBus.emit(AuthEvent.Authorized)
+      }
+
       authEventBus.events.collect { event ->
         when (event) {
-          is AuthEvent.Login -> {
-            val result = authRepository.login(event.request)
-            if (result.isSuccess) {
-              authEventBus.emit(AuthEvent.LoginSuccess)
-              loginSuccess()
-            }
-            event.response.complete(result)
-          }
-
-          is AuthEvent.Register -> {
-            val result = authRepository.register(event.request)
-            event.response.complete(result)
-
-          }
-
           is AuthEvent.Logout -> {
-            logout()
-            authEventBus.emit(AuthEvent.Unauthorized)
+            executeLogoutCleanup()
           }
-
           is AuthEvent.RefreshToken -> {
-            refreshAccessToken()
+            authRepository.refreshAccessToken()
           }
           else -> {}
         }
       }
-      if (isUserLogged) {
-        authEventBus.emit(AuthEvent.Authorized)
-      }
     }
   }
-  
-  suspend fun loginSuccess() {
-    authEventBus.updateLoginState(true)
-    authEventBus.emit(AuthEvent.Authorized)
+
+  suspend fun login(request: LoginRequest): Result<Unit> {
+    val result = authRepository.login(request)
+    if (result.isSuccess) {
+      authEventBus.emit(AuthEvent.LoginSuccess)
+      authEventBus.updateLoginState(true)
+      authEventBus.emit(AuthEvent.Authorized)
+    }
+    return result
   }
-  
+
+  suspend fun register(request: RegisterRequest): Result<Unit> {
+    return authRepository.register(request)
+  }
+
   suspend fun logout() {
+    authEventBus.emit(AuthEvent.Logout)
+  }
+
+  private suspend fun executeLogoutCleanup() {
     authRepository.logout()
     authEventBus.updateLoginState(false)
+    authEventBus.emit(AuthEvent.Unauthorized)
   }
-  
-  suspend fun refreshAccessToken() {
-    authRepository.refreshAccessToken()
-  }
-  
 }

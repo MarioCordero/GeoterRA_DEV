@@ -29,14 +29,6 @@ fun RequestsContent(
       }
     }
 
-    state.snackBarMessage?.let {
-      Text(
-        text = it,
-        color = MaterialTheme.colorScheme.error,
-        modifier = Modifier.padding(16.dp)
-      )
-    }
-
     LazyColumn(
       contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp),

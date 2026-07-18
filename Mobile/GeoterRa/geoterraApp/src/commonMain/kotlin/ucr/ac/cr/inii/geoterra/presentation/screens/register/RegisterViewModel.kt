@@ -6,10 +6,11 @@ import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.requests.RegisterRequest
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthEventBus
+import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 class RegisterViewModel(
-  private val authEventBus: AuthEventBus
+  private val authService: AuthService
 ) : BaseScreenModel<RegisterState>(RegisterState()) {
 
   fun onNameChanged(v: String) = updateState { it.copy(name = v, fieldErrors = it.fieldErrors - "name") }
@@ -52,11 +53,8 @@ class RegisterViewModel(
         password = s.password
       )
 
-      val deferred = CompletableDeferred<Result<Unit>>()
 
-      authEventBus.emit(AuthEvent.Register(request, deferred))
-
-      deferred.await()
+      authService.register(request)
         .onSuccess {
           updateState { it.copy(isLoading = false, isSuccess = true) }
         }

@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.requests.LoginRequest
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthEventBus
+import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 /**
@@ -14,7 +15,7 @@ import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
  * 
  */
 class LoginViewModel(
-  private val authEventBus: AuthEventBus,
+  private val authService: AuthService,
 ) : BaseScreenModel<LoginState>(LoginState()) {
   
   fun onEmailChanged(newValue: String) {
@@ -65,16 +66,9 @@ class LoginViewModel(
 
     screenModelScope.launch {
       val s = state.value
-      val deferred = CompletableDeferred<Result<Unit>>()
+      val request = LoginRequest(s.email, s.password)
 
-      authEventBus.emit(
-        AuthEvent.Login(
-          LoginRequest(s.email, s.password)
-          , deferred
-        )
-      )
-
-      deferred.await()
+      authService.login(request)
         .onSuccess {
           delay(100)
           updateState { it.copy(isLoading = false, isSuccess = true) }

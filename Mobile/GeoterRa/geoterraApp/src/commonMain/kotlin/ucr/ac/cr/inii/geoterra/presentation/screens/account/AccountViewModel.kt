@@ -8,16 +8,17 @@ import ucr.ac.cr.inii.geoterra.core.network.isAuthError
 import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthEventBus
+import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 class AccountViewModel(
 	private val userRepository: UserRepositoryInterface,
-	private val authEventBus: AuthEventBus
+	private val authService: AuthService
 ) : BaseScreenModel<AccountState>(AccountState()) {
 
 	init {
 		screenModelScope.launch {
-			authEventBus.isLoggedIn.collect { isLogged ->
+			authService.isLoggedIn.collect { isLogged ->
 				when (isLogged) {
 					true -> loadUserProfile()
 					false -> _state.update { it.copy(user = null, error = null) }
@@ -35,7 +36,7 @@ class AccountViewModel(
 				.onFailure { e ->
 					val exception = e as ApiException
 					if (exception.isAuthError()) {
-						authEventBus.emit(AuthEvent.Logout)
+						authService.logout()
 						_state.update { it.copy(error = "Su sesión ha expirado. Inicie sesión nuevamente.", isLoading = false) }
 					} else {
 						_state.update { it.copy(error = e.message, isLoading = false) }
@@ -60,7 +61,7 @@ class AccountViewModel(
 
 	fun logout() {
 		screenModelScope.launch {
-			authEventBus.emit(AuthEvent.Logout)
+			authService.logout()
 		}
 	}
 

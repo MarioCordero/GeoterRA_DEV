@@ -9,24 +9,26 @@ import ucr.ac.cr.inii.geoterra.core.network.isInvalidAccess
 import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 import ucr.ac.cr.inii.geoterra.domain.repository.InvestigationRequestsRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
-import ucr.ac.cr.inii.geoterra.domain.auth.AuthEventBus
+import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 
 class InvestigationRequestsViewModel(
   private val requestRepository: InvestigationRequestsRepositoryInterface,
-  private val authEventBus: AuthEventBus
+  private val authService: AuthService
 ) : BaseScreenModel<InvestigationRequestsState>(InvestigationRequestsState()) {
   
   init {
     screenModelScope.launch {
-      authEventBus.events.collect { event ->
+      authService.events.collect { event ->
         when (event) {
-          is AuthEvent.Logout -> {
+          is AuthEvent.Unauthorized -> {
             clearData()
+						updateLoginState(false)
           }
 
           is AuthEvent.Authorized -> {
             fetchSubmittedRequests()
+						updateLoginState(true)
           }
 
           else -> {}
@@ -38,6 +40,10 @@ class InvestigationRequestsViewModel(
   private fun clearData() {
     _state.update { it.copy(requests = emptyList(), isLoading = false) }
   }
+
+	private fun updateLoginState(isLoggedIn: Boolean) {
+		_state.update { it.copy(isLoggedIn = isLoggedIn, isLoading = false) }
+	}
   
   fun fetchSubmittedRequests() {
     screenModelScope.launch {
@@ -113,6 +119,10 @@ class InvestigationRequestsViewModel(
   fun clearPdfError() {
     _state.update { it.copy(pdfError = null) }
   }
+
+	fun updateSnackBarMessage(message: String?) {
+		_state.update { it.copy(snackBarMessage = message) }
+	}
 
   /**
    * Dismiss the snackbar message.
