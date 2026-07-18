@@ -6,9 +6,9 @@ import kotlinx.serialization.Serializable
 data class InvestigationRequestResponse(
   val request_id: String,
   val request_name: String,
-  val owner_name: String,
+  val owner_name: String?,
   val owner_phone_number: String?,
-  val owner_email: String,
+  val owner_email: String?,
   val current_usage: String,
   val temperature_sensation: String,
   val bubbles: Boolean,

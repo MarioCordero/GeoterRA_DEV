@@ -3,6 +3,9 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ucr.ac.cr.inii.geoterra.core.network.ApiException
+import ucr.ac.cr.inii.geoterra.core.network.isAuthError
+import ucr.ac.cr.inii.geoterra.core.network.isInvalidAccess
 import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 import ucr.ac.cr.inii.geoterra.domain.repository.InvestigationRequestsRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
@@ -18,7 +21,7 @@ class InvestigationRequestsViewModel(
     screenModelScope.launch {
       authEventBus.events.collect { event ->
         when (event) {
-          is AuthEvent.Unauthorized -> {
+          is AuthEvent.Logout -> {
             clearData()
           }
 
@@ -43,11 +46,12 @@ class InvestigationRequestsViewModel(
         .onSuccess { data ->
           _state.update { it.copy(isLoading = false, requests = data) }
         }
-        .onFailure { exception ->
-          if (exception.message == "Tu sesión ha expirado. Por favor, inicia sesión de nuevo.") {
-            _state.update { it.copy(isLoading = false) }
+        .onFailure { exception->
+          val apiException = exception as? ApiException
+          if (!(apiException?.isAuthError() == true || apiException?.isInvalidAccess() == true)) {
+            _state.update { it.copy(isLoading = false, snackBarMessage = apiException?.message) }
           } else {
-            _state.update { it.copy(isLoading = false, snackBarMessage = exception.message) }
+            _state.update { it.copy(isLoading = false, snackBarMessage = null) }
           }
         }
     }
@@ -110,5 +114,8 @@ class InvestigationRequestsViewModel(
     _state.update { it.copy(pdfError = null) }
   }
 
+  /**
+   * Dismiss the snackbar message.
+   */
   fun dismissSnackBar() = updateState { it.copy(snackBarMessage = null) }
 }
