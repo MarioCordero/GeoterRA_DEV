@@ -18,11 +18,10 @@ class AccountViewModel(
 
 	init {
 		screenModelScope.launch {
-			authService.isLoggedIn.collect { isLogged ->
-				when (isLogged) {
-					true -> loadUserProfile()
-					false -> _state.update { it.copy(user = null, error = null) }
-					null -> {}
+			authService.events.collect { event ->
+				when (event) {
+					is AuthEvent.LoginSuccess, is AuthEvent.Authorized -> loadUserProfile()
+					is AuthEvent.Logout, is AuthEvent.Unauthorized -> _state.update { it.copy(user = null, isLoading = false) }
 				}
 			}
 		}
@@ -36,7 +35,6 @@ class AccountViewModel(
 				.onFailure { e ->
 					val exception = e as ApiException
 					if (exception.isAuthError()) {
-						authService.logout()
 						_state.update { it.copy(error = "Su sesión ha expirado. Inicie sesión nuevamente.", isLoading = false) }
 					} else {
 						_state.update { it.copy(error = e.message, isLoading = false) }

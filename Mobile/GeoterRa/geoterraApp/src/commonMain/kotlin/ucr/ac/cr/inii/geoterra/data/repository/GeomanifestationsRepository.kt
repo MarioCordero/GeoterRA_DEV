@@ -23,10 +23,7 @@ class GeomanifestationsRepository(private val client: HttpClient) : Geomanifesta
    */
   override suspend fun getManifestations(filters: GeomanifestationFilters): Result<PaginatedManifestationsRemote> {
     return try {
-      // Evaluates whether to use the admin or public endpoint depending on showAll flag
-      val endpoint = if (filters.showAll == true) "admin/geomanifestations" else "geomanifestations"
-
-      val response = client.get(endpoint) {
+      val response = client.get("geomanifestations") {
         filters.page?.let { parameter("page", it) }
         filters.limit?.let { parameter("limit", it) }
         filters.provinceSnitCode?.let { parameter("province_snit_code", it) }
@@ -34,7 +31,6 @@ class GeomanifestationsRepository(private val client: HttpClient) : Geomanifesta
         filters.districtSnitCode?.let { parameter("district_snit_code", it) }
         filters.tempMin?.let { parameter("temp_min", it) }
         filters.tempMax?.let { parameter("temp_max", it) }
-        filters.showAll?.let { parameter("show_all", it) }
       }
 
       if (response.status.isSuccess()) {

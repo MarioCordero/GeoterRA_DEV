@@ -38,16 +38,9 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.FormSection
 fun EditProfileContent(
   modifier: Modifier = Modifier,
   state: EditProfileState,
-  snackBarState : SnackbarHostState,
   onEvent: EditProfileViewModel,
   onBack: () -> Unit
 ) {
-  LaunchedEffect(state.snackBarMessage) {
-    state.snackBarMessage?.let { message ->
-      snackBarState.showSnackbar(message)
-      onEvent.dismissSnackbar()
-    }
-  }
 
   Column(
     modifier = modifier

@@ -24,9 +24,10 @@ import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 import ucr.ac.cr.inii.geoterra.domain.pdf.PDFUtil
 import ucr.ac.cr.inii.geoterra.presentation.components.request.RequestBottomModalContent
 import ucr.ac.cr.inii.geoterra.presentation.components.common.ConfirmDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.common.StatusDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.form.InvestigationRequestFormScreen
 
 class RequestsScreen : Screen {
@@ -39,7 +40,7 @@ class RequestsScreen : Screen {
 		val state by viewModel.state.collectAsState()
 		val navigator = LocalNavigator.currentOrThrow
 
-		val snackbarHostState = remember { SnackbarHostState() }
+		val snackbarHostState = remember { TypedSnackbarHostState() }
 		var selectedRequest by remember { mutableStateOf<InvestigationRequestResponse?>(null) }
 		val sheetState = rememberModalBottomSheetState()
 		val scope = rememberCoroutineScope()
@@ -49,9 +50,9 @@ class RequestsScreen : Screen {
 		}
 
 		LaunchedEffect(state.snackBarMessage) {
-			state.snackBarMessage?.let {
-				snackbarHostState.showSnackbar(it)
-				viewModel.dismissSnackBar()
+			state.snackBarMessage?.let { message ->
+				snackbarHostState.showSuccessSnackbar(message)
+				viewModel.clearSnackBarMessage()
 			}
 		}
 
@@ -76,14 +77,11 @@ class RequestsScreen : Screen {
 			)
 		}
 
-		// 2. SuccessActionDialog para éxito
-		if (state.showSuccessDialog) {
-			SuccessActionDialog(
-				title = "¡Borrado exitoso!",
-				message = "La solicitud ha sido eliminada correctamente de tu lista.",
-				onConfirm = { viewModel.clearSuccessDialog() },
-				onDismiss = { viewModel.clearSuccessDialog() }
-			)
+		LaunchedEffect(state.pdfError) {
+			state.pdfError?.let {
+				snackbarHostState.showErrorSnackbar(it)
+				viewModel.clearPdfError()
+			}
 		}
 
 		// Success Dialog
@@ -99,15 +97,6 @@ class RequestsScreen : Screen {
 					viewModel.clearPdfStatus()
 				},
 				onDismiss = { viewModel.clearPdfStatus() }
-			)
-		}
-
-		// Error Dialog
-		if (state.pdfError != null) {
-			StatusDialog(
-				isSuccess = false,
-				message = state.pdfError!!,
-				onDismiss = { viewModel.clearPdfError() }
 			)
 		}
 
@@ -146,7 +135,7 @@ class RequestsScreen : Screen {
 		}
 
 		Scaffold(
-			snackbarHost = { SnackbarHost(snackbarHostState) },
+			snackbarHost = { CustomSnackbarHost(snackbarHostState) },
 			floatingActionButton = {
 				FloatingActionButton(
 					onClick = {

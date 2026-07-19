@@ -10,6 +10,5 @@ data class InvestigationRequestsState(
   val pdfError: String? = null,
   val requests: List<InvestigationRequestResponse> = emptyList(),
   val snackBarMessage: String? = null,
-  val requestToDelete: InvestigationRequestResponse? = null,
-  val showSuccessDialog: Boolean = false
+  val requestToDelete: InvestigationRequestResponse? = null
 )

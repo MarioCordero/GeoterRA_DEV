@@ -121,8 +121,7 @@ class AuthRepository(
       
       val data = envelope.data
         ?: return Result.failure(Exception("Refresh token no contiene datos válidos"))
-      println("Refresh response: $data")
-      
+
       tokenManager.saveTokens(
         data.access_token,
         data.refresh_token
@@ -135,7 +134,6 @@ class AuthRepository(
       Result.failure(Exception("Session expirada. Inicia sesión nuevamente."))
     }
   }
-  
   
   override suspend fun isUserLoggedIn(): Boolean = tokenManager.getAccessToken() != null
 }

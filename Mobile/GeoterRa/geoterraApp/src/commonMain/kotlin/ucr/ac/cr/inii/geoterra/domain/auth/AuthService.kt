@@ -26,13 +26,19 @@ class AuthService(
 
       authEventBus.events.collect { event ->
         when (event) {
+					is AuthEvent.LoginSuccess -> {
+						authEventBus.updateLoginState(true)
+					}
           is AuthEvent.Logout -> {
             executeLogoutCleanup()
           }
-          is AuthEvent.RefreshToken -> {
-            authRepository.refreshAccessToken()
-          }
-          else -> {}
+          is AuthEvent.Unauthorized -> {
+						authEventBus.updateLoginState(false)
+						authRepository.logout()
+					}
+					is AuthEvent.Authorized -> {
+						authEventBus.updateLoginState(true)
+					}
         }
       }
     }

@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.asStateFlow
 sealed class AuthEvent {
   object Unauthorized : AuthEvent()
   object Authorized : AuthEvent()
-  object RefreshToken : AuthEvent()
   object LoginSuccess : AuthEvent()
   object Logout : AuthEvent()
 }

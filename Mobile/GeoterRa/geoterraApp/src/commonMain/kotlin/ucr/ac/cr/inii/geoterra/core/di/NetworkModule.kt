@@ -67,21 +67,23 @@ val networkModule = module {
         bearer {
           sendWithoutRequest { request ->
             val path = request.url.encodedPath
-            val isPublic = path.contains("/auth/login") ||
-              path.contains("/auth/register") ||
-              path.contains("/auth/refresh")
+            val publicPaths = listOf("/auth/login", "/auth/register", "/auth/refresh", "geomanifestations/")
 
-            !isPublic
+						val isPublicPath = publicPaths.any { publicPath ->
+              path.startsWith(publicPath)
+            }
+
+            !isPublicPath
           }
 
+					// Loads tokens from the token manager
           loadTokens {
             val tokenManager = get<TokenManager>()
             val access = tokenManager.getAccessToken()
             val refresh = tokenManager.getRefreshToken()
 
             if (access != null && refresh != null) {
-              println("Cargando tokens: $access, $refresh")
-              BearerTokens(access, refresh)
+							BearerTokens(access, refresh)
             } else {
               null
             }
@@ -102,11 +104,11 @@ val networkModule = module {
               val data = response.data
               val errors = response.errors
 
-              val hasRefreshTokenError = errors.any { error ->
+              val expiredRefreshToken = errors.any { error ->
                 error.isAuthError()
               }
 
-              if (hasRefreshTokenError || data == null) {
+              if (expiredRefreshToken || data == null) {
                 tm.clearTokens()
                 authEventBus.emit(AuthEvent.Logout)
                 return@refreshTokens null
@@ -114,7 +116,7 @@ val networkModule = module {
 
               // Save new tokens
               tm.saveTokens(data.access_token, data.refresh_token)
-              println("Refrescando tokens: ${data.access_token}, ${data.refresh_token}")
+							authEventBus.emit(AuthEvent.Authorized)
               BearerTokens(data.access_token, data.refresh_token)
 
             } catch (e: Exception) {

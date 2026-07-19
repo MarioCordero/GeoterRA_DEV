@@ -46,7 +46,6 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.DangerActionItem
 import ucr.ac.cr.inii.geoterra.presentation.components.account.InfoTile
 import ucr.ac.cr.inii.geoterra.presentation.components.account.ProfileHeaderCard
 import ucr.ac.cr.inii.geoterra.presentation.components.common.ConfirmDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.common.StatusDialog
 
 @Composable
 fun AccountContent(
@@ -56,7 +55,6 @@ fun AccountContent(
   onDeleteAccountClick: () -> Unit,
   onEditClick: () -> Unit,
   onThemeToggle: (Boolean) -> Unit,
-  clearError: () -> Unit
 ) {
   var showLogoutDialog by remember { mutableStateOf(false) }
   var showDeleteDialog by remember { mutableStateOf(false) }
@@ -120,11 +118,6 @@ fun AccountContent(
         }
       }
     }
-
-    if (state.error != null) {
-      StatusDialog(false, state.error, onDismiss = { clearError()})
-    }
-
   }
   
   if (showLogoutDialog) {

@@ -13,8 +13,7 @@ data class GeomanifestationFilters(
 	val cantonSnitCode: Int? = null,
 	val districtSnitCode: Int? = null,
 	val tempMin: Double? = null,
-	val tempMax: Double? = null,
-	val showAll: Boolean? = null
+	val tempMax: Double? = null
 )
 
 /**

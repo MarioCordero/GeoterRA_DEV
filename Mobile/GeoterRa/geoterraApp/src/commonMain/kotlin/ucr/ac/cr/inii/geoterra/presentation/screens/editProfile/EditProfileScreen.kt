@@ -8,6 +8,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -23,9 +24,10 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import org.koin.core.parameter.parametersOf
 import ucr.ac.cr.inii.geoterra.data.model.responses.UserResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
+import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.common.StatusDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 
 class EditProfileScreen(
   private val userProfile: UserResponse
@@ -39,8 +41,7 @@ class EditProfileScreen(
       parameters = { parametersOf(userProfile) }
     )
     val state by viewModel.state.collectAsState()
-
-    val snackBarState = remember { SnackbarHostState() }
+    val snackBarState = remember { TypedSnackbarHostState() }
 
     // --- Dialogs ---
     if (state.isLoading) {
@@ -56,16 +57,14 @@ class EditProfileScreen(
       )
     }
 
-    if (state.error != null) {
-      StatusDialog(
-        isSuccess = false,
-        message = state.error!!,
-        onDismiss = { viewModel.clearStatus() }
-      )
-    }
+		LaunchedEffect(state.snackBarMessage) {
+			state.snackBarMessage?.let { message ->
+				snackBarState.showSuccessSnackbar(message)
+			}
+		}
 
     Scaffold(
-      snackbarHost = { SnackbarHost(hostState = snackBarState) },
+      snackbarHost = { CustomSnackbarHost(hostState = snackBarState) },
       topBar = {
         Row(
           modifier = Modifier
@@ -81,7 +80,6 @@ class EditProfileScreen(
       EditProfileContent(
         modifier = Modifier.padding(top = padding.calculateTopPadding()),
         state = state,
-        snackBarState = snackBarState,
         onEvent = viewModel,
         onBack = { navigator.pop() }
       )
