@@ -336,7 +336,7 @@ class InvestigationRequestServiceTest extends TestCase
 		$this->authenticateUser(['role' => AllowedUserRoles::INVESTIGATOR]);
 		$request = $this->createTestRequest();
 
-		$this->service->addState($request['request_id'], 'En Proceso', 'Moving forward');
+		$this->service->adminAddState($request['request_id'], 'En Proceso', 'Moving forward');
 
 		$stmt = $this->pdo->prepare(
 			'SELECT * FROM requests_state WHERE request_id = ? AND value = ?'
@@ -351,7 +351,7 @@ class InvestigationRequestServiceTest extends TestCase
 		$request = $this->createTestRequest();
 
 		try {
-			$this->service->addState($request['request_id'], 'En Proceso', 'Moving forward');
+			$this->service->adminAddState($request['request_id'], 'En Proceso', 'Moving forward');
 			$this->fail('Expected ApiException was not thrown');
 		} catch (ApiException $e) {
 			$this->assertEquals(403, $e->getHttpStatus());
@@ -363,7 +363,7 @@ class InvestigationRequestServiceTest extends TestCase
 		$this->authenticateUser(['role' => AllowedUserRoles::ADMIN]);
 
 		try {
-			$this->service->addState(UlidGenerator::generate(), 'En Proceso', 'Moving forward');
+			$this->service->adminAddState(UlidGenerator::generate(), 'En Proceso', 'Moving forward');
 			$this->fail('Expected ApiException was not thrown');
 		} catch (ApiException $e) {
 			$this->assertEquals(404, $e->getHttpStatus());
@@ -509,7 +509,7 @@ class InvestigationRequestServiceTest extends TestCase
 		$request1 = $this->createTestRequest();
 		$request2 = $this->createTestRequest();
 
-		$result = $this->service->getAll();
+		$result = $this->service->adminGetAll();
 
 		$this->assertCount(2, $result);
 		$ids = array_column($result, 'request_id');
@@ -523,7 +523,7 @@ class InvestigationRequestServiceTest extends TestCase
 		$this->authenticateUser(['role' => AllowedUserRoles::MAINTENANCE]);
 
 		try {
-			$this->service->getAll();
+			$this->service->adminGetAll();
 			$this->fail('Expected ApiException was not thrown');
 		} catch (ApiException $e) {
 			$this->assertEquals(403, $e->getHttpStatus());

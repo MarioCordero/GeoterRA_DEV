@@ -25,10 +25,27 @@ final class InvestigationRequestService
     $this->repository = new InvestigationRequestRepository($pdo);
   }
 
+  public function getAllByUser(): array
+  {
+    $user = Request::getUser();
+    $rows = $this->repository->findAllByUser($user['user_id']);
+    return array_map([$this, 'formatRequest'], $rows);
+  }
+
+  public function getById(string $id): array
+  {
+    $user = Request::getUser();
+    $row = $this->repository->findByIdAndUser($id, $user['user_id']);
+    if (!$row) {
+      throw new ApiException(ErrorType::analysisRequestNotFound(), 404);
+    }
+    return $this->formatRequest($row);
+  }
+
   public function create(RegisterInvestigationRequestDTO $dto): array
   {
     $user = Request::getUser();
-    $dto->validate($user);
+    $dto->validate();
 
     if ($dto->relationWithOwner === 'Titular') {
       $user = $this->userRepository->findActiveUserById($user['user_id']);
@@ -56,7 +73,7 @@ final class InvestigationRequestService
   public function update(string $id, UpdateInvestigationRequestDTO $dto): array
   {
     $user = Request::getUser();
-    $dto->validate($user);
+    $dto->validate();
 
     $existing = $this->repository->findByIdAndUser($id, $user['user_id']);
     if (!$existing) {
@@ -86,36 +103,30 @@ final class InvestigationRequestService
     return $this->formatRequest($result);
   }
 
-//
-//  public function adminUpdate(string $id, UpdateInvestigationRequestDTO $dto
-//  ): void {
-//    $user = Request::requireRole(
-//      [
-//        AllowedUserRoles::ADMIN,
-//        AllowedUserRoles::FIELD_INVESTIGATOR,
-//        AllowedUserRoles::INVESTIGATOR
-//      ]
-//    );
-//
-//    $dto->validate($user);
-//    $this->validateOwnerRelation(
-//      [
-//        'ownerName' => $dto->ownerName,
-//        'ownerPhoneNumber' => $dto->ownerPhoneNumber,
-//        'ownerEmail' => $dto->ownerEmail,
-//        'relationWithOwner' => $dto->relationWithOwner,
-//      ], $user
-//    );
-//
-//    $existing = $this->repository->findById($id);
-//    if (!$existing) {
-//      throw new ApiException(ErrorType::analysisRequestNotFound(), 404);
-//    }
-//
-//    $this->repository->adminUpdate($id, $dto);
-//  }
 
-  public function addState(string $id, string $stateValue, string $description
+  public function delete(string $id): void
+  {
+    $user = Request::getUser();
+
+    $existing = $this->repository->findByIdAndUser($id, $user['user_id']);
+    if (!$existing) {
+      throw new ApiException(ErrorType::analysisRequestNotFound(), 404);
+    }
+    $this->repository->delete($id, $user['user_id']);
+  }
+  public function getStates(string $id): array
+  {
+    $user = Request::getUser();
+
+    $request = $this->repository->findByIdAndUser($id, $user['user_id']);
+    if (!$request) {
+      throw new ApiException(ErrorType::analysisRequestNotFound(), 404);
+    }
+
+    return $this->repository->getStatesByRequestId($id);
+  }
+
+  public function adminAddState(string $id, string $stateValue, string $description
   ): void {
     $user = Request::requireRole(
       [
@@ -134,25 +145,6 @@ final class InvestigationRequestService
       $id, $stateValue, $description, $user['user_id']
     );
   }
-
-  public function getStates(string $id): array
-  {
-    $request = $this->repository->findById($id);
-    if (!$request) {
-      throw new ApiException(ErrorType::analysisRequestNotFound(), 404);
-    }
-
-    $user = Request::getUser();
-
-    $isOwner = ($request['user_id'] === $user['user_id']);
-
-    if (!$isOwner) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
-
-    return $this->repository->getStatesByRequestId($id);
-  }
-
 
   public function adminGetStates(string $id): array
   {
@@ -175,55 +167,14 @@ final class InvestigationRequestService
     return $this->repository->getStatesByRequestId($id);
   }
 
-  public function delete(string $id): void
-  {
-    $user = Request::requireRole(
-      [
-        AllowedUserRoles::ADMIN,
-        AllowedUserRoles::FIELD_INVESTIGATOR,
-        AllowedUserRoles::INVESTIGATOR
-      ]
-    );
-
-    $existing = $this->repository->findByIdAndUser($id, $user['user_id']);
-    if (!$existing) {
-      throw new ApiException(ErrorType::analysisRequestNotFound(), 404);
-    }
-    $this->repository->delete($id, $user['user_id']);
-  }
-
-//
-//  public function adminDelete(string $id): void
-//  {
-//    Request::requireRole(
-//      [
-//        AllowedUserRoles::ADMIN,
-//        AllowedUserRoles::FIELD_INVESTIGATOR,
-//        AllowedUserRoles::INVESTIGATOR
-//      ]
-//    );
-//
-//    $existing = $this->repository->findById($id);
-//    if (!$existing) {
-//      throw new ApiException(ErrorType::analysisRequestNotFound(), 404);
-//    }
-//    $this->repository->adminDelete($id);
-//  }
-
-  public function getAllByUser(): array
-  {
-    $user = Request::requireRole(AllowedUserRoles::values());
-    $rows = $this->repository->findAllByUser($user['user_id']);
-    return array_map([$this, 'formatRequest'], $rows);
-  }
-
-  public function getAll(): array
+  public function adminGetAll(): array
   {
     Request::requireRole(
       [
         AllowedUserRoles::ADMIN,
         AllowedUserRoles::FIELD_INVESTIGATOR,
-        AllowedUserRoles::INVESTIGATOR
+        AllowedUserRoles::INVESTIGATOR,
+        AllowedUserRoles::MAINTENANCE,
       ]
     );
 
@@ -231,10 +182,19 @@ final class InvestigationRequestService
     return array_map([$this, 'formatRequest'], $rows);
   }
 
-  public function getById(string $id): array
+
+  public function adminGetById(string $id): array
   {
-    $user = Request::getUser();
-    $row = $this->repository->findByIdAndUser($id, $user['user_id']);
+    Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR,
+        AllowedUserRoles::MAINTENANCE,
+      ]
+    );
+
+    $row = $this->repository->findById($id);
     if (!$row) {
       throw new ApiException(ErrorType::analysisRequestNotFound(), 404);
     }
@@ -285,22 +245,5 @@ final class InvestigationRequestService
     }
 
     return $result;
-  }
-
-  public function adminGetById(string $id): array
-  {
-    Request::requireRole(
-      [
-        AllowedUserRoles::ADMIN,
-        AllowedUserRoles::FIELD_INVESTIGATOR,
-        AllowedUserRoles::INVESTIGATOR
-      ]
-    );
-
-    $row = $this->repository->findById($id);
-    if (!$row) {
-      throw new ApiException(ErrorType::analysisRequestNotFound(), 404);
-    }
-    return $this->formatRequest($row);
   }
 }
