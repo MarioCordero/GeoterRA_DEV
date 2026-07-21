@@ -30,119 +30,120 @@ expect fun getHttpClientEngine(): HttpClientEngine
 
 @OptIn(InternalAPI::class)
 val networkModule = module {
-  single { AuthEventBus() }
-  single { TokenManager(get()) }
+	single { AuthEventBus() }
+	single { TokenManager(get()) }
 
-  single<HttpClient> {
-    val networkScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+	single<HttpClient> {
+		val networkScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-    val authEventBus = get<AuthEventBus>()
-    val client = HttpClient(getHttpClientEngine()) {
-      install(HttpTimeout) {
-        requestTimeoutMillis = 30_000
-        connectTimeoutMillis = 30_000
-        socketTimeoutMillis = 30_000
-      }
+		val authEventBus = get<AuthEventBus>()
+		val client = HttpClient(getHttpClientEngine()) {
+			install(HttpTimeout) {
+				requestTimeoutMillis = 30_000
+				connectTimeoutMillis = 30_000
+				socketTimeoutMillis = 30_000
+			}
 
-      install(ContentNegotiation) {
-        json(Json {
-          ignoreUnknownKeys = true
-          coerceInputValues = true
-          explicitNulls = true
-          encodeDefaults = true
-        })
-      }
+			install(ContentNegotiation) {
+				json(Json {
+					ignoreUnknownKeys = true
+					coerceInputValues = true
+					explicitNulls = true
+					encodeDefaults = true
+				})
+			}
 
-      install(Logging) {
-        logger = object : Logger {
-          override fun log(message: String) {
-            println("KtorClient: $message")
-          }
-        }
+			install(Logging) {
+				logger = object : Logger {
+					override fun log(message: String) {
+						println("KtorClient: $message")
+					}
+				}
 
-        level = LogLevel.ALL
-      }
+				level = LogLevel.ALL
+			}
 
-      install(Auth) {
-        bearer {
-          sendWithoutRequest { request ->
-            val path = request.url.encodedPath
-            val publicPaths = listOf("/auth/login", "/auth/register", "/auth/refresh", "geomanifestations/")
+			install(Auth) {
+				bearer {
+					sendWithoutRequest { request ->
+						val path = request.url.encodedPath
+						val publicPaths =
+							listOf("/auth/login", "/auth/register", "/auth/refresh", "geomanifestations/")
 
 						val isPublicPath = publicPaths.any { publicPath ->
-              path.startsWith(publicPath)
-            }
+							path.startsWith(publicPath)
+						}
 
-            !isPublicPath
-          }
+						!isPublicPath
+					}
 
 					// Loads tokens from the token manager
-          loadTokens {
-            val tokenManager = get<TokenManager>()
-            val access = tokenManager.getAccessToken()
-            val refresh = tokenManager.getRefreshToken()
+					loadTokens {
+						val tokenManager = get<TokenManager>()
+						val access = tokenManager.getAccessToken()
+						val refresh = tokenManager.getRefreshToken()
 
-            if (access != null && refresh != null) {
+						if (access != null && refresh != null) {
 							BearerTokens(access, refresh)
-            } else {
-              null
-            }
-          }
+						} else {
+							null
+						}
+					}
 
-          refreshTokens {
-            val tm = get<TokenManager>()
-            val refreshToken = tm.getRefreshToken() ?: return@refreshTokens null
+					refreshTokens {
+						val tm = get<TokenManager>()
+						val refreshToken = tm.getRefreshToken() ?: return@refreshTokens null
 
-            try {
-              // Client for refreshing tokens
-              val response = client.post("auth/refresh") {
-                markAsRefreshTokenRequest()
-                contentType(ContentType.Application.Json)
-                setBody(RefreshAccessTokenRequest(refreshToken))
-              }.body<ApiResponseModel<RefreshAccessTokenResponse>>()
+						try {
+							// Client for refreshing tokens
+							val response = client.post("auth/refresh") {
+								markAsRefreshTokenRequest()
+								contentType(ContentType.Application.Json)
+								setBody(RefreshAccessTokenRequest(refreshToken))
+							}.body<ApiResponseModel<RefreshAccessTokenResponse>>()
 
-              val data = response.data
-              val errors = response.errors
+							val data = response.data
+							val errors = response.errors
 
-              val expiredRefreshToken = errors.any { error ->
-                error.isAuthError()
-              }
+							val expiredRefreshToken = errors.any { error ->
+								error.isAuthError()
+							}
 
-              if (expiredRefreshToken || data == null) {
-                tm.clearTokens()
-                authEventBus.emit(AuthEvent.Logout)
-                return@refreshTokens null
-              }
+							if (expiredRefreshToken || data == null) {
+								tm.clearTokens()
+								authEventBus.emit(AuthEvent.Logout)
+								return@refreshTokens null
+							}
 
-              // Save new tokens
-              tm.saveTokens(data.access_token, data.refresh_token)
+							// Save new tokens
+							tm.saveTokens(data.access_token, data.refresh_token)
 							authEventBus.emit(AuthEvent.Authorized)
-              BearerTokens(data.access_token, data.refresh_token)
+							BearerTokens(data.access_token, data.refresh_token)
 
-            } catch (e: Exception) {
-              tm.clearTokens()
-              authEventBus.emit(AuthEvent.Logout)
-              null
-            }
-          }
-        }
-      }
+						} catch (e: Exception) {
+							tm.clearTokens()
+							authEventBus.emit(AuthEvent.Logout)
+							null
+						}
+					}
+				}
+			}
 
-      defaultRequest {
-        url(NetworkConfig.API_URL)
-        header(HttpHeaders.ContentType, ContentType.Application.Json)
-        header("x-api-key", NetworkConfig.API_KEY)
-      }
-    }
+			defaultRequest {
+				url(NetworkConfig.API_URL)
+				header(HttpHeaders.ContentType, ContentType.Application.Json)
+				header("x-api-key", NetworkConfig.API_KEY)
+			}
+		}
 
-    networkScope.launch {
-      authEventBus.events.collect { event ->
-        if (event is AuthEvent.LoginSuccess) {
-          client.authProvider<BearerAuthProvider>()?.clearToken()
-        }
-      }
-    }
+		networkScope.launch {
+			authEventBus.events.collect { event ->
+				if (event is AuthEvent.LoginSuccess) {
+					client.authProvider<BearerAuthProvider>()?.clearToken()
+				}
+			}
+		}
 
-    client
-  }
+		client
+	}
 }

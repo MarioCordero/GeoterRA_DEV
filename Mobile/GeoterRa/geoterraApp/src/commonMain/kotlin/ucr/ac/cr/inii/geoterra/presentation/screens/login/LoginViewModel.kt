@@ -1,14 +1,13 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.login
 
 import cafe.adriel.voyager.core.model.screenModelScope
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.requests.LoginRequest
-import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
-import ucr.ac.cr.inii.geoterra.domain.auth.AuthEventBus
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
 
 /**
  * Updated ViewModel to handle real API authentication.
@@ -55,9 +54,8 @@ class LoginViewModel(
       it.copy(
         email = it.email.trim(),
         password = it.password.trim(),
-        fieldErrors = emptyMap(),
-        error = null
-      )
+        fieldErrors = emptyMap()
+			)
     }
 
     if (!validateFields()) return
@@ -77,18 +75,17 @@ class LoginViewModel(
           updateState {
             it.copy(
               isLoading = false,
-              error = error.message
-            )
+							snackBarMessage = SnackbarMessage(
+								text = error.message ?: "Ocurrió un error inesperado al iniciar sesión.",
+								type = SnackbarType.ERROR
+							)
+						)
           }
         }
     }
   }
   
-  fun dismissSnackbar() {
+  fun onSnackBarDismissed() {
     updateState { it.copy(snackBarMessage = null) }
-  }
-
-  fun clearStatus() {
-    updateState { it.copy(isSuccess = false, error = null) }
   }
 }

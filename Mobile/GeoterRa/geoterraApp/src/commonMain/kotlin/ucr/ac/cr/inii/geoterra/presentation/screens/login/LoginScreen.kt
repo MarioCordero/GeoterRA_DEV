@@ -2,8 +2,6 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.login
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -17,8 +15,8 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ucr.ac.cr.inii.geoterra.presentation.components.common.StatusDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
+import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 import ucr.ac.cr.inii.geoterra.presentation.screens.register.RegisterScreen
 
 /**
@@ -26,54 +24,40 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.register.RegisterScreen
  */
 class LoginScreen : Screen {
 
-  override val key: ScreenKey = uniqueScreenKey
+	override val key: ScreenKey = uniqueScreenKey
 
-  @Composable
-  override fun Content() {
-    val viewModel = getScreenModel<LoginViewModel>()
-    val state by viewModel.state.collectAsState()
-    val navigator = LocalNavigator.currentOrThrow
+	@Composable
+	override fun Content() {
+		val viewModel = getScreenModel<LoginViewModel>()
+		val state by viewModel.state.collectAsState()
+		val navigator = LocalNavigator.currentOrThrow
 
-    val snackbarHostState = remember { SnackbarHostState() }
+		val snackbarHostState = remember { TypedSnackbarHostState() }
 
-    if (state.isSuccess) {
-      SuccessActionDialog(
-        message = "Cuenta actualizada correctamente.",
-        confirmText = "Aceptar",
-        onConfirm = { viewModel.clearStatus(); navigator.pop() },
-        onDismiss = { viewModel.clearStatus(); navigator.pop() }
-      )
-    }
+		LaunchedEffect(state.snackBarMessage) {
+			state.snackBarMessage?.let { snackbarMsg ->
+				snackbarHostState.showSnackbar(
+					message = snackbarMsg.text,
+					type = snackbarMsg.type
+				)
+				viewModel.onSnackBarDismissed()
+			}
+		}
 
-    if (state.error != null) {
-      StatusDialog(
-        isSuccess = false,
-        message = state.error!!,
-        onDismiss = { viewModel.clearStatus() }
-      )
-    }
-
-    LaunchedEffect(state.snackBarMessage) {
-      state.snackBarMessage?.let {
-        snackbarHostState.showSnackbar(message = it)
-        viewModel.dismissSnackbar()
-      }
-    }
-
-    Scaffold(
-      modifier = Modifier.fillMaxSize(),
-      containerColor = Color.Transparent,
-      snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) {
-      LoginContent(
-        modifier = Modifier,
-        state = state,
-        onEmailChanged = viewModel::onEmailChanged,
-        onPasswordChanged = viewModel::onPasswordChanged,
-        onLoginClick = viewModel::login,
-        onRegisterClick = { navigator.push(RegisterScreen()) },
-        onTogglePassword = viewModel::togglePasswordVisibility,
-      )
-    }
-  }
+		Scaffold(
+			modifier = Modifier.fillMaxSize(),
+			containerColor = Color.Transparent,
+			snackbarHost = { CustomSnackbarHost(snackbarHostState) }
+		) {
+			LoginContent(
+				modifier = Modifier,
+				state = state,
+				onEmailChanged = viewModel::onEmailChanged,
+				onPasswordChanged = viewModel::onPasswordChanged,
+				onLoginClick = viewModel::login,
+				onRegisterClick = { navigator.push(RegisterScreen()) },
+				onTogglePassword = viewModel::togglePasswordVisibility,
+			)
+		}
+	}
 }

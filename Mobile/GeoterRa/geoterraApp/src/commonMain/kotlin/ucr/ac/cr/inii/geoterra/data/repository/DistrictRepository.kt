@@ -4,6 +4,8 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.isSuccess
+import ucr.ac.cr.inii.geoterra.core.network.ApiError
+import ucr.ac.cr.inii.geoterra.core.network.ApiException
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.DistrictResponse
@@ -22,7 +24,14 @@ class DistrictRepository(private val client: HttpClient) : DistrictRepositoryInt
         handleErrorResponse(response)
       }
     } catch (e: Exception) {
-      Result.failure(Exception("Error de red: verifica tu conexión."))
-    }
+			Result.failure(
+				ApiException(
+					ApiError(
+						code = ApiError.INTERNAL_ERROR,
+						message = "Error de red: verifica tu conexión a internet."
+					)
+				)
+			)
+		}
   }
 }

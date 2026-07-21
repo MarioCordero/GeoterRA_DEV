@@ -25,7 +25,7 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.form.
 import ucr.ac.cr.inii.geoterra.presentation.screens.editProfile.EditProfileViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginViewModel
-import ucr.ac.cr.inii.geoterra.presentation.screens.manifestation.ManifestationDetailViewModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.map.manifestation.ManifestationDetailViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.map.MapViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.register.RegisterViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.InvestigationRequestsViewModel

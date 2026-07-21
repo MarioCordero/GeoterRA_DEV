@@ -32,6 +32,11 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+data class SnackbarMessage(
+	val text: String,
+	val type: SnackbarType = SnackbarType.INFO
+)
+
 /**
  * Defines the visual style of a snackbar.
  */

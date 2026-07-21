@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,63 +24,63 @@ import ucr.ac.cr.inii.geoterra.data.model.responses.UserResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 
 class EditProfileScreen(
-  private val userProfile: UserResponse
+	private val userProfile: UserResponse
 ) : Screen {
-  override val key: ScreenKey = uniqueScreenKey
+	override val key: ScreenKey = uniqueScreenKey
 
-  @Composable
-  override fun Content() {
-    val navigator = LocalNavigator.currentOrThrow
-    val viewModel = getScreenModel<EditProfileViewModel>(
-      parameters = { parametersOf(userProfile) }
-    )
-    val state by viewModel.state.collectAsState()
-    val snackBarState = remember { TypedSnackbarHostState() }
+	@Composable
+	override fun Content() {
+		val navigator = LocalNavigator.currentOrThrow
+		val viewModel = getScreenModel<EditProfileViewModel>(
+			parameters = { parametersOf(userProfile) }
+		)
+		val state by viewModel.state.collectAsState()
+		val snackBarState = remember { TypedSnackbarHostState() }
 
-    // --- Dialogs ---
-    if (state.isLoading) {
-      LoadingDialog(isVisible = true, message = "Actualizando cuenta...")
-    }
+		// --- Dialogs ---
+		if (state.isLoading) {
+			LoadingDialog(isVisible = true, message = "Actualizando cuenta...")
+		}
 
-    if (state.isSuccess) {
-      SuccessActionDialog(
-        message = "Cuenta actualizada correctamente.",
-        confirmText = "Aceptar",
-        onConfirm = { viewModel.clearStatus(); navigator.pop() },
-        onDismiss = { viewModel.clearStatus(); navigator.pop() }
-      )
-    }
-
-		LaunchedEffect(state.snackBarMessage) {
-			state.snackBarMessage?.let { message ->
-				snackBarState.showSuccessSnackbar(message)
+		LaunchedEffect(state.isSuccess) {
+			if (state.isSuccess) {
+				state.snackBarMessage?.let { message ->
+					snackBarState.showSnackbar(message.text, message.type)
+					viewModel.onSnackbarDismissed()
+					navigator.pop()
+				}
 			}
 		}
 
-    Scaffold(
-      snackbarHost = { CustomSnackbarHost(hostState = snackBarState) },
-      topBar = {
-        Row(
-          modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 10.dp),
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.End
-        ) {
-          AdaptiveBackButton(onBack = { navigator.pop() })
-        }
-      }
-    ) { padding ->
-      EditProfileContent(
-        modifier = Modifier.padding(top = padding.calculateTopPadding()),
-        state = state,
-        onEvent = viewModel,
-        onBack = { navigator.pop() }
-      )
-    }
-  }
+		LaunchedEffect(state.snackBarMessage) {
+			state.snackBarMessage?.let { message ->
+				snackBarState.showSnackbar(message.text, message.type)
+				viewModel.onSnackbarDismissed()
+			}
+		}
+
+		Scaffold(
+			snackbarHost = { CustomSnackbarHost(hostState = snackBarState) },
+			topBar = {
+				Row(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(horizontal = 20.dp, vertical = 10.dp),
+					verticalAlignment = Alignment.CenterVertically,
+					horizontalArrangement = Arrangement.End
+				) {
+					AdaptiveBackButton(onBack = { navigator.pop() })
+				}
+			}
+		) { padding ->
+			EditProfileContent(
+				modifier = Modifier.padding(top = padding.calculateTopPadding()),
+				state = state,
+				onEvent = viewModel
+			)
+		}
+	}
 }

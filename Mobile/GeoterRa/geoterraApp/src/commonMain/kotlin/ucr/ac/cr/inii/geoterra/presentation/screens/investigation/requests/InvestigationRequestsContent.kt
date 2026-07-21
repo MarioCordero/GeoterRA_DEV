@@ -12,7 +12,7 @@ import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.request.RequestCardItem
 
 @Composable
-fun RequestsContent(
+fun InvestigationRequestsContent(
   modifier: Modifier,
   state: InvestigationRequestsState,
   onView: (InvestigationRequestResponse) -> Unit,

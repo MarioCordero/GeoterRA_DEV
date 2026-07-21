@@ -28,9 +28,10 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
 import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.form.InvestigationRequestFormScreen
 
-class RequestsScreen : Screen {
+class InvestigationRequestsScreen : Screen {
 	override val key: ScreenKey = uniqueScreenKey
 
 	@OptIn(ExperimentalMaterial3Api::class)
@@ -50,15 +51,15 @@ class RequestsScreen : Screen {
 		}
 
 		LaunchedEffect(state.snackBarMessage) {
-			state.snackBarMessage?.let { message ->
-				snackbarHostState.showSuccessSnackbar(message)
+			state.snackBarMessage?.let { snackbarMsg ->
+				snackbarHostState.showSnackbar(
+					message = snackbarMsg.text,
+					type = snackbarMsg.type
+				)
 				viewModel.clearSnackBarMessage()
 			}
 		}
 
-		// --- UI FEEDBACK DIALOGS ---
-
-		// Loading Dialog
 		if (state.isPdfGenerating) {
 			LoadingDialog(
 				isVisible = state.isPdfGenerating,
@@ -77,14 +78,6 @@ class RequestsScreen : Screen {
 			)
 		}
 
-		LaunchedEffect(state.pdfError) {
-			state.pdfError?.let {
-				snackbarHostState.showErrorSnackbar(it)
-				viewModel.clearPdfError()
-			}
-		}
-
-		// Success Dialog
 		if (state.lastGeneratedPdfPath != null) {
 			SuccessActionDialog(
 				message = "El reporte PDF se ha generado correctamente.",
@@ -115,15 +108,17 @@ class RequestsScreen : Screen {
 								viewModel.setPdfGenerating(true)
 								val fileName = "Reporte_Solicitud_${req.request_name}"
 
-								// Call the generator and capture the path
 								val resultPath = PDFUtil.generateRequestPdf(req, fileName)
 
 								if (resultPath != null) {
 									viewModel.setGeneratedPdfPath(resultPath)
-									selectedRequest = null // Close the bottom sheet on success
+									selectedRequest = null
 								}
 							} catch (e: Exception) {
-								viewModel.setPdfError("Error al generar PDF: ${e.message}")
+								viewModel.updateSnackBarMessage(
+									"Ha ocurrido un error al generar el PDF, por favor intenta de nuevo.",
+									SnackbarType.ERROR
+								)
 								e.printStackTrace()
 							} finally {
 								viewModel.setPdfGenerating(false)
@@ -142,7 +137,10 @@ class RequestsScreen : Screen {
 						if (state.isLoggedIn) {
 							navigator.push(InvestigationRequestFormScreen())
 						} else {
-							viewModel.updateSnackBarMessage("Esta acción requiere que inicie sesión.")
+							viewModel.updateSnackBarMessage(
+								"Esta acción requiere que inicie sesión.",
+								SnackbarType.INFO
+							)
 						}
 					},
 					containerColor = MaterialTheme.colorScheme.primary,
@@ -168,7 +166,7 @@ class RequestsScreen : Screen {
 				}
 			}
 		) { paddingValues ->
-			RequestsContent(
+			InvestigationRequestsContent(
 				modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
 				state = state,
 				onView = { req -> selectedRequest = req },

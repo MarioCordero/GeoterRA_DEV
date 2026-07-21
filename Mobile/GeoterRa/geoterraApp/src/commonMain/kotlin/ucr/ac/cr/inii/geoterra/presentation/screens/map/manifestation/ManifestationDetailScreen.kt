@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.manifestation
+package ucr.ac.cr.inii.geoterra.presentation.screens.map.manifestation
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -17,6 +17,7 @@ import ucr.ac.cr.inii.geoterra.domain.pdf.PDFUtil
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.StatusDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 
 class ManifestationDetailScreen(val manifestation: GeomanifestationResponse) : Screen {
   override val key: ScreenKey = uniqueScreenKey
@@ -29,6 +30,7 @@ class ManifestationDetailScreen(val manifestation: GeomanifestationResponse) : S
     )
     val state by viewModel.state.collectAsState()
     val navigator = LocalNavigator.currentOrThrow
+		val snackbarHostState = remember { TypedSnackbarHostState() }
 
     // Loading Dialog
     if (state.isPdfGenerating) {
@@ -54,19 +56,20 @@ class ManifestationDetailScreen(val manifestation: GeomanifestationResponse) : S
       )
     }
 
-    // Error Dialog
-    if (state.pdfError != null) {
-      StatusDialog(
-        isSuccess = false,
-        message = state.pdfError!!,
-        onDismiss = { viewModel.clearPdfError() }
-      )
-    }
+		LaunchedEffect(state.snackBarMessage) {
+			state.snackBarMessage?.let { snackbarMsg ->
+				snackbarHostState.showSnackbar(
+					message = snackbarMsg.text,
+					type = snackbarMsg.type
+				)
+				viewModel.onSnackbarDismissed()
+			}
+		}
 
     ManifestationDetailContent(
       modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
       state = state,
-      manifestation = state.manifestation!!,
+      manifestation = state.manifestation,
       onDownload = {
         viewModel.downloadReport()
       },

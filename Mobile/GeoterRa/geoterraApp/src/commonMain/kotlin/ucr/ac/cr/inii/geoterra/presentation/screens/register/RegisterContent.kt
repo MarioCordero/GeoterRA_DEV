@@ -40,17 +40,9 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.PasswordField
 fun RegisterContent(
   modifier: Modifier = Modifier,
   state: RegisterState,
-  snackBarState : SnackbarHostState,
   onEvent: RegisterViewModel,
   onBack: () -> Unit
 ) {
-  LaunchedEffect(state.snackBarMessage) {
-    state.snackBarMessage?.let { message ->
-      snackBarState.showSnackbar(message)
-      onEvent.dismissSnackbar()
-    }
-  }
-
   Column(
     modifier = modifier
       .fillMaxSize()

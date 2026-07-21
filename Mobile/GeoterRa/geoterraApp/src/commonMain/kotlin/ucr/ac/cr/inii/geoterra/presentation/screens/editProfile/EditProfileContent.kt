@@ -39,7 +39,6 @@ fun EditProfileContent(
   modifier: Modifier = Modifier,
   state: EditProfileState,
   onEvent: EditProfileViewModel,
-  onBack: () -> Unit
 ) {
 
   Column(

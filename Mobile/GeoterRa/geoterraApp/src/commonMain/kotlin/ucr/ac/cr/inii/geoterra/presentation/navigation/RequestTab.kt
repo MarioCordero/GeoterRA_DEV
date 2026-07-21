@@ -7,7 +7,7 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import geoterra.geoterraapp.generated.resources.Res
 import geoterra.geoterraapp.generated.resources.ic_contract
 import org.jetbrains.compose.resources.painterResource
-import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.RequestsScreen
+import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.InvestigationRequestsScreen
 
 internal object RequestTab : Tab {
   override val key: String = "RequestTab_${hashCode()}"
@@ -21,6 +21,6 @@ internal object RequestTab : Tab {
   
   @Composable
   override fun Content() {
-    Navigator(RequestsScreen())
+    Navigator(InvestigationRequestsScreen())
   }
 }

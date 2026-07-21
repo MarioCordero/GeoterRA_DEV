@@ -45,32 +45,30 @@ data class InvestigationRequestFormScreen(
 		)
 
 		val state by viewModel.state.collectAsState()
-
-		val snackBarHost = remember { TypedSnackbarHostState() }
+		val snackbarHostState = remember { TypedSnackbarHostState() }
 
 		LoadingDialog(
 			isVisible = state.isLoading,
 		)
 
+		LaunchedEffect(state.snackBarMessage) {
+			state.snackBarMessage?.let { snackbarMsg ->
+				snackbarHostState.showSnackbar(
+					message = snackbarMsg.text,
+					type = snackbarMsg.type
+				)
 
-		LaunchedEffect(state.isSuccess) {
-			if (state.isSuccess) {
-				val successMessage = state.snackBarMessage ?: "Operación completada correctamente."
-				snackBarHost.showSuccessSnackbar(successMessage)
-				viewModel.clearSuccess()
-				navigator.pop()
-			}
-		}
+				viewModel.onEvent(AnalysisFormEvent.ClearSnackBar)
 
-		LaunchedEffect(state.error) {
-			state.error?.let { errorMessage ->
-				snackBarHost.showErrorSnackbar(errorMessage)
-				viewModel.clearError()
+				if (state.isSuccess) {
+					viewModel.clearSuccess()
+					navigator.pop()
+				}
 			}
 		}
 
 		Scaffold(
-			snackbarHost = { CustomSnackbarHost(snackBarHost) },
+			snackbarHost = { CustomSnackbarHost(snackbarHostState) },
 			modifier = Modifier.fillMaxSize(),
 			containerColor = MaterialTheme.colorScheme.background,
 			topBar = {

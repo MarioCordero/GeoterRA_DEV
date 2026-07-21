@@ -11,6 +11,8 @@ import ucr.ac.cr.inii.geoterra.domain.repository.InvestigationRequestsRepository
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
 
 class InvestigationRequestsViewModel(
 	private val requestRepository: InvestigationRequestsRepositoryInterface,
@@ -55,7 +57,15 @@ class InvestigationRequestsViewModel(
 				.onFailure { exception ->
 					val apiException = exception as? ApiException
 					if (!(apiException?.isAuthError() == true || apiException?.isInvalidAccess() == true)) {
-						_state.update { it.copy(isLoading = false, snackBarMessage = apiException?.message) }
+						_state.update {
+							it.copy(
+								isLoading = false,
+								snackBarMessage = SnackbarMessage(
+									text = apiException?.message ?: "Unknown error occurred",
+									type = SnackbarType.ERROR
+								)
+							)
+						}
 					} else {
 						_state.update { it.copy(isLoading = false, snackBarMessage = null) }
 					}
@@ -75,13 +85,24 @@ class InvestigationRequestsViewModel(
 					_state.update {
 						it.copy(
 							isLoading = false,
-							snackBarMessage = "Solicitud eliminada correctamente",
+							snackBarMessage = SnackbarMessage(
+								text = "Solicitud eliminada correctamente",
+								type = SnackbarType.SUCCESS
+							),
 							requests = it.requests.filter { it.request_id != requestId }
 						)
 					}
 				}
 				.onFailure { exception ->
-					_state.update { it.copy(isLoading = false, snackBarMessage = exception.message) }
+					_state.update {
+						it.copy(
+							isLoading = false,
+							snackBarMessage = SnackbarMessage(
+								text = exception.message ?: "Error deleting request",
+								type = SnackbarType.ERROR
+							)
+						)
+					}
 				}
 		}
 	}
@@ -107,22 +128,14 @@ class InvestigationRequestsViewModel(
 		_state.update { it.copy(lastGeneratedPdfPath = null, isPdfGenerating = false) }
 	}
 
-	/**
-	 * Stores the path of the generated PDF.
-	 */
-	fun setPdfError(error: String?) {
-		_state.update { it.copy(pdfError = error) }
-	}
-
-	/**
-	 * Resets PDF states after closing the status dialog.
-	 */
-	fun clearPdfError() {
-		_state.update { it.copy(pdfError = null) }
-	}
-
-	fun updateSnackBarMessage(message: String?) {
-		_state.update { it.copy(snackBarMessage = message) }
+	fun updateSnackBarMessage(message: String?, type: SnackbarType = SnackbarType.INFO) {
+		_state.update {
+			it.copy(
+				snackBarMessage = message?.let { text ->
+					SnackbarMessage(text, type)
+				}
+			)
+		}
 	}
 
 	/**

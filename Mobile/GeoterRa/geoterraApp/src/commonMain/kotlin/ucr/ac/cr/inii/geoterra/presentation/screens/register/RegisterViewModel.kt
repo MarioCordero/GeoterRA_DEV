@@ -1,13 +1,12 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.register
 
 import cafe.adriel.voyager.core.model.screenModelScope
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.requests.RegisterRequest
-import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
-import ucr.ac.cr.inii.geoterra.domain.auth.AuthEventBus
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
 
 class RegisterViewModel(
   private val authService: AuthService
@@ -20,12 +19,11 @@ class RegisterViewModel(
   fun onPasswordChanged(v: String) = updateState { it.copy(password = v, fieldErrors = it.fieldErrors - "password") }
   fun onConfirmPasswordChanged(v: String) = updateState { it.copy(confirmPassword = v) }
   fun togglePasswordVisibility() = updateState { it.copy(isPasswordVisible = !it.isPasswordVisible) }
-  fun dismissSnackbar() = updateState { it.copy(snackBarMessage = null) }
+  fun onSnackbarDismissed() = updateState { it.copy(snackBarMessage = null) }
 
-  fun clearStatus() = updateState { it.copy(isSuccess = false, error = null) }
+  fun clearStatus() = updateState { it.copy(isSuccess = false) }
 
   fun register() {
-
     updateState {
       it.copy(
         name = it.name.trim(),
@@ -35,7 +33,7 @@ class RegisterViewModel(
         password = it.password.trim(),
         confirmPassword = it.confirmPassword.trim(),
         fieldErrors = emptyMap(),
-        error = null
+				snackBarMessage = null
       )
     }
 
@@ -56,14 +54,23 @@ class RegisterViewModel(
 
       authService.register(request)
         .onSuccess {
-          updateState { it.copy(isLoading = false, isSuccess = true) }
+          updateState { it.copy(
+						isLoading = false,
+						isSuccess = true,
+						snackBarMessage = SnackbarMessage(
+							text = "Cuenta creada con éxito. Ya puedes iniciar sesión.",
+							type = SnackbarType.SUCCESS
+						)
+					)}
         }
         .onFailure { error ->
           updateState {
             it.copy(
               isLoading = false,
-              error = error.message
-                ?: "Ha ocurrido un error de servidor al crear la cuenta."
+							snackBarMessage = SnackbarMessage(
+								text = error.message ?: "Ocurrió un error inesperado al crear la cuenta.",
+								type = SnackbarType.ERROR
+							)
             )
           }
         }

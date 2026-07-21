@@ -5,9 +5,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -21,9 +20,9 @@ import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
+import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.common.StatusDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 
 class RegisterScreen : Screen {
   override val key: ScreenKey = uniqueScreenKey
@@ -34,7 +33,7 @@ class RegisterScreen : Screen {
     val viewModel = getScreenModel<RegisterViewModel>()
     val state by viewModel.state.collectAsState()
 
-    val snackBarState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { TypedSnackbarHostState() }
 
     if (state.isLoading) {
       LoadingDialog(
@@ -43,31 +42,18 @@ class RegisterScreen : Screen {
       )
     }
 
-    if (state.isSuccess) {
-      SuccessActionDialog(
-        message = "¡Cuenta creada con éxito! Ya puedes iniciar sesión.",
-        confirmText = "Aceptar",
-        onConfirm = {
-          viewModel.clearStatus()
-          navigator.pop()
-        },
-        onDismiss = {
-          viewModel.clearStatus()
-          navigator.pop()
-        }
-      )
-    }
-
-    if (state.error != null) {
-      StatusDialog(
-        isSuccess = false,
-        message = state.error!!,
-        onDismiss = { viewModel.clearStatus() }
-      )
-    }
+		LaunchedEffect(state.snackBarMessage) {
+			state.snackBarMessage?.let { snackbarMsg ->
+				snackbarHostState.showSnackbar(
+					message = snackbarMsg.text,
+					type = snackbarMsg.type
+				)
+				viewModel.onSnackbarDismissed()
+			}
+		}
 
     Scaffold(
-      snackbarHost = { SnackbarHost(hostState = snackBarState) },
+      snackbarHost = { CustomSnackbarHost(snackbarHostState) },
       topBar = {
         Row(
           modifier = Modifier
@@ -83,7 +69,6 @@ class RegisterScreen : Screen {
       RegisterContent(
         modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
         state = state,
-        snackBarState = snackBarState,
         onEvent = viewModel,
         onBack = { navigator.pop() }
       )
