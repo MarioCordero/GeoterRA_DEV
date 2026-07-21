@@ -40,8 +40,9 @@ class InsituTestServiceTest extends TestCase
 
 	private function authenticateAs(string $role): array
 	{
-		$user = ['user_id' => UlidGenerator::generate(), 'role' => $role];
+		$user = $this->createTestUser(['role' => $role]);
 		Request::setUser($user);
+		$_SERVER['HTTP_X_CLIENT_ID'] = 'web-secret-key-789';
 		return $user;
 	}
 
@@ -52,7 +53,7 @@ class InsituTestServiceTest extends TestCase
 		$latitude = $overrides['latitude'] ?? 9.9333;
 		$longitude = $overrides['longitude'] ?? -84.0833;
 		$visibility = $overrides['visibility'] ?? 1;
-		$createdBy = $overrides['created_by'] ?? UlidGenerator::generate();
+		$createdBy = $overrides['created_by'] ?? $this->getOrCreateDefaultUser()['user_id'];
 
 		$stmt = $this->pdo->prepare(
 			'INSERT INTO geomanifestations (
@@ -93,7 +94,7 @@ class InsituTestServiceTest extends TestCase
 		$conductivity = $overrides['conductivity'] ?? 320.25;
 		$ph = $overrides['ph'] ?? 7.2;
 		$description = $overrides['description'] ?? 'Test in-situ measurement';
-		$createdBy = $overrides['created_by'] ?? UlidGenerator::generate();
+		$createdBy = $overrides['created_by'] ?? $this->getOrCreateDefaultUser()['user_id'];
 
 		$stmt = $this->pdo->prepare(
 			'INSERT INTO insitu_tests (
@@ -267,7 +268,7 @@ class InsituTestServiceTest extends TestCase
 
 	public function testGetByManifestationHiddenThrowsForbiddenWithoutRole(): void
 	{
-		Request::setUser(null);
+		$this->authenticateAs(AllowedUserRoles::USER);
 		$manifestation = $this->createTestGeomanifestation(['visibility' => 0]);
 		$this->createTestInsituTest(['manifestation' => $manifestation]);
 

@@ -21,10 +21,14 @@ use Throwable;
 abstract class TestCase extends PHPUnitTestCase
 {
     protected PDO $pdo;
+    protected ?array $defaultUser = null;
 
     protected function setUp(): void
     {
         parent::setUp();
+        // Set default test API key
+        $_SERVER['HTTP_X_API_KEY'] = 'web-secret-key-789';
+        \Http\Request::init();
         // Get test database connection
         $this->pdo = $_SERVER['TEST_DATABASE'];
         // Reset database state for each test
@@ -36,6 +40,7 @@ abstract class TestCase extends PHPUnitTestCase
      */
     protected function resetDatabase(): void
     {
+        $this->defaultUser = null;
         $this->pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
         $this->pdo->exec('DELETE FROM logs_entries');
         $this->pdo->exec('DELETE FROM logs');
@@ -48,6 +53,14 @@ abstract class TestCase extends PHPUnitTestCase
         $this->pdo->exec('DELETE FROM access_tokens');
         $this->pdo->exec('DELETE FROM users');
         $this->pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
+    }
+
+    protected function getOrCreateDefaultUser(): array
+    {
+        if ($this->defaultUser === null) {
+            $this->defaultUser = $this->createTestUser(['role' => 'admin']);
+        }
+        return $this->defaultUser;
     }
 
     /**
@@ -64,6 +77,9 @@ abstract class TestCase extends PHPUnitTestCase
         $passwordHash = $overrides['password_hash'] ?? password_hash($password, PASSWORD_BCRYPT);
         $phone = $overrides['phone_number'] ?? $overrides['phone'] ?? null;
         $role = $overrides['role'] ?? 'user';
+        if ($role === 'fieldInvestigator') {
+            $role = 'field_investigator';
+        }
 
         // Consulta actualizada con las columnas correctas
         $stmt = $this->pdo->prepare(
