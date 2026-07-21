@@ -1,24 +1,94 @@
-# Archivos y carpetas generadas
-# KOTLIN MULTIPLATFORM
-# =======================
-
-# --- Gradle build cache and outputs ---
-.gradle/
-build/
-**/build/
-out/
-captures/
-
-# --- Local configuration files ---
+# ==========================================
+# Entorno, Secretos y Configuraciones Locales
+# ==========================================
+.env
 local.properties
-.gradle/
-gradle-app.setting
-.gradle-build-cache/
+secrets.properties
+secrets.defaults.properties
+API/config/api-keys.php
+API/config/config.ini
+google-services.json
+app/google-services.json
+**/google-services.json
+GoogleService-Info.plist
 
-# --- Android Studio configuration ---
-.idea/
+# Keystores y Llaves
+*.jks
+*.keystore
+*.pem
+*.key
+*.p12
+
+# ==========================================
+# Gradle & Kotlin / Android
+# ==========================================
+.gradle/
+.gradle-build-cache/
+gradle-app.setting
+/.kts_cache
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# Kotlin & Compose
 .kotlin
-*.iml
+*.klib
+*.kotlin_module
+*.kotlin_metadata
+*.kotlin_builtins
+**/.compose-cache/
+**/.kotlin/compose-cache/
+
+# Archivos de compilación Android
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+
+# ProGuard / R8
+proguard/
+*.mapping
+*.dump
+*.seeds
+*.usage
+
+# ==========================================
+# C++ / NDK / CMake
+# ==========================================
+cmake-build-*/
+obj/
+libs/
+
+# ==========================================
+# iOS / CocoaPods
+# ==========================================
+**/Pods/
+Podfile.lock
+
+# ==========================================
+# Node.js & Frontend (JavaScript / Vite)
+# ==========================================
+node_modules/
+docApiWebsite/node_modules
+website/.vite/
+website/dist/
+dist/
+*.json
+!composer.json
+!package.json
+!package-lock.json
+
+# ==========================================
+# PHP / Backend
+# ==========================================
+vendor/
+API/vendor/
+API/.phpunit.cache/*
+
+# ==========================================
+# IDEs & Editores (Android Studio, IntelliJ, VS Code)
+# ==========================================
+.idea/
 .idea/workspace.xml
 .idea/tasks.xml
 .idea/gradle.xml
@@ -29,140 +99,49 @@ gradle-app.setting
 .idea/navEditor.xml
 .idea/assetWizardSettings.xml
 .idea/deploymentTargetDropDown.xml
-
-# -- Cococa Pods --
-**/Pods/
-Podfile.lock
-
-# --- Log files ---
-*.log
-
-# --- Keystore files (never commit secrets) ---
-*.jks
-*.keystore
-*.pem
-*.key
-*.p12
-
-# --- Generated files by Android Studio ---
-*.apk
-*.ap_
-*.aab
-*.dex
-*.class
-
-# --- ProGuard / R8 ---
-proguard/
-*.mapping
-*.dump
-*.seeds
-*.usage
-*.log
-
-# --- Gradle wrapper ---
-# The wrapper JAR and properties are needed for consistent builds,
-# but avoid committing temporary Gradle caches.
-!gradle/wrapper/gradle-wrapper.jar
-!gradle/wrapper/gradle-wrapper.properties
-
-# --- Environment-specific ---
-*.swp
-*.swo
-*.tmp
-*.temp
-*~
-.DS_Store
-Thumbs.db
-
-# --- IntelliJ IDEA cache directories ---
 .idea/sonarlint/
 .idea/httpRequests/
 .idea/shelf/
 .idea/other.xml
+*.iml
 
-# --- Kotlin-specific build outputs ---
-*.kotlin_module
-*.kotlin_metadata
-*.kotlin_builtins
+.vscode/
 
-# --- Generated JNI / CMake outputs ---
-cmake-build-*/
-
-# --- Test outputs ---
+# ==========================================
+# Compilación, Salidas y Reportes
+# ==========================================
+build/
+**/build/
+out/
+/out
+captures/
+/captures
 /test-results/
 /coverage/
+API/coverage/
 /reports/
-
-# --- Jetpack Compose compiler caches ---
-**/.compose-cache/
-**/.kotlin/compose-cache/
-
-# --- Miscellaneous ---
-*.hprof
-*.orig
-*.rej
-
-# --- Firebase / Google Services secrets ---
-google-services.json
-GoogleService-Info.plist
-app/google-services.json
-**/google-services.json
-
-# --- NDK / C++ build outputs ---
-obj/
-libs/
-
-# --- Lint and analysis reports ---
 lint/
 lint-results.*
 lint-report.*
 
-# --- Custom build output directories ---
-/out
-/captures
-
-# Archivos del entorno
-.env
-*.keystore
-*.jks
+# ==========================================
+# Archivos de Sistema y Temporales
+# ==========================================
 *.log
-*.lock
-*.tmp
 *.swp
+*.swo
+*.tmp
+*.temp
+*.lock
+*~
+.DS_Store
+Thumbs.db
 
-# Secretos y configuraciones locales
-secrets.properties
-secrets.defaults.properties
-
-# Cache de Kotlin DSL
-/.kts_cache
-
-# Configuración de VSCode
-.vscode/
-*.json
-!composer.json
-!package.json
-!package-lock.json
-*.klib
-
-node_modules/
-API/config/config.ini
-.vscode
-website/.vite/deps/_metadata.json
-website/.vite/deps/package.json
-
-
-# -----------------------------
-# Backend
-# -----------------------------
-API/vendor/
-vendor/
-API/.phpunit.cache/*
-API/config/config.ini
+# ==========================================
+# Varios / Utilidades
+# ==========================================
+*.hprof
+*.orig
+*.rej
 notes.txt
 GeoterRA_local.session.sql
-.vscode/*
-API/config/api-keys.php
-API/config/config.ini
-docApiWebsite/node_modules
-API/coverage/
