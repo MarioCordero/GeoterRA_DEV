@@ -182,10 +182,12 @@ final class InvestigationRequestRepository
 	 */
 	public function findById(string $id): ?array
 	{
-		$sql = "SELECT r.*,
+		$sql = "SELECT r.*, 
                    p.province_name,
                    c.canton_name,
                    d.district_name,
+                   u.first_name AS user_first_name,
+                   u.last_name AS user_last_name,
                    rs.value AS current_state, 
                    rs.description AS state_description,
                    rs.created_at AS state_created_at
@@ -290,6 +292,8 @@ final class InvestigationRequestRepository
                    p.province_name,
                    c.canton_name,
                    d.district_name,
+                   u.first_name AS user_first_name,
+                   u.last_name AS user_last_name,
                    rs.value AS current_state, 
                    rs.description AS state_description,
                    rs.created_at AS state_created_at

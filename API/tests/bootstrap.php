@@ -12,6 +12,12 @@ date_default_timezone_set('UTC');
 define('BASE_DIR', dirname(__DIR__));
 define('TESTS_DIR', dirname(__FILE__));
 
+// Ensure api-keys.php exists in config directory for tests
+$apiKeysPath = BASE_DIR . '/config/api-keys.php';
+if (!file_exists($apiKeysPath)) {
+  @file_put_contents($apiKeysPath, "<?php\nreturn [\n  'web-secret-key-789' => 'web',\n  'android-key-123' => 'mobile',\n  'ios-key-456' => 'mobile',\n];\n");
+}
+
 // Ensure session starts correctly in CLI mode without throwing headers already sent
 //if (session_status() === PHP_SESSION_NONE) {
 //  session_start();
@@ -56,17 +62,15 @@ spl_autoload_register(
  */
 function initializeTestDatabase(): PDO
 {
-  // Read the environment variables (GitHub Actions) or use the defaults (Local)
-  // Note: It is better to use 127.0.0.1 instead of 'localhost' to force TCP connection and avoid error 2002
-  $host = getenv('DB_HOST') ?: '127.0.0.1';
-  $port = getenv('DB_PORT') ?: 8081;
-  $user = getenv('DB_USER') ?: 'mario';
-  $password = getenv('DB_PASS') !== false ? getenv('DB_PASS') : '2003';
+  $configIniPath = BASE_DIR . '/config/config.ini';
+  $iniConfig = file_exists($configIniPath) ? (parse_ini_file($configIniPath, true)['database'] ?? []) : [];
 
-  $host = '127.0.0.1';
-  $port = 8081;
-  $user = 'root';
-  $password = '';
+  // Read environment variables (GitHub Actions) or fallback to config.ini / defaults (Local)
+  $host = getenv('DB_HOST') ?: ($iniConfig['host'] ?? '127.0.0.1');
+  if ($host === 'localhost') $host = '127.0.0.1';
+  $port = (int)(getenv('DB_PORT') ?: ($iniConfig['port'] ?? 3306));
+  $user = getenv('DB_USER') ?: ($iniConfig['user'] ?? 'root');
+  $password = getenv('DB_PASS') !== false ? (string)getenv('DB_PASS') : ($iniConfig['pass'] ?? '');
 
   // Names of the databases
   $prodDbName = 'GeoterRA';
@@ -124,16 +128,15 @@ function initializeTestDatabase(): PDO
  */
 function loadTestSchema(): void
 {
-  $host = getenv('DB_HOST') ?: '127.0.0.1';
-  $port = getenv('DB_PORT') ?: 3306;
-  $user = getenv('DB_USER') ?: 'mario';
-  $password = getenv('DB_PASS') !== false ? getenv('DB_PASS') : '2003';
-  $testDbName = 'GeoterRA_test';
+  $configIniPath = BASE_DIR . '/config/config.ini';
+  $iniConfig = file_exists($configIniPath) ? (parse_ini_file($configIniPath, true)['database'] ?? []) : [];
 
-  $host = '127.0.0.1';
-  $port = 8081;
-  $user = 'root';
-  $password = '';
+  $host = getenv('DB_HOST') ?: ($iniConfig['host'] ?? '127.0.0.1');
+  if ($host === 'localhost') $host = '127.0.0.1';
+  $port = (int)(getenv('DB_PORT') ?: ($iniConfig['port'] ?? 3306));
+  $user = getenv('DB_USER') ?: ($iniConfig['user'] ?? 'root');
+  $password = getenv('DB_PASS') !== false ? (string)getenv('DB_PASS') : ($iniConfig['pass'] ?? '');
+  $testDbName = 'GeoterRA_test';
 
   try {
     $schemaPath = dirname(__DIR__, 2) . '/database/GeoterRA.sql';
