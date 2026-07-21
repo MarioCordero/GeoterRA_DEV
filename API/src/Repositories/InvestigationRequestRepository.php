@@ -29,27 +29,6 @@ final class InvestigationRequestRepository
 		$requestId = UlidGenerator::generate();
 		$timePart = substr($requestId, 0, 10);
 		$generatedName = 'SOLI-' . $dto->districtSnitCode . '-' . $timePart;
-		// Initialize owner details with DTO defaults
-		$ownerName = $dto->ownerName;
-		$ownerPhone = $dto->ownerPhoneNumber;
-		$ownerEmail = $dto->ownerEmail;
-
-		// Resolve owner information automatically if the applicant is the legal owner
-		if ($dto->relationWithOwner === 'Titular') {
-			$userSql = "SELECT first_name, last_name, email, phone_number 
-                  FROM users 
-                  WHERE user_id = :user_id AND is_deleted = 0 
-                  LIMIT 1";
-			$userStmt = $this->pdo->prepare($userSql);
-			$userStmt->execute([':user_id' => $userId]);
-			$user = $userStmt->fetch(PDO::FETCH_ASSOC);
-
-			if ($user) {
-				$ownerName = trim($user['first_name'] . ' ' . $user['last_name']);
-				$ownerPhone = $user['phone_number'];
-				$ownerEmail = $user['email'];
-			}
-		}
 
 		$sql = "INSERT INTO requests (
                       request_id, province_snit_code, canton_snit_code, district_snit_code,
@@ -71,9 +50,9 @@ final class InvestigationRequestRepository
 				':district_snit' => $dto->districtSnitCode,
 				':user_id' => $userId,
 				':name' => $generatedName,
-				':owner_name' => $ownerName,
-				':owner_phone' => $ownerPhone,
-				':owner_email' => $ownerEmail,
+				':owner_name' => $dto->ownerName,
+				':owner_phone' => $dto->ownerPhoneNumber,
+				':owner_email' => $dto->ownerEmail,
 				':current_usage' => $dto->currentUsage,
 				':temp_sensation' => $dto->temperatureSensation,
 				':bubbles' => $dto->bubbles ? 1 : 0,
@@ -203,10 +182,12 @@ final class InvestigationRequestRepository
 	 */
 	public function findById(string $id): ?array
 	{
-		$sql = "SELECT r.*,
+		$sql = "SELECT r.*, 
                    p.province_name,
                    c.canton_name,
                    d.district_name,
+                   u.first_name AS user_first_name,
+                   u.last_name AS user_last_name,
                    rs.value AS current_state, 
                    rs.description AS state_description,
                    rs.created_at AS state_created_at
@@ -311,6 +292,8 @@ final class InvestigationRequestRepository
                    p.province_name,
                    c.canton_name,
                    d.district_name,
+                   u.first_name AS user_first_name,
+                   u.last_name AS user_last_name,
                    rs.value AS current_state, 
                    rs.description AS state_description,
                    rs.created_at AS state_created_at

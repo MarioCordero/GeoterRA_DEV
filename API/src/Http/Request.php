@@ -124,7 +124,7 @@ final class Request
         $data = self::json();
 
         if ($data === null) {
-            throw new ApiException(ErrorType::invalidJson());
+            throw new ApiException(ErrorType::invalidJson(), 400);
         }
 
         return $data;
@@ -165,7 +165,7 @@ final class Request
   public static function getUser(): ?array
   {
     if (self::$user === null) {
-      throw new ApiException(ErrorType::unauthorized());
+      throw new ApiException(ErrorType::unauthorized(), 401);
     }
     return self::$user;
   }
@@ -175,7 +175,7 @@ final class Request
         $user = self::getUser();
         if ($user === null || !isset($user['role'])
             || !in_array($user['role'], $allowedRoles, true)) {
-            throw new ApiException(ErrorType::forbidden());
+            throw new ApiException(ErrorType::forbidden(), 403);
         }
         return $user;
     }

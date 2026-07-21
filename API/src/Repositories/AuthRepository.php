@@ -234,7 +234,7 @@ final class AuthRepository extends Repository
    */
   public function findRefreshTokenByHash(string $tokenHash): ?array
   {
-    $sql = "SELECT family_id, used_at, revoked_at FROM refresh_tokens WHERE token_hash = :hash";
+    $sql = "SELECT user_id, family_id, used_at, revoked_at FROM refresh_tokens WHERE token_hash = :hash";
     $stmt = $this->db->prepare($sql);
     $stmt->execute(['hash' => $tokenHash]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);

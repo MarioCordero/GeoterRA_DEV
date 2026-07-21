@@ -69,8 +69,8 @@ final class GeomanifestationViewRepository extends Repository
             LEFT JOIN districts d ON (gm.district_snit_code = d.district_snit_code)) 
             LEFT JOIN georeports gr ON (gm.current_georeport_id = gr.georeport_id)) 
             LEFT JOIN users report_creator ON (gr.created_by = report_creator.user_id)) 
-            LEFT JOIN insitu_tests ist ON (gr.insitu_test_id = ist.insitu_test_id)) 
-            LEFT JOIN inlab_tests ilt ON (gr.inlab_test_id = ilt.inlab_test_id))";
+            LEFT JOIN insitu_tests ist ON (gr.insitu_test_id = ist.insitu_test_id OR ist.geomanifestation_id = gm.geomanifestation_id)) 
+            LEFT JOIN inlab_tests ilt ON (gr.inlab_test_id = ilt.inlab_test_id OR ilt.geomanifestation_id = gm.geomanifestation_id))";
 	}
 
 	/**
@@ -159,13 +159,12 @@ final class GeomanifestationViewRepository extends Repository
 		$total = (int)$countStmt->fetchColumn();
 
 		// Get paginated data
+		$limitInt = (int)$limit;
+		$offsetInt = (int)$offset;
 		$sql = "SELECT * FROM ($baseSql) AS view_geomanifestations 
                 $whereClause 
                 ORDER BY manifestation_created_at DESC
-                LIMIT :limit OFFSET :offset";
-
-		$params[':limit'] = $limit;
-		$params[':offset'] = $offset;
+                LIMIT {$limitInt} OFFSET {$offsetInt}";
 
 		$stmt = $this->execute($sql, $params);
 		$data = $stmt->fetchAll(PDO::FETCH_ASSOC);

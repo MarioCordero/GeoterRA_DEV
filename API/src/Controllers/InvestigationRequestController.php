@@ -152,7 +152,7 @@ final class InvestigationRequestController
   public function adminIndex(): void
   {
     try {
-      $requests = $this->service->getAll();
+      $requests = $this->service->adminGetAll();
       Response::success($requests);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
@@ -176,24 +176,6 @@ final class InvestigationRequestController
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
-//
-//  /**
-//   * PUT /admin/analysis-request/{id}
-//   * Updates any analysis request (admin only, no state restriction).
-//   */
-//  public function adminUpdate(string $id): void
-//  {
-//    try {
-//      $body = Request::parseJsonRequest();
-//      $dto = UpdateInvestigationRequestDTO::fromArray($body);
-//      $this->service->adminUpdate($id, $dto);
-//      Response::success(['message' => 'Analysis request updated successfully']);
-//    } catch (ApiException $e) {
-//      Response::error($e->getError(), $e->getCode());
-//    } catch (Throwable $e) {
-//      Response::error(ErrorType::internal($e->getMessage()), 500);
-//    }
-//  }
 
   /**
    * POST /admin/analysis-request/{id}/states
@@ -209,24 +191,8 @@ final class InvestigationRequestController
       }
       $stateValue = $body['state'];
       $description = $body['description'] ?? '';
-      $this->service->addState($id, $stateValue, $description);
+      $this->service->adminAddState($id, $stateValue, $description);
       Response::success(['message' => 'State added successfully']);
-    } catch (ApiException $e) {
-      Response::error($e->getError(), $e->getCode());
-    } catch (Throwable $e) {
-      Response::error(ErrorType::internal($e->getMessage()), 500);
-    }
-  }
-
-  /**
-   * DELETE /admin/analysis-request/{id}
-   * Deletes any analysis request (admin only).
-   */
-  public function adminDelete(string $id): void
-  {
-    try {
-      $this->service->adminDelete($id);
-      Response::success(['message' => 'Analysis request deleted successfully']);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
     } catch (Throwable $e) {

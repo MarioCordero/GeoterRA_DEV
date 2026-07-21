@@ -201,11 +201,9 @@ class UpdateInvestigationRequestDTOTest extends TestCase
     $dto = new UpdateInvestigationRequestDTO(
       ownerName: 'Different Owner'
     );
-    $userData = ['first_name' => 'John', 'last_name' => 'Doe', 'phone_number' => '88888888', 'email' => 'john@example.com'];
 
-    $this->expectException(ApiException::class);
-    $this->expectExceptionCode(422);
-    $dto->validate($userData);
+    $this->expectNotToPerformAssertions();
+    $dto->validate();
   }
 
   public function testValidatePassesWhenOwnerDiffersAndRelationProvided(): void
@@ -214,10 +212,9 @@ class UpdateInvestigationRequestDTOTest extends TestCase
       ownerName: 'Different Owner',
       relationWithOwner: 'Familiar'
     );
-    $userData = ['first_name' => 'John', 'last_name' => 'Doe', 'phone_number' => '88888888', 'email' => 'john@example.com'];
 
     $this->expectNotToPerformAssertions();
-    $dto->validate($userData);
+    $dto->validate();
   }
 
   public function testValidateThrowsExceptionWhenOwnerDiffersAndRelationInvalid(): void
@@ -226,11 +223,10 @@ class UpdateInvestigationRequestDTOTest extends TestCase
       ownerName: 'Different Owner',
       relationWithOwner: 'Invalido'
     );
-    $userData = ['first_name' => 'John', 'last_name' => 'Doe', 'phone_number' => '88888888', 'email' => 'john@example.com'];
 
     $this->expectException(ApiException::class);
     $this->expectExceptionCode(422);
-    $dto->validate($userData);
+    $dto->validate();
   }
 
   public function testValidatePassesWhenOwnerSameAndRelationNotRequired(): void
@@ -238,10 +234,9 @@ class UpdateInvestigationRequestDTOTest extends TestCase
     $dto = new UpdateInvestigationRequestDTO(
       ownerName: 'John Doe'  // same as user
     );
-    $userData = ['first_name' => 'John', 'last_name' => 'Doe', 'phone_number' => '88888888', 'email' => 'john@example.com'];
 
     $this->expectNotToPerformAssertions();
-    $dto->validate($userData);
+    $dto->validate();
   }
 
   public function testValidatePassesWhenOwnerDiffersByPhoneButRelationProvided(): void
@@ -250,9 +245,8 @@ class UpdateInvestigationRequestDTOTest extends TestCase
       ownerPhoneNumber: '99999999',
       relationWithOwner: 'Empleado'
     );
-    $userData = ['first_name' => 'John', 'last_name' => 'Doe', 'phone_number' => '88888888', 'email' => 'john@example.com'];
 
     $this->expectNotToPerformAssertions();
-    $dto->validate($userData);
+    $dto->validate();
   }
 }
