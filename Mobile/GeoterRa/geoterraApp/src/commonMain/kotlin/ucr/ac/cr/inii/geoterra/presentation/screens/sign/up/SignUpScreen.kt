@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.register
+package ucr.ac.cr.inii.geoterra.presentation.screens.sign
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -24,13 +24,13 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 
-class RegisterScreen : Screen {
+class SignUpScreen : Screen {
   override val key: ScreenKey = uniqueScreenKey
 
   @Composable
   override fun Content() {
     val navigator = LocalNavigator.currentOrThrow
-    val viewModel = getScreenModel<RegisterViewModel>()
+    val viewModel = getScreenModel<SignUpViewModel>()
     val state by viewModel.state.collectAsState()
 
     val snackbarHostState = remember { TypedSnackbarHostState() }
@@ -66,7 +66,7 @@ class RegisterScreen : Screen {
         }
       }
     ) { paddingValues ->
-      RegisterContent(
+      SignUpContent(
         modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
         state = state,
         onEvent = viewModel,

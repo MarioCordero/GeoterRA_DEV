@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.editProfile
+package ucr.ac.cr.inii.geoterra.presentation.screens.account.edit
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -17,11 +17,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,8 +35,8 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.FormSection
 @Composable
 fun EditProfileContent(
   modifier: Modifier = Modifier,
-  state: EditProfileState,
-  onEvent: EditProfileViewModel,
+  state: EditAccountState,
+  onEvent: EditAccountViewModel,
 ) {
 
   Column(
@@ -125,7 +123,7 @@ fun EditProfileContent(
           if (state.isLoading) {
             CircularProgressIndicator(modifier = Modifier.size(24.dp),color = Color.White)
           } else {
-            Text("ACTUALIZAR", fontWeight = FontWeight.Bold)
+            Text("Actualizar", fontWeight = FontWeight.Bold)
           }
         }
       }

@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.login
+package ucr.ac.cr.inii.geoterra.presentation.screens.sign.`in`
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -37,9 +37,9 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.FormSection
 import ucr.ac.cr.inii.geoterra.presentation.components.common.PasswordField
 
 @Composable
-fun LoginContent(
+fun SignInContent(
   modifier: Modifier,
-  state: LoginState,
+  state: SignInState,
   onEmailChanged: (String) -> Unit,
   onPasswordChanged: (String) -> Unit,
   onLoginClick: () -> Unit,

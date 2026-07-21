@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.editProfile
+package ucr.ac.cr.inii.geoterra.presentation.screens.account.edit
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.launch
@@ -9,10 +9,10 @@ import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
 
-class EditProfileViewModel(
+class EditAccountViewModel(
 	private val userProfile: UserResponse,
 	private val userRepository: UserRepositoryInterface
-) : BaseScreenModel<EditProfileState>(EditProfileState()) {
+) : BaseScreenModel<EditAccountState>(EditAccountState()) {
 
 	init {
 		updateState {

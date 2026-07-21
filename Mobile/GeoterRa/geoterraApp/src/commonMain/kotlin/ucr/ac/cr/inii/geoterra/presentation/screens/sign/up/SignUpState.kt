@@ -1,8 +1,8 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.register
+package ucr.ac.cr.inii.geoterra.presentation.screens.sign
 
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
 
-data class RegisterState(
+data class SignUpState(
   val name: String = "",
   val lastname: String = "",
   val email: String = "",

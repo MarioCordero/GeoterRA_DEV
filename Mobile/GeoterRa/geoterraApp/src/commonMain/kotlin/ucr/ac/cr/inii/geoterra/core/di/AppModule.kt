@@ -22,12 +22,12 @@ import ucr.ac.cr.inii.geoterra.domain.repository.ProvinceRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.InvestigationRequestsRepositoryInterface
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.form.InvestigationRequestFormViewModel
-import ucr.ac.cr.inii.geoterra.presentation.screens.editProfile.EditProfileViewModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.account.edit.EditAccountViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeViewModel
-import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginViewModel
-import ucr.ac.cr.inii.geoterra.presentation.screens.map.manifestation.ManifestationDetailViewModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.sign.`in`.SignInViewModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation.GeomanifestationViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.map.MapViewModel
-import ucr.ac.cr.inii.geoterra.presentation.screens.register.RegisterViewModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.sign.SignUpViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.InvestigationRequestsViewModel
 
 val appModule = module {
@@ -39,12 +39,12 @@ val appModule = module {
   single { InvestigationRequestsViewModel(get(), get()) }
 
   // Inner ViewModels
-  factory { ManifestationDetailViewModel(get()) }
-  factory { LoginViewModel(get()) }
-  factory { RegisterViewModel(get()) }
+  factory { GeomanifestationViewModel(get()) }
+  factory { SignInViewModel(get()) }
+  factory { SignUpViewModel(get()) }
 
   factory { params ->
-    EditProfileViewModel(
+    EditAccountViewModel(
       userProfile = params.get<UserResponse>(),
       get(),
     )

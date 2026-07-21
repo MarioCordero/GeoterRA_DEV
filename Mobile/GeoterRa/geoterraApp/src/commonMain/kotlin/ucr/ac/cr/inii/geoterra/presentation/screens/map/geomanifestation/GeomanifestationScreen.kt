@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.map.manifestation
+package ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -15,17 +15,16 @@ import org.koin.core.parameter.parametersOf
 import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
 import ucr.ac.cr.inii.geoterra.domain.pdf.PDFUtil
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.common.StatusDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 
-class ManifestationDetailScreen(val manifestation: GeomanifestationResponse) : Screen {
+class GeomanifestationScreen(val manifestation: GeomanifestationResponse) : Screen {
   override val key: ScreenKey = uniqueScreenKey
 
   @OptIn(ExperimentalMaterial3Api::class)
   @Composable
   override fun Content() {
-    val viewModel = getScreenModel<ManifestationDetailViewModel>(
+    val viewModel = getScreenModel<GeomanifestationViewModel>(
       parameters = { parametersOf(manifestation) }
     )
     val state by viewModel.state.collectAsState()
@@ -66,7 +65,7 @@ class ManifestationDetailScreen(val manifestation: GeomanifestationResponse) : S
 			}
 		}
 
-    ManifestationDetailContent(
+    GeomanifestationDetailContent(
       modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
       state = state,
       manifestation = state.manifestation,

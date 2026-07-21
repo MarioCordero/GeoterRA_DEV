@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.login
+package ucr.ac.cr.inii.geoterra.presentation.screens.sign.`in`
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
@@ -17,18 +17,18 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
-import ucr.ac.cr.inii.geoterra.presentation.screens.register.RegisterScreen
+import ucr.ac.cr.inii.geoterra.presentation.screens.sign.SignUpScreen
 
 /**
  * Voyager Screen for the Login screen.
  */
-class LoginScreen : Screen {
+class SignInScreen : Screen {
 
 	override val key: ScreenKey = uniqueScreenKey
 
 	@Composable
 	override fun Content() {
-		val viewModel = getScreenModel<LoginViewModel>()
+		val viewModel = getScreenModel<SignInViewModel>()
 		val state by viewModel.state.collectAsState()
 		val navigator = LocalNavigator.currentOrThrow
 
@@ -49,13 +49,13 @@ class LoginScreen : Screen {
 			containerColor = Color.Transparent,
 			snackbarHost = { CustomSnackbarHost(snackbarHostState) }
 		) {
-			LoginContent(
+			SignInContent(
 				modifier = Modifier,
 				state = state,
 				onEmailChanged = viewModel::onEmailChanged,
 				onPasswordChanged = viewModel::onPasswordChanged,
 				onLoginClick = viewModel::login,
-				onRegisterClick = { navigator.push(RegisterScreen()) },
+				onRegisterClick = { navigator.push(SignUpScreen()) },
 				onTogglePassword = viewModel::togglePasswordVisibility,
 			)
 		}

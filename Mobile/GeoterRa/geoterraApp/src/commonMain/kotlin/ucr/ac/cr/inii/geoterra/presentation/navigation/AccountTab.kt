@@ -11,10 +11,9 @@ import org.koin.compose.koinInject
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.transitions.SlideTransition
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountScreen
-import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginScreen
+import ucr.ac.cr.inii.geoterra.presentation.screens.sign.`in`.SignInScreen
 
 object AccountTab : Tab {
   override val key: String = "AccountTab_${hashCode()}"
@@ -28,7 +27,7 @@ object AccountTab : Tab {
       val rootScreen = if (isLoggedIn == true) {
         AccountScreen()
       } else {
-        LoginScreen()
+        SignInScreen()
       }
 
       Navigator(rootScreen)

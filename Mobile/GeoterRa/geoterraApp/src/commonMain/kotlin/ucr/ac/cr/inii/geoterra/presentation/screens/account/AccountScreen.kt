@@ -22,8 +22,8 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.delay
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
-import ucr.ac.cr.inii.geoterra.presentation.screens.editProfile.EditProfileScreen
-import ucr.ac.cr.inii.geoterra.presentation.screens.login.LoginScreen
+import ucr.ac.cr.inii.geoterra.presentation.screens.account.edit.EditAccountScreen
+import ucr.ac.cr.inii.geoterra.presentation.screens.sign.`in`.SignInScreen
 
 /**
  * Voyager Screen implementation for Home.
@@ -48,7 +48,7 @@ class AccountScreen : Screen {
 			if (state.user == null && !state.isLoading) {
 				snackbarHostState.showErrorSnackbar("Su sesión ha expirado. Inicie sesión nuevamente.")
 				delay(2000)
-				navigator.replaceAll(LoginScreen())
+				navigator.replaceAll(SignInScreen())
 			}
 		}
 
@@ -78,14 +78,14 @@ class AccountScreen : Screen {
 				state = state,
 				onLogoutClick = {
 					viewModel.logout()
-					navigator.replaceAll(LoginScreen())
+					navigator.replaceAll(SignInScreen())
 				},
 				onDeleteAccountClick = {
 					viewModel.deleteAccount()
 					navigator.pop()
 				},
 				onEditClick = {
-					navigator.push(EditProfileScreen(userProfile = state.user!!))
+					navigator.push(EditAccountScreen(userProfile = state.user!!))
 				},
 				onThemeToggle = { isDark ->
 					viewModel.toggleTheme(isDark)

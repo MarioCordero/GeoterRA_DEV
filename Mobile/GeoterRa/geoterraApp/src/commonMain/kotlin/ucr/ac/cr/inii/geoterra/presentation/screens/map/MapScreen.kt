@@ -29,7 +29,7 @@ import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ucr.ac.cr.inii.geoterra.presentation.components.map.FilterBottomModal
-import ucr.ac.cr.inii.geoterra.presentation.screens.map.manifestation.ManifestationDetailScreen
+import ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation.GeomanifestationScreen
 
 class MapScreen : Screen {
   override val key: ScreenKey = uniqueScreenKey
@@ -84,7 +84,7 @@ class MapScreen : Screen {
         onUserMarkerClick = viewModel::onUserMarkerSelected,
         onDismissPanel = { viewModel.onManifestationMarkerSelected("") },
         onDetailsClick = { manifestation ->
-          navigator.push(ManifestationDetailScreen(manifestation))
+          navigator.push(GeomanifestationScreen(manifestation))
         }
       )
 

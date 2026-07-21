@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.register
+package ucr.ac.cr.inii.geoterra.presentation.screens.sign
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.launch
@@ -8,9 +8,9 @@ import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
 
-class RegisterViewModel(
+class SignUpViewModel(
   private val authService: AuthService
-) : BaseScreenModel<RegisterState>(RegisterState()) {
+) : BaseScreenModel<SignUpState>(SignUpState()) {
 
   fun onNameChanged(v: String) = updateState { it.copy(name = v, fieldErrors = it.fieldErrors - "name") }
   fun onLastnameChanged(v: String) = updateState { it.copy(lastname = v, fieldErrors = it.fieldErrors - "lastname") }

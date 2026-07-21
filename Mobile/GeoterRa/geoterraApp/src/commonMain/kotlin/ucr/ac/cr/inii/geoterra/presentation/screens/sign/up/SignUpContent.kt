@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.register
+package ucr.ac.cr.inii.geoterra.presentation.screens.sign
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -17,12 +17,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,10 +35,10 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.FormSection
 import ucr.ac.cr.inii.geoterra.presentation.components.common.PasswordField
 
 @Composable
-fun RegisterContent(
+fun SignUpContent(
   modifier: Modifier = Modifier,
-  state: RegisterState,
-  onEvent: RegisterViewModel,
+  state: SignUpState,
+  onEvent: SignUpViewModel,
   onBack: () -> Unit
 ) {
   Column(

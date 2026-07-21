@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.map.manifestation
+package ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
@@ -29,12 +29,12 @@ import ucr.ac.cr.inii.geoterra.presentation.components.manifestation.ChemicalRow
 import ucr.ac.cr.inii.geoterra.presentation.components.manifestation.ManifestationReport
 
 @Composable
-fun ManifestationDetailContent(
-	modifier: Modifier,
-	state : ManifestationDetailState,
-	manifestation: GeomanifestationResponse,
-	onDownload: () -> Unit,
-	onBack: () -> Unit
+fun GeomanifestationDetailContent(
+  modifier: Modifier,
+  state : GeomanifestationState,
+  manifestation: GeomanifestationResponse,
+  onDownload: () -> Unit,
+  onBack: () -> Unit
 ) {
   Column(
     modifier = modifier

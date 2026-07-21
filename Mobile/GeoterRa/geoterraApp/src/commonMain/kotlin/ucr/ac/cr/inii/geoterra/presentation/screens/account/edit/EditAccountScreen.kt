@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.editProfile
+package ucr.ac.cr.inii.geoterra.presentation.screens.account.edit
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -26,7 +26,7 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 
-class EditProfileScreen(
+class EditAccountScreen(
 	private val userProfile: UserResponse
 ) : Screen {
 	override val key: ScreenKey = uniqueScreenKey
@@ -34,7 +34,7 @@ class EditProfileScreen(
 	@Composable
 	override fun Content() {
 		val navigator = LocalNavigator.currentOrThrow
-		val viewModel = getScreenModel<EditProfileViewModel>(
+		val viewModel = getScreenModel<EditAccountViewModel>(
 			parameters = { parametersOf(userProfile) }
 		)
 		val state by viewModel.state.collectAsState()

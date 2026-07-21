@@ -28,7 +28,7 @@ import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.DataBox
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SectionHeader
-import ucr.ac.cr.inii.geoterra.presentation.screens.map.manifestation.ChemicalGroupCard
+import ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation.ChemicalGroupCard
 
 @Composable
 fun ManifestationReport(

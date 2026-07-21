@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.login
+package ucr.ac.cr.inii.geoterra.presentation.screens.sign.`in`
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.delay
@@ -13,9 +13,9 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
  * Updated ViewModel to handle real API authentication.
  * 
  */
-class LoginViewModel(
+class SignInViewModel(
   private val authService: AuthService,
-) : BaseScreenModel<LoginState>(LoginState()) {
+) : BaseScreenModel<SignInState>(SignInState()) {
   
   fun onEmailChanged(newValue: String) {
     updateState { it.copy(email = newValue, fieldErrors = it.fieldErrors - "email") }

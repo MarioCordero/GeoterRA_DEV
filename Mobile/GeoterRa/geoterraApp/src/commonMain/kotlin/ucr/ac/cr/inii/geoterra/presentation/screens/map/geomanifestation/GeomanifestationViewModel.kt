@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.map.manifestation
+package ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
@@ -9,9 +9,9 @@ import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
 
-class ManifestationDetailViewModel(
+class GeomanifestationViewModel(
   private val initialManifestation: GeomanifestationResponse
-) : BaseScreenModel<ManifestationDetailState>(ManifestationDetailState(manifestation = initialManifestation)) {
+) : BaseScreenModel<GeomanifestationState>(GeomanifestationState(manifestation = initialManifestation)) {
   
   fun downloadReport() {
     screenModelScope.launch {
