@@ -62,7 +62,7 @@ fun RequestCardItem(
             overflow = TextOverflow.Ellipsis
           )
           Text(
-            text = "Enviado: ${request.created_at.take(10)}",
+            text = "Fecha de creación: ${request.created_at.take(10)}",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurface
           )
@@ -73,7 +73,7 @@ fun RequestCardItem(
       Spacer(modifier = Modifier.height(16.dp))
       InfoChip(
         icon = Icons.Default.LocationOn,
-        label = "Ubicación",
+        label = "Ubicación Geográfica",
         value = "${request.location.province}, ${request.location.canton}, ${request.location.district}" ,
         modifier = Modifier.fillMaxWidth()
       )

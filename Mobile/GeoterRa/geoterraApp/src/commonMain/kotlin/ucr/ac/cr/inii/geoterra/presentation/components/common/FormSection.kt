@@ -31,12 +31,12 @@ fun FormSection(
   Column(
     modifier = Modifier
       .wrapContentHeight()
-      .fillMaxWidth()
+      .fillMaxWidth(),
   ) {
     if (title != null || icon != null) {
       Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(bottom = 4.dp)
+        modifier = Modifier.padding(bottom = 4.dp),
       ) {
         if (icon != null) {
           Icon(
@@ -62,7 +62,7 @@ fun FormSection(
       modifier = Modifier
         .fillMaxWidth()
         .padding(if (title == null && icon == null) 0.dp else 8.dp),
-      verticalArrangement = Arrangement.spacedBy(0.dp)
+      verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       content()
     }

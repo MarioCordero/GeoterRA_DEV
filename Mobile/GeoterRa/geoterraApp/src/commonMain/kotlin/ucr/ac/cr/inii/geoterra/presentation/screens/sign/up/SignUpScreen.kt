@@ -25,22 +25,22 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 
 class SignUpScreen : Screen {
-  override val key: ScreenKey = uniqueScreenKey
+	override val key: ScreenKey = uniqueScreenKey
 
-  @Composable
-  override fun Content() {
-    val navigator = LocalNavigator.currentOrThrow
-    val viewModel = getScreenModel<SignUpViewModel>()
-    val state by viewModel.state.collectAsState()
+	@Composable
+	override fun Content() {
+		val navigator = LocalNavigator.currentOrThrow
+		val viewModel = getScreenModel<SignUpViewModel>()
+		val state by viewModel.state.collectAsState()
 
-    val snackbarHostState = remember { TypedSnackbarHostState() }
+		val snackbarHostState = remember { TypedSnackbarHostState() }
 
-    if (state.isLoading) {
-      LoadingDialog(
-        isVisible = state.isLoading,
-        message = "Creando cuenta..."
-      )
-    }
+		if (state.isLoading) {
+			LoadingDialog(
+				isVisible = state.isLoading,
+				message = "Creando cuenta..."
+			)
+		}
 
 		LaunchedEffect(state.snackBarMessage) {
 			state.snackBarMessage?.let { snackbarMsg ->
@@ -52,26 +52,28 @@ class SignUpScreen : Screen {
 			}
 		}
 
-    Scaffold(
-      snackbarHost = { CustomSnackbarHost(snackbarHostState) },
-      topBar = {
-        Row(
-          modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 10.dp),
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.End
-        ) {
-          AdaptiveBackButton(onBack = { navigator.pop() })
-        }
-      }
-    ) { paddingValues ->
-      SignUpContent(
-        modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
-        state = state,
-        onEvent = viewModel,
-        onBack = { navigator.pop() }
-      )
-    }
-  }
+		Scaffold(
+			snackbarHost = { CustomSnackbarHost(snackbarHostState) },
+			topBar = {
+				Row(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(horizontal = 20.dp, vertical = 10.dp),
+					verticalAlignment = Alignment.CenterVertically,
+					horizontalArrangement = Arrangement.End
+				) {
+					AdaptiveBackButton(onBack = { navigator.pop() })
+				}
+			}
+		) { paddingValues ->
+			SignUpContent(
+				modifier = Modifier
+					.padding(top = paddingValues.calculateTopPadding())
+					.padding(horizontal = 20.dp),
+				state = state,
+				onEvent = viewModel,
+				onBack = { navigator.pop() }
+			)
+		}
+	}
 }

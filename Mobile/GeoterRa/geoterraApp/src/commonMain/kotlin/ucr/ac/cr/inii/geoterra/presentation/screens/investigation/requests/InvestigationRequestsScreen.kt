@@ -29,6 +29,7 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
+import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.details.InvestigationRequestDetailsScreen
 import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.form.InvestigationRequestFormScreen
 
 class InvestigationRequestsScreen : Screen {
@@ -42,9 +43,6 @@ class InvestigationRequestsScreen : Screen {
 		val navigator = LocalNavigator.currentOrThrow
 
 		val snackbarHostState = remember { TypedSnackbarHostState() }
-		var selectedRequest by remember { mutableStateOf<InvestigationRequestResponse?>(null) }
-		val sheetState = rememberModalBottomSheetState()
-		val scope = rememberCoroutineScope()
 
 		LaunchedEffect(Unit) {
 			viewModel.fetchSubmittedRequests()
@@ -92,42 +90,42 @@ class InvestigationRequestsScreen : Screen {
 				onDismiss = { viewModel.clearPdfStatus() }
 			)
 		}
-
-		selectedRequest?.let { request ->
-			ModalBottomSheet(
-				onDismissRequest = { selectedRequest = null },
-				sheetState = sheetState,
-				containerColor = MaterialTheme.colorScheme.background,
-				shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-			) {
-				RequestBottomModalContent(
-					request = request,
-					onDownloadPdf = { req ->
-						scope.launch {
-							try {
-								viewModel.setPdfGenerating(true)
-								val fileName = "Reporte_Solicitud_${req.request_name}"
-
-								val resultPath = PDFUtil.generateRequestPdf(req, fileName)
-
-								if (resultPath != null) {
-									viewModel.setGeneratedPdfPath(resultPath)
-									selectedRequest = null
-								}
-							} catch (e: Exception) {
-								viewModel.updateSnackBarMessage(
-									"Ha ocurrido un error al generar el PDF, por favor intenta de nuevo.",
-									SnackbarType.ERROR
-								)
-								e.printStackTrace()
-							} finally {
-								viewModel.setPdfGenerating(false)
-							}
-						}
-					}
-				)
-			}
-		}
+//
+//		selectedRequest?.let { request ->
+//			ModalBottomSheet(
+//				onDismissRequest = { selectedRequest = null },
+//				sheetState = sheetState,
+//				containerColor = MaterialTheme.colorScheme.background,
+//				shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
+//			) {
+//				RequestBottomModalContent(
+//					request = request,
+//					onDownloadPdf = { req ->
+//						scope.launch {
+//							try {
+//								viewModel.setPdfGenerating(true)
+//								val fileName = "Reporte_Solicitud_${req.request_name}"
+//
+//								val resultPath = PDFUtil.generateRequestPdf(req, fileName)
+//
+//								if (resultPath != null) {
+//									viewModel.setGeneratedPdfPath(resultPath)
+//									selectedRequest = null
+//								}
+//							} catch (e: Exception) {
+//								viewModel.updateSnackBarMessage(
+//									"Ha ocurrido un error al generar el PDF, por favor intenta de nuevo.",
+//									SnackbarType.ERROR
+//								)
+//								e.printStackTrace()
+//							} finally {
+//								viewModel.setPdfGenerating(false)
+//							}
+//						}
+//					}
+//				)
+//			}
+//		}
 
 		Scaffold(
 			snackbarHost = { CustomSnackbarHost(snackbarHostState) },
@@ -167,9 +165,13 @@ class InvestigationRequestsScreen : Screen {
 			}
 		) { paddingValues ->
 			InvestigationRequestsContent(
-				modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
+				modifier = Modifier
+					.padding(top = paddingValues.calculateTopPadding())
+					.padding(horizontal = 20.dp),
 				state = state,
-				onView = { req -> selectedRequest = req },
+				onView = { req ->
+					navigator.push(InvestigationRequestDetailsScreen(req))
+				},
 				onEdit = { req -> navigator.push(InvestigationRequestFormScreen(requestToEdit = req)) },
 				onDelete = { req -> viewModel.setRequestToDelete(req) }
 			)

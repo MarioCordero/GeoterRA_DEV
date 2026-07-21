@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
-import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.DataBox
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SectionHeader
 import ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation.ChemicalGroupCard
@@ -33,8 +32,7 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation.Chemica
 @Composable
 fun ManifestationReport(
 	manifestation: GeomanifestationResponse,
-	isForPdf: Boolean,
-	onBack: () -> Unit
+	isForPdf: Boolean
 ) {
   Column(
     modifier = Modifier
@@ -42,7 +40,6 @@ fun ManifestationReport(
         if (isForPdf) Modifier.width(380.dp)
         else Modifier.fillMaxSize()
       )
-      .padding(16.dp)
   ) {
     Row(
       modifier = Modifier.fillMaxWidth(),
@@ -56,9 +53,6 @@ fun ManifestationReport(
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.primary,
       )
-      if (!isForPdf) {
-        AdaptiveBackButton(onBack = onBack)
-      }
     }
 
     Spacer(modifier = Modifier.height(24.dp))

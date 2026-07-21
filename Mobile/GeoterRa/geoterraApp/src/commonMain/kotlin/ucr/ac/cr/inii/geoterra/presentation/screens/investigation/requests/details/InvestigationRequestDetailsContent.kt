@@ -1,17 +1,13 @@
-package ucr.ac.cr.inii.geoterra.presentation.components.request
-
+package ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.details
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BubbleChart
 import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Group
-import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
@@ -29,12 +25,12 @@ import androidx.compose.ui.unit.sp
 import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.common.InfoChip
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SectionHeader
+import ucr.ac.cr.inii.geoterra.presentation.components.request.StatusBadge
 
 @Composable
-fun RequestBottomModalContent(
+fun RequestDetailsContent(
 	request: InvestigationRequestResponse,
-	isForPdf: Boolean = false,
-	onDownloadPdf: (InvestigationRequestResponse) -> Unit
+	isForPdf: Boolean = false
 ) {
 	val scrollState = if (!isForPdf) rememberScrollState() else null
 
@@ -52,6 +48,7 @@ fun RequestBottomModalContent(
 				if (scrollState != null) Modifier.verticalScroll(scrollState) else Modifier
 			),
 	) {
+
 		Row(
 			modifier = Modifier.fillMaxWidth(),
 			horizontalArrangement = Arrangement.SpaceBetween,
@@ -233,19 +230,9 @@ fun RequestBottomModalContent(
 			)
 		}
 
+		// Espacio extra al final para que el FAB no tape el contenido al scrollear
 		if (!isForPdf) {
-			Spacer(modifier = Modifier.height(16.dp))
-			Button(
-				onClick = { onDownloadPdf(request) },
-				modifier = Modifier.fillMaxWidth().height(58.dp),
-				shape = RoundedCornerShape(16.dp)
-			) {
-				Icon(Icons.Default.Download, null, modifier = Modifier.size(20.dp))
-				Spacer(modifier = Modifier.width(8.dp))
-				Text("Descargar Solicitud", style = MaterialTheme.typography.titleMedium)
-			}
-
-			Spacer(modifier = Modifier.height(24.dp))
+			Spacer(modifier = Modifier.height(80.dp))
 		}
 	}
 }

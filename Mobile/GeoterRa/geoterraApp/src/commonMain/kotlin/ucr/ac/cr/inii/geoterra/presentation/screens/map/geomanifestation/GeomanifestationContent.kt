@@ -44,8 +44,7 @@ fun GeomanifestationDetailContent(
 
     ManifestationReport(
       manifestation = manifestation,
-      isForPdf = false,
-      onBack = onBack
+      isForPdf = false
     )
 
     Spacer(modifier = Modifier.height(24.dp))

@@ -59,7 +59,6 @@ object PDFUtil {
         ManifestationReport(
           manifestation = manifestation,
           isForPdf = true,
-          onBack = {}
         )
       },
       shareAfterCreation = false,

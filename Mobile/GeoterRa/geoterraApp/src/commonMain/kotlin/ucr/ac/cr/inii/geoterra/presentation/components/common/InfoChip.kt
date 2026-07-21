@@ -56,17 +56,16 @@ fun InfoChip(
     Spacer(modifier = Modifier.width(12.dp))
     Column {
       Text(
-        text = label.uppercase(),
-        style = MaterialTheme.typography.labelSmall.copy(
-          fontWeight = FontWeight.Bold,
-          letterSpacing = 1.sp
-        ),
-        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+        text = label,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onSurface,
+        fontSize = 14.sp
       )
       Text(
         text = value,
-        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
         color = MaterialTheme.colorScheme.onSurface,
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp,
         maxLines = 4,
         overflow = TextOverflow.Ellipsis
       )

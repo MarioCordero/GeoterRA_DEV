@@ -27,10 +27,10 @@ fun SectionHeader(title: String, icon: ImageVector? = null) {
       Spacer(Modifier.width(8.dp))
     }
     Text(
-      text = title.uppercase(),
-      style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 1.2.sp),
+      text = title,
       fontWeight = FontWeight.Bold,
-      color = MaterialTheme.colorScheme.onSurface
+      color = MaterialTheme.colorScheme.onSurface,
+      fontSize = 16.sp
     )
   }
 }
