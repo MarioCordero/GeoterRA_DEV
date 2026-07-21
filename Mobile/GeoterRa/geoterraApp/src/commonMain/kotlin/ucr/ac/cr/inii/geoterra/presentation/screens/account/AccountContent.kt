@@ -41,12 +41,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.ActionMenuItem
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.DangerActionItem
+import ucr.ac.cr.inii.geoterra.presentation.components.common.ActionMenuItem
+import ucr.ac.cr.inii.geoterra.presentation.components.common.DangerActionItem
 import ucr.ac.cr.inii.geoterra.presentation.components.account.InfoTile
 import ucr.ac.cr.inii.geoterra.presentation.components.account.ProfileHeaderCard
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.ConfirmDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.StatusDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.ConfirmDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.StatusDialog
 
 @Composable
 fun AccountContent(

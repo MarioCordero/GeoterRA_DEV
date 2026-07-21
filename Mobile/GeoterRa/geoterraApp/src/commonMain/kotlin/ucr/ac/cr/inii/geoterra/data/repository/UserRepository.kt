@@ -8,15 +8,15 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
-import ucr.ac.cr.inii.geoterra.data.model.remote.UpdateUserResponse
-import ucr.ac.cr.inii.geoterra.data.model.remote.UserRemote
-import ucr.ac.cr.inii.geoterra.data.model.remote.UserUpdateRequest
+import ucr.ac.cr.inii.geoterra.data.model.responses.UpdateUserResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.UserResponse
+import ucr.ac.cr.inii.geoterra.data.model.requests.UserUpdateRequest
 import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
 
 class UserRepository(private val client: HttpClient) : UserRepositoryInterface {
-  override suspend fun getMe(): Result<UserRemote> = try {
+  override suspend fun getMe(): Result<UserResponse> = try {
     val response = client.get("users/me")
-    val envelope = response.body<ApiResponseModel<UserRemote>>()
+    val envelope = response.body<ApiResponseModel<UserResponse>>()
     if (envelope.data != null) Result.success(envelope.data)
     else handleErrorResponse(response)
   } catch (e: Exception) {

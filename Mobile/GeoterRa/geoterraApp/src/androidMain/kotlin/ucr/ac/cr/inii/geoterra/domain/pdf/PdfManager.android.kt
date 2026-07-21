@@ -243,7 +243,7 @@ actual class PDFManager actual constructor() {
       val file = File(filePath)
       if (!file.exists()) return
 
-      val uri = androidx.core.content.FileProvider.getUriForFile(
+      val uri = FileProvider.getUriForFile(
         mContext,
         authority,
         file

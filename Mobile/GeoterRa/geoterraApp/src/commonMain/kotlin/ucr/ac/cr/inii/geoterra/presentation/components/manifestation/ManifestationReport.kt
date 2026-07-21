@@ -1,6 +1,5 @@
 package ucr.ac.cr.inii.geoterra.presentation.components.manifestation
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,18 +24,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.AdaptiveBackButton
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.DataBox
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.SectionHeader
+import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
+import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
+import ucr.ac.cr.inii.geoterra.presentation.components.common.DataBox
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SectionHeader
 import ucr.ac.cr.inii.geoterra.presentation.screens.manifestation.ChemicalGroupCard
 
 @Composable
 fun ManifestationReport(
-  manifestation: ManifestationRemote,
-  isForPdf: Boolean,
-  onBack: () -> Unit
+	manifestation: GeomanifestationResponse,
+	isForPdf: Boolean,
+	onBack: () -> Unit
 ) {
   Column(
     modifier = Modifier
@@ -89,19 +87,19 @@ fun ManifestationReport(
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
       DataBox(
         Modifier.weight(1f), "Temperatura",
-        "${manifestation.temperature ?: "--"}°C",
+        "${manifestation.insitu_test?.temperature ?: "--"}°C",
         Icons.Default.Thermostat, Color(0xFFFF5722)
       )
       DataBox(
         Modifier.weight(1f), "pH",
-        "${manifestation.field_pH ?: "--"}",
+        "${manifestation.insitu_test?.ph ?: "--"}",
         Icons.Default.Opacity, Color(0xFF2196F3)
       )
     }
     Spacer(modifier = Modifier.height(8.dp))
     DataBox(
       Modifier.fillMaxWidth(), "Conductividad Eléctrica",
-      "${manifestation.field_conductivity ?: "--"} µS/cm",
+      "${manifestation.insitu_test?.conductivity ?: "--"} µS/cm",
       Icons.Default.ElectricBolt, Color(0xFF4CAF50)
     )
 
@@ -110,13 +108,13 @@ fun ManifestationReport(
     SectionHeader("Parámetros de Laboratorio", Icons.Default.Science)
     DataBox(
       Modifier.fillMaxWidth(), "pH",
-      "${manifestation.field_pH ?: "--"}",
+      "${manifestation.inlab_test?.ph ?: "--"}",
       Icons.Default.Opacity, Color(0xFF2196F3)
     )
     Spacer(modifier = Modifier.height(8.dp))
     DataBox(
       Modifier.fillMaxWidth(), "Conductividad Eléctrica",
-      "${manifestation.field_conductivity ?: "--"} µS/cm",
+      "${manifestation.inlab_test?.conductivity ?: "--"} µS/cm",
       Icons.Default.ElectricBolt, Color(0xFF4CAF50)
     )
 
@@ -130,12 +128,12 @@ fun ManifestationReport(
       title = "Cationes Principales",
       color = Color(0xFFE91E63),
       elements = listOf(
-        "Sodio (Na)" to manifestation.na,
-        "Potasio (K)" to manifestation.k,
-        "Calcio (Ca)" to manifestation.ca,
-        "Magnesio (Mg)" to manifestation.mg,
-        "Hierro (Fe)" to manifestation.fe,
-        "Litio (Li)" to manifestation.li
+        "Sodio (Na)" to manifestation.inlab_test?.na,
+        "Potasio (K)" to manifestation.inlab_test?.k,
+        "Calcio (Ca)" to manifestation.inlab_test?.ca,
+        "Magnesio (Mg)" to manifestation.inlab_test?.mg,
+        "Hierro (Fe)" to manifestation.inlab_test?.fe,
+        "Litio (Li)" to manifestation.inlab_test?.li
       )
     )
 
@@ -146,12 +144,12 @@ fun ManifestationReport(
       title = "Aniones y Otros",
       color = Color(0xFF00BCD4),
       elements = listOf(
-        "Cloro (Cl)" to manifestation.cl,
-        "Sulfatos (SO4)" to manifestation.so4,
-        "Bicarbonato (HCO3)" to manifestation.hco3,
-        "Flúor (F)" to manifestation.f,
-        "Boro (B)" to manifestation.b,
-        "Sílice (SiO2)" to manifestation.si
+        "Cloro (Cl)" to manifestation.inlab_test?.cl,
+        "Sulfatos (SO4)" to manifestation.inlab_test?.so4,
+        "Bicarbonato (HCO3)" to manifestation.inlab_test?.hco3,
+        "Flúor (F)" to manifestation.inlab_test?.f,
+        "Boro (B)" to manifestation.inlab_test?.b,
+        "Sílice (SiO2)" to manifestation.inlab_test?.si
       )
     )
 

@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Thermostat
@@ -24,15 +23,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ucr.ac.cr.inii.geoterra.data.model.remote.AnalysisRequestRemote
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.InfoChip
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.SectionHeader
+import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
+import ucr.ac.cr.inii.geoterra.presentation.components.common.InfoChip
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SectionHeader
 
 @Composable
 fun RequestBottomModalContent(
-  request: AnalysisRequestRemote,
+  request: InvestigationRequestResponse,
   isForPdf: Boolean = false,
-  onDownloadPdf: (AnalysisRequestRemote) -> Unit
+  onDownloadPdf: (InvestigationRequestResponse) -> Unit
 ) {
   val scrollState = if (!isForPdf) rememberScrollState() else null
 
@@ -56,7 +55,7 @@ fun RequestBottomModalContent(
       verticalAlignment = Alignment.CenterVertically
     ) {
       Text(
-        text = request.name,
+        text = request.request_name,
         style = MaterialTheme.typography.titleLarge.copy(
           fontSize = titleSize,
           fontWeight = FontWeight.ExtraBold,
@@ -67,51 +66,52 @@ fun RequestBottomModalContent(
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
       )
-      StatusBadge(request.state)
+      StatusBadge(request.current_state.value)
     }
 
     Spacer(modifier = Modifier.height(verticalSpacing))
     val fillMaxWidth = Modifier.fillMaxWidth()
 
-    // --- SOLICITANTE ---
-    SectionHeader(title = "Información de Solicitante")
-
-    InfoChip(
-      Icons.Default.Email,
-      "Correo",
-      request.email,
-      fillMaxWidth,
-      MaterialTheme.colorScheme.primary
-    )
-
     Spacer(modifier = Modifier.height(verticalSpacing))
 
     // --- PROPIETARIO ---
-    SectionHeader(title = "Información de Contacto")
+    SectionHeader(title = "Información del Propietario")
     InfoChip(
       Icons.Default.Person,
-      "Propietario",
-      request.owner_name ?: "N/D",
+      "Nombre Completo",
+      request.owner_name ?: "No especificado",
       fillMaxWidth,
       MaterialTheme.colorScheme.primary
     )
+
     Spacer(modifier = Modifier.height(chipSpacing))
+
     InfoChip(
       Icons.Default.Phone,
-      "Número",
-      request.owner_contact_number ?: "N/D",
+      "Teléfono",
+      request.owner_phone_number ?: "No especificado",
       fillMaxWidth,
       MaterialTheme.colorScheme.secondary
+    )
+
+    Spacer(modifier = Modifier.height(chipSpacing))
+
+    InfoChip(
+      Icons.Default.Email,
+      "Correo Electrónico",
+      request.owner_email ?: "No especificado",
+      fillMaxWidth,
+      MaterialTheme.colorScheme.primary
     )
 
     Spacer(modifier = Modifier.height(verticalSpacing))
 
     // --- SITIO ---
-    SectionHeader(title = "Información del Sitio")
+    SectionHeader(title = "Información Geográfica")
     InfoChip(
       Icons.Default.LocationOn,
-      "Región",
-      request.regionName(),
+      "Ubicación",
+      "${request.location.province}, ${request.location.canton}, ${request.location.district}",
       Modifier.fillMaxWidth()
     )
 
@@ -124,12 +124,12 @@ fun RequestBottomModalContent(
       val fillMidWidth = Modifier.weight(1f)
       InfoChip(
         Icons.Default.Explore,
-        "Lat", request.latitude.take(10),
+        "Latitud", request.location.latitude.toString(),
         fillMidWidth,
         MaterialTheme.colorScheme.secondary
       )
       InfoChip(Icons.Default.Explore,
-        "Long", request.longitude.take(10),
+        "Longitud", request.location.longitude.toString(),
         fillMidWidth, MaterialTheme.colorScheme.secondary
       )
     }
@@ -145,12 +145,12 @@ fun RequestBottomModalContent(
       val obsModifier = Modifier.weight(1f)
       InfoChip(
         Icons.Default.Thermostat, "Sensación",
-        request.temperature_sensation ?: "N/A", obsModifier,
+        request.temperature_sensation, obsModifier,
         MaterialTheme.colorScheme.primary
       )
       InfoChip(
         Icons.Default.BubbleChart, "Burbujas",
-        if (request.bubbles == 1) "Sí" else "No",
+        if (request.bubbles) "Sí" else "No",
         obsModifier, MaterialTheme.colorScheme.secondary
       )
     }
@@ -158,11 +158,19 @@ fun RequestBottomModalContent(
     // --- NOTAS ---
     Spacer(modifier = Modifier.height(verticalSpacing))
 
-    SectionHeader(title = "Notas de Campo")
+    SectionHeader(title = "Información Adicional")
 
     InfoChip(
       Icons.Default.Description,
-      "Detalles", request.details ?: "N/D",
+      "Dirección Exacta", request.exact_address.ifBlank { "No especificado" },
+      Modifier.fillMaxWidth()
+    )
+
+    Spacer(modifier = Modifier.height(chipSpacing))
+
+    InfoChip(
+      Icons.Default.Description,
+      "Detalles Adicionales", request.details.ifBlank { "No especificado" },
       Modifier.fillMaxWidth()
     )
 

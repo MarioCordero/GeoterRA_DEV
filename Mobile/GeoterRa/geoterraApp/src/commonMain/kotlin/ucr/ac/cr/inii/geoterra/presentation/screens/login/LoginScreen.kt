@@ -17,8 +17,8 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.StatusDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.SuccessActionDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.StatusDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
 import ucr.ac.cr.inii.geoterra.presentation.screens.register.RegisterScreen
 
 /**

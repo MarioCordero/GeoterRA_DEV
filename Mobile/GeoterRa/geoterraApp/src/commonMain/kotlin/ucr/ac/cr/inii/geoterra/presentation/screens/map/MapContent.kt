@@ -31,20 +31,20 @@ import org.maplibre.compose.sources.rememberRasterSource
 import org.maplibre.compose.style.BaseStyle
 import org.maplibre.compose.util.ClickResult
 import org.maplibre.spatialk.geojson.Position
-import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
-import ucr.ac.cr.inii.geoterra.data.model.remote.toGeoJsonString
+import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.toGeoJsonString
 import ucr.ac.cr.inii.geoterra.presentation.components.map.ManifestationInfoPanel
 import ucr.ac.cr.inii.geoterra.presentation.components.map.UserLocationInfoPanel
 
 
 @Composable
 fun MapContent(
-  modifier: Modifier = Modifier,
-  state: MapState,
-  onManifestationMarkerClick: (String) -> Unit,
-  onUserMarkerClick: () -> Unit,
-  onDetailsClick: (ManifestationRemote) -> Unit,
-  onDismissPanel: () -> Unit
+	modifier: Modifier = Modifier,
+	state: MapState,
+	onManifestationMarkerClick: (String) -> Unit,
+	onUserMarkerClick: () -> Unit,
+	onDetailsClick: (GeomanifestationResponse) -> Unit,
+	onDismissPanel: () -> Unit
 ) {
   Box(modifier = modifier.fillMaxSize()) {
     
@@ -64,8 +64,8 @@ fun MapContent(
         cameraState.animateTo(
           CameraPosition(
             target = Position(
-              latitude = manifestation.latitude.toDouble(),
-              longitude = manifestation.longitude.toDouble()
+              latitude = manifestation.location.latitude,
+              longitude = manifestation.location.longitude
             ),
             zoom = targetZoom
           )
@@ -96,7 +96,7 @@ fun MapContent(
     
     MaplibreMap(
       modifier = Modifier.fillMaxSize(),
-      baseStyle = BaseStyle.Uri(state.styleUrl),
+      baseStyle = BaseStyle.Uri(state.baseStyleUrl),
       cameraState = cameraState,
       onMapClick = { pos, offset ->
         onDismissPanel()
@@ -109,18 +109,19 @@ fun MapContent(
     
     ) {
 
-      val activeLayer = state.availableStyleLayers.find { it.id == state.selectedLayerId }
+      state.availableStyleLayers.filter { it.id in state.selectedLayerIds }.forEach { layer ->
+        layer.snitRasterUrl?.let { rasterUrl ->
 
-      activeLayer?.snitRasterUrl?.let { rasterUrl ->
-        val snitRasterSource = rememberRasterSource(
-          tiles = listOf(rasterUrl),
-          tileSize = 256
-        )
+          val snitRasterSource = rememberRasterSource(
+            tiles = listOf(rasterUrl),
+            tileSize = 256
+          )
 
-        RasterLayer(
-          id = "snit-raster-layer",
-          source = snitRasterSource
-        )
+          RasterLayer(
+            id = "snit-raster-layer-${layer.id}",
+            source = snitRasterSource
+          )
+        }
       }
       
       val manifestationSource = rememberGeoJsonSource(

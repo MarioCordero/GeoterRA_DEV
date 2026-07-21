@@ -16,14 +16,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ucr.ac.cr.inii.geoterra.data.model.remote.ManifestationRemote
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.InfoBadge
+import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
+import ucr.ac.cr.inii.geoterra.presentation.components.common.InfoBadge
 
 @Composable
 fun ManifestationInfoPanel(
-  modifier: Modifier = Modifier,
-  manifestation: ManifestationRemote,
-  onViewFullDetails: () -> Unit
+	modifier: Modifier = Modifier,
+	manifestation: GeomanifestationResponse,
+	onViewFullDetails: () -> Unit
 ) {
   Card(
     modifier = modifier
@@ -67,13 +67,13 @@ fun ManifestationInfoPanel(
             color = MaterialTheme.colorScheme.onSurface
           )
           Text(
-            text = manifestation.regionName(),
+            text = "${manifestation.location.province}, ${manifestation.location.canton}, ${manifestation.location.district}",
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
           )
           Text(
-            text = "Lat: ${manifestation.latitude.toString().take(10)}," +
-              " Lon: ${manifestation.longitude.toString().take(10)}",
+            text = "Lat: ${manifestation.location.latitude.toString().take(10)}," +
+              " Lon: ${manifestation.location.longitude.toString().take(10)}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = Modifier.padding(top = 2.dp)
@@ -94,19 +94,19 @@ fun ManifestationInfoPanel(
       ) {
         InfoBadge(
           label = "Temperatura",
-          value = "${manifestation.temperature ?: "--"}°C",
+          value = "${manifestation.insitu_test?.temperature ?: "--"}°C",
           icon = Icons.Default.Thermostat,
           color = Color(0xFFFF5722)
         )
         InfoBadge(
           label = "pH",
-          value = "${manifestation.field_pH ?: "--"}",
+          value = "${manifestation.insitu_test?.ph ?: "--"}",
           icon = Icons.Default.WaterDrop,
           color = Color(0xff2196f6)
         )
         InfoBadge(
           label = "Conductividad",
-          value = "${manifestation.field_conductivity ?: "--"}",
+          value = "${manifestation.insitu_test?.conductivity ?: "--"}",
           icon = Icons.Default.Info,
           color = Color(0xFF4CAF50)
         )

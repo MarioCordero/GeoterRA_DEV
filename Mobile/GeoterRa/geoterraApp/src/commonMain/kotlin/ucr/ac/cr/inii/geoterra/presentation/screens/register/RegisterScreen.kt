@@ -20,10 +20,10 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.AdaptiveBackButton
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.LoadingDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.StatusDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.layout.SuccessActionDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
+import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.StatusDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
 
 class RegisterScreen : Screen {
   override val key: ScreenKey = uniqueScreenKey

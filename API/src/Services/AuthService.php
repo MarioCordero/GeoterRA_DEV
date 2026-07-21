@@ -54,7 +54,7 @@ final class AuthService
     }
 
     $userId = $user['user_id'];
-    $accessTtl = 3600 + 1800;
+    $accessTtl = 60 * 5;
     $refreshTtl = 3600 * 24 * 30;
 
     $rawAccessToken = bin2hex(random_bytes(32));
@@ -68,6 +68,7 @@ final class AuthService
 
     try {
       $this->pdo->beginTransaction();
+      $this->authRepository->deleteUserTokens($userId);
       $this->authRepository->createRefreshToken($refreshDto);
       $this->authRepository->upsertAccessToken($accessDto);
       $this->pdo->commit();
@@ -123,6 +124,7 @@ final class AuthService
         $this->authRepository->revokeRefreshTokenFamily(
           $usedToken['family_id']
         );
+        $this->authRepository->deleteUserTokens($usedToken['user_id']);
       }
       throw new ApiException(ErrorType::invalidRefreshToken(), 401);
     }
@@ -130,7 +132,7 @@ final class AuthService
     $userId = $stored['user_id'];
     $oldTokenId = $stored['refresh_token_id'];
     $familyId = $stored['family_id'];
-    $accessTtl = 3600 + 1800;
+    $accessTtl = 60 * 5;
     $refreshTtl = 3600 * 24 * 30;
 
     $rawNewAccess = bin2hex(random_bytes(32));
@@ -151,8 +153,7 @@ final class AuthService
     } catch (Throwable $e) {
       $this->pdo->rollBack();
       // If duplicate entry (race condition), revoke family
-      if (str_contains($e->getMessage(), 'Duplicate entry') || $e->getCode(
-        ) === 23000) {
+      if ($e->getCode() === 23000) {
         $this->authRepository->revokeRefreshTokenFamily($familyId);
         throw new ApiException(ErrorType::invalidRefreshToken(), 401);
       }

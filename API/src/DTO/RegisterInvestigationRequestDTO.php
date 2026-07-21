@@ -42,11 +42,11 @@ final class RegisterInvestigationRequestDTO
     public ?string $exactAddress = null,
     public ?float $latitude = null,
     public ?float $longitude = null,
-    public ?string $relationWithOwner = null,
+    public string $relationWithOwner,
   ) {}
 
   /**
-   * Creates DTO from HTTP request payload.
+   * Creates DTO from the HTTP request payload.
    *
    * @param array<string,mixed> $data
    * @return self
@@ -67,18 +67,31 @@ final class RegisterInvestigationRequestDTO
       }
     }
 
+    $ownerName = isset($data['owner_name']) ? trim((string)$data['owner_name']) : null;
+    if ($ownerName === '') {
+      $ownerName = null;
+    }
+
+    $ownerPhone = $data['owner_phone_number'] ?? null;
+    if ($ownerPhone !== null && trim((string)$ownerPhone) === '') {
+      $ownerPhone = null;
+    }
+
+    $ownerEmail = $data['owner_email'] ?? null;
+    if ($ownerEmail !== null && trim((string)$ownerEmail) === '') {
+      $ownerEmail = null;
+    }
+
     return new self(
       provinceSnitCode : (int)$data['province_snit_code'],
       cantonSnitCode : (int)$data['canton_snit_code'],
       districtSnitCode : (int)$data['district_snit_code'],
       currentUsage : (string)$data['current_usage'],
       temperatureSensation : (string)$data['temperature_sensation'],
-      ownerName : isset($data['owner_name']) ? trim(
-        (string)$data['owner_name']
-      ) : null,
-      ownerPhoneNumber : $data['owner_phone_number'] ?? null,
-      ownerEmail : $data['owner_email'] ?? null,
-      bubbles : isset($data['bubbles']) ? (bool)$data['bubbles'] : false,
+      ownerName : $ownerName,
+      ownerPhoneNumber : $ownerPhone,
+      ownerEmail : $ownerEmail,
+      bubbles : isset($data['bubbles']) && $data['bubbles'],
       details : $data['details'] ?? null,
       exactAddress : $data['exact_address'] ?? null,
       latitude : isset($data['latitude']) ? (float)$data['latitude'] : null,
@@ -90,10 +103,9 @@ final class RegisterInvestigationRequestDTO
   /**
    * Validates business rules for creation.
    *
-   * @param array<string,mixed> $userData Authenticated user data (keys: first_name, last_name, phone_number, email, user_id)
    * @throws ApiException
    */
-  public function validate(array $userData): void
+  public function validate(): void
   {
     // SNIT codes must be positive
     if ($this->provinceSnitCode <= 0 || $this->cantonSnitCode <= 0 || $this->districtSnitCode <= 0) {
@@ -118,56 +130,12 @@ final class RegisterInvestigationRequestDTO
       );
     }
 
-    // Owner email format (if provided)
-    if ($this->ownerEmail !== null && !filter_var(
-        $this->ownerEmail, FILTER_VALIDATE_EMAIL
-      )) {
-      throw new ApiException(ErrorType::invalidField('owner_email'), 422);
-    }
-
-    // Owner phone number format (Costa Rican: 8 digits or 1234-5678)
-    if ($this->ownerPhoneNumber !== null && !preg_match(
-        '/^[0-9]{8}$|^[0-9]{4}-[0-9]{4}$/', $this->ownerPhoneNumber
-      )) {
-      throw new ApiException(
-        ErrorType::invalidField(
-          'owner_phone_number (must be 8 digits or 1234-5678)'
-        ), 422
-      );
-    }
-
     // Coordinates range
     if ($this->latitude !== null && ($this->latitude < -90 || $this->latitude > 90)) {
       throw new ApiException(ErrorType::invalidField('latitude'), 422);
     }
     if ($this->longitude !== null && ($this->longitude < -180 || $this->longitude > 180)) {
       throw new ApiException(ErrorType::invalidField('longitude'), 422);
-    }
-
-    // Check if owner differs from authenticated user
-    $fullName = trim(
-      ($userData['first_name'] ?? '') . ' ' . ($userData['last_name'] ?? '')
-    );
-    $ownerDiffers = false;
-    if ($this->ownerName !== null && $this->ownerName !== $fullName) {
-      $ownerDiffers = true;
-    }
-    if ($this->ownerPhoneNumber !== null && $this->ownerPhoneNumber !== ($userData['phone_number'] ?? null)) {
-      $ownerDiffers = true;
-    }
-    if ($this->ownerEmail !== null && strtolower(
-        $this->ownerEmail
-      ) !== strtolower($userData['email'] ?? '')) {
-      $ownerDiffers = true;
-    }
-
-    if ($ownerDiffers && empty($this->relationWithOwner)) {
-      throw new ApiException(
-        ErrorType::missingField(
-          'relation_with_owner (required when owner information differs from requester)'
-        ),
-        422
-      );
     }
 
     // Relation enum
@@ -179,6 +147,27 @@ final class RegisterInvestigationRequestDTO
             'relation_with_owner (must be Familiar, Empleado, Socio, Conocido, Titular)'
           ), 422
         );
+      }
+
+      if ($this->relationWithOwner !== 'Titular') {
+
+        // Owner email format
+        if ($this->ownerEmail !== null && !filter_var(
+            $this->ownerEmail, FILTER_VALIDATE_EMAIL
+          )) {
+          throw new ApiException(ErrorType::invalidField('owner_email'), 422);
+        }
+
+        // Owner phone number format (Costa Rica: 8 digits or 1234-5678)
+        if ($this->ownerPhoneNumber !== null && !preg_match(
+            '/^[0-9]{8}$|^[0-9]{4}-[0-9]{4}$/', $this->ownerPhoneNumber
+          )) {
+          throw new ApiException(
+            ErrorType::invalidField(
+              'owner_phone_number (must be 8 digits or 1234-5678)'
+            ), 422
+          );
+        }
       }
     }
   }

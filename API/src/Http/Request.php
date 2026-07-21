@@ -43,6 +43,8 @@ final class Request
             ]);
         }
 
+        $headers = self::getHeaders();
+
         self::$apiKey = $headers['-x-api-key'] ?? $_SERVER['HTTP_X_API_KEY'] ?? null;
 
         // Load API keys from environment-aware location
@@ -122,7 +124,7 @@ final class Request
         $data = self::json();
 
         if ($data === null) {
-            throw new ApiException(ErrorType::invalidJson());
+            throw new ApiException(ErrorType::invalidJson(), 400);
         }
 
         return $data;
@@ -154,26 +156,26 @@ final class Request
         self::$user = $user;
     }
 
-    /**
-     * Retrieves the authenticated user data.
-     *
-     * @return array<mixed>|null The user details or null if the request is
-     * unauthenticated.
-     */
-    public static function getUser(): ?array
-    {
-        if (!self::$user === null) {
-            throw new ApiException(ErrorType::unauthorized());
-        }
-        return self::$user;
+  /**
+   * Retrieves the authenticated user data.
+   *
+   * @return array<mixed>|null The user details or null if the request is
+   * unauthenticated.
+   */
+  public static function getUser(): ?array
+  {
+    if (self::$user === null) {
+      throw new ApiException(ErrorType::unauthorized(), 401);
     }
+    return self::$user;
+  }
 
     public static function requireRole(array $allowedRoles): array
     {
         $user = self::getUser();
         if ($user === null || !isset($user['role'])
             || !in_array($user['role'], $allowedRoles, true)) {
-            throw new ApiException(ErrorType::forbidden());
+            throw new ApiException(ErrorType::forbidden(), 403);
         }
         return $user;
     }
@@ -241,7 +243,7 @@ final class Request
             $path = '/';
         }
 
-        $basePath = '/API/public';
+        $basePath = '/api';
         $pos = stripos($path, $basePath);
 
         if ($pos === 0) {

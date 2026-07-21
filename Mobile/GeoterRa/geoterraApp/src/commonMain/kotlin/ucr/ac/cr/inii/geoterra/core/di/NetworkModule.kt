@@ -2,6 +2,7 @@ package ucr.ac.cr.inii.geoterra.core.di
 
 import io.ktor.client.*
 import io.ktor.client.call.body
+import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.auth.*
 import io.ktor.client.plugins.auth.providers.*
@@ -9,7 +10,6 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.client.engine.cio.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.utils.io.InternalAPI
 import kotlinx.coroutines.CoroutineScope
@@ -19,13 +19,14 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
-import ucr.ac.cr.inii.geoterra.core.network.ErrorMapper
 import ucr.ac.cr.inii.geoterra.core.network.NetworkConfig
 import ucr.ac.cr.inii.geoterra.core.network.TokenManager
-import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenRequest
-import ucr.ac.cr.inii.geoterra.data.model.remote.RefreshAccessTokenResponse
+import ucr.ac.cr.inii.geoterra.data.model.requests.RefreshAccessTokenRequest
+import ucr.ac.cr.inii.geoterra.data.model.responses.RefreshAccessTokenResponse
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthEventBus
+
+expect fun getHttpClientEngine(): HttpClientEngine
 
 @OptIn(InternalAPI::class)
 val networkModule = module {
@@ -33,14 +34,10 @@ val networkModule = module {
   single { TokenManager(get()) }
 
   single<HttpClient> {
-//    fun HttpClient.invalidateAuthTokens() {
-//      authProvider<BearerAuthProvider>()?.clearToken()
-//    }
-
     val networkScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     val authEventBus = get<AuthEventBus>()
-    val client = HttpClient(CIO) {
+    val client = HttpClient(getHttpClientEngine()) {
       install(HttpTimeout) {
         requestTimeoutMillis = 30_000
         connectTimeoutMillis = 30_000
@@ -51,6 +48,8 @@ val networkModule = module {
         json(Json {
           ignoreUnknownKeys = true
           coerceInputValues = true
+          explicitNulls = true
+          encodeDefaults = true
         })
       }
 
@@ -104,12 +103,12 @@ val networkModule = module {
               val errors = response.errors
 
               val hasRefreshTokenError = errors.any { error ->
-                error.code == ErrorMapper.INVALID_REFRESH_TOKEN || ErrorMapper.isAuthError(error.code)
+                error.isAuthError()
               }
 
               if (hasRefreshTokenError || data == null) {
                 tm.clearTokens()
-                authEventBus.emit(AuthEvent.Unauthorized)
+                authEventBus.emit(AuthEvent.Logout)
                 return@refreshTokens null
               }
 
@@ -120,7 +119,7 @@ val networkModule = module {
 
             } catch (e: Exception) {
               tm.clearTokens()
-              authEventBus.emit(AuthEvent.Unauthorized)
+              authEventBus.emit(AuthEvent.Logout)
               null
             }
           }

@@ -40,7 +40,7 @@ actual class PDFManager actual constructor() {
   private var PAGE_WIDTH = 595.0
   private var PAGE_HEIGHT = 1500.0  // Adjusted to A4 size dynamically
 
-  suspend fun createComposeViewController(content: @Composable () -> Unit): UIViewController? {
+  suspend fun createComposeViewController(content: @Composable () -> Unit): UIViewController {
     return withContext(Dispatchers.Main) {
       println("⚠️ Initializing ComposeUIViewController...")
 
@@ -190,7 +190,7 @@ actual class PDFManager actual constructor() {
    * Captures a section of a UIView as an image
    */
   @OptIn(ExperimentalForeignApi::class)
-  private fun captureUIViewSectionAsImage(view: UIView, offsetY: Double, captureHeight: Double): UIImage? {
+  private fun captureUIViewSectionAsImage(view: UIView, offsetY: Double, captureHeight: Double): UIImage {
     val width = view.bounds.useContents { size.width }
 
     // Define the rect to capture

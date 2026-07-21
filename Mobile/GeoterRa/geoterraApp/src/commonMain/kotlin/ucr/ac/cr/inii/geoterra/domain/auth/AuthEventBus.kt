@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import ucr.ac.cr.inii.geoterra.data.model.remote.LoginRequest
-import ucr.ac.cr.inii.geoterra.data.model.remote.RegisterRequest
+import ucr.ac.cr.inii.geoterra.data.model.requests.LoginRequest
+import ucr.ac.cr.inii.geoterra.data.model.requests.RegisterRequest
 
 sealed class AuthEvent {
   object Unauthorized : AuthEvent()
@@ -29,7 +29,7 @@ sealed class AuthEvent {
   ) : AuthEvent()
 }
 
-class AuthEventBus() {
+class AuthEventBus {
   private val _events = MutableSharedFlow<AuthEvent>(replay = 1)
   val events = _events.asSharedFlow()
 
