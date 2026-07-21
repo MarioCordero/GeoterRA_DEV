@@ -56,17 +56,12 @@ spl_autoload_register(
  */
 function initializeTestDatabase(): PDO
 {
-  // Read the environment variables (GitHub Actions) or use the defaults (Local)
-  // Note: It is better to use 127.0.0.1 instead of 'localhost' to force TCP connection and avoid error 2002
+  // Read the environment variables (GitHub Actions) or use defaults (Local)
+  // Note: Use 127.0.0.1 instead of 'localhost' to force TCP connection and avoid socket errors
   $host = getenv('DB_HOST') ?: '127.0.0.1';
-  $port = getenv('DB_PORT') ?: 8081;
-  $user = getenv('DB_USER') ?: 'mario';
-  $password = getenv('DB_PASS') !== false ? getenv('DB_PASS') : '2003';
-
-  $host = '127.0.0.1';
-  $port = 8081;
-  $user = 'root';
-  $password = '';
+  $port = (int)(getenv('DB_PORT') ?: 3306);
+  $user = getenv('DB_USER') ?: 'root';
+  $password = getenv('DB_PASS') !== false ? (string)getenv('DB_PASS') : '';
 
   // Names of the databases
   $prodDbName = 'GeoterRA';
@@ -125,15 +120,10 @@ function initializeTestDatabase(): PDO
 function loadTestSchema(): void
 {
   $host = getenv('DB_HOST') ?: '127.0.0.1';
-  $port = getenv('DB_PORT') ?: 3306;
-  $user = getenv('DB_USER') ?: 'mario';
-  $password = getenv('DB_PASS') !== false ? getenv('DB_PASS') : '2003';
+  $port = (int)(getenv('DB_PORT') ?: 3306);
+  $user = getenv('DB_USER') ?: 'root';
+  $password = getenv('DB_PASS') !== false ? (string)getenv('DB_PASS') : '';
   $testDbName = 'GeoterRA_test';
-
-  $host = '127.0.0.1';
-  $port = 8081;
-  $user = 'root';
-  $password = '';
 
   try {
     $schemaPath = dirname(__DIR__, 2) . '/database/GeoterRA.sql';
@@ -175,8 +165,4 @@ function loadTestSchema(): void
 
 // Store database connection in global state for tests
 $_SERVER['TEST_DATABASE'] = initializeTestDatabase();
-
-ob_start();
-$_SERVER['TEST_DATABASE'] = initializeTestDatabase();
-ob_end_clean();
 ?>
