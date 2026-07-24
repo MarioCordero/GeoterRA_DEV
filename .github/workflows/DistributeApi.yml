@@ -1,4 +1,4 @@
-name: Distribución de API a Develop, Web y Mobile (Solo carpeta API/)
+name: Distribución de API y Database a Develop, Web y Mobile
 
 on:
   workflow_dispatch:
@@ -59,43 +59,43 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git fetch origin # Nos aseguramos de tener todas las ramas remotas actualizadas
 
-      # --- SINCRONIZACIÓN EXCLUSIVA DE LA CARPETA API/ ---
+      # --- SINCRONIZACIÓN EXCLUSIVA DE LAS CARPETAS API/ Y DATABASE/ ---
 
-      - name: Sincronizar API en develop
+      - name: Sincronizar API y database en develop
         run: |
           git checkout develop || git checkout -b develop origin/develop
-          rm -rf API/
-          git checkout origin/API -- API/
-          git add API/
+          rm -rf API/ database/
+          git checkout origin/API -- API/ database/
+          git add API/ database/
           if ! git diff --cached --quiet; then
-            git commit -m "🚀 CI: Auto-sync de la carpeta API/ desde rama API"
+            git commit -m "🚀 CI: Auto-sync de carpetas API/ y database/ desde rama API"
             git push origin develop
           else
-            echo "No hay cambios nuevos en API para la rama develop."
+            echo "No hay cambios nuevos en API o database para la rama develop."
           fi
 
-      - name: Sincronizar API en web
+      - name: Sincronizar API y database en web
         run: |
           git checkout web || git checkout -b web origin/web
-          rm -rf API/
-          git checkout origin/API -- API/
-          git add API/
+          rm -rf API/ database/
+          git checkout origin/API -- API/ database/
+          git add API/ database/
           if ! git diff --cached --quiet; then
-            git commit -m "🚀 CI: Auto-sync de la carpeta API/ desde rama API"
+            git commit -m "🚀 CI: Auto-sync de carpetas API/ y database/ desde rama API"
             git push origin web
           else
-            echo "No hay cambios nuevos en API para la rama web."
+            echo "No hay cambios nuevos en API o database para la rama web."
           fi
 
-      - name: Sincronizar API en mobile
+      - name: Sincronizar API y database en mobile
         run: |
           git checkout mobile || git checkout -b mobile origin/mobile
-          rm -rf API/
-          git checkout origin/API -- API/
-          git add API/
+          rm -rf API/ database/
+          git checkout origin/API -- API/ database/
+          git add API/ database/
           if ! git diff --cached --quiet; then
-            git commit -m "🚀 CI: Auto-sync de la carpeta API/ desde rama API"
+            git commit -m "🚀 CI: Auto-sync de carpetas API/ y database/ desde rama API"
             git push origin mobile
           else
-            echo "No hay cambios nuevos en API para la rama mobile."
+            echo "No hay cambios nuevos en API o database para la rama mobile."
           fi
