@@ -37,7 +37,6 @@ class InvestigationRequestDetailsScreen(
 		val navigator = LocalNavigator.currentOrThrow
 		val scope = rememberCoroutineScope()
 
-		// Manejo de estado local para la generación del PDF en esta pantalla
 		var isPdfGenerating by remember { mutableStateOf(false) }
 		var lastGeneratedPdfPath by remember { mutableStateOf<String?>(null) }
 		val snackbarHostState = remember { TypedSnackbarHostState() }
@@ -114,8 +113,12 @@ class InvestigationRequestDetailsScreen(
 				)
 			}
 		) { paddingValues ->
-			Box(modifier = Modifier.padding(paddingValues).padding(horizontal = 20.dp)) {
-				RequestDetailsContent(request = request, isForPdf = false)
+			Box(
+				modifier = Modifier
+					.padding(top = paddingValues.calculateTopPadding())
+					.padding(horizontal = 20.dp)
+			) {
+				InvestigationRequestDetailsContent(request = request, isForPdf = false)
 			}
 		}
 	}

@@ -104,7 +104,8 @@ class InvestigationRequestFormViewModel(
 							province_snit_code = event.snitCode ?: 0,
 							canton_snit_code = 0,
 							district_snit_code = 0
-						)
+						),
+						fieldErrors = it.fieldErrors - "province"
 					)
 				}
 			}
@@ -115,7 +116,8 @@ class InvestigationRequestFormViewModel(
 						request = it.request.copy(
 							canton_snit_code = event.snitCode ?: 0,
 							district_snit_code = 0
-						)
+						),
+						fieldErrors = it.fieldErrors - "canton"
 					)
 				}
 			}
@@ -125,7 +127,8 @@ class InvestigationRequestFormViewModel(
 					it.copy(
 						request = it.request.copy(
 							district_snit_code = event.snitCode ?: 0
-						)
+						),
+						fieldErrors = it.fieldErrors - "district"
 					)
 				}
 			}
@@ -143,11 +146,21 @@ class InvestigationRequestFormViewModel(
 			}
 
 			is AnalysisFormEvent.UsageChanged -> {
-				_state.update { it.copy(request = it.request.copy(current_usage = event.value)) }
+				_state.update {
+					it.copy(
+						request = it.request.copy(current_usage = event.value),
+						fieldErrors = it.fieldErrors - "usage"
+					)
+				}
 			}
 
 			is AnalysisFormEvent.TempChanged -> {
-				_state.update { it.copy(request = it.request.copy(temperature_sensation = event.value)) }
+				_state.update {
+					it.copy(
+						request = it.request.copy(temperature_sensation = event.value),
+						fieldErrors = it.fieldErrors - "temp"
+					)
+				}
 			}
 
 			is AnalysisFormEvent.BubblesChanged -> {
@@ -179,11 +192,21 @@ class InvestigationRequestFormViewModel(
 			}
 
 			is AnalysisFormEvent.ExactAddressChanged -> {
-				_state.update { it.copy(request = it.request.copy(exact_address = event.value)) }
+				_state.update {
+					it.copy(
+						request = it.request.copy(exact_address = event.value),
+						fieldErrors = it.fieldErrors - "address"
+					)
+				}
 			}
 
 			is AnalysisFormEvent.RelationChanged -> {
-				_state.update { it.copy(request = it.request.copy(relation_with_owner = event.value)) }
+				_state.update {
+					it.copy(
+						request = it.request.copy(relation_with_owner = event.value),
+						fieldErrors = it.fieldErrors - "relation"
+					)
+				}
 			}
 
 			is AnalysisFormEvent.Submit -> {
@@ -291,13 +314,13 @@ class InvestigationRequestFormViewModel(
 		val req = _state.value.request
 
 		if (req.province_snit_code == 0) {
-			errors["province"] = "Por favor, seleccione una provincia."
+			errors["province"] = "Seleccione una provincia."
 		}
 		if (req.canton_snit_code == 0) {
-			errors["canton"] = "Por favor, seleccione un cantón."
+			errors["canton"] = "Seleccione un cantón."
 		}
 		if (req.district_snit_code == 0) {
-			errors["district"] = "Por favor, seleccione un distrito."
+			errors["district"] = "Seleccione un distrito."
 		}
 
 		if (req.owner_email?.isNotBlank() == true) {
@@ -317,7 +340,23 @@ class InvestigationRequestFormViewModel(
 		}
 
 		if (req.latitude == 0.0 && req.longitude == 0.0) {
-			errors["location"] = "Por favor, proporcione datos de ubicación."
+			errors["location"] = "Proporcione los datos de ubicación."
+		}
+
+		if (req.current_usage.isBlank()) {
+			errors["usage"] = "Seleccione el uso actual."
+		}
+
+		if (req.relation_with_owner.isBlank()) {
+			errors["relation"] = "Seleccione la relación con el propietario."
+		}
+
+		if (req.temperature_sensation.isBlank()) {
+			errors["temp"] = "Seleccione la sensación térmica."
+		}
+
+		if (req.exact_address.isBlank()) {
+			errors["address"] = "Proporcione la dirección exacta."
 		}
 
 		_state.update { it.copy(fieldErrors = errors) }

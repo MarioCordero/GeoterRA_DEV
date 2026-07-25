@@ -44,7 +44,6 @@ fun SignUpContent(
   Column(
     modifier = modifier
       .fillMaxSize()
-      .padding(horizontal = 32.dp)
       .verticalScroll(rememberScrollState()),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center
@@ -141,7 +140,7 @@ fun SignUpContent(
           if (state.isLoading) {
             CircularProgressIndicator(modifier = Modifier.size(24.dp),color = Color.White)
           } else {
-            Text("REGISTRARME", fontWeight = FontWeight.Bold)
+            Text("Registrarme", fontWeight = FontWeight.Bold)
           }
         }
 

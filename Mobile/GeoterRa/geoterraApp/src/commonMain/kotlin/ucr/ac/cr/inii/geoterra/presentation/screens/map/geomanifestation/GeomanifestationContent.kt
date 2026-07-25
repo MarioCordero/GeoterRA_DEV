@@ -47,7 +47,7 @@ fun GeomanifestationDetailContent(
       isForPdf = false
     )
 
-    Spacer(modifier = Modifier.height(24.dp))
+    Spacer(modifier = Modifier.height(12.dp))
 
     Button(
       onClick = { onDownload() },
@@ -72,7 +72,7 @@ fun GeomanifestationDetailContent(
       }
     }
 
-    Spacer(modifier = Modifier.height(32.dp))
+    Spacer(modifier = Modifier.height(16.dp))
   }
 }
 

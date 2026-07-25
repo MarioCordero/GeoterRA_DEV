@@ -35,8 +35,12 @@ fun PasswordField(
     onValueChange = onValueChange,
     label = { Text(label) },
     isError = isError,
-    supportingText = { if (isError && errorMessage != null) Text(errorMessage) },
-    modifier = modifier.fillMaxWidth(),
+		supportingText = if (isError && errorMessage != null) {
+			{ Text(errorMessage) }
+		} else {
+			null
+		},
+		modifier = modifier.fillMaxWidth(),
     shape = RoundedCornerShape(12.dp),
     singleLine = true,
     visualTransformation = if (isVisible) VisualTransformation.None else PasswordVisualTransformation(),

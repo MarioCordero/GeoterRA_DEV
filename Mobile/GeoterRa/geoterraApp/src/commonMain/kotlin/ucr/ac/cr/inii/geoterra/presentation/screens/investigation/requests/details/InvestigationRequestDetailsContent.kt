@@ -28,19 +28,18 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.SectionHeader
 import ucr.ac.cr.inii.geoterra.presentation.components.request.StatusBadge
 
 @Composable
-fun RequestDetailsContent(
+fun InvestigationRequestDetailsContent(
 	request: InvestigationRequestResponse,
 	isForPdf: Boolean = false
 ) {
 	val scrollState = if (!isForPdf) rememberScrollState() else null
 
-	val verticalSpacing = if (isForPdf) 8.dp else 16.dp
-	val chipSpacing = if (isForPdf) 4.dp else 8.dp
-	val titleSize = if (isForPdf) 18.sp else 22.sp
+	val verticalSpacing = 16.dp
+	val chipSpacing = 8.dp
+	val titleSize = 22.sp
 
 	Column(
 		modifier = Modifier
-			.padding(if (isForPdf) 12.dp else 20.dp)
 			.then(
 				if (isForPdf) Modifier.width(380.dp) else Modifier.fillMaxSize()
 			)
@@ -59,7 +58,6 @@ fun RequestDetailsContent(
 				style = MaterialTheme.typography.titleLarge.copy(
 					fontSize = titleSize,
 					fontWeight = FontWeight.ExtraBold,
-					letterSpacing = (-0.5).sp
 				),
 				color = MaterialTheme.colorScheme.onSurface,
 				modifier = Modifier.weight(1f, fill = false),
@@ -230,9 +228,8 @@ fun RequestDetailsContent(
 			)
 		}
 
-		// Espacio extra al final para que el FAB no tape el contenido al scrollear
 		if (!isForPdf) {
-			Spacer(modifier = Modifier.height(80.dp))
+			Spacer(modifier = Modifier.height(verticalSpacing))
 		}
 	}
 }

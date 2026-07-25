@@ -52,11 +52,10 @@ class AccountScreen : Screen {
 			}
 		}
 
-		// Show error snackbar when error appears
-		LaunchedEffect(state.error) {
-			state.error?.let {
-				snackbarHostState.showErrorSnackbar(it)
-				viewModel.clearError()
+		LaunchedEffect(state.snackBarMessage) {
+			state.snackBarMessage?.let { message ->
+				snackbarHostState.showSnackbar(message.text, message.type)
+				viewModel.clearSnackBar()
 			}
 		}
 

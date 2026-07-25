@@ -34,7 +34,9 @@ fun <T> SearchableDropdown(
 	itemToString: (T) -> String,
 	onItemSelected: (T?) -> Unit,
 	modifier: Modifier = Modifier,
-	enabled: Boolean = true
+	enabled: Boolean = true,
+	isError: Boolean = false,
+	errorMessage: String? = null
 ) {
 	var expanded by remember { mutableStateOf(false) }
 	var searchQuery by remember { mutableStateOf("") }
@@ -52,6 +54,12 @@ fun <T> SearchableDropdown(
 	Column(modifier = modifier.fillMaxWidth()) {
 		OutlinedTextField(
 			value = textFieldValue,
+			isError = isError,
+			supportingText = if (isError && errorMessage != null) {
+				{ Text(errorMessage) }
+			} else {
+				null
+			},
 			onValueChange = { newValue ->
 				searchQuery = newValue
 				expanded = true

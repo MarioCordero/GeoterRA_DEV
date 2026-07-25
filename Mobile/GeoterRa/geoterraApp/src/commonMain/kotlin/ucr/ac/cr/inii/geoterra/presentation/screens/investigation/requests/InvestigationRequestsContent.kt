@@ -31,7 +31,8 @@ fun InvestigationRequestsContent(
 
     LazyColumn(
       verticalArrangement = Arrangement.spacedBy(16.dp),
-      modifier = Modifier.weight(1f).fillMaxWidth()
+      modifier = Modifier.weight(1f).fillMaxWidth(),
+			contentPadding = PaddingValues(bottom = 16.dp)
     ) {
       items(state.requests, key = { it.request_id }) { request ->
         RequestCardItem(
@@ -41,7 +42,6 @@ fun InvestigationRequestsContent(
           onDelete = { onDelete(request) }
         )
       }
-    }
-
+		}
   }
 }

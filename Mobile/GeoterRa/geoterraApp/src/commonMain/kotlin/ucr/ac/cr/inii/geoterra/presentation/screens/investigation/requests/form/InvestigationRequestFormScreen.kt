@@ -91,7 +91,9 @@ data class InvestigationRequestFormScreen(
 			}
 		) { paddingValues ->
 			InvestigationRequestFormContent(
-				modifier = Modifier.padding(top = paddingValues.calculateTopPadding()).padding(horizontal = 20.dp),
+				modifier = Modifier
+					.padding(top = paddingValues.calculateTopPadding())
+					.padding(horizontal = 20.dp),
 				state = state,
 				onEvent = viewModel::onEvent,
 			)

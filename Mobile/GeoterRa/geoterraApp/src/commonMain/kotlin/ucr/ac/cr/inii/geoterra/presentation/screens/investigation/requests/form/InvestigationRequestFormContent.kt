@@ -67,7 +67,9 @@ fun InvestigationRequestFormContent(
 					onEvent(AnalysisFormEvent.ProvinceChanged(province?.province_snit_code))
 				},
 				modifier = Modifier.fillMaxWidth(),
-				enabled = state.availableProvinces.isNotEmpty()
+				enabled = state.availableProvinces.isNotEmpty(),
+				isError = state.fieldErrors["province"] != null,
+				errorMessage = state.fieldErrors["province"]
 			)
 
 			// Canton dropdown – enabled only when a province is selected
@@ -80,7 +82,9 @@ fun InvestigationRequestFormContent(
 					onEvent(AnalysisFormEvent.CantonChanged(canton?.canton_snit_code))
 				},
 				modifier = Modifier.fillMaxWidth(),
-				enabled = state.request.province_snit_code != 0 && filteredCantons.isNotEmpty()
+				enabled = state.request.province_snit_code != 0 && filteredCantons.isNotEmpty(),
+				isError = state.fieldErrors["canton"] != null,
+				errorMessage = state.fieldErrors["canton"]
 			)
 
 			// District dropdown – enabled only when a canton is selected
@@ -93,7 +97,9 @@ fun InvestigationRequestFormContent(
 					onEvent(AnalysisFormEvent.DistrictChanged(district?.district_snit_code))
 				},
 				modifier = Modifier.fillMaxWidth(),
-				enabled = state.request.canton_snit_code != 0 && filteredDistricts.isNotEmpty()
+				enabled = state.request.canton_snit_code != 0 && filteredDistricts.isNotEmpty(),
+				isError = state.fieldErrors["district"] != null,
+				errorMessage = state.fieldErrors["district"]
 			)
 		}
 
@@ -102,13 +108,15 @@ fun InvestigationRequestFormContent(
 			SearchableDropdown(
 				label = "Uso actual",
 				items = usageOptions,
-				selectedItem = state.request.current_usage,
+				selectedItem = state.request.current_usage.takeIf { it.isNotBlank() },
 				itemToString = { it },
 				onItemSelected = { usage ->
 					onEvent(AnalysisFormEvent.UsageChanged(usage.toString()))
 				},
 				modifier = Modifier.fillMaxWidth(),
-				enabled = true
+				enabled = true,
+				isError = state.fieldErrors["usage"] != null,
+				errorMessage = state.fieldErrors["usage"]
 			)
 		}
 
@@ -119,13 +127,15 @@ fun InvestigationRequestFormContent(
 			SearchableDropdown(
 				label = "Tipo de relación",
 				items = relationOptions,
-				selectedItem = state.request.relation_with_owner,
+				selectedItem = state.request.relation_with_owner.takeIf { it.isNotBlank() },
 				itemToString = { it },
 				onItemSelected = { relation ->
 					onEvent(AnalysisFormEvent.RelationChanged(relation ?: "Titular"))
 				},
 				modifier = Modifier.fillMaxWidth(),
-				enabled = true
+				enabled = true,
+				isError = state.fieldErrors["relation"] != null,
+				errorMessage = state.fieldErrors["relation"]
 			)
 		}
 
@@ -164,13 +174,15 @@ fun InvestigationRequestFormContent(
 			SearchableDropdown(
 				label = "Sensación térmica",
 				items = tempOptions,
-				selectedItem = state.request.temperature_sensation,
+				selectedItem = state.request.temperature_sensation.takeIf { it.isNotBlank() },
 				itemToString = { it },
 				onItemSelected = { temp ->
 					onEvent(AnalysisFormEvent.TempChanged(temp ?: "Sin Especificar"))
 				},
 				modifier = Modifier.fillMaxWidth(),
-				enabled = true
+				enabled = true,
+				isError = state.fieldErrors["temp"] != null,
+				errorMessage = state.fieldErrors["temp"]
 			)
 
 			Row(
@@ -208,7 +220,9 @@ fun InvestigationRequestFormContent(
 				label = "Dirección exacta",
 				icon = Icons.Default.Home,
 				singleLine = false,
-				minLines = 1
+				minLines = 1,
+				isError = state.fieldErrors["address"] != null,
+				errorMessage = state.fieldErrors["address"]
 			)
 
 			Row(
@@ -225,6 +239,7 @@ fun InvestigationRequestFormContent(
 					isError = state.fieldErrors["location"] != null,
 					errorMessage = state.fieldErrors["location"]
 				)
+
 				CustomTextField(
 					value = state.request.longitude.toString().take(10),
 					onValueChange = { onEvent(AnalysisFormEvent.LonChanged(it)) },
@@ -247,8 +262,6 @@ fun InvestigationRequestFormContent(
 				Text("Obtener Ubicación GPS", style = MaterialTheme.typography.labelSmall)
 			}
 		}
-
-		Spacer(Modifier.height(4.dp))
 
 		Button(
 			onClick = { onEvent(AnalysisFormEvent.Submit) },

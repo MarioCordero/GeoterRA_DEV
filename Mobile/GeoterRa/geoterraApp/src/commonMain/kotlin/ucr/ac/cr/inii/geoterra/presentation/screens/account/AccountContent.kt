@@ -77,7 +77,7 @@ fun AccountContent(
         item {
           Column {
             InfoTile(Icons.Default.Email, "Correo electrónico", state.user.email)
-            InfoTile(Icons.Default.Phone, "Teléfono", state.user.phone_number ?: "No asignado")
+            InfoTile(Icons.Default.Phone, "Teléfono", state.user.phone_number ?: "No especificado")
             InfoTile(Icons.Default.Badge, "Rol de usuario", state.user.role)
           }
         }
@@ -92,10 +92,10 @@ fun AccountContent(
             }
           )
           ActionMenuItem(Icons.Default.Edit, "Editar información personal", onClick = onEditClick)
-          ActionMenuItem(Icons.Default.History, "Historial de solicitudes", onClick = { /* Historial */ })
+//          ActionMenuItem(Icons.Default.History, "Historial de solicitudes", onClick = { /* Historial */ })
         }
 
-        // Acciones de Cuenta (Peligro)
+        // Acciones de Cuenta
         item {
           Spacer(Modifier.height(16.dp))
           HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outline)
@@ -108,13 +108,13 @@ fun AccountContent(
               showLogoutDialog = true
             }
           )
-          DangerActionItem(
-            Icons.Default.DeleteForever,
-            "Eliminar cuenta",
-            isCritical = true,
-
-            onClick = { showDeleteDialog = true }
-          )
+//          DangerActionItem(
+//            Icons.Default.DeleteForever,
+//            "Eliminar cuenta",
+//            isCritical = true,
+//
+//            onClick = { showDeleteDialog = true }
+//          )
         }
       }
     }

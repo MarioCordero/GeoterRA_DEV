@@ -3,8 +3,11 @@ package ucr.ac.cr.inii.geoterra.presentation.components.request
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,117 +34,134 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.InfoChip
 
 @Composable
 fun RequestCardItem(
-  request: InvestigationRequestResponse,
-  onView: () -> Unit,
-  onEdit: () -> Unit,
-  onDelete: () -> Unit
+	request: InvestigationRequestResponse,
+	onView: () -> Unit,
+	onEdit: () -> Unit,
+	onDelete: () -> Unit
 ) {
-  Card(
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(horizontal = 4.dp),
-    shape = RoundedCornerShape(24.dp),
-    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-  ) {
-    Column(modifier = Modifier.padding(20.dp)) {
-      Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-      ) {
-        Column(modifier = Modifier.weight(1f)) {
-          Text(
-            text = request.request_name,
-            style = MaterialTheme.typography.titleLarge.copy(
-              fontWeight = FontWeight.ExtraBold,
-              letterSpacing = (-0.5).sp
-            ),
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-          )
-          Text(
-            text = "Fecha de creación: ${request.created_at.take(10)}",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurface
-          )
-        }
-        StatusBadge(request.current_state.value)
-      }
-      
-      Spacer(modifier = Modifier.height(16.dp))
-      InfoChip(
-        icon = Icons.Default.LocationOn,
-        label = "Ubicación Geográfica",
-        value = "${request.location.province}, ${request.location.canton}, ${request.location.district}" ,
-        modifier = Modifier.fillMaxWidth()
-      )
+	Card(
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(horizontal = 4.dp),
+		shape = RoundedCornerShape(24.dp),
+		elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+		colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+	) {
+		Column(modifier = Modifier.padding(20.dp)) {
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.SpaceBetween,
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				Column(modifier = Modifier.weight(1f)) {
+					Text(
+						text = request.request_name,
+						style = MaterialTheme.typography.titleLarge.copy(
+							fontWeight = FontWeight.ExtraBold,
+						),
+						color = MaterialTheme.colorScheme.onSurface,
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis
+					)
+					Text(
+						text = "Fecha de creación: ${request.created_at.take(10)}",
+						style = MaterialTheme.typography.labelSmall,
+						color = MaterialTheme.colorScheme.onSurface
+					)
+				}
+				StatusBadge(request.current_state.value)
+			}
 
-      Spacer(modifier = Modifier.height(8.dp))
+			Spacer(modifier = Modifier.height(16.dp))
+			InfoChip(
+				icon = Icons.Default.LocationOn,
+				label = "Ubicación Geográfica",
+				value = "${request.location.province}, ${request.location.canton}, ${request.location.district}",
+				modifier = Modifier.fillMaxWidth()
+			)
 
-      Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-      ) {
-        InfoChip(
-          icon = Icons.Default.Explore,
-          label = "Latitud",
-          value = request.location.latitude.toString(),
-          modifier = Modifier.weight(1f),
-          iconColor = MaterialTheme.colorScheme.secondary
-        )
-        InfoChip(
-          icon = Icons.Default.Explore,
-          label = "Longitud",
-          value = request.location.longitude.toString(),
-          modifier = Modifier.weight(1f),
-          iconColor = MaterialTheme.colorScheme.secondary
-        )
-      }
-      
-      Spacer(modifier = Modifier.height(20.dp))
-      
-      Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-        verticalAlignment = Alignment.CenterVertically
-      ) {
-        Button(
-          onClick = onView,
-          modifier = Modifier.weight(1f).height(44.dp),
-          shape = RoundedCornerShape(12.dp),
-          colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-        ) {
-          Text("Detalles", style = MaterialTheme.typography.labelLarge)
-        }
-        
-        OutlinedButton(
-          onClick = onEdit,
-          modifier = Modifier.weight(1f).height(44.dp),
-          shape = RoundedCornerShape(12.dp),
-          border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-        ) {
-          Text(
-            "Editar",
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurface
-          )
-        }
-        
-        OutlinedButton(
-          onClick = onDelete,
-          modifier = Modifier.weight(1f).height(44.dp),
-          shape = RoundedCornerShape(12.dp),
-          border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-        ) {
-          Text(
-            "Eliminar",
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurface
-          )
-        }
-      }
-    }
-  }
+			Spacer(modifier = Modifier.height(8.dp))
+
+			Row(
+				modifier = Modifier
+					.fillMaxWidth()
+					.height(IntrinsicSize.Max),
+				horizontalArrangement = Arrangement.spacedBy(8.dp)
+
+			) {
+				InfoChip(
+					icon = Icons.Default.Explore,
+					label = "Latitud",
+					value = request.location.latitude.toString(),
+					modifier = Modifier
+						.weight(1f)
+						.fillMaxHeight(),
+					maxLines = 1,
+					iconColor = MaterialTheme.colorScheme.secondary
+				)
+				InfoChip(
+					icon = Icons.Default.Explore,
+					label = "Longitud",
+					value = request.location.longitude.toString(),
+					modifier = Modifier
+						.weight(1f)
+						.fillMaxHeight(),
+					maxLines = 1,
+					iconColor = MaterialTheme.colorScheme.secondary
+				)
+			}
+
+			Spacer(modifier = Modifier.height(20.dp))
+
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				Button(
+					onClick = onView,
+					modifier = Modifier.weight(1f).height(44.dp),
+					shape = RoundedCornerShape(12.dp),
+					colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+					contentPadding = PaddingValues(horizontal = 4.dp)
+				) {
+					Text(
+						text = "Detalles",
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis
+					)
+				}
+
+				OutlinedButton(
+					onClick = onEdit,
+					modifier = Modifier.weight(1f).height(44.dp),
+					shape = RoundedCornerShape(12.dp),
+					border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+					contentPadding = PaddingValues(horizontal = 4.dp)
+				) {
+					Text(
+						text = "Editar",
+						color = MaterialTheme.colorScheme.onSurface,
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis
+					)
+				}
+
+				OutlinedButton(
+					onClick = onDelete,
+					modifier = Modifier.weight(1f).height(44.dp),
+					shape = RoundedCornerShape(12.dp),
+					border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+					contentPadding = PaddingValues(horizontal = 4.dp)
+				) {
+					Text(
+						text = "Eliminar",
+						color = MaterialTheme.colorScheme.onSurface,
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis
+					)
+				}
+			}
+		}
+	}
 }

@@ -12,6 +12,8 @@ import ucr.ac.cr.inii.geoterra.domain.repository.DistrictRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.GeomanifestationsRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.ProvinceRepositoryInterface
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
 
 /**
  * ViewModel that manages map interactions, layer selections, and hierarchical region filtering.
@@ -37,8 +39,15 @@ class MapViewModel(
 				.onSuccess { provinces ->
 					_state.update { it.copy(availableProvinces = provinces) }
 				}
-				.onFailure {
-					_state.update { it.copy(snackBarMessage = it.snackBarMessage) }
+				.onFailure { error ->
+					_state.update {
+						it.copy(
+							snackBarMessage = SnackbarMessage(
+								"Error al cargar provincias: ${error.message}",
+								SnackbarType.ERROR
+							)
+						)
+					}
 				}
 		}
 	}
@@ -49,8 +58,15 @@ class MapViewModel(
 				.onSuccess { cantons ->
 					_state.update { it.copy(availableCantons = cantons) }
 				}
-				.onFailure {
-					_state.update { it.copy(snackBarMessage = it.snackBarMessage) }
+				.onFailure { error ->
+					_state.update {
+						it.copy(
+							snackBarMessage = SnackbarMessage(
+								"Error al cargar cantones: ${error.message}",
+								SnackbarType.ERROR
+							)
+						)
+					}
 				}
 		}
 	}
@@ -61,8 +77,15 @@ class MapViewModel(
 				.onSuccess { districts ->
 					_state.update { it.copy(availableDistricts = districts) }
 				}
-				.onFailure {
-					_state.update { it.copy(snackBarMessage = it.snackBarMessage) }
+				.onFailure { error ->
+					_state.update {
+						it.copy(
+							snackBarMessage = SnackbarMessage(
+								"Error al cargar distritos: ${error.message}",
+								SnackbarType.ERROR
+							)
+						)
+					}
 				}
 		}
 	}
@@ -110,7 +133,9 @@ class MapViewModel(
 					_state.update {
 						it.copy(
 							isLoading = false,
-							snackBarMessage = error.message ?: "No se pudieron cargar las manifestaciones"
+							snackBarMessage = SnackbarMessage(
+								error.message ?: "No se pudieron cargar las manifestaciones", SnackbarType.ERROR
+							)
 						)
 					}
 				}
@@ -154,7 +179,12 @@ class MapViewModel(
 				observeUserLocation()
 			} else {
 				_state.update {
-					it.copy(snackBarMessage = "Permiso de ubicación denegado")
+					it.copy(
+						snackBarMessage = SnackbarMessage(
+							"Permiso de ubicación denegado",
+							SnackbarType.ERROR
+						)
+					)
 				}
 			}
 		} else {
@@ -276,5 +306,9 @@ class MapViewModel(
 			tempMin = state.value.selectedTempMin,
 			tempMax = state.value.selectedTempMax
 		)
+	}
+
+	fun clearSnackBar() {
+		_state.update { it.copy(snackBarMessage = null) }
 	}
 }

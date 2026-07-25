@@ -94,15 +94,15 @@ fun SignInContent(
       ) {
         Column(
           modifier = Modifier.padding(24.dp),
-          horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+          horizontalAlignment = Alignment.CenterHorizontally,
+					verticalArrangement = Arrangement.spacedBy(12.dp)
+				) {
 
           Text(
             text = "Bienvenido de nuevo",
             style = MaterialTheme.typography.headlineSmall.copy(
-              fontWeight = FontWeight.ExtraBold,
-              letterSpacing = (-0.5).sp
-            ),
+              fontWeight = FontWeight.ExtraBold
+						),
             color = MaterialTheme.colorScheme.onSurface
           )
 
@@ -110,7 +110,6 @@ fun SignInContent(
             text = "Ingresa tus credenciales para continuar",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(bottom = 24.dp)
           )
 
           FormSection {

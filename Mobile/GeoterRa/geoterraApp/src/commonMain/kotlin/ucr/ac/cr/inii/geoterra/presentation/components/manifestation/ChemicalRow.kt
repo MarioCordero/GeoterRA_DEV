@@ -29,7 +29,7 @@ fun ChemicalRow(label: String, value: Double?) {
       color = MaterialTheme.colorScheme.onSurface
     )
     Text(
-      text = if (value != null) "$value mg/L" else "N/D",
+      text = if (value != null) "$value mg/L" else " --- mg/L",
       style = MaterialTheme.typography.bodyLarge.copy(
         fontWeight = FontWeight.SemiBold,
         fontFeatureSettings = "tnum"

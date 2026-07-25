@@ -35,14 +35,14 @@ data class InvestigationRequestRequest(
   val owner_name: String? = null,
   val owner_phone_number: String? = null,
   val owner_email: String? = null,
-  val current_usage: String = "Otro",
-  val temperature_sensation: String = "Sin Especificar",
+  val current_usage: String = "",
+  val temperature_sensation: String = "",
   val bubbles: Boolean = false,
   val details: String = "",
   val exact_address: String = "",
   val latitude: Double = 0.0,
   val longitude: Double = 0.0,
-  val relation_with_owner: String = "Titular"
+  val relation_with_owner: String = ""
 ) {
   companion object Companion {
     /**

@@ -85,7 +85,7 @@ class GeomanifestationScreen(val manifestation: GeomanifestationResponse) : Scre
 		) { paddingValues ->
 			GeomanifestationDetailContent(
 				modifier = Modifier
-					.padding(paddingValues)
+					.padding(top = paddingValues.calculateTopPadding())
 					.padding(horizontal = 20.dp),
 				state = state,
 				manifestation = state.manifestation,

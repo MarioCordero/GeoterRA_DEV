@@ -29,8 +29,9 @@ fun InfoChip(
   label: String,
   value: String,
   modifier: Modifier = Modifier,
-  iconColor: Color = MaterialTheme.colorScheme.primary
-) {
+  iconColor: Color = MaterialTheme.colorScheme.primary,
+	maxLines: Int = 2
+	) {
   Row(
     modifier = modifier
       .background(
@@ -66,7 +67,7 @@ fun InfoChip(
         color = MaterialTheme.colorScheme.onSurface,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
-        maxLines = 4,
+        maxLines = maxLines,
         overflow = TextOverflow.Ellipsis
       )
     }

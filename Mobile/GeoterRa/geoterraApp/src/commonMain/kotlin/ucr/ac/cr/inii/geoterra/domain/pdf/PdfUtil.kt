@@ -7,7 +7,7 @@ import org.koin.mp.KoinPlatform.getKoin
 import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.manifestation.ManifestationReport
-import ucr.ac.cr.inii.geoterra.presentation.components.request.RequestBottomModalContent
+import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.details.InvestigationRequestDetailsContent
 
 object PDFUtil {
 
@@ -38,11 +38,10 @@ object PDFUtil {
     return generatePdf(
       fileName = fileName,
       content = {
-        RequestBottomModalContent(
-          request = request,
-          isForPdf = true,
-          onDownloadPdf = {}
-        )
+				InvestigationRequestDetailsContent(
+					request = request,
+					isForPdf = true
+				)
       },
       shareAfterCreation = false,
       authority = AUTHORITY
