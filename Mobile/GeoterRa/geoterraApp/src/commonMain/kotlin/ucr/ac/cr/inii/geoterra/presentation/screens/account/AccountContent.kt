@@ -8,20 +8,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.CircularProgressIndicator
@@ -46,68 +44,63 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.DangerActionItem
 import ucr.ac.cr.inii.geoterra.presentation.components.account.InfoTile
 import ucr.ac.cr.inii.geoterra.presentation.components.account.ProfileHeaderCard
 import ucr.ac.cr.inii.geoterra.presentation.components.common.ConfirmDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.ThemeToggle
 
 @Composable
 fun AccountContent(
-  modifier: Modifier,
-  state: AccountState,
-  onLogoutClick: () -> Unit,
-  onDeleteAccountClick: () -> Unit,
-  onEditClick: () -> Unit,
-  onThemeToggle: (Boolean) -> Unit,
+	modifier: Modifier,
+	state: AccountState,
+	onLogoutClick: () -> Unit,
+	onDeleteAccountClick: () -> Unit,
+	onEditClick: () -> Unit,
+	onThemeToggle: (Boolean) -> Unit,
 ) {
-  var showLogoutDialog by remember { mutableStateOf(false) }
-  var showDeleteDialog by remember { mutableStateOf(false) }
+	var showLogoutDialog by remember { mutableStateOf(false) }
+	var showDeleteDialog by remember { mutableStateOf(false) }
+	val scrollState = rememberScrollState()
 
-  Box(modifier = modifier.fillMaxSize()) {
-    if (state.isLoading) {
-      CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-    }
+	Box(modifier = modifier.fillMaxSize().verticalScroll(scrollState)) {
+		if (state.isLoading) {
+			CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+		}
 
-    if (state.user != null) {
-      LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-      ) {
-        item {
-          ProfileHeaderCard(state.user)
-        }
+		if (state.user != null) {
+			Column(
+				modifier = Modifier.fillMaxSize()
+					.padding(PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp)),
+				verticalArrangement = Arrangement.spacedBy(16.dp)
+			) {
+				ProfileHeaderCard(state.user)
 
-        item {
-          Column {
-            InfoTile(Icons.Default.Email, "Correo electrónico", state.user.email)
-            InfoTile(Icons.Default.Phone, "Teléfono", state.user.phone_number ?: "No especificado")
-            InfoTile(Icons.Default.Badge, "Rol de usuario", state.user.role)
-          }
-        }
+				Column {
+					InfoTile(Icons.Default.Email, "Correo electrónico", state.user.email)
+					InfoTile(Icons.Default.Phone, "Teléfono", state.user.phone_number ?: "No especificado")
+					InfoTile(Icons.Default.Badge, "Rol de usuario", state.user.role)
+				}
 
-        item {
-          Text("Configuración", style = MaterialTheme.typography.labelLarge, color = Color.Gray)
-          Spacer(Modifier.height(8.dp))
-          ThemeSelectorItem(
-            isDark = state.isDarkMode,
-            onToggle = { isDark ->
-              onThemeToggle(isDark)
-            }
-          )
-          ActionMenuItem(Icons.Default.Edit, "Editar información personal", onClick = onEditClick)
-//          ActionMenuItem(Icons.Default.History, "Historial de solicitudes", onClick = { /* Historial */ })
-        }
+				Text("Configuración", style = MaterialTheme.typography.labelLarge, color = Color.Gray)
 
-        // Acciones de Cuenta
-        item {
-          Spacer(Modifier.height(16.dp))
-          HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outline)
-          Spacer(Modifier.height(16.dp))
+				Column {
+					ThemeToggle(
+						isDark = state.isDarkMode,
+						onToggle = { isDark ->
+							onThemeToggle(isDark)
+						}
+					)
 
-          DangerActionItem(
-            Icons.AutoMirrored.Filled.Logout,
-            "Cerrar sesión",
-            onClick = {
-              showLogoutDialog = true
-            }
-          )
+					ActionMenuItem(Icons.Default.Edit, "Editar información personal", onClick = onEditClick)
+				}
+
+				HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outline)
+
+				Column {
+					DangerActionItem(
+						Icons.AutoMirrored.Filled.Logout,
+						"Cerrar sesión",
+						onClick = {
+							showLogoutDialog = true
+						}
+					)
 //          DangerActionItem(
 //            Icons.Default.DeleteForever,
 //            "Eliminar cuenta",
@@ -115,78 +108,35 @@ fun AccountContent(
 //
 //            onClick = { showDeleteDialog = true }
 //          )
-        }
-      }
-    }
-  }
-  
-  if (showLogoutDialog) {
-    ConfirmDialog(
-      title = "¿Cerrar sesión?",
-      message = "Tu sesión actual finalizará. Deberás ingresar tus credenciales la próxima vez.",
-      confirmText = "Salir",
-      onConfirm = {
-        onLogoutClick()
-        showLogoutDialog = false },
-      onDismiss = { showLogoutDialog = false }
-    )
-  }
-  
-  if (showDeleteDialog) {
-    ConfirmDialog(
-      title = "¿Eliminar cuenta?",
-      message = "Esta acción es irreversible. Se borrarán todas tus solicitudes y datos de campo permanentemente.",
-      confirmText = "Eliminar",
-      isDanger = true,
-      onConfirm = {
-//        onDeleteAccountClick()
-        showDeleteDialog = false },
-      onDismiss = { showDeleteDialog = false }
-    )
-  }
-}
+				}
+			}
+		}
 
-@Composable
-fun ThemeSelectorItem(
-  isDark: Boolean,
-  onToggle: (Boolean) -> Unit
-) {
-  Surface(
-    onClick = { onToggle(!isDark) },
-    shape = RoundedCornerShape(12.dp),
-    color = Color.Transparent
-  ) {
-    Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 8.dp),
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-      Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-          imageVector = if (isDark) Icons.Default.DarkMode else Icons.Default.LightMode,
-          contentDescription = null,
-          tint = MaterialTheme.colorScheme.primary
-        )
-        Spacer(Modifier.width(12.dp))
-        Text(
-          text = if (isDark) "Modo Oscuro" else "Modo Claro",
-          style = MaterialTheme.typography.bodyLarge
-        )
-      }
+		if (showLogoutDialog) {
+			ConfirmDialog(
+				title = "¿Cerrar sesión?",
+				message = "Tu sesión actual finalizará. Deberás ingresar tus credenciales la próxima vez.",
+				confirmText = "Salir",
+				onConfirm = {
+					onLogoutClick()
+					showLogoutDialog = false
+				},
+				onDismiss = { showLogoutDialog = false }
+			)
+		}
 
-      Switch(
-        checked = isDark,
-        onCheckedChange = onToggle,
-        thumbContent = {
-          Icon(
-            modifier = Modifier.size(SwitchDefaults.IconSize),
-            imageVector = if (isDark) Icons.Default.DarkMode else Icons.Default.LightMode,
-            contentDescription = null,
-          )
-        }
-      )
-    }
-  }
+		if (showDeleteDialog) {
+			ConfirmDialog(
+				title = "¿Eliminar cuenta?",
+				message = "Esta acción es irreversible. Se borrarán todas tus solicitudes y datos de campo permanentemente.",
+				confirmText = "Eliminar",
+				isDanger = true,
+				onConfirm = {
+        onDeleteAccountClick()
+					showDeleteDialog = false
+				},
+				onDismiss = { showDeleteDialog = false }
+			)
+		}
+	}
 }

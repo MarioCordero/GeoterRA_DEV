@@ -76,14 +76,23 @@ class EditAccountScreen(
 						.fillMaxWidth()
 						.padding(horizontal = 20.dp, vertical = 10.dp),
 					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = Arrangement.End
+					horizontalArrangement = Arrangement.Start
 				) {
+					Text(
+						text = "Editar Cuenta",
+						style = MaterialTheme.typography.headlineMedium,
+						fontWeight = FontWeight.Bold,
+						color = MaterialTheme.colorScheme.secondary,
+						modifier = Modifier.weight(1f)
+					)
 					AdaptiveBackButton(onBack = { navigator.pop() })
 				}
 			}
 		) { padding ->
 			EditProfileContent(
-				modifier = Modifier.padding(top = padding.calculateTopPadding()),
+				modifier = Modifier
+					.padding(top = padding.calculateTopPadding())
+					.padding(horizontal = 20.dp),
 				state = state,
 				onEvent = viewModel
 			)

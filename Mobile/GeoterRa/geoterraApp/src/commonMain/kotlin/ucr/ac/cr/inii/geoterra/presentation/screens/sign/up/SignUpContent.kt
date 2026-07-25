@@ -13,6 +13,10 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Password
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -30,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import geoterra.geoterraapp.generated.resources.Res
 import geoterra.geoterraapp.generated.resources.logo_GeoterRA
 import org.jetbrains.compose.resources.painterResource
+import ucr.ac.cr.inii.geoterra.presentation.components.common.ActionButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomTextField
 import ucr.ac.cr.inii.geoterra.presentation.components.common.FormSection
 import ucr.ac.cr.inii.geoterra.presentation.components.common.PasswordField
@@ -66,17 +71,14 @@ fun SignUpContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
       ) {
-        Text(
-          text = "Crear Cuenta",
-          style = MaterialTheme.typography.headlineSmall,
-          fontWeight = FontWeight.ExtraBold
-        )
-
-        FormSection {
+        FormSection(
+					title = "Nombre Completo",
+					icon = Icons.Default.Person
+				) {
           CustomTextField(
             value = state.name,
             onValueChange = onEvent::onNameChanged,
-            label = "Nombre",
+            label = "Nombre(s)",
             isError = state.fieldErrors["name"] != null,
             errorMessage = state.fieldErrors["name"]
           )
@@ -87,68 +89,71 @@ fun SignUpContent(
             isError = state.fieldErrors["lastname"] != null,
             errorMessage = state.fieldErrors["lastname"]
           )
-          CustomTextField(
-            value = state.email,
-            onValueChange = onEvent::onEmailChanged,
-            label = "Correo Electrónico",
-            keyboardType = KeyboardType.Email,
-            isError = state.fieldErrors["email"] != null,
-            errorMessage = state.fieldErrors["email"]
-          )
-          CustomTextField(
-            value = state.phoneNumber,
-            onValueChange = onEvent::onPhoneChanged,
-            label = "Teléfono (Opcional)",
-            keyboardType = KeyboardType.Phone,
-            isError = state.fieldErrors["phone"] != null,
-            errorMessage = state.fieldErrors["phone"]
-          )
-          PasswordField(
-            value = state.password,
-            onValueChange = onEvent::onPasswordChanged,
-            label = "Contraseña",
-            isVisible = state.isPasswordVisible,
-            onToggleVisibility = onEvent::togglePasswordVisibility,
-            isError = state.fieldErrors["password"] != null,
-            errorMessage = state.fieldErrors["password"]
-          )
-          PasswordField(
-            value = state.confirmPassword,
-            onValueChange = onEvent::onConfirmPasswordChanged,
-            label = "Confirmar Contraseña",
-            isVisible = state.isPasswordVisible,
-            onToggleVisibility = onEvent::togglePasswordVisibility
-          )
         }
 
-        Button(
-          onClick = {onEvent.register()},
-          modifier = Modifier
-            .fillMaxWidth()
-            .height(58.dp),
-          shape = RoundedCornerShape(16.dp),
-          colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
-          ),
-          elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 4.dp,
-            pressedElevation = 0.dp
-          ),
-          enabled = !state.isLoading
-        ) {
-          if (state.isLoading) {
-            CircularProgressIndicator(modifier = Modifier.size(24.dp),color = Color.White)
-          } else {
-            Text("Registrarme", fontWeight = FontWeight.Bold)
-          }
-        }
+				FormSection(
+					title = "Información de Contacto",
+					icon = Icons.Default.Email
+				) {
+					CustomTextField(
+						value = state.email,
+						onValueChange = onEvent::onEmailChanged,
+						label = "Correo Electrónico",
+						keyboardType = KeyboardType.Email,
+						isError = state.fieldErrors["email"] != null,
+						errorMessage = state.fieldErrors["email"]
+					)
+					CustomTextField(
+						value = state.phoneNumber,
+						onValueChange = onEvent::onPhoneChanged,
+						label = "Teléfono (Opcional)",
+						keyboardType = KeyboardType.Phone,
+						isError = state.fieldErrors["phone"] != null,
+						errorMessage = state.fieldErrors["phone"]
+					)
+				}
 
-        TextButton(onClick = onBack) {
-          Text("¿Ya tienes cuenta? Inicia sesión",
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface)
-        }
+				FormSection(
+					title = "Contraseña",
+					icon = Icons.Default.Password
+				) {
+					PasswordField(
+						value = state.password,
+						onValueChange = onEvent::onPasswordChanged,
+						label = "Contraseña",
+						isVisible = state.isPasswordVisible,
+						onToggleVisibility = onEvent::togglePasswordVisibility,
+						isError = state.fieldErrors["password"] != null,
+						errorMessage = state.fieldErrors["password"]
+					)
+					PasswordField(
+						value = state.confirmPassword,
+						onValueChange = onEvent::onConfirmPasswordChanged,
+						label = "Confirmar Contraseña",
+						isVisible = state.isPasswordVisible,
+						onToggleVisibility = onEvent::togglePasswordVisibility
+					)
+				}
+
+				Column(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalAlignment = Alignment.CenterHorizontally,
+					verticalArrangement = Arrangement.spacedBy(2.dp)
+				) {
+
+					ActionButton(
+						isLoading = state.isLoading,
+						text = "Registrarme",
+						onClick = onEvent::register,
+					)
+
+					TextButton(onClick = onBack) {
+						Text("¿Ya tienes cuenta? Inicia sesión",
+							fontWeight = FontWeight.Bold,
+							color = MaterialTheme.colorScheme.onSurface)
+					}
+				}
+
       }
     }
 

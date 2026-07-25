@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -29,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import geoterra.geoterraapp.generated.resources.Res
 import geoterra.geoterraapp.generated.resources.logo_GeoterRA
 import org.jetbrains.compose.resources.painterResource
+import ucr.ac.cr.inii.geoterra.presentation.components.common.ActionButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomTextField
 import ucr.ac.cr.inii.geoterra.presentation.components.common.FormSection
 
@@ -42,7 +46,6 @@ fun EditProfileContent(
   Column(
     modifier = modifier
       .fillMaxSize()
-      .padding(horizontal = 32.dp)
       .verticalScroll(rememberScrollState()),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center
@@ -65,17 +68,15 @@ fun EditProfileContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
       ) {
-        Text(
-          text = "Editar Cuenta",
-          style = MaterialTheme.typography.headlineSmall,
-          fontWeight = FontWeight.ExtraBold
-        )
 
-        FormSection {
+        FormSection(
+					title = "Nombre Completo",
+					icon = Icons.Default.Person
+				) {
           CustomTextField(
             value = state.payload.first_name,
             onValueChange = onEvent::onNameChanged,
-            label = "Nombre",
+            label = "Nombre(s)",
             isError = state.fieldErrors["name"] != null,
             errorMessage = state.fieldErrors["name"]
           )
@@ -86,46 +87,35 @@ fun EditProfileContent(
             isError = state.fieldErrors["lastname"] != null,
             errorMessage = state.fieldErrors["lastname"]
           )
-          CustomTextField(
-            value = state.payload.email,
-            onValueChange = onEvent::onEmailChanged,
-            label = "Correo Electrónico",
-            keyboardType = KeyboardType.Email,
-            isError = state.fieldErrors["email"] != null,
-            errorMessage = state.fieldErrors["email"]
-          )
-          CustomTextField(
-            value = state.payload.phone_number ?: "",
-            onValueChange = onEvent::onPhoneChanged,
-            label = "Teléfono",
-            keyboardType = KeyboardType.Phone,
-            isError = state.fieldErrors["phone"] != null,
-            errorMessage = state.fieldErrors["phone"]
-          )
         }
 
-        Button(
-          onClick = {onEvent.updateProfile()},
-          modifier = Modifier
-            .fillMaxWidth()
-            .height(58.dp),
-          shape = RoundedCornerShape(16.dp),
-          colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
-          ),
-          elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 4.dp,
-            pressedElevation = 0.dp
-          ),
-          enabled = !state.isLoading
-        ) {
-          if (state.isLoading) {
-            CircularProgressIndicator(modifier = Modifier.size(24.dp),color = Color.White)
-          } else {
-            Text("Actualizar", fontWeight = FontWeight.Bold)
-          }
-        }
+				FormSection(
+					title = "Información de Contacto",
+					icon = Icons.Default.Email
+				) {
+					CustomTextField(
+						value = state.payload.email,
+						onValueChange = onEvent::onEmailChanged,
+						label = "Correo Electrónico",
+						keyboardType = KeyboardType.Email,
+						isError = state.fieldErrors["email"] != null,
+						errorMessage = state.fieldErrors["email"]
+					)
+					CustomTextField(
+						value = state.payload.phone_number ?: "",
+						onValueChange = onEvent::onPhoneChanged,
+						label = "Teléfono",
+						keyboardType = KeyboardType.Phone,
+						isError = state.fieldErrors["phone"] != null,
+						errorMessage = state.fieldErrors["phone"]
+					)
+				}
+
+				ActionButton(
+					isLoading = state.isLoading,
+					text = "Actualizar",
+					onClick = onEvent::updateProfile,
+				)
       }
     }
 

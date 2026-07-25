@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
+import ucr.ac.cr.inii.geoterra.presentation.components.common.ActionButton
 import ucr.ac.cr.inii.geoterra.presentation.components.manifestation.ChemicalRow
 import ucr.ac.cr.inii.geoterra.presentation.components.manifestation.ManifestationReport
 
@@ -49,28 +50,11 @@ fun GeomanifestationDetailContent(
 
     Spacer(modifier = Modifier.height(12.dp))
 
-    Button(
-      onClick = { onDownload() },
-      modifier = Modifier
-        .fillMaxWidth()
-        .height(58.dp),
-      shape = RoundedCornerShape(16.dp),
-      colors = ButtonDefaults.buttonColors(
-        containerColor = MaterialTheme.colorScheme.primary,
-        contentColor = MaterialTheme.colorScheme.onPrimary
-      ),
-      elevation = ButtonDefaults.buttonElevation(
-        defaultElevation = 4.dp,
-        pressedElevation = 0.dp
-      ),
-      enabled = !state.isLoading
-    ) {
-      if (state.isLoading) {
-        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
-      } else {
-        Text("Descargar Reporte", fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
-      }
-    }
+		ActionButton(
+			isLoading = state.isLoading,
+			text = "Descargar Reporte",
+			onClick = onDownload,
+		)
 
     Spacer(modifier = Modifier.height(16.dp))
   }

@@ -98,19 +98,25 @@ fun SignInContent(
 					verticalArrangement = Arrangement.spacedBy(12.dp)
 				) {
 
-          Text(
-            text = "Bienvenido de nuevo",
-            style = MaterialTheme.typography.headlineSmall.copy(
-              fontWeight = FontWeight.ExtraBold
-						),
-            color = MaterialTheme.colorScheme.onSurface
-          )
+					Column(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalAlignment = Alignment.CenterHorizontally,
+						verticalArrangement = Arrangement.spacedBy(4.dp)
+					) {
+						Text(
+							text = "Bienvenido de nuevo",
+							style = MaterialTheme.typography.headlineSmall.copy(
+								fontWeight = FontWeight.ExtraBold
+							),
+							color = MaterialTheme.colorScheme.onSurface
+						)
 
-          Text(
-            text = "Ingresa tus credenciales para continuar",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface,
-          )
+						Text(
+							text = "Ingresa tus credenciales para continuar",
+							style = MaterialTheme.typography.bodySmall,
+							color = MaterialTheme.colorScheme.onSurface,
+						)
+					}
 
           FormSection {
             CustomTextField(
@@ -135,21 +141,27 @@ fun SignInContent(
             )
           }
 
-          ActionButton(
-            isLoading = state.isLoading,
-            text = "Ingresar",
-            onClick = onLoginClick,
-          )
+					Column(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalAlignment = Alignment.CenterHorizontally,
+						verticalArrangement = Arrangement.spacedBy(2.dp)
+					) {
+						ActionButton(
+							isLoading = state.isLoading,
+							text = "Ingresar",
+							onClick = onLoginClick,
+						)
 
-          TextButton(
-            onClick = { onRegisterClick() },
-          ) {
-            Text(
-              "¿No tienes cuenta? Regístrate aquí",
-              color = MaterialTheme.colorScheme.onSurface,
-              fontWeight = FontWeight.Bold
-            )
-          }
+						TextButton(
+							onClick = { onRegisterClick() },
+						) {
+							Text(
+								"¿No tienes cuenta? Regístrate aquí",
+								color = MaterialTheme.colorScheme.onSurface,
+								fontWeight = FontWeight.Bold
+							)
+						}
+					}
         }
       }
     }

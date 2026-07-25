@@ -9,10 +9,6 @@ import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
 
-/**
- * Updated ViewModel to handle real API authentication.
- * 
- */
 class SignInViewModel(
   private val authService: AuthService,
 ) : BaseScreenModel<SignInState>(SignInState()) {
@@ -36,14 +32,14 @@ class SignInViewModel(
     val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[a-z]+$".toRegex()
 
     if (s.email.isBlank()) {
-      errors["email"] = "Por favor, proporcione un correo electrónico."
+      errors["email"] = "Proporcione el correo electrónico."
     } else if (!s.email.matches(emailRegex)) {
       errors["email"] = "Invalid email format."
     }
 
-    if (s.password.length < 8) {
-      errors["password"] = "La contraseña debe tener al menos 8 carácteres."
-    }
+		if (s.password.isBlank()) {
+			errors["password"] = "Proporcione la contraseña."
+		}
 
     updateState { it.copy(fieldErrors = errors) }
     return errors.isEmpty()

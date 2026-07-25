@@ -29,6 +29,7 @@ import ucr.ac.cr.inii.geoterra.presentation.components.request.StatusBadge
 
 @Composable
 fun InvestigationRequestDetailsContent(
+	modifier: Modifier = Modifier,
 	request: InvestigationRequestResponse,
 	isForPdf: Boolean = false
 ) {
@@ -39,12 +40,12 @@ fun InvestigationRequestDetailsContent(
 	val titleSize = 22.sp
 
 	Column(
-		modifier = Modifier
+		modifier = modifier
 			.then(
-				if (isForPdf) Modifier.width(380.dp) else Modifier.fillMaxSize()
+				if (isForPdf) modifier.width(380.dp) else modifier.fillMaxSize()
 			)
 			.then(
-				if (scrollState != null) Modifier.verticalScroll(scrollState) else Modifier
+				if (scrollState != null) modifier.verticalScroll(scrollState) else modifier
 			),
 	) {
 

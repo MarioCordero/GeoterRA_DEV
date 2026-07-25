@@ -81,11 +81,11 @@ class SignUpViewModel(
     val errors = mutableMapOf<String, String>()
     val s = state.value
 
-    if (s.name.isBlank()) errors["name"] = "Por favor, proporcione un nombre."
-    if (s.lastname.isBlank()) errors["lastname"] = "Por favor, proporcione un apellido."
+    if (s.name.isBlank()) errors["name"] = "Proporcione su(s) nombre(s)."
+    if (s.lastname.isBlank()) errors["lastname"] = "Proporcione los apellidos."
 
     val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[a-z]+$".toRegex()
-    if (s.email.isBlank()) errors["email"] = "Por favor, proporcione un correo electrónico."
+    if (s.email.isBlank()) errors["email"] = "Proporcione un correo electrónico."
     else if (!s.email.matches(emailRegex)) errors["email"] = "El formato del correo electrónico no es válido."
 
     if (s.phoneNumber.isNotBlank()) {
@@ -94,7 +94,8 @@ class SignUpViewModel(
     }
 
     if (s.password.length < 8) {
-      errors["password"] = "La contraseña debe tener al menos 8 caracteres."
+      errors["password"] = "La contraseña debe tener al menos 8 caracteres, incluir al menos" +
+						" una letra mayúscula, una letra minúscula, un número y un carácter especial."
     } else if (s.password != s.confirmPassword) {
       errors["password"] = "Las contraseñas no coinciden."
     }

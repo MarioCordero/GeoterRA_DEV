@@ -65,11 +65,11 @@ class EditAccountViewModel(
 		val errors = mutableMapOf<String, String>()
 		val payload = state.value.payload
 
-		if (payload.first_name.isBlank()) errors["name"] = "Por favor, proporcione un nombre."
-		if (payload.last_name.isBlank()) errors["lastname"] = "Por favor, proporcione un apellido."
+		if (payload.first_name.isBlank()) errors["name"] = "Proporcione su(s) nombre(s)."
+		if (payload.last_name.isBlank()) errors["lastname"] = "Proporcione sus apellidos."
 
 		val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[a-z]+$".toRegex()
-		if (payload.email.isBlank()) errors["email"] = "Por favor, proporcione un correo electrónico."
+		if (payload.email.isBlank()) errors["email"] = "Proporcione un correo electrónico."
 		else if (!payload.email.matches(emailRegex)) errors["email"] =
 			"El formato del correo electrónico no es válido."
 

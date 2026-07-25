@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ucr.ac.cr.inii.geoterra.presentation.components.common.ActionButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomTextField
 import ucr.ac.cr.inii.geoterra.presentation.components.common.FormSection
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SearchableDropdown
@@ -263,28 +264,11 @@ fun InvestigationRequestFormContent(
 			}
 		}
 
-		Button(
+		ActionButton(
+			isLoading = state.isLoading,
+			text = "Enviar Solicitud",
 			onClick = { onEvent(AnalysisFormEvent.Submit) },
-			modifier = Modifier
-				.fillMaxWidth()
-				.height(58.dp),
-			shape = RoundedCornerShape(16.dp),
-			colors = ButtonDefaults.buttonColors(
-				containerColor = MaterialTheme.colorScheme.primary,
-				contentColor = MaterialTheme.colorScheme.onPrimary
-			),
-			elevation = ButtonDefaults.buttonElevation(
-				defaultElevation = 4.dp,
-				pressedElevation = 0.dp
-			),
-			enabled = !state.isLoading
-		) {
-			if (state.isLoading) {
-				CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
-			} else {
-				Text("Enviar Solicitud", fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
-			}
-		}
+		)
 
 		Spacer(Modifier.height(16.dp))
 	}

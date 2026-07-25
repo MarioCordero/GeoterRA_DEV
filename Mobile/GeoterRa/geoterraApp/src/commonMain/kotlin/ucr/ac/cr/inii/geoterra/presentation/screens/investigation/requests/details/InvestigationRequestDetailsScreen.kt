@@ -113,13 +113,13 @@ class InvestigationRequestDetailsScreen(
 				)
 			}
 		) { paddingValues ->
-			Box(
+			InvestigationRequestDetailsContent(
 				modifier = Modifier
 					.padding(top = paddingValues.calculateTopPadding())
-					.padding(horizontal = 20.dp)
-			) {
-				InvestigationRequestDetailsContent(request = request, isForPdf = false)
-			}
+					.padding(horizontal = 20.dp),
+				request = request,
+				isForPdf = false
+			)
 		}
 	}
 }
