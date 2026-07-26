@@ -1,20 +1,20 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.form
 
+import ucr.ac.cr.inii.geoterra.data.model.requests.InvestigationRequestRequest
 import ucr.ac.cr.inii.geoterra.data.model.responses.CantonResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.DistrictResponse
-import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestRequest
 import ucr.ac.cr.inii.geoterra.data.model.responses.ProvinceResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
 
 data class InvestigationRequestFormState(
-  val isLoading: Boolean = false,
-  val isSuccess: Boolean = false,
-  val availableProvinces: List<ProvinceResponse> = emptyList(),
-  val availableCantons: List<CantonResponse> = emptyList(),
-  val availableDistricts: List<DistrictResponse> = emptyList(),
-  val request: InvestigationRequestRequest = InvestigationRequestRequest(),
+	val isLoading: Boolean = false,
+	val isSuccess: Boolean = false,
+	val availableProvinces: List<ProvinceResponse> = emptyList(),
+	val availableCantons: List<CantonResponse> = emptyList(),
+	val availableDistricts: List<DistrictResponse> = emptyList(),
+	val request: InvestigationRequestRequest = InvestigationRequestRequest(),
 	val snackBarMessage: SnackbarMessage? = null,
-  val fieldErrors: Map<String, String> = emptyMap()
+	val fieldErrors: Map<String, String> = emptyMap()
 )
 
 sealed class AnalysisFormEvent {

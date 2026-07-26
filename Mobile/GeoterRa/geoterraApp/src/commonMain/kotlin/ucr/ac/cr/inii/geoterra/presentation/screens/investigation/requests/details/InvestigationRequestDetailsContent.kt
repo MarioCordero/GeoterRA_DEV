@@ -42,10 +42,10 @@ fun InvestigationRequestDetailsContent(
 	Column(
 		modifier = modifier
 			.then(
-				if (isForPdf) modifier.width(380.dp) else modifier.fillMaxSize()
+				if (isForPdf) Modifier.width(380.dp) else Modifier.fillMaxSize()
 			)
 			.then(
-				if (scrollState != null) modifier.verticalScroll(scrollState) else modifier
+				if (scrollState != null) Modifier.verticalScroll(scrollState) else Modifier
 			),
 	) {
 

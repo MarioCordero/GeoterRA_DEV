@@ -1,6 +1,6 @@
 package ucr.ac.cr.inii.geoterra.domain.repository
 
-import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestRequest
+import ucr.ac.cr.inii.geoterra.data.model.requests.InvestigationRequestRequest
 import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 
 interface InvestigationRequestsRepositoryInterface {

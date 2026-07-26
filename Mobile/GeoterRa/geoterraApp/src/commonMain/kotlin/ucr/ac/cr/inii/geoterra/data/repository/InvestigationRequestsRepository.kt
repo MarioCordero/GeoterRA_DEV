@@ -9,7 +9,7 @@ import ucr.ac.cr.inii.geoterra.core.network.ApiError
 import ucr.ac.cr.inii.geoterra.core.network.ApiException
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
-import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestRequest
+import ucr.ac.cr.inii.geoterra.data.model.requests.InvestigationRequestRequest
 import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 import ucr.ac.cr.inii.geoterra.domain.repository.InvestigationRequestsRepositoryInterface
 
