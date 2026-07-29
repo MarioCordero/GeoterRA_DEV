@@ -241,7 +241,7 @@ fun InvestigationRequestDetailsContent(
 		// --- PIE DE PÁGINA ---
 		Text(
 			text = "Solicitud creada el ${state.request.created_at}",
-			style = MaterialTheme.typography.labelSmall.copy(fontSize = if (isForPdf) 8.sp else 10.sp),
+			style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
 			color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
 			modifier = Modifier.align(Alignment.CenterHorizontally)
 		)
