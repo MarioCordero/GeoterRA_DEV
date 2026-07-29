@@ -1,6 +1,7 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.details
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BubbleChart
@@ -26,11 +27,12 @@ import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.common.InfoChip
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SectionHeader
 import ucr.ac.cr.inii.geoterra.presentation.components.request.StatusBadge
+import ucr.ac.cr.inii.geoterra.presentation.components.request.StatusHistoryChip
 
 @Composable
 fun InvestigationRequestDetailsContent(
 	modifier: Modifier = Modifier,
-	request: InvestigationRequestResponse,
+	state: InvestigationRequestDetailsState,
 	isForPdf: Boolean = false
 ) {
 	val scrollState = if (!isForPdf) rememberScrollState() else null
@@ -55,17 +57,16 @@ fun InvestigationRequestDetailsContent(
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Text(
-				text = request.request_name,
+				text = state.request.request_name,
 				style = MaterialTheme.typography.titleLarge.copy(
 					fontSize = titleSize,
 					fontWeight = FontWeight.ExtraBold,
 				),
 				color = MaterialTheme.colorScheme.onSurface,
 				modifier = Modifier.weight(1f, fill = false),
-				maxLines = 1,
+				maxLines = 2,
 				overflow = TextOverflow.Ellipsis
 			)
-			StatusBadge(request.current_state.value)
 		}
 
 		Spacer(modifier = Modifier.height(verticalSpacing))
@@ -74,7 +75,7 @@ fun InvestigationRequestDetailsContent(
 		InfoChip(
 			Icons.Default.LocationOn,
 			"Provincia, Cantón, Distrito",
-			"${request.location.province}, ${request.location.canton}, ${request.location.district}",
+			"${state.request.location.province}, ${state.request.location.canton}, ${state.request.location.district}",
 			Modifier.fillMaxWidth()
 		)
 
@@ -85,7 +86,7 @@ fun InvestigationRequestDetailsContent(
 		InfoChip(
 			Icons.Default.Home,
 			"Uso Actual",
-			request.current_usage,
+			state.request.current_usage,
 			Modifier.fillMaxWidth(),
 			MaterialTheme.colorScheme.secondary
 		)
@@ -97,7 +98,7 @@ fun InvestigationRequestDetailsContent(
 		InfoChip(
 			Icons.Default.Group,
 			"Tipo de Relación",
-			request.relation_with_owner,
+			state.request.relation_with_owner,
 			Modifier.fillMaxWidth(),
 			MaterialTheme.colorScheme.primary
 		)
@@ -109,7 +110,7 @@ fun InvestigationRequestDetailsContent(
 		InfoChip(
 			Icons.Default.Person,
 			"Nombre Completo",
-			request.owner_name ?: "No especificado",
+			state.request.owner_name ?: "No especificado",
 			Modifier.fillMaxWidth(),
 			MaterialTheme.colorScheme.primary
 		)
@@ -119,7 +120,7 @@ fun InvestigationRequestDetailsContent(
 		InfoChip(
 			Icons.Default.Phone,
 			"Teléfono",
-			request.owner_phone_number ?: "No especificado",
+			state.request.owner_phone_number ?: "No especificado",
 			Modifier.fillMaxWidth(),
 			MaterialTheme.colorScheme.secondary
 		)
@@ -129,7 +130,7 @@ fun InvestigationRequestDetailsContent(
 		InfoChip(
 			Icons.Default.Email,
 			"Correo Electrónico",
-			request.owner_email ?: "No especificado",
+			state.request.owner_email ?: "No especificado",
 			Modifier.fillMaxWidth(),
 			MaterialTheme.colorScheme.primary
 		)
@@ -146,7 +147,7 @@ fun InvestigationRequestDetailsContent(
 		) {
 			InfoChip(
 				Icons.Default.Thermostat, "Sensación Térmica",
-				request.temperature_sensation,
+				state.request.temperature_sensation,
 				Modifier
 					.weight(1f)
 					.fillMaxHeight(),
@@ -154,7 +155,7 @@ fun InvestigationRequestDetailsContent(
 			)
 			InfoChip(
 				Icons.Default.BubbleChart, "Burbujas",
-				if (request.bubbles) "Sí" else "No",
+				if (state.request.bubbles) "Sí" else "No",
 				Modifier
 					.weight(1f)
 					.fillMaxHeight(),
@@ -166,7 +167,7 @@ fun InvestigationRequestDetailsContent(
 
 		InfoChip(
 			Icons.Default.Description,
-			"Detalles Adicionales", request.details.ifBlank { "No especificado" },
+			"Detalles Adicionales", state.request.details.ifBlank { "No especificado" },
 			Modifier.fillMaxWidth(),
 			MaterialTheme.colorScheme.secondary
 		)
@@ -177,7 +178,7 @@ fun InvestigationRequestDetailsContent(
 		SectionHeader(title = "Ubicación Exacta")
 		InfoChip(
 			Icons.Default.Description,
-			"Dirección Exacta", request.exact_address.ifBlank { "No especificado" },
+			"Dirección Exacta", state.request.exact_address.ifBlank { "No especificado" },
 			Modifier.fillMaxWidth()
 		)
 
@@ -192,7 +193,7 @@ fun InvestigationRequestDetailsContent(
 			InfoChip(
 				Icons.Default.Explore,
 				"Latitud",
-				request.location.latitude.toString(),
+				state.request.location.latitude.toString(),
 				Modifier
 					.weight(1f)
 					.fillMaxHeight(),
@@ -201,7 +202,7 @@ fun InvestigationRequestDetailsContent(
 			InfoChip(
 				Icons.Default.Explore,
 				"Longitud",
-				request.location.longitude.toString(),
+				state.request.location.longitude.toString(),
 				Modifier
 					.weight(1f)
 					.fillMaxHeight(),
@@ -211,9 +212,35 @@ fun InvestigationRequestDetailsContent(
 
 		Spacer(modifier = Modifier.height(verticalSpacing))
 
+		SectionHeader(title = "Historial de Estados")
+
+		if (state.isLoading && state.statuses.isEmpty()) {
+			Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+				CircularProgressIndicator(modifier = Modifier.size(24.dp))
+			}
+		} else if (state.statuses.isEmpty()) {
+			Text(
+				text = "No hay historial disponible",
+				style = MaterialTheme.typography.bodyMedium,
+				modifier = Modifier.padding(vertical = 8.dp)
+			)
+		} else {
+			Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+				state.statuses.forEach { statusResponse ->
+					StatusHistoryChip(
+						statusValue = statusResponse.value,
+						createdAt = statusResponse.created_at,
+						description = statusResponse.description,
+					)
+				}
+			}
+		}
+
+		Spacer(modifier = Modifier.height(verticalSpacing))
+
 		// --- PIE DE PÁGINA ---
 		Text(
-			text = "Solicitud creada el ${request.created_at}",
+			text = "Solicitud creada el ${state.request.created_at}",
 			style = MaterialTheme.typography.labelSmall.copy(fontSize = if (isForPdf) 8.sp else 10.sp),
 			color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
 			modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -230,7 +257,7 @@ fun InvestigationRequestDetailsContent(
 		}
 
 		if (!isForPdf) {
-			Spacer(modifier = Modifier.height(verticalSpacing))
+			Spacer(modifier = Modifier.height(verticalSpacing * 7))
 		}
 	}
 }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Explore
@@ -30,7 +31,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
+import ucr.ac.cr.inii.geoterra.presentation.components.common.ActionButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.InfoChip
+import ucr.ac.cr.inii.geoterra.presentation.components.common.OutlinedActionButton
 
 @Composable
 fun RequestCardItem(
@@ -51,16 +54,16 @@ fun RequestCardItem(
 			Row(
 				modifier = Modifier.fillMaxWidth(),
 				horizontalArrangement = Arrangement.SpaceBetween,
-				verticalAlignment = Alignment.CenterVertically
+				verticalAlignment = Alignment.Top
 			) {
-				Column(modifier = Modifier.weight(1f)) {
+				Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
 					Text(
 						text = request.request_name,
 						style = MaterialTheme.typography.titleLarge.copy(
 							fontWeight = FontWeight.ExtraBold,
 						),
 						color = MaterialTheme.colorScheme.onSurface,
-						maxLines = 1,
+						maxLines = 2,
 						overflow = TextOverflow.Ellipsis
 					)
 					Text(
@@ -69,10 +72,14 @@ fun RequestCardItem(
 						color = MaterialTheme.colorScheme.onSurface
 					)
 				}
-				StatusBadge(request.current_state.value)
+				StatusBadge(
+					state = request.current_state.value,
+					modifier = Modifier.width(110.dp)
+				)
 			}
 
 			Spacer(modifier = Modifier.height(16.dp))
+
 			InfoChip(
 				icon = Icons.Default.LocationOn,
 				label = "Ubicación Geográfica",
@@ -118,49 +125,27 @@ fun RequestCardItem(
 				horizontalArrangement = Arrangement.spacedBy(10.dp),
 				verticalAlignment = Alignment.CenterVertically
 			) {
-				Button(
+
+				ActionButton(
+					text = "Detalles",
 					onClick = onView,
-					modifier = Modifier.weight(1f).height(44.dp),
-					shape = RoundedCornerShape(12.dp),
-					colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-					contentPadding = PaddingValues(horizontal = 4.dp)
-				) {
-					Text(
-						text = "Detalles",
-						maxLines = 1,
-						overflow = TextOverflow.Ellipsis
-					)
-				}
+					modifier = Modifier.weight(1f),
+					isCompact = true
+				)
 
-				OutlinedButton(
+				OutlinedActionButton(
+					text = "Editar",
 					onClick = onEdit,
-					modifier = Modifier.weight(1f).height(44.dp),
-					shape = RoundedCornerShape(12.dp),
-					border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-					contentPadding = PaddingValues(horizontal = 4.dp)
-				) {
-					Text(
-						text = "Editar",
-						color = MaterialTheme.colorScheme.onSurface,
-						maxLines = 1,
-						overflow = TextOverflow.Ellipsis
-					)
-				}
+					modifier = Modifier.weight(1f),
+					isCompact = true
+				)
 
-				OutlinedButton(
+				OutlinedActionButton(
+					text = "Eliminar",
 					onClick = onDelete,
-					modifier = Modifier.weight(1f).height(44.dp),
-					shape = RoundedCornerShape(12.dp),
-					border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-					contentPadding = PaddingValues(horizontal = 4.dp)
-				) {
-					Text(
-						text = "Eliminar",
-						color = MaterialTheme.colorScheme.onSurface,
-						maxLines = 1,
-						overflow = TextOverflow.Ellipsis
-					)
-				}
+					modifier = Modifier.weight(1f),
+					isCompact = true
+				)
 			}
 		}
 	}

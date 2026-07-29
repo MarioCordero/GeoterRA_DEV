@@ -44,7 +44,7 @@ fun InfoChip(
     Box(
       modifier = Modifier
         .size(36.dp)
-        .background(MaterialTheme.colorScheme.surface, CircleShape),
+        .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
       contentAlignment = Alignment.Center
     ) {
       Icon(

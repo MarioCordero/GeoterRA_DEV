@@ -55,13 +55,6 @@ class InvestigationRequestsScreen : Screen {
 			}
 		}
 
-		if (state.isPdfGenerating) {
-			LoadingDialog(
-				isVisible = state.isPdfGenerating,
-				message = "Renderizando documento, por favor espere..."
-			)
-		}
-
 		state.requestToDelete?.let { request ->
 			ConfirmDialog(
 				title = "Eliminar solicitud",
@@ -72,57 +65,6 @@ class InvestigationRequestsScreen : Screen {
 				isDanger = true
 			)
 		}
-
-		if (state.lastGeneratedPdfPath != null) {
-			SuccessActionDialog(
-				message = "El reporte PDF se ha generado correctamente.",
-				confirmText = "Abrir PDF",
-				dismissText = "Ahora no",
-				onConfirm = {
-					state.lastGeneratedPdfPath?.let { path ->
-						PDFUtil.openPdf(path, "ucr.ac.cr.inii.geoterra.provider")
-					}
-					viewModel.clearPdfStatus()
-				},
-				onDismiss = { viewModel.clearPdfStatus() }
-			)
-		}
-//
-//		selectedRequest?.let { request ->
-//			ModalBottomSheet(
-//				onDismissRequest = { selectedRequest = null },
-//				sheetState = sheetState,
-//				containerColor = MaterialTheme.colorScheme.background,
-//				shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-//			) {
-//				RequestBottomModalContent(
-//					request = request,
-//					onDownloadPdf = { req ->
-//						scope.launch {
-//							try {
-//								viewModel.setPdfGenerating(true)
-//								val fileName = "Reporte_Solicitud_${req.request_name}"
-//
-//								val resultPath = PDFUtil.generateRequestPdf(req, fileName)
-//
-//								if (resultPath != null) {
-//									viewModel.setGeneratedPdfPath(resultPath)
-//									selectedRequest = null
-//								}
-//							} catch (e: Exception) {
-//								viewModel.updateSnackBarMessage(
-//									"Ha ocurrido un error al generar el PDF, por favor intenta de nuevo.",
-//									SnackbarType.ERROR
-//								)
-//								e.printStackTrace()
-//							} finally {
-//								viewModel.setPdfGenerating(false)
-//							}
-//						}
-//					}
-//				)
-//			}
-//		}
 
 		Scaffold(
 			snackbarHost = { CustomSnackbarHost(snackbarHostState) },

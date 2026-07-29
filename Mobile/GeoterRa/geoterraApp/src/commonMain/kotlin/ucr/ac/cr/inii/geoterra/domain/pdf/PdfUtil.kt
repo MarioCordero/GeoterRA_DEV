@@ -8,6 +8,7 @@ import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.manifestation.ManifestationReport
 import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.details.InvestigationRequestDetailsContent
+import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.details.InvestigationRequestDetailsState
 
 object PDFUtil {
 
@@ -32,14 +33,14 @@ object PDFUtil {
   }
 
   suspend fun generateRequestPdf(
-    request: InvestigationRequestResponse,
+    state: InvestigationRequestDetailsState,
     fileName: String
   ) : String? {
     return generatePdf(
       fileName = fileName,
       content = {
 				InvestigationRequestDetailsContent(
-					request = request,
+					state = state,
 					isForPdf = true
 				)
       },

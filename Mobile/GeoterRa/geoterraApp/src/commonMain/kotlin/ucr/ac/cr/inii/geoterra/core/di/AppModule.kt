@@ -29,6 +29,7 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation.Geomani
 import ucr.ac.cr.inii.geoterra.presentation.screens.map.MapViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.sign.SignUpViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.InvestigationRequestsViewModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.details.InvestigationRequestDetailsViewModel
 
 val appModule = module {
   // Tabs ViewModels (ScreenModels)
@@ -61,6 +62,13 @@ val appModule = module {
       permissionManager = get()
     )
   }
+
+	factory { params ->
+		InvestigationRequestDetailsViewModel(
+			request = params.get<InvestigationRequestResponse>(),
+			repository = get()
+		)
+	}
   
   // Util modules
   single { Settings() }

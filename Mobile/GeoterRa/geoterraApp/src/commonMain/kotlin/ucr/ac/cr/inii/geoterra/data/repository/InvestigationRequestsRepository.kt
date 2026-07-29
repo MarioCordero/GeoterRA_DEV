@@ -45,14 +45,48 @@ class InvestigationRequestsRepository(
 		}
 	}
 
+	override suspend fun getRequestStatuses(id: String): Result<List<InvestigationRequestResponse.StateResponse>> {
+		return try {
+			val response = client.get("analysis-requests/$id/states")
+			if (response.status.isSuccess()) {
+				val envelope =
+					response.body<ApiResponseModel<List<InvestigationRequestResponse.StateResponse>>>()
+				if (envelope.errors.isNotEmpty()) {
+					return Result.failure(ApiException(envelope.errors.first()))
+				}
+				Result.success(envelope.data ?: emptyList())
+			} else {
+				handleErrorResponse(response)
+			}
+			} catch (e: Exception) {
+			Result.failure(
+				ApiException(
+					ApiError(
+						code = ApiError.INTERNAL_ERROR,
+						message = "Error de red: verifica tu conexión a internet."
+					)
+				)
+			)
+		}
+	}
+
 	override suspend fun createRequest(form: InvestigationRequestRequest): Result<Unit> {
 		return try {
 			val response = client.post("analysis-requests") {
 				contentType(ContentType.Application.Json)
 				setBody(form)
 			}
-			if (response.status.isSuccess()) Result.success(Unit)
-			else handleErrorResponse(response)
+			if (response.status.isSuccess()){
+				val envelope = response.body<ApiResponseModel<JsonElement>>()
+
+				if (envelope.errors.isNotEmpty()) {
+					return Result.failure(ApiException(envelope.errors.first()))
+				}
+
+				Result.success(Unit)
+			} else  {
+				handleErrorResponse(response)
+			}
 		} catch (e: Exception) {
 			Result.failure(
 				ApiException(

@@ -106,27 +106,27 @@ class InvestigationRequestsViewModel(
 				}
 		}
 	}
-
-	/**
-	 * Updates the state to reflect PDF generation progress.
-	 */
-	fun setPdfGenerating(isGenerating: Boolean) {
-		_state.update { it.copy(isPdfGenerating = isGenerating) }
-	}
-
-	/**
-	 * Stores the path of the generated PDF.
-	 */
-	fun setGeneratedPdfPath(path: String?) {
-		_state.update { it.copy(lastGeneratedPdfPath = path) }
-	}
-
-	/**
-	 * Resets PDF states after closing the success dialog.
-	 */
-	fun clearPdfStatus() {
-		_state.update { it.copy(lastGeneratedPdfPath = null, isPdfGenerating = false) }
-	}
+//
+//	/**
+//	 * Updates the state to reflect PDF generation progress.
+//	 */
+//	fun setPdfGenerating(isGenerating: Boolean) {
+//		_state.update { it.copy(isPdfGenerating = isGenerating) }
+//	}
+//
+//	/**
+//	 * Stores the path of the generated PDF.
+//	 */
+//	fun setGeneratedPdfPath(path: String?) {
+//		_state.update { it.copy(lastGeneratedPdfPath = path) }
+//	}
+//
+//	/**
+//	 * Resets PDF states after closing the success dialog.
+//	 */
+//	fun clearPdfStatus() {
+//		_state.update { it.copy(lastGeneratedPdfPath = null, isPdfGenerating = false) }
+//	}
 
 	fun updateSnackBarMessage(message: String?, type: SnackbarType = SnackbarType.INFO) {
 		_state.update {

@@ -1,7 +1,6 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.details
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,9 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
+import org.koin.core.parameter.parametersOf
 import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 import ucr.ac.cr.inii.geoterra.domain.pdf.PDFUtil
 import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
@@ -37,29 +38,45 @@ class InvestigationRequestDetailsScreen(
 		val navigator = LocalNavigator.currentOrThrow
 		val scope = rememberCoroutineScope()
 
-		var isPdfGenerating by remember { mutableStateOf(false) }
-		var lastGeneratedPdfPath by remember { mutableStateOf<String?>(null) }
+		val viewModel = getScreenModel<InvestigationRequestDetailsViewModel>(
+			parameters = { parametersOf(request) }
+		)
+		val state by viewModel.state.collectAsState()
 		val snackbarHostState = remember { TypedSnackbarHostState() }
 
-		if (isPdfGenerating) {
+		LaunchedEffect(state.request?.request_id) {
+			viewModel.fetchRequestStatuses(request.request_id)
+		}
+
+		LaunchedEffect(state.snackBarMessage) {
+			state.snackBarMessage?.let { snackbarMsg ->
+				snackbarHostState.showSnackbar(
+					message = snackbarMsg.text,
+					type = snackbarMsg.type
+				)
+				viewModel.clearSnackBarMessage()
+			}
+		}
+
+		if (state.isPdfGenerating) {
 			LoadingDialog(
-				isVisible = isPdfGenerating,
+				isVisible = state.isPdfGenerating,
 				message = "Renderizando documento, por favor espere..."
 			)
 		}
 
-		if (lastGeneratedPdfPath != null) {
+		if (state.lastGeneratedPdfPath != null) {
 			SuccessActionDialog(
 				message = "El reporte PDF se ha generado correctamente.",
 				confirmText = "Abrir PDF",
 				dismissText = "Ahora no",
 				onConfirm = {
-					lastGeneratedPdfPath?.let { path ->
+					state.lastGeneratedPdfPath?.let { path ->
 						PDFUtil.openPdf(path, "ucr.ac.cr.inii.geoterra.provider")
 					}
-					lastGeneratedPdfPath = null
+					viewModel.clearPdfStatus()
 				},
-				onDismiss = { lastGeneratedPdfPath = null }
+				onDismiss = { viewModel.clearPdfStatus() }
 			)
 		}
 
@@ -88,21 +105,21 @@ class InvestigationRequestDetailsScreen(
 					onClick = {
 						scope.launch {
 							try {
-								isPdfGenerating = true
+								viewModel.setPdfGenerating(true)
 								val fileName = "Reporte_Solicitud_${request.request_name}"
-								val resultPath = PDFUtil.generateRequestPdf(request, fileName)
+								val resultPath = PDFUtil.generateRequestPdf(state, fileName)
 
 								if (resultPath != null) {
-									lastGeneratedPdfPath = resultPath
+									viewModel.setGeneratedPdfPath(resultPath)
 								}
 							} catch (e: Exception) {
-								snackbarHostState.showSnackbar(
+								viewModel.updateSnackBarMessage(
 									message = "Ha ocurrido un error al generar el PDF, por favor intenta de nuevo.",
 									type = SnackbarType.ERROR
 								)
 								e.printStackTrace()
 							} finally {
-								isPdfGenerating = false
+								viewModel.setPdfGenerating(false)
 							}
 						}
 					},
@@ -117,7 +134,7 @@ class InvestigationRequestDetailsScreen(
 				modifier = Modifier
 					.padding(top = paddingValues.calculateTopPadding())
 					.padding(horizontal = 20.dp),
-				request = request,
+				state = state,
 				isForPdf = false
 			)
 		}
