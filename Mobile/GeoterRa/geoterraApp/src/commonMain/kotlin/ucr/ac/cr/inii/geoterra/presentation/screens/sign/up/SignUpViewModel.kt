@@ -19,10 +19,8 @@ class SignUpViewModel(
   fun onPasswordChanged(v: String) = updateState { it.copy(password = v, fieldErrors = it.fieldErrors - "password") }
   fun onConfirmPasswordChanged(v: String) = updateState { it.copy(confirmPassword = v) }
   fun togglePasswordVisibility() = updateState { it.copy(isPasswordVisible = !it.isPasswordVisible) }
-  fun onSnackbarDismissed() = updateState { it.copy(snackBarMessage = null) }
-
-  fun clearStatus() = updateState { it.copy(isSuccess = false) }
-
+  fun onSnackbarDismissed() = updateState { it.copy(snackBarMessage = null, isSuccess = false) }
+	
   fun register() {
     updateState {
       it.copy(
@@ -44,13 +42,12 @@ class SignUpViewModel(
     screenModelScope.launch {
       val s = state.value
       val request = RegisterRequest(
-        name = s.name,
-        lastname = s.lastname,
+        first_name = s.name,
+        last_name = s.lastname,
         email = s.email,
         phone_number = s.phoneNumber.ifBlank { null },
         password = s.password
       )
-
 
       authService.register(request)
         .onSuccess {

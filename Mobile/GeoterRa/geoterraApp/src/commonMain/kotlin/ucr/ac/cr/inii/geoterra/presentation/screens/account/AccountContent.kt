@@ -22,6 +22,8 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -38,12 +40,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ucr.ac.cr.inii.geoterra.presentation.components.common.ActionMenuItem
 import ucr.ac.cr.inii.geoterra.presentation.components.common.DangerActionItem
 import ucr.ac.cr.inii.geoterra.presentation.components.account.InfoTile
 import ucr.ac.cr.inii.geoterra.presentation.components.account.ProfileHeaderCard
 import ucr.ac.cr.inii.geoterra.presentation.components.common.ConfirmDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SectionHeader
 import ucr.ac.cr.inii.geoterra.presentation.components.common.ThemeToggle
 
 @Composable
@@ -72,15 +76,60 @@ fun AccountContent(
 			) {
 				ProfileHeaderCard(state.user)
 
-				Column {
-					InfoTile(Icons.Default.Email, "Correo electrónico", state.user.email)
-					InfoTile(Icons.Default.Phone, "Teléfono", state.user.phone_number ?: "No especificado")
-					InfoTile(Icons.Default.Badge, "Rol de usuario", state.user.role)
+				if (state.user.role != "user") {
+					Card(
+						modifier = Modifier.fillMaxWidth(),
+						colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+						shape = RoundedCornerShape(24.dp)
+					) {
+						Row(
+							modifier = Modifier.padding(20.dp),
+							verticalAlignment = Alignment.CenterVertically
+						) {
+							Icon(
+								Icons.Default.Badge,
+								contentDescription = null,
+								tint = MaterialTheme.colorScheme.primary,
+								modifier = Modifier.size(24.dp)
+							)
+							Spacer(Modifier.width(16.dp))
+
+							val userRole = when (state.user.role) {
+								"admin" -> "Administrador"
+								"field_investigator" -> "Investigador de Campo"
+								"investigator" -> "Investigador"
+								"manteinance" -> "Mantenimiento"
+								else -> null
+							}
+
+							Text(
+								userRole ?: state.user.role,
+								style = MaterialTheme.typography.titleLarge,
+								fontWeight = FontWeight.Bold,
+								color = MaterialTheme.colorScheme.primary
+							)
+						}
+					}
 				}
 
-				Text("Configuración", style = MaterialTheme.typography.labelLarge, color = Color.Gray)
+				HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outline)
 
-				Column {
+				Column(
+					modifier = Modifier.fillMaxWidth(),
+					verticalArrangement = Arrangement.spacedBy(4.dp)
+				) {
+					SectionHeader(title = "Información de Contacto")
+
+					InfoTile(Icons.Default.Email, "Correo electrónico", state.user.email)
+					InfoTile(Icons.Default.Phone, "Teléfono", state.user.phone_number ?: "No especificado")
+				}
+
+				Column(
+					modifier = Modifier.fillMaxWidth(),
+					verticalArrangement = Arrangement.spacedBy(4.dp)
+				) {
+					SectionHeader(title = "Configuración")
+
 					ThemeToggle(
 						isDark = state.isDarkMode,
 						onToggle = { isDark ->
@@ -132,7 +181,7 @@ fun AccountContent(
 				confirmText = "Eliminar",
 				isDanger = true,
 				onConfirm = {
-        onDeleteAccountClick()
+					onDeleteAccountClick()
 					showDeleteDialog = false
 				},
 				onDismiss = { showDeleteDialog = false }
