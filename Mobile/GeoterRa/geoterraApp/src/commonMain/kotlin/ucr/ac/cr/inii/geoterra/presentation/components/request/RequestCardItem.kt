@@ -133,19 +133,21 @@ fun RequestCardItem(
 					isCompact = true
 				)
 
-				OutlinedActionButton(
-					text = "Editar",
-					onClick = onEdit,
-					modifier = Modifier.weight(1f),
-					isCompact = true
-				)
+				if (request.current_state.value == "Pendiente") {
+					OutlinedActionButton(
+						text = "Editar",
+						onClick = onEdit,
+						modifier = Modifier.weight(1f),
+						isCompact = true
+					)
 
-				OutlinedActionButton(
-					text = "Eliminar",
-					onClick = onDelete,
-					modifier = Modifier.weight(1f),
-					isCompact = true
-				)
+					OutlinedActionButton(
+						text = "Eliminar",
+						onClick = onDelete,
+						modifier = Modifier.weight(1f),
+						isCompact = true
+					)
+				}
 			}
 		}
 	}
