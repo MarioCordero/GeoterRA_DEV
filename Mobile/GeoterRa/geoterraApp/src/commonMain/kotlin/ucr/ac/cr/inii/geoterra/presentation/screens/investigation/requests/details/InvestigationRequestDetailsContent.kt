@@ -35,8 +35,7 @@ import ucr.ac.cr.inii.geoterra.presentation.components.request.StatusHistoryChip
 fun InvestigationRequestDetailsContent(
 	modifier: Modifier = Modifier,
 	state: InvestigationRequestDetailsState,
-	isForPdf: Boolean = false,
-	onSizeMeasured: ((IntSize) -> Unit)? = null
+	isForPdf: Boolean = false
 ) {
 	val scrollState = if (!isForPdf) rememberScrollState() else null
 
@@ -51,9 +50,6 @@ fun InvestigationRequestDetailsContent(
 			.then(
 				if (scrollState != null) Modifier.verticalScroll(scrollState) else Modifier
 			)
-			.onGloballyPositioned { coordinates ->
-				onSizeMeasured?.invoke(coordinates.size)
-			},
 	) {
 
 		Row(

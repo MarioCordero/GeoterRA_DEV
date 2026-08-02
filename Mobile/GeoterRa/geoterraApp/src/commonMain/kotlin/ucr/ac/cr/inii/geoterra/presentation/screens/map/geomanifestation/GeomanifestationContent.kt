@@ -31,7 +31,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.common.DataBox
@@ -42,8 +41,7 @@ import ucr.ac.cr.inii.geoterra.presentation.components.manifestation.ChemicalGro
 fun GeomanifestationContent(
 	modifier: Modifier = Modifier,
 	manifestation: GeomanifestationResponse,
-	isForPdf: Boolean = false,
-	onSizeMeasured: ((IntSize) -> Unit)? = null
+	isForPdf: Boolean = false
 ) {
 	val scrollState = if (!isForPdf) rememberScrollState() else null
 
@@ -55,12 +53,8 @@ fun GeomanifestationContent(
 			)
 			.then(
 				if (scrollState != null) Modifier.verticalScroll(scrollState) else Modifier
-			)
-			.onGloballyPositioned { coordinates ->
-				onSizeMeasured?.invoke(coordinates.size)
-			},
+			),
 		verticalArrangement = Arrangement.spacedBy(16.dp),
-
 		) {
 		Row(
 			modifier = Modifier.fillMaxWidth(),
@@ -295,21 +289,8 @@ fun GeomanifestationContent(
 			)
 		}
 
-		Spacer(modifier = Modifier.height(32.dp))
+		if (!isForPdf) {
+			Spacer(modifier = Modifier.height(112.dp))
+		}
 	}
-//
-//	// Othewr
-//	Column(
-//		modifier = modifier
-//			.fillMaxSize()
-//			.verticalScroll(rememberScrollState())
-//	) {
-//
-//		ManifestationReport(
-//			manifestation = manifestation,
-//			isForPdf = false
-//		)
-//
-//		Spacer(modifier = Modifier.height(32.dp))
-//	}
 }

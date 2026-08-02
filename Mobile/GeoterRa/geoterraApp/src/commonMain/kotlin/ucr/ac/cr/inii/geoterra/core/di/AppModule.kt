@@ -32,63 +32,62 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.Inves
 import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.details.InvestigationRequestDetailsViewModel
 
 val appModule = module {
-  // Tabs ViewModels (ScreenModels)
-  single { AuthService(get(), get()) }
-  single { HomeViewModel() }
-  single { MapViewModel(get(), get(), get(), get(), get(), get()) }
-  single { AccountViewModel(get(), get(), get()) }
-  single { InvestigationRequestsViewModel(get(), get()) }
+	// Tabs ViewModels (ScreenModels)
+	single { AuthService(get(), get()) }
+	single { HomeViewModel() }
+	single { MapViewModel(get(), get(), get(), get(), get(), get()) }
+	single { AccountViewModel(get(), get(), get()) }
+	single { InvestigationRequestsViewModel(get(), get()) }
 
-  // Inner ViewModels
-  factory { GeomanifestationViewModel(get()) }
-  factory { SignInViewModel(get()) }
-  factory { SignUpViewModel(get()) }
+	// Inner ViewModels
+	factory { GeomanifestationViewModel(get()) }
+	factory { SignInViewModel(get()) }
+	factory { SignUpViewModel(get()) }
 
-  factory { params ->
-    EditAccountViewModel(
-      userProfile = params.get<UserResponse>(),
-      get(),
-    )
-  }
+	factory { params ->
+		EditAccountViewModel(
+			userProfile = params.get<UserResponse>(),
+			get(),
+		)
+	}
 
-  factory { params ->
-    InvestigationRequestFormViewModel(
-      analysisRequestRepository = get(),
-      provincesRepository = get(),
-      cantonsRepository = get(),
-      districtsRepository = get(),
-      requestToEdit = params.getOrNull<InvestigationRequestResponse>(),
-      locationProvider = get(),
-      permissionManager = get()
-    )
-  }
+	factory { params ->
+		InvestigationRequestFormViewModel(
+			analysisRequestRepository = get(),
+			provincesRepository = get(),
+			cantonsRepository = get(),
+			districtsRepository = get(),
+			requestToEdit = params.getOrNull<InvestigationRequestResponse>(),
+			locationProvider = get(),
+			permissionManager = get()
+		)
+	}
 
 	factory { params ->
 		InvestigationRequestDetailsViewModel(
-			request = params.get<InvestigationRequestResponse>(),
-			repository = get()
+			request = params.get<InvestigationRequestResponse>(), repository = get()
 		)
 	}
-  
-  // Util modules
-  single { Settings() }
-  single { PDFManager() }
-  
-  // Repository implementation
-  single<AuthRepositoryInterface> { AuthRepository(get(), get()) }
-  single<UserRepositoryInterface> { UserRepository(get()) }
-  single<ProvinceRepositoryInterface> { ProvinceRepository(get()) }
-  single<CantonRepositoryInterface> { CantonRepository(get()) }
-  single<DistrictRepositoryInterface> { DistrictRepository(get()) }
-  single<InvestigationRequestsRepositoryInterface> { InvestigationRequestsRepository(get()) }
-  single<GeomanifestationsRepositoryInterface> { GeomanifestationsRepository(get()) }
 
-  // Provide concrete implementations if needed by other components directly
-  single { AuthRepository(get(), get()) }
-  single { GeomanifestationsRepository(get()) }
-  single { UserRepository(get()) }
-  single { ProvinceRepository(get()) }
-  single { CantonRepository(get()) }
-  single { DistrictRepository(get()) }
-  single { InvestigationRequestsRepository(get()) }
+	// Util modules
+	single { Settings() }
+	single { PDFManager() }
+
+	// Repository implementation
+	single<AuthRepositoryInterface> { AuthRepository(get(), get()) }
+	single<UserRepositoryInterface> { UserRepository(get()) }
+	single<ProvinceRepositoryInterface> { ProvinceRepository(get()) }
+	single<CantonRepositoryInterface> { CantonRepository(get()) }
+	single<DistrictRepositoryInterface> { DistrictRepository(get()) }
+	single<InvestigationRequestsRepositoryInterface> { InvestigationRequestsRepository(get()) }
+	single<GeomanifestationsRepositoryInterface> { GeomanifestationsRepository(get()) }
+
+	// Provide concrete implementations if needed by other components directly
+	single { AuthRepository(get(), get()) }
+	single { GeomanifestationsRepository(get()) }
+	single { UserRepository(get()) }
+	single { ProvinceRepository(get()) }
+	single { CantonRepository(get()) }
+	single { DistrictRepository(get()) }
+	single { InvestigationRequestsRepository(get()) }
 }
