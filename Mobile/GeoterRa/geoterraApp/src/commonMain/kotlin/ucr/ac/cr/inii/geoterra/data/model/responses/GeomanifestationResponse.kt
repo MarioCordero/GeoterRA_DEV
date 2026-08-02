@@ -1,5 +1,6 @@
 package ucr.ac.cr.inii.geoterra.data.model.responses
 
+import cafe.adriel.voyager.core.lifecycle.JavaSerializable
 import kotlinx.serialization.Serializable
 
 /**
@@ -34,7 +35,7 @@ data class GeomanifestationResponse(
 	val current_georeport: GeoreportResponse? = null,
 	val insitu_test: InsituTestResponse? = null,
 	val inlab_test: InlabTestResponse? = null
-) {
+) : JavaSerializable {
 
 }
 
