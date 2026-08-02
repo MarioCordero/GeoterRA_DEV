@@ -62,6 +62,14 @@ final class ErrorType implements JsonSerializable
 		return new self("MISSING_FIELD", "El campo obligatorio '{$field}' no se encuentra en la solicitud");
 	}
 
+  /**
+   * Error for missing required query parameters.
+   */
+  public static function missingQueryParameter(string $param): self
+  {
+    return new self("MISSING_QUERY_PARAM", "El parámetro '{$param}' no se encuentra en la url de la solicitud");
+  }
+
 	/**
 	 * Error for invalid email format.
 	 */
