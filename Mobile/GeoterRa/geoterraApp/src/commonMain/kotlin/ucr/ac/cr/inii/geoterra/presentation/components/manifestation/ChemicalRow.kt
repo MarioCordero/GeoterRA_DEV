@@ -31,7 +31,7 @@ fun ChemicalRow(label: String, value: Double?) {
     Text(
       text = if (value != null) "$value mg/L" else " --- mg/L",
       style = MaterialTheme.typography.bodyLarge.copy(
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = FontWeight.Bold,
         fontFeatureSettings = "tnum"
       ),
       color = if (value != null) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline

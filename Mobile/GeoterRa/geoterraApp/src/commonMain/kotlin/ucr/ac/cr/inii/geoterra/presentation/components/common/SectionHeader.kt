@@ -17,20 +17,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun SectionHeader(title: String, icon: ImageVector? = null) {
-  Row(
-    verticalAlignment = Alignment.CenterVertically,
-    modifier = Modifier.padding(bottom = 12.dp)
-  ) {
-    if (icon != null) {
-      Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
-      Spacer(Modifier.width(8.dp))
-    }
-    Text(
-      text = title,
-      fontWeight = FontWeight.Bold,
-      color = MaterialTheme.colorScheme.onSurface,
-      fontSize = 16.sp
-    )
-  }
+fun SectionHeader(
+	title: String,
+	icon: ImageVector? = null,
+	modifier: Modifier = Modifier.padding(bottom = 12.dp)
+) {
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+		modifier = modifier
+	) {
+		if (icon != null) {
+			Icon(
+				icon,
+				contentDescription = null,
+				modifier = Modifier.size(18.dp),
+				tint = MaterialTheme.colorScheme.primary
+			)
+			Spacer(Modifier.width(8.dp))
+		}
+		Text(
+			text = title,
+			style = MaterialTheme.typography.titleMedium.copy(
+				fontWeight = FontWeight.Bold,
+				fontSize = 18.sp
+			),
+			color = MaterialTheme.colorScheme.onSurface
+		)
+	}
 }

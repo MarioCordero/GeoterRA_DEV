@@ -24,47 +24,29 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun FormSection(
-  title: String? = null,
-  icon: ImageVector? = null,
-  content: @Composable ColumnScope.() -> Unit
+	title: String? = null,
+	icon: ImageVector? = null,
+	content: @Composable ColumnScope.() -> Unit
 ) {
-  Column(
-    modifier = Modifier
-      .wrapContentHeight()
-      .fillMaxWidth(),
-  ) {
-    if (title != null || icon != null) {
-      Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(bottom = 4.dp),
-      ) {
-        if (icon != null) {
-          Icon(
-            icon,
-            contentDescription = null,
-            tint = Color(0xFFF57C00),
-            modifier = Modifier.size(20.dp)
-          )
-        }
-        if (title != null) {
-          if (icon != null) Spacer(Modifier.width(8.dp))
-          Text(
-            text = title,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface,
-            fontSize = 16.sp
-          )
-        }
-      }
-    }
-
-    Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(if (title == null && icon == null) 0.dp else 8.dp),
-      verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-      content()
-    }
-  }
+	Column(
+		modifier = Modifier
+			.wrapContentHeight()
+			.fillMaxWidth(),
+	) {
+		if (title != null || icon != null) {
+			SectionHeader(
+				title = title ?: "",
+				icon = icon,
+				modifier = Modifier.padding(bottom = 4.dp)
+			)
+		}
+		Column(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(if (title == null && icon == null) 0.dp else 8.dp),
+			verticalArrangement = Arrangement.spacedBy(8.dp)
+		) {
+			content()
+		}
+	}
 }

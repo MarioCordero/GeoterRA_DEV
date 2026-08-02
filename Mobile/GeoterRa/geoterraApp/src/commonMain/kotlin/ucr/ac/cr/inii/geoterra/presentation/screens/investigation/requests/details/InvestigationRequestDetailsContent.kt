@@ -19,8 +19,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
@@ -33,22 +35,25 @@ import ucr.ac.cr.inii.geoterra.presentation.components.request.StatusHistoryChip
 fun InvestigationRequestDetailsContent(
 	modifier: Modifier = Modifier,
 	state: InvestigationRequestDetailsState,
-	isForPdf: Boolean = false
+	isForPdf: Boolean = false,
+	onSizeMeasured: ((IntSize) -> Unit)? = null
 ) {
 	val scrollState = if (!isForPdf) rememberScrollState() else null
 
 	val verticalSpacing = 16.dp
 	val chipSpacing = 8.dp
-	val titleSize = 22.sp
 
 	Column(
 		modifier = modifier
 			.then(
-				if (isForPdf) Modifier.width(380.dp) else Modifier.fillMaxSize()
+				if (isForPdf) Modifier.width(540.dp).padding(vertical = 32.dp, horizontal = 32.dp) else Modifier.fillMaxSize()
 			)
 			.then(
 				if (scrollState != null) Modifier.verticalScroll(scrollState) else Modifier
-			),
+			)
+			.onGloballyPositioned { coordinates ->
+				onSizeMeasured?.invoke(coordinates.size)
+			},
 	) {
 
 		Row(
@@ -58,9 +63,8 @@ fun InvestigationRequestDetailsContent(
 		) {
 			Text(
 				text = state.request.request_name,
-				style = MaterialTheme.typography.titleLarge.copy(
-					fontSize = titleSize,
-					fontWeight = FontWeight.ExtraBold,
+				style = MaterialTheme.typography.headlineLarge.copy(
+					fontWeight = FontWeight.Bold,
 				),
 				color = MaterialTheme.colorScheme.onSurface,
 				modifier = Modifier.weight(1f, fill = false),

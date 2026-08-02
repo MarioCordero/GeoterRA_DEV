@@ -3,11 +3,13 @@ package ucr.ac.cr.inii.geoterra.domain.pdf
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ComposeUIViewController
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
@@ -38,11 +40,10 @@ actual class PDFManager actual constructor() {
 
   // A4 page dimensions in points (72 points per inch)
   private var PAGE_WIDTH = 595.0
-  private var PAGE_HEIGHT = 1500.0  // Adjusted to A4 size dynamically
+  private var PAGE_HEIGHT = 1500.0
 
   suspend fun createComposeViewController(content: @Composable () -> Unit): UIViewController {
     return withContext(Dispatchers.Main) {
-      println("⚠️ Initializing ComposeUIViewController...")
 
       val controller = ComposeUIViewController {
         LaunchedEffect(Unit) {
@@ -50,16 +51,14 @@ actual class PDFManager actual constructor() {
         }
         Box(
           modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White),
-          contentAlignment = Alignment.Center
+            .background(Color.White)
+						.padding(32.dp),
+          contentAlignment = Alignment.TopCenter
         ) {
           content()
         }
       }
-      // ADDED FIX: Set the user interface style to light
       controller.overrideUserInterfaceStyle = UIUserInterfaceStyle.UIUserInterfaceStyleLight
-      println("✅ ComposeUIViewController initialized successfully!")
       controller
     }
   }
@@ -70,21 +69,18 @@ actual class PDFManager actual constructor() {
     content: @Composable () -> Unit
   ): String? {
     return withContext(Dispatchers.Main) {
-      println("⚠️ Content is being called...")
 
-      val uiViewController = createComposeViewController(content) ?: return@withContext null
-
-      println("🎉 UIViewController successfully created!")
+      val uiViewController = createComposeViewController(content)
 
       val window = UIWindow(CGRectMake(0.0, 0.0, PAGE_WIDTH, PAGE_HEIGHT))
       window.rootViewController = uiViewController
       window.overrideUserInterfaceStyle = UIUserInterfaceStyle.UIUserInterfaceStyleLight
       window.makeKeyAndVisible()
 
-      val uiView = uiViewController.view ?: return@withContext null
+      val uiView = uiViewController.view
 
       // Ensure UIKit has time to process layout updates
-      repeat(5) { attempt ->
+      repeat(5) { _ ->
         delay(300)
         uiView.setNeedsLayout()
         uiView.layoutIfNeeded()
@@ -92,10 +88,7 @@ actual class PDFManager actual constructor() {
         val width = uiView.frame.useContents { size.width }
         val height = uiView.frame.useContents { size.height }
 
-        println("📏 Attempt #$attempt: width=$width, height=$height")
-
         if (width > 0 && height > 0) {
-          println("✅ View fully rendered after $attempt attempts!")
           return@repeat
         }
       }
@@ -106,9 +99,8 @@ actual class PDFManager actual constructor() {
       uiView.layoutIfNeeded()
 
       // Get final height of the rendered view
-      val fittingSize = uiView.sizeThatFits(CGSizeMake(PAGE_WIDTH, PAGE_HEIGHT))
+      val fittingSize = uiView.sizeThatFits(CGSizeMake(PAGE_WIDTH, 15000.0))
       val fullHeight = fittingSize.useContents { height }
-      println("📏 Final Rendered Height: $fullHeight")
 
       // Dynamically adjust PAGE_HEIGHT if needed
 //      if (fullHeight > PAGE_HEIGHT) PAGE_HEIGHT = fullHeight
@@ -122,9 +114,8 @@ actual class PDFManager actual constructor() {
 
       // Generate the PDF
       val pdfFilePath = createMultiPagePdf(images, fileName)
-      println("📄 PDF Generated at: $pdfFilePath")
 
-      pdfFilePath
+			return@withContext pdfFilePath
     }
   }
 
@@ -140,8 +131,6 @@ actual class PDFManager actual constructor() {
 
   @OptIn(ExperimentalForeignApi::class)
   private fun createMultiPagePdf(images: List<UIImage>, fileName: String): String? {
-    println("📄 Creating PDF with ${images.size} pages.")
-
     // Create PDF context
     val pdfRenderer = UIGraphicsPDFRenderer(bounds = CGRectMake(0.0, 0.0, PAGE_WIDTH, PAGE_HEIGHT))
 
@@ -177,9 +166,7 @@ actual class PDFManager actual constructor() {
     while (offsetY < fullHeight) {
       val captureHeight = min(PAGE_HEIGHT, fullHeight - offsetY)
       val snapshot = captureUIViewSectionAsImage(view, offsetY, captureHeight)
-      if (snapshot != null) {
-        images.add(snapshot)
-      }
+			images.add(snapshot)
       offsetY += PAGE_HEIGHT
     }
 

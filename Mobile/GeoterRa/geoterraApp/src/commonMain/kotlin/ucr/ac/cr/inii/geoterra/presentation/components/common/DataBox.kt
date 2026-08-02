@@ -21,22 +21,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun DataBox(modifier: Modifier, label: String, value: String, icon: ImageVector? = null, color: Color) {
-  Surface(
-    modifier = modifier,
-    shape = RoundedCornerShape(16.dp),
-    color = MaterialTheme.colorScheme.surface,
-    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-  ) {
-    Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-      if (icon != null) {
-        Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(24.dp))
-        Spacer(modifier = Modifier.width(12.dp))
-      }
-      Column {
-        Text(label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-        Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black)
-      }
-    }
-  }
+fun DataBox(
+	modifier: Modifier,
+	label: String,
+	value: String,
+	icon: ImageVector? = null,
+	color: Color
+) {
+	Surface(
+		modifier = modifier,
+		shape = RoundedCornerShape(16.dp),
+		color = MaterialTheme.colorScheme.surface,
+		border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+	) {
+		Row(
+			modifier = Modifier.padding(16.dp),
+			verticalAlignment = Alignment.CenterVertically
+		) {
+			if (icon != null) {
+				Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(24.dp))
+				Spacer(modifier = Modifier.width(12.dp))
+			}
+			Column {
+				Text(label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+				Text(value, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.ExtraBold)
+			}
+		}
+	}
 }

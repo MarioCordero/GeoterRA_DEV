@@ -1,5 +1,6 @@
 package ucr.ac.cr.inii.geoterra.data.model.responses
 
+import cafe.adriel.voyager.core.lifecycle.JavaSerializable
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -18,12 +19,12 @@ data class InvestigationRequestResponse(
   val created_at: String,
   val location: LocationResponse,
   val current_state: StateResponse
-) {
+) : JavaSerializable {
 	companion object
 	@Serializable
 	data class StateResponse(
 		val value: String,
 		val description: String,
 		val created_at: String
-	)
+	) : JavaSerializable
 }

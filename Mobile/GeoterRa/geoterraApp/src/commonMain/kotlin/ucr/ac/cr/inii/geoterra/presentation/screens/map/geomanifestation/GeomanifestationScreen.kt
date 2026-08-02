@@ -1,6 +1,8 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,6 +33,7 @@ class GeomanifestationScreen(val manifestation: GeomanifestationResponse) : Scre
 		val viewModel = getScreenModel<GeomanifestationViewModel>(
 			parameters = { parametersOf(manifestation) }
 		)
+
 		val state by viewModel.state.collectAsState()
 		val navigator = LocalNavigator.currentOrThrow
 		val snackbarHostState = remember { TypedSnackbarHostState() }
@@ -71,28 +74,42 @@ class GeomanifestationScreen(val manifestation: GeomanifestationResponse) : Scre
 
 		Scaffold(
 			snackbarHost = { CustomSnackbarHost(snackbarHostState) },
+			floatingActionButton = {
+				ExtendedFloatingActionButton(
+					onClick = {
+						viewModel.downloadReport()
+					},
+					icon = { Icon(Icons.Default.Download, contentDescription = "Descargar PDF") },
+					text = { Text("Descargar PDF") },
+					containerColor = MaterialTheme.colorScheme.primary,
+					contentColor = MaterialTheme.colorScheme.onPrimary
+				)
+			},
 			topBar = {
 				Row(
 					modifier = Modifier
 						.fillMaxWidth()
 						.padding(horizontal = 20.dp, vertical = 10.dp),
 					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = Arrangement.End
+					horizontalArrangement = Arrangement.Start
 				) {
+					Text(
+						text = "Geomanifestación",
+						style = MaterialTheme.typography.headlineMedium,
+						fontWeight = FontWeight.Bold,
+						color = MaterialTheme.colorScheme.secondary,
+						modifier = Modifier.weight(1f)
+					)
 					AdaptiveBackButton(onBack = { navigator.pop() })
 				}
 			}
 		) { paddingValues ->
-			GeomanifestationDetailContent(
+			GeomanifestationContent(
 				modifier = Modifier
 					.padding(top = paddingValues.calculateTopPadding())
 					.padding(horizontal = 20.dp),
-				state = state,
 				manifestation = state.manifestation,
-				onDownload = {
-					viewModel.downloadReport()
-				},
-				onBack = navigator::pop
+				isForPdf = false
 			)
 		}
 	}

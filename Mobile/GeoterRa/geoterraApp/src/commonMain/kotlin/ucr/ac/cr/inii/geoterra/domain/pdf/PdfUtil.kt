@@ -1,14 +1,21 @@
 package ucr.ac.cr.inii.geoterra.domain.pdf
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.mp.KoinPlatform.getKoin
-import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
-import ucr.ac.cr.inii.geoterra.presentation.components.manifestation.ManifestationReport
 import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.details.InvestigationRequestDetailsContent
 import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.details.InvestigationRequestDetailsState
+import ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation.GeomanifestationContent
+import ucr.ac.cr.inii.geoterra.themes.GeoterraTheme
 
 object PDFUtil {
 
@@ -22,8 +29,20 @@ object PDFUtil {
     shareAfterCreation: Boolean = false,
     authority:String=""
   ): String? = withContext(Dispatchers.Default) {
-    // ADDED FIX: Retrieve the instance from Koin instead of manual instantiation
-    val pdfPath = pdfManager.createPdfFromComposable(fileName, content)
+    val pdfPath = pdfManager.createPdfFromComposable(
+			fileName,
+			{
+				GeoterraTheme(useDarkTheme = false) {
+					Box(
+						modifier = Modifier
+							.padding(32.dp)
+							.background(MaterialTheme.colorScheme.background)
+					) {
+						content()
+					}
+				}
+			}
+		)
 
     if (shareAfterCreation && pdfPath != null) {
       pdfManager.openPdf(pdfPath,authority)
@@ -56,10 +75,10 @@ object PDFUtil {
     return generatePdf(
       fileName = fileName,
       content = {
-        ManifestationReport(
-          manifestation = manifestation,
-          isForPdf = true,
-        )
+				GeomanifestationContent(
+					manifestation = manifestation,
+					isForPdf = true,
+				)
       },
       shareAfterCreation = false,
       authority = AUTHORITY
