@@ -1,6 +1,7 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.account
 
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.core.network.ApiException
@@ -14,8 +15,11 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
 
 class AccountViewModel(
 	private val userRepository: UserRepositoryInterface,
-	private val authService: AuthService
-) : BaseScreenModel<AccountState>(AccountState()) {
+	private val authService: AuthService,
+	private val settings: Settings
+) : BaseScreenModel<AccountState>(AccountState(
+	isDarkMode = settings.getBoolean("is_dark_mode", false)
+)) {
 
 	init {
 		screenModelScope.launch {
@@ -90,8 +94,8 @@ class AccountViewModel(
 	}
 
 	fun toggleTheme(isDark: Boolean) {
+		settings.putBoolean("is_dark_mode", isDark)
 		_state.update { it.copy(isDarkMode = isDark) }
-
 	}
 
 	fun logout() {

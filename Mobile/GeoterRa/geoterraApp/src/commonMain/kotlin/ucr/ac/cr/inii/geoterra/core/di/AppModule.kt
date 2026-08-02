@@ -36,7 +36,7 @@ val appModule = module {
   single { AuthService(get(), get()) }
   single { HomeViewModel() }
   single { MapViewModel(get(), get(), get(), get(), get(), get()) }
-  single { AccountViewModel(get(), get()) }
+  single { AccountViewModel(get(), get(), get()) }
   single { InvestigationRequestsViewModel(get(), get()) }
 
   // Inner ViewModels
