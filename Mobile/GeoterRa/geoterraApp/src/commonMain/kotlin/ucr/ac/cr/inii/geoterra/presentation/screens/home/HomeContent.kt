@@ -167,7 +167,7 @@ fun HomeContent(
         Spacer(modifier = Modifier.height(16.dp))
         Text(
           text = "© 2021 Instituto de Investigaciones en Ingeniería - UCR",
-          color = Color.DarkGray,
+          color = Color.Gray,
           fontSize = 12.sp
         )
       }
