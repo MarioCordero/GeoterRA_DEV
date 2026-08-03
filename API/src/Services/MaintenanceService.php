@@ -159,56 +159,12 @@ final class MaintenanceService
     }
   }
 
-  /**
-   * Updates a user's role.
-   * Only users with Admin and Manteinance Roles can perform this action.
-   *
-   * @param UpdateUserRoleDTO $dto Validated role update data
-   *
-   * @throws ApiException If user not found, validation fails, or permission denied
-   *
-   * @return array Updated user data
-   */
-  public function updateUserRole(UpdateUserRoleDTO $dto, string $userId): array
-  {
-
-    Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::MAINTENANCE
-    ]);
-    
-    $dto->validate();
-
-    if ($dto->role === AllowedUserRoles::ADMIN) {
-      Request::requireRole([AllowedUserRoles::ADMIN]);
-    }
-
-    // Check if target user exists
-    $targetUser = $this->userRepository->findById($userId);
-    if (!$targetUser) {
-      throw new ApiException(ErrorType::notFound('User'), 404);
-    }
-
-    // Update the role
-    $updated = $this->userRepository->updateRole($userId, $dto->role);
-    if (!$updated) {
-      throw new ApiException(ErrorType::userUpdateFailed(), 500);
-    }
-
-    // Return updated user data
-    $updatedUser = $this->userRepository->findById($userId);
-    return [
-      'data' => $updatedUser,
-      'meta' => null
-    ];
-  }
-
   // --------------------------------------------------------------------------- //
   // --------------------------------- HELPERS --------------------------------- //
   // --------------------------------------------------------------------------- //
 
   /**
-   * Convert table name to human readable format
+   * Convert table name to human-readable format
    * e.g., users -> Usuarios, analysis_requests -> Solicitudes de Análisis
    */
   private function humanizeTableName(string $tableName): string

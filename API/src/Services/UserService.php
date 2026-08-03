@@ -3,7 +3,10 @@ declare(strict_types=1);
 
 namespace Services;
 
+use DTO\AllowedUserRoles;
+use DTO\UpdatePasswordDTO;
 use DTO\UpdateUserRoleDTO;
+use Http\Request;
 use PDO;
 use Http\ErrorType;
 use DTO\UpdateUserDTO;
@@ -93,7 +96,6 @@ final class UserService
       );
     }
   }
-
   /**
    * Updates the authenticated user's profile.
    *
@@ -102,31 +104,50 @@ final class UserService
    */
   public function updateUser(UpdateUserDTO $dto): void
   {
-    $auth = $this->authService->requireAuth();
+    $auth = Request::getUser();
+
     $userId = $auth['user_id'];
-    $dto->setUserId($userId);
     $dto->validate();
 
-    if ($dto->password) {
-      $currentUser = $this->repository->findById($userId);
-      if (!$currentUser) {
-        throw new ApiException(ErrorType::notFound('User'), 404);
-      }
-      if (
-        !PasswordService::verify(
-          $dto->currentPassword,
-          $currentUser['password_hash']
-        )
-      ) {
-        throw new ApiException(
-          ErrorType::validationError('Current password is incorrect'),
-          400
-        );
-      }
-      $dto->password = PasswordService::hash($dto->password);
+    $updated = $this->repository->update($userId, $dto);
+    if (!$updated) {
+      throw new ApiException(ErrorType::userUpdateFailed(), 500);
+    }
+  }
+
+  /**
+   * Updates the authenticated user's password.
+   *
+   * @param UpdatePasswordDTO $dto The data transfer object containing the password update request
+   * @throws ApiException
+   * @return void
+   */
+  public function updatePassword(UpdatePasswordDTO $dto): void
+  {
+    $auth = Request::getUser();
+    $userId = $auth['user_id'];
+    $dto->validate();
+
+    $currentUser = $this->repository->findById($userId);
+    if (!$currentUser) {
+      throw new ApiException(ErrorType::notFound('User'), 404);
     }
 
-    $updated = $this->repository->update($dto);
+    if (
+      !PasswordService::verify(
+        $dto->currentPassword,
+        $currentUser['password_hash']
+      )
+    ) {
+      throw new ApiException(
+        ErrorType::validationError('Current password is incorrect'),
+        400
+      );
+    }
+
+    $newPasswordHash = PasswordService::hash($dto->newPassword);
+
+    $updated = $this->repository->updatePassword($userId, $newPasswordHash);
     if (!$updated) {
       throw new ApiException(ErrorType::userUpdateFailed(), 500);
     }
@@ -139,7 +160,7 @@ final class UserService
    */
   public function deleteCurrentUser(): void
   {
-    $auth = $this->authService->requireAuth();
+    $auth = Request::getUser();
     $userId = $auth['user_id'];
     $deleted = $this->repository->deleteUser($userId);
     if (!$deleted) {
@@ -157,7 +178,7 @@ final class UserService
    */
   public function getCurrentUser(): array
   {
-    $auth = $this->authService->requireAuth();
+    $auth = Request::getUser();
     $userId = (string) $auth['user_id'];
     $user = $this->repository->findActiveUserById($userId);
     if (!$user) {
@@ -167,26 +188,46 @@ final class UserService
   }
 
   /**
-   * Updates a user's role (admin only).
+   * Updates a user's role.
+   * Only users with Admin and Manteinance Roles can perform this action.
    *
-   * @param UpdateUserRoleDTO $dto
-   * @throws ApiException
+   * @param UpdateUserRoleDTO $dto Validated role update data
+   *
+   * @throws ApiException If user not found, validation fails, or permission denied
+   *
+   * @return array|null Updated user data
    */
-  public function updateUserRole(UpdateUserRoleDTO $dto): void
+  public function updateUserRole(string $userId, UpdateUserRoleDTO $dto): ?array
   {
-    // Admin authorization is checked in the controller via permission system
+    Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::MAINTENANCE
+    ]);
+
     $dto->validate();
-    $user = $this->repository->findById($dto->userId);
-    if (!$user) {
+
+    if ($dto->role === AllowedUserRoles::ADMIN) {
+      Request::requireRole([AllowedUserRoles::ADMIN]);
+    }
+
+    // Check if target user exists
+    $targetUser = $this->repository->findById($userId);
+    if (!$targetUser) {
       throw new ApiException(ErrorType::notFound('User'), 404);
     }
-    $updated = $this->repository->updateRole($dto->userId, $dto->role);
+
+    // Update the role
+    $updated = $this->repository->updateRole($userId, $dto->role);
     if (!$updated) {
-      throw new ApiException(
-        ErrorType::internal('Failed to update user role'),
-        500
-      );
+      throw new ApiException(ErrorType::userUpdateFailed(), 500);
     }
+
+    // Return updated user data
+    $updatedUser = $this->repository->findById($userId);
+    return [
+      'data' => $updatedUser,
+      'meta' => null
+    ];
   }
 
   /**
