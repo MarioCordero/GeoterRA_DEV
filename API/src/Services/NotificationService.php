@@ -140,7 +140,7 @@ final class NotificationService
     string $requestName,
     string $time
   ): void {
-    $subject = "Confirmación: Nueva Solicitud Creada";
+    $subject = "Confirmación: Nueva Solicitud de Investigación Creada";
     $antiClip = $this->getAntiClippingToken();
 
     $body = "
@@ -153,7 +153,7 @@ final class NotificationService
           <h2 style='font-size: 18px; font-weight: bold; margin-top: 0;'>Hola {$firstName},</h2>
           
           <p style='line-height: 1.5;'>
-            Le confirmamos que su solicitud ha sido creada exitosamente en nuestro sistema.
+            Le confirmamos que su solicitud de investigación ha sido creada exitosamente en nuestro sistema.
           </p>
 
           <div style='margin: 30px 0; padding: 20px; background-color: #f4f4f4; border-radius: 8px;'>
@@ -194,7 +194,7 @@ final class NotificationService
           <h2 style='font-size: 18px; font-weight: bold; margin-top: 0;'>Hola {$firstName},</h2>
           
           <p style='line-height: 1.5;'>
-            Le informamos que la información de su solicitud de inesvtigación ha sido actualizada correctamente.
+            Le informamos que la información de su solicitud de investigación ha sido actualizada correctamente.
           </p>
 
           <div style='margin: 30px 0; padding: 20px; background-color: #f4f4f4; border-radius: 8px;'>
@@ -241,7 +241,7 @@ final class NotificationService
           <h2 style='font-size: 18px; font-weight: bold; margin-top: 0;'>Hola {$firstName},</h2>
           
           <p style='line-height: 1.5;'>
-            Le notificamos que el equipo técnico ha registrado un cambio en el proceso de su solicitud <strong>{$requestName}</strong>.
+            Le notificamos que el equipo técnico ha registrado un cambio en el proceso de su solicitud de investigación: <strong>{$requestName}</strong>.
           </p>
 
           <div style='margin: 30px 0; padding: 20px; background-color: #f4f4f4; border-radius: 8px;'>

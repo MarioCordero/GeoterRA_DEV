@@ -115,7 +115,7 @@ final class InvestigationRequestService
 
     $activeUser = $this->userRepository->findActiveUserById($user['user_id']);
     if ($activeUser) {
-      $this->notificationService->notifyRequestCreated(
+      $this->notificationService->notifyRequestUpdated(
         $activeUser['email'],
         $activeUser['first_name'],
         $result['request_name'],
