@@ -4,25 +4,55 @@ declare(strict_types=1);
 namespace Controllers;
 
 use DTO\LoginUserDTO;
+use DTO\ResetPasswordDTO;
 use Http\ApiException;
 use Http\ErrorType;
 use Http\Request;
 use Http\Response;
 use PDO;
 use Services\AuthService;
+use Services\SmtpEmailService;
+use Services\NotificationService;
 use Throwable;
+use OpenApi\Annotations as OA;
 
+/**
+ * Controller handling authentication endpoints.
+ */
 final class AuthController
 {
   private AuthService $authService;
 
-  public function __construct(private PDO $pdo)
+  /**
+   * Constructs the AuthController and wires necessary dependencies.
+   *
+   * @param PDO $pdo The active database connection.
+   */
+  public function __construct(private readonly PDO $pdo)
   {
-    $this->authService = new AuthService($this->pdo);
+    $emailSender = new SmtpEmailService();
+    $notificationService = new NotificationService($emailSender);
+    $this->authService = new AuthService($this->pdo, $notificationService);
   }
 
   /**
-   * POST /auth/login
+   * @OA\Post(
+   *     path="/auth/login",
+   *     summary="Authenticate user and return tokens",
+   *     tags={"Authentication"},
+   *     @OA\RequestBody(
+   *         required=true,
+   *         @OA\JsonContent(ref="#/components/schemas/LoginUserDTO")
+   *     ),
+   *     @OA\Response(
+   *         response=200,
+   *         description="Successful authentication"
+   *     ),
+   *     @OA\Response(
+   *         response=401,
+   *         description="Invalid credentials or account deleted"
+   *     )
+   * )
    */
   public function login(): void
   {
@@ -56,19 +86,33 @@ final class AuthController
   }
 
   /**
-   * POST /auth/refresh
+   * @OA\Post(
+   *     path="/auth/refresh",
+   *     summary="Refresh access tokens",
+   *     tags={"Authentication"},
+   *     @OA\Response(
+   *         response=200,
+   *         description="Tokens refreshed successfully"
+   *     ),
+   *     @OA\Response(
+   *         response=401,
+   *         description="Invalid or expired refresh token"
+   *     )
+   * )
    */
   public function refresh(): void
   {
     try {
       $body = Request::parseJsonRequest();
       if (empty($body['refresh_token'])) {
-        throw new ApiException(ErrorType::missingField('refresh_token'), 400);
+        throw new ApiException(
+          ErrorType::missingField('refresh_token'),
+          400
+        );
       }
 
       $result = $this->authService->refreshTokens($body['refresh_token']);
       if (Request::isWeb()) {
-        // Update cookie with new access token
         $accessToken = $result['data']['access_token'];
         $expiresIn = $result['meta']['expires_in'] ?? 60 * 5;
         setcookie(
@@ -78,13 +122,12 @@ final class AuthController
             'expires' => time() + $expiresIn,
             'path' => '/',
             'domain' => '',
-            'secure' => false, // configurable via EnvironmentDetector
+            'secure' => false,
             'httponly' => true,
             'samesite' => 'Lax',
           ]
         );
 
-        // Return only user data (tokens are in cookie)
         $responseData = [
           'user_id' => $result['data']['user_id'],
           'message' => 'Session renewed',
@@ -94,7 +137,6 @@ final class AuthController
           'expires_in' => $expiresIn,
         ];
       } else {
-        // Mobile: return tokens in body
         $responseData = [
           'access_token' => $result['data']['access_token'],
           'refresh_token' => $result['data']['refresh_token'],
@@ -116,24 +158,104 @@ final class AuthController
   }
 
   /**
-   * POST /auth/logout
+   * @OA\Post(
+   *     path="/auth/password-reset/request",
+   *     summary="Request a password reset OTP",
+   *     tags={"Authentication"},
+   *     @OA\RequestBody(
+   *         required=true,
+   *         @OA\JsonContent(
+   *             required={"email"},
+   *             @OA\Property(property="email", type="string", format="email")
+   *         )
+   *     ),
+   *     @OA\Response(response=200, description="OTP requested successfully")
+   * )
+   */
+  public function requestPasswordReset(): void
+  {
+    try {
+      $data = Request::parseJsonRequest();
+
+      if (empty($data['email'])) {
+        throw new ApiException(
+          ErrorType::missingField('email'),
+          400
+        );
+      }
+
+      $this->authService->requestPasswordReset($data['email']);
+
+      Response::success(
+        ['message' => 'El código de recuperación ha sido enviado a su correo electrónico.']
+      );
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getCode());
+    } catch (Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
+
+  /**
+   * @OA\Post(
+   *     path="/auth/password-reset/reset",
+   *     summary="Reset the password using the OTP",
+   *     tags={"Authentication"},
+   *     @OA\RequestBody(
+   *         required=true,
+   *         @OA\JsonContent(
+   *             required={"token", "new_password"},
+   *             @OA\Property(property="token", type="string"),
+   *             @OA\Property(property="new_password", type="string")
+   *         )
+   *     ),
+   *     @OA\Response(response=200, description="Password updated successfully")
+   * )
+   */
+  public function resetPassword(): void
+  {
+    try {
+      $data = Request::parseJsonRequest();
+      $dto = ResetPasswordDTO::fromArray($data);
+
+      $this->authService->resetPassword($dto);
+
+      Response::success(
+        ['message' => 'La contraseña se ha actualizado correctamente.']
+      );
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getCode());
+    } catch (Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
+
+  /**
+   * @OA\Post(
+   *     path="/auth/logout",
+   *     summary="Invalidate user session",
+   *     tags={"Authentication"},
+   *     @OA\Response(
+   *         response=200,
+   *         description="User logged out successfully"
+   *     )
+   * )
    */
   public function logout(): void
   {
     try {
       $this->authService->logout();
 
-      // Clear cookie for web clients
       if (Request::isWeb()) {
         setcookie(
           'geoterra_session_token', '', [
-          'expires' => time() - 60 * 5,
-          'path' => '/',
-          'domain' => '',
-          'secure' => false,
-          'httponly' => true,
-          'samesite' => 'Lax',
-        ]
+            'expires' => time() - 60 * 5,
+            'path' => '/',
+            'domain' => '',
+            'secure' => false,
+            'httponly' => true,
+            'samesite' => 'Lax',
+          ]
         );
       }
 

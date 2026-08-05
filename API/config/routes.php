@@ -4,6 +4,8 @@ return [
   ['method' => 'POST', 'path' => '/auth/refresh', 'controller' => 'AuthController', 'action' => 'refresh'],
   ['method' => 'POST', 'path' => '/auth/login', 'controller' => 'AuthController', 'action' => 'login'],
   ['method' => 'POST', 'path' => '/auth/logout', 'controller' => 'AuthController', 'action' => 'logout'],
+  ['method' => 'POST', 'path' => '/auth/password-reset/request', 'controller' => 'AuthController', 'action' => 'requestPasswordReset'],
+  ['method' => 'POST', 'path' => '/auth/password-reset/reset', 'controller' => 'AuthController', 'action' => 'resetPassword'],
 
   // User routes
   ['method' => 'GET', 'path' => '/users/me', 'controller' => 'UserController', 'action' => 'show'],
