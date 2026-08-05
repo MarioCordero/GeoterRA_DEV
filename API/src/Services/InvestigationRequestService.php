@@ -18,11 +18,13 @@ final class InvestigationRequestService
 {
   private InvestigationRequestRepository $repository;
   private UserRepository $userRepository;
+  private NotificationService $notificationService;
 
   public function __construct(private PDO $pdo)
   {
     $this->userRepository = new UserRepository($pdo);
     $this->repository = new InvestigationRequestRepository($pdo);
+    $this->notificationService = new NotificationService(new SmtpEmailService());
   }
 
   public function getAllByUser(): array
@@ -60,6 +62,17 @@ final class InvestigationRequestService
       $this->pdo->beginTransaction();
       $result = $this->repository->create($dto, $user['user_id']);
       $this->pdo->commit();
+
+      $activeUser = $this->userRepository->findActiveUserById($user['user_id']);
+      if ($activeUser) {
+        $this->notificationService->notifyRequestCreated(
+          $activeUser['email'],
+          $activeUser['first_name'],
+          $result['request_name'],
+          date('Y-m-d H:i:s')
+        );
+      }
+
       return $this->formatRequest($result);
     } catch (Throwable $e) {
       $this->pdo->rollBack();
@@ -89,7 +102,6 @@ final class InvestigationRequestService
       );
     }
 
-
     if ($dto->relationWithOwner === 'Titular') {
       $user = $this->userRepository->findActiveUserById($user['user_id']);
       if ($user) {
@@ -100,9 +112,19 @@ final class InvestigationRequestService
     }
 
     $result = $this->repository->update($id, $user['user_id'], $dto);
+
+    $activeUser = $this->userRepository->findActiveUserById($user['user_id']);
+    if ($activeUser) {
+      $this->notificationService->notifyRequestCreated(
+        $activeUser['email'],
+        $activeUser['first_name'],
+        $result['request_name'],
+        date('Y-m-d H:i:s')
+      );
+    }
+
     return $this->formatRequest($result);
   }
-
 
   public function delete(string $id): void
   {
@@ -144,6 +166,18 @@ final class InvestigationRequestService
     $this->repository->addState(
       $id, $stateValue, $description, $user['user_id']
     );
+
+    $owner = $this->userRepository->findById($request['user_id']);
+    if ($owner) {
+      $this->notificationService->notifyRequestStateChanged(
+        $owner['email'],
+        $owner['first_name'],
+        $request['request_name'],
+        $stateValue,
+        $description,
+        date('Y-m-d H:i:s')
+      );
+    }
   }
 
   public function adminGetStates(string $id): array

@@ -128,4 +128,144 @@ final class NotificationService
 
     $this->emailSender->send($email, $subject, $body);
   }
+
+  /**
+   * Sends an email notification when a new investigation request is successfully created.
+   *
+   * @param string $email The owner's email address.
+   * @param string $firstName The owner's first name.
+   * @param string $requestName The generated name or ID of the request.
+   * @param string $time The timestamp of the creation event.
+   * @return void
+   */
+  public function notifyRequestCreated(
+    string $email,
+    string $firstName,
+    string $requestName,
+    string $time
+  ): void {
+    $subject = "Confirmación: Nueva Solicitud de Investigación Creada";
+
+    $body = "
+      <div style='max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333333;'>
+        <div style='background-color: #F19B29; padding: 20px; color: white;'>
+          <h1 style='margin: 0; font-size: 24px; font-weight: bold;'>GeoterRA</h1>
+        </div>
+        
+        <div style='padding: 30px 20px;'>
+          <h2 style='font-size: 18px; font-weight: bold; margin-top: 0;'>Hola {$firstName},</h2>
+          
+          <p style='line-height: 1.5;'>
+            Le confirmamos que su solicitud de investigación <strong>{$requestName}</strong> ha sido creada exitosamente en el sistema.
+          </p>
+          
+          <p style='line-height: 1.5;'>
+            <strong>Fecha de registro:</strong> {$time}
+          </p>
+
+          <p style='line-height: 1.5; color: #666666;'>
+            Nuestro equipo de investigadores revisará la información y le notificaremos cuando haya una actualización en el estado de su solicitud.
+          </p>
+        </div>
+      </div>
+    ";
+
+    $this->emailSender->send($email, $subject, $body);
+  }
+
+  /**
+   * Sends an email notification when an investigation request is updated by the owner.
+   *
+   * @param string $email The owner's email address.
+   * @param string $firstName The owner's first name.
+   * @param string $requestName The generated name or ID of the request.
+   * @param string $time The timestamp of the update event.
+   * @return void
+   */
+  public function notifyRequestUpdated(
+    string $email,
+    string $firstName,
+    string $requestName,
+    string $time
+  ): void {
+    $subject = "Actualización de Solicitud de Investigación Exitosa";
+
+    $body = "
+      <div style='max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333333;'>
+        <div style='background-color: #F19B29; padding: 20px; color: white;'>
+          <h1 style='margin: 0; font-size: 24px; font-weight: bold;'>GeoterRA</h1>
+        </div>
+        
+        <div style='padding: 30px 20px;'>
+          <h2 style='font-size: 18px; font-weight: bold; margin-top: 0;'>Hola {$firstName},</h2>
+          
+          <p style='line-height: 1.5;'>
+            Le informamos que la información de su solicitud de investigación <strong>{$requestName}</strong> ha sido actualizada correctamente.
+          </p>
+          
+          <p style='line-height: 1.5;'>
+            <strong>Fecha de modificación:</strong> {$time}
+          </p>
+
+          <p style='line-height: 1.5; color: #666666;'>
+            Puede revisar los detalles de su solicitud ingresando a su cuenta desde la página web o la aplicación móvil.
+          </p>
+        </div>
+      </div>
+    ";
+
+    $this->emailSender->send($email, $subject, $body);
+  }
+
+  /**
+   * Sends an email notification when an administrator assigns a new state to a request.
+   *
+   * @param string $email The owner's email address.
+   * @param string $firstName The owner's first name.
+   * @param string $requestName The generated name or ID of the request.
+   * @param string $newState The newly assigned state value.
+   * @param string $description The optional description/comments provided by the admin.
+   * @param string $time The timestamp of the state change.
+   * @return void
+   */
+  public function notifyRequestStateChanged(
+    string $email,
+    string $firstName,
+    string $requestName,
+    string $newState,
+    string $description,
+    string $time
+  ): void {
+    $subject = "Cambio de Estado en Solicitud";
+    $descHtml = !empty($description) ? "<p style='line-height: 1.5;'><strong>Comentarios del administrador:</strong> {$description}</p>" : "";
+
+    $body = "
+      <div style='max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333333;'>
+        <div style='background-color: #F19B29; padding: 20px; color: white;'>
+          <h1 style='margin: 0; font-size: 24px; font-weight: bold;'>GeoterRA</h1>
+        </div>
+        
+        <div style='padding: 30px 20px;'>
+          <h2 style='font-size: 18px; font-weight: bold; margin-top: 0;'>Hola {$firstName},</h2>
+          
+          <p style='line-height: 1.5;'>
+            Le notificamos que un administrador ha registrado un cambio en el proceso de su solicitud de investigación <strong>{$requestName}</strong>.
+          </p>
+
+          <div style='margin: 30px 0; padding: 20px; background-color: #f4f4f4; border-radius: 8px;'>
+            <p style='margin: 0 0 10px 0; font-size: 16px;'><strong>Nuevo Estado:</strong> <span style='color: #F19B29; font-weight: bold;'>{$newState}</span></p>
+            <p style='margin: 0; font-size: 14px; color: #555555;'><strong>Fecha:</strong> {$time}</p>
+          </div>
+          
+          {$descHtml}
+
+          <p style='line-height: 1.5; color: #666666;'>
+            Para más información, por favor acceda a su cuenta para visualizar los detalles del avance en su solicitud de investigación.
+          </p>
+        </div>
+      </div>
+    ";
+
+    $this->emailSender->send($email, $subject, $body);
+  }
 }
