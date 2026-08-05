@@ -36,19 +36,22 @@ final class Request
     }
 
     $headers = self::getHeaders();
-    self::$apiKey = $headers['-x-api-key'] ?? $_SERVER['HTTP_X_API_KEY'] ?? null;
+    self::$apiKey = $headers['-x-api-key']
+      ?? $_SERVER['HTTP_X_API_KEY'] ?? null;
 
     // Searchs for api-keys.php in the following paths:
     $productionKeysPath = dirname(__DIR__, 4) . '/api-keys.php';
     $localKeysPath = dirname(__DIR__, 2) . '/config/api-keys.php';
 
     // If the file exists in the production directory, use it. Otherwise, use the local one.
-    $apiKeysPath = (EnvironmentDetector::isProduction() && file_exists($productionKeysPath))
-      ? $productionKeysPath
-      : $localKeysPath;
+    $apiKeysPath = (
+      EnvironmentDetector::isProduction() && file_exists($productionKeysPath)
+    ) ? $productionKeysPath : $localKeysPath;
 
     if (!file_exists($apiKeysPath)) {
-      throw new RuntimeException('API keys configuration file not found at: ' . $apiKeysPath);
+      throw new RuntimeException(
+        'API keys configuration file not found at: ' . $apiKeysPath
+      );
     }
 
     $apiKeys = require $apiKeysPath;
@@ -69,7 +72,7 @@ final class Request
   public static function getBody(): ?string
   {
     if (self::$rawBody === null) {
-      $raw = fopen('php://input', 'r');
+      $raw = fopen('php://input', 'rb');
       if ($raw === false) {
         self::$rawBody = null;
       } else {
@@ -183,7 +186,7 @@ final class Request
   }
 
   /**
-   * Extract Bearer token from Authorization header.
+   * Extract Bearer token from the Authorization header.
    * Format: "Bearer <token>"
    *
    * @return string|null The token if present, null otherwise
