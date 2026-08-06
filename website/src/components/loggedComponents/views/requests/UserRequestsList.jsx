@@ -1,6 +1,4 @@
-import React from 'react';
 import UserRequests from '../../../common/UserRequests';
-import { usePermissions } from '../../../../hooks/usePermissions';
 
 /**
  * UserRequestsList View

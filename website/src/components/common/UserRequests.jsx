@@ -5,18 +5,17 @@ import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { Table, Button, Modal, Tag, message, Empty, Drawer, Divider, Collapse } from 'antd';
 import { analysisRequestIndex, analysisRequestDelete } from '../../config/apiConf';
 
-
 /**
- * MyRequests Component
+ * UserRequests Component
  * 
  * Displays list of user's submitted analysis requests.
  * Features: view details, delete request, responsive table/card layout for mobile.
  * 
  * @component
  * @example
- * <MyRequests />
+ * <UserRequests />
  */
-const MyRequests = () => {
+const UserRequests = () => {
   // ─── View state ───
   const [isMobile, setIsMobile] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -459,4 +458,4 @@ const MyRequests = () => {
   );
 };
 
-export default MyRequests;
+export default UserRequests;

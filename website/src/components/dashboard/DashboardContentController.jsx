@@ -1,5 +1,5 @@
 import React from 'react';
-import MyRequests from '../common/MyRequests';
+import UserRequests from '../common/UserRequests';
 import { useSession } from '../../hooks/useSession';
 import { usePermissions } from '../../hooks/usePermissions';
 import SystemLogs from '../loggedComponents/views/logs/SystemLogs';
@@ -29,7 +29,7 @@ const DashboardContentController = ({ selectedKey }) => {
 
     case '2':
       // My Requests - show list + add button
-      return <MyRequests />;
+      return <UserRequests />;
 
     case '3':
       // Manage Requests - admin/maintenance only
