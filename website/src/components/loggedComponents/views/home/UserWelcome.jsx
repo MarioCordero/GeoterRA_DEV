@@ -2,6 +2,7 @@ import { Card, Row, Col, Tag } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { useSession } from '../../../../hooks/useSession';
+import UserInfo from './userInfo';
 
 /**
  * UserWelcome Component
@@ -53,31 +54,14 @@ const UserWelcome = () => {
         <h1 className="text-4xl font-bold mb-2">
           ¡Bienvenido, {user?.name || 'Usuario'}!
         </h1>
-        <p className="text-amber-100">Portal de Investigador de Campo - GeoterRA</p>
+        <p className="text-amber-100">Portal de App - GeoterRA</p>
       </div>
 
       {/* User Info Cards */}
+      <UserInfo />
+
+      {/* Dashboard Specific Stats */}
       <Row gutter={16} className="mb-8">
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <p className="text-gray-600 text-sm">Rol</p>
-            <Tag color="orange">👤 Investigador de Campo</Tag>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <p className="text-gray-600 text-sm">Email</p>
-            <p className="font-semibold text-sm">{sessionUser?.email}</p>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <p className="text-gray-600 text-sm">Estado</p>
-            <Tag color={sessionUser?.is_active ? 'green' : 'red'}>
-              {sessionUser?.is_active ? '✅ Activo' : '❌ Inactivo'}
-            </Tag>
-          </Card>
-        </Col>
         <Col xs={24} sm={12} md={6}>
           <Card>
             <p className="text-gray-600 text-sm">Puntos Solicitados</p>
@@ -86,51 +70,48 @@ const UserWelcome = () => {
         </Col>
       </Row>
 
-      {/* Role Description */}
+      {/* Role Description: User */}
       <Card className="mb-8 bg-blue-50 border-l-4 border-blue-500">
-        <h3 className="text-xl font-bold mb-3">📋 Descripción del Rol: Investigador de Campo</h3>
+        <h3 className="text-xl font-bold mb-3">📋 Descripción del Rol: Usuario</h3>
         <p className="text-gray-700 mb-4">
-          Como Investigador de Campo, eres responsable de recopilar datos sobre manifestaciones geotermales. 
-          Tu rol te permite crear solicitudes de análisis, monitorear su estado en el proceso de revisión y 
-          contribuir datos fundamentales para la investigación científica del potencial geotérmico.
+          Como Usuario, eres responsable de iniciar y dar seguimiento a los estudios de puntos de manifestación geotérmica (Común).
+          Tu rol te permite documentar nuevos estudios, revisar su avance, eliminar registros obsoletos y gestionar tu información personal.
         </p>
         <h4 className="font-semibold text-gray-800 mb-2">🎯 Responsabilidades Principales:</h4>
         <ul style={{ margin: '0', paddingLeft: '20px', color: '#333' }}>
-          <li>Crear solicitudes de análisis para manifestaciones geotermales</li>
-          <li>Proporcionar información precisa sobre temperatura, actividad de burbujeo y ubicación GPS</li>
-          <li>Monitorear el estado de tus solicitudes en el proceso de revisión</li>
-          <li>Editar o eliminar solicitudes pendientes de revisión</li>
-          <li>Acceder a información detallada sobre cada solicitud enviada</li>
-          <li>Exportar solicitudes en formato PDF cuando sea necesario</li>
+          <li>Iniciar estudios de un punto de manifestación (Común).</li>
+          <li>Revisar estudios iniciados (Común).</li>
+          <li>Eliminar estudios iniciados (Común).</li>
+          <li>Actualizar tu información personal en la plataforma.</li>
         </ul>
       </Card>
 
-      {/* Capabilities */}
+      {/* Capabilities: User */}
       <Card className="mb-8 bg-amber-50 border-l-4 border-amber-500">
         <h3 className="text-lg font-bold mb-4">🎯 ¿Qué puedes hacer aquí?</h3>
         <Row gutter={16}>
           <Col xs={24} sm={12} md={6}>
             <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-blue-600 mb-2">✅ Nueva Solicitud</h4>
-              <p className="text-sm text-gray-600">Crea una nueva solicitud de análisis geotérmico indicando ubicación GPS, temperatura y características del sitio.</p>
+              <h4 className="font-semibold text-blue-600 mb-2">🔬 Iniciar Estudio</h4>
+              <p className="text-sm text-gray-600">Comienza un nuevo estudio común sobre una manifestación geotérmica.</p>
             </div>
           </Col>
           <Col xs={24} sm={12} md={6}>
             <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-blue-600 mb-2">📊 Ver Estado</h4>
-              <p className="text-sm text-gray-600">Consulta el estado actual de todas tus solicitudes, desde registro inicial hasta aprobación final.</p>
+              <h4 className="font-semibold text-blue-600 mb-2">📋 Revisar Estudios</h4>
+              <p className="text-sm text-gray-600">Consulta el progreso y los detalles de tus estudios iniciados.</p>
             </div>
           </Col>
           <Col xs={24} sm={12} md={6}>
             <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-blue-600 mb-2">✏️ Editar o Eliminar</h4>
-              <p className="text-sm text-gray-600">Modifica o elimina tus solicitudes mientras estén en estado pendiente de revisión.</p>
+              <h4 className="font-semibold text-blue-600 mb-2">❌ Eliminar Estudios</h4>
+              <p className="text-sm text-gray-600">Remueve del sistema estudios iniciados que ya no sean requeridos.</p>
             </div>
           </Col>
           <Col xs={24} sm={12} md={6}>
             <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-blue-600 mb-2">📥 Exportar PDF</h4>
-              <p className="text-sm text-gray-600">Descarga tus solicitudes en formato PDF con toda la información registrada.</p>
+              <h4 className="font-semibold text-blue-600 mb-2">⚙️ Mi Perfil</h4>
+              <p className="text-sm text-gray-600">Actualiza tus datos de contacto y detalles personales en cualquier momento.</p>
             </div>
           </Col>
         </Row>
