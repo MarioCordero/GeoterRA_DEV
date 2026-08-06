@@ -5,8 +5,8 @@ const SessionContext = createContext({
   user: null,
   loading: false,
   error: null,
-  refresh: async () => {},
-  logout: async () => {},
+  refresh: async () => { },
+  logout: async () => { },
 });
 
 export const SessionProvider = ({ children }) => {
@@ -21,7 +21,7 @@ export const SessionProvider = ({ children }) => {
     try {
       // API CALL - using userMeSession() function
       const result = await userMeSession();
-      
+
       if (result.ok && result.data) {
         setUser(result.data);
         return result.data;
@@ -32,12 +32,12 @@ export const SessionProvider = ({ children }) => {
         setUser(null);
         return null;
       }
-      
+
       console.error('❌ [useSession] Error:', result.error);
       setError(result.error);
       setUser(null);
       return null;
-      
+
     } catch (err) {
       console.error('❌ [useSession] Exception:', err);
       setError(err.message);
@@ -52,7 +52,7 @@ export const SessionProvider = ({ children }) => {
     try {
       // API CALL - using authLogout() function
       const result = await authLogout();
-      
+
       if (!result.ok) {
         console.warn('⚠️ [useSession] Logout failed:', result.error);
       }

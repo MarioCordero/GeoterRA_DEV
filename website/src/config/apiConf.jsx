@@ -1,15 +1,14 @@
 const API_CONFIG = {
   environment: import.meta.env.MODE === 'production' ? 'production' : 'local',
-  
+
   baseUrls: {
     production: 'https://geoterra.inii.ucr.ac.cr/api',
     local: 'http://localhost:8000/api'
   },
 
-  // TODO: HIDE THE APIKEY
   defaultHeaders: {
     'Content-Type': 'application/json',
-    'x-api-key': 'web-secret-key-789',
+    'x-api-key': import.meta.env.VITE_API_KEY,
   },
 
   endpoints: {
@@ -66,11 +65,11 @@ export const getApiBaseUrl = () => {
 
 export const buildApiUrl = (endpoint) => {
   const baseUrl = getApiBaseUrl();
-  
+
   if (baseUrl.startsWith('/')) {
     return `${baseUrl}${endpoint}`.replace(/\/+/g, '/');
   }
-  
+
   return `${baseUrl}${endpoint}`.replace(/([^:]\/)\/+/g, '$1');
 };
 
@@ -149,7 +148,7 @@ export const debugApiConfig = () => {
 
 export const autoDetectEnvironment = () => {
   const hostname = window.location.hostname;
-  
+
   if (hostname === 'localhost' || hostname === 'geoterra.com') {
     API_CONFIG.environment = 'local';
   } else {
