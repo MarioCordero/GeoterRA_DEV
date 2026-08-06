@@ -15,6 +15,7 @@ use Repositories\DistrictRepository;
 use Repositories\GeomanifestationRepository;
 use Repositories\GeomanifestationViewRepository;
 use Repositories\ProvinceRepository;
+use Repositories\UserRepository;
 
 /**
  * Business logic for geothermal manifestations.
@@ -27,6 +28,8 @@ final class GeomanifestationService
   private CantonRepository $cantonRepository;
   private DistrictRepository $districtRepository;
   private AuthService $authService;
+  private $notificationService;
+  private UserRepository $userRepository;
 
   public function __construct(private readonly PDO $pdo)
   {
@@ -36,6 +39,10 @@ final class GeomanifestationService
     $this->cantonRepository = new CantonRepository($pdo);
     $this->districtRepository = new DistrictRepository($pdo);
     $this->authService = new AuthService($pdo);
+    $this->userRepository = new UserRepository($pdo);
+    $this->notificationService = new NotificationService(
+      new SmtpEmailService()
+    );
   }
 
   /**
@@ -65,6 +72,17 @@ final class GeomanifestationService
 
     $auth = $this->authService->requireAuth();
     $created = $this->repository->create($dto->toArray(), $auth['user_id']);
+
+    $user = $this->userRepository->findById($auth['user_id']);
+    if ($user) {
+      $this->notificationService->notifyResourceCreated(
+        $user['email'],
+        $user['first_name'],
+        'Geomanifestación',
+        $dto->name,
+        date('Y-m-d H:i:s')
+      );
+    }
 
     // Fetch the created record from the view (include hidden because it's admin operation)
     $viewRow = $this->viewRepository->findById(
@@ -258,7 +276,7 @@ final class GeomanifestationService
    */
   public function delete(string $id): void
   {
-    Request::requireRole(
+    $auth = Request::requireRole(
       [
         AllowedUserRoles::ADMIN,
         AllowedUserRoles::FIELD_INVESTIGATOR,
@@ -266,7 +284,8 @@ final class GeomanifestationService
       ]
     );
 
-    if (!$this->repository->findById($id)) {
+    $existing = $this->repository->findById($id);
+    if (!$existing) {
       throw new ApiException(
         ErrorType::notFound('Geothermal manifestation'), 404
       );
@@ -274,6 +293,17 @@ final class GeomanifestationService
 
     if (!$this->repository->delete($id)) {
       throw new ApiException(ErrorType::manifestationDeleteFailed(), 500);
+    }
+
+    $user = $this->userRepository->findById($auth['user_id']);
+    if ($user) {
+      $this->notificationService->notifyResourceDeleted(
+        $user['email'],
+        $user['first_name'],
+        'Geomanifestación',
+        $existing['geomanifestation_name'],
+        date('Y-m-d H:i:s')
+      );
     }
   }
 

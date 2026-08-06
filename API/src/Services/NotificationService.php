@@ -260,4 +260,121 @@ final class NotificationService
 
     $this->emailSender->send($email, $subject, trim($body));
   }
+
+  public function notifyResourceCreated(
+    string $email,
+    string $firstName,
+    string $resourceType,
+    string $resourceName,
+    string $time
+  ): void {
+    $subject = "Confirmación: Registro de {$resourceType}";
+    $antiClip = $this->getAntiClippingToken();
+
+    $body = "
+      <div style='width: 100%; max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333333; word-break: break-word; box-sizing: border-box;'>
+        <div style='background-color: #F19B29; padding: 20px; color: white;'>
+          <h1 style='margin: 0; font-size: 24px; font-weight: bold;'>GeoterRA</h1>
+        </div>
+        
+        <div style='padding: 30px 20px;'>
+          <h2 style='font-size: 18px; font-weight: bold; margin-top: 0;'>Hola {$firstName},</h2>
+          
+          <p style='line-height: 1.5;'>
+            Le confirmamos que el registro de <strong>{$resourceType}</strong> ha sido creado exitosamente en nuestro sistema.
+          </p>
+
+          <div style='margin: 30px 0; padding: 20px; background-color: #f4f4f4; border-radius: 8px;'>
+            <p style='margin: 0 0 10px 0; font-size: 16px; word-break: break-word;'><strong>Detalle:</strong> <span style='color: #F19B29; font-weight: bold;'>{$resourceName}</span></p>
+            <p style='margin: 0; font-size: 14px; color: #555555;'><strong>Fecha de registro:</strong> {$time}</p>
+          </div>
+
+          <p style='line-height: 1.5; color: #666666;'>
+            Puede acceder al sistema para visualizar o gestionar este nuevo registro.
+          </p>
+        </div>
+        {$antiClip}
+      </div>
+    ";
+
+    $this->emailSender->send($email, $subject, trim($body));
+  }
+
+  public function notifyResourceUpdated(
+    string $email,
+    string $firstName,
+    string $resourceType,
+    string $resourceName,
+    string $time
+  ): void {
+    $subject = "Actualización: {$resourceType} Modificado";
+    $antiClip = $this->getAntiClippingToken();
+
+    $body = "
+      <div style='width: 100%; max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333333; word-break: break-word; box-sizing: border-box;'>
+        <div style='background-color: #F19B29; padding: 20px; color: white;'>
+          <h1 style='margin: 0; font-size: 24px; font-weight: bold;'>GeoterRA</h1>
+        </div>
+        
+        <div style='padding: 30px 20px;'>
+          <h2 style='font-size: 18px; font-weight: bold; margin-top: 0;'>Hola {$firstName},</h2>
+          
+          <p style='line-height: 1.5;'>
+            Le informamos que la información del registro de <strong>{$resourceType}</strong> ha sido actualizada correctamente.
+          </p>
+
+          <div style='margin: 30px 0; padding: 20px; background-color: #f4f4f4; border-radius: 8px;'>
+            <p style='margin: 0 0 10px 0; font-size: 16px; word-break: break-word;'><strong>Detalle:</strong> <span style='color: #F19B29; font-weight: bold;'>{$resourceName}</span></p>
+            <p style='margin: 0; font-size: 14px; color: #555555;'><strong>Fecha de modificación:</strong> {$time}</p>
+          </div>
+
+          <p style='line-height: 1.5; color: #666666;'>
+            Puede revisar los detalles actualizados ingresando a su cuenta en el sistema.
+          </p>
+        </div>
+        {$antiClip}
+      </div>
+    ";
+
+    $this->emailSender->send($email, $subject, trim($body));
+  }
+
+  public function notifyResourceDeleted(
+    string $email,
+    string $firstName,
+    string $resourceType,
+    string $resourceName,
+    string $time
+  ): void {
+    $subject = "Eliminación: {$resourceType} Eliminado";
+    $antiClip = $this->getAntiClippingToken();
+
+    $body = "
+      <div style='width: 100%; max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333333; word-break: break-word; box-sizing: border-box;'>
+        <div style='background-color: #F19B29; padding: 20px; color: white;'>
+          <h1 style='margin: 0; font-size: 24px; font-weight: bold;'>GeoterRA</h1>
+        </div>
+        
+        <div style='padding: 30px 20px;'>
+          <h2 style='font-size: 18px; font-weight: bold; margin-top: 0;'>Hola {$firstName},</h2>
+          
+          <p style='line-height: 1.5;'>
+            Le notificamos que el registro de <strong>{$resourceType}</strong> ha sido eliminado del sistema.
+          </p>
+
+          <div style='margin: 30px 0; padding: 20px; background-color: #f4f4f4; border-radius: 8px;'>
+            <p style='margin: 0 0 10px 0; font-size: 16px; word-break: break-word;'><strong>Detalle:</strong> <span style='color: #F19B29; font-weight: bold;'>{$resourceName}</span></p>
+            <p style='margin: 0; font-size: 14px; color: #555555;'><strong>Fecha de eliminación:</strong> {$time}</p>
+          </div>
+
+          <p style='line-height: 1.5; color: #666666;'>
+            Esta acción es irreversible. Si considera que se trata de un error, por favor contacte al soporte del sistema de inmediato.
+          </p>
+        </div>
+        {$antiClip}
+      </div>
+    ";
+
+    $this->emailSender->send($email, $subject, trim($body));
+  }
 }

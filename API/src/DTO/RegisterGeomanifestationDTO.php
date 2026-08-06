@@ -46,9 +46,10 @@ final class RegisterGeomanifestationDTO
    */
   public static function fromArray(array $data): self
   {
-    if (!isset($data['name']) || trim((string)$data['name']) === '') {
+    if (!isset($data['geomanifestation_name'])
+      || trim((string)$data['geomanifestation_name']) === '') {
       throw new ApiException(
-        ErrorType::missingField('name'), 422
+        ErrorType::missingField('geomanifestation_name'), 422
       );
     }
     if (!isset($data['latitude']) || !is_numeric($data['latitude'])) {
@@ -62,7 +63,7 @@ final class RegisterGeomanifestationDTO
     }
 
     return new self(
-      name : trim((string)$data['name']),
+      name : trim((string)$data['geomanifestation_name']),
       latitude : (float)$data['latitude'],
       longitude : (float)$data['longitude'],
       provinceSnitCode : isset($data['province_snit_code'])
@@ -86,7 +87,7 @@ final class RegisterGeomanifestationDTO
   public function toArray(): array
   {
     return [
-      'name' => $this->name,
+      'geomanifestation_name' => $this->name,
       'latitude' => $this->latitude,
       'longitude' => $this->longitude,
       'province_snit_code' => $this->provinceSnitCode,
