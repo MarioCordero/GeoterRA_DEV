@@ -1,18 +1,23 @@
 import dayjs from "dayjs";
 import "leaflet/dist/leaflet.css";
 import PhoneInput from './PhoneInput';
-import { analysisRequestStore } from '../../config/apiConf';
+import { 
+  analysisRequestStore, 
+  provincesIndex, 
+  cantonsIndex, 
+  districtsIndex 
+} from '../../config/apiConf';
 import { useSession } from '../../hooks/useSession';
 import MapCoordinatePicker from './MapCoordinatePicker';
 import React, { useState, useEffect, useRef } from "react";
-import { Modal, Button, Form, Input, Radio, DatePicker, Upload, message, Spin } from "antd";
+import { Modal, Button, Form, Input, Radio, DatePicker, Upload, message, Spin, Select } from "antd";
 
 const FORM_CACHE_KEY = "addPointFormCache";
 
-const AddRequest = ({ 
+const AddRequest = ({
   onRequestAdded,
   isAdmin = false,
-  useTokenAuth = false 
+  useTokenAuth = false
 }) => {
   const { user, loading: sessionLoading } = useSession();
   const userEmail = user?.email;
@@ -22,42 +27,113 @@ const AddRequest = ({
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const locationRequestRef = useRef(null);
-  const componentMountedRef = useRef(true);
 
+  // Location selector state
+  const [provinces, setProvinces] = useState([]);
+  const [cantons, setCantons] = useState([]);
+  const [districts, setDistricts] = useState([]);
+
+  const [loadingProvinces, setLoadingProvinces] = useState(false);
+  const [loadingCantons, setLoadingCantons] = useState(false);
+  const [loadingDistricts, setLoadingDistricts] = useState(false);
+
+  // Load provinces when modal opens
   useEffect(() => {
     if (visible) {
+      loadProvinces();
+      
       const cached = localStorage.getItem(FORM_CACHE_KEY);
       if (cached) {
-        const parsed = JSON.parse(cached);
-        if (parsed.fecha && typeof parsed.fecha === "string") {
-          parsed.fecha = dayjs(parsed.fecha);
-        }
-        form.setFieldsValue(parsed);
-        if (parsed.lat && parsed.lng) {
-          setLatLng({ lat: parsed.lat, lng: parsed.lng });
-        }
-      }
-    }
-  }, [visible, form]);
+        try {
+          const parsed = JSON.parse(cached);
+          if (parsed.fecha && typeof parsed.fecha === "string") {
+            parsed.fecha = dayjs(parsed.fecha);
+          }
+          form.setFieldsValue(parsed);
+          if (parsed.lat && parsed.lng) {
+            setLatLng({ lat: parsed.lat, lng: parsed.lng });
+          }
 
-  useEffect(() => {
-    if (visible) {
-      const cached = localStorage.getItem(FORM_CACHE_KEY);
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (parsed.fecha && typeof parsed.fecha === "string") {
-          parsed.fecha = dayjs(parsed.fecha);
+          // Restore cantons and districts if cached
+          if (parsed.provinceSnitCode) {
+            handleProvinceChange(parsed.provinceSnitCode).then(() => {
+              if (parsed.cantonSnitCode) {
+                handleCantonChange(parsed.cantonSnitCode);
+              }
+            });
+          }
+        } catch (e) {
+          console.error("Error loading cached form:", e);
         }
-        form.setFieldsValue(parsed);
-        if (parsed.lat && parsed.lng) setLatLng({ lat: parsed.lat, lng: parsed.lng });
       }
+    } else {
+      setProvinces([]);
+      setCantons([]);
+      setDistricts([]);
     }
-  }, [visible, form]);
+  }, [visible]);
+
+  const loadProvinces = async () => {
+    try {
+      setLoadingProvinces(true);
+      const res = await provincesIndex();
+      if (res.ok && Array.isArray(res.data)) {
+        setProvinces(res.data);
+      }
+    } catch (err) {
+      console.error("Error loading provinces:", err);
+    } finally {
+      setLoadingProvinces(false);
+    }
+  };
+
+  const handleProvinceChange = async (provinceSnitCode) => {
+    form.setFieldsValue({
+      cantonSnitCode: undefined,
+      districtSnitCode: undefined
+    });
+    setCantons([]);
+    setDistricts([]);
+
+    if (!provinceSnitCode) return;
+
+    try {
+      setLoadingCantons(true);
+      const res = await cantonsIndex(provinceSnitCode);
+      if (res.ok && Array.isArray(res.data)) {
+        setCantons(res.data);
+      }
+    } catch (err) {
+      console.error("Error loading cantons:", err);
+    } finally {
+      setLoadingCantons(false);
+    }
+  };
+
+  const handleCantonChange = async (cantonSnitCode) => {
+    form.setFieldsValue({
+      districtSnitCode: undefined
+    });
+    setDistricts([]);
+
+    if (!cantonSnitCode) return;
+
+    try {
+      setLoadingDistricts(true);
+      const res = await districtsIndex(cantonSnitCode);
+      if (res.ok && Array.isArray(res.data)) {
+        setDistricts(res.data);
+      }
+    } catch (err) {
+      console.error("Error loading districts:", err);
+    } finally {
+      setLoadingDistricts(false);
+    }
+  };
 
   useEffect(() => {
     if (!visible) {
       if (locationRequestRef.current !== null) {
-        console.log('Modal closed - cancelling location request');
         locationRequestRef.current = null;
       }
     }
@@ -65,7 +141,6 @@ const AddRequest = ({
 
   const handleOk = async () => {
     try {
-      // Verify session before submitting
       if (!userEmail) {
         message.error("Debes estar autenticado para enviar una solicitud");
         return;
@@ -74,28 +149,27 @@ const AddRequest = ({
       const values = await form.validateFields();
       setLoading(true);
 
-      // Map temperature sensation values
       const temperatureSensationMap = {
-        "3": "Cálido",
+        "3": "Caliente",
         "2": "Templado",
-        "1": "Frío"
+        "1": "Natural"
       };
 
-      // Prepare payload for API - using AnalysisRequestDTO structure
       const payload = {
-        region: 1, // TODO: Make this selectable - add region selector to form
-        email: userEmail,
-        owner_contact_number: values.contactNumber,
+        province_snit_code: Number(values.provinceSnitCode),
+        canton_snit_code: Number(values.cantonSnitCode),
+        district_snit_code: Number(values.districtSnitCode),
+        owner_email: userEmail,
+        owner_phone_number: values.contactNumber ? values.contactNumber.replace(/\D/g, '') : null,
         owner_name: values.propietario || "",
-        temperature_sensation: temperatureSensationMap[values.sensTermica],
+        temperature_sensation: temperatureSensationMap[values.sensTermica] || "Natural",
         bubbles: values.burbujeo === "1",
         details: values.direccion || "",
-        current_usage: values.usoActual || "",
-        latitude: latLng.lat || "",
-        longitude: latLng.lng || "",
-        state: "Registrada"
-        // TODO: Photo handling for future implementation
-        // photos: [] - Convert images from upload component and upload to separate endpoint
+        exact_address: values.direccion || "",
+        current_usage: values.usoActual || "Otro",
+        latitude: latLng.lat ? Number(latLng.lat) : null,
+        longitude: latLng.lng ? Number(latLng.lng) : null,
+        relation_with_owner: "Titular",
       };
 
       const result = await analysisRequestStore(payload);
@@ -104,41 +178,37 @@ const AddRequest = ({
         form.resetFields();
         localStorage.removeItem(FORM_CACHE_KEY);
         setLatLng({});
-        
+
         if (onRequestAdded) {
           onRequestAdded();
         }
-        
+
         Modal.success({
           title: "¡Solicitud enviada!",
           content: result.data?.message || "Tu solicitud fue enviada correctamente.",
         });
       } else {
         const errorMessage = result.error || "Error al enviar la solicitud";
-        
         console.error("❌ API Response Error:", result);
-        console.error("❌ Error Message:", errorMessage);
-        
         message.error(errorMessage);
       }
     } catch (err) {
       console.error("Request error:", err);
-      message.error("Error al enviar la solicitud: " + err.message);
+      if (err.errorFields) {
+        message.warning("Por favor complete todos los campos requeridos");
+      } else {
+        message.error("Error al enviar la solicitud: " + err.message);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const handleCancel = () => {
-    // Cancel any ongoing location request
     if (locationRequestRef.current !== null) {
-      console.log('Cancelling ongoing location request');
       locationRequestRef.current = null;
     }
-    
-    // Reset coordinates
     setLatLng({});
-    
     setVisible(false);
   };
 
@@ -151,15 +221,14 @@ const AddRequest = ({
     }
   }, [latLng]);
 
-  // Render status messages
   const renderStatusMessage = () => {
     if (sessionLoading) {
       return (
-        <div style={{ 
-          padding: "10px", 
-          backgroundColor: "#e6f7ff", 
-          border: "1px solid #91d5ff", 
-          borderRadius: "4px", 
+        <div style={{
+          padding: "10px",
+          backgroundColor: "#e6f7ff",
+          border: "1px solid #91d5ff",
+          borderRadius: "4px",
           marginBottom: "16px",
           color: "#1890ff",
           textAlign: "center"
@@ -171,11 +240,11 @@ const AddRequest = ({
 
     if (!userEmail) {
       return (
-        <div style={{ 
-          padding: "10px", 
-          backgroundColor: "#fff2e8", 
-          border: "1px solid #ffbb96", 
-          borderRadius: "4px", 
+        <div style={{
+          padding: "10px",
+          backgroundColor: "#fff2e8",
+          border: "1px solid #ffbb96",
+          borderRadius: "4px",
           marginBottom: "16px",
           color: "#d46b08"
         }}>
@@ -192,8 +261,7 @@ const AddRequest = ({
       <Button type="primary" onClick={() => setVisible(true)} disabled={!userEmail}>
         Agregar Solicitud
       </Button>
-      
-      {/* Main Modal */}
+
       <Modal
         title="Formulario de solicitud de puntos"
         open={visible}
@@ -205,10 +273,10 @@ const AddRequest = ({
           <Button key="back" onClick={handleCancel} disabled={loading}>
             Cancelar
           </Button>,
-          <Button 
-            key="submit" 
-            type="primary" 
-            onClick={handleOk} 
+          <Button
+            key="submit"
+            type="primary"
+            onClick={handleOk}
             loading={loading}
             disabled={!userEmail}
           >
@@ -217,12 +285,68 @@ const AddRequest = ({
         ]}
       >
         {renderStatusMessage()}
-        
-        <Form
-          layout="vertical"
-          form={form}
-        >
+
+        <Form layout="vertical" form={form}>
           <PhoneInput form={form} name="contactNumber" required={true} />
+
+          {/* Location Selectors */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-3">
+            <Form.Item
+              label="Provincia"
+              name="provinceSnitCode"
+              rules={[{ required: true, message: "Seleccione una provincia" }]}
+            >
+              <Select
+                placeholder="Provincia"
+                loading={loadingProvinces}
+                onChange={handleProvinceChange}
+                options={provinces.map((p) => ({
+                  value: p.province_snit_code,
+                  label: p.province_name,
+                }))}
+                showSearch
+                optionFilterProp="label"
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Cantón"
+              name="cantonSnitCode"
+              rules={[{ required: true, message: "Seleccione un cantón" }]}
+            >
+              <Select
+                placeholder="Cantón"
+                loading={loadingCantons}
+                disabled={cantons.length === 0}
+                onChange={handleCantonChange}
+                options={cantons.map((c) => ({
+                  value: c.canton_snit_code,
+                  label: c.canton_name,
+                }))}
+                showSearch
+                optionFilterProp="label"
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Distrito"
+              name="districtSnitCode"
+              rules={[{ required: true, message: "Seleccione un distrito" }]}
+            >
+              <Select
+                placeholder="Distrito"
+                loading={loadingDistricts}
+                disabled={districts.length === 0}
+                options={districts.map((d) => ({
+                  value: d.district_snit_code,
+                  label: d.district_name,
+                }))}
+                showSearch
+                optionFilterProp="label"
+              />
+            </Form.Item>
+          </div>
+
           <Form.Item label="Fecha" name="fecha" rules={[{ required: true }]}>
             <DatePicker style={{ width: "100%" }} />
           </Form.Item>
@@ -237,7 +361,17 @@ const AddRequest = ({
             <Input placeholder="En caso de que sea en propiedad privada" />
           </Form.Item>
           <Form.Item label="Uso actual" name="usoActual">
-            <Input placeholder="Uso que se le da a la zona" />
+            <Select 
+              placeholder="Uso que se le da a la zona" 
+              options={[
+                { value: 'Residencial', label: 'Residencial' },
+                { value: 'Comercial', label: 'Comercial' },
+                { value: 'Turístico', label: 'Turístico' },
+                { value: 'Conservación', label: 'Conservación' },
+                { value: 'Ganadería', label: 'Ganadería' },
+                { value: 'Otro', label: 'Otro' }
+              ]} 
+            />
           </Form.Item>
           <Form.Item label="Presenta burbujeo" name="burbujeo" rules={[{ required: true }]}>
             <Radio.Group>
@@ -253,11 +387,11 @@ const AddRequest = ({
               <Button>Seleccionar archivo</Button>
             </Upload>
           </Form.Item>
-          
+
           {/* Map Section with Coordinate Picker */}
           <Form.Item label="Lugar en GPS">
             <MapCoordinatePicker
-              latLng={latLng} 
+              latLng={latLng}
               onCoordinatesChange={(coords) => {
                 setLatLng(coords);
               }}
@@ -268,7 +402,7 @@ const AddRequest = ({
             />
           </Form.Item>
         </Form>
-        
+
         {loading && (
           <div style={{ textAlign: "center", marginTop: 16 }}>
             <Spin />
@@ -278,6 +412,5 @@ const AddRequest = ({
     </>
   );
 };
-
 
 export default AddRequest;

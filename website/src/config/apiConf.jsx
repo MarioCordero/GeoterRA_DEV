@@ -56,6 +56,15 @@ const API_CONFIG = {
       updateUserRole: (id) => `/maintenance/users/${id}`,
       allTables: '/maintenance/database/tables',
     },
+    provinces: {
+      index: '/provinces',
+    },
+    cantons: {
+      index: (provinceSnitCode) => provinceSnitCode ? `/cantons?province_snit_code=${provinceSnitCode}` : '/cantons',
+    },
+    districts: {
+      index: (cantonSnitCode) => cantonSnitCode ? `/districts?canton_snit_code=${cantonSnitCode}` : '/districts',
+    },
   }
 };
 
@@ -137,6 +146,21 @@ export const maintenance = {
   allUsers: () => buildApiUrl(API_CONFIG.endpoints.maintenance.allUsers),
   updateUserRole: (id) => buildApiUrl(API_CONFIG.endpoints.maintenance.updateUserRole(id)),
   allTables: () => buildApiUrl(API_CONFIG.endpoints.maintenance.allTables),
+};
+
+// ============================================
+// LOCATION (PROVINCES, CANTONS, DISTRICTS) ENDPOINTS
+// ============================================
+export const provinces = {
+  index: () => buildApiUrl(API_CONFIG.endpoints.provinces.index),
+};
+
+export const cantons = {
+  index: (provinceSnitCode) => buildApiUrl(API_CONFIG.endpoints.cantons.index(provinceSnitCode)),
+};
+
+export const districts = {
+  index: (cantonSnitCode) => buildApiUrl(API_CONFIG.endpoints.districts.index(cantonSnitCode)),
 };
 
 // ============================================
@@ -370,6 +394,21 @@ export const maintenanceUpdateUserRole = async (id, payload) => {
 
 export const maintenanceAllTables = async () => {
   return callApi(maintenance.allTables(), 'GET');
+};
+
+// ============================================
+// LOCATION (PROVINCES, CANTONS, DISTRICTS) API FUNCTIONS
+// ============================================
+export const provincesIndex = async () => {
+  return callApi(provinces.index(), 'GET');
+};
+
+export const cantonsIndex = async (provinceSnitCode) => {
+  return callApi(cantons.index(provinceSnitCode), 'GET');
+};
+
+export const districtsIndex = async (cantonSnitCode) => {
+  return callApi(districts.index(cantonSnitCode), 'GET');
 };
 
 export default API_CONFIG;

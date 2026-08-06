@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { analysisRequestIndex, analysisRequestDelete } from '../../config/apiConf';
 import { Table, Button, Modal, Tag, message, Empty, Drawer, Divider, Collapse } from 'antd';
+import RequestDetails from './RequestDetails';
 
 /**
  * UserRequests Component
@@ -27,7 +28,7 @@ const UserRequests = () => {
 
   // ─── Modal/Drawer state ───
   const [viewModalVisible, setViewModalVisible] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [selectedRequestId, setSelectedRequestId] = useState(null);
   const [notImplementedModalOpen, setNotImplementedModalOpen] = useState(false);
 
   // ─── Effects ───
@@ -88,13 +89,16 @@ const UserRequests = () => {
   };
 
   const handleDelete = (record) => {
-    setNotImplementedModalOpen(true);
+    const id = record.request_id || record.id_soli;
+    setSelectedRequestId(id);
+    setViewModalVisible(true);
   };
 
   // ─── Render helpers ───
 
   const handleViewDetails = (record) => {
-    setSelectedRequest(record);
+    const id = record.request_id || record.id_soli;
+    setSelectedRequestId(id);
     setViewModalVisible(true);
   };
 
@@ -109,7 +113,11 @@ const UserRequests = () => {
     <div className="bg-white rounded-lg shadow-md p-4 mb-4 border-l-4 border-blue-500">
       <div className="flex justify-between items-start mb-3">
         <div>
-          <p className="font-semibold text-sm">{request.name}</p>
+          <p className="font-semibold text-sm">
+            {request.location 
+              ? `${request.location.province}, ${request.location.canton}, ${request.location.district}`
+              : 'Sin ubicación'}
+          </p>
           <p className="text-xs text-gray-500">{request.owner_name}</p>
         </div>
         <Tag color={request.state === 'Registrada' ? 'blue' : request.state === 'En revisión' ? 'orange' : 'green'}>
@@ -170,10 +178,13 @@ const UserRequests = () => {
 
   const columns = [
     {
-      title: 'Solicitud',
-      dataIndex: 'name',
-      key: 'name',
-      render: (text) => <span className="font-semibold">{text}</span>,
+      title: 'Ubicación',
+      key: 'location',
+      render: (_, record) => {
+        const loc = record.location;
+        const text = loc ? `${loc.province}, ${loc.canton}, ${loc.district}` : 'Sin ubicación';
+        return <span className="font-semibold">{text}</span>;
+      },
     },
     {
       title: 'Solicitante',
@@ -358,96 +369,14 @@ const UserRequests = () => {
         />
       )}
 
-      {/* Detail Drawer */}
-      <Drawer
-        title="Detalles de la Solicitud"
-        placement="right"
+      {/* Detail Modal Component */}
+      <RequestDetails
+        requestId={selectedRequestId}
+        visible={viewModalVisible}
         onClose={() => setViewModalVisible(false)}
-        open={viewModalVisible}
-        width={isMobile ? '100%' : 400}
-      >
-        {selectedRequest && (
-          <div>
-            <div>
-              <p style={{ fontWeight: 'bold', marginBottom: '4px', color: '#666' }}>Solicitud</p>
-              <p style={{ marginBottom: '16px', fontSize: '16px' }}>{selectedRequest.name}</p>
-            </div>
-
-            <Divider />
-
-            <div>
-              <p style={{ fontWeight: 'bold', marginBottom: '4px', color: '#666' }}>Estado</p>
-              <Tag color={selectedRequest.state === 'Registrada' ? 'blue' : selectedRequest.state === 'En revisión' ? 'orange' : 'green'}>
-                {selectedRequest.state || 'Registrada'}
-              </Tag>
-            </div>
-
-            <Divider />
-
-            <div>
-              <p style={{ fontWeight: 'bold', marginBottom: '4px', color: '#666' }}>Solicitante</p>
-              <p style={{ marginBottom: '8px' }}>{selectedRequest.owner_name}</p>
-              <p style={{ marginBottom: '8px' }}>📧 {selectedRequest.email}</p>
-              {selectedRequest.owner_contact_number && (
-                <p style={{ marginBottom: '16px' }}>📞 {selectedRequest.owner_contact_number}</p>
-              )}
-            </div>
-
-            <Divider />
-
-            <div>
-              <p style={{ fontWeight: 'bold', marginBottom: '4px', color: '#666' }}>Información del Sitio</p>
-              {selectedRequest.temperature_sensation && (
-                <p style={{ marginBottom: '4px' }}>🌡️ Sensación Térmica: {selectedRequest.temperature_sensation}</p>
-              )}
-              {selectedRequest.bubbles && (
-                <p style={{ marginBottom: '4px' }}>💧 Burbujeo: Sí</p>
-              )}
-              {selectedRequest.current_usage && (
-                <p style={{ marginBottom: '8px' }}>🏗️ Uso Actual: {selectedRequest.current_usage}</p>
-              )}
-            </div>
-
-            <Divider />
-
-            <div>
-              <p style={{ fontWeight: 'bold', marginBottom: '4px', color: '#666' }}>Ubicación GPS</p>
-              <p style={{ marginBottom: '4px' }}>
-                📍 Lat: {selectedRequest.latitude?.toFixed(6) || 'N/A'}
-              </p>
-              <p style={{ marginBottom: '8px' }}>
-                📍 Lng: {selectedRequest.longitude?.toFixed(6) || 'N/A'}
-              </p>
-            </div>
-
-            {selectedRequest.details && (
-              <>
-                <Divider />
-                <div>
-                  <p style={{ fontWeight: 'bold', marginBottom: '4px', color: '#666' }}>Detalles Adicionales</p>
-                  <p style={{ marginBottom: '16px', whiteSpace: 'pre-wrap' }}>
-                    {selectedRequest.details}
-                  </p>
-                </div>
-              </>
-            )}
-
-            <Divider />
-
-            <div>
-              <p style={{ fontWeight: 'bold', marginBottom: '4px', color: '#666' }}>Fecha de Creación</p>
-              <p>
-                {new Date(selectedRequest.created_at).toLocaleDateString('es-ES', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </p>
-            </div>
-          </div>
-        )}
-      </Drawer>
+        onUpdated={loadRequests}
+        onDeleted={loadRequests}
+      />
 
       {/* Not Implemented Modal for delete action */}
       <NotImplementedModal
