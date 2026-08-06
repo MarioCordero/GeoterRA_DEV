@@ -21,6 +21,8 @@ final class GeomanifestationViewRepository extends Repository
 		return "SELECT 
               gm.geomanifestation_id AS geomanifestation_id,
               gm.geomanifestation_name AS geomanifestation_name,
+              r.request_id AS request_id,
+              r.request_name AS request_name,
               gm.latitude AS latitude,
               gm.longitude AS longitude,
               gm.description AS manifestation_description,
@@ -62,15 +64,17 @@ final class GeomanifestationViewRepository extends Repository
               ilt.mg AS mg,
               ilt.description AS lab_description,
               ilt.created_at AS lab_created_at 
-            FROM ((((((((geomanifestations gm 
+            FROM ((((((((
+                geomanifestations gm 
             LEFT JOIN users gm_creator ON (gm.created_by = gm_creator.user_id)) 
             LEFT JOIN provinces p ON (gm.province_snit_code = p.province_snit_code)) 
             LEFT JOIN cantons c ON (gm.canton_snit_code = c.canton_snit_code)) 
             LEFT JOIN districts d ON (gm.district_snit_code = d.district_snit_code)) 
             LEFT JOIN georeports gr ON (gm.current_georeport_id = gr.georeport_id)) 
             LEFT JOIN users report_creator ON (gr.created_by = report_creator.user_id)) 
-            LEFT JOIN insitu_tests ist ON (gr.insitu_test_id = ist.insitu_test_id OR ist.geomanifestation_id = gm.geomanifestation_id)) 
-            LEFT JOIN inlab_tests ilt ON (gr.inlab_test_id = ilt.inlab_test_id OR ilt.geomanifestation_id = gm.geomanifestation_id))";
+            LEFT JOIN insitu_tests ist ON gr.insitu_test_id = ist.insitu_test_id
+            LEFT JOIN requests r ON r.request_id = gm.request_id)
+            LEFT JOIN inlab_tests ilt ON gr.inlab_test_id = ilt.inlab_test_id)";
 	}
 
 	/**

@@ -104,7 +104,9 @@ final class GeomanifestationService
       $cantonSnitCode !== null
       && !$this->cantonRepository->existsBySnitCode($cantonSnitCode)
     ) {
-      throw new ApiException(ErrorType::invalidField('canton_snit_code'), 422);
+      throw new ApiException(
+        ErrorType::invalidField('canton_snit_code'), 422
+      );
     }
     if (
       $districtSnitCode !== null
@@ -121,7 +123,7 @@ final class GeomanifestationService
    *
    * @param array<string,mixed> $row
    * @param bool $isAdmin If true, excludes insitu/inlab test data
-   * @return array<string,mixed>
+   * @return array<string, mixed>
    */
   private function formatManifestationView(array $row, bool $isAdmin = false
   ): array {
@@ -137,49 +139,53 @@ final class GeomanifestationService
         'canton_snit_code' => $row['canton_snit_code'],
         'district' => $row['district_name'],
         'district_snit_code' => $row['district_snit_code'],
-				'latitude' => round((float)$row['latitude'], 7),
-				'longitude' => round((float)$row['longitude'], 7),
+				'latitude' => (float)$row['latitude'],
+				'longitude' => (float)$row['longitude'],
       ],
       'current_georeport' => $row['georeport_id'] ? [
         'georeport_id' => $row['georeport_id'],
         'details' => $row['report_details'],
         'created_at' => $row['report_created_at'],
       ] : null,
-    ];
-
-    if (!$isAdmin) {
-      $response['insitu_test'] = $row['insitu_test_id'] ? [
+      'insitu_test' => $row['insitu_test_id'] ? [
         'insitu_test_id' => $row['insitu_test_id'],
-        'temperature' => isset($row['temperature']) ? (float)$row['temperature'] : null,
-        'conductivity' => isset($row['insitu_conductivity']) ? (float)$row['insitu_conductivity'] : null,
+        'temperature' => isset($row['temperature'])
+          ? (float)$row['temperature'] : null,
+        'conductivity' => isset($row['insitu_conductivity'])
+          ? (float)$row['insitu_conductivity'] : null,
         'ph' => isset($row['insitu_ph']) ? (float)$row['insitu_ph'] : null,
         'description' => $row['insitu_description'],
         'created_at' => $row['insitu_created_at'],
-      ] : null;
-
-      $response['inlab_test'] = $row['inlab_test_id'] ? [
-        'inlab_test_id' => $row['inlab_test_id'],
-        'ph' => isset($row['lab_ph']) ? (float)$row['lab_ph'] : null,
-        'conductivity' => isset($row['lab_conductivity']) ? (float)$row['lab_conductivity'] : null,
-        'cl' => isset($row['cl']) ? (float)$row['cl'] : null,
-        'ca' => isset($row['ca']) ? (float)$row['ca'] : null,
-        'hco3' => isset($row['hco3']) ? (float)$row['hco3'] : null,
-        'so4' => isset($row['so4']) ? (float)$row['so4'] : null,
-        'fe' => isset($row['fe']) ? (float)$row['fe'] : null,
-        'si' => isset($row['si']) ? (float)$row['si'] : null,
-        'b' => isset($row['b']) ? (float)$row['b'] : null,
-        'li' => isset($row['li']) ? (float)$row['li'] : null,
-        'f' => isset($row['f']) ? (float)$row['f'] : null,
-        'na' => isset($row['na']) ? (float)$row['na'] : null,
-        'k' => isset($row['k']) ? (float)$row['k'] : null,
-        'mg' => isset($row['mg']) ? (float)$row['mg'] : null,
-        'description' => $row['lab_description'],
-        'created_at' => $row['lab_created_at'],
-      ] : null;
-    }
+      ] : null,
+    'inlab_test' => $row['inlab_test_id'] ? [
+      'inlab_test_id' => $row['inlab_test_id'],
+      'ph' => isset($row['lab_ph']) ? (float)$row['lab_ph'] : null,
+      'conductivity' => isset($row['lab_conductivity'])
+        ? (float)$row['lab_conductivity'] : null,
+      'cl' => isset($row['cl']) ? (float)$row['cl'] : null,
+      'ca' => isset($row['ca']) ? (float)$row['ca'] : null,
+      'hco3' => isset($row['hco3']) ? (float)$row['hco3'] : null,
+      'so4' => isset($row['so4']) ? (float)$row['so4'] : null,
+      'fe' => isset($row['fe']) ? (float)$row['fe'] : null,
+      'si' => isset($row['si']) ? (float)$row['si'] : null,
+      'b' => isset($row['b']) ? (float)$row['b'] : null,
+      'li' => isset($row['li']) ? (float)$row['li'] : null,
+      'f' => isset($row['f']) ? (float)$row['f'] : null,
+      'na' => isset($row['na']) ? (float)$row['na'] : null,
+      'k' => isset($row['k']) ? (float)$row['k'] : null,
+      'mg' => isset($row['mg']) ? (float)$row['mg'] : null,
+      'description' => $row['lab_description'],
+      'created_at' => $row['lab_created_at'],
+    ] : null,
+    ];
 
     if ($isAdmin) {
       $response['visibility'] = (bool)$row['visibility'];
+
+      $response['request'] = [
+        'request_id' => $row['request_id'],
+        'request_name' => $row['request_name'],
+      ];
     }
 
     return $response;
@@ -244,9 +250,6 @@ final class GeomanifestationService
 
     return $this->formatManifestationView($viewRow, true);
   }
-
-  // ---------- Public API methods ----------
-
   /**
    * Permanently deletes a manifestation.
    *
@@ -346,7 +349,14 @@ final class GeomanifestationService
       ]
     );
 
-    return $this->getFiltered(false, null, null, null, $page, $limit);
+    return $this->getFiltered(
+      false,
+      null,
+      null,
+      null,
+      $page,
+      $limit
+    );
   }
 
   /**
@@ -370,7 +380,9 @@ final class GeomanifestationService
     int $limit
   ): array {
     // If filters are provided, validate hierarchy
-    if ($provinceSnitCode !== null || $cantonSnitCode !== null || $districtSnitCode !== null) {
+    if ($provinceSnitCode !== null
+      || $cantonSnitCode !== null
+      || $districtSnitCode !== null) {
       $this->validateSnitHierarchy(
         $provinceSnitCode, $cantonSnitCode, $districtSnitCode
       );

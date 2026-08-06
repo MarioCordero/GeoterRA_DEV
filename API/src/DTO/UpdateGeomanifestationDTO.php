@@ -32,12 +32,13 @@ final class UpdateGeomanifestationDTO
     public ?int $cantonSnitCode = null,
     public ?int $districtSnitCode = null,
     public ?string $currentGeoreportId = null,
+    public ?string $requestId = null,
     public ?string $description = null,
     public ?bool $visibility = null
   ) {}
 
   /**
-   * Creates DTO from HTTP request payload (only fields that exist in the array).
+   * Creates DTO from the HTTP request payload (only fields that exist in the array).
    *
    * @param array<string,mixed> $data
    * @return self
@@ -46,12 +47,18 @@ final class UpdateGeomanifestationDTO
   {
     return new self(
       name: isset($data['name']) ? trim((string) $data['name']) : null,
-      latitude: isset($data['latitude']) ? (float) $data['latitude'] : null,
-      longitude: isset($data['longitude']) ? (float) $data['longitude'] : null,
-      provinceSnitCode: isset($data['province_snit_code']) ? (int) $data['province_snit_code'] : null,
-      cantonSnitCode: isset($data['canton_snit_code']) ? (int) $data['canton_snit_code'] : null,
-      districtSnitCode: isset($data['district_snit_code']) ? (int) $data['district_snit_code'] : null,
+      latitude: isset($data['latitude'])
+        ? (float) $data['latitude'] : null,
+      longitude: isset($data['longitude'])
+        ? (float) $data['longitude'] : null,
+      provinceSnitCode: isset($data['province_snit_code'])
+        ? (int) $data['province_snit_code'] : null,
+      cantonSnitCode: isset($data['canton_snit_code'])
+        ? (int) $data['canton_snit_code'] : null,
+      districtSnitCode: isset($data['district_snit_code'])
+        ? (int) $data['district_snit_code'] : null,
       currentGeoreportId: $data['current_georeport_id'] ?? null,
+      requestId: $data['request_id'] ?? null,
       description: $data['description'] ?? null,
       visibility: isset($data['visibility']) ? (bool) $data['visibility'] : null
     );
@@ -59,7 +66,7 @@ final class UpdateGeomanifestationDTO
 
   /**
    * Returns an array with only the fields that should be updated.
-   * Excludes null values, but includes false for visibility.
+   * Excludes null values but includes false for visibility.
    *
    * @return array<string,mixed>
    */
@@ -88,6 +95,9 @@ final class UpdateGeomanifestationDTO
     if ($this->currentGeoreportId !== null) {
       $update['current_georeport_id'] = $this->currentGeoreportId;
     }
+    if ($this->requestId !== null) {
+      $update['request_id'] = $this->requestId;
+    }
     if ($this->description !== null) {
       $update['description'] = $this->description;
     }
@@ -111,7 +121,8 @@ final class UpdateGeomanifestationDTO
         422
       );
     }
-    if ($this->latitude !== null && ($this->latitude < -90 || $this->latitude > 90)) {
+    if ($this->latitude !== null
+      && ($this->latitude < -90 || $this->latitude > 90)) {
       throw new ApiException(
         ErrorType::invalidField('latitude'),
         422
