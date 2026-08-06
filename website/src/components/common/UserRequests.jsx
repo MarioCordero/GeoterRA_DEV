@@ -2,8 +2,8 @@ import AddRequest from './AddRequest';
 import NotImplementedModal from './NotImplementedModal';
 import React, { useState, useEffect, useRef } from 'react';
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import { Table, Button, Modal, Tag, message, Empty, Drawer, Divider, Collapse } from 'antd';
 import { analysisRequestIndex, analysisRequestDelete } from '../../config/apiConf';
+import { Table, Button, Modal, Tag, message, Empty, Drawer, Divider, Collapse } from 'antd';
 
 /**
  * UserRequests Component
@@ -280,7 +280,7 @@ const UserRequests = () => {
                     <li><strong>Envía la solicitud</strong> y recibirás una confirmación con el número de seguimiento</li>
                   </ol>
                 </div>
-                
+
                 <h4 className="font-semibold text-gray-800 mb-3">📊 Estados de tu solicitud - ¿Dónde está mi solicitud?</h4>
                 <div className="space-y-2">
                   <div style={{ padding: '8px 12px', backgroundColor: '#e6f7ff', borderLeftWidth: '3px', borderLeftColor: '#1890ff', borderRadius: '4px' }}>
