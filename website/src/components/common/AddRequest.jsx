@@ -10,7 +10,12 @@ import {
 import { useSession } from '../../hooks/useSession';
 import MapCoordinatePicker from './MapCoordinatePicker';
 import React, { useState, useEffect, useRef } from "react";
-import { Modal, Button, Form, Input, Radio, DatePicker, Upload, message, Spin, Select } from "antd";
+import { 
+  Modal, Button, Form, Input, Radio, Upload, message, Spin, Select, Card, Switch 
+} from "antd";
+import { 
+  EnvironmentFilled, ExperimentOutlined, UserOutlined, PlusCircleOutlined 
+} from "@ant-design/icons";
 
 const FORM_CACHE_KEY = "addPointFormCache";
 
@@ -26,7 +31,7 @@ const AddRequest = ({
   const [latLng, setLatLng] = useState({});
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const locationRequestRef = useRef(null);
+  const [hasOwnerInfo, setHasOwnerInfo] = useState("0"); // "0": No (default/null), "1": Sí (Conozco al propietario)
 
   // Location selector state
   const [provinces, setProvinces] = useState([]);
@@ -46,12 +51,12 @@ const AddRequest = ({
       if (cached) {
         try {
           const parsed = JSON.parse(cached);
-          if (parsed.fecha && typeof parsed.fecha === "string") {
-            parsed.fecha = dayjs(parsed.fecha);
-          }
           form.setFieldsValue(parsed);
           if (parsed.lat && parsed.lng) {
             setLatLng({ lat: parsed.lat, lng: parsed.lng });
+          }
+          if (parsed.hasOwnerInfo) {
+            setHasOwnerInfo(parsed.hasOwnerInfo);
           }
 
           // Restore cantons and districts if cached
@@ -70,6 +75,7 @@ const AddRequest = ({
       setProvinces([]);
       setCantons([]);
       setDistricts([]);
+      setHasOwnerInfo("0");
     }
   }, [visible]);
 
@@ -131,14 +137,6 @@ const AddRequest = ({
     }
   };
 
-  useEffect(() => {
-    if (!visible) {
-      if (locationRequestRef.current !== null) {
-        locationRequestRef.current = null;
-      }
-    }
-  }, [visible]);
-
   const handleOk = async () => {
     try {
       if (!userEmail) {
@@ -149,27 +147,24 @@ const AddRequest = ({
       const values = await form.validateFields();
       setLoading(true);
 
-      const temperatureSensationMap = {
-        "3": "Caliente",
-        "2": "Templado",
-        "1": "Natural"
-      };
-
+      // Build payload matching RegisterInvestigationRequestDTO
       const payload = {
         province_snit_code: Number(values.provinceSnitCode),
         canton_snit_code: Number(values.cantonSnitCode),
         district_snit_code: Number(values.districtSnitCode),
-        owner_email: userEmail,
-        owner_phone_number: values.contactNumber ? values.contactNumber.replace(/\D/g, '') : null,
-        owner_name: values.propietario || "",
-        temperature_sensation: temperatureSensationMap[values.sensTermica] || "Natural",
-        bubbles: values.burbujeo === "1",
-        details: values.direccion || "",
-        exact_address: values.direccion || "",
-        current_usage: values.usoActual || "Otro",
+        current_usage: values.currentUsage || "Otro",
+        temperature_sensation: values.temperatureSensation || "Natural",
+        bubbles: values.bubbles === "1" || values.bubbles === true,
+        exact_address: values.exactAddress?.trim() || null,
+        details: values.details?.trim() || null,
         latitude: latLng.lat ? Number(latLng.lat) : null,
         longitude: latLng.lng ? Number(latLng.lng) : null,
-        relation_with_owner: "Titular",
+        
+        // Owner info is completely optional (null if not provided or unknown)
+        owner_name: hasOwnerInfo === "1" && values.ownerName?.trim() ? values.ownerName.trim() : null,
+        owner_phone_number: hasOwnerInfo === "1" && values.contactNumber ? values.contactNumber.replace(/\D/g, '') : null,
+        owner_email: hasOwnerInfo === "1" && values.ownerEmail?.trim() ? values.ownerEmail.trim() : null,
+        relation_with_owner: hasOwnerInfo === "1" && values.relationWithOwner ? values.relationWithOwner : (hasOwnerInfo === "1" ? "Titular" : null),
       };
 
       const result = await analysisRequestStore(payload);
@@ -178,6 +173,7 @@ const AddRequest = ({
         form.resetFields();
         localStorage.removeItem(FORM_CACHE_KEY);
         setLatLng({});
+        setHasOwnerInfo("0");
 
         if (onRequestAdded) {
           onRequestAdded();
@@ -205,21 +201,19 @@ const AddRequest = ({
   };
 
   const handleCancel = () => {
-    if (locationRequestRef.current !== null) {
-      locationRequestRef.current = null;
-    }
     setLatLng({});
+    setHasOwnerInfo("0");
     setVisible(false);
   };
 
-  // Update lat/lng in form and cache when map is clicked
+  // Cache coordinates and form data when changed
   useEffect(() => {
     if (latLng.lat && latLng.lng) {
       form.setFieldsValue({ lat: latLng.lat, lng: latLng.lng });
       const current = form.getFieldsValue();
-      localStorage.setItem(FORM_CACHE_KEY, JSON.stringify({ ...current, lat: latLng.lat, lng: latLng.lng }));
+      localStorage.setItem(FORM_CACHE_KEY, JSON.stringify({ ...current, lat: latLng.lat, lng: latLng.lng, hasOwnerInfo }));
     }
-  }, [latLng]);
+  }, [latLng, hasOwnerInfo]);
 
   const renderStatusMessage = () => {
     if (sessionLoading) {
@@ -258,156 +252,253 @@ const AddRequest = ({
 
   return (
     <>
-      <Button type="primary" onClick={() => setVisible(true)} disabled={!userEmail}>
+      <Button 
+        type="primary" 
+        size="large"
+        icon={<PlusCircleOutlined />}
+        onClick={() => setVisible(true)} 
+        disabled={!userEmail}
+      >
         Agregar Solicitud
       </Button>
 
       <Modal
-        title="Formulario de solicitud de puntos"
+        title={
+          <div className="flex items-center gap-2 py-2 pr-6 border-b border-gray-100">
+            <span className="poppins-bold text-xl text-geoterra-blue">
+              Formulario de Solicitud de Manifestación
+            </span>
+          </div>
+        }
         open={visible}
         onOk={handleOk}
         onCancel={handleCancel}
-        width={700}
+        width="88vw"
+        style={{ top: 20, maxWidth: '1100px' }}
+        bodyStyle={{ padding: '24px 32px 32px 32px' }}
         confirmLoading={loading}
         footer={[
-          <Button key="back" onClick={handleCancel} disabled={loading}>
+          <Button key="back" size="large" onClick={handleCancel} disabled={loading}>
             Cancelar
           </Button>,
           <Button
             key="submit"
             type="primary"
+            size="large"
             onClick={handleOk}
             loading={loading}
             disabled={!userEmail}
           >
-            Enviar
+            Enviar Solicitud
           </Button>,
         ]}
       >
         {renderStatusMessage()}
 
-        <Form layout="vertical" form={form}>
-          <PhoneInput form={form} name="contactNumber" required={true} />
+        <Form 
+          layout="vertical" 
+          form={form} 
+          className="poppins space-y-8"
+          initialValues={{
+            temperatureSensation: "Natural",
+            currentUsage: "Residencial",
+            bubbles: "0"
+          }}
+        >
+          {/* Section 1: Ubicación Geográfica */}
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <h3 className="text-lg font-bold text-geoterra-blue border-b border-gray-100 pb-3 flex items-center gap-2">
+              <EnvironmentFilled /> Ubicación de la Manifestación
+            </h3>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <Form.Item
+                label="Provincia"
+                name="provinceSnitCode"
+                rules={[{ required: true, message: "Seleccione una provincia" }]}
+              >
+                <Select
+                  size="large"
+                  placeholder="Seleccione provincia"
+                  loading={loadingProvinces}
+                  onChange={handleProvinceChange}
+                  options={provinces.map((p) => ({
+                    value: p.province_snit_code,
+                    label: p.province_name,
+                  }))}
+                  showSearch
+                  optionFilterProp="label"
+                />
+              </Form.Item>
 
-          {/* Location Selectors */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-3">
-            <Form.Item
-              label="Provincia"
-              name="provinceSnitCode"
-              rules={[{ required: true, message: "Seleccione una provincia" }]}
-            >
-              <Select
-                placeholder="Provincia"
-                loading={loadingProvinces}
-                onChange={handleProvinceChange}
-                options={provinces.map((p) => ({
-                  value: p.province_snit_code,
-                  label: p.province_name,
-                }))}
-                showSearch
-                optionFilterProp="label"
-              />
-            </Form.Item>
+              <Form.Item
+                label="Cantón"
+                name="cantonSnitCode"
+                rules={[{ required: true, message: "Seleccione un cantón" }]}
+              >
+                <Select
+                  size="large"
+                  placeholder="Seleccione cantón"
+                  loading={loadingCantons}
+                  disabled={cantons.length === 0}
+                  onChange={handleCantonChange}
+                  options={cantons.map((c) => ({
+                    value: c.canton_snit_code,
+                    label: c.canton_name,
+                  }))}
+                  showSearch
+                  optionFilterProp="label"
+                />
+              </Form.Item>
 
-            <Form.Item
-              label="Cantón"
-              name="cantonSnitCode"
-              rules={[{ required: true, message: "Seleccione un cantón" }]}
-            >
-              <Select
-                placeholder="Cantón"
-                loading={loadingCantons}
-                disabled={cantons.length === 0}
-                onChange={handleCantonChange}
-                options={cantons.map((c) => ({
-                  value: c.canton_snit_code,
-                  label: c.canton_name,
-                }))}
-                showSearch
-                optionFilterProp="label"
-              />
-            </Form.Item>
+              <Form.Item
+                label="Distrito"
+                name="districtSnitCode"
+                rules={[{ required: true, message: "Seleccione un distrito" }]}
+              >
+                <Select
+                  size="large"
+                  placeholder="Seleccione distrito"
+                  loading={loadingDistricts}
+                  disabled={districts.length === 0}
+                  options={districts.map((d) => ({
+                    value: d.district_snit_code,
+                    label: d.district_name,
+                  }))}
+                  showSearch
+                  optionFilterProp="label"
+                />
+              </Form.Item>
+            </div>
 
-            <Form.Item
-              label="Distrito"
-              name="districtSnitCode"
-              rules={[{ required: true, message: "Seleccione un distrito" }]}
-            >
-              <Select
-                placeholder="Distrito"
-                loading={loadingDistricts}
-                disabled={districts.length === 0}
-                options={districts.map((d) => ({
-                  value: d.district_snit_code,
-                  label: d.district_name,
-                }))}
-                showSearch
-                optionFilterProp="label"
-              />
+            <Form.Item label="Dirección Exacta" name="exactAddress">
+              <Input.TextArea rows={2} placeholder="Ej. Camino a Bagaces, 200 m norte de escuela..." />
             </Form.Item>
           </div>
 
-          <Form.Item label="Fecha" name="fecha" rules={[{ required: true }]}>
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item label="Sensación térmica" name="sensTermica" rules={[{ required: true }]}>
-            <Radio.Group>
-              <Radio value="3">Caliente</Radio>
-              <Radio value="2">Tibio</Radio>
-              <Radio value="1">Frio</Radio>
-            </Radio.Group>
-          </Form.Item>
-          <Form.Item label="Propietario de la zona" name="propietario">
-            <Input placeholder="En caso de que sea en propiedad privada" />
-          </Form.Item>
-          <Form.Item label="Uso actual" name="usoActual">
-            <Select 
-              placeholder="Uso que se le da a la zona" 
-              options={[
-                { value: 'Residencial', label: 'Residencial' },
-                { value: 'Comercial', label: 'Comercial' },
-                { value: 'Turístico', label: 'Turístico' },
-                { value: 'Conservación', label: 'Conservación' },
-                { value: 'Ganadería', label: 'Ganadería' },
-                { value: 'Otro', label: 'Otro' }
-              ]} 
-            />
-          </Form.Item>
-          <Form.Item label="Presenta burbujeo" name="burbujeo" rules={[{ required: true }]}>
-            <Radio.Group>
-              <Radio value="1">Sí</Radio>
-              <Radio value="0">No</Radio>
-            </Radio.Group>
-          </Form.Item>
-          <Form.Item label="Indicaciones para llegar al lugar" name="direccion">
-            <Input.TextArea placeholder="Como se llega a la zona" />
-          </Form.Item>
-          <Form.Item label="Subir Foto" name="foto" valuePropName="fileList" getValueFromEvent={e => e && e.fileList}>
-            <Upload beforeUpload={() => false} maxCount={1}>
-              <Button>Seleccionar archivo</Button>
-            </Upload>
-          </Form.Item>
+          {/* Section 2: Características de la Manifestación */}
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <h3 className="text-lg font-bold text-geoterra-blue border-b border-gray-100 pb-3 flex items-center gap-2">
+              <ExperimentOutlined /> Características de la Manifestación
+            </h3>
 
-          {/* Map Section with Coordinate Picker */}
-          <Form.Item label="Lugar en GPS">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Form.Item 
+                label="Uso Actual del Terreno" 
+                name="currentUsage" 
+                rules={[{ required: true, message: "Seleccione el uso actual" }]}
+              >
+                <Select
+                  size="large"
+                  placeholder="Seleccione el uso del terreno"
+                  options={[
+                    { value: 'Residencial', label: 'Residencial' },
+                    { value: 'Comercial', label: 'Comercial' },
+                    { value: 'Turístico', label: 'Turístico' },
+                    { value: 'Conservación', label: 'Conservación' },
+                    { value: 'Ganadería', label: 'Ganadería' },
+                    { value: 'Otro', label: 'Otro' }
+                  ]}
+                />
+              </Form.Item>
+
+              <Form.Item 
+                label="Sensación Térmica" 
+                name="temperatureSensation" 
+                rules={[{ required: true, message: "Seleccione la sensación térmica" }]}
+              >
+                <Select
+                  size="large"
+                  placeholder="Sensación térmica percibida"
+                  options={[
+                    { value: 'Hirviendo', label: '🔥 Hirviendo' },
+                    { value: 'Muy Caliente', label: '🌶️ Muy Caliente' },
+                    { value: 'Caliente', label: '🥵 Caliente' },
+                    { value: 'Templado', label: '🌤️ Templado' },
+                    { value: 'Natural', label: '🍃 Natural' },
+                    { value: 'Sin Especificar', label: '🤷 Sin Especificar' }
+                  ]}
+                />
+              </Form.Item>
+
+              <Form.Item label="Burbujeo Activo" name="bubbles">
+                <Radio.Group size="large" className="pt-2">
+                  <Radio value="1">Sí (Activo)</Radio>
+                  <Radio value="0">No</Radio>
+                </Radio.Group>
+              </Form.Item>
+            </div>
+
+            <Form.Item label="Detalles u Observaciones Adicionales" name="details">
+              <Input.TextArea rows={3} placeholder="Describa detalles adicionales sobre la emanación de vapor, gas o temperatura observada..." />
+            </Form.Item>
+          </div>
+
+          {/* Section 3: Información del Propietario (OPCIONAL) */}
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-100 pb-3 gap-2">
+              <h3 className="text-lg font-bold text-geoterra-blue flex items-center gap-2 m-0">
+                <UserOutlined /> Información del Propietario <span className="text-xs text-gray-400 font-normal">(Opcional)</span>
+              </h3>
+              
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-semibold text-gray-600">¿Conoce al propietario?</span>
+                <Radio.Group 
+                  value={hasOwnerInfo} 
+                  onChange={(e) => setHasOwnerInfo(e.target.value)}
+                  buttonStyle="solid"
+                >
+                  <Radio.Button value="0">No (Desconocido)</Radio.Button>
+                  <Radio.Button value="1">Sí (Ingresar datos)</Radio.Button>
+                </Radio.Group>
+              </div>
+            </div>
+
+            {hasOwnerInfo === "1" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                <Form.Item label="Nombre del Propietario" name="ownerName">
+                  <Input size="large" placeholder="Nombre completo del propietario" />
+                </Form.Item>
+
+                <Form.Item label="Relación con el Propietario" name="relationWithOwner">
+                  <Select size="large" defaultValue="Titular" options={[
+                    { value: 'Titular', label: 'Propietario / Titular' },
+                    { value: 'Familiar', label: 'Familiar' },
+                    { value: 'Empleado', label: 'Empleado' },
+                    { value: 'Socio', label: 'Socio' },
+                    { value: 'Conocido', label: 'Conocido' }
+                  ]} />
+                </Form.Item>
+
+                <Form.Item label="Correo del Propietario" name="ownerEmail">
+                  <Input size="large" type="email" placeholder="correo@ejemplo.com" />
+                </Form.Item>
+
+                <Form.Item label="Teléfono del Propietario" name="contactNumber">
+                  <PhoneInput size="large" />
+                </Form.Item>
+              </div>
+            )}
+          </div>
+
+          {/* Section 4: Geolocalización en Mapa */}
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <h3 className="text-lg font-bold text-geoterra-blue border-b border-gray-100 pb-3 flex items-center gap-2">
+              <EnvironmentFilled /> Geolocalización GPS
+            </h3>
+
             <MapCoordinatePicker
               latLng={latLng}
               onCoordinatesChange={(coords) => {
                 setLatLng(coords);
               }}
               title="Coordenadas GPS"
-              mapHeight="300px"
+              mapHeight="350px"
               showApplyButton={false}
               showClearButton={true}
             />
-          </Form.Item>
-        </Form>
-
-        {loading && (
-          <div style={{ textAlign: "center", marginTop: 16 }}>
-            <Spin />
           </div>
-        )}
+        </Form>
       </Modal>
     </>
   );
