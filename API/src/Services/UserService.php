@@ -22,11 +22,15 @@ final class UserService
 {
   private UserRepository $repository;
   private AuthService $authService;
+  private $notificationService;
 
   public function __construct(private PDO $pdo)
   {
     $this->repository = new UserRepository($this->pdo);
     $this->authService = new AuthService($this->pdo);
+    $this->notificationService = new NotificationService(
+      new SmtpEmailService()
+    );
   }
 
   /**
@@ -224,6 +228,17 @@ final class UserService
 
     // Return updated user data
     $updatedUser = $this->repository->findById($userId);
+
+    if (isset($updatedUser['email'], $updatedUser['first_name'])) {
+      $currentTime = date('d/m/Y H:i:s');
+      $this->notificationService->notifyRoleUpdated(
+        $updatedUser['email'],
+        $updatedUser['first_name'],
+        $this->translateUserRole($updatedUser['role']),
+        $currentTime
+      );
+    }
+
     return [
       'data' => $updatedUser,
       'meta' => null
@@ -261,7 +276,9 @@ final class UserService
     $userId = (string) $auth['user_id'];
     $user = $this->repository->findActiveUserById($userId);
     if (!$user) {
-      throw new ApiException(ErrorType::notFound('User'), 404);
+      throw new ApiException(
+        ErrorType::notFound('User'), 404
+      );
     }
     return [
       'id' => $user['user_id'],
@@ -272,5 +289,18 @@ final class UserService
       'last_name' => $user['last_name'] ?? null,
       'phone_number' => $user['phone_number'] ?? null,
     ];
+  }
+
+  private function translateUserRole(string $role) : ?string
+  {
+    $translatedRoles = [
+      'user' => 'Usuario',
+      'admin' => 'Administrador',
+      'maintenance' => 'Mantenimiento',
+      'field_investigator' => 'Investigador de Campo',
+      'investigator' => 'Investigador'
+    ];
+
+    return $translatedRoles[$role] ?? null;
   }
 }

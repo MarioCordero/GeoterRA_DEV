@@ -132,6 +132,48 @@ final class NotificationService
   }
 
   /**
+   * Sends an email notification when a user's role is updated by an
+   * administrator or manteinance.
+   */
+  public function notifyRoleUpdated(
+    string $email,
+    string $firstName,
+    string $newRole,
+    string $time
+  ): void {
+    $subject = "Actualización de Cuenta: Nuevo Rol Asignado";
+    $antiClip = $this->getAntiClippingToken();
+
+    $body = "
+      <div style='width: 100%; max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333333; word-break: break-word; box-sizing: border-box;'>
+        <div style='background-color: #F19B29; padding: 20px; color: white;'>
+          <h1 style='margin: 0; font-size: 24px; font-weight: bold;'>GeoterRA</h1>
+        </div>
+        
+        <div style='padding: 30px 20px;'>
+          <h2 style='font-size: 18px; font-weight: bold; margin-top: 0;'>Hola {$firstName},</h2>
+          
+          <p style='line-height: 1.5;'>
+            Le informamos que el equipo técnico ha modificado los permisos de su cuenta y se le ha asignado un nuevo <strong>rol</strong> en el sistema.
+          </p>
+
+          <div style='margin: 30px 0; padding: 20px; background-color: #f4f4f4; border-radius: 8px;'>
+            <p style='margin: 0 0 10px 0; font-size: 16px; word-break: break-word;'><strong>Nuevo Rol Asignado:</strong> <span style='color: #F19B29; font-weight: bold;'>{$newRole}</span></p>
+            <p style='margin: 0; font-size: 14px; color: #555555;'><strong>Fecha de modificación:</strong> {$time}</p>
+          </div>
+
+          <p style='line-height: 1.5; color: #666666;'>
+            Los cambios ya se encuentran activos. Si usted considera que se trata de un error o presenta problemas para acceder a sus nuevas funciones, por favor contacte al soporte técnico del sistema.
+          </p>
+        </div>
+        {$antiClip}
+      </div>
+    ";
+
+    $this->emailSender->send($email, $subject, trim($body));
+  }
+
+  /**
    * Sends an email notification when a new investigation request is successfully created.
    */
   public function notifyRequestCreated(
