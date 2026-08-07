@@ -13,7 +13,7 @@ class RegisterGeomanifestationDTOTest extends TestCase
   public function testFromArrayWithValidData(): void
   {
     $data = [
-      'name' => 'Test GM',
+      'geomanifestation_name' => 'Test GM',
       'latitude' => 10.5,
       'longitude' => -84.5,
       'province_snit_code' => 1,
@@ -40,7 +40,7 @@ class RegisterGeomanifestationDTOTest extends TestCase
   public function testFromArrayWithDefaultVisibilityFalse(): void
   {
     $data = [
-      'name' => 'Test GM',
+      'geomanifestation_name' => 'Test GM',
       'latitude' => 10.5,
       'longitude' => -84.5,
     ];
@@ -69,7 +69,7 @@ class RegisterGeomanifestationDTOTest extends TestCase
 
     RegisterGeomanifestationDTO::fromArray(
       [
-        'name' => '   ',
+        'geomanifestation_name' => '   ',
         'latitude' => 10.5,
         'longitude' => -84.5
       ]
@@ -83,7 +83,7 @@ class RegisterGeomanifestationDTOTest extends TestCase
 
     RegisterGeomanifestationDTO::fromArray(
       [
-        'name' => 'Test',
+        'geomanifestation_name' => 'Test',
         'longitude' => -84.5
       ]
     );
@@ -96,7 +96,7 @@ class RegisterGeomanifestationDTOTest extends TestCase
 
     RegisterGeomanifestationDTO::fromArray(
       [
-        'name' => 'Test',
+        'geomanifestation_name' => 'Test',
         'latitude' => 'abc',
         'longitude' => -84.5
       ]
@@ -110,7 +110,7 @@ class RegisterGeomanifestationDTOTest extends TestCase
 
     RegisterGeomanifestationDTO::fromArray(
       [
-        'name' => 'Test',
+        'geomanifestation_name' => 'Test',
         'latitude' => 10.5
       ]
     );

@@ -158,7 +158,7 @@ class GeomanifestationServiceTest extends TestCase
 		$this->authenticateAs(AllowedUserRoles::ADMIN);
 
 		$dto = RegisterGeomanifestationDTO::fromArray([
-			'name' => 'Las Hornillas',
+			'geomanifestation_name' => 'Las Hornillas',
 			'latitude' => 10.1,
 			'longitude' => -85.3,
 		]);
@@ -166,7 +166,7 @@ class GeomanifestationServiceTest extends TestCase
 		$result = $this->service->create($dto);
 
 		$this->assertNotEmpty($result['geomanifestation_id']);
-		$this->assertEquals('Las Hornillas', $result['name']);
+		$this->assertEquals('Las Hornillas', $result['geomanifestation_name']);
 		$this->assertNull($result['location']['province']);
 		$this->assertArrayHasKey('visibility', $result);
 		$this->assertArrayNotHasKey('insitu_test', $result);
@@ -180,7 +180,7 @@ class GeomanifestationServiceTest extends TestCase
 		$geo = $this->createTestGeoHierarchy();
 
 		$dto = RegisterGeomanifestationDTO::fromArray([
-			'name' => 'Rincon de la Vieja Fumarole',
+			'geomanifestation_name' => 'Rincon de la Vieja Fumarole',
 			'latitude' => 10.83,
 			'longitude' => -85.34,
 			'province_snit_code' => $geo['province_snit_code'],
@@ -200,7 +200,7 @@ class GeomanifestationServiceTest extends TestCase
 		$this->authenticateAs(AllowedUserRoles::ADMIN);
 
 		$dto = RegisterGeomanifestationDTO::fromArray([
-			'name' => 'Orphan Manifestation',
+			'geomanifestation_name' => 'Orphan Manifestation',
 			'latitude' => 10.0,
 			'longitude' => -84.0,
 			'province_snit_code' => 999999,
@@ -220,7 +220,7 @@ class GeomanifestationServiceTest extends TestCase
 		$this->authenticateAs(AllowedUserRoles::USER);
 
 		$dto = RegisterGeomanifestationDTO::fromArray([
-			'name' => 'Forbidden Manifestation',
+			'geomanifestation_name' => 'Forbidden Manifestation',
 			'latitude' => 10.0,
 			'longitude' => -84.0,
 		]);
@@ -238,7 +238,7 @@ class GeomanifestationServiceTest extends TestCase
 		$this->authenticateAs(AllowedUserRoles::ADMIN);
 
 		$dto = RegisterGeomanifestationDTO::fromArray([
-			'name' => 'Invalid Latitude',
+			'geomanifestation_name' => 'Invalid Latitude',
 			'latitude' => 120.0,
 			'longitude' => -84.0,
 		]);
@@ -320,17 +320,17 @@ class GeomanifestationServiceTest extends TestCase
 		$this->authenticateAs(AllowedUserRoles::ADMIN);
 		$manifestation = $this->createTestGeomanifestation();
 
-		$dto = UpdateGeomanifestationDTO::fromArray(['name' => 'Updated Name']);
+		$dto = UpdateGeomanifestationDTO::fromArray(['geomanifestation_name' => 'Updated Name']);
 		$result = $this->service->update($manifestation['geomanifestation_id'], $dto);
 
-		$this->assertEquals('Updated Name', $result['name']);
+		$this->assertEquals('Updated Name', $result['geomanifestation_name']);
 		$this->assertArrayHasKey('visibility', $result);
 	}
 
 	public function testUpdateThrowsNotFoundForNonexistentId(): void
 	{
 		$this->authenticateAs(AllowedUserRoles::ADMIN);
-		$dto = UpdateGeomanifestationDTO::fromArray(['name' => 'Ghost']);
+		$dto = UpdateGeomanifestationDTO::fromArray(['geomanifestation_name' => 'Ghost']);
 
 		try {
 			$this->service->update(UlidGenerator::generate(), $dto);
@@ -344,7 +344,7 @@ class GeomanifestationServiceTest extends TestCase
 	{
 		$this->authenticateAs(AllowedUserRoles::USER);
 		$manifestation = $this->createTestGeomanifestation();
-		$dto = UpdateGeomanifestationDTO::fromArray(['name' => 'Should not apply']);
+		$dto = UpdateGeomanifestationDTO::fromArray(['geomanifestation_name' => 'Should not apply']);
 
 		try {
 			$this->service->update($manifestation['geomanifestation_id'], $dto);
@@ -376,7 +376,7 @@ class GeomanifestationServiceTest extends TestCase
 
 		$result = $this->service->update($manifestation['geomanifestation_id'], $dto);
 
-		$this->assertEquals($manifestation['geomanifestation_name'], $result['name']);
+		$this->assertEquals($manifestation['geomanifestation_name'], $result['geomanifestation_name']);
 	}
 
 	// -------------------------------- delete --------------------------------- //
