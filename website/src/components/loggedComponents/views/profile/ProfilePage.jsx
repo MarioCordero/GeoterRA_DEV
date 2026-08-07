@@ -3,6 +3,7 @@ import { userMeUpdate, userMeDelete } from '../../../../config/apiConf';
 import { useSession } from '../../../../hooks/useSession';
 import ConfirmationModal from '../../../common/ConfirmationModal';
 import SuccessModal from '../../../common/SuccessModal';
+import ErrorModal from '../../../common/ErrorModal';
 import { Form, Input, Button, Card, Spin, Row, Col, message } from 'antd';
 import { LockOutlined, MailOutlined, UserOutlined, PhoneOutlined, SaveOutlined, ExclamationCircleOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
@@ -15,11 +16,21 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  
+  // Modals state
   const [modalVisible, setModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [profileUpdateSuccessVisible, setProfileUpdateSuccessVisible] = useState(false);
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  
   const [pendingData, setPendingData] = useState(null);
+
+  const showError = (msg) => {
+    setErrorMessage(msg);
+    setErrorModalVisible(true);
+  };
 
   // Handle profile update submission
   const handleProfileUpdate = async (values) => {
@@ -33,21 +44,27 @@ const ProfilePage = () => {
     setLoading(true);
 
     try {
+      // Backend expects snake_case: first_name, last_name, email, phone_number
       const payload = {
+        first_name: pendingData.firstName,
+        last_name: pendingData.lastName,
+        email: pendingData.email,
+        phone_number: pendingData.phone ? pendingData.phone.replace(/\D/g, '') : null,
+        // Also supply camelCase properties for backwards compatibility
         firstName: pendingData.firstName,
         lastName: pendingData.lastName,
-        email: pendingData.email,
-        phoneNumber: pendingData.phone,
+        phoneNumber: pendingData.phone ? pendingData.phone.replace(/\D/g, '') : null,
       };
+
       const result = await userMeUpdate(payload);
-      if (!result.ok) throw new Error(result.error || 'Error updating profile');
+      if (!result.ok) throw new Error(result.error || 'Error al actualizar el perfil');
 
       setLoading(false);
       setPendingData(null);
       setProfileUpdateSuccessVisible(true);
     } catch (error) {
-      message.error(`Error: ${error.message}`);
       setLoading(false);
+      showError(error.message || 'Error al actualizar la información del perfil');
     }
   };
 
@@ -60,32 +77,36 @@ const ProfilePage = () => {
   // Handle password change submission
   const handlePasswordChange = async (values) => {
     if (values.newPassword !== values.confirmPassword) {
-      message.error('Las contraseñas no coinciden');
+      showError('Las contraseñas no coinciden');
       return;
     }
     setPasswordLoading(true);
 
     try {
+      // Payload matching PUT /users/me endpoint fields
       const payload = {
-        currentPassword: values.currentPassword,
+        current_password: values.currentPassword,
         password: values.newPassword,
+        first_name: user.first_name || user.firstName,
+        last_name: user.last_name || user.lastName,
+        email: user.email,
+        phone_number: user.phone_number || user.phoneNumber,
+        currentPassword: values.currentPassword,
         firstName: user.first_name || user.firstName,
         lastName: user.last_name || user.lastName,
-        email: user.email,
         phoneNumber: user.phone_number || user.phoneNumber,
       };
 
       const response = await userMeUpdate(payload);
       if (!response.ok) {
-        throw new Error(response.error || 'Password change failed');
+        throw new Error(response.error || 'Error al cambiar la contraseña');
       }
 
       setSuccessModalVisible(true);
-      console.log('✅ [handlePasswordChange] Password changed successfully - Success modal is now visible');
       passwordForm.resetFields();
     } catch (error) {
       console.error('❌ [handlePasswordChange] Error:', error);
-      message.error(`Error: ${error.message}`);
+      showError(error.message || 'Error al cambiar la contraseña');
     } finally {
       setPasswordLoading(false);
     }
@@ -107,7 +128,7 @@ const ProfilePage = () => {
       const result = await userMeDelete();
 
       if (!result.ok) {
-        throw new Error(result.error || 'Account deletion failed');
+        throw new Error(result.error || 'Error al eliminar la cuenta');
       }
 
       message.success('✅ Cuenta eliminada correctamente');
@@ -116,7 +137,7 @@ const ProfilePage = () => {
       }, 1500);
     } catch (error) {
       console.error('Account deletion error:', error);
-      message.error(`Error: ${error.message}`);
+      showError(error.message || 'Error al eliminar la cuenta');
     } finally {
       setDeleteLoading(false);
     }
@@ -163,13 +184,13 @@ const ProfilePage = () => {
                 <Col xs={24} sm={12}>
                   <div className="py-3">
                     <p className="text-gray-400 m-0 text-xs">Nombre</p>
-                    <p className="m-0 text-base font-medium">{user.first_name || '-'}</p>
+                    <p className="m-0 text-base font-medium">{user.first_name || user.firstName || '-'}</p>
                   </div>
                 </Col>
                 <Col xs={24} sm={12}>
                   <div className="py-3">
                     <p className="text-gray-400 m-0 text-xs">Apellido</p>
-                    <p className="m-0 text-base font-medium">{user.last_name || '-'}</p>
+                    <p className="m-0 text-base font-medium">{user.last_name || user.lastName || '-'}</p>
                   </div>
                 </Col>
               </Row>
@@ -185,7 +206,7 @@ const ProfilePage = () => {
                 <Col xs={24} sm={12}>
                   <div className="py-3">
                     <p className="text-gray-400 m-0 text-xs">Número de Teléfono</p>
-                    <p className="m-0 text-base font-medium">{user.phone_number || '-'}</p>
+                    <p className="m-0 text-base font-medium">{user.phone_number || user.phoneNumber || '-'}</p>
                   </div>
                 </Col>
                 <Col xs={24} sm={12}>
@@ -221,10 +242,10 @@ const ProfilePage = () => {
               layout="vertical"
               onFinish={handleProfileUpdate}
               initialValues={{
-                firstName: user.first_name || '',
-                lastName: user.last_name || '',
+                firstName: user.first_name || user.firstName || '',
+                lastName: user.last_name || user.lastName || '',
                 email: user.email || '',
-                phone: user.phone_number || '',
+                phone: user.phone_number || user.phoneNumber || '',
               }}
             >
               <Row gutter={16}>
@@ -435,14 +456,14 @@ const ProfilePage = () => {
         title="Confirmar cambios"
         message="¿Estás seguro de que deseas actualizar tu información personal?"
         items={[
-          ...(pendingData?.firstName !== user.first_name ? [{
+          ...(pendingData?.firstName !== (user.first_name || user.firstName) ? [{
             label: 'Nombre',
-            old: user.first_name,
+            old: user.first_name || user.firstName,
             new: pendingData?.firstName,
           }] : []),
-          ...(pendingData?.lastName !== user.last_name ? [{
+          ...(pendingData?.lastName !== (user.last_name || user.lastName) ? [{
             label: 'Apellido',
-            old: user.last_name,
+            old: user.last_name || user.lastName,
             new: pendingData?.lastName,
           }] : []),
           ...(pendingData?.email !== user.email ? [{
@@ -450,9 +471,9 @@ const ProfilePage = () => {
             old: user.email,
             new: pendingData?.email,
           }] : []),
-          ...(pendingData?.phone !== (user.phone_number || '') ? [{
+          ...(pendingData?.phone !== (user.phone_number || user.phoneNumber || '') ? [{
             label: 'Teléfono',
-            old: user.phone_number || '(No especificado)',
+            old: user.phone_number || user.phoneNumber || '(No especificado)',
             new: pendingData?.phone || '(No especificado)',
           }] : []),
         ]}
@@ -503,6 +524,13 @@ const ProfilePage = () => {
         status="success"
         confirmText="Continuar"
         onConfirm={handleProfileUpdateSuccess}
+      />
+
+      {/* Custom Error Modal */}
+      <ErrorModal
+        open={errorModalVisible}
+        errorMessage={errorMessage}
+        onClose={() => setErrorModalVisible(false)}
       />
     </div>
   );

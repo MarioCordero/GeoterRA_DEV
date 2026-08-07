@@ -1,7 +1,22 @@
 import React from 'react';
 
-const ErrorModal = ({ visible, errorMessage, onClose }) => {
-  if (!visible) return null;
+/**
+ * Reusable Error Modal Component
+ * Displays custom full-screen overlay with frosted backdrop blur
+ * 
+ * @param {Object} props
+ * @param {boolean} [props.visible] - Whether modal is open
+ * @param {boolean} [props.open] - Alternative prop for visibility
+ * @param {boolean} [props.isOpen] - Alternative prop for visibility
+ * @param {string} [props.errorMessage] - Error message to display
+ * @param {string} [props.message] - Alternative prop for error message
+ * @param {Function} props.onClose - Callback when closing modal
+ */
+const ErrorModal = ({ visible, open, isOpen, errorMessage, message, onClose }) => {
+  const isVisible = visible !== undefined ? visible : (open !== undefined ? open : isOpen);
+  if (!isVisible) return null;
+
+  const displayMessage = errorMessage || message || 'Ha ocurrido un error inesperado';
 
   return (
     <div className="fixed inset-0 bg-white/30 bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-1000">
@@ -26,7 +41,7 @@ const ErrorModal = ({ visible, errorMessage, onClose }) => {
             Error
           </h3>
           <p className="text-base sm:text-lg text-gray-600 poppins mb-8 leading-relaxed">
-            {errorMessage || 'Ha ocurrido un error inesperado'}
+            {displayMessage}
           </p>
           <button
             onClick={onClose}
