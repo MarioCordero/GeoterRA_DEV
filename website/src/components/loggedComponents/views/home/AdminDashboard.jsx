@@ -1,11 +1,12 @@
-import { Spin, Card, Row, Col, Statistic, Tag, Button } from 'antd';
 import "../../../../colorModule.css";
 import '../../../../fontsModule.css';
 import React, { useState, useEffect } from 'react';
 import { useSession } from '../../../../hooks/useSession';
 import { analysisRequest } from '../../../../config/apiConf';
 import { usePermissions } from '../../../../hooks/usePermissions';
+import { Spin, Card, Row, Col, Statistic, Tag, Button } from 'antd';
 import { FileTextOutlined, CheckCircleOutlined, ClockCircleOutlined, DeleteOutlined } from '@ant-design/icons';
+import UserInfo from './userInfo';
 
 const AdminDashboard = () => {
   const { user: sessionUser, loading, error } = useSession();
@@ -76,53 +77,21 @@ const AdminDashboard = () => {
       </div>
 
       {/* User Info Cards */}
-      <Row gutter={16} className="mb-8">
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <p className="text-gray-600 text-sm">Rol</p>
-            <Tag color="blue">👨‍💼 Coordinador Científico</Tag>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <p className="text-gray-600 text-sm">Email</p>
-            <p className="font-semibold text-sm">{sessionUser?.email}</p>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <p className="text-gray-600 text-sm">Estado de Cuenta</p>
-            <Tag color={sessionUser?.is_active ? 'green' : 'red'}>
-              {sessionUser?.is_active ? '✅ Activa' : '❌ Inactiva'}
-            </Tag>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <p className="text-gray-600 text-sm">Verificación</p>
-            <Tag color={sessionUser?.is_verified ? 'green' : 'orange'}>
-              {sessionUser?.is_verified ? '✅ Verificado' : '⏳ Pendiente'}
-            </Tag>
-          </Card>
-        </Col>
-      </Row>
+      <UserInfo />
 
-      {/* Role Description */}
-      <Card className="mb-8 bg-blue-50 border-l-4 border-blue-500">
-        <h3 className="text-xl font-bold mb-3">📋 Descripción del Rol: Coordinador Científico</h3>
+      {/* Role Description: Admin */}
+      <Card className="mb-8 bg-red-50 border-l-4 border-red-600">
+        <h3 className="text-xl font-bold mb-3">📋 Descripción del Rol: Administrador Global</h3>
         <p className="text-gray-700 mb-4">
-          Como Coordinador Científico, eres responsable de revisar, validar y procesar las solicitudes de análisis geotérmico. 
-          Tu rol te permite evaluar la calidad de los datos, confirmar ubicaciones, completar análisis químicos y garantizar 
-          que solo los datos verificados se publiquen en el sistema.
+          Como Administrador, posees el nivel de autorización más alto en GeoterRA. Heredas todas las capacidades operativas
+          y tienes control absoluto sobre la gestión del sistema, la base de datos y todos los niveles de usuarios.
         </p>
         <h4 className="font-semibold text-gray-800 mb-2">🎯 Responsabilidades Principales:</h4>
         <ul style={{ margin: '0', paddingLeft: '20px', color: '#333' }}>
-          <li>Revisar todas las solicitudes de análisis pendientes</li>
-          <li>Validar la precisión de datos GPS y observaciones de campo</li>
-          <li>Completar mediciones de laboratorio (pH, conductividad, iones)</li>
-          <li>Procesar análisis y crear registros de manifestaciones verificadas</li>
-          <li>Publicar puntos en el mapa interactivo del sistema</li>
-          <li>Gestionar rechazos y coordinar con investigadores cuando sea necesario</li>
+          <li>Control total sobre todos los módulos de GeoterRA.</li>
+          <li>Gestión irrestricta de TODOS los usuarios (incluyendo otros administradores e investigadores).</li>
+          <li>Administración global de la base de datos y el mapa.</li>
+          <li>Supervisión de toda la auditoría y logs del sistema.</li>
         </ul>
       </Card>
 
@@ -171,32 +140,32 @@ const AdminDashboard = () => {
         </Col>
       </Row>
 
-      {/* Capabilities */}
-      <Card className="mb-8 bg-blue-100 border-l-4 border-blue-500">
+      {/* Capabilities: Admin */}
+      <Card className="mb-8 bg-rose-50 border-l-4 border-rose-500">
         <h3 className="text-lg font-bold mb-4">🎯 ¿Qué puedes hacer aquí?</h3>
         <Row gutter={16}>
           <Col xs={24} sm={12} md={6}>
             <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-blue-600 mb-2">📋 Revisar Solicitudes</h4>
-              <p className="text-sm text-gray-600">Accede al panel de gestión para revisar, validar y procesar todas las solicitudes pendientes de análisis.</p>
+              <h4 className="font-semibold text-red-700 mb-2">👑 Control Total</h4>
+              <p className="text-sm text-gray-600">Acceso sin restricciones a todas las funciones, investigaciones y configuraciones.</p>
             </div>
           </Col>
           <Col xs={24} sm={12} md={6}>
             <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-blue-600 mb-2">🔬 Análisis Químico</h4>
-              <p className="text-sm text-gray-600">Ingresa mediciones de laboratorio (pH, conductividad, iones) para completar el análisis geoquímico.</p>
+              <h4 className="font-semibold text-red-700 mb-2">👥 Gestión Global</h4>
+              <p className="text-sm text-gray-600">Creación, edición y eliminación de cualquier cuenta, independientemente de su rol.</p>
             </div>
           </Col>
           <Col xs={24} sm={12} md={6}>
             <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-blue-600 mb-2">📍 Confirmar Ubicación</h4>
-              <p className="text-sm text-gray-600">Verifica y ajusta las coordenadas GPS de los puntos antes de procesarlos al mapa.</p>
+              <h4 className="font-semibold text-red-700 mb-2">🗺️ Administrar Mapa</h4>
+              <p className="text-sm text-gray-600">Control absoluto sobre los datos geoespaciales y puntos de manifestación.</p>
             </div>
           </Col>
           <Col xs={24} sm={12} md={6}>
             <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-blue-600 mb-2">🗺️ Ver Mapa</h4>
-              <p className="text-sm text-gray-600">Visualiza todas las manifestaciones geotermales aprobadas en el mapa interactivo.</p>
+              <h4 className="font-semibold text-red-700 mb-2">🛡️ Seguridad y Logs</h4>
+              <p className="text-sm text-gray-600">Revisión profunda de registros, auditorías en tiempo real y mantenimiento de DB.</p>
             </div>
           </Col>
         </Row>

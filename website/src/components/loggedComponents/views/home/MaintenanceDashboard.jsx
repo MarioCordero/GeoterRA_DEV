@@ -5,10 +5,11 @@ import { useSession } from '../../../../hooks/useSession';
 import { Card, Row, Col, Statistic, Tag, Spin } from 'antd';
 import { maintenanceDashboardInfo } from '../../../../config/apiConf';
 import { HddOutlined, TeamOutlined, DatabaseOutlined, FileTextOutlined } from '@ant-design/icons';
+import UserInfo from './userInfo';
 
 const MaintenanceDashboard = () => {
   const { user: sessionUser, loading: sessionLoading } = useSession();
-  
+
   // State Management
   const [dashboardData, setDashboardData] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
@@ -46,7 +47,7 @@ const MaintenanceDashboard = () => {
 
   // Helper function to get load color
   const getLoadColor = (load) => {
-    switch(load) {
+    switch (load) {
       case 'Low':
         return '#52c41a';
       case 'Moderate':
@@ -77,51 +78,20 @@ const MaintenanceDashboard = () => {
       </div>
 
       {/* User Info Cards */}
-      <Row gutter={16} className="mb-8">
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <p className="text-gray-600 text-sm">Rol</p>
-            <Tag color="green">🔧 Mantenimiento</Tag>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <p className="text-gray-600 text-sm">Email</p>
-            <p className="font-semibold text-sm">{sessionUser?.email}</p>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <p className="text-gray-600 text-sm">Estado</p>
-            <Tag color={sessionUser?.is_active ? 'green' : 'red'}>
-              {sessionUser?.is_active ? '✅ Activo' : '❌ Inactivo'}
-            </Tag>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <p className="text-gray-600 text-sm">Acceso a Datos</p>
-            <Tag color="blue">🔍 Solo Lectura</Tag>
-          </Card>
-        </Col>
-      </Row>
+      <UserInfo />
 
-      {/* Role Description */}
-      <Card className="mb-8 bg-blue-50 border-l-4 border-blue-500">
-        <h3 className="text-xl font-bold mb-3">📋 Descripción del Rol: Administrador de Mantenimiento</h3>
+      {/* Role Description: Maintenance */}
+      <Card className="mb-8 bg-orange-50 border-l-4 border-orange-500">
+        <h3 className="text-xl font-bold mb-3">📋 Descripción del Rol: Mantenimiento</h3>
         <p className="text-gray-700 mb-4">
-          Como Administrador de Mantenimiento, eres responsable de monitorear y mantener la integridad del sistema GeoterRA. 
-          Tu rol te permite supervisar el estado de la infraestructura, gestionar usuarios y acceder a información crítica del sistema 
-          con permisos de solo lectura para garantizar seguridad.
+          Como personal de Mantenimiento, tu labor es asegurar la integridad de la plataforma. Tienes acceso a herramientas
+          de soporte, monitoreo de registros y gestión de cuentas de nivel base.
         </p>
         <h4 className="font-semibold text-gray-800 mb-2">🎯 Responsabilidades Principales:</h4>
         <ul style={{ margin: '0', paddingLeft: '20px', color: '#333' }}>
-          <li>Monitorear el estado y rendimiento del servidor en tiempo real</li>
-          <li>Supervisar usuarios activos en el sistema</li>
-          <li>Revisar solicitudes pendientes y su estado de procesamiento</li>
-          <li>Acceder a registros del sistema para auditoría y diagnóstico</li>
-          <li>Gestionar información de usuarios registrados (solo lectura)</li>
-          <li>Visualizar la estructura completa de la base de datos</li>
+          <li>Visualización de la base de datos operativa.</li>
+          <li>Gestionar usuarios existentes (excluyendo a administradores e investigadores).</li>
+          <li>Visualizar en tiempo real los logs de la base de datos.</li>
         </ul>
       </Card>
 
@@ -170,32 +140,26 @@ const MaintenanceDashboard = () => {
         </Col>
       </Row>
 
-      {/* Capabilities */}
-      <Card className="mb-8 bg-green-100 border-l-4 border-green-500">
+      {/* Capabilities: Maintenance */}
+      <Card className="mb-8 bg-amber-50 border-l-4 border-amber-600">
         <h3 className="text-lg font-bold mb-4">🎯 ¿Qué puedes hacer aquí?</h3>
         <Row gutter={16}>
-          <Col xs={24} sm={12} md={6}>
+          <Col xs={24} sm={12} md={8}>
             <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-blue-600 mb-2">📊 Registros del Sistema</h4>
-              <p className="text-sm text-gray-600">Accede a los últimos 500 registros de eventos, errores y acciones realizadas en el sistema.</p>
+              <h4 className="font-semibold text-orange-600 mb-2">🗄️ Consulta de Datos</h4>
+              <p className="text-sm text-gray-600">Visualiza la estructura y los datos registrados para fines de soporte técnico.</p>
             </div>
           </Col>
-          <Col xs={24} sm={12} md={6}>
+          <Col xs={24} sm={12} md={8}>
             <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-blue-600 mb-2">👥 Gestionar Usuarios</h4>
-              <p className="text-sm text-gray-600">Visualiza la lista completa de usuarios registrados, información de contacto y estado de actividad.</p>
+              <h4 className="font-semibold text-orange-600 mb-2">👥 Soporte de Usuarios</h4>
+              <p className="text-sm text-gray-600">Gestiona y asiste a las cuentas de usuarios de nivel común y de campo.</p>
             </div>
           </Col>
-          <Col xs={24} sm={12} md={6}>
+          <Col xs={24} sm={12} md={8}>
             <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-blue-600 mb-2">🗄️ Base de Datos</h4>
-              <p className="text-sm text-gray-600">Accede a todas las tablas, estructura y datos almacenados (hasta 1000 registros por tabla).</p>
-            </div>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-blue-600 mb-2">📈 Monitor de Salud</h4>
-              <p className="text-sm text-gray-600">Monitorea estadísticas en tiempo real: servidor, usuarios activos y carga del sistema.</p>
+              <h4 className="font-semibold text-orange-600 mb-2">🔍 Auditoría de Logs</h4>
+              <p className="text-sm text-gray-600">Monitorea los registros de actividad de la base de datos en tiempo real.</p>
             </div>
           </Col>
         </Row>
@@ -232,7 +196,7 @@ const MaintenanceDashboard = () => {
         </Row>
         <div style={{ marginTop: '20px', padding: '12px', backgroundColor: '#e6f7ff', borderRadius: '4px', borderLeft: '4px solid #1890ff' }}>
           <p style={{ margin: '0', fontSize: '14px', color: '#0050b3' }}>
-            <strong>💡 Nota:</strong> El rol de Mantenimiento es de solo lectura. Esto garantiza que se mantiene la integridad de los datos críticos. 
+            <strong>💡 Nota:</strong> El rol de Mantenimiento es de solo lectura. Esto garantiza que se mantiene la integridad de los datos críticos.
             Para cambios en los datos, contacta con un administrador de base de datos.
           </p>
         </div>
