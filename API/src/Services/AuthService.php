@@ -5,9 +5,12 @@ namespace Services;
 
 use Core\EnvironmentDetector;
 use Core\Logger;
+use DateTime;
+use DateTimeZone;
 use DTO\AccessTokenDTO;
 use DTO\LoginUserDTO;
 use DTO\RefreshTokenDTO;
+use DTO\ResetPasswordDTO;
 use Http\ApiException;
 use Http\ErrorType;
 use Http\Request;
@@ -21,8 +24,10 @@ final class AuthService
   private UserRepository $userRepository;
   private AuthRepository $authRepository;
 
-  public function __construct(private PDO $pdo)
-  {
+  public function __construct(
+    private readonly PDO $pdo,
+    private readonly ?NotificationService $notificationService = null
+  ) {
     $this->userRepository = new UserRepository($this->pdo);
     $this->authRepository = new AuthRepository($this->pdo);
   }
@@ -72,10 +77,29 @@ final class AuthService
       $this->authRepository->createRefreshToken($refreshDto);
       $this->authRepository->upsertAccessToken($accessDto);
       $this->pdo->commit();
+
+      if ($this->notificationService !== null) {
+        $ip = Request::getIpAddress();
+        $userAgent = Request::getUserAgent();
+        $location = IpLocationService::getFromIp($ip);
+        $tz = new DateTimeZone('America/Costa_Rica');
+        $crDate = new DateTime('now', $tz);
+        $time = $crDate->format('Y-m-d H:i:s');
+        $device = $this->parseDeviceFromUserAgent($userAgent);
+
+        $this->notificationService->notifyNewLogin(
+          $user['email'],
+          $user['first_name'],
+          $device,
+          $location,
+          $time
+        );
+      }
+
     } catch (Throwable $e) {
       $this->pdo->rollBack();
       throw new ApiException(
-        ErrorType::internal('Login failed: ' . $e->getMessage()),
+        ErrorType::internal('Login failed'),
         500
       );
     }
@@ -97,6 +121,125 @@ final class AuthService
         'expires_in' => $accessTtl,
       ],
     ];
+  }
+
+  /**
+   * Extracts a simplified device OS/Browser name from the raw User-Agent string.
+   *
+   * @param string $userAgent The raw HTTP User-Agent.
+   * @return string A human-readable device/browser identifier.
+   */
+  private function parseDeviceFromUserAgent(string $userAgent): string
+  {
+    $os = 'Unknown OS';
+    if (preg_match('/windows nt 10/i', $userAgent)) $os = 'Windows 10/11';
+    elseif (preg_match('/windows nt/i', $userAgent)) $os = 'Windows';
+    elseif (preg_match('/macintosh|mac os x/i', $userAgent)) $os = 'macOS';
+    elseif (preg_match('/linux/i', $userAgent)) $os = 'Linux';
+    elseif (preg_match('/iphone|ipad|ipod/i', $userAgent)) $os = 'iOS';
+    elseif (preg_match('/android/i', $userAgent)) $os = 'Android';
+
+    $browser = 'Unknown Browser';
+    if (preg_match('/edg/i', $userAgent)) $browser = 'Edge';
+    elseif (preg_match('/chrome/i', $userAgent)) $browser = 'Chrome';
+    elseif (preg_match('/safari/i', $userAgent)
+      && !preg_match('/chrome/i', $userAgent)
+    ) $browser = 'Safari';
+    elseif (preg_match('/firefox/i', $userAgent)) $browser = 'Firefox';
+
+    return "{$os} - {$browser}";
+  }
+
+  /**
+   * Initiates the password reset process by generating an OTP and dispatching an email.
+   *
+   * @param string $email The user's email address.
+   * @return void
+   * @throws Throwable
+   */
+  public function requestPasswordReset(string $email): void
+  {
+    $user = $this->userRepository->findByEmail($email);
+
+    if (!$user || $user['is_deleted'] === 1) {
+      return;
+    }
+
+    $rawToken = (string) random_int(100000, 999999);
+    $tokenHash = hash('sha256', $rawToken);
+    // 5-Minutes expiry
+    $expiry = time() + 300;
+
+    try {
+      $this->pdo->beginTransaction();
+
+      $this->authRepository->deletePasswordResetTokens($user['user_id']);
+      $this->authRepository->insertPasswordResetToken(
+        $user['user_id'],
+        $tokenHash,
+        $expiry
+      );
+
+      $this->pdo->commit();
+
+      if ($this->notificationService !== null) {
+        $this->notificationService->notifyPasswordReset(
+          $user['email'],
+          $user['first_name'],
+          $rawToken
+        );
+      }
+    } catch (Throwable $e) {
+      $this->pdo->rollBack();
+      throw new ApiException(
+        ErrorType::internal(
+          'Ha ocurrido un error durante la petición de recuperación'),
+        500
+      );
+    }
+  }
+
+  /**
+   * Validates the provided OTP and updates the user's password.
+   *
+   * @param ResetPasswordDTO $dto The DTO containing the OTP and new password.
+   * @return void
+   * @throws ApiException
+   */
+  public function resetPassword(ResetPasswordDTO $dto): void
+  {
+    $dto->validate();
+
+    $tokenHash = hash('sha256', $dto->token);
+    $record = $this->authRepository->findPasswordResetToken($tokenHash);
+
+    if (!$record || (int)$record['token_expiry'] < time()) {
+      throw new ApiException(
+        ErrorType::unauthorized('Invalid or expired reset token'),
+        401
+      );
+    }
+
+    $hashedPassword = PasswordService::hash($dto->newPassword);
+
+    try {
+      $this->pdo->beginTransaction();
+      $this->userRepository->updatePassword(
+        $record['user_id'],
+        $hashedPassword
+      );
+      $this->authRepository->deletePasswordResetTokens($record['user_id']);
+
+      // Enforce security by revoking active sessions upon password change
+      $this->authRepository->deleteUserTokens($record['user_id']);
+      $this->pdo->commit();
+    } catch (Throwable $e) {
+      $this->pdo->rollBack();
+      throw new ApiException(
+        ErrorType::internal('Failed to reset password'),
+        500
+      );
+    }
   }
 
   private function hashToken(string $rawToken): string
@@ -158,7 +301,7 @@ final class AuthService
         throw new ApiException(ErrorType::invalidRefreshToken(), 401);
       }
       throw new ApiException(
-        ErrorType::internal('Token refresh failed: ' . $e->getMessage()),
+        ErrorType::internal('Token refresh failed'),
         500
       );
     }

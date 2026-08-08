@@ -36,8 +36,13 @@ class UserServiceTest extends TestCase
 
     private function authenticateUser(string $userId): void
     {
-        $accessData = $this->createTestAccessToken($userId);
-        $_COOKIE['geoterra_session_token'] = $accessData['token'];
+      $accessData = $this->createTestAccessToken($userId);
+      $_SERVER['HTTP_AUTHORIZATION'] = 'Bearer ' . $accessData['token'];
+      $_COOKIE['geoterra_session_token'] = $accessData['token'];
+
+      Request::init();
+      $user = $this->getUserById($userId);
+      Request::setUser($user);
     }
 
     public function testRegisterUserSuccess(): void
@@ -82,16 +87,13 @@ class UserServiceTest extends TestCase
         $dto = UpdateUserDTO::fromArray([
             'first_name' => 'Johnny',
             'last_name' => 'Doe',
-            'email' => $user['email'],
-            'current_password' => 'SecurePass123!',
-            'password' => 'NewSecurePass123!'
-        ], $user['user_id']);
+            'email' => $user['email']
+        ]);
 
         $this->userService->updateUser($dto);
-        
+
         $updatedUser = $this->getUserById($user['user_id']);
         $this->assertEquals('Johnny', $updatedUser['first_name']);
-        $this->assertTrue(PasswordService::verify('NewSecurePass123!', $updatedUser['password_hash']));
     }
 
     public function testDeleteCurrentUserSuccess(): void
@@ -117,17 +119,20 @@ class UserServiceTest extends TestCase
         $this->assertEquals($user['email'], $result['data']['email']);
     }
 
-    public function testUpdateUserRoleSuccess(): void
-    {
-        $user = $this->createTestUser(['role' => 'user']);
-        
-        $dto = UpdateUserRoleDTO::fromArray([
-            'role' => 'admin'
-        ], $user['user_id']);
+  public function testUpdateUserRoleSuccess(): void
+  {
+    $admin = $this->createTestUser(['role' => 'admin']);
+    $this->authenticateUser($admin['user_id']);
 
-        $this->userService->updateUserRole($dto);
-        
-        $updatedUser = $this->getUserById($user['user_id']);
-        $this->assertEquals('admin', $updatedUser['role']);
-    }
+    $user = $this->createTestUser(['role' => 'user']);
+
+    $dto = UpdateUserRoleDTO::fromArray([
+      'role' => 'admin'
+    ]);
+
+    $this->userService->updateUserRole($user['user_id'], $dto);
+
+    $updatedUser = $this->getUserById($user['user_id']);
+    $this->assertEquals('admin', $updatedUser['role']);
+  }
 }

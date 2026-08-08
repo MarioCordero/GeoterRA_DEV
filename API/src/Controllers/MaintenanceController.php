@@ -18,12 +18,9 @@ use Throwable;
 final class MaintenanceController
 {
   private MaintenanceService $service;
-  private AuthService $authService;
-
   public function __construct(private PDO $pdo)
   {
     $this->service = new MaintenanceService($pdo);
-    $this->authService = new AuthService($pdo);
   }
 
   // GET /maintenance/system/logs
@@ -104,16 +101,19 @@ final class MaintenanceController
 
       // Validate user ID parameter
       if (empty($id)) {
-        Response::error(ErrorType::missingField('id'), 400);
+        Response::error(
+          ErrorType::missingQueryParameter('id'),
+          400
+        );
         return;
       }
 
       // Parse request body
       $body = Request::parseJsonRequest();
-      $dto = UpdateUserRoleDTO::fromArray($body, $id);
+      $dto = UpdateUserRoleDTO::fromArray($body);
 
       // Update user role
-      $result = $this->service->updateUserRole($dto, $user['role']);
+      $result = $this->service->updateUserRole($dto, $id);
       Response::success($result['data'], $result['meta'], 200);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());

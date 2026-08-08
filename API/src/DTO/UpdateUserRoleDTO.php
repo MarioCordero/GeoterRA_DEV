@@ -25,25 +25,15 @@ use OpenApi\Annotations as OA;
 final class UpdateUserRoleDTO
 {
   public function __construct(
-    public string $userId,
     public string $role,
   ) {
   }
 
-  public static function fromArray(array $data, string $userId = ''): self
+  public static function fromArray(array $data): self
   {
     return new self(
-      $userId,
       trim($data['role'] ?? '')
     );
-  }
-
-  /**
-   * Set the user ID for the DTO
-   */
-  public function setUserId(string $userId): void
-  {
-    $this->userId = $userId;
   }
 
   /**
@@ -53,13 +43,6 @@ final class UpdateUserRoleDTO
    */
   public function validate(): void
   {
-    if (empty($this->userId)) {
-      throw new ApiException(
-        ErrorType::missingField('userId'),
-        422
-      );
-    }
-
     if (empty($this->role)) {
       throw new ApiException(
         ErrorType::missingField('role'),

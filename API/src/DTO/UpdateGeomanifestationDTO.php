@@ -14,7 +14,7 @@ use Http\ErrorType;
 final class UpdateGeomanifestationDTO
 {
   /**
-   * @param string|null $name New name
+   * @param string|null $geomanifestation_name New name
    * @param float|null $latitude New latitude
    * @param float|null $longitude New longitude
    * @param int|null $provinceSnitCode New province SNIT code
@@ -25,19 +25,20 @@ final class UpdateGeomanifestationDTO
    * @param bool|null $visibility New visibility (null means no change)
    */
   public function __construct(
-    public ?string $name = null,
+    public ?string $geomanifestation_name = null,
     public ?float $latitude = null,
     public ?float $longitude = null,
     public ?int $provinceSnitCode = null,
     public ?int $cantonSnitCode = null,
     public ?int $districtSnitCode = null,
     public ?string $currentGeoreportId = null,
+    public ?string $requestId = null,
     public ?string $description = null,
     public ?bool $visibility = null
   ) {}
 
   /**
-   * Creates DTO from HTTP request payload (only fields that exist in the array).
+   * Creates DTO from the HTTP request payload (only fields that exist in the array).
    *
    * @param array<string,mixed> $data
    * @return self
@@ -45,13 +46,21 @@ final class UpdateGeomanifestationDTO
   public static function fromArray(array $data): self
   {
     return new self(
-      name: isset($data['name']) ? trim((string) $data['name']) : null,
-      latitude: isset($data['latitude']) ? (float) $data['latitude'] : null,
-      longitude: isset($data['longitude']) ? (float) $data['longitude'] : null,
-      provinceSnitCode: isset($data['province_snit_code']) ? (int) $data['province_snit_code'] : null,
-      cantonSnitCode: isset($data['canton_snit_code']) ? (int) $data['canton_snit_code'] : null,
-      districtSnitCode: isset($data['district_snit_code']) ? (int) $data['district_snit_code'] : null,
+      geomanifestation_name: isset($data['geomanifestation_name'])
+        ? trim((string)
+      $data['geomanifestation_name']) : null,
+      latitude: isset($data['latitude'])
+        ? (float) $data['latitude'] : null,
+      longitude: isset($data['longitude'])
+        ? (float) $data['longitude'] : null,
+      provinceSnitCode: isset($data['province_snit_code'])
+        ? (int) $data['province_snit_code'] : null,
+      cantonSnitCode: isset($data['canton_snit_code'])
+        ? (int) $data['canton_snit_code'] : null,
+      districtSnitCode: isset($data['district_snit_code'])
+        ? (int) $data['district_snit_code'] : null,
       currentGeoreportId: $data['current_georeport_id'] ?? null,
+      requestId: $data['request_id'] ?? null,
       description: $data['description'] ?? null,
       visibility: isset($data['visibility']) ? (bool) $data['visibility'] : null
     );
@@ -59,7 +68,7 @@ final class UpdateGeomanifestationDTO
 
   /**
    * Returns an array with only the fields that should be updated.
-   * Excludes null values, but includes false for visibility.
+   * Excludes null values but includes false for visibility.
    *
    * @return array<string,mixed>
    */
@@ -67,8 +76,8 @@ final class UpdateGeomanifestationDTO
   {
     $update = [];
 
-    if ($this->name !== null) {
-      $update['geomanifestation_name'] = $this->name;
+    if ($this->geomanifestation_name !== null) {
+      $update['geomanifestation_name'] = $this->geomanifestation_name;
     }
     if ($this->latitude !== null) {
       $update['latitude'] = $this->latitude;
@@ -88,6 +97,9 @@ final class UpdateGeomanifestationDTO
     if ($this->currentGeoreportId !== null) {
       $update['current_georeport_id'] = $this->currentGeoreportId;
     }
+    if ($this->requestId !== null) {
+      $update['request_id'] = $this->requestId;
+    }
     if ($this->description !== null) {
       $update['description'] = $this->description;
     }
@@ -105,13 +117,15 @@ final class UpdateGeomanifestationDTO
    */
   public function validate(): void
   {
-    if ($this->name !== null && strlen($this->name) > 255) {
+    if ($this->geomanifestation_name !== null
+      && strlen($this->geomanifestation_name) > 255) {
       throw new ApiException(
         ErrorType::invalidField('name (max 255 characters)'),
         422
       );
     }
-    if ($this->latitude !== null && ($this->latitude < -90 || $this->latitude > 90)) {
+    if ($this->latitude !== null
+      && ($this->latitude < -90 || $this->latitude > 90)) {
       throw new ApiException(
         ErrorType::invalidField('latitude'),
         422
