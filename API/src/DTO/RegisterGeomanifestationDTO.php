@@ -13,7 +13,7 @@ use Http\ErrorType;
 final class RegisterGeomanifestationDTO
 {
   /**
-   * @param string $name Manifestation name (required)
+   * @param string $geomanifestation_name Manifestation name (required)
    * @param float $latitude Latitude (required)
    * @param float $longitude Longitude (required)
    * @param int|null $provinceSnitCode SNIT code of province
@@ -25,7 +25,7 @@ final class RegisterGeomanifestationDTO
    * @param bool $visibility Whether visible to public (default false)
    */
   public function __construct(
-    public string $name,
+    public string $geomanifestation_name,
     public float $latitude,
     public float $longitude,
     public ?int $provinceSnitCode = null,
@@ -63,7 +63,7 @@ final class RegisterGeomanifestationDTO
     }
 
     return new self(
-      name : trim((string)$data['geomanifestation_name']),
+      geomanifestation_name : trim((string)$data['geomanifestation_name']),
       latitude : (float)$data['latitude'],
       longitude : (float)$data['longitude'],
       provinceSnitCode : isset($data['province_snit_code'])
@@ -87,7 +87,7 @@ final class RegisterGeomanifestationDTO
   public function toArray(): array
   {
     return [
-      'geomanifestation_name' => $this->name,
+      'geomanifestation_name' => $this->geomanifestation_name,
       'latitude' => $this->latitude,
       'longitude' => $this->longitude,
       'province_snit_code' => $this->provinceSnitCode,
@@ -107,9 +107,9 @@ final class RegisterGeomanifestationDTO
    */
   public function validate(): void
   {
-    if (strlen($this->name) > 255) {
+    if (strlen($this->geomanifestation_name) > 255) {
       throw new ApiException(
-        ErrorType::invalidField('name (max 255 characters)'),
+        ErrorType::invalidField('geomanifestation_name (max 255 characters)'),
         422
       );
     }

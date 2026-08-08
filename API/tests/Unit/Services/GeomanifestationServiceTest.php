@@ -125,24 +125,79 @@ class GeomanifestationServiceTest extends TestCase
 			'district_snit_code' => $overrides['district_snit_code'] ?? null,
 		];
 	}
+  private function createTestInsituTest(string $geomanifestationId, float $temperature): void
+  {
+    $insituTestId = UlidGenerator::generate();
+    $inlabTestId = UlidGenerator::generate();
+    $georeportId = UlidGenerator::generate();
+    $userId = $this->getOrCreateDefaultUser()['user_id'];
 
-	private function createTestInsituTest(string $geomanifestationId, float $temperature): void
-	{
-		$this->pdo->prepare(
-			'INSERT INTO insitu_tests (
+    $this->pdo->prepare(
+      'INSERT INTO insitu_tests (
                 insitu_test_id, geomanifestation_id, temperature, conductivity,
                 ph, description, created_by, created_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())'
-		)->execute([
-			UlidGenerator::generate(),
-			$geomanifestationId,
-			$temperature,
-			300.0,
-			7.0,
-			'Test in-situ measurement',
-			$this->getOrCreateDefaultUser()['user_id'],
-		]);
-	}
+    )->execute([
+      $insituTestId,
+      $geomanifestationId,
+      $temperature,
+      300.0,
+      7.0,
+      'Test in-situ measurement',
+      $userId,
+    ]);
+
+    $this->pdo->prepare(
+      'INSERT INTO inlab_tests (
+                inlab_test_id, geomanifestation_id,
+                ph, conductivity, cl, ca, hco3, so4, fe, si, b, li, f, na, k, mg,
+                description, created_by, created_at
+            ) VALUES (
+                ?, ?,
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, NOW()
+            )'
+    )->execute([
+      $inlabTestId,
+      $geomanifestationId,
+      7.0,
+      300.0,
+      10.0,
+      5.0,
+      20.0,
+      2.0,
+      0.1,
+      15.0,
+      0.5,
+      0.01,
+      1.0,
+      12.0,
+      3.0,
+      2.0,
+      'Test in-lab measurement',
+      $userId,
+    ]);
+
+    $this->pdo->prepare(
+      'INSERT INTO georeports (
+                georeport_id, geomanifestation_id, insitu_test_id, inlab_test_id,
+                created_by, created_at
+            ) VALUES (?, ?, ?, ?, ?, NOW())'
+    )->execute([
+      $georeportId,
+      $geomanifestationId,
+      $insituTestId,
+      $inlabTestId,
+      $userId,
+    ]);
+
+    $this->pdo->prepare(
+      'UPDATE geomanifestations SET current_georeport_id = ? WHERE geomanifestation_id = ?'
+    )->execute([
+      $georeportId,
+      $geomanifestationId
+    ]);
+  }
 
 	private function findGeomanifestationRow(string $id): ?array
 	{
@@ -169,9 +224,8 @@ class GeomanifestationServiceTest extends TestCase
 		$this->assertEquals('Las Hornillas', $result['geomanifestation_name']);
 		$this->assertNull($result['location']['province']);
 		$this->assertArrayHasKey('visibility', $result);
-		$this->assertArrayNotHasKey('insitu_test', $result);
-
-		$this->assertNotNull($this->findGeomanifestationRow($result['geomanifestation_id']));
+    $this->assertNull($result['insitu_test']);
+    $this->assertNotNull($this->findGeomanifestationRow($result['geomanifestation_id']));
 	}
 
 	public function testCreateWithValidLocation(): void
@@ -286,8 +340,8 @@ class GeomanifestationServiceTest extends TestCase
 
 		$this->assertEquals($manifestation['geomanifestation_id'], $result['geomanifestation_id']);
 		$this->assertArrayHasKey('visibility', $result);
-		$this->assertArrayNotHasKey('insitu_test', $result);
-	}
+    $this->assertNull($result['insitu_test']);
+  }
 
 	public function testGetByIdIncludeHiddenThrowsForbiddenWithoutRole(): void
 	{

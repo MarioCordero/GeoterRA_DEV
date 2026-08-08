@@ -79,7 +79,7 @@ final class GeomanifestationService
         $user['email'],
         $user['first_name'],
         'Geomanifestación',
-        $dto->name,
+        $dto->geomanifestation_name,
         date('Y-m-d H:i:s')
       );
     }
@@ -147,7 +147,7 @@ final class GeomanifestationService
   ): array {
     $response = [
       'geomanifestation_id' => $row['geomanifestation_id'],
-      'name' => $row['geomanifestation_name'],
+      'geomanifestation_name' => $row['geomanifestation_name'],
       'description' => $row['manifestation_description'],
       'created_at' => $row['manifestation_created_at'],
       'location' => [

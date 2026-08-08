@@ -14,7 +14,7 @@ use Http\ErrorType;
 final class UpdateGeomanifestationDTO
 {
   /**
-   * @param string|null $name New name
+   * @param string|null $geomanifestation_name New name
    * @param float|null $latitude New latitude
    * @param float|null $longitude New longitude
    * @param int|null $provinceSnitCode New province SNIT code
@@ -25,7 +25,7 @@ final class UpdateGeomanifestationDTO
    * @param bool|null $visibility New visibility (null means no change)
    */
   public function __construct(
-    public ?string $name = null,
+    public ?string $geomanifestation_name = null,
     public ?float $latitude = null,
     public ?float $longitude = null,
     public ?int $provinceSnitCode = null,
@@ -46,7 +46,9 @@ final class UpdateGeomanifestationDTO
   public static function fromArray(array $data): self
   {
     return new self(
-      name: isset($data['name']) ? trim((string) $data['name']) : null,
+      geomanifestation_name: isset($data['geomanifestation_name'])
+        ? trim((string)
+      $data['geomanifestation_name']) : null,
       latitude: isset($data['latitude'])
         ? (float) $data['latitude'] : null,
       longitude: isset($data['longitude'])
@@ -74,8 +76,8 @@ final class UpdateGeomanifestationDTO
   {
     $update = [];
 
-    if ($this->name !== null) {
-      $update['geomanifestation_name'] = $this->name;
+    if ($this->geomanifestation_name !== null) {
+      $update['geomanifestation_name'] = $this->geomanifestation_name;
     }
     if ($this->latitude !== null) {
       $update['latitude'] = $this->latitude;
@@ -115,7 +117,8 @@ final class UpdateGeomanifestationDTO
    */
   public function validate(): void
   {
-    if ($this->name !== null && strlen($this->name) > 255) {
+    if ($this->geomanifestation_name !== null
+      && strlen($this->geomanifestation_name) > 255) {
       throw new ApiException(
         ErrorType::invalidField('name (max 255 characters)'),
         422
