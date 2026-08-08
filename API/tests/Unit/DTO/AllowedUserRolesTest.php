@@ -22,7 +22,8 @@ class AllowedUserRolesTest extends TestCase
         $this->assertEquals('user', AllowedUserRoles::USER);
         $this->assertEquals('maintenance', AllowedUserRoles::MAINTENANCE);
         $this->assertEquals('investigator', AllowedUserRoles::INVESTIGATOR);
-        $this->assertEquals('fieldInvestigator', AllowedUserRoles::FIELD_INVESTIGATOR);
+        $this->assertEquals('field_investigator',
+          AllowedUserRoles::FIELD_INVESTIGATOR);
     }
 
     public function testGetAllRolesReturnsAllowedRoles(): void

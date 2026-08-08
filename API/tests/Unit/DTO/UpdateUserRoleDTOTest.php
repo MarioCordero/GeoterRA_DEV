@@ -13,9 +13,8 @@ class UpdateUserRoleDTOTest extends TestCase
 {
     public function testCanCreateUpdateUserRoleDTO(): void
     {
-        $dto = new UpdateUserRoleDTO('user123', AllowedUserRoles::ADMIN);
+        $dto = new UpdateUserRoleDTO(AllowedUserRoles::ADMIN);
 
-        $this->assertSame('user123', $dto->userId);
         $this->assertSame(AllowedUserRoles::ADMIN, $dto->role);
     }
 
@@ -23,9 +22,8 @@ class UpdateUserRoleDTOTest extends TestCase
     {
         $data = ['role' => AllowedUserRoles::MAINTENANCE];
         
-        $dto = UpdateUserRoleDTO::fromArray($data, 'user123');
+        $dto = UpdateUserRoleDTO::fromArray($data);
 
-        $this->assertSame('user123', $dto->userId);
         $this->assertSame(AllowedUserRoles::MAINTENANCE, $dto->role);
     }
 
@@ -38,35 +36,24 @@ class UpdateUserRoleDTOTest extends TestCase
         $this->assertSame('user', $dto->role);
     }
 
-    public function testSetUserId(): void
+    public function testRoleAssigment(): void
     {
-        $dto = new UpdateUserRoleDTO('', AllowedUserRoles::USER);
-        $dto->setUserId('new_user_123');
+        $dto = new UpdateUserRoleDTO(AllowedUserRoles::USER);
 
-        $this->assertSame('new_user_123', $dto->userId);
+        $this->assertSame('user', $dto->role);
     }
 
     public function testValidatePassesWithValidData(): void
     {
-        $dto = new UpdateUserRoleDTO('user123', AllowedUserRoles::USER);
+        $dto = new UpdateUserRoleDTO(AllowedUserRoles::USER);
         
         $this->expectNotToPerformAssertions();
         $dto->validate();
     }
 
-    public function testValidateThrowsExceptionIfUserIdIsEmpty(): void
-    {
-        $dto = new UpdateUserRoleDTO('', AllowedUserRoles::USER);
-
-        $this->expectException(ApiException::class);
-        $this->expectExceptionCode(422);
-
-        $dto->validate();
-    }
-
     public function testValidateThrowsExceptionIfRoleIsEmpty(): void
     {
-        $dto = new UpdateUserRoleDTO('user123', '');
+        $dto = new UpdateUserRoleDTO( '');
 
         $this->expectException(ApiException::class);
         $this->expectExceptionCode(422);
@@ -76,7 +63,7 @@ class UpdateUserRoleDTOTest extends TestCase
 
     public function testValidateThrowsExceptionIfRoleIsInvalid(): void
     {
-        $dto = new UpdateUserRoleDTO('user123', 'invalid_role');
+        $dto = new UpdateUserRoleDTO('invalid');
 
         $this->expectException(ApiException::class);
         $this->expectExceptionCode(422);

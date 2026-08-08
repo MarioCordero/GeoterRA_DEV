@@ -12,6 +12,7 @@ use Http\Request;
 use PDO;
 use Repositories\GeomanifestationRepository;
 use Repositories\InsituTestRepository;
+use Repositories\UserRepository;
 
 /**
  * Business logic for in-situ tests (insitu_tests table).
@@ -21,12 +22,18 @@ final class InsituTestService
   private InsituTestRepository $repository;
   private GeomanifestationRepository $geomanifestationRepository;
   private AuthService $authService;
+  private UserRepository $userRepository;
+  private NotificationService $notificationService;
 
   public function __construct(private PDO $pdo)
   {
     $this->repository = new InsituTestRepository($pdo);
     $this->geomanifestationRepository = new GeomanifestationRepository($pdo);
     $this->authService = new AuthService($pdo);
+    $this->userRepository = new UserRepository($pdo);
+    $this->notificationService = new NotificationService(
+      new SmtpEmailService()
+    );
   }
 
   /**
@@ -49,6 +56,21 @@ final class InsituTestService
     $this->validateGeomanifestationExists($dto->geomanifestationId);
 
     $result = $this->repository->create($dto, $auth['user_id']);
+
+    $user = $this->userRepository->findById($auth['user_id']);
+    if ($user) {
+      $manifestation = $this->geomanifestationRepository->findById(
+        $dto->geomanifestationId
+      );
+      $mName = $manifestation['geomanifestation_name'] ?? 'Desconocida';
+      $this->notificationService->notifyResourceCreated(
+        $user['email'],
+        $user['first_name'],
+        'Prueba In-Situ',
+        "Prueba asociada a " . $mName,
+        date('Y-m-d H:i:s')
+      );
+    }
 
     return $this->formatTest($result);
   }
@@ -170,11 +192,11 @@ final class InsituTestService
    *
    * @param string $id
    * @param UpdateInsituTestDTO $dto
-   * @throws ApiException
+   * @return array|null
    */
   public function update(string $id, UpdateInsituTestDTO $dto): ?array
   {
-    Request::requireRole(
+    $auth = Request::requireRole(
       [
         AllowedUserRoles::ADMIN,
         AllowedUserRoles::FIELD_INVESTIGATOR,
@@ -195,6 +217,21 @@ final class InsituTestService
         ErrorType::internal('Failed to update in-situ test'), 500
       );
     }
+
+    $user = $this->userRepository->findById($auth['user_id']);
+    if ($user) {
+      $manifestation = $this->geomanifestationRepository->findById(
+        $id
+      );
+      $mName = $manifestation['geomanifestation_name'] ?? 'Desconocida';
+      $this->notificationService->notifyResourceCreated(
+        $user['email'],
+        $user['first_name'],
+        'Prueba In-Situ',
+        "Prueba asociada a " . $mName,
+        date('Y-m-d H:i:s')
+      );
+    }
     
     return $this->formatTest($updated);
   }
@@ -207,7 +244,7 @@ final class InsituTestService
    */
   public function delete(string $id): void
   {
-    Request::requireRole(
+    $auth = Request::requireRole(
       [
         AllowedUserRoles::ADMIN,
         AllowedUserRoles::FIELD_INVESTIGATOR,
@@ -224,6 +261,21 @@ final class InsituTestService
     if (!$deleted) {
       throw new ApiException(
         ErrorType::internal('Failed to delete in-situ test'), 500
+      );
+    }
+
+    $user = $this->userRepository->findById($auth['user_id']);
+    if ($user) {
+      $manifestation = $this->geomanifestationRepository->findById(
+        $existing['geomanifestation_id']
+      );
+      $mName = $manifestation['geomanifestation_name'] ?? 'Desconocida';
+      $this->notificationService->notifyResourceDeleted(
+        $user['email'],
+        $user['first_name'],
+        'Prueba In-Situ',
+        "Prueba asociada a " . $mName,
+        date('Y-m-d H:i:s')
       );
     }
   }

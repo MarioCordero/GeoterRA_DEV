@@ -38,56 +38,26 @@ use OpenApi\Annotations as OA;
  *     nullable=true,
  *     description="Número telefónico (8-15 dígitos)",
  *     example="87654321"
- *   ),
- *   @OA\Property(
- *     property="currentPassword",
- *     type="string",
- *     format="password",
- *     nullable=true,
- *     description="Contraseña actual requerida para cambiar contraseña",
- *     example="OldPassword123"
- *   ),
- *   @OA\Property(
- *     property="password",
- *     type="string",
- *     format="password",
- *     nullable=true,
- *     description="Nueva contraseña (mínimo 8 caracteres)",
- *     example="NewPassword123"
  *   )
  * )
  */
 final class UpdateUserDTO
 {
   public function __construct(
-    public string $userId,
     public string $firstName,
     public string $lastName,
     public string $email,
-    public ?string $phoneNumber,
-    public ?string $currentPassword,
-    public ?string $password,  
+    public ?string $phoneNumber
   ) {}
 
-  public static function fromArray(array $data, string $userId = ''): self
+  public static function fromArray(array $data): self
   {
     return new self(
-      $userId,
       trim($data['first_name'] ?? ''),
       trim($data['last_name'] ?? ''),
       trim($data['email'] ?? ''),
-      $data['phone_number'] ?? null,
-      $data['current_password'] ?? null,
-      $data['password'] ?? null
+      $data['phone_number'] ?? null
     );
-  }
-
-  /**
-   * Set the user ID for the DTO
-   */
-  public function setUserId(string $userId): void
-  {
-    $this->userId = $userId;
   }
 
   /**
@@ -97,24 +67,10 @@ final class UpdateUserDTO
    */
   public function validate(): void
   {
-    if ($this->password && !$this->currentPassword) {
-      throw new ApiException(
-        ErrorType::validationError('Current password is required to change password'),
-        400
-      );
-    }
-
     if ($this->email && !filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
       throw new ApiException(
         ErrorType::invalidEmail(),
         422
-      );
-    }
-
-    if ($this->password && strlen($this->password) < 8) {
-      throw new ApiException(
-        ErrorType::validationError('Password must be at least 8 characters'),
-        400
       );
     }
 

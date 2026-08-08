@@ -6,12 +6,16 @@ use Http\Request;
 use Http\ErrorType;
 use Core\GlobalErrorHandler;
 use Router\SimpleRouter;
+use Dotenv\Dotenv;
 
 $basePath = realpath(__DIR__ . '/../');
 $srcPath = $basePath . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR;
 $configPath = $basePath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
 
 require __DIR__ . '/../vendor/autoload.php';
+
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
 
 $safeRequire = function (string $path) {
   if (file_exists($path)) {
@@ -44,7 +48,7 @@ if (function_exists('validateSessionToken')) {
   validateSessionToken($db);
 }
 
-if (!Http\Request::isValidClient()) {
+if (!Request::isValidClient()) {
   Http\Response::error(Http\ErrorType::unauthorized('Invalid API Key'), 403);
 }
 
