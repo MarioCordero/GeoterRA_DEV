@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 08-08-2026 a las 00:42:01
+-- Tiempo de generación: 09-08-2026 a las 01:53:16
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.0.28
 
@@ -1323,7 +1323,7 @@ CREATE TABLE `users` (
   `last_name` varchar(110) NOT NULL,
   `password_hash` varchar(255) NOT NULL,
   `role` enum('admin','user','maintenance','investigator','field_investigator') NOT NULL DEFAULT 'user',
-  `is_deleted` tinyint(4) NOT NULL DEFAULT 0,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
   `is_verified` tinyint(1) NOT NULL DEFAULT 0,
   `failed_login_attempts` tinyint(1) UNSIGNED DEFAULT 0,
   `last_login_at` timestamp NULL DEFAULT NULL,
