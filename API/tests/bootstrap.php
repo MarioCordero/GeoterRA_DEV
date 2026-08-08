@@ -18,11 +18,6 @@ if (!file_exists($apiKeysPath)) {
   @file_put_contents($apiKeysPath, "<?php\nreturn [\n  'web-secret-key-789' => 'web',\n  'android-key-123' => 'mobile',\n  'ios-key-456' => 'mobile',\n];\n");
 }
 
-// Ensure session starts correctly in CLI mode without throwing headers already sent
-//if (session_status() === PHP_SESSION_NONE) {
-//  session_start();
-//}
-
 if (session_status() === PHP_SESSION_NONE && PHP_SAPI !== 'cli') {
   session_start();
 }
@@ -72,43 +67,65 @@ function initializeTestDatabase(): PDO
   $user = getenv('DB_USER') ?: ($iniConfig['user'] ?? 'root');
   $password = getenv('DB_PASS') !== false ? (string)getenv('DB_PASS') : ($iniConfig['pass'] ?? '');
 
+  $socket = getenv('DB_SOCKET') ?: ($iniConfig['unix_socket'] ?? null);
+
+  if (!empty($socket)) {
+    echo "[*] Configuración de DB - Socket: {$socket} | User: {$user}\n";
+  } else {
+    echo "[*] Configuración de DB - Host: {$host}:{$port} | User: {$user}\n";
+  }
+
   // Names of the databases
   $prodDbName = 'GeoterRA';
   $testDbName = 'GeoterRA_test';
 
   // Connect to production database (to read schema)
-  $prodDsn = "mysql:host={$host};port={$port};dbname={$prodDbName};charset=utf8mb4";
+  if (!empty($socket)) {
+    $prodDsn = "mysql:unix_socket={$socket};dbname={$prodDbName};charset=utf8mb4";
+  } else {
+    $prodDsn = "mysql:host={$host};port={$port};dbname={$prodDbName};charset=utf8mb4";
+  }
+
   try {
     $prodPdo = new PDO(
       $prodDsn, $user, $password, [
-      PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-      PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+      ]
     );
     echo "[✓] Connected to production database: {$prodDbName}\n";
   } catch (PDOException $e) {
-    echo "[✗] Failed to connect to production database: " . $e->getMessage(
-      ) . "\n";
+    echo "[✗] Failed to connect to production database: " . $e->getMessage() . "\n";
     exit(1);
   }
 
   // Always drop and recreate test database to ensure clean schema load
   try {
-    $serverDsn = "mysql:host={$host};port={$port};charset=utf8mb4";
+    if (!empty($socket)) {
+      $serverDsn = "mysql:unix_socket={$socket};charset=utf8mb4";
+    } else {
+      $serverDsn = "mysql:host={$host};port={$port};charset=utf8mb4";
+    }
+
     $serverPdo = new PDO(
       $serverDsn, $user, $password, [
-      PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    ]
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+      ]
     );
     $serverPdo->exec("DROP DATABASE IF EXISTS `{$testDbName}`");
     $serverPdo->exec("CREATE DATABASE `{$testDbName}`");
 
-    $testDsn = "mysql:host={$host};port={$port};dbname={$testDbName};charset=utf8mb4";
+    if (!empty($socket)) {
+      $testDsn = "mysql:unix_socket={$socket};dbname={$testDbName};charset=utf8mb4";
+    } else {
+      $testDsn = "mysql:host={$host};port={$port};dbname={$testDbName};charset=utf8mb4";
+    }
+
     $testPdo = new PDO(
       $testDsn, $user, $password, [
-      PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-      PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+      ]
     );
     echo "[✓] Recreated and connected to test database: {$testDbName}\n";
   } catch (PDOException $e) {
@@ -136,6 +153,9 @@ function loadTestSchema(): void
   $port = (int)(getenv('DB_PORT') ?: ($iniConfig['port'] ?? 3306));
   $user = getenv('DB_USER') ?: ($iniConfig['user'] ?? 'root');
   $password = getenv('DB_PASS') !== false ? (string)getenv('DB_PASS') : ($iniConfig['pass'] ?? '');
+
+  $socket = getenv('DB_SOCKET') ?: ($iniConfig['unix_socket'] ?? null);
+
   $testDbName = 'GeoterRA_test';
 
   try {
@@ -147,15 +167,26 @@ function loadTestSchema(): void
 
     echo "\n[*] Loading test database schema from fixtures...\n";
 
-    $command = sprintf(
-      'sed "s/\`[gG]eoter[rR][aA]\`\.//g" %s | mysql -h %s -P %s -u %s -p%s %s 2>&1',
-      escapeshellarg($schemaPath),
-      escapeshellarg((string)$host),
-      escapeshellarg((string)$port),
-      escapeshellarg($user),
-      escapeshellarg($password),
-      escapeshellarg($testDbName)
-    );
+    if (!empty($socket)) {
+      $command = sprintf(
+        'sed "s/\`[gG]eoter[rR][aA]\`\.//g" %s | mysql -S %s -u %s -p%s %s 2>&1',
+        escapeshellarg($schemaPath),
+        escapeshellarg((string)$socket),
+        escapeshellarg($user),
+        escapeshellarg($password),
+        escapeshellarg($testDbName)
+      );
+    } else {
+      $command = sprintf(
+        'sed "s/\`[gG]eoter[rR][aA]\`\.//g" %s | mysql -h %s -P %s -u %s -p%s %s 2>&1',
+        escapeshellarg($schemaPath),
+        escapeshellarg((string)$host),
+        escapeshellarg((string)$port),
+        escapeshellarg($user),
+        escapeshellarg($password),
+        escapeshellarg($testDbName)
+      );
+    }
 
     $output = [];
     $returnVar = 0;

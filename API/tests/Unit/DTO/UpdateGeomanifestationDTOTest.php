@@ -13,7 +13,7 @@ class UpdateGeomanifestationDTOTest extends TestCase
   public function testFromArrayWithValidData(): void
   {
     $data = [
-      'name' => 'Updated GM',
+      'geomanifestation_name' => 'Updated GM',
       'latitude' => 11.5,
       'longitude' => -85.0,
       'province_snit_code' => 2,
@@ -26,7 +26,7 @@ class UpdateGeomanifestationDTOTest extends TestCase
 
     $dto = UpdateGeomanifestationDTO::fromArray($data);
 
-    $this->assertSame('Updated GM', $dto->name);
+    $this->assertSame('Updated GM', $dto->geomanifestation_name);
     $this->assertSame(11.5, $dto->latitude);
     $this->assertSame(-85.0, $dto->longitude);
     $this->assertSame(2, $dto->provinceSnitCode);
@@ -40,13 +40,13 @@ class UpdateGeomanifestationDTOTest extends TestCase
   public function testFromArrayWithPartialData(): void
   {
     $data = [
-      'name' => 'Updated GM',
+      'geomanifestation_name' => 'Updated GM',
       'latitude' => 11.5,
     ];
 
     $dto = UpdateGeomanifestationDTO::fromArray($data);
 
-    $this->assertSame('Updated GM', $dto->name);
+    $this->assertSame('Updated GM', $dto->geomanifestation_name);
     $this->assertSame(11.5, $dto->latitude);
     $this->assertNull($dto->longitude);
     $this->assertNull($dto->provinceSnitCode);
@@ -55,7 +55,7 @@ class UpdateGeomanifestationDTOTest extends TestCase
   public function testFromArrayWithEmptyData(): void
   {
     $dto = UpdateGeomanifestationDTO::fromArray([]);
-    $this->assertNull($dto->name);
+    $this->assertNull($dto->geomanifestation_name);
     $this->assertNull($dto->latitude);
     $this->assertNull($dto->longitude);
     $this->assertNull($dto->visibility);
@@ -64,7 +64,7 @@ class UpdateGeomanifestationDTOTest extends TestCase
   public function testToArrayReturnsOnlyNonNullFields(): void
   {
     $dto = new UpdateGeomanifestationDTO(
-      name : 'Name',
+      geomanifestation_name : 'Name',
       latitude : 10.5,
       longitude : null,
       provinceSnitCode : 1,

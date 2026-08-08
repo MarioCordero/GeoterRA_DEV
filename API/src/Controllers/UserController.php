@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Controllers;
 
 use DTO\PermissionsDTO;
+use DTO\UpdatePasswordDTO;
 use DTO\UpdateUserDTO;
 use DTO\RegisterUserDTO;
 use DTO\UpdateUserRoleDTO;
@@ -76,9 +77,30 @@ final class UserController
       $dto = UpdateUserDTO::fromArray($body);
       $this->userService->updateUser($dto);
       Response::success(
-        ['message' => 'User profile updated successfully'],
-        null,
-        200
+        ['message' => 'User profile updated successfully']
+      );
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getCode());
+    } catch (Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
+
+  /**
+   * PUT /users/me/password
+   * Updates the authenticated user's password.
+   * Expected JSON: { "current_password": "...", "new_password": "..." }
+   *
+   * @return void
+   */
+  public function updatePassword(): void
+  {
+    try {
+      $body = Request::parseJsonRequest();
+      $dto = UpdatePasswordDTO::fromArray($body);
+      $this->userService->updatePassword($dto);
+      Response::success(
+        ['message' => 'User password updated successfully']
       );
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
@@ -89,7 +111,7 @@ final class UserController
 
   /**
    * PUT /admin/users/{id}/role
-   * Updates a user's role (admin only).
+   * Updates a user's role (admin/manteinance only).
    *
    * Expected JSON: { "role": "admin" }
    *
@@ -100,12 +122,10 @@ final class UserController
   {
     try {
       $body = Request::parseJsonRequest();
-      $dto = UpdateUserRoleDTO::fromArray($body, $id);
-      $this->userService->updateUserRole($dto);
+      $dto = UpdateUserRoleDTO::fromArray($body);
+      $this->userService->updateUserRole($id, $dto);
       Response::success(
-        ['message' => 'User role updated successfully'],
-        null,
-        200
+        ['message' => 'User role updated successfully']
       );
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
@@ -123,9 +143,7 @@ final class UserController
     try {
       $this->userService->deleteCurrentUser();
       Response::success(
-        ['message' => 'User account deleted successfully'],
-        null,
-        200
+        ['message' => 'User account deleted successfully']
       );
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
