@@ -59,43 +59,46 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git fetch origin # Nos aseguramos de tener todas las ramas remotas actualizadas
 
-      # --- SINCRONIZACIÓN EXCLUSIVA DE LAS CARPETAS API/ Y DATABASE/ ---
+      # --- SINCRONIZACIÓN EXCLUSIVA DE API/ Y DEL ARCHIVO database/GeoterRA.sql ---
 
-      - name: Sincronizar API y database en develop
+      - name: Sincronizar API y database/GeoterRA.sql en develop
         run: |
           git checkout develop || git checkout -b develop origin/develop
-          rm -rf API/ database/
-          git checkout origin/API -- API/ database/
-          git add API/ database/
+          rm -rf API/
+          rm -f database/GeoterRA.sql
+          git checkout origin/API -- API/ database/GeoterRA.sql
+          git add API/ database/GeoterRA.sql
           if ! git diff --cached --quiet; then
-            git commit -m "🚀 CI: Auto-sync de carpetas API/ y database/ desde rama API"
+            git commit -m "🚀 CI: Auto-sync de API/ y database/GeoterRA.sql desde rama API"
             git push origin develop
           else
-            echo "No hay cambios nuevos en API o database para la rama develop."
+            echo "No hay cambios nuevos en API o database/GeoterRA.sql para la rama develop."
           fi
 
-      - name: Sincronizar API y database en web
+      - name: Sincronizar API y database/GeoterRA.sql en web
         run: |
           git checkout web || git checkout -b web origin/web
-          rm -rf API/ database/
-          git checkout origin/API -- API/ database/
-          git add API/ database/
+          rm -rf API/
+          rm -f database/GeoterRA.sql
+          git checkout origin/API -- API/ database/GeoterRA.sql
+          git add API/ database/GeoterRA.sql
           if ! git diff --cached --quiet; then
-            git commit -m "🚀 CI: Auto-sync de carpetas API/ y database/ desde rama API"
+            git commit -m "🚀 CI: Auto-sync de API/ y database/GeoterRA.sql desde rama API"
             git push origin web
           else
-            echo "No hay cambios nuevos en API o database para la rama web."
+            echo "No hay cambios nuevos en API o database/GeoterRA.sql para la rama web."
           fi
 
-      - name: Sincronizar API y database en mobile
+      - name: Sincronizar API y database/GeoterRA.sql en mobile
         run: |
           git checkout mobile || git checkout -b mobile origin/mobile
-          rm -rf API/ database/
-          git checkout origin/API -- API/ database/
-          git add API/ database/
+          rm -rf API/
+          rm -f database/GeoterRA.sql
+          git checkout origin/API -- API/ database/GeoterRA.sql
+          git add API/ database/GeoterRA.sql
           if ! git diff --cached --quiet; then
-            git commit -m "🚀 CI: Auto-sync de carpetas API/ y database/ desde rama API"
+            git commit -m "🚀 CI: Auto-sync de API/ y database/GeoterRA.sql desde rama API"
             git push origin mobile
           else
-            echo "No hay cambios nuevos en API o database para la rama mobile."
+            echo "No hay cambios nuevos en API o database/GeoterRA.sql para la rama mobile."
           fi
