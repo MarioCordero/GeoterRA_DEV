@@ -10,22 +10,34 @@ import UserManagement from '../loggedComponents/views/users/UserManagement';
 import RequestManager from '../loggedComponents/views/manage/RequestsManager';
 import DatabaseViewer from '../loggedComponents/views/database/DatabaseViewer';
 import MaintenanceDashboard from '../loggedComponents/views/home/MaintenanceDashboard';
+import FieldInvestigatorDashboard from '../loggedComponents/views/home/fieldInvestigatorDashboard';
+import InvestigatorDashboard from '../loggedComponents/views/home/investigatorDashboard';
 
 const DashboardContentController = ({ selectedKey }) => {
   const { hasPermission, PERMISSIONS } = usePermissions();
   const { user } = useSession();
 
-  switch (selectedKey) {
-    case '1': {
-      // Dashboard - show different dashboard based on role
-      if (user?.role === 'admin') {
+  const renderHomeView = (role) => {
+    switch (role) {
+      case 'admin':
         return <AdminDashboard />;
-      }
-      if (user?.role === 'maintenance') {
+      case 'maintenance':
         return <MaintenanceDashboard />;
-      }
-      return <UserWelcome />;
+      case 'field_investigator':
+      case 'fieldInvestigator':
+        return <FieldInvestigatorDashboard />;
+      case 'investigator':
+        return <InvestigatorDashboard />;
+      case 'user':
+      default:
+        return <UserWelcome />;
     }
+  };
+
+  switch (selectedKey) {
+    case '1':
+      // Dashboard - show different dashboard based on role
+      return renderHomeView(user?.role);
 
     case '2':
       // My Requests - show list + add button
@@ -85,11 +97,8 @@ const DashboardContentController = ({ selectedKey }) => {
       return <div style={{ padding: '24px' }}>Configuración - En desarrollo</div>;
 
     default:
-      // Fallback to dashboard
-      if (hasPermission(PERMISSIONS.REVIEW_REQUESTS)) {
-        return <AdminDashboard />;
-      }
-      return <UserWelcome />;
+      // Fallback to home view based on role
+      return renderHomeView(user?.role);
   }
 };
 

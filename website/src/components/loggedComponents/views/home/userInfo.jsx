@@ -65,6 +65,8 @@ const UserInfo = () => {
         return <Tag color="blue" icon={<UserOutlined />}>👨‍💼 Administrador de App</Tag>;
       case 'maintenance':
         return <Tag color="green" icon={<UserOutlined />}>🔧 Mantenimiento</Tag>;
+      case 'field_investigator':
+      case 'fieldInvestigator':
       case 'fieldInvestigastor':
         return <Tag color="green" icon={<UserOutlined />}>⛏️ Investigador de campo</Tag>;
       case 'investigator':
