@@ -34,8 +34,9 @@ class CantonServiceTest extends TestCase
 
 	private function authenticateAs(string $role): array
 	{
-		$user = ['user_id' => UlidGenerator::generate(), 'role' => $role];
+		$user = $this->createTestUser(['role' => $role]);
 		Request::setUser($user);
+		$_SERVER['HTTP_X_CLIENT_ID'] = 'web-secret-key-789';
 		return $user;
 	}
 
@@ -44,7 +45,7 @@ class CantonServiceTest extends TestCase
 		$provinceId = $overrides['province_id'] ?? UlidGenerator::generate();
 		$snitCode = $overrides['province_snit_code'] ?? random_int(1000, 999999);
 		$name = $overrides['province_name'] ?? ('Test Province ' . $snitCode);
-		$createdBy = $overrides['created_by'] ?? UlidGenerator::generate();
+		$createdBy = $overrides['created_by'] ?? $this->getOrCreateDefaultUser()['user_id'];
 
 		$stmt = $this->pdo->prepare(
 			'INSERT INTO provinces (province_id, province_snit_code, province_name, created_by, created_at)
@@ -66,7 +67,7 @@ class CantonServiceTest extends TestCase
 		$cantonId = $overrides['canton_id'] ?? UlidGenerator::generate();
 		$cantonSnitCode = $overrides['canton_snit_code'] ?? random_int(1000, 999999);
 		$name = $overrides['canton_name'] ?? ('Test Canton ' . $cantonSnitCode);
-		$createdBy = $overrides['created_by'] ?? UlidGenerator::generate();
+		$createdBy = $overrides['created_by'] ?? $this->getOrCreateDefaultUser()['user_id'];
 
 		$stmt = $this->pdo->prepare(
 			'INSERT INTO cantons (canton_id, province_snit_code, canton_snit_code, canton_name, created_by, created_at)

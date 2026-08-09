@@ -145,12 +145,17 @@ final class UpdateInvestigationRequestDTO
       'relation_with_owner'    => 'relationWithOwner',
     ];
 
-    foreach ($this->setFields as $fieldKey) {
+    $fieldsToProcess = !empty($this->setFields) ? $this->setFields : array_keys($fieldMap);
+
+    foreach ($fieldsToProcess as $fieldKey) {
       $property = $fieldMap[$fieldKey] ?? null;
       if ($property === null) {
         continue;
       }
       $value = $this->$property;
+      if (empty($this->setFields) && $value === null) {
+        continue;
+      }
       if ($fieldKey === 'bubbles' && $value !== null) {
         $value = $value ? 1 : 0;
       }
@@ -202,6 +207,19 @@ final class UpdateInvestigationRequestDTO
       throw new ApiException(ErrorType::invalidField('longitude'), 422);
     }
 
+    // Owner email format
+    if ($this->ownerEmail !== null && !filter_var($this->ownerEmail, FILTER_VALIDATE_EMAIL)) {
+      throw new ApiException(ErrorType::invalidField('owner_email'), 422);
+    }
+
+    // Owner phone number format
+    if ($this->ownerPhoneNumber !== null && !preg_match('/^[0-9]{8}$|^[0-9]{4}-[0-9]{4}$/', $this->ownerPhoneNumber)) {
+      throw new ApiException(
+        ErrorType::invalidField('owner_phone_number (must be 8 digits or 1234-5678)'),
+        422
+      );
+    }
+
     // Relation with owner: if provided, must be valid enum
     if ($this->relationWithOwner !== null) {
       $validRelations = ['Familiar', 'Empleado', 'Socio', 'Conocido', 'Titular'];
@@ -210,19 +228,6 @@ final class UpdateInvestigationRequestDTO
           ErrorType::invalidField('relation_with_owner (must be Familiar, Empleado, Socio, Conocido, Titular)'),
           422
         );
-      }
-
-      // Only validate owner email and phone if relation is not 'Titular'
-      if ($this->relationWithOwner !== 'Titular') {
-        if ($this->ownerEmail !== null && !filter_var($this->ownerEmail, FILTER_VALIDATE_EMAIL)) {
-          throw new ApiException(ErrorType::invalidField('owner_email'), 422);
-        }
-        if ($this->ownerPhoneNumber !== null && !preg_match('/^[0-9]{8}$|^[0-9]{4}-[0-9]{4}$/', $this->ownerPhoneNumber)) {
-          throw new ApiException(
-            ErrorType::invalidField('owner_phone_number (must be 8 digits or 1234-5678)'),
-            422
-          );
-        }
       }
     }
   }

@@ -840,9 +840,9 @@ Los DTOs validan y encapsulan los datos transferidos entre capas.
 
 ### 3. **AnalysisRequestDTO**
 
->Estructura:
+> Estructura:
 >```php
->public string $name                    // Nombre del análisis
+>public string $geomanifestation_name                    // Nombre del análisis
 >public string $region                  // Región (norte, centro, sur, etc.)
 >public string $email                   // Email de contacto
 >public string $ownerContactNumber      // Teléfono del propietario

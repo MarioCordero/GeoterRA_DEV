@@ -159,62 +159,28 @@ final class MaintenanceService
     }
   }
 
-  /**
-   * Updates a user's role.
-   * Only users with ASSIGN_ROLES permission can perform this action.
-   *
-   * @param UpdateUserRoleDTO $dto Validated role update data
-   * @param string $actorRole Role of the user performing the update (for permission check)
-   *
-   * @throws ApiException If user not found, validation fails, or permission denied
-   *
-   * @return array Updated user data
-   */
-  public function updateUserRole(UpdateUserRoleDTO $dto, string $actorRole): array
-  {
-
-    Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::MAINTENANCE
-    ]);
-    
-    $dto->validate();
-
-    // Check if target user exists
-    $targetUser = $this->userRepository->findById($dto->userId);
-    if (!$targetUser) {
-      throw new ApiException(ErrorType::notFound('User'), 404);
-    }
-
-    // Update the role
-    $updated = $this->userRepository->updateRole($dto->userId, $dto->role);
-    if (!$updated) {
-      throw new ApiException(ErrorType::userUpdateFailed(), 500);
-    }
-
-    // Return updated user data
-    $updatedUser = $this->userRepository->findById($dto->userId);
-    return [
-      'data' => $updatedUser,
-      'meta' => null
-    ];
-  }
-
   // --------------------------------------------------------------------------- //
   // --------------------------------- HELPERS --------------------------------- //
   // --------------------------------------------------------------------------- //
 
   /**
-   * Convert table name to human readable format
+   * Convert table name to human-readable format
    * e.g., users -> Usuarios, analysis_requests -> Solicitudes de Análisis
    */
   private function humanizeTableName(string $tableName): string
   {
     $translations = [
       'users' => 'Usuarios',
-      'analysis_requests' => 'Solicitudes de Análisis',
-      'regions' => 'Regiones',
-      'tokens' => 'Tokens',
+      'requests' => 'Solicitudes de Investigación',
+      'request_states' => 'Estados de Solicitudes',
+      'provinces' => 'Provincias',
+      'cantons' => 'Cantones',
+      'districts' => 'Distritos',
+      'geomanifestations' => 'Geomanifestaciones',
+      'insitu_tests' => 'Pruebas de Campo',
+      'inlab_tests' => 'Pruebas de Laboratorio',
+      'access_tokens' => 'Tokens de Acceso',
+      'georeports' => 'Georeportes',
       'sessions' => 'Sesiones',
     ];
 

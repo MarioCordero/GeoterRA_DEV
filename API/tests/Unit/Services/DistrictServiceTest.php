@@ -35,17 +35,20 @@ class DistrictServiceTest extends TestCase
 
 	private function authenticateAs(string $role): array
 	{
-		$user = ['user_id' => UlidGenerator::generate(), 'role' => $role];
+		$user = $this->createTestUser(['role' => $role]);
 		Request::setUser($user);
+		$_SERVER['HTTP_X_CLIENT_ID'] = 'web-secret-key-789';
 		return $user;
 	}
+
+	private static int $testCounter = 100;
 
 	private function createTestProvince(array $overrides = []): array
 	{
 		$provinceId = $overrides['province_id'] ?? UlidGenerator::generate();
-		$snitCode = $overrides['province_snit_code'] ?? random_int(1000, 999999);
-		$name = $overrides['province_name'] ?? ('Test Province ' . $snitCode);
-		$createdBy = $overrides['created_by'] ?? UlidGenerator::generate();
+		$snitCode = $overrides['province_snit_code'] ?? (self::$testCounter % 9 + 1);
+		$name = $overrides['province_name'] ?? ('Test Province ' . self::$testCounter++);
+		$createdBy = $overrides['created_by'] ?? $this->getOrCreateDefaultUser()['user_id'];
 
 		$stmt = $this->pdo->prepare(
 			'INSERT INTO provinces (province_id, province_snit_code, province_name, created_by, created_at)
@@ -65,9 +68,9 @@ class DistrictServiceTest extends TestCase
 	{
 		$province = $overrides['province'] ?? $this->createTestProvince();
 		$cantonId = $overrides['canton_id'] ?? UlidGenerator::generate();
-		$cantonSnitCode = $overrides['canton_snit_code'] ?? random_int(1000, 999999);
-		$name = $overrides['canton_name'] ?? ('Test Canton ' . $cantonSnitCode);
-		$createdBy = $overrides['created_by'] ?? UlidGenerator::generate();
+		$cantonSnitCode = $overrides['canton_snit_code'] ?? (int)($province['province_snit_code'] . sprintf('%02d', (self::$testCounter % 90 + 1)));
+		$name = $overrides['canton_name'] ?? ('Test Canton ' . self::$testCounter++);
+		$createdBy = $overrides['created_by'] ?? $this->getOrCreateDefaultUser()['user_id'];
 
 		$stmt = $this->pdo->prepare(
 			'INSERT INTO cantons (canton_id, province_snit_code, canton_snit_code, canton_name, created_by, created_at)
@@ -88,9 +91,9 @@ class DistrictServiceTest extends TestCase
 	{
 		$canton = $overrides['canton'] ?? $this->createTestCanton();
 		$districtId = $overrides['district_id'] ?? UlidGenerator::generate();
-		$districtSnitCode = $overrides['district_snit_code'] ?? random_int(1000, 999999);
-		$name = $overrides['district_name'] ?? ('Test District ' . $districtSnitCode);
-		$createdBy = $overrides['created_by'] ?? UlidGenerator::generate();
+		$districtSnitCode = $overrides['district_snit_code'] ?? (int)($canton['canton_snit_code'] . sprintf('%02d', (self::$testCounter % 90 + 1)));
+		$name = $overrides['district_name'] ?? ('Test District ' . self::$testCounter++);
+		$createdBy = $overrides['created_by'] ?? $this->getOrCreateDefaultUser()['user_id'];
 
 		$stmt = $this->pdo->prepare(
 			'INSERT INTO districts (district_id, canton_snit_code, district_snit_code, district_name, created_by, created_at)
@@ -207,17 +210,18 @@ class DistrictServiceTest extends TestCase
 	{
 		$this->authenticateAs(AllowedUserRoles::ADMIN);
 		$canton = $this->createTestCanton();
+		$districtSnit = (int)($canton['canton_snit_code'] . '01');
 
 		$dto = DistrictDTO::fromArray([
 			'canton_snit_code' => $canton['canton_snit_code'],
-			'district_snit_code' => 60001,
+			'district_snit_code' => $districtSnit,
 			'district_name' => 'Carmen',
 		]);
 
 		$this->service->create($dto);
 
 		$stmt = $this->pdo->prepare('SELECT * FROM districts WHERE district_snit_code = ?');
-		$stmt->execute([60001]);
+		$stmt->execute([$districtSnit]);
 		$created = $stmt->fetch();
 
 		$this->assertNotFalse($created);
@@ -285,7 +289,7 @@ class DistrictServiceTest extends TestCase
 
 	public function testUpdate(): void
 	{
-		$this->authenticateAs(AllowedUserRoles::FIELD_INVESTIGATOR);
+		$this->authenticateAs(AllowedUserRoles::ADMIN);
 		$existing = $this->createTestDistrict();
 
 		$dto = DistrictDTO::fromArray([

@@ -42,37 +42,14 @@ final class UserRepository
   }
 
   /**
-   * Updates user profile, optionally including password.
+   * Updates user profile (excluding password).
    *
+   * @param string $userId
    * @param UpdateUserDTO $dto
    * @return bool
    */
-  public function update(UpdateUserDTO $dto): bool
+  public function update(string $userId, UpdateUserDTO $dto): bool
   {
-    if ($dto->password) {
-      $stmt = $this->db->prepare(
-        'UPDATE users SET
-                first_name = :first_name,
-                last_name = :last_name,
-                email = :email,
-                phone_number = :phone_number,
-                password_hash = :password_hash
-                WHERE user_id = :user_id
-                AND deleted_at IS NULL
-                AND is_deleted = 0'
-      );
-      return $stmt->execute(
-        [
-          ':first_name' => $dto->firstName,
-          ':last_name' => $dto->lastName,
-          ':email' => $dto->email,
-          ':phone_number' => $dto->phoneNumber,
-          ':password_hash' => $dto->password,
-          ':user_id' => $dto->userId
-        ]
-      );
-    }
-
     $stmt = $this->db->prepare(
       'UPDATE users SET
             first_name = :first_name,
@@ -89,9 +66,28 @@ final class UserRepository
         ':last_name' => $dto->lastName,
         ':email' => $dto->email,
         ':phone_number' => $dto->phoneNumber,
-        ':user_id' => $dto->userId
+        ':user_id' => $userId
       ]
     );
+  }
+
+  /**
+   * Updates a user's password.
+   *
+   * @param string $userId The ID of the user
+   * @param string $passwordHash The new hashed password
+   * @return bool True if the update was successful, false otherwise
+   */
+  public function updatePassword(string $userId, string $passwordHash): bool
+  {
+    $stmt = $this->db->prepare(
+      'UPDATE users SET password_hash = :password_hash
+            WHERE user_id = :user_id AND deleted_at IS NULL AND is_deleted = 0'
+    );
+    return $stmt->execute([
+      ':password_hash' => $passwordHash,
+      ':user_id' => $userId
+    ]);
   }
 
   /**

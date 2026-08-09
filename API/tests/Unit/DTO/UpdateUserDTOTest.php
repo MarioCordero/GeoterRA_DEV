@@ -18,20 +18,15 @@ class UpdateUserDTOTest extends TestCase
       'first_name' => 'John',
       'last_name' => 'Doe',
       'email' => 'john@example.com',
-      'phone_number' => '87654321',
-      'current_password' => 'OldPass123!',
-      'password' => 'NewPass123!',
+      'phone_number' => '87654321'
     ];
 
     $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
 
-    $this->assertSame(self::USER_ID, $dto->userId);
     $this->assertSame('John', $dto->firstName);
     $this->assertSame('Doe', $dto->lastName);
     $this->assertSame('john@example.com', $dto->email);
     $this->assertSame('87654321', $dto->phoneNumber);
-    $this->assertSame('OldPass123!', $dto->currentPassword);
-    $this->assertSame('NewPass123!', $dto->password);
   }
 
   public function testFromArrayWithPartialData(): void
@@ -43,23 +38,11 @@ class UpdateUserDTOTest extends TestCase
 
     $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
 
-    $this->assertSame(self::USER_ID, $dto->userId);
     // Los campos no proporcionados se asignan como string vacío
     $this->assertSame('', $dto->firstName);
     $this->assertSame('', $dto->lastName);
     $this->assertSame('', $dto->email);
     $this->assertSame('87654321', $dto->phoneNumber);
-    $this->assertNull($dto->currentPassword);
-    $this->assertSame('NewPass123!', $dto->password);
-  }
-
-  public function testSetUserId(): void
-  {
-    $dto = UpdateUserDTO::fromArray([], '');
-    $this->assertSame('', $dto->userId);
-
-    $dto->setUserId('new-id');
-    $this->assertSame('new-id', $dto->userId);
   }
 
   public function testValidatePassesWithValidData(): void
@@ -76,24 +59,6 @@ class UpdateUserDTOTest extends TestCase
     $dto->validate();
   }
 
-  public function testValidateThrowsExceptionWhenChangingPasswordWithoutCurrentPassword(): void
-  {
-    $data = [
-      'first_name' => 'John',
-      'last_name' => 'Doe',
-      'email' => 'john@example.com',
-      'password' => 'NewPass123!', // password provided, but no current_password
-    ];
-
-    $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
-
-    $this->expectException(ApiException::class);
-    $this->expectExceptionCode(400);
-    $this->expectExceptionMessage('Current password is required to change password');
-
-    $dto->validate();
-  }
-
   public function testValidateThrowsExceptionForInvalidEmail(): void
   {
     $data = [
@@ -106,25 +71,6 @@ class UpdateUserDTOTest extends TestCase
 
     $this->expectException(ApiException::class);
     $this->expectExceptionCode(422);
-
-    $dto->validate();
-  }
-
-  public function testValidateThrowsExceptionForNewPasswordTooShort(): void
-  {
-    $data = [
-      'first_name' => 'John',
-      'last_name' => 'Doe',
-      'email' => 'john@example.com',
-      'current_password' => 'OldPass123!',
-      'password' => 'Short1!', // 7 characters
-    ];
-
-    $dto = UpdateUserDTO::fromArray($data, self::USER_ID);
-
-    $this->expectException(ApiException::class);
-    $this->expectExceptionCode(400);
-    $this->expectExceptionMessage('Password must be at least 8 characters');
 
     $dto->validate();
   }

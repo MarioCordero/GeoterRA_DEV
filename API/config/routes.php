@@ -4,10 +4,13 @@ return [
   ['method' => 'POST', 'path' => '/auth/refresh', 'controller' => 'AuthController', 'action' => 'refresh'],
   ['method' => 'POST', 'path' => '/auth/login', 'controller' => 'AuthController', 'action' => 'login'],
   ['method' => 'POST', 'path' => '/auth/logout', 'controller' => 'AuthController', 'action' => 'logout'],
+  ['method' => 'POST', 'path' => '/auth/password-reset/request', 'controller' => 'AuthController', 'action' => 'requestPasswordReset'],
+  ['method' => 'POST', 'path' => '/auth/password-reset/reset', 'controller' => 'AuthController', 'action' => 'resetPassword'],
 
   // User routes
   ['method' => 'GET', 'path' => '/users/me', 'controller' => 'UserController', 'action' => 'show'],
   ['method' => 'PUT', 'path' => '/users/me', 'controller' => 'UserController', 'action' => 'update'],
+  ['method' => 'PUT', 'path' => '/users/me/password', 'controller' => 'UserController', 'action' => 'updatePassword'],
   ['method' => 'GET', 'path' => '/users/me/session', 'controller' => 'UserController', 'action' => 'showSession'],
   ['method' => 'POST', 'path' => '/users/register', 'controller' => 'UserController', 'action' => 'register'],
   ['method' => 'DELETE', 'path' => '/users/me', 'controller' => 'UserController', 'action' => 'delete'],
@@ -33,7 +36,6 @@ return [
   ['method' => 'GET', 'path' => '/maintenance/system/logs', 'controller' => 'MaintenanceController', 'action' => 'getSystemLogs'],
   ['method' => 'GET', 'path' => '/maintenance/dashboard', 'controller' => 'MaintenanceController', 'action' => 'getDashboardInfo'],
   ['method' => 'GET', 'path' => '/maintenance/users', 'controller' => 'MaintenanceController', 'action' => 'showAllUsers'],
-  ['method' => 'PUT', 'path' => '/maintenance/users/{id}', 'controller' => 'MaintenanceController', 'action' => 'updateUserRole'],
   ['method' => 'GET', 'path' => '/maintenance/database/tables', 'controller' => 'MaintenanceController', 'action' => 'getAllDatabaseTables'],
 
   ['method' => 'GET', 'path' => '/provinces', 'controller' => 'ProvinceController', 'action' => 'index'],

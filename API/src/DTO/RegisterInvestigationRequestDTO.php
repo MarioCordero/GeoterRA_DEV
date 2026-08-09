@@ -42,7 +42,7 @@ final class RegisterInvestigationRequestDTO
     public ?string $exactAddress = null,
     public ?float $latitude = null,
     public ?float $longitude = null,
-    public string $relationWithOwner,
+    public ?string $relationWithOwner = null,
   ) {}
 
   /**
@@ -138,6 +138,24 @@ final class RegisterInvestigationRequestDTO
       throw new ApiException(ErrorType::invalidField('longitude'), 422);
     }
 
+    // Owner email format
+    if ($this->ownerEmail !== null && !filter_var(
+        $this->ownerEmail, FILTER_VALIDATE_EMAIL
+      )) {
+      throw new ApiException(ErrorType::invalidField('owner_email'), 422);
+    }
+
+    // Owner phone number format (Costa Rica: 8 digits or 1234-5678)
+    if ($this->ownerPhoneNumber !== null && !preg_match(
+        '/^[0-9]{8}$|^[0-9]{4}-[0-9]{4}$/', $this->ownerPhoneNumber
+      )) {
+      throw new ApiException(
+        ErrorType::invalidField(
+          'owner_phone_number (must be 8 digits or 1234-5678)'
+        ), 422
+      );
+    }
+
     // Relation enum
     if ($this->relationWithOwner !== null) {
       $validRelations = ['Familiar', 'Empleado', 'Socio', 'Conocido', 'Titular'];
@@ -147,27 +165,6 @@ final class RegisterInvestigationRequestDTO
             'relation_with_owner (must be Familiar, Empleado, Socio, Conocido, Titular)'
           ), 422
         );
-      }
-
-      if ($this->relationWithOwner !== 'Titular') {
-
-        // Owner email format
-        if ($this->ownerEmail !== null && !filter_var(
-            $this->ownerEmail, FILTER_VALIDATE_EMAIL
-          )) {
-          throw new ApiException(ErrorType::invalidField('owner_email'), 422);
-        }
-
-        // Owner phone number format (Costa Rica: 8 digits or 1234-5678)
-        if ($this->ownerPhoneNumber !== null && !preg_match(
-            '/^[0-9]{8}$|^[0-9]{4}-[0-9]{4}$/', $this->ownerPhoneNumber
-          )) {
-          throw new ApiException(
-            ErrorType::invalidField(
-              'owner_phone_number (must be 8 digits or 1234-5678)'
-            ), 422
-          );
-        }
       }
     }
   }
