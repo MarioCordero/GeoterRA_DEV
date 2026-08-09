@@ -55,7 +55,7 @@ function NotImplementedModal({ isOpen, onClose }) {
               Contacto directo:
             </p>
             <div className="space-y-1">
-              <p className="text-sm text-geoterra-blue poppins">📧 contacto@geoterra.com</p>
+              <p className="text-sm text-geoterra-blue poppins">📧 geoterra.inii.ucr@gmail.com</p>
               <p className="text-sm text-geoterra-blue poppins">📞 +506 (XXX) XXX-XXXX</p>
             </div>
           </div>

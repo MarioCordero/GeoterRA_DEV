@@ -16,6 +16,8 @@ const API_CONFIG = {
       refresh: '/auth/refresh',
       login: '/auth/login',
       logout: '/auth/logout',
+      passwordResetRequest: '/auth/password-reset/request',
+      passwordResetReset: '/auth/password-reset/reset',
     },
     users: {
       me: '/users/me',
@@ -41,6 +43,10 @@ const API_CONFIG = {
       store: '/registered-manifestations',
       update: (id) => `/registered-manifestations/${id}`,
       delete: (id) => `/registered-manifestations/${id}`,
+    },
+    geomanifestations: {
+      index: '/geomanifestations',
+      show: (id) => `/geomanifestations/${id}`,
     },
     Regions: {
       index: '/regions',
@@ -89,6 +95,8 @@ export const auth = {
   login: () => buildApiUrl(API_CONFIG.endpoints.auth.login),
   refresh: () => buildApiUrl(API_CONFIG.endpoints.auth.refresh),
   logout: () => buildApiUrl(API_CONFIG.endpoints.auth.logout),
+  passwordResetRequest: () => buildApiUrl(API_CONFIG.endpoints.auth.passwordResetRequest),
+  passwordResetReset: () => buildApiUrl(API_CONFIG.endpoints.auth.passwordResetReset),
 };
 
 // ============================================
@@ -124,6 +132,11 @@ export const registeredManifestations = {
   store: () => buildApiUrl(API_CONFIG.endpoints.registeredManifestations.store),
   update: (id) => buildApiUrl(API_CONFIG.endpoints.registeredManifestations.update(id)),
   delete: (id) => buildApiUrl(API_CONFIG.endpoints.registeredManifestations.delete(id)),
+};
+
+export const geomanifestations = {
+  index: () => buildApiUrl(API_CONFIG.endpoints.geomanifestations.index),
+  show: (id) => buildApiUrl(API_CONFIG.endpoints.geomanifestations.show(id)),
 };
 
 // ============================================
@@ -261,6 +274,14 @@ export const authLogout = async () => {
   return callApi(auth.logout(), 'POST');
 };
 
+export const authPasswordResetRequest = async (payload) => {
+  return callApi(auth.passwordResetRequest(), 'POST', payload);
+};
+
+export const authPasswordResetReset = async (payload) => {
+  return callApi(auth.passwordResetReset(), 'POST', payload);
+};
+
 // ============================================
 // USER API FUNCTIONS
 // ============================================
@@ -348,6 +369,14 @@ export const registeredManifestationsUpdate = async (id, payload) => {
 
 export const registeredManifestationsDelete = async (id) => {
   return callApi(registeredManifestations.delete(id), 'DELETE');
+};
+
+export const geomanifestationsIndex = async () => {
+  return callApi(geomanifestations.index(), 'GET');
+};
+
+export const geomanifestationsShow = async (id) => {
+  return callApi(geomanifestations.show(id), 'GET');
 };
 
 // ============================================
