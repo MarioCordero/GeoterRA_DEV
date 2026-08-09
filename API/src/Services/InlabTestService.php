@@ -12,6 +12,7 @@ use Http\Request;
 use PDO;
 use Repositories\GeomanifestationRepository;
 use Repositories\InlabTestRepository;
+use Repositories\UserRepository;
 
 /**
  * Business logic for in-lab tests (inlab_tests table).
@@ -21,12 +22,18 @@ final class InlabTestService
   private InlabTestRepository $repository;
   private GeomanifestationRepository $geomanifestationRepository;
   private AuthService $authService;
+  private NotificationService $notificationService;
+
 
   public function __construct(private PDO $pdo)
   {
     $this->repository = new InlabTestRepository($pdo);
     $this->geomanifestationRepository = new GeomanifestationRepository($pdo);
     $this->authService = new AuthService($pdo);
+    $this->userRepository = new UserRepository($pdo);
+    $this->notificationService = new NotificationService(
+      new SmtpEmailService()
+    );
   }
 
   /**
@@ -45,9 +52,25 @@ final class InlabTestService
     );
 
     $dto->validate();
-    $this->validateGeomanifestationExists($dto->geomanifestationId);
 
-    return $this->formatTest($this->repository->create($dto, $auth['user_id']));
+    $result = $this->repository->create($dto, $auth['user_id']);
+
+    $user = $this->userRepository->findById($auth['user_id']);
+    if ($user) {
+      $manifestation = $this->geomanifestationRepository->findById(
+        $dto->geomanifestationId
+      );
+      $mName = $manifestation['geomanifestation_name'] ?? 'Desconocida';
+      $this->notificationService->notifyResourceCreated(
+        $user['email'],
+        $user['first_name'],
+        'Prueba de Laboratorio',
+        "Prueba asociada a " . $mName,
+        date('Y-m-d H:i:s')
+      );
+    }
+
+    return $this->formatTest($result);
   }
 
   /**
@@ -80,7 +103,22 @@ final class InlabTestService
   private function formatTest(array $row): array
   {
     // Round numeric fields
-    $numericFields = ['ph', 'conductivity', 'cl', 'ca', 'hco3', 'so4', 'fe', 'si', 'b', 'li', 'f', 'na', 'k', 'mg'];
+    $numericFields = [
+      'ph',
+      'conductivity',
+      'cl',
+      'ca',
+      'hco3',
+      'so4',
+      'fe',
+      'si',
+      'b',
+      'li',
+      'f',
+      'na',
+      'k',
+      'mg'
+    ];
     foreach ($numericFields as $field) {
       if (isset($row[$field]) && is_numeric($row[$field])) {
         $row[$field] = round((float)$row[$field], 2);
@@ -195,7 +233,7 @@ final class InlabTestService
    */
   public function update(string $id, UpdateInlabTestDTO $dto): array
   {
-    $user = Request::requireRole(
+    $auth = Request::requireRole(
       [
         AllowedUserRoles::ADMIN,
         AllowedUserRoles::INVESTIGATOR
@@ -216,6 +254,21 @@ final class InlabTestService
       );
     }
 
+    $user = $this->userRepository->findById($auth['user_id']);
+    if ($user) {
+      $manifestation = $this->geomanifestationRepository->findById(
+        $existing['geomanifestation_id']
+      );
+      $mName = $manifestation['geomanifestation_name'] ?? 'Desconocida';
+      $this->notificationService->notifyResourceUpdated(
+        $user['email'],
+        $user['first_name'],
+        'Prueba de Laboratorio',
+        "Prueba asociada a " . $mName,
+        date('Y-m-d H:i:s')
+      );
+    }
+
     return $this->formatTest($updated);
   }
 
@@ -227,7 +280,7 @@ final class InlabTestService
    */
   public function delete(string $id): void
   {
-    Request::requireRole(
+    $auth = Request::requireRole(
       [
         AllowedUserRoles::ADMIN,
         AllowedUserRoles::INVESTIGATOR
@@ -236,13 +289,30 @@ final class InlabTestService
 
     $existing = $this->repository->findById($id);
     if (!$existing) {
-      throw new ApiException(ErrorType::notFound('In-lab test'), 404);
+      throw new ApiException(
+        ErrorType::notFound('In-lab test'), 404
+      );
     }
 
     $deleted = $this->repository->delete($id);
     if (!$deleted) {
       throw new ApiException(
         ErrorType::internal('Failed to delete in-lab test'), 500
+      );
+    }
+
+    $user = $this->userRepository->findById($auth['user_id']);
+    if ($user) {
+      $manifestation = $this->geomanifestationRepository->findById(
+        $existing['geomanifestation_id']
+      );
+      $mName = $manifestation['geomanifestation_name'] ?? 'Desconocida';
+      $this->notificationService->notifyResourceDeleted(
+        $user['email'],
+        $user['first_name'],
+        'Prueba de Laboratorio',
+        "Prueba asociada a " . $mName,
+        date('Y-m-d H:i:s')
       );
     }
   }

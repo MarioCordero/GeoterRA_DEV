@@ -19,10 +19,11 @@ final class GeomanifestationRepository extends Repository
    */
   public function findByName(string $name): ?array
   {
-    $sql = "SELECT geomanifestation_id, province_snit_code, canton_snit_code, district_snit_code,
-                       current_georeport_id, geomanifestation_name, latitude, longitude, description,
-                       visibility, created_at, created_by
-                FROM geomanifestations
+    $sql = "SELECT g.geomanifestation_id, g.province_snit_code, g.canton_snit_code, g.district_snit_code,
+                       g.current_georeport_id, r.request_id, r.request_name, g.geomanifestation_name,
+                       g.latitude, g.longitude, g.description, g.visibility, g.created_at, g.created_by
+                FROM geomanifestations g
+                LEFT JOIN requests r on g.request_id = r.request_id
                 WHERE LOWER(geomanifestation_name) = LOWER(:name)
                 LIMIT 1";
     $stmt = $this->execute($sql, [':name' => $name]);
@@ -45,11 +46,12 @@ final class GeomanifestationRepository extends Repository
     $countStmt = $this->execute($countSql);
     $total = (int)$countStmt->fetchColumn();
 
-    $sql = "SELECT geomanifestation_id, province_snit_code, canton_snit_code, district_snit_code,
-                       current_georeport_id, geomanifestation_name, latitude, longitude, description,
-                       visibility, created_at, created_by
-                FROM geomanifestations
-                ORDER BY created_at DESC
+    $sql = "SELECT g.geomanifestation_id, g.province_snit_code, g.canton_snit_code, g.district_snit_code,
+                       g.current_georeport_id, r.request_id, r.request_name, g.geomanifestation_name,
+                       g.latitude, g.longitude, g.description, g.visibility, g.created_at, g.created_by
+                FROM geomanifestations g
+                LEFT JOIN requests r on g.request_id = r.request_id
+                ORDER BY g.created_at DESC
                 LIMIT :limit OFFSET :offset";
     $stmt = $this->execute($sql, [':limit' => $limit, ':offset' => $offset]);
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -76,11 +78,12 @@ final class GeomanifestationRepository extends Repository
     );
     $total = (int)$countStmt->fetchColumn();
 
-    $sql = "SELECT geomanifestation_id, province_snit_code, canton_snit_code, district_snit_code,
-                       current_georeport_id, geomanifestation_name, latitude, longitude, description,
-                       visibility, created_at, created_by
-                FROM geomanifestations
-                WHERE province_snit_code = :province_snit
+    $sql = "SELECT g.geomanifestation_id, g.province_snit_code, g.canton_snit_code, g.district_snit_code,
+                       g.current_georeport_id, r.request_id, r.request_name, g.geomanifestation_name,
+                       g.latitude, g.longitude, g.description, g.visibility, g.created_at, g.created_by
+                FROM geomanifestations g
+                LEFT JOIN requests r on g.request_id = r.request_id
+                WHERE g.province_snit_code = :province_snit
                 ORDER BY created_at DESC
                 LIMIT :limit OFFSET :offset";
     $stmt = $this->execute(
@@ -100,41 +103,39 @@ final class GeomanifestationRepository extends Repository
    *
    * @param array<string,mixed> $data Associative array with keys: name, latitude, longitude,
    *        province_snit_code, canton_snit_code, district_snit_code, current_georeport_id,
-   *        description, visibility (0/1)
+   *        description, visibility (0/1), request_id
    * @param string $userId
    * @return array The generated row
    */
   public function create(array $data, string $userId): array
   {
     $id = $this->generateUlid();
-    $finalName = trim(
-      $data['name']
-    ) !== '' ? $data['name'] : 'SOLI-' . strtoupper(substr($id, -5));
 
     $sql = "INSERT INTO geomanifestations (
                     geomanifestation_id, province_snit_code, canton_snit_code, district_snit_code,
-                    current_georeport_id, geomanifestation_name, latitude, longitude, description,
+                    current_georeport_id, geomanifestation_name, request_id, latitude, longitude, description,
                     visibility, created_by, created_at
                 ) VALUES (
                     :id, :province_snit, :canton_snit, :district_snit,
-                    :current_georeport, :name, :lat, :lng, :desc,
+                    :current_georeport, :name, :request_id, :lat, :lng, :desc,
                     :visibility, :created_by, NOW()
                 )";
 
     $this->execute(
       $sql, [
-      ':id' => $id,
-      ':province_snit' => $data['province_snit_code'] ?? null,
-      ':canton_snit' => $data['canton_snit_code'] ?? null,
-      ':district_snit' => $data['district_snit_code'] ?? null,
-      ':current_georeport' => $data['current_georeport_id'] ?? null,
-      ':name' => $finalName,
-      ':lat' => $data['latitude'],
-      ':lng' => $data['longitude'],
-      ':desc' => $data['description'] ?? null,
-      ':visibility' => $data['visibility'] ?? 0,
-      ':created_by' => $userId
-    ]
+        ':id' => $id,
+        ':province_snit' => $data['province_snit_code'] ?? null,
+        ':canton_snit' => $data['canton_snit_code'] ?? null,
+        ':district_snit' => $data['district_snit_code'] ?? null,
+        ':current_georeport' => $data['current_georeport_id'] ?? null,
+        ':request_id' => $data['request_id'] ?? null,
+        ':name' => $data['geomanifestation_name'],
+        ':lat' => $data['latitude'],
+        ':lng' => $data['longitude'],
+        ':desc' => $data['description'] ?? null,
+        ':visibility' => $data['visibility'] ?? 0,
+        ':created_by' => $userId
+      ]
     );
 
     return $this->findById($id);
@@ -148,10 +149,12 @@ final class GeomanifestationRepository extends Repository
    */
   public function findById(string $id): ?array
   {
-    $sql = "SELECT geomanifestation_id, province_snit_code, canton_snit_code, district_snit_code,
-                       current_georeport_id, geomanifestation_name, latitude, longitude, description,
-                       visibility, created_at, created_by
-                FROM geomanifestations
+    $sql = "SELECT g.geomanifestation_id, g.province_snit_code, g.canton_snit_code, g.district_snit_code,
+                       g.current_georeport_id, r.request_id, r.request_name, g.geomanifestation_name,
+                       g.latitude, g.longitude, g.description, g.visibility,
+                       g.created_at, g.created_by
+                FROM geomanifestations g
+                LEFT JOIN requests r on g.request_id = r.request_id
                 WHERE geomanifestation_id = :id";
     $stmt = $this->execute($sql, [':id' => $id]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -163,7 +166,7 @@ final class GeomanifestationRepository extends Repository
    *
    * @param string $id
    * @param bool $visibility
-   * @return bool
+   * @return array|null
    */
   public function updateVisibility(string $id, bool $visibility): ?array
   {
@@ -175,7 +178,7 @@ final class GeomanifestationRepository extends Repository
    *
    * @param string $id
    * @param array<string,mixed> $fields Associative array of column => value
-   * @return array Not null array if row updated.
+   * @return array|null Not null array if row updated.
    */
   public function update(string $id, array $fields): ?array
   {

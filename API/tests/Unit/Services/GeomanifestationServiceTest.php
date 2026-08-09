@@ -125,24 +125,79 @@ class GeomanifestationServiceTest extends TestCase
 			'district_snit_code' => $overrides['district_snit_code'] ?? null,
 		];
 	}
+  private function createTestInsituTest(string $geomanifestationId, float $temperature): void
+  {
+    $insituTestId = UlidGenerator::generate();
+    $inlabTestId = UlidGenerator::generate();
+    $georeportId = UlidGenerator::generate();
+    $userId = $this->getOrCreateDefaultUser()['user_id'];
 
-	private function createTestInsituTest(string $geomanifestationId, float $temperature): void
-	{
-		$this->pdo->prepare(
-			'INSERT INTO insitu_tests (
+    $this->pdo->prepare(
+      'INSERT INTO insitu_tests (
                 insitu_test_id, geomanifestation_id, temperature, conductivity,
                 ph, description, created_by, created_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())'
-		)->execute([
-			UlidGenerator::generate(),
-			$geomanifestationId,
-			$temperature,
-			300.0,
-			7.0,
-			'Test in-situ measurement',
-			$this->getOrCreateDefaultUser()['user_id'],
-		]);
-	}
+    )->execute([
+      $insituTestId,
+      $geomanifestationId,
+      $temperature,
+      300.0,
+      7.0,
+      'Test in-situ measurement',
+      $userId,
+    ]);
+
+    $this->pdo->prepare(
+      'INSERT INTO inlab_tests (
+                inlab_test_id, geomanifestation_id,
+                ph, conductivity, cl, ca, hco3, so4, fe, si, b, li, f, na, k, mg,
+                description, created_by, created_at
+            ) VALUES (
+                ?, ?,
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, NOW()
+            )'
+    )->execute([
+      $inlabTestId,
+      $geomanifestationId,
+      7.0,
+      300.0,
+      10.0,
+      5.0,
+      20.0,
+      2.0,
+      0.1,
+      15.0,
+      0.5,
+      0.01,
+      1.0,
+      12.0,
+      3.0,
+      2.0,
+      'Test in-lab measurement',
+      $userId,
+    ]);
+
+    $this->pdo->prepare(
+      'INSERT INTO georeports (
+                georeport_id, geomanifestation_id, insitu_test_id, inlab_test_id,
+                created_by, created_at
+            ) VALUES (?, ?, ?, ?, ?, NOW())'
+    )->execute([
+      $georeportId,
+      $geomanifestationId,
+      $insituTestId,
+      $inlabTestId,
+      $userId,
+    ]);
+
+    $this->pdo->prepare(
+      'UPDATE geomanifestations SET current_georeport_id = ? WHERE geomanifestation_id = ?'
+    )->execute([
+      $georeportId,
+      $geomanifestationId
+    ]);
+  }
 
 	private function findGeomanifestationRow(string $id): ?array
 	{
@@ -158,7 +213,7 @@ class GeomanifestationServiceTest extends TestCase
 		$this->authenticateAs(AllowedUserRoles::ADMIN);
 
 		$dto = RegisterGeomanifestationDTO::fromArray([
-			'name' => 'Las Hornillas',
+			'geomanifestation_name' => 'Las Hornillas',
 			'latitude' => 10.1,
 			'longitude' => -85.3,
 		]);
@@ -166,12 +221,11 @@ class GeomanifestationServiceTest extends TestCase
 		$result = $this->service->create($dto);
 
 		$this->assertNotEmpty($result['geomanifestation_id']);
-		$this->assertEquals('Las Hornillas', $result['name']);
+		$this->assertEquals('Las Hornillas', $result['geomanifestation_name']);
 		$this->assertNull($result['location']['province']);
 		$this->assertArrayHasKey('visibility', $result);
-		$this->assertArrayNotHasKey('insitu_test', $result);
-
-		$this->assertNotNull($this->findGeomanifestationRow($result['geomanifestation_id']));
+    $this->assertNull($result['insitu_test']);
+    $this->assertNotNull($this->findGeomanifestationRow($result['geomanifestation_id']));
 	}
 
 	public function testCreateWithValidLocation(): void
@@ -180,7 +234,7 @@ class GeomanifestationServiceTest extends TestCase
 		$geo = $this->createTestGeoHierarchy();
 
 		$dto = RegisterGeomanifestationDTO::fromArray([
-			'name' => 'Rincon de la Vieja Fumarole',
+			'geomanifestation_name' => 'Rincon de la Vieja Fumarole',
 			'latitude' => 10.83,
 			'longitude' => -85.34,
 			'province_snit_code' => $geo['province_snit_code'],
@@ -200,7 +254,7 @@ class GeomanifestationServiceTest extends TestCase
 		$this->authenticateAs(AllowedUserRoles::ADMIN);
 
 		$dto = RegisterGeomanifestationDTO::fromArray([
-			'name' => 'Orphan Manifestation',
+			'geomanifestation_name' => 'Orphan Manifestation',
 			'latitude' => 10.0,
 			'longitude' => -84.0,
 			'province_snit_code' => 999999,
@@ -220,7 +274,7 @@ class GeomanifestationServiceTest extends TestCase
 		$this->authenticateAs(AllowedUserRoles::USER);
 
 		$dto = RegisterGeomanifestationDTO::fromArray([
-			'name' => 'Forbidden Manifestation',
+			'geomanifestation_name' => 'Forbidden Manifestation',
 			'latitude' => 10.0,
 			'longitude' => -84.0,
 		]);
@@ -238,7 +292,7 @@ class GeomanifestationServiceTest extends TestCase
 		$this->authenticateAs(AllowedUserRoles::ADMIN);
 
 		$dto = RegisterGeomanifestationDTO::fromArray([
-			'name' => 'Invalid Latitude',
+			'geomanifestation_name' => 'Invalid Latitude',
 			'latitude' => 120.0,
 			'longitude' => -84.0,
 		]);
@@ -286,8 +340,8 @@ class GeomanifestationServiceTest extends TestCase
 
 		$this->assertEquals($manifestation['geomanifestation_id'], $result['geomanifestation_id']);
 		$this->assertArrayHasKey('visibility', $result);
-		$this->assertArrayNotHasKey('insitu_test', $result);
-	}
+    $this->assertNull($result['insitu_test']);
+  }
 
 	public function testGetByIdIncludeHiddenThrowsForbiddenWithoutRole(): void
 	{
@@ -320,17 +374,17 @@ class GeomanifestationServiceTest extends TestCase
 		$this->authenticateAs(AllowedUserRoles::ADMIN);
 		$manifestation = $this->createTestGeomanifestation();
 
-		$dto = UpdateGeomanifestationDTO::fromArray(['name' => 'Updated Name']);
+		$dto = UpdateGeomanifestationDTO::fromArray(['geomanifestation_name' => 'Updated Name']);
 		$result = $this->service->update($manifestation['geomanifestation_id'], $dto);
 
-		$this->assertEquals('Updated Name', $result['name']);
+		$this->assertEquals('Updated Name', $result['geomanifestation_name']);
 		$this->assertArrayHasKey('visibility', $result);
 	}
 
 	public function testUpdateThrowsNotFoundForNonexistentId(): void
 	{
 		$this->authenticateAs(AllowedUserRoles::ADMIN);
-		$dto = UpdateGeomanifestationDTO::fromArray(['name' => 'Ghost']);
+		$dto = UpdateGeomanifestationDTO::fromArray(['geomanifestation_name' => 'Ghost']);
 
 		try {
 			$this->service->update(UlidGenerator::generate(), $dto);
@@ -344,7 +398,7 @@ class GeomanifestationServiceTest extends TestCase
 	{
 		$this->authenticateAs(AllowedUserRoles::USER);
 		$manifestation = $this->createTestGeomanifestation();
-		$dto = UpdateGeomanifestationDTO::fromArray(['name' => 'Should not apply']);
+		$dto = UpdateGeomanifestationDTO::fromArray(['geomanifestation_name' => 'Should not apply']);
 
 		try {
 			$this->service->update($manifestation['geomanifestation_id'], $dto);
@@ -376,7 +430,7 @@ class GeomanifestationServiceTest extends TestCase
 
 		$result = $this->service->update($manifestation['geomanifestation_id'], $dto);
 
-		$this->assertEquals($manifestation['geomanifestation_name'], $result['name']);
+		$this->assertEquals($manifestation['geomanifestation_name'], $result['geomanifestation_name']);
 	}
 
 	// -------------------------------- delete --------------------------------- //

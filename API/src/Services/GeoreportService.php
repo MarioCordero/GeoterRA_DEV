@@ -14,6 +14,7 @@ use Repositories\GeomanifestationRepository;
 use Repositories\GeoreportRepository;
 use Repositories\InlabTestRepository;
 use Repositories\InsituTestRepository;
+use Repositories\UserRepository;
 
 /**
  * Business logic for geothermal reports (georeports table).
@@ -25,6 +26,9 @@ final class GeoreportService
   private InsituTestRepository $insituTestRepository;
   private InlabTestRepository $inlabTestRepository;
   private AuthService $authService;
+  private NotificationService $notificationService;
+  private UserRepository $userRepository;
+
 
   public function __construct(private PDO $pdo)
   {
@@ -33,6 +37,8 @@ final class GeoreportService
     $this->insituTestRepository = new InsituTestRepository($pdo);
     $this->inlabTestRepository = new InlabTestRepository($pdo);
     $this->authService = new AuthService($pdo);
+    $this->userRepository = new UserRepository($pdo);
+    $this->notificationService = new NotificationService(new SmtpEmailService());
   }
 
   /**
@@ -78,6 +84,21 @@ final class GeoreportService
       }
     }
 
+    $user = $this->userRepository->findById($auth['user_id']);
+    if ($user) {
+      $manifestation = $this->geomanifestationRepository->findById(
+        $dto->geomanifestationId
+      );
+      $mName = $manifestation['geomanifestation_name'] ?? 'Desconocida';
+      $this->notificationService->notifyResourceCreated(
+        $user['email'],
+        $user['first_name'],
+        'Reporte Geotérmico',
+        "Reporte asociado a " . $mName,
+        date('Y-m-d H:i:s')
+      );
+    }
+
     return $this->formatReport($created);
   }
 
@@ -110,11 +131,15 @@ final class GeoreportService
   ): void {
     $insitu = $this->insituTestRepository->findById($insituTestId);
     if (!$insitu) {
-      throw new ApiException(ErrorType::invalidField('insitu_test_id'), 422);
+      throw new ApiException(
+        ErrorType::invalidField('insitu_test_id'), 422
+      );
     }
     $inlab = $this->inlabTestRepository->findById($inlabTestId);
     if (!$inlab) {
-      throw new ApiException(ErrorType::invalidField('inlab_test_id'), 422);
+      throw new ApiException(
+        ErrorType::invalidField('inlab_test_id'), 422
+      );
     }
   }
 
@@ -161,7 +186,9 @@ final class GeoreportService
 
     $georeport = $this->repository->findById($id);
     if (!$georeport) {
-      throw new ApiException(ErrorType::notFound('Georeport'), 404);
+      throw new ApiException(
+        ErrorType::notFound('Georeport'), 404
+      );
     }
 
     // Check manifestation visibility
@@ -171,7 +198,9 @@ final class GeoreportService
     if ($manifestation && !$manifestation['visibility']) {
       $isAdmin = ($user['role'] ?? '') === AllowedUserRoles::ADMIN;
       if (!$isAdmin) {
-        throw new ApiException(ErrorType::notFound('Georeport'), 404);
+        throw new ApiException(
+          ErrorType::notFound('Georeport'), 404
+        );
       }
     }
 
@@ -223,7 +252,7 @@ final class GeoreportService
   public function update(
     string $id, UpdateGeoreportDTO $dto, bool $setAsCurrent = false
   ): array {
-    $user = Request::requireRole(
+    $auth = Request::requireRole(
       [
         AllowedUserRoles::ADMIN,
         AllowedUserRoles::FIELD_INVESTIGATOR,
@@ -236,11 +265,14 @@ final class GeoreportService
     // Check if the georeport exists
     $existing = $this->repository->findById($id);
     if (!$existing) {
-      throw new ApiException(ErrorType::notFound('Georeport'), 404);
+      throw new ApiException(
+        ErrorType::notFound('Georeport'), 404
+      );
     }
 
     // Validate references if they are being updated
-    $manifestationId = $dto->geomanifestationId ?? $existing['geomanifestation_id'];
+    $manifestationId = $dto->geomanifestationId
+      ?? $existing['geomanifestation_id'];
     $insituId = $dto->insituTestId ?? $existing['insitu_test_id'];
     $inlabId = $dto->inlabTestId ?? $existing['inlab_test_id'];
 
@@ -258,6 +290,21 @@ final class GeoreportService
       $this->repository->setAsCurrentForManifestation($manifestationId, $id);
     }
 
+    $user = $this->userRepository->findById($auth['user_id']);
+    if ($user) {
+      $manifestation = $this->geomanifestationRepository->findById(
+        $manifestationId
+      );
+      $mName = $manifestation['geomanifestation_name'] ?? 'Desconocida';
+      $this->notificationService->notifyResourceUpdated(
+        $user['email'],
+        $user['first_name'],
+        'Reporte Geotérmico',
+        "Reporte asociado a " . $mName,
+        date('Y-m-d H:i:s')
+      );
+    }
+
     return $this->formatReport($updated);
   }
 
@@ -269,7 +316,7 @@ final class GeoreportService
    */
   public function delete(string $id): void
   {
-    Request::requireRole(
+    $auth = Request::requireRole(
       [
         AllowedUserRoles::ADMIN,
         AllowedUserRoles::FIELD_INVESTIGATOR,
@@ -279,7 +326,9 @@ final class GeoreportService
 
     $georeport = $this->repository->findById($id);
     if (!$georeport) {
-      throw new ApiException(ErrorType::notFound('Georeport'), 404);
+      throw new ApiException(
+        ErrorType::notFound('Georeport'), 404
+      );
     }
 
     // If this georeport is the current one for its manifestation, clear the reference.
@@ -296,6 +345,21 @@ final class GeoreportService
     if (!$deleted) {
       throw new ApiException(
         ErrorType::internal('Failed to delete georeport'), 500
+      );
+    }
+
+    $user = $this->userRepository->findById($auth['user_id']);
+    if ($user) {
+      $manifestation = $this->geomanifestationRepository->findById(
+        $georeport['geomanifestation_id']
+      );
+      $mName = $manifestation['geomanifestation_name'] ?? 'Desconocida';
+      $this->notificationService->notifyResourceDeleted(
+        $user['email'],
+        $user['first_name'],
+        'Reporte Geotérmico',
+        "Reporte asociado a " . $mName,
+        date('Y-m-d H:i:s')
       );
     }
   }

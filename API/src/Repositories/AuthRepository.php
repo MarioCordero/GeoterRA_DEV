@@ -136,15 +136,64 @@ final class AuthRepository extends Repository
   }
 
   /**
-   * Creates a brand new refresh token (first in its family).
+   * Creates a brand-new refresh token (first in its family).
    *
    * @param RefreshTokenDTO $data Refresh token data (user ID, hash, TTL).
    *
    * @return string The new token ID.
+   * @throws Throwable
    */
   public function createRefreshToken(RefreshTokenDTO $data): string
   {
     return $this->rotateRefreshToken($data, null);
+  }
+
+  /**
+   * Inserts a new password reset token for a user.
+   *
+   * @param string $userId The user's ID.
+   * @param string $tokenHash The hashed OTP token.
+   * @param int $expiry The unix timestamp when the token expires.
+   * @return void
+   */
+  public function insertPasswordResetToken(string $userId, string $tokenHash, int $expiry): void
+  {
+    $sql = "INSERT INTO password_reset_tokens (user_id, token, token_expiry) VALUES (:user_id, :token, :expiry)";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([
+      ':user_id' => $userId,
+      ':token' => $tokenHash,
+      ':expiry' => $expiry
+    ]);
+  }
+
+  /**
+   * Finds a password reset token by its hash.
+   *
+   * @param string $tokenHash The hashed OTP token.
+   * @return array|null Associative array containing the token record, or null if not found.
+   */
+  public function findPasswordResetToken(string $tokenHash): ?array
+  {
+    $sql = "SELECT user_id, token, token_expiry FROM password_reset_tokens WHERE token = :token LIMIT 1";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([':token' => $tokenHash]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $row ?: null;
+  }
+
+  /**
+   * Deletes all password reset tokens associated with a specific user.
+   *
+   * @param string $userId The user's ID.
+   * @return void
+   */
+  public function deletePasswordResetTokens(string $userId): void
+  {
+    $sql = "DELETE FROM password_reset_tokens WHERE user_id = :user_id";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([':user_id' => $userId]);
   }
 
   /**
