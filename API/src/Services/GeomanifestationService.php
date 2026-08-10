@@ -72,18 +72,7 @@ final class GeomanifestationService
 
     $auth = $this->authService->requireAuth();
     $created = $this->repository->create($dto->toArray(), $auth['user_id']);
-
     $user = $this->userRepository->findById($auth['user_id']);
-    if ($user) {
-      $this->notificationService->notifyResourceCreated(
-        $user['email'],
-        $user['first_name'],
-        'Geomanifestación',
-        $dto->geomanifestation_name,
-        date('Y-m-d H:i:s')
-      );
-    }
-
     // Fetch the created record from the view (include hidden because it's admin operation)
     $viewRow = $this->viewRepository->findById(
       $created['geomanifestation_id'], true
@@ -94,7 +83,25 @@ final class GeomanifestationService
       );
     }
 
-    return $this->formatManifestationView($viewRow, true);
+    $formatted = $this->formatManifestationView($viewRow, true);
+
+    if ($user) {
+      $this->notificationService->notifyGeomanifestationCreated(
+        $user['email'],
+        $user['first_name'],
+        $formatted['geomanifestation_name'],
+        $formatted['description'],
+        $formatted['location']['province'],
+        $formatted['location']['canton'],
+        $formatted['location']['district'],
+        $formatted['location']['latitude'],
+        $formatted['location']['longitude'],
+        $formatted['visibility'],
+        date('Y-m-d H:i:s')
+      );
+    }
+
+    return $formatted;
   }
 
   /**
@@ -219,7 +226,7 @@ final class GeomanifestationService
    */
   public function update(string $id, UpdateGeomanifestationDTO $dto): array
   {
-    Request::requireRole(
+    $auth = Request::requireRole(
       [
         AllowedUserRoles::ADMIN,
         AllowedUserRoles::FIELD_INVESTIGATOR,
@@ -263,6 +270,25 @@ final class GeomanifestationService
     if (!$viewRow) {
       throw new ApiException(
         ErrorType::internal('Failed to retrieve updated manifestation'), 500
+      );
+    }
+
+    $formatted = $this->formatManifestationView($viewRow, true);
+
+    $user = $this->userRepository->findById($auth['user_id']);
+    if ($user) {
+      $this->notificationService->notifyGeomanifestationUpdated(
+        $user['email'],
+        $user['first_name'],
+        $formatted['geomanifestation_name'],
+        $formatted['description'],
+        $formatted['location']['province'],
+        $formatted['location']['canton'],
+        $formatted['location']['district'],
+        $formatted['location']['latitude'],
+        $formatted['location']['longitude'],
+        $formatted['visibility'],
+        date('Y-m-d H:i:s')
       );
     }
 
