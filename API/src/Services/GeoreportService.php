@@ -36,7 +36,6 @@ final class GeoreportService
     $this->geomanifestationRepository = new GeomanifestationRepository($pdo);
     $this->insituTestRepository = new InsituTestRepository($pdo);
     $this->inlabTestRepository = new InlabTestRepository($pdo);
-    $this->authService = new AuthService($pdo);
     $this->userRepository = new UserRepository($pdo);
     $this->notificationService = new NotificationService(new SmtpEmailService());
   }
@@ -90,11 +89,14 @@ final class GeoreportService
         $dto->geomanifestationId
       );
       $mName = $manifestation['geomanifestation_name'] ?? 'Desconocida';
-      $this->notificationService->notifyResourceCreated(
+      $requestName = $manifestation['request_name'] ?? null;
+
+      $this->notificationService->notifyGeoreportCreated(
         $user['email'],
         $user['first_name'],
-        'Reporte Geotérmico',
-        "Reporte asociado a " . $mName,
+        $mName,
+        $requestName,
+        $created['details'] ?? null,
         date('Y-m-d H:i:s')
       );
     }
@@ -296,11 +298,14 @@ final class GeoreportService
         $manifestationId
       );
       $mName = $manifestation['geomanifestation_name'] ?? 'Desconocida';
-      $this->notificationService->notifyResourceUpdated(
+      $requestName = $manifestation['request_name'] ?? null;
+
+      $this->notificationService->notifyGeoreportUpdated(
         $user['email'],
         $user['first_name'],
-        'Reporte Geotérmico',
-        "Reporte asociado a " . $mName,
+        $mName,
+        $requestName,
+        $updated['details'] ?? null,
         date('Y-m-d H:i:s')
       );
     }
