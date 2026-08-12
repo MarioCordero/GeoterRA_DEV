@@ -21,16 +21,16 @@ final class InsituTestService
 {
   private InsituTestRepository $repository;
   private GeomanifestationRepository $geomanifestationRepository;
-  private AuthService $authService;
   private UserRepository $userRepository;
   private NotificationService $notificationService;
 
-  public function __construct(private PDO $pdo)
+  public function __construct(private readonly PDO $pdo)
   {
-    $this->repository = new InsituTestRepository($pdo);
-    $this->geomanifestationRepository = new GeomanifestationRepository($pdo);
-    $this->authService = new AuthService($pdo);
-    $this->userRepository = new UserRepository($pdo);
+    $this->repository = new InsituTestRepository($this->pdo);
+    $this->geomanifestationRepository = new GeomanifestationRepository(
+      $this->pdo
+    );
+    $this->userRepository = new UserRepository($this->pdo);
     $this->notificationService = new NotificationService(
       new SmtpEmailService()
     );
@@ -40,7 +40,7 @@ final class InsituTestService
    * Creates a new in-situ test (admin/investigator only).
    *
    * @param RegisterInsituTestDTO $dto
-   * @throws ApiException
+   * @return array
    */
   public function create(RegisterInsituTestDTO $dto): array
   {
