@@ -194,7 +194,7 @@ final class GeomanifestationController
         $onlyVisible
       );
 
-      Response::success($result);
+      Response::success($result['data'], $result['pagination']);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
     } catch (Throwable $e) {
