@@ -21,16 +21,16 @@ final class InlabTestService
 {
   private InlabTestRepository $repository;
   private GeomanifestationRepository $geomanifestationRepository;
-  private AuthService $authService;
   private NotificationService $notificationService;
-
+  private UserRepository $userRepository;
 
   public function __construct(private PDO $pdo)
   {
-    $this->repository = new InlabTestRepository($pdo);
-    $this->geomanifestationRepository = new GeomanifestationRepository($pdo);
-    $this->authService = new AuthService($pdo);
-    $this->userRepository = new UserRepository($pdo);
+    $this->repository = new InlabTestRepository($this->pdo);
+    $this->geomanifestationRepository = new GeomanifestationRepository(
+      $this->pdo
+    );
+    $this->userRepository = new UserRepository($this->pdo);
     $this->notificationService = new NotificationService(
       new SmtpEmailService()
     );
@@ -40,7 +40,7 @@ final class InlabTestService
    * Creates a new in-lab test (admin/investigator only).
    *
    * @param RegisterInlabTestDTO $dto
-   * @throws ApiException
+   * @return array
    */
   public function create(RegisterInlabTestDTO $dto): array
   {
