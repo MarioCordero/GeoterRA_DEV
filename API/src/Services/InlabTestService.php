@@ -21,16 +21,16 @@ final class InlabTestService
 {
   private InlabTestRepository $repository;
   private GeomanifestationRepository $geomanifestationRepository;
-  private AuthService $authService;
   private NotificationService $notificationService;
-
+  private UserRepository $userRepository;
 
   public function __construct(private PDO $pdo)
   {
-    $this->repository = new InlabTestRepository($pdo);
-    $this->geomanifestationRepository = new GeomanifestationRepository($pdo);
-    $this->authService = new AuthService($pdo);
-    $this->userRepository = new UserRepository($pdo);
+    $this->repository = new InlabTestRepository($this->pdo);
+    $this->geomanifestationRepository = new GeomanifestationRepository(
+      $this->pdo
+    );
+    $this->userRepository = new UserRepository($this->pdo);
     $this->notificationService = new NotificationService(
       new SmtpEmailService()
     );
@@ -40,7 +40,7 @@ final class InlabTestService
    * Creates a new in-lab test (admin/investigator only).
    *
    * @param RegisterInlabTestDTO $dto
-   * @throws ApiException
+   * @return array
    */
   public function create(RegisterInlabTestDTO $dto): array
   {
@@ -61,11 +61,26 @@ final class InlabTestService
         $dto->geomanifestationId
       );
       $mName = $manifestation['geomanifestation_name'] ?? 'Desconocida';
-      $this->notificationService->notifyResourceCreated(
+      $this->notificationService->notifyInlabTestCreated(
         $user['email'],
         $user['first_name'],
-        'Prueba de Laboratorio',
-        "Prueba asociada a " . $mName,
+        $mName,
+        $result['ph'] !== null ? (float)$result['ph'] : null,
+        $result['conductivity'] !== null
+          ? (float)$result['conductivity'] : null,
+        $result['cl'] !== null ? (float)$result['cl'] : null,
+        $result['ca'] !== null ? (float)$result['ca'] : null,
+        $result['hco3'] !== null ? (float)$result['hco3'] : null,
+        $result['so4'] !== null ? (float)$result['so4'] : null,
+        $result['fe'] !== null ? (float)$result['fe'] : null,
+        $result['si'] !== null ? (float)$result['si'] : null,
+        $result['b'] !== null ? (float)$result['b'] : null,
+        $result['li'] !== null ? (float)$result['li'] : null,
+        $result['f'] !== null ? (float)$result['f'] : null,
+        $result['na'] !== null ? (float)$result['na'] : null,
+        $result['k'] !== null ? (float)$result['k'] : null,
+        $result['mg'] !== null ? (float)$result['mg'] : null,
+        $result['description'] ?? null,
         date('Y-m-d H:i:s')
       );
     }
@@ -260,11 +275,26 @@ final class InlabTestService
         $existing['geomanifestation_id']
       );
       $mName = $manifestation['geomanifestation_name'] ?? 'Desconocida';
-      $this->notificationService->notifyResourceUpdated(
+      $this->notificationService->notifyInlabTestUpdated(
         $user['email'],
         $user['first_name'],
-        'Prueba de Laboratorio',
-        "Prueba asociada a " . $mName,
+        $mName,
+        $updated['ph'] !== null ? (float)$updated['ph'] : null,
+        $updated['conductivity'] !== null
+          ? (float)$updated['conductivity'] : null,
+        $updated['cl'] !== null ? (float)$updated['cl'] : null,
+        $updated['ca'] !== null ? (float)$updated['ca'] : null,
+        $updated['hco3'] !== null ? (float)$updated['hco3'] : null,
+        $updated['so4'] !== null ? (float)$updated['so4'] : null,
+        $updated['fe'] !== null ? (float)$updated['fe'] : null,
+        $updated['si'] !== null ? (float)$updated['si'] : null,
+        $updated['b'] !== null ? (float)$updated['b'] : null,
+        $updated['li'] !== null ? (float)$updated['li'] : null,
+        $updated['f'] !== null ? (float)$updated['f'] : null,
+        $updated['na'] !== null ? (float)$updated['na'] : null,
+        $updated['k'] !== null ? (float)$updated['k'] : null,
+        $updated['mg'] !== null ? (float)$updated['mg'] : null,
+        $updated['description'] ?? null,
         date('Y-m-d H:i:s')
       );
     }
@@ -307,11 +337,26 @@ final class InlabTestService
         $existing['geomanifestation_id']
       );
       $mName = $manifestation['geomanifestation_name'] ?? 'Desconocida';
-      $this->notificationService->notifyResourceDeleted(
+      $this->notificationService->notifyInlabTestDeleted(
         $user['email'],
         $user['first_name'],
-        'Prueba de Laboratorio',
-        "Prueba asociada a " . $mName,
+        $mName,
+        $existing['ph'] !== null ? (float)$existing['ph'] : null,
+        $existing['conductivity'] !== null
+          ? (float)$existing['conductivity'] : null,
+        $existing['cl'] !== null ? (float)$existing['cl'] : null,
+        $existing['ca'] !== null ? (float)$existing['ca'] : null,
+        $existing['hco3'] !== null ? (float)$existing['hco3'] : null,
+        $existing['so4'] !== null ? (float)$existing['so4'] : null,
+        $existing['fe'] !== null ? (float)$existing['fe'] : null,
+        $existing['si'] !== null ? (float)$existing['si'] : null,
+        $existing['b'] !== null ? (float)$existing['b'] : null,
+        $existing['li'] !== null ? (float)$existing['li'] : null,
+        $existing['f'] !== null ? (float)$existing['f'] : null,
+        $existing['na'] !== null ? (float)$existing['na'] : null,
+        $existing['k'] !== null ? (float)$existing['k'] : null,
+        $existing['mg'] !== null ? (float)$existing['mg'] : null,
+        $existing['description'] ?? null,
         date('Y-m-d H:i:s')
       );
     }

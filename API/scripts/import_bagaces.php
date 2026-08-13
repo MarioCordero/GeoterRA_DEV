@@ -2,30 +2,27 @@
 <?php
 /**
  * Import Bagaces test data from CSV file using repositories.
- * Converts coordinates from CRTM05 (Costa Rica) to WGS84 (lat/lon).
- *
- * Usage: php import_bagaces.php
- *
- * Expected CSV: semicolon separated, comma as decimal point.
- * Columns: SITIO;X;Y;Temp;pH_campo;Cond_campo;pH_Lab;Cond_Lab;Cl;Ca+;HCO3-;SO4;Fe;Si;B;Li;F;Na;K;Mg+
+ * Converts coordinates from CRTM05 (EPSG:5367) to WGS84 (EPSG:4326).
  */
+
+declare(strict_types=1);
 
 // Autoloader
 $autoloadPaths = [
-    __DIR__ . '/../vendor/autoload.php',
-    __DIR__ . '/vendor/autoload.php',
+  __DIR__ . '/../vendor/autoload.php',
+  __DIR__ . '/vendor/autoload.php',
 ];
 $autoloadFound = false;
 foreach ($autoloadPaths as $path) {
-    if (file_exists($path)) {
-        require_once $path;
-        $autoloadFound = true;
-        break;
-    }
+  if (file_exists($path)) {
+    require_once $path;
+    $autoloadFound = true;
+    break;
+  }
 }
 if (!$autoloadFound) {
-    fwrite(STDERR, "Autoloader not found. Run 'composer install'.\n");
-    exit(1);
+  fwrite(STDERR, "Autoloader no encontrado. Ejecute 'composer install'.\n");
+  exit(1);
 }
 
 use Repositories\GeomanifestationRepository;
@@ -33,257 +30,300 @@ use Repositories\InsituTestRepository;
 use Repositories\InlabTestRepository;
 use Repositories\GeoreportRepository;
 use Core\UlidGenerator;
-use DTO\RegisterGeomanifestationDTO;
-use DTO\UpdateGeomanifestationDTO;
-use DTO\InsituTestDTO;
-use DTO\InlabTestDTO;
-use DTO\GeoreportDTO;
+use DTO\RegisterInsituTestDTO;
+use DTO\RegisterInlabTestDTO;
+use DTO\RegisterGeoreportDTO;
 use proj4php\Proj4php;
 use proj4php\Proj;
 use proj4php\Point;
 
-// Initialize coordinate transformation
+// -------------------------------------------------------------------------
+// Configuración de Proyección CRTM05 (EPSG:5367) a WGS84 (EPSG:4326)
+// -------------------------------------------------------------------------
 $proj4 = new Proj4php();
-// CRTM05 definition (official Costa Rica projection)
-$projCRTM05 = new Proj('+proj=tmerc +lat_0=0 +lon_0=-84.3216666666667 +k=0.9999 +x_0=500000 +y_0=271820.622 +datum=WGS84 +units=m +no_defs', $proj4);
+$projCRTM05 = new Proj(
+  '+proj=tmerc +lat_0=0 +lon_0=-84.3216666666667 +k=0.9999 +x_0=500000 +y_0=271820.622 +datum=WGS84 +units=m +no_defs',
+  $proj4
+);
 $projWGS84 = new Proj('EPSG:4326', $proj4);
 
-// Database connection
+// Códigos SNIT territoriales fijados para Bagaces, Guanacaste
+$snitConfig = [
+  'province_snit_code' => 5,     // Guanacaste
+  'canton_snit_code'   => 504,   // Bagaces
+  'district_snit_code' => 50401, // Bagaces
+];
+
+// Conexión a Base de Datos
 $configPaths = [
-    __DIR__ . '/../config/database.php',
-    __DIR__ . '/config/database.php',
+  __DIR__ . '/../config/database.php',
+  __DIR__ . '/config/database.php',
 ];
 $pdo = null;
 foreach ($configPaths as $path) {
-    if (file_exists($path)) {
-        $pdo = require $path;
-        break;
-    }
+  if (file_exists($path)) {
+    $pdo = require $path;
+    break;
+  }
 }
 if (!$pdo) {
-    fwrite(STDERR, "Database connection not found.\n");
-    exit(1);
+  fwrite(STDERR, "Conexión a la base de datos no encontrada.\n");
+  exit(1);
 }
 
-// Get or create admin user
-$stmt = $pdo->query("SELECT user_id FROM users WHERE role = 'admin' LIMIT 1");
+// Obtener o crear usuario del sistema
+$stmt = $pdo->query("SELECT user_id FROM users WHERE role = 'admin' AND email = 'system@geoterra.com' LIMIT 1");
 $systemUserId = $stmt->fetchColumn();
 if (!$systemUserId) {
-    $passwordHash = password_hash('System@123', PASSWORD_DEFAULT);
-    $userId = UlidGenerator::generate();
-    $stmt = $pdo->prepare("INSERT INTO users (user_id, email, first_name, last_name, password_hash, role, is_deleted, is_verified) 
-                           VALUES (:id, 'system@geoterra.com', 'System', 'Importer', :hash, 'admin', 1, 1)");
-    $stmt->execute([':id' => $userId, ':hash' => $passwordHash]);
-    $systemUserId = $userId;
-    echo "Created system admin user with ID: $systemUserId\n";
+  $passwordHash = password_hash('System@123', PASSWORD_DEFAULT);
+  $userId = UlidGenerator::generate();
+  $stmt = $pdo->prepare("INSERT INTO users (user_id, email, first_name, last_name, password_hash, role, is_deleted, is_verified) 
+                           VALUES (:id, 'system@geoterra.com', 'System', 'Importer', :hash, 'admin', 0, 1)");
+  $stmt->execute([':id' => $userId, ':hash' => $passwordHash]);
+  $systemUserId = $userId;
+  echo "Usuario administrador de sistema creado: $systemUserId\n";
 }
-echo "Using user ID: $systemUserId\n";
+echo "Usando ID de usuario: $systemUserId\n";
 
-// Initialize repositories
+// Inicializar Repositorios
 $geomanifestationRepo = new GeomanifestationRepository($pdo);
 $insituRepo = new InsituTestRepository($pdo);
 $inlabRepo = new InlabTestRepository($pdo);
 $georeportRepo = new GeoreportRepository($pdo);
 
-// Locate CSV file
-$csvFile = __DIR__ . '/Bagaces test 1.csv';
-if (!file_exists($csvFile)) {
-    die("CSV file not found: $csvFile\n");
+// Localizar archivo CSV
+$possibleFiles = [
+  __DIR__ . '/Bagaces test 1.csv',
+  __DIR__ . '/bagases.csv',
+  __DIR__ . '/bagases_test1.csv'
+];
+$csvFile = null;
+foreach ($possibleFiles as $file) {
+  if (file_exists($file)) {
+    $csvFile = $file;
+    break;
+  }
 }
 
-echo "Reading CSV file: $csvFile\n";
+if (!$csvFile) {
+  die("Archivo CSV de datos no encontrado.\n");
+}
+
+echo "Leyendo archivo CSV: $csvFile\n";
 $handle = fopen($csvFile, 'r');
 if (!$handle) {
-    die("Could not open CSV file.\n");
+  die("No se pudo abrir el archivo CSV.\n");
 }
 
-// Read first line as raw string to detect delimiter and remove BOM
+// Detección de encabezado y delimitador
 $firstLine = fgets($handle);
 if ($firstLine === false) {
-    die("Empty CSV file.\n");
+  die("El archivo CSV está vacío.\n");
 }
-// Remove UTF-8 BOM if present
-if (substr($firstLine, 0, 3) == "\xEF\xBB\xBF") {
-    $firstLine = substr($firstLine, 3);
+if (substr($firstLine, 0, 3) === "\xEF\xBB\xBF") {
+  $firstLine = substr($firstLine, 3);
 }
-// Determine delimiter: look for semicolon or comma
-if (strpos($firstLine, ';') !== false) {
-    $delimiter = ';';
-} elseif (strpos($firstLine, ',') !== false) {
-    $delimiter = ',';
-} else {
-    die("Could not determine delimiter. Expected semicolon or comma.\n");
-}
-// Parse header
+
+$delimiter = (strpos($firstLine, ';') !== false) ? ';' : ',';
 $header = str_getcsv($firstLine, $delimiter, '"', "\\");
-// Verify header
+
 if (strtoupper(trim($header[0])) !== 'SITIO') {
-    die("Could not identify header row. Expected 'SITIO' as first column.\n");
+  die("No se identificó la columna principal 'SITIO'.\n");
 }
-echo "Detected delimiter: '$delimiter'\n";
+echo "Delimitador detectado: '$delimiter'\n";
+
+// Funciones auxiliares de limpieza y plantillas
+$cleanNumber = function ($val): float {
+  if ($val === null || $val === '***' || $val === '') {
+    return 0.0;
+  }
+  $val = trim((string)$val);
+  if (strpos($val, '<') === 0) {
+    return 0.0;
+  }
+  $val = str_replace(',', '.', $val);
+  $val = preg_replace('/[^0-9.-]/', '', $val);
+  return $val !== '' ? (float)$val : 0.0;
+};
+
+$buildInsituDescription = function (string $site, float $temp, float $cond, float $ph): string {
+  $details = [];
+  $details[] = ($temp > 0) ? "Temperatura: {$temp} °C" : "Temperatura no registrada o en 0";
+  $details[] = ($ph > 0) ? "pH: {$ph}" : "pH sin medición de campo";
+  $details[] = ($cond > 0) ? "Conductividad: {$cond} µS/cm" : "Conductividad no reportada";
+
+  return sprintf("Mediciones in-situ registradas para el sitio %s. [%s]", $site, implode(' | ', $details));
+};
+
+$buildInlabDescription = function (string $site, array $components): string {
+  $zeroed = [];
+  $active = [];
+  foreach ($components as $key => $val) {
+    if ($val <= 0.0) {
+      $zeroed[] = strtoupper($key);
+    } else {
+      $active[] = strtoupper($key) . ": {$val}";
+    }
+  }
+
+  $desc = "Análisis fisicoquímico de laboratorio para " . $site . ".";
+  if (!empty($zeroed)) {
+    $desc .= " Parámetros sin detección/no medidos (registrados en 0): " . implode(', ', $zeroed) . ".";
+  }
+  return $desc;
+};
 
 $inserted = 0;
 $skipped = 0;
 
-// Process remaining lines
+// Procesamiento de registros
 while (($line = fgets($handle)) !== false) {
-    $line = rtrim($line, "\r\n");
-    if (empty($line))
-        continue;
-    $row = str_getcsv($line, $delimiter, '"', "\\");
-    if (count($row) < 20) {
-        // Some rows may be malformed; skip
-        continue;
-    }
-    $siteName = trim($row[0]);
-    if ($siteName === '')
-        continue;
+  $line = rtrim($line, "\r\n");
+  if (empty($line)) {
+    continue;
+  }
 
-    // Check if manifestation already exists
-    if ($geomanifestationRepo->findByName($siteName)) {
-        echo "Skipping '$siteName' (already exists).\n";
-        $skipped++;
-        continue;
-    }
+  $row = str_getcsv($line, $delimiter, '"', "\\");
+  if (count($row) < 3) {
+    continue;
+  }
 
-    // Helper to clean numeric values with comma as decimal, returns 0.0 if invalid or missing (because DB NOT NULL)
-    $cleanNumber = function ($val) {
-        if ($val === null || $val === '***' || $val === '')
-            return 0.0;
-        $val = trim($val);
-        if (strpos($val, '<') === 0)
-            return 0.0;
-        $val = str_replace(',', '.', $val);
-        $val = preg_replace('/[^0-9.-]/', '', $val);
-        return $val !== '' ? (float) $val : 0.0;
-    };
+  $siteName = trim($row[0]);
+  if ($siteName === '') {
+    continue;
+  }
 
-    // Extract raw values
-    $xRaw = $row[1] ?? '0';
-    $yRaw = $row[2] ?? '0';
-    $x = $cleanNumber($xRaw);
-    $y = $cleanNumber($yRaw);
+  // Verificar si la geomanifestación ya existe
+  if ($geomanifestationRepo->findByName($siteName)) {
+    echo "Saltando '$siteName' (ya existe en la base de datos).\n";
+    $skipped++;
+    continue;
+  }
 
-    // Convert coordinates from CRTM05 to WGS84 (lat/lon)
-    try {
-        $point = new Point($x, $y, $projCRTM05);
-        $converted = $proj4->transform($projWGS84, $point);
-        $longitude = $converted->x;
-        $latitude = $converted->y;
-    } catch (Exception $e) {
-        echo "Error converting coordinates for '$siteName': " . $e->getMessage() . "\n";
-        continue;
-    }
+  // Coordenadas CRTM05
+  $x = $cleanNumber($row[1] ?? '0');
+  $y = $cleanNumber($row[2] ?? '0');
 
-    if ($latitude < -90 || $latitude > 90 || $longitude < -180 || $longitude > 180) {
-        echo "Invalid coordinates for '$siteName': lat={$latitude}, lon={$longitude}. Skipping.\n";
-        continue;
-    }
+  // Transformación de coordenadas a WGS84
+  try {
+    $point = new Point($x, $y, $projCRTM05);
+    $converted = $proj4->transform($projWGS84, $point);
+    $longitude = $converted->x;
+    $latitude = $converted->y;
+  } catch (Exception $e) {
+    echo "Error convirtiendo coordenadas para '$siteName': " . $e->getMessage() . "\n";
+    continue;
+  }
 
-    $temp = $cleanNumber($row[3] ?? null);
-    $phField = $cleanNumber($row[4] ?? null);
-    $condField = $cleanNumber($row[5] ?? null);
-    $phLab = $cleanNumber($row[6] ?? null);
-    $condLab = $cleanNumber($row[7] ?? null);
-    $cl = $cleanNumber($row[8] ?? null);
-    $ca = $cleanNumber($row[9] ?? null);
-    $hco3 = $cleanNumber($row[10] ?? null);
-    $so4 = $cleanNumber($row[11] ?? null);
-    $fe = $cleanNumber($row[12] ?? null);
-    $si = $cleanNumber($row[13] ?? null);
-    $b = $cleanNumber($row[14] ?? null);
-    $li = $cleanNumber($row[15] ?? null);
-    $f = $cleanNumber($row[16] ?? null);
-    $na = $cleanNumber($row[17] ?? null);
-    $k = $cleanNumber($row[18] ?? null);
-    $mg = $cleanNumber($row[19] ?? null);
+  // Extracción de parámetros
+  $temp     = $cleanNumber($row[3] ?? null);
+  $phField  = $cleanNumber($row[4] ?? null);
+  $condField = $cleanNumber($row[5] ?? null);
+  $phLab    = $cleanNumber($row[6] ?? null);
+  $condLab  = $cleanNumber($row[7] ?? null);
+  $cl       = $cleanNumber($row[8] ?? null);
+  $ca       = $cleanNumber($row[9] ?? null);
+  $hco3     = $cleanNumber($row[10] ?? null);
+  $so4      = $cleanNumber($row[11] ?? null);
+  $fe       = $cleanNumber($row[12] ?? null);
+  $si       = $cleanNumber($row[13] ?? null);
+  $b        = $cleanNumber($row[14] ?? null);
+  $li       = $cleanNumber($row[15] ?? null);
+  $f        = $cleanNumber($row[16] ?? null);
+  $na       = $cleanNumber($row[17] ?? null);
+  $k        = $cleanNumber($row[18] ?? null);
+  $mg       = $cleanNumber($row[19] ?? null);
 
-    try {
-        // Create Geomanifestation with fixed territorial codes (Bagaces: 5, 504, 50401)
-        $dtoManifest = new RegisterGeomanifestationDTO(
-            $siteName,
-            $latitude,
-            $longitude,
-            5,
-            504,
-            50401,
-            "Imported from Bagaces test data",
-            false
-        );
-        $manifestationId = $geomanifestationRepo->create($dtoManifest->toArray(), $systemUserId);
+  try {
+    // 1. Crear Geomanifestation
+    $manifestationData = [
+      'geomanifestation_name' => $siteName,
+      'latitude'              => $latitude,
+      'longitude'             => $longitude,
+      'province_snit_code'    => $snitConfig['province_snit_code'],
+      'canton_snit_code'      => $snitConfig['canton_snit_code'],
+      'district_snit_code'    => $snitConfig['district_snit_code'],
+      'description'           => "Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: {$siteName}).",
+      'visibility'            => 1,
+      'current_georeport_id'  => null,
+      'request_id'            => null
+    ];
 
-        // Ensure the name is correctly stored (in case the repository overwrote it)
-        $current = $geomanifestationRepo->findById($manifestationId);
-        if ($current && $current['name'] !== $siteName) {
-            $updateDto = new UpdateGeomanifestationDTO(
-                name: $siteName,
-                latitude: $latitude,
-                longitude: $longitude,
-                provinceSnitCode: 5,
-                cantonSnitCode: 504,
-                districtSnitCode: 50401,
-                currentGeoreportId: $current['current_georeport_id'] ?? null,
-                description: $current['description'] ?? null,
-                visibility: $current['visibility'] ?? false
-            );
-            $geomanifestationRepo->update($manifestationId, $updateDto->toArray());
-            echo "Updated manifestation name to: $siteName\n";
-        }
+    $manifestation = $geomanifestationRepo->create($manifestationData, $systemUserId);
+    $manifestationId = $manifestation['geomanifestation_id'];
 
-        echo "Created manifestation: $siteName (ID: $manifestationId) [lat={$latitude}, lon={$longitude}]\n";
+    echo "Geomanifestación creada: {$siteName} (ID: {$manifestationId}) [Lat: {$latitude}, Lon: {$longitude}]\n";
 
-        // Create Insitu Test
-        $insituDto = new InsituTestDTO(
-            null,
-            $manifestationId,
-            $temp,
-            $condField,
-            $phField,
-            "Field measurement"
-        );
-        $insituId = $insituRepo->create($insituDto, $systemUserId);
+    // 2. Crear Insitu Test
+    $insituDesc = $buildInsituDescription($siteName, $temp, $condField, $phField);
+    $insituDto = new RegisterInsituTestDTO(
+      geomanifestationId: $manifestationId,
+      temperature: $temp,
+      conductivity: $condField,
+      ph: $phField,
+      description: $insituDesc
+    );
+    $insituTest = $insituRepo->create($insituDto, $systemUserId);
+    $insituId = $insituTest['insitu_test_id'];
 
-        // Create Inlab Test
-        $inlabDto = new InlabTestDTO(
-            null,
-            $manifestationId,
-            $phLab,
-            $condLab,
-            $cl,
-            $ca,
-            $hco3,
-            $so4,
-            $fe,
-            $si,
-            $b,
-            $li,
-            $f,
-            $na,
-            $k,
-            $mg,
-            "Laboratory analysis"
-        );
-        $inlabId = $inlabRepo->create($inlabDto, $systemUserId);
+    // 3. Crear Inlab Test
+    $labComponents = [
+      'ph' => $phLab, 'cond' => $condLab, 'cl' => $cl, 'ca' => $ca,
+      'hco3' => $hco3, 'so4' => $so4, 'fe' => $fe, 'si' => $si,
+      'b' => $b, 'li' => $li, 'f' => $f, 'na' => $na, 'k' => $k, 'mg' => $mg
+    ];
+    $inlabDesc = $buildInlabDescription($siteName, $labComponents);
 
-        // Create Georeport
-        $georeportDto = new GeoreportDTO(
-            null,
-            $manifestationId,
-            $insituId,
-            $inlabId,
-            "Initial import from Bagaces data"
-        );
-        $georeportId = $georeportRepo->create($georeportDto, $systemUserId);
+    $inlabDto = new RegisterInlabTestDTO(
+      geomanifestationId: $manifestationId,
+      ph: $phLab,
+      conductivity: $condLab,
+      cl: $cl,
+      ca: $ca,
+      hco3: $hco3,
+      so4: $so4,
+      fe: $fe,
+      si: $si,
+      b: $b,
+      li: $li,
+      f: $f,
+      na: $na,
+      k: $k,
+      mg: $mg,
+      description: $inlabDesc
+    );
+    $inlabTest = $inlabRepo->create($inlabDto, $systemUserId);
+    $inlabId = $inlabTest['inlab_test_id'];
 
-        // Set as current georeport
-        $georeportRepo->setAsCurrentForManifestation($manifestationId, $georeportId);
+    // 4. Crear Georeport
+    $reportDetails = sprintf(
+      "Informe geotérmico consolidado para %s (Bagaces, Guanacaste). Registra parámetros in-situ (ID: %s) y resultados hidroquímicos de laboratorio (ID: %s).",
+      $siteName,
+      $insituId,
+      $inlabId
+    );
+    $georeportDto = new RegisterGeoreportDTO(
+      geomanifestationId: $manifestationId,
+      insituTestId: $insituId,
+      inlabTestId: $inlabId,
+      details: $reportDetails
+    );
+    $georeport = $georeportRepo->create($georeportDto, $systemUserId);
+    $georeportId = $georeport['georeport_id'];
 
-        $inserted++;
-        echo "  -> Insitu test: $insituId, Inlab test: $inlabId, Georeport: $georeportId\n";
-    } catch (Exception $e) {
-        echo "Error processing '$siteName': " . $e->getMessage() . "\n";
-    }
+    // 5. Vincular como georeporte actual de la manifestación
+    $georeportRepo->setAsCurrentForManifestation($manifestationId, $georeportId);
+
+    $inserted++;
+    echo "  -> Insitu Test ID: {$insituId}\n";
+    echo "  -> Inlab Test ID: {$inlabId}\n";
+    echo "  -> Georeport ID: {$georeportId} (Establecido como actual)\n";
+
+  } catch (Exception $e) {
+    echo "Error procesando el sitio '{$siteName}': " . $e->getMessage() . "\n";
+  }
 }
+
 fclose($handle);
 
-echo "\nImport completed: $inserted inserted, $skipped skipped.\n";
+echo "\nProceso finalizado con éxito: {$inserted} registros insertados, {$skipped} omitidos.\n";

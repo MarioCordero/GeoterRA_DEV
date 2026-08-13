@@ -21,16 +21,16 @@ final class InsituTestService
 {
   private InsituTestRepository $repository;
   private GeomanifestationRepository $geomanifestationRepository;
-  private AuthService $authService;
   private UserRepository $userRepository;
   private NotificationService $notificationService;
 
-  public function __construct(private PDO $pdo)
+  public function __construct(private readonly PDO $pdo)
   {
-    $this->repository = new InsituTestRepository($pdo);
-    $this->geomanifestationRepository = new GeomanifestationRepository($pdo);
-    $this->authService = new AuthService($pdo);
-    $this->userRepository = new UserRepository($pdo);
+    $this->repository = new InsituTestRepository($this->pdo);
+    $this->geomanifestationRepository = new GeomanifestationRepository(
+      $this->pdo
+    );
+    $this->userRepository = new UserRepository($this->pdo);
     $this->notificationService = new NotificationService(
       new SmtpEmailService()
     );
@@ -40,7 +40,7 @@ final class InsituTestService
    * Creates a new in-situ test (admin/investigator only).
    *
    * @param RegisterInsituTestDTO $dto
-   * @throws ApiException
+   * @return array
    */
   public function create(RegisterInsituTestDTO $dto): array
   {
@@ -63,11 +63,15 @@ final class InsituTestService
         $dto->geomanifestationId
       );
       $mName = $manifestation['geomanifestation_name'] ?? 'Desconocida';
-      $this->notificationService->notifyResourceCreated(
+
+      $this->notificationService->notifyInsituTestCreated(
         $user['email'],
         $user['first_name'],
-        'Prueba In-Situ',
-        "Prueba asociada a " . $mName,
+        $mName,
+        $dto->temperature,
+        $dto->conductivity,
+        $dto->ph,
+        $dto->description,
         date('Y-m-d H:i:s')
       );
     }
@@ -208,7 +212,9 @@ final class InsituTestService
 
     $existing = $this->repository->findById($id);
     if (!$existing) {
-      throw new ApiException(ErrorType::notFound('In-situ test'), 404);
+      throw new ApiException(
+        ErrorType::notFound('In-situ test'), 404
+      );
     }
 
     $updated = $this->repository->update($id, $dto);
@@ -224,11 +230,21 @@ final class InsituTestService
         $id
       );
       $mName = $manifestation['geomanifestation_name'] ?? 'Desconocida';
-      $this->notificationService->notifyResourceCreated(
+      $temp = $dto->temperature ?? ($existing['temperature'] !== null
+        ? (float)$existing['temperature'] : null);
+      $cond = $dto->conductivity ?? ($existing['conductivity'] !== null
+        ? (float)$existing['conductivity'] : null);
+      $phVal = $dto->ph ?? ($existing['ph'] !== null
+        ? (float)$existing['ph'] : null);
+      $desc = $dto->description ?? $existing['description'];
+      $this->notificationService->notifyInsituTestUpdated(
         $user['email'],
         $user['first_name'],
-        'Prueba In-Situ',
-        "Prueba asociada a " . $mName,
+        $mName,
+        $temp,
+        $cond,
+        $phVal,
+        $desc,
         date('Y-m-d H:i:s')
       );
     }
@@ -270,11 +286,21 @@ final class InsituTestService
         $existing['geomanifestation_id']
       );
       $mName = $manifestation['geomanifestation_name'] ?? 'Desconocida';
-      $this->notificationService->notifyResourceDeleted(
+      $temp = $existing['temperature'] !== null
+        ? (float)$existing['temperature'] : null;
+      $cond = $existing['conductivity'] !== null
+        ? (float)$existing['conductivity'] : null;
+      $phVal = $existing['ph'] !== null ? (float)$existing['ph'] : null;
+      $desc = $existing['description'];
+
+      $this->notificationService->notifyInsituTestDeleted(
         $user['email'],
         $user['first_name'],
-        'Prueba In-Situ',
-        "Prueba asociada a " . $mName,
+        $mName,
+        $temp,
+        $cond,
+        $phVal,
+        $desc,
         date('Y-m-d H:i:s')
       );
     }
