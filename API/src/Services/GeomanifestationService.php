@@ -205,12 +205,12 @@ final class GeomanifestationService
     ];
 
     if ($isAdmin) {
-      $response['visibility'] = (bool)$row['visibility'];
+      $response['visibility'] = isset($row['visibility']) && $row['visibility'];
 
-      $response['request'] = [
+      $response['request'] = (isset($row['request_id'])) ? [
         'request_id' => $row['request_id'],
         'request_name' => $row['request_name'],
-      ];
+      ] : null;
     }
 
     return $response;
@@ -586,18 +586,6 @@ final class GeomanifestationService
   }
 
   /**
-   * Returns a single enriched manifestation from the view (public).
-   *
-   * @param string $id
-   * @return array
-   * @throws ApiException
-   */
-  public function getViewById(string $id): array
-  {
-    return $this->getById($id, false);
-  }
-
-  /**
    * Retrieves a single manifestation by ID.
    *
    * @param string $id
@@ -605,7 +593,7 @@ final class GeomanifestationService
    * @return array
    * @throws ApiException
    */
-  public function getById(string $id, bool $includeHidden = false): array
+  public function getViewById(string $id, bool $includeHidden = false): array
   {
     // Enforce role if trying to view hidden
     if ($includeHidden) {
