@@ -3,9 +3,9 @@ import { useSession } from '../../../../hooks/useSession';
 import React, { useState, useEffect, useRef } from 'react';
 import MapCoordinatePicker from '../../../common/MapCoordinatePicker';
 import NotImplementedModal from '../../../common/NotImplementedModal';
-import { EyeOutlined, DeleteOutlined, CheckOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { EyeOutlined, DeleteOutlined, CheckOutlined, EnvironmentOutlined, SyncOutlined, EditOutlined } from '@ant-design/icons';
 import { Spin, Tag, Button, Modal, Form, Input, InputNumber, message, Select, Collapse } from 'antd';
-import { analysisRequestAdminIndex, analysisRequestAdminUpdate, analysisRequestAdminDelete, analysisRequestAdminShow, registeredManifestationsStore, regionsIndex } from '../../../../config/apiConf';
+import { analysisRequestAdminIndex, analysisRequestAdminUpdate, analysisRequestAdminDelete, analysisRequestAdminShow, analysisRequestAdminAddState, geomanifestationsAdminStore, registeredManifestationsStore, regionsIndex, provincesIndex } from '../../../../config/apiConf';
 
 const defaultPosition = [9.93333, -84.08333];
 
@@ -22,11 +22,10 @@ const RequestsManager = () => {
   const [isNotImplementedOpen, setIsNotImplementedOpen] = useState(false);
   const [confirmedCoordinates, setConfirmedCoordinates] = useState(null);
   const [fetchingDetails, setFetchingDetails] = useState(false);
-  const [addManualPointModalVisible, setAddManualPointModalVisible] = useState(false);
-  const [addPointForm] = Form.useForm();
-  const [selectedCoordinates, setSelectedCoordinates] = useState(null);
-  const [regions, setRegions] = useState([]);
-  const [submittingManualPoint, setSubmittingManualPoint] = useState(false);
+  const [changeStateModalVisible, setChangeStateModalVisible] = useState(false);
+  const [selectedRequestForState, setSelectedRequestForState] = useState(null);
+  const [stateForm] = Form.useForm();
+  const [submittingStateChange, setSubmittingStateChange] = useState(false);
   const { user } = useSession();
 
   // Check if screen is mobile size
@@ -49,27 +48,57 @@ const RequestsManager = () => {
         throw new Error(result.error || 'No autorizado desde el backend para ver todas las solicitudes, por favor consulte a su administrador');
       }
 
-      if (result.data && Array.isArray(result.data)) {
-        return result.data.map(item => ({
-          id_soli: item.id,
-          name: item.name || `SOLI-${item.id.slice(-5)}`,
-          created_at: item.created_at,
-          email: item.email || 'Sin email',
-          region_id: item.region_id || '',
+      const listData = Array.isArray(result.data) 
+        ? result.data 
+        : (result.data?.data && Array.isArray(result.data.data) ? result.data.data : []);
+
+      return listData.map(item => {
+        const id = item.request_id || item.id || item.id_soli || '';
+        const idStr = String(id);
+        const name = item.request_name || item.name || (idStr ? `SOLI-${idStr.slice(-5)}` : 'SOLI-XXXXX');
+        
+        let stateValue = 'Pendiente';
+        if (typeof item.current_state === 'object' && item.current_state !== null) {
+          stateValue = item.current_state.value || item.current_state.state || 'Pendiente';
+        } else if (item.current_state) {
+          stateValue = item.current_state;
+        } else if (item.state) {
+          stateValue = item.state;
+        }
+
+        const userEmail = item.owner_email || item.email || 
+          (item.user_first_name ? `${item.user_first_name} ${item.user_last_name || ''}`.trim() : 'Sin email');
+
+        const lat = item.location?.latitude ?? item.latitude ?? '';
+        const lng = item.location?.longitude ?? item.longitude ?? '';
+
+        return {
+          id_soli: id,
+          request_id: id,
+          id: id,
+          name: name,
+          request_name: name,
+          created_at: item.created_at || '',
+          email: userEmail,
+          owner_email: userEmail,
+          region_id: item.province_snit_code || item.region_id || '',
+          province_snit_code: item.province_snit_code || '',
+          canton_snit_code: item.canton_snit_code || '',
+          district_snit_code: item.district_snit_code || '',
           owner_name: item.owner_name || '',
-          owner_contact_number: item.owner_contact_number || '',
+          owner_contact_number: item.owner_phone_number || item.owner_contact_number || '',
           current_usage: item.current_usage || '',
           temperature_sensation: item.temperature_sensation || '',
-          bubbles: item.bubbles || 0,
+          bubbles: item.bubbles ? 1 : 0,
           details: item.details || '',
-          latitude: item.latitude || '',
-          longitude: item.longitude || '',
-          state: item.state || 'Pendiente',
-          created_by: item.created_by || '',
-        }));
-      }
-      
-      return [];
+          exact_address: item.exact_address || '',
+          latitude: lat,
+          longitude: lng,
+          state: stateValue,
+          current_state: stateValue,
+          created_by: item.created_by || item.user_id || '',
+        };
+      });
     } catch (error) {
       console.error('[AdminRequests] ❌ Error fetching all requests:', error);
       throw error;
@@ -163,10 +192,11 @@ const RequestsManager = () => {
         setLoading(true);
         setError(null);
         
-        // Verify user is admin or maintenance
-        const isAdmin = user?.role === 'admin' || user?.role === 'maintenance' || user?.is_admin;
-        if (!isAdmin) {
-          setError('Usuario no autorizado como administrador');
+        // Verify user has role authorized to manage requests
+        const allowedRoles = ['admin', 'maintenance', 'investigator', 'field_investigator'];
+        const canManage = allowedRoles.includes(user?.role) || user?.is_admin;
+        if (!canManage) {
+          setError('Usuario no autorizado para gestionar solicitudes');
           return;
         }
         
@@ -183,21 +213,105 @@ const RequestsManager = () => {
     loadAllRequests();
   }, [user]);
 
-  // Load regions for manual point form
-  useEffect(() => {
-    const loadRegions = async () => {
-      try {
-        const result = await regionsIndex();
-        if (result.ok && Array.isArray(result.data)) {
-          setRegions(result.data);
-        }
-      } catch (error) {
-        console.error('❌ Error loading regions:', error);
+  // Handle open state change modal
+  const handleOpenChangeStateModal = (request) => {
+    setSelectedRequestForState(request);
+    stateForm.setFieldsValue({
+      state: request.state || 'Pendiente',
+      description: '',
+    });
+    setChangeStateModalVisible(true);
+  };
+
+  // Handle submitting state change (POST /admin/analysis-requests/{id}/states)
+  const handleSubmitStateChange = async (values) => {
+    try {
+      if (!selectedRequestForState) return;
+      setSubmittingStateChange(true);
+
+      const requestId = selectedRequestForState.id_soli || selectedRequestForState.request_id || selectedRequestForState.id;
+      const payload = {
+        state: values.state,
+        description: values.description || 'Cambio de estado por administración',
+      };
+
+      const result = await analysisRequestAdminAddState(requestId, payload);
+
+      if (!result.ok) {
+        throw new Error(result.error || 'Error al actualizar el estado de la solicitud');
       }
-    };
-    
-    loadRegions();
-  }, []);
+
+      message.success(`Estado de solicitud actualizado a "${values.state}" correctamente`);
+      setChangeStateModalVisible(false);
+      setSelectedRequestForState(null);
+      stateForm.resetFields();
+      await refreshRequests();
+    } catch (err) {
+      console.error('❌ Error updating request state:', err);
+      message.error(err.message || 'Error al cambiar estado');
+    } finally {
+      setSubmittingStateChange(false);
+    }
+  };
+
+  // Handle accepting request and converting it to a blank geomanifestation draft
+  const handleAcceptRequest = (request) => {
+    Modal.confirm({
+      title: '¿Aceptar Solicitud y Crear Geomanifestación?',
+      content: (
+        <div>
+          <p>¿Deseas aceptar la solicitud <strong>"{request.name}"</strong>?</p>
+          <p className="text-xs text-gray-500 mt-2">
+            Se creará automáticamente una geomanifestación en borrador (en blanco) con la ubicación proporcionada, la cual aparecerá disponible en la pestaña <strong>"Solicitudes Aceptadas"</strong> del módulo de Geomanifestaciones.
+          </p>
+        </div>
+      ),
+      okText: 'Sí, Aceptar Solicitud',
+      cancelText: 'Cancelar',
+      okButtonProps: { style: { backgroundColor: '#52c41a', borderColor: '#52c41a' } },
+      onOk: async () => {
+        try {
+          const requestId = request.id_soli || request.request_id || request.id;
+          
+          // 1. Build blank geomanifestation payload
+          const manifestationPayload = {
+            name: request.name || request.request_name || `Geomanifestación-${requestId}`,
+            latitude: parseFloat(request.latitude) || 9.9333,
+            longitude: parseFloat(request.longitude) || -84.0833,
+            province_snit_code: parseInt(request.province_snit_code || request.region_id) || 1,
+            canton_snit_code: parseInt(request.canton_snit_code) || null,
+            district_snit_code: parseInt(request.district_snit_code) || null,
+            description: request.details || request.description || `Manifestación generada desde la solicitud ${request.name}`,
+            visibility: false,
+          };
+
+          // Store blank geomanifestation
+          let storeRes = await geomanifestationsAdminStore(manifestationPayload);
+          if (!storeRes.ok) {
+            storeRes = await registeredManifestationsStore({
+              name: manifestationPayload.name,
+              region_id: manifestationPayload.province_snit_code,
+              latitude: manifestationPayload.latitude,
+              longitude: manifestationPayload.longitude,
+              description: manifestationPayload.description,
+            });
+          }
+
+          // 2. Update request state to "Procesada"
+          await analysisRequestAdminAddState(requestId, {
+            state: 'Procesada',
+            description: 'Solicitud aceptada y convertida en geomanifestación (borrador)'
+          });
+
+          message.success('Solicitud aceptada exitosamente. Se ha creado la geomanifestación en Geomanifestaciones.');
+          await refreshRequests();
+        } catch (err) {
+          console.error('❌ Error al aceptar solicitud:', err);
+          message.error('Error al aceptar solicitud: ' + (err.message || err));
+        }
+      }
+    });
+  };
 
   // Refresh requests
   const refreshRequests = async () => {
@@ -213,67 +327,7 @@ const RequestsManager = () => {
     }
   };
 
-  // Handle manual point modal close
-  const handleAddManualPointModalClose = () => {
-    setAddManualPointModalVisible(false);
-    setSelectedCoordinates(null);
-    addPointForm.resetFields();
-  };
 
-  // Handle manual point form submission
-  const handleSubmitManualPoint = async (values) => {
-    try {
-      if (!selectedCoordinates) {
-        message.error('Por favor selecciona las coordenadas primero');
-        return;
-      }
-
-      setSubmittingManualPoint(true);
-
-      // Build the payload
-      const payload = {
-        name: values.name,
-        region_id: values.region_id || regions[0]?.id,
-        latitude: selectedCoordinates.lat,
-        longitude: selectedCoordinates.lng,
-        description: values.description || null,
-        temperature: values.temperature ? parseFloat(values.temperature) : null,
-        field_pH: values.field_pH ? parseFloat(values.field_pH) : null,
-        field_conductivity: values.field_conductivity ? parseFloat(values.field_conductivity) : null,
-        lab_pH: values.lab_pH ? parseFloat(values.lab_pH) : null,
-        lab_conductivity: values.lab_conductivity ? parseFloat(values.lab_conductivity) : null,
-        cl: values.cl ? parseFloat(values.cl) : null,
-        ca: values.ca ? parseFloat(values.ca) : null,
-        hco3: values.hco3 ? parseFloat(values.hco3) : null,
-        so4: values.so4 ? parseFloat(values.so4) : null,
-        fe: values.fe ? parseFloat(values.fe) : null,
-        si: values.si ? parseFloat(values.si) : null,
-        b: values.b ? parseFloat(values.b) : null,
-        li: values.li ? parseFloat(values.li) : null,
-        f: values.f ? parseFloat(values.f) : null,
-        na: values.na ? parseFloat(values.na) : null,
-        k: values.k ? parseFloat(values.k) : null,
-        mg: values.mg ? parseFloat(values.mg) : null,
-      };
-
-      const result = await registeredManifestationsStore(payload);
-
-      if (!result.ok) {
-        throw new Error(result.error || 'Error creando punto manual');
-      }
-
-      message.success('Punto agregado exitosamente');
-      handleAddManualPointModalClose();
-      
-      // Refresh requests to show new point
-      await refreshRequests();
-    } catch (error) {
-      console.error('❌ Error submitting manual point:', error);
-      message.error(error.message || 'Error al agregar punto');
-    } finally {
-      setSubmittingManualPoint(false);
-    }
-  };
 
   // Handle view details
   const handleViewDetails = (record) => {
@@ -373,7 +427,7 @@ const RequestsManager = () => {
       // Submit approval
       await submitApprovedPoint(approvalData);
       
-      message.success('✅ Solicitud procesada y estado actualizado a "Analizada"', 2);
+      message.success('Solicitud procesada y estado actualizado a "Analizada"', 2);
       setReviewModalVisible(false);
       reviewForm.resetFields();
       setSelectedRequest(null);
@@ -397,7 +451,7 @@ const RequestsManager = () => {
       onOk: async () => {
         try {
           await deleteRequest(record.id_soli);
-          message.success('✅ Solicitud eliminada');
+          message.success('Solicitud eliminada');
           await refreshRequests();
         } catch (error) {
           message.error('Error: ' + error.message);
@@ -439,22 +493,16 @@ const RequestsManager = () => {
         <Button
           size="small"
           type="primary"
+          style={{
+            backgroundColor: request.state === 'Procesada' ? '#8c8c8c' : '#52c41a',
+            borderColor: request.state === 'Procesada' ? '#8c8c8c' : '#52c41a'
+          }}
           icon={<CheckOutlined />}
-          onClick={() => handleReviewAccept(request)}
-          disabled={request.state !== 'Pendiente'}
-          title="Revisar y aprobar"
+          onClick={() => handleAcceptRequest(request)}
+          disabled={request.state === 'Procesada'}
+          title="Aceptar solicitud y convertir en geomanifestación"
         >
-          Revisar
-        </Button>
-        <Button
-          size="small"
-          type="primary"
-          danger
-          icon={<DeleteOutlined />}
-          onClick={() => handleDelete(request)}
-          title="Eliminar solicitud"
-        >
-          Eliminar
+          {request.state === 'Procesada' ? 'Aceptada' : 'Aceptar'}
         </Button>
         <Button
           size="small"
@@ -511,13 +559,6 @@ const RequestsManager = () => {
             className="w-full md:w-auto"
           >
             Actualizar
-          </Button>
-          <Button 
-            type="primary"
-            onClick={() => setAddManualPointModalVisible(true)}
-            className="w-full md:w-auto"
-          >
-            Agregar Punto Manualmente
           </Button>
         </div>
 
@@ -638,22 +679,16 @@ const RequestsManager = () => {
                             <Button
                               size="small"
                               type="primary"
+                              style={{
+                                backgroundColor: request.state === 'Procesada' ? '#8c8c8c' : '#52c41a',
+                                borderColor: request.state === 'Procesada' ? '#8c8c8c' : '#52c41a'
+                              }}
                               icon={<CheckOutlined />}
-                              onClick={() => handleReviewAccept(request)}
-                              disabled={request.state !== 'Pendiente'}
-                              title="Revisar y aprobar"
+                              onClick={() => handleAcceptRequest(request)}
+                              disabled={request.state === 'Procesada'}
+                              title="Aceptar solicitud y convertir en geomanifestación"
                             >
-                              Revisar
-                            </Button>
-                            <Button
-                              size="small"
-                              type="primary"
-                              danger
-                              icon={<DeleteOutlined />}
-                              onClick={() => handleDelete(request)}
-                              title="Eliminar solicitud"
-                            >
-                              Eliminar
+                              {request.state === 'Procesada' ? 'Aceptada' : 'Aceptar'}
                             </Button>
                             <Button
                               size="small"
@@ -937,200 +972,59 @@ const RequestsManager = () => {
         )}
       </Modal>
 
-      {/* Manual Point Form Modal with Embedded Map */}
+      {/* Change Request State Modal */}
       <Modal
-        title="Agregar Punto Manualmente"
-        open={addManualPointModalVisible}
-        onOk={() => addPointForm.submit()}
-        onCancel={handleAddManualPointModalClose}
-        okText="Guardar"
-        cancelText="Cancelar"
-        confirmLoading={submittingManualPoint}
-        width={800}
-        style={{ maxHeight: '90vh' }}
-        centered
-        styles={{
-          body: {
-            maxHeight: 'calc(100vh - 200px)',
-            overflowY: 'auto'
-          }
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <SyncOutlined style={{ color: '#1890ff' }} />
+            <span>Actualizar Estado de Solicitud ({selectedRequestForState?.name})</span>
+          </div>
+        }
+        open={changeStateModalVisible}
+        onOk={() => stateForm.submit()}
+        onCancel={() => {
+          setChangeStateModalVisible(false);
+          setSelectedRequestForState(null);
+          stateForm.resetFields();
         }}
+        okText="Guardar Estado"
+        cancelText="Cancelar"
+        confirmLoading={submittingStateChange}
+        centered
       >
         <Form
-          form={addPointForm}
+          form={stateForm}
           layout="vertical"
-          onFinish={handleSubmitManualPoint}
+          onFinish={handleSubmitStateChange}
         >
-          {/* Map Coordinate Picker - Embedded */}
-          <Form.Item label="">
-            <MapCoordinatePicker
-              latLng={selectedCoordinates}
-              onCoordinatesChange={(coords) => {
-                setSelectedCoordinates(coords);
-                addPointForm.setFieldsValue({
-                  latitude: coords.lat,
-                  longitude: coords.lng,
-                });
-              }}
-              title="Coordenadas GPS"
-              mapHeight="350px"
-              showApplyButton={false}
-              showClearButton={true}
-            />
-          </Form.Item>
-
           <Form.Item
-            name="latitude"
-            hidden
+            name="state"
+            label="Nuevo Estado de la Solicitud"
+            rules={[{ required: true, message: 'Selecciona un estado' }]}
           >
-            <InputNumber />
+            <Select placeholder="Selecciona el estado">
+              <Select.Option value="Pendiente">
+                <Tag color="orange">Pendiente</Tag>
+              </Select.Option>
+              <Select.Option value="Revisión">
+                <Tag color="blue">Revisión</Tag>
+              </Select.Option>
+              <Select.Option value="Procesada">
+                <Tag color="green">Procesada</Tag>
+              </Select.Option>
+            </Select>
           </Form.Item>
-
-          <Form.Item
-            name="longitude"
-            hidden
-          >
-            <InputNumber />
-          </Form.Item>
-
-          <hr className="my-4" />
-          <h3 className="font-semibold text-base mb-4">ℹ️ Información del Punto</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Form.Item
-              name="name"
-              label="Nombre del Punto"
-              rules={[{ required: true, message: 'El nombre es requerido' }]}
-            >
-              <Input placeholder="Ej: SOLI-1EVB8" />
-            </Form.Item>
-
-            <Form.Item
-              name="region_id"
-              label="Región"
-              rules={[{ required: true, message: 'Selecciona una región' }]}
-            >
-              <Select placeholder="Selecciona una región">
-                {regions.map(region => (
-                  <Select.Option key={region.id} value={region.id}>
-                    {region.name}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </div>
 
           <Form.Item
             name="description"
-            label="Descripción"
+            label="Descripción / Justificación"
+            rules={[{ required: true, message: 'Ingresa una descripción o justificación del cambio de estado' }]}
           >
-            <Input.TextArea rows={2} placeholder="Descripción del punto" />
+            <Input.TextArea
+              rows={3}
+              placeholder="Ej: El equipo técnico procesó la solicitud"
+            />
           </Form.Item>
-
-          <hr className="my-4" />
-          <h3 className="font-semibold text-base mb-4">🌡️ Mediciones de Campo (Opcional)</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Form.Item
-              name="temperature"
-              label="Temperatura (°C)"
-              rules={[
-                { 
-                  pattern: /^-?\d+(\.\d{1,2})?$/, 
-                  message: 'Ingresa una temperatura válida'
-                }
-              ]}
-            >
-              <InputNumber style={{ width: '100%' }} placeholder="25.5" step={0.1} />
-            </Form.Item>
-
-            <Form.Item
-              name="field_pH"
-              label="pH Campo"
-              rules={[
-                {
-                  pattern: /^\d+(\.\d{1,2})?$/,
-                  message: 'pH debe estar entre 0 y 14'
-                }
-              ]}
-            >
-              <InputNumber style={{ width: '100%' }} placeholder="7.0" step={0.01} min={0} max={14} />
-            </Form.Item>
-
-            <Form.Item
-              name="field_conductivity"
-              label="Conductividad Campo (μS/cm)"
-            >
-              <InputNumber style={{ width: '100%' }} placeholder="500" step={0.01} />
-            </Form.Item>
-          </div>
-
-          <hr className="my-4" />
-          <h3 className="font-semibold text-base mb-4">🧪 Mediciones de Laboratorio (Opcional)</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Form.Item
-              name="lab_pH"
-              label="pH Laboratorio"
-              rules={[
-                {
-                  pattern: /^\d+(\.\d{1,2})?$/,
-                  message: 'pH debe estar entre 0 y 14'
-                }
-              ]}
-            >
-              <InputNumber style={{ width: '100%' }} placeholder="7.0" step={0.01} min={0} max={14} />
-            </Form.Item>
-
-            <Form.Item
-              name="lab_conductivity"
-              label="Conductividad Lab (μS/cm)"
-            >
-              <InputNumber style={{ width: '100%' }} placeholder="500" step={0.01} />
-            </Form.Item>
-          </div>
-
-          <hr className="my-4" />
-          <h3 className="font-semibold text-base mb-4">⚗️ Elementos Químicos (Opcional)</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Form.Item name="cl" label="Cl">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="10" />
-            </Form.Item>
-            <Form.Item name="ca" label="Ca">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="20" />
-            </Form.Item>
-            <Form.Item name="hco3" label="HCO3">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="30" />
-            </Form.Item>
-            <Form.Item name="so4" label="SO4">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="40" />
-            </Form.Item>
-            <Form.Item name="fe" label="Fe">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="0.5" />
-            </Form.Item>
-            <Form.Item name="si" label="Si">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="50" />
-            </Form.Item>
-            <Form.Item name="b" label="B">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="1.0" />
-            </Form.Item>
-            <Form.Item name="li" label="Li">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="1" />
-            </Form.Item>
-            <Form.Item name="f" label="F">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="0.5" />
-            </Form.Item>
-            <Form.Item name="na" label="Na">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="60" />
-            </Form.Item>
-            <Form.Item name="k" label="K">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="70" />
-            </Form.Item>
-            <Form.Item name="mg" label="Mg">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="80" />
-            </Form.Item>
-          </div>
         </Form>
       </Modal>
 

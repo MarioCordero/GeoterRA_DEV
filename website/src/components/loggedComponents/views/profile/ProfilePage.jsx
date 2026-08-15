@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { userMeUpdate, userMeDelete } from '../../../../config/apiConf';
+import { userMeUpdate, userMeDelete, userUpdatePassword } from '../../../../config/apiConf';
 import { useSession } from '../../../../hooks/useSession';
 import ConfirmationModal from '../../../common/ConfirmationModal';
 import SuccessModal from '../../../common/SuccessModal';
@@ -44,16 +44,12 @@ const ProfilePage = () => {
     setLoading(true);
 
     try {
-      // Backend expects snake_case: first_name, last_name, email, phone_number
+      // Payload matching PUT /users/me
       const payload = {
         first_name: pendingData.firstName,
         last_name: pendingData.lastName,
         email: pendingData.email,
         phone_number: pendingData.phone ? pendingData.phone.replace(/\D/g, '') : null,
-        // Also supply camelCase properties for backwards compatibility
-        firstName: pendingData.firstName,
-        lastName: pendingData.lastName,
-        phoneNumber: pendingData.phone ? pendingData.phone.replace(/\D/g, '') : null,
       };
 
       const result = await userMeUpdate(payload);
@@ -83,21 +79,13 @@ const ProfilePage = () => {
     setPasswordLoading(true);
 
     try {
-      // Payload matching PUT /users/me endpoint fields
+      // Payload matching PUT /users/me/password endpoint fields
       const payload = {
         current_password: values.currentPassword,
-        password: values.newPassword,
-        first_name: user.first_name || user.firstName,
-        last_name: user.last_name || user.lastName,
-        email: user.email,
-        phone_number: user.phone_number || user.phoneNumber,
-        currentPassword: values.currentPassword,
-        firstName: user.first_name || user.firstName,
-        lastName: user.last_name || user.lastName,
-        phoneNumber: user.phone_number || user.phoneNumber,
+        new_password: values.newPassword,
       };
 
-      const response = await userMeUpdate(payload);
+      const response = await userUpdatePassword(payload);
       if (!response.ok) {
         throw new Error(response.error || 'Error al cambiar la contraseña');
       }
@@ -131,7 +119,7 @@ const ProfilePage = () => {
         throw new Error(result.error || 'Error al eliminar la cuenta');
       }
 
-      message.success('✅ Cuenta eliminada correctamente');
+      message.success('Cuenta eliminada correctamente');
       setTimeout(() => {
         window.location.href = '/';
       }, 1500);
