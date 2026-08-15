@@ -21,6 +21,7 @@ const API_CONFIG = {
     },
     users: {
       me: '/users/me',
+      mePassword: '/users/me/password',
       register: '/users/register',
       meSession: `/users/me/session`,
     },
@@ -35,6 +36,8 @@ const API_CONFIG = {
       adminShow: (id) => `/admin/analysis-requests/${id}`,
       adminUpdate: (id) => `/admin/analysis-requests/${id}`,
       adminDelete: (id) => `/admin/analysis-requests/${id}`,
+      adminAddState: (id) => `/admin/analysis-requests/${id}/states`,
+      adminGetStates: (id) => `/admin/analysis-requests/${id}/states`,
     },
     registeredManifestations: {
       index: '/registered-manifestations?region=all',
@@ -47,6 +50,8 @@ const API_CONFIG = {
     geomanifestations: {
       index: '/geomanifestations',
       show: (id) => `/geomanifestations/${id}`,
+      adminIndex: '/admin/geomanifestations',
+      adminStore: '/admin/geomanifestations',
     },
     Regions: {
       index: '/regions',
@@ -104,6 +109,7 @@ export const auth = {
 // ============================================
 export const users = {
   me: () => buildApiUrl(API_CONFIG.endpoints.users.me),
+  mePassword: () => buildApiUrl(API_CONFIG.endpoints.users.mePassword),
   meSession: () => buildApiUrl(API_CONFIG.endpoints.users.meSession),
   register: () => buildApiUrl(API_CONFIG.endpoints.users.register),
 };
@@ -121,6 +127,8 @@ export const analysisRequest = {
   adminShow: (id) => buildApiUrl(API_CONFIG.endpoints.analysisRequest.adminShow(id)),
   adminUpdate: (id) => buildApiUrl(API_CONFIG.endpoints.analysisRequest.adminUpdate(id)),
   adminDelete: (id) => buildApiUrl(API_CONFIG.endpoints.analysisRequest.adminDelete(id)),
+  adminAddState: (id) => buildApiUrl(API_CONFIG.endpoints.analysisRequest.adminAddState(id)),
+  adminGetStates: (id) => buildApiUrl(API_CONFIG.endpoints.analysisRequest.adminGetStates(id)),
 };
 
 // ============================================
@@ -137,6 +145,8 @@ export const registeredManifestations = {
 export const geomanifestations = {
   index: () => buildApiUrl(API_CONFIG.endpoints.geomanifestations.index),
   show: (id) => buildApiUrl(API_CONFIG.endpoints.geomanifestations.show(id)),
+  adminIndex: () => buildApiUrl(API_CONFIG.endpoints.geomanifestations.adminIndex),
+  adminStore: () => buildApiUrl(API_CONFIG.endpoints.geomanifestations.adminStore),
 };
 
 // ============================================
@@ -293,6 +303,10 @@ export const userMeUpdate = async (payload) => {
   return callApi(users.me(), 'PUT', payload);
 };
 
+export const userUpdatePassword = async (payload) => {
+  return callApi(users.mePassword(), 'PUT', payload);
+};
+
 export const userMeDelete = async () => {
   return callApi(users.me(), 'DELETE');
 };
@@ -344,6 +358,14 @@ export const analysisRequestAdminDelete = async (id) => {
   return callApi(analysisRequest.adminDelete(id), 'DELETE');
 };
 
+export const analysisRequestAdminAddState = async (id, payload) => {
+  return callApi(analysisRequest.adminAddState(id), 'POST', payload);
+};
+
+export const analysisRequestAdminGetStates = async (id) => {
+  return callApi(analysisRequest.adminGetStates(id), 'GET');
+};
+
 // ============================================
 // REGISTERED MANIFESTATIONS API FUNCTIONS
 // ============================================
@@ -379,11 +401,23 @@ export const geomanifestationsShow = async (id) => {
   return callApi(geomanifestations.show(id), 'GET');
 };
 
+export const geomanifestationsAdminIndex = async () => {
+  return callApi(geomanifestations.adminIndex(), 'GET');
+};
+
+export const geomanifestationsAdminStore = async (payload) => {
+  return callApi(geomanifestations.adminStore(), 'POST', payload);
+};
+
 // ============================================
 // REGIONS API FUNCTIONS
 // ============================================
 export const regionsIndex = async () => {
-  return callApi(regions.index(), 'GET');
+  const res = await callApi(regions.index(), 'GET');
+  if (!res.ok) {
+    return provincesIndex();
+  }
+  return res;
 };
 
 export const regionsShow = async (id) => {
