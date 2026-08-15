@@ -1,45 +1,39 @@
 import AddRequest from './AddRequest';
-import NotImplementedModal from './NotImplementedModal';
-import React, { useState, useEffect, useRef } from 'react';
-import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { DeleteOutlined, EyeOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { analysisRequestIndex, analysisRequestDelete } from '../../config/apiConf';
-import { Table, Button, Modal, Tag, message, Empty, Drawer, Divider, Collapse } from 'antd';
+import { Table, Button, Modal, Tag, message, Empty, Collapse } from 'antd';
 import RequestDetails from './RequestDetails';
 
 /**
  * UserRequests Component
  * 
  * Displays list of user's submitted analysis requests.
- * Features: view details, delete request, responsive table/card layout for mobile.
+ * Features: view details, edit request, delete request with confirmation, responsive table/card layout for mobile.
  * 
  * @component
- * @example
- * <UserRequests />
  */
 const UserRequests = () => {
   // ─── View state ───
   const [isMobile, setIsMobile] = useState(false);
   const [loading, setLoading] = useState(true);
-  const reloadRef = useRef(0);
 
   // ─── Data state ───
   const [requests, setRequests] = useState([]);
   const [error, setError] = useState(null);
 
-  // ─── Modal/Drawer state ───
+  // ─── Modal state ───
   const [viewModalVisible, setViewModalVisible] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState(null);
-  const [notImplementedModalOpen, setNotImplementedModalOpen] = useState(false);
 
   // ─── Effects ───
 
   useEffect(() => {
     loadRequests();
-  }, [reloadRef.current]);
+  }, []);
 
   const handleRequestAdded = () => {
-    // Trigger reload by updating ref
-    reloadRef.current += 1;
+    loadRequests();
   };
 
   useEffect(() => {
@@ -79,22 +73,37 @@ const UserRequests = () => {
 
   const deleteRequest = async (requestId) => {
     try {
-      await analysisRequestDelete(requestId);
-      setRequests((prev) => prev.filter((r) => r.id_soli !== requestId));
-      message.success('Solicitud eliminada correctamente');
+      const response = await analysisRequestDelete(requestId);
+      if (response.ok) {
+        setRequests((prev) => prev.filter((r) => r.request_id !== requestId && r.id_soli !== requestId));
+        message.success('Solicitud eliminada correctamente');
+      } else {
+        throw new Error(response.error || 'Error al eliminar la solicitud');
+      }
     } catch (err) {
       console.error('Error deleting request:', err);
-      message.error(err.message || 'Error al eliminar solicitud');
+      message.error(err.message || 'Error al eliminar la solicitud');
     }
   };
 
   const handleDelete = (record) => {
     const id = record.request_id || record.id_soli;
-    setSelectedRequestId(id);
-    setViewModalVisible(true);
-  };
+    const locationText = record.location 
+      ? `${record.location.province}, ${record.location.canton}`
+      : record.request_name || `Solicitud #${id}`;
 
-  // ─── Render helpers ───
+    Modal.confirm({
+      title: '¿Eliminar solicitud?',
+      icon: <ExclamationCircleOutlined className="text-red-500" />,
+      content: `¿Estás seguro de que deseas eliminar la solicitud de "${locationText}"? Esta acción es permanente y no se puede deshacer.`,
+      okText: 'Sí, eliminar',
+      okType: 'danger',
+      cancelText: 'Cancelar',
+      onOk: async () => {
+        await deleteRequest(id);
+      },
+    });
+  };
 
   const handleViewDetails = (record) => {
     const id = record.request_id || record.id_soli;
@@ -103,22 +112,22 @@ const UserRequests = () => {
   };
 
   const dataSource = (requests || []).map((request, index) => ({
-    key: request.id_soli || index,
+    key: request.request_id || request.id_soli || index,
     ...request,
   }));
 
   // ─── Mobile card component ───
 
   const MobileRequestCard = ({ request }) => (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-4 border-l-4 border-blue-500">
+    <div className="bg-white rounded-xl shadow-md p-4 mb-4 border-l-4 border-blue-500 poppins">
       <div className="flex justify-between items-start mb-3">
         <div>
-          <p className="font-semibold text-sm">
-            {request.location 
+          <p className="font-bold text-sm text-gray-800 m-0">
+            {request.location
               ? `${request.location.province}, ${request.location.canton}, ${request.location.district}`
               : 'Sin ubicación'}
           </p>
-          <p className="text-xs text-gray-500">{request.owner_name}</p>
+          <p className="text-xs text-gray-500 m-0 mt-0.5">{request.owner_name || 'Sin propietario especificado'}</p>
         </div>
         <Tag color={request.state === 'Registrada' ? 'blue' : request.state === 'En revisión' ? 'orange' : 'green'}>
           {request.state || 'Registrada'}
@@ -126,35 +135,24 @@ const UserRequests = () => {
       </div>
 
       <p className="text-xs text-gray-500 mb-3">
-        📅 {new Date(request.created_at).toLocaleDateString('es-ES')}
+        📅 {request.created_at ? new Date(request.created_at).toLocaleDateString('es-ES') : 'Fecha no disponible'}
       </p>
 
-      <div className="space-y-2 mb-4 text-sm">
-        {request.email && <p>📧 Email: {request.email}</p>}
-        {request.owner_contact_number && (
-          <p>📞 Teléfono: {request.owner_contact_number}</p>
+      <div className="space-y-1.5 mb-4 text-xs text-gray-600">
+        {request.owner_email && <p className="m-0">📧 Email: {request.owner_email}</p>}
+        {request.owner_phone_number && (
+          <p className="m-0">📞 Teléfono: {request.owner_phone_number}</p>
         )}
-        {request.current_usage && <p>🏗️ Uso Actual: {request.current_usage}</p>}
+        {request.current_usage && <p className="m-0">🏗️ Uso Actual: {request.current_usage}</p>}
         {request.temperature_sensation && (
-          <p>
-            🌡️ Sensación Térmica:{' '}
-            {request.temperature_sensation === 'Muy frío'
-              ? '❄️ Muy frío'
-              : request.temperature_sensation === 'Frío'
-                ? '🥶 Frío'
-                : request.temperature_sensation === 'Templado'
-                  ? '🌤️ Templado'
-                  : request.temperature_sensation === 'Cálido'
-                    ? '🔥 Cálido'
-                    : request.temperature_sensation === 'Muy Caliente'
-                      ? '🔥🔥 Muy Caliente'
-                      : '🌶️ ' + request.temperature_sensation}
+          <p className="m-0">
+            🌡️ Sensación Térmica: {request.temperature_sensation}
           </p>
         )}
-        {request.bubbles && <p>💧 Burbujeo: ✅</p>}
+        {request.bubbles && <p className="m-0">💧 Burbujeo: Sí</p>}
       </div>
 
-      <div className="flex gap-2 justify-end">
+      <div className="flex gap-2 justify-end pt-2 border-t border-gray-100">
         <Button
           size="small"
           type="primary"
@@ -178,27 +176,27 @@ const UserRequests = () => {
 
   const columns = [
     {
-      title: 'Ubicación',
+      title: 'Ubicación (Provincia, Cantón, Distrito)',
       key: 'location',
       render: (_, record) => {
         const loc = record.location;
         const text = loc ? `${loc.province}, ${loc.canton}, ${loc.district}` : 'Sin ubicación';
-        return <span className="font-semibold">{text}</span>;
+        return <span className="font-semibold text-gray-800">{text}</span>;
       },
     },
     {
-      title: 'Solicitante',
+      title: 'Propietario / Solicitante',
       dataIndex: 'owner_name',
       key: 'owner_name',
-      render: (text) => <span className="text-sm">{text}</span>,
+      render: (text) => <span className="text-sm text-gray-600">{text || '(No especificado)'}</span>,
     },
     {
-      title: 'Fecha',
+      title: 'Fecha de Creación',
       dataIndex: 'created_at',
       key: 'created_at',
       render: (date) => (
-        <span className="text-sm">
-          {new Date(date).toLocaleDateString('es-ES')}
+        <span className="text-sm text-gray-600">
+          {date ? new Date(date).toLocaleDateString('es-ES') : '-'}
         </span>
       ),
     },
@@ -242,12 +240,12 @@ const UserRequests = () => {
   // ═══════════════════════════════════════════
 
   return (
-    <div style={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
+    <div className="p-6 bg-gray-50 min-h-screen poppins">
       {/* Header */}
-      <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="mb-6 flex justify-between items-center flex-wrap gap-4">
         <div>
-          <h2 style={{ margin: '0 0 8px 0', color: '#333' }}>Mis Solicitudes</h2>
-          <p style={{ marginBottom: 0, color: '#666', fontSize: '14px' }}>
+          <h2 className="text-2xl font-bold text-gray-800 m-0 mb-1">Mis Solicitudes de Análisis</h2>
+          <p className="text-sm text-gray-500 m-0">
             {requests.length} solicitud{requests.length !== 1 ? 'es' : ''} registrada{requests.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -256,67 +254,45 @@ const UserRequests = () => {
 
       {/* Error message */}
       {error && (
-        <div
-          style={{
-            padding: '12px',
-            backgroundColor: '#fff2e8',
-            border: '1px solid #ffbb96',
-            borderRadius: '4px',
-            marginBottom: '16px',
-            color: '#d46b08',
-          }}
-        >
+        <div className="p-3 bg-orange-50 border border-orange-200 text-orange-700 rounded-lg mb-4 text-sm">
           ⚠️ {error}
         </div>
       )}
 
       {/* Collapsible Guidance */}
       <Collapse
-        className="mb-8"
-        style={{ backgroundColor: '#fefce8', borderColor: '#fcd34d' }}
+        className="mb-6 shadow-sm border border-amber-200 bg-amber-50/50 rounded-xl overflow-hidden"
         items={[
           {
             key: '1',
-            label: <span style={{ fontSize: '16px', fontWeight: 'bold' }}>💡 ¿Cómo crear una solicitud de análisis?</span>,
+            label: <span className="font-bold text-sm text-gray-800">💡 ¿Cómo crear una solicitud de análisis?</span>,
             children: (
-              <div>
-                <div className="mb-6">
-                  <h4 className="font-semibold text-gray-800 mb-3">📝 Pasos para crear una nueva solicitud:</h4>
-                  <ol style={{ margin: '0', paddingLeft: '20px', color: '#333', lineHeight: '1.8' }}>
-                    <li><strong>Haz clic en "+ Nueva Solicitud"</strong> en la esquina superior derecha de esta pantalla</li>
-                    <li><strong>Completa el formulario</strong> con los datos del sitio: nombre, ubicación GPS, temperatura observada y otros detalles</li>
-                    <li><strong>Selecciona la región geotérmica</strong> donde se encuentra la manifestación</li>
-                    <li><strong>Proporciona tu información de contacto</strong> para que el equipo de revisión pueda comunicarse contigo si es necesario</li>
-                    <li><strong>Describe las observaciones</strong> sobre la actividad del sitio (burbujeo, uso actual del terreno, etc.)</li>
-                    <li><strong>Envía la solicitud</strong> y recibirás una confirmación con el número de seguimiento</li>
+              <div className="text-xs text-gray-700 space-y-4">
+                <div>
+                  <h4 className="font-semibold text-gray-800 mb-2">📝 Pasos para crear una nueva solicitud:</h4>
+                  <ol className="m-0 pl-5 space-y-1 text-gray-600">
+                    <li><strong>Haz clic en "+ Nueva Solicitud"</strong> en la esquina superior derecha</li>
+                    <li><strong>Selecciona la ubicación territorial</strong> (Provincia, Cantón y Distrito)</li>
+                    <li><strong>Ingresa las coordenadas GPS</strong> usando el mapa interactivo incorporado</li>
+                    <li><strong>Indica si conoces al propietario</strong> del terreno o si es información opcional</li>
+                    <li><strong>Describe las manifestaciones</strong> de calor (temperatura, uso actual, burbujeo)</li>
+                    <li><strong>Envía la solicitud</strong> para recibir la revisión por parte del equipo técnico</li>
                   </ol>
                 </div>
 
-                <h4 className="font-semibold text-gray-800 mb-3">📊 Estados de tu solicitud - ¿Dónde está mi solicitud?</h4>
-                <div className="space-y-2">
-                  <div style={{ padding: '8px 12px', backgroundColor: '#e6f7ff', borderLeftWidth: '3px', borderLeftColor: '#1890ff', borderRadius: '4px' }}>
-                    <strong style={{ color: '#0050b3' }}>🔵 Registrada:</strong>
-                    <span style={{ color: '#0050b3', marginLeft: '8px' }}>Tu solicitud fue recibida. Ahora está en la cola esperando revisión por parte del equipo científico.</span>
+                <h4 className="font-semibold text-gray-800 mb-2">📊 Estados de tu solicitud:</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <div className="p-2 bg-blue-50 border-l-4 border-blue-500 rounded text-blue-900">
+                    <strong>🔵 Registrada:</strong> Solicitud recibida y en espera de revisión.
                   </div>
-                  <div style={{ padding: '8px 12px', backgroundColor: '#fff7e6', borderLeftWidth: '3px', borderLeftColor: '#faad14', borderRadius: '4px' }}>
-                    <strong style={{ color: '#ad6800' }}>🟡 En revisión:</strong>
-                    <span style={{ color: '#ad6800', marginLeft: '8px' }}>Un investigador está analizando tu solicitud y verificando los datos proporcionados.</span>
+                  <div className="p-2 bg-amber-50 border-l-4 border-amber-500 rounded text-amber-900">
+                    <strong>🟡 En revisión:</strong> El equipo científico está analizando los datos.
                   </div>
-                  <div style={{ padding: '8px 12px', backgroundColor: '#f6f8fb', borderLeftWidth: '3px', borderLeftColor: '#faad14', borderRadius: '4px' }}>
-                    <strong style={{ color: '#ad6800' }}>🔍 Verificación de campo:</strong>
-                    <span style={{ color: '#ad6800', marginLeft: '8px' }}>Se realizará una verificación de campo para confirmar los datos y condiciones del sitio.</span>
+                  <div className="p-2 bg-emerald-50 border-l-4 border-emerald-500 rounded text-emerald-900">
+                    <strong>✅ Aprobada:</strong> Solicitud aprobada y publicada en el mapa geotérmico.
                   </div>
-                  <div style={{ padding: '8px 12px', backgroundColor: '#f6f8fb', borderLeftWidth: '3px', borderLeftColor: '#faad14', borderRadius: '4px' }}>
-                    <strong style={{ color: '#ad6800' }}>🧪 Análisis en laboratorio:</strong>
-                    <span style={{ color: '#ad6800', marginLeft: '8px' }}>Se están realizando análisis químicos y técnicos detallados de las muestras o datos recopilados.</span>
-                  </div>
-                  <div style={{ padding: '8px 12px', backgroundColor: '#f6f0ff', borderLeftWidth: '3px', borderLeftColor: '#52c41a', borderRadius: '4px' }}>
-                    <strong style={{ color: '#274a1c' }}>✅ Aprobada:</strong>
-                    <span style={{ color: '#274a1c', marginLeft: '8px' }}>¡Solicitud completada! Tu manifestación fue publicada en el mapa interactivo de GeoterRA.</span>
-                  </div>
-                  <div style={{ padding: '8px 12px', backgroundColor: '#fff1f0', borderLeftWidth: '3px', borderLeftColor: '#ff4d4f', borderRadius: '4px' }}>
-                    <strong style={{ color: '#7f0000' }}>❌ Rechazada:</strong>
-                    <span style={{ color: '#7f0000', marginLeft: '8px' }}>Lamentablemente, la solicitud fue rechazada. Revisa los comentarios del equipo para más información.</span>
+                  <div className="p-2 bg-red-50 border-l-4 border-red-500 rounded text-red-900">
+                    <strong>❌ Rechazada:</strong> Revisa las observaciones enviadas por el equipo.
                   </div>
                 </div>
               </div>
@@ -330,11 +306,13 @@ const UserRequests = () => {
         <div>
           {requests.length === 0 ? (
             <Empty
-              description="No hay solicitudes"
-              style={{ backgroundColor: 'white', borderRadius: '8px', padding: '40px' }}
+              description="No hay solicitudes registradas"
+              style={{ backgroundColor: 'white', borderRadius: '12px', padding: '40px' }}
             />
           ) : (
-            requests.map((request) => <MobileRequestCard key={request.id_soli} request={request} />)
+            requests.map((request, idx) => (
+              <MobileRequestCard key={request.request_id || request.id_soli || idx} request={request} />
+            ))
           )}
         </div>
       ) : (
@@ -357,15 +335,12 @@ const UserRequests = () => {
           locale={{
             emptyText: (
               <Empty
-                description="No hay solicitudes"
+                description="No hay solicitudes registradas"
                 style={{ padding: '40px 0' }}
               />
             ),
           }}
-          style={{
-            backgroundColor: 'white',
-            borderRadius: '8px',
-          }}
+          className="bg-white rounded-xl shadow-md overflow-hidden"
         />
       )}
 
@@ -376,12 +351,6 @@ const UserRequests = () => {
         onClose={() => setViewModalVisible(false)}
         onUpdated={loadRequests}
         onDeleted={loadRequests}
-      />
-
-      {/* Not Implemented Modal for delete action */}
-      <NotImplementedModal
-        isOpen={notImplementedModalOpen}
-        onClose={() => setNotImplementedModalOpen(false)}
       />
     </div>
   );
