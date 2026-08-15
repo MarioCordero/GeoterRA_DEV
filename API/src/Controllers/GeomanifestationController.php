@@ -38,24 +38,30 @@ final class GeomanifestationController
       $provinceSnitCode = isset($_GET['province_snit_code']) ? (int)$_GET['province_snit_code'] : null;
       $cantonSnitCode = isset($_GET['canton_snit_code']) ? (int)$_GET['canton_snit_code'] : null;
       $districtSnitCode = isset($_GET['district_snit_code']) ? (int)$_GET['district_snit_code'] : null;
+      $tempMin = isset($_GET['temp_min']) ? (float)$_GET['temp_min'] : null;
+      $tempMax = isset($_GET['temp_max']) ? (float)$_GET['temp_max'] : null;
 
-      // If any filter is provided, use the filtered method; otherwise getAll.
-      if ($provinceSnitCode !== null || $cantonSnitCode !== null || $districtSnitCode !== null) {
-        $result = $this->service->getViewAllPaginated(
-          $page,
-          $limit,
-          $provinceSnitCode,
-          $cantonSnitCode,
-          $districtSnitCode,
-          null,
-          null,
-          false // admin: show all, including hidden
-        );
-      } else {
-        $result = $this->service->getAll($page, $limit);
-      }
+      $showAll = isset($_GET['show_all']) ? filter_var(
+        $_GET['show_all'],
+        FILTER_VALIDATE_BOOLEAN
+      ) : false;
+      $onlyVisible = !$showAll;
 
-      Response::success($result);
+      $result = $this->service->getViewAllPaginated(
+        $page,
+        $limit,
+        $provinceSnitCode,
+        $cantonSnitCode,
+        $districtSnitCode,
+        $tempMin,
+        $tempMax,
+        $onlyVisible
+      );
+
+      Response::success(
+        $result['data'], ['pagination' => $result['pagination']]
+      );
+
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
     } catch (Throwable $e) {
@@ -72,7 +78,7 @@ final class GeomanifestationController
   public function show(string $id): void
   {
     try {
-      $manifestation = $this->service->getById($id, true);
+      $manifestation = $this->service->getViewById($id, true);
       Response::success($manifestation);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
@@ -194,7 +200,9 @@ final class GeomanifestationController
         $onlyVisible
       );
 
-      Response::success($result['data'], $result['pagination']);
+      Response::success(
+        $result['data'], ['pagination' => $result['pagination']]
+      );
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
     } catch (Throwable $e) {
