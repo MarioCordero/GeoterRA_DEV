@@ -312,7 +312,7 @@ class GeomanifestationServiceTest extends TestCase
 	{
 		$manifestation = $this->createTestGeomanifestation(['visibility' => 1]);
 
-		$result = $this->service->getById($manifestation['geomanifestation_id']);
+		$result = $this->service->getViewById($manifestation['geomanifestation_id']);
 
 		$this->assertEquals($manifestation['geomanifestation_id'], $result['geomanifestation_id']);
 		$this->assertArrayHasKey('insitu_test', $result);
@@ -324,7 +324,7 @@ class GeomanifestationServiceTest extends TestCase
 		$manifestation = $this->createTestGeomanifestation(['visibility' => 0]);
 
 		try {
-			$this->service->getById($manifestation['geomanifestation_id']);
+			$this->service->getViewById($manifestation['geomanifestation_id']);
 			$this->fail('Expected ApiException was not thrown');
 		} catch (ApiException $e) {
 			$this->assertEquals(404, $e->getHttpStatus());
@@ -336,7 +336,7 @@ class GeomanifestationServiceTest extends TestCase
 		$manifestation = $this->createTestGeomanifestation(['visibility' => 0]);
 		$this->authenticateAs(AllowedUserRoles::MAINTENANCE);
 
-		$result = $this->service->getById($manifestation['geomanifestation_id'], true);
+		$result = $this->service->getViewById($manifestation['geomanifestation_id'], true);
 
 		$this->assertEquals($manifestation['geomanifestation_id'], $result['geomanifestation_id']);
 		$this->assertArrayHasKey('visibility', $result);
@@ -349,7 +349,7 @@ class GeomanifestationServiceTest extends TestCase
 		$manifestation = $this->createTestGeomanifestation(['visibility' => 0]);
 
 		try {
-			$this->service->getById($manifestation['geomanifestation_id'], true);
+			$this->service->getViewById($manifestation['geomanifestation_id'], true);
 			$this->fail('Expected ApiException was not thrown');
 		} catch (ApiException $e) {
 			$this->assertEquals(403, $e->getHttpStatus());
@@ -359,7 +359,7 @@ class GeomanifestationServiceTest extends TestCase
 	public function testGetByIdThrowsNotFoundForNonexistentId(): void
 	{
 		try {
-			$this->service->getById(UlidGenerator::generate());
+			$this->service->getViewById(UlidGenerator::generate());
 			$this->fail('Expected ApiException was not thrown');
 		} catch (ApiException $e) {
 			$this->assertEquals(404, $e->getHttpStatus());
@@ -579,7 +579,7 @@ class GeomanifestationServiceTest extends TestCase
 	public function testGetByProvinceThrowsInvalidFieldForNonexistentProvince(): void
 	{
 		try {
-			$this->service->getByProvince(999999);
+			$this->service->getViewAllPaginated(1, 20,999999);
 			$this->fail('Expected ApiException was not thrown');
 		} catch (ApiException $e) {
 			$this->assertEquals(422, $e->getHttpStatus());

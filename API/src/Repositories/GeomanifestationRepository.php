@@ -60,6 +60,71 @@ final class GeomanifestationRepository extends Repository
   }
 
   /**
+   * Returns paginated list of manifestations with optional filters.
+   * This unifies and replaces the old getAll() and getByProvince() methods.
+   *
+   * @param int $page
+   * @param int $limit
+   * @param int|null $provinceSnitCode
+   * @param int|null $cantonSnitCode
+   * @param int|null $districtSnitCode
+   * @param bool $onlyVisible
+   * @return array{data: array[], total: int}
+   */
+  public function getAllPaginated(
+    int  $page = 1,
+    int  $limit = 20,
+    ?int $provinceSnitCode = null,
+    ?int $cantonSnitCode = null,
+    ?int $districtSnitCode = null,
+    bool $onlyVisible = true
+  ): array {
+    $offset = ($page - 1) * $limit;
+
+    $conditions = [];
+    $params = [];
+
+    if ($onlyVisible) {
+      $conditions[] = "g.visibility = 1";
+    }
+    if ($provinceSnitCode !== null) {
+      $conditions[] = "g.province_snit_code = :province_snit";
+      $params[':province_snit'] = $provinceSnitCode;
+    }
+    if ($cantonSnitCode !== null) {
+      $conditions[] = "g.canton_snit_code = :canton_snit";
+      $params[':canton_snit'] = $cantonSnitCode;
+    }
+    if ($districtSnitCode !== null) {
+      $conditions[] = "g.district_snit_code = :district_snit";
+      $params[':district_snit'] = $districtSnitCode;
+    }
+
+    $whereClause = empty($conditions) ? "" : "WHERE " . implode(" AND ", $conditions);
+
+    $countSql = "SELECT COUNT(*) FROM geomanifestations g $whereClause";
+    $countStmt = $this->execute($countSql, $params);
+    $total = (int)$countStmt->fetchColumn();
+
+    $limitInt = $limit;
+    $offsetInt = (int)$offset;
+
+    $sql = "SELECT g.geomanifestation_id, g.province_snit_code, g.canton_snit_code, g.district_snit_code,
+                   g.current_georeport_id, r.request_id, r.request_name, g.geomanifestation_name,
+                   g.latitude, g.longitude, g.description, g.visibility, g.created_at, g.created_by
+            FROM geomanifestations g
+            LEFT JOIN requests r on g.request_id = r.request_id
+            $whereClause
+            ORDER BY g.created_at DESC
+            LIMIT {$limitInt} OFFSET {$offsetInt}";
+
+    $stmt = $this->execute($sql, $params);
+    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    return ['data' => $data, 'total' => $total];
+  }
+
+  /**
    * Returns visible manifestations by province SNIT code with pagination.
    *
    * @param int $provinceSnitCode
