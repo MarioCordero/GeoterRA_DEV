@@ -59,7 +59,7 @@ fun ManifestationInfoPanel(
         Spacer(Modifier.width(8.dp))
         Column {
           Text(
-            text = manifestation.name,
+            text = manifestation.geomanifestation_name,
             style = MaterialTheme.typography.titleLarge.copy(
               fontWeight = FontWeight.ExtraBold,
               letterSpacing = 0.5.sp

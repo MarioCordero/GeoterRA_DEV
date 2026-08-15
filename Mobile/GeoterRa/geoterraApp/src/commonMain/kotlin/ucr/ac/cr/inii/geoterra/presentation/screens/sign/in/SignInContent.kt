@@ -2,9 +2,12 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.sign.`in`
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,8 +26,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import geoterra.geoterraapp.generated.resources.Res
@@ -44,6 +50,7 @@ fun SignInContent(
   onPasswordChanged: (String) -> Unit,
   onLoginClick: () -> Unit,
   onRegisterClick: () -> Unit,
+	onPasswordRecoveryClick: () -> Unit,
   onTogglePassword: () -> Unit,
 ) {
 
@@ -144,7 +151,7 @@ fun SignInContent(
 					Column(
 						modifier = Modifier.fillMaxWidth(),
 						horizontalAlignment = Alignment.CenterHorizontally,
-						verticalArrangement = Arrangement.spacedBy(2.dp)
+						verticalArrangement = Arrangement.spacedBy(8.dp)
 					) {
 						ActionButton(
 							isLoading = state.isLoading,
@@ -152,13 +159,37 @@ fun SignInContent(
 							onClick = onLoginClick,
 						)
 
-						TextButton(
-							onClick = { onRegisterClick() },
+						Column(
+							modifier = Modifier.fillMaxWidth(),
+							horizontalAlignment = Alignment.CenterHorizontally,
+							verticalArrangement = Arrangement.spacedBy(4.dp)
 						) {
 							Text(
-								"¿No tienes cuenta? Regístrate aquí",
+								text = buildAnnotatedString {
+									append("¿No tienes cuenta? ")
+									withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+										append("Regístrate aquí")
+									}
+								},
 								color = MaterialTheme.colorScheme.onSurface,
-								fontWeight = FontWeight.Bold
+								style = MaterialTheme.typography.bodySmall,
+								modifier = Modifier
+									.clickable { onRegisterClick() }
+									.padding(vertical = 4.dp, horizontal = 8.dp)
+							)
+
+							Text(
+								text = buildAnnotatedString {
+									append("¿Ha olvidado su contraseña? ")
+									withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+										append("Recuperar")
+									}
+								},
+								color = MaterialTheme.colorScheme.onSurface,
+								style = MaterialTheme.typography.bodySmall,
+								modifier = Modifier
+									.clickable { onPasswordRecoveryClick() }
+									.padding(vertical = 4.dp, horizontal = 8.dp)
 							)
 						}
 					}

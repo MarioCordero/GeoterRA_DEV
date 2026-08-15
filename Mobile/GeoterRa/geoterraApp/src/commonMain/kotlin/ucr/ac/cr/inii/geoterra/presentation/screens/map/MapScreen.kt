@@ -36,7 +36,6 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation.Geomani
 class MapScreen : Screen {
   override val key: ScreenKey = uniqueScreenKey
 
-
   @OptIn(ExperimentalMaterial3Api::class)
   @Composable
   override fun Content() {

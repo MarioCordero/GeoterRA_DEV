@@ -9,6 +9,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType.*
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import kotlinx.serialization.json.JsonElement
 import ucr.ac.cr.inii.geoterra.core.network.ApiError
 import ucr.ac.cr.inii.geoterra.core.network.ApiException
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
@@ -29,7 +30,6 @@ class AuthRepository(
 	fun invalidateAuthTokens() {
 
 		val authProvider = client.authProvider<BearerAuthProvider>()
-
 		requireNotNull(authProvider)
 
 		authProvider.clearToken()
@@ -50,7 +50,7 @@ class AuthRepository(
 			}
 
 			if (response.status.isSuccess()) {
-				val envelope = response.body<ApiResponseModel<RegisterResponse>>()
+				val envelope = response.body<ApiResponseModel<RegisterResponse, JsonElement>>()
 				if (envelope.data != null) {
 					return Result.success(Unit)
 				}
@@ -84,7 +84,7 @@ class AuthRepository(
 			}
 
 			if (response.status.isSuccess()) {
-				val envelope = response.body<ApiResponseModel<LoginResponse>>()
+				val envelope = response.body<ApiResponseModel<LoginResponse, JsonElement>>()
 				if (envelope.data != null) {
 					tokenManager.saveTokens(envelope.data.access_token, envelope.data.refresh_token)
 					invalidateAuthTokens()
@@ -137,7 +137,7 @@ class AuthRepository(
 			val envelope = client.post("auth/refresh") {
 				contentType(Application.Json)
 				setBody(RefreshAccessTokenRequest(refreshToken))
-			}.body<ApiResponseModel<RefreshAccessTokenResponse>>()
+			}.body<ApiResponseModel<RefreshAccessTokenResponse, JsonElement>>()
 
 			val data = envelope.data
 				?: return Result.failure(
@@ -169,4 +169,78 @@ class AuthRepository(
 	}
 
 	override suspend fun isUserLoggedIn(): Boolean = tokenManager.getAccessToken() != null
+
+	override suspend fun requestPasswordReset(email: String): Result<Unit> {
+		return try {
+			val response = client.post("auth/password-reset/request") {
+				contentType(Application.Json)
+				setBody(mapOf("email" to email))
+			}
+
+			if (response.status.isSuccess()) {
+				val envelope = response.body<ApiResponseModel<JsonElement, JsonElement>>()
+				if (envelope.errors.isEmpty()) {
+					return Result.success(Unit)
+				} else {
+					return Result.failure(
+						ApiException(
+							ApiError(
+								code = envelope.errors.first().code,
+								message = envelope.errors.first().message
+							)
+						)
+					)
+				}
+			}
+
+			handleErrorResponse(response)
+
+		} catch (e: Exception) {
+			Result.failure(
+				ApiException(
+					ApiError(
+						code = ApiError.INTERNAL_ERROR,
+						message = "Error de red: verifica tu conexión a internet."
+					)
+				)
+			)
+		}
+	}
+
+	override suspend fun resetPassword(token: String, password: String): Result<Unit> {
+		return try {
+			val response = client.post("auth/password-reset/reset") {
+				contentType(Application.Json)
+				setBody(mapOf("token" to token, "new_password" to password))
+			}
+
+			if (response.status.isSuccess()) {
+				val envelope = response.body<ApiResponseModel<JsonElement, JsonElement>>()
+				if (envelope.errors.isEmpty()) {
+					return Result.success(Unit)
+				} else {
+					return Result.failure(
+						ApiException(
+							ApiError(
+								code = envelope.errors.first().code,
+								message = envelope.errors.first().message
+							)
+						)
+					)
+				}
+			}
+
+			handleErrorResponse(response)
+
+		} catch (e: Exception) {
+			Result.failure(
+				ApiException(
+					ApiError(
+						code = ApiError.INTERNAL_ERROR,
+						message = "Error de red: verifica tu conexión a internet."
+					)
+				)
+			)
+		}
+	}
 }

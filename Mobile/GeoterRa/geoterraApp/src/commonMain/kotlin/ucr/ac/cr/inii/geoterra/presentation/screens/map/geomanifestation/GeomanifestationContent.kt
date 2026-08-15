@@ -62,7 +62,7 @@ fun GeomanifestationContent(
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Text(
-				text = manifestation.name,
+				text = manifestation.geomanifestation_name,
 				style = MaterialTheme.typography.headlineLarge.copy(
 					fontWeight = FontWeight.Bold,
 				),

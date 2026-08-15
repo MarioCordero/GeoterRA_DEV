@@ -28,7 +28,7 @@ data class PaginatedManifestationsRemote(
 @Serializable
 data class GeomanifestationResponse(
 	val geomanifestation_id: String,
-	val name: String,
+	val geomanifestation_name: String,
 	val description: String?,
 	val created_at: String,
 	val location: LocationResponse,
@@ -51,7 +51,7 @@ fun List<GeomanifestationResponse>.toGeoJsonString(): String {
           },
           "properties": {
             "id": "${manifestation.geomanifestation_id}",
-            "name": "${manifestation.name}",
+            "name": "${manifestation.geomanifestation_name}",
             "description": "${manifestation.description}",
             "temp": $temperature,
 						"latitude": ${manifestation.location.latitude},

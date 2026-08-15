@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import org.koin.dsl.module
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.NetworkConfig
@@ -100,7 +101,7 @@ val networkModule = module {
 								markAsRefreshTokenRequest()
 								contentType(ContentType.Application.Json)
 								setBody(RefreshAccessTokenRequest(refreshToken))
-							}.body<ApiResponseModel<RefreshAccessTokenResponse>>()
+							}.body<ApiResponseModel<RefreshAccessTokenResponse, JsonElement>>()
 
 							val data = response.data
 							val errors = response.errors

@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.isSuccess
+import kotlinx.serialization.json.JsonElement
 import ucr.ac.cr.inii.geoterra.core.network.ApiError
 import ucr.ac.cr.inii.geoterra.core.network.ApiException
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
@@ -18,7 +19,7 @@ class ProvinceRepository(private val client: HttpClient) : ProvinceRepositoryInt
 			val response = client.get("provinces")
 
 			if (response.status.isSuccess()) {
-				val envelope = response.body<ApiResponseModel<List<ProvinceResponse>>>()
+				val envelope = response.body<ApiResponseModel<List<ProvinceResponse>, JsonElement>>()
 				Result.success(envelope.data ?: emptyList())
 			} else {
 				handleErrorResponse(response)

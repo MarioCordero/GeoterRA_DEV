@@ -17,6 +17,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
+import ucr.ac.cr.inii.geoterra.presentation.screens.account.password.recovery.PasswordRecoveryScreen
 import ucr.ac.cr.inii.geoterra.presentation.screens.sign.SignUpScreen
 
 /**
@@ -55,7 +56,12 @@ class SignInScreen : Screen {
 				onEmailChanged = viewModel::onEmailChanged,
 				onPasswordChanged = viewModel::onPasswordChanged,
 				onLoginClick = viewModel::login,
-				onRegisterClick = { navigator.push(SignUpScreen()) },
+				onRegisterClick = { navigator.push(
+					SignUpScreen()
+				)},
+				onPasswordRecoveryClick = { navigator.push(
+					PasswordRecoveryScreen()
+				)},
 				onTogglePassword = viewModel::togglePasswordVisibility,
 			)
 		}

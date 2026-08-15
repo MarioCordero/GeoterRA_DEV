@@ -22,7 +22,7 @@ class InvestigationRequestsRepository(
 			val response = client.get("analysis-requests")
 
 			if (response.status.isSuccess()) {
-				val envelope = response.body<ApiResponseModel<List<InvestigationRequestResponse>>>()
+				val envelope = response.body<ApiResponseModel<List<InvestigationRequestResponse>, JsonElement>>()
 
 				if (envelope.errors.isNotEmpty()) {
 					return Result.failure(ApiException(envelope.errors.first()))
@@ -50,7 +50,7 @@ class InvestigationRequestsRepository(
 			val response = client.get("analysis-requests/$id/states")
 			if (response.status.isSuccess()) {
 				val envelope =
-					response.body<ApiResponseModel<List<InvestigationRequestResponse.StateResponse>>>()
+					response.body<ApiResponseModel<List<InvestigationRequestResponse.StateResponse>, JsonElement>>()
 				if (envelope.errors.isNotEmpty()) {
 					return Result.failure(ApiException(envelope.errors.first()))
 				}
@@ -77,7 +77,7 @@ class InvestigationRequestsRepository(
 				setBody(form)
 			}
 			if (response.status.isSuccess()){
-				val envelope = response.body<ApiResponseModel<JsonElement>>()
+				val envelope = response.body<ApiResponseModel<JsonElement, JsonElement>>()
 
 				if (envelope.errors.isNotEmpty()) {
 					return Result.failure(ApiException(envelope.errors.first()))
@@ -106,7 +106,7 @@ class InvestigationRequestsRepository(
 				setBody(form)
 			}
 			if (response.status.isSuccess()) {
-				val envelope = response.body<ApiResponseModel<JsonElement>>()
+				val envelope = response.body<ApiResponseModel<JsonElement, JsonElement>>()
 
 				if (envelope.errors.isNotEmpty()) {
 					return Result.failure(ApiException(envelope.errors.first()))
@@ -135,7 +135,7 @@ class InvestigationRequestsRepository(
 					return Result.success(Unit)
 				}
 
-				val envelope = response.body<ApiResponseModel<JsonElement>>()
+				val envelope = response.body<ApiResponseModel<JsonElement, JsonElement>>()
 
 				if (envelope.errors.isNotEmpty()) {
 					return Result.failure(ApiException(envelope.errors.first()))

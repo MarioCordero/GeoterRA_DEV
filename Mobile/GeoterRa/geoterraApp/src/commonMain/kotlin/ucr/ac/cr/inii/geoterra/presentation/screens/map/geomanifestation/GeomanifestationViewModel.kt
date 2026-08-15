@@ -18,7 +18,7 @@ class GeomanifestationViewModel(
 		screenModelScope.launch {
 			_state.update { it.copy(isLoading = true, isPdfGenerating = true) }
 			try {
-				val fileName = "Reporte_Geoquímico_${initialManifestation.name}"
+				val fileName = "Reporte_Geoquímico_${initialManifestation.geomanifestation_name}"
 
 				// Call the generator and capture the path
 				val resultPath = PDFUtil.generateManifestationReportPdf(initialManifestation, fileName)

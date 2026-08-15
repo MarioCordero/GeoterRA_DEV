@@ -67,4 +67,14 @@ class AuthService(
     authEventBus.updateLoginState(false)
     authEventBus.emit(AuthEvent.Unauthorized)
   }
+
+	suspend fun requestPasswordReset(email: String) : Result<Unit> {
+		val result = authRepository.requestPasswordReset(email)
+		return result
+	}
+
+	suspend fun resetPassword(token: String, password: String) : Result<Unit> {
+		val result = authRepository.resetPassword(token, password)
+		return result
+	}
 }
