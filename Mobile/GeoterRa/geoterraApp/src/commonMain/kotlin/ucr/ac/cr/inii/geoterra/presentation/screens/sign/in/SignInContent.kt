@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -166,20 +167,6 @@ fun SignInContent(
 						) {
 							Text(
 								text = buildAnnotatedString {
-									append("¿No tienes cuenta? ")
-									withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-										append("Regístrate aquí")
-									}
-								},
-								color = MaterialTheme.colorScheme.onSurface,
-								style = MaterialTheme.typography.bodySmall,
-								modifier = Modifier
-									.clickable { onRegisterClick() }
-									.padding(vertical = 4.dp, horizontal = 8.dp)
-							)
-
-							Text(
-								text = buildAnnotatedString {
 									append("¿Ha olvidado su contraseña? ")
 									withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
 										append("Recuperar")
@@ -189,6 +176,26 @@ fun SignInContent(
 								style = MaterialTheme.typography.bodySmall,
 								modifier = Modifier
 									.clickable { onPasswordRecoveryClick() }
+									.padding(vertical = 4.dp, horizontal = 8.dp)
+							)
+
+							HorizontalDivider(
+								modifier = Modifier.padding(vertical = 12.dp),
+								thickness = 0.5.dp,
+								color = MaterialTheme.colorScheme.outlineVariant
+							)
+
+							Text(
+								text = buildAnnotatedString {
+									append("¿No tiene cuenta? ")
+									withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+										append("Regístrate aquí")
+									}
+								},
+								color = MaterialTheme.colorScheme.onSurface,
+								style = MaterialTheme.typography.bodySmall,
+								modifier = Modifier
+									.clickable { onRegisterClick() }
 									.padding(vertical = 4.dp, horizontal = 8.dp)
 							)
 						}

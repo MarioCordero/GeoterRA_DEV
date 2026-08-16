@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import geoterra.geoterraapp.generated.resources.Res
 import geoterra.geoterraapp.generated.resources.logo_GeoterRA
 import org.jetbrains.compose.resources.painterResource
+import ucr.ac.cr.inii.geoterra.presentation.components.account.OtpInputField
 import ucr.ac.cr.inii.geoterra.presentation.components.common.ActionButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomTextField
 import ucr.ac.cr.inii.geoterra.presentation.components.common.FormSection
@@ -109,14 +110,12 @@ fun PasswordRecoveryContent(
 							modifier = Modifier.fillMaxWidth()
 						)
 					} else {
-						CustomTextField(
-							value = state.token,
-							onValueChange = onTokenChanged,
-							label = "Código OTP",
-							keyboardType = KeyboardType.Number,
+						OtpInputField(
+							otpText = state.token,
+							onOtpTextChange = onTokenChanged,
 							isError = state.fieldErrors["token"] != null,
 							errorMessage = state.fieldErrors["token"],
-							modifier = Modifier.fillMaxWidth()
+							modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
 						)
 
 						PasswordField(
