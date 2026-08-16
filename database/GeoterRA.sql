@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 11-08-2026 a las 00:27:00
+-- Tiempo de generación: 16-08-2026 a las 03:09:39
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.0.28
 
@@ -35,6 +35,13 @@ CREATE TABLE `access_tokens` (
   `revoked_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `access_tokens`
+--
+
+INSERT INTO `access_tokens` (`access_token_id`, `user_id`, `access_token_hash`, `expires_at`, `revoked_at`, `created_at`) VALUES
+('01M03HCEY8EZ3QXQQCDF3JGADE', '06F43H2S28KNWX71TSF7MWWTA4', '508465ca267e7d7f6a6580aea569de875957d50c22fbfa5256e87a074328d7c3', '2026-08-16 02:26:32', NULL, '2026-08-16 02:21:32');
 
 -- --------------------------------------------------------
 
@@ -686,17 +693,17 @@ CREATE TABLE `geomanifestations` (
 --
 
 INSERT INTO `geomanifestations` (`geomanifestation_id`, `province_snit_code`, `canton_snit_code`, `district_snit_code`, `current_georeport_id`, `geomanifestation_name`, `latitude`, `longitude`, `description`, `visibility`, `request_id`, `created_at`, `created_by`) VALUES
-('01KZPW48VQK3HX66A75T2AGMM2', 5, 504, 50401, '01KZPW48VVN1KDDC1MV9SS06R0', 'Termal Sitio U-1', 8.2306133481998, -88.521192530135, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal Sitio U-1).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48VX1QD60FKQGVQX7SNX', 5, 504, 50401, '01KZPW48VZJR9P92PZC7JVEZSB', 'Termal CTP-1', 8.2145283471201, -85.520923292616, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal CTP-1).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48W123WBDF19W66N9S9G', 5, 504, 50401, '01KZPW48W35ENZ7EHN460P2HAR', 'Termal CTP-2', 8.2116650353023, -85.521381013988, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal CTP-2).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48W4SV1TEYD30N2AS472', 5, 504, 50401, '01KZPW48W7Z7Y4QNAP7GQD9KWV', 'Termal CTP-3', 8.2116565097621, -85.521180778737, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal CTP-3).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48W80Z3QBTE5HRJ4ZBE5', 5, 504, 50401, '01KZPW48W9QC9HDRR0Y43KT3WW', 'Termal Guayabal', 8.2946156654409, -85.500722654853, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal Guayabal).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WAX5SPDKKN9Y4HEZK3', 5, 504, 50401, '01KZPW48WBS3K9MR0THR2JE1HJ', 'Termal Josue Ulate', 8.2804240607158, -85.505467227198, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal Josue Ulate).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WCWFNCEY425CW0QA32', 5, 504, 50401, '01KZPW48WD38D533BX25MMJ59P', 'Termal R. Perdido-1', 8.1380488959591, -85.514014561137, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal R. Perdido-1).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WEEVZ518Q9S26RZTR4', 5, 504, 50401, '01KZPW48WFQ6YF44EQPTNPF0GZ', 'Termal R. Perdido-2', 8.1378797746675, -85.513963045815, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal R. Perdido-2).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WGDKWK9MBEJJB7Y1CZ', 5, 504, 50401, '01KZPW48WH24E48FXJFCHZ5147', 'Termal R. Perdido-3', 8.1376761988585, -85.513886782987, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal R. Perdido-3).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WJT58KDJH5V51MJVPZ', 5, 504, 50401, '01KZPW48WK0ZBWR4PCM5GV9TF9', 'Termal R. Perdido-4', 8.1373647703377, -85.513944300091, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal R. Perdido-4).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WK0ZBWR4PCM5GV9TFA', 5, 504, 50401, '01KZPW48WM0Q5PS1WP94RGJ53P', 'Termal Guayacan', 8.2603902949406, -85.5073895895, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal Guayacan).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4');
+('01KZPW48VQK3HX66A75T2AGMM2', 5, 504, 50401, '01KZPW48VVN1KDDC1MV9SS06R0', 'Termal Sitio U-1', 10.68176273, -88.22942008, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal Sitio U-1).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KZPW48VX1QD60FKQGVQX7SNX', 5, 504, 50401, '01KZPW48VZJR9P92PZC7JVEZSB', 'Termal CTP-1', 10.67182293, -85.20778864, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal CTP-1).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KZPW48W123WBDF19W66N9S9G', 5, 504, 50401, '01KZPW48W35ENZ7EHN460P2HAR', 'Termal CTP-2', 10.6689596, -85.20824697, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal CTP-2).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KZPW48W4SV1TEYD30N2AS472', 5, 504, 50401, '01KZPW48W7Z7Y4QNAP7GQD9KWV', 'Termal CTP-3', 10.66895126, -85.20804531, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal CTP-3).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KZPW48W80Z3QBTE5HRJ4ZBE5', 5, 504, 50401, '01KZPW48W9QC9HDRR0Y43KT3WW', 'Termal Guayabal', 10.75191725, -85.18751709, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal Guayabal).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KZPW48WAX5SPDKKN9Y4HEZK3', 5, 504, 50401, '01KZPW48WBS3K9MR0THR2JE1HJ', 'Termal Josue Ulate', 10.73772339, -85.19228275, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal Josue Ulate).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KZPW48WCWFNCEY425CW0QA32', 5, 504, 50401, '01KZPW48WD38D533BX25MMJ59P', 'Termal R. Perdido-1', 10.59536039, -85.20076053, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal R. Perdido-1).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KZPW48WEEVZ518Q9S26RZTR4', 5, 504, 50401, '01KZPW48WFQ6YF44EQPTNPF0GZ', 'Termal R. Perdido-2', 10.59519134, -85.2007085, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal R. Perdido-2).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KZPW48WGDKWK9MBEJJB7Y1CZ', 5, 504, 50401, '01KZPW48WH24E48FXJFCHZ5147', 'Termal R. Perdido-3', 10.59498786, -85.20063151, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal R. Perdido-3).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KZPW48WJT58KDJH5V51MJVPZ', 5, 504, 50401, '01KZPW48WK0ZBWR4PCM5GV9TF9', 'Termal R. Perdido-4', 10.59467643, -85.20068915, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal R. Perdido-4).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KZPW48WK0ZBWR4PCM5GV9TFA', 5, 504, 50401, '01KZPW48WM0Q5PS1WP94RGJ53P', 'Termal Guayacan', 10.71769071, -85.19420058, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal Guayacan).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4');
 
 -- --------------------------------------------------------
 
@@ -897,6 +904,19 @@ CREATE TABLE `refresh_tokens` (
   `replaced_by` char(26) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `refresh_tokens`
+--
+
+INSERT INTO `refresh_tokens` (`refresh_token_id`, `user_id`, `token_hash`, `family_id`, `expires_at`, `used_at`, `is_rotated`, `revoked_at`, `replaced_by`, `created_at`) VALUES
+('01KZSZV7HWW1FP4Q5PQ6VMGRJM', '06F43H2S28KNWX71TSF7MWWTA4', 'bdd4ae09462fea4de651aafaef779715fefb000bc319d51edb73cf78b2293d4f', '01KZSZV7HWW1FP4Q5PQ6VMGRJK', '2026-09-11 09:21:52', NULL, 0, '2026-08-12 03:35:53', NULL, '2026-08-12 09:21:52'),
+('01KZT0MWGDF486K59K0EN4749G', '06F43H2S28KNWX71TSF7MWWTA4', 'baf9c8bd970bf4feda379e85a147a308830f33a953a8e3a996334bad47cdc6c6', '01KZT0MWGDF486K59K0EN4749F', '2026-09-11 09:35:53', NULL, 0, '2026-08-14 20:57:04', NULL, '2026-08-12 09:35:53'),
+('01M0110SN27VH5BN6WHSF4SQW2', '06F43H2S28KNWX71TSF7MWWTA4', '6cef148aac9078c22e21f22177b0f40c81522914c632c5a66b646ae7463acf83', '01M0110SN27VH5BN6WHSF4SQW1', '2026-09-14 02:57:04', NULL, 0, '2026-08-15 04:14:43', NULL, '2026-08-15 02:57:04'),
+('01M01T25CCHF9AF48WFH6CN95D', '06F43H2S28KNWX71TSF7MWWTA4', 'c3192f4e403134e8fb9ac512afaac3355f6efccba0f5dce04e14deff82b84029', '01M01T25CCHF9AF48WFH6CN95C', '2026-09-14 10:14:43', NULL, 0, '2026-08-15 04:28:17', NULL, '2026-08-15 10:14:43'),
+('01M01TV0ACA8YER0ZJMB9QVWY8', '06F43H2S28KNWX71TSF7MWWTA4', '0315e2e75e09e2553673d9d98faefcb4f7e90e1c84cb9de44f189e0702317952', '01M01TV0ABDKFECK63Y1FFFDGA', '2026-09-14 10:28:17', NULL, 0, '2026-08-15 18:44:26', NULL, '2026-08-15 10:28:17'),
+('01M03BTN40BNK1G9VY85Y06J5E', '06F43H2S28KNWX71TSF7MWWTA4', '1428ba472a46064f3cc463a3120dad39597800432cd48da55c6238eaf19115f9', '01M03BTN40BNK1G9VY85Y06J5D', '2026-09-15 00:44:26', NULL, 0, '2026-08-15 20:21:32', NULL, '2026-08-16 00:44:26'),
+('01M03HCEY8EZ3QXQQCDF3JGADD', '06F43H2S28KNWX71TSF7MWWTA4', '597faa6a503b89f1d2fbcdced7b97ecba89f657fe54c6f129122465e3fafad41', '01M03HCEY8EZ3QXQQCDF3JGADC', '2026-09-15 02:21:32', NULL, 0, NULL, NULL, '2026-08-16 02:21:32');
 
 --
 -- Disparadores `refresh_tokens`
