@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -57,6 +58,7 @@ fun AccountContent(
 	onLogoutClick: () -> Unit,
 	onDeleteAccountClick: () -> Unit,
 	onEditClick: () -> Unit,
+	onChangePasswordClick: () -> Unit,
 	onThemeToggle: (Boolean) -> Unit,
 ) {
 	var showLogoutDialog by remember { mutableStateOf(false) }
@@ -98,7 +100,7 @@ fun AccountContent(
 								"admin" -> "Administrador"
 								"field_investigator" -> "Investigador de Campo"
 								"investigator" -> "Investigador"
-								"manteinance" -> "Mantenimiento"
+								"maintenance" -> "Mantenimiento"
 								else -> null
 							}
 
@@ -137,7 +139,17 @@ fun AccountContent(
 						}
 					)
 
-					ActionMenuItem(Icons.Default.Edit, "Editar información personal", onClick = onEditClick)
+					ActionMenuItem(
+						Icons.Default.Edit,
+						"Editar información personal",
+						onClick = onEditClick
+					)
+
+					ActionMenuItem(
+						Icons.Default.Password,
+						"Cambiar contraseña",
+						onClick = onChangePasswordClick
+					)
 				}
 
 				HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outline)

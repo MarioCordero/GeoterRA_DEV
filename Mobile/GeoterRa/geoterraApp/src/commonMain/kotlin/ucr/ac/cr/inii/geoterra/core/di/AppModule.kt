@@ -23,6 +23,7 @@ import ucr.ac.cr.inii.geoterra.domain.repository.InvestigationRequestsRepository
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.form.InvestigationRequestFormViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.edit.EditAccountViewModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.account.password.change.PasswordChangeViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.password.recovery.PasswordRecoveryViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.sign.`in`.SignInViewModel
@@ -44,6 +45,7 @@ val appModule = module {
 	factory { GeomanifestationViewModel(get()) }
 	factory { SignInViewModel(get()) }
 	factory { SignUpViewModel(get()) }
+	factory { PasswordChangeViewModel(get()) }
 	factory { PasswordRecoveryViewModel(get()) }
 
 	factory { params ->

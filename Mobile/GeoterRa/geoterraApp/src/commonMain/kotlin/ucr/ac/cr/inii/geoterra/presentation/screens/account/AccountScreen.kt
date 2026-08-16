@@ -23,6 +23,7 @@ import kotlinx.coroutines.delay
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.edit.EditAccountScreen
+import ucr.ac.cr.inii.geoterra.presentation.screens.account.password.change.PasswordChangeScreen
 import ucr.ac.cr.inii.geoterra.presentation.screens.sign.`in`.SignInScreen
 
 /**
@@ -85,6 +86,9 @@ class AccountScreen : Screen {
 				},
 				onEditClick = {
 					navigator.push(EditAccountScreen(userProfile = state.user!!))
+				},
+				onChangePasswordClick = {
+					navigator.push(PasswordChangeScreen())
 				},
 				onThemeToggle = { isDark ->
 					viewModel.toggleTheme(isDark)

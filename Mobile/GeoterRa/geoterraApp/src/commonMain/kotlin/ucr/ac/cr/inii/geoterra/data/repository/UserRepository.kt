@@ -11,10 +11,12 @@ import ucr.ac.cr.inii.geoterra.core.network.ApiError
 import ucr.ac.cr.inii.geoterra.core.network.ApiException
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
+import ucr.ac.cr.inii.geoterra.data.model.requests.UpdatePasswordRequest
 import ucr.ac.cr.inii.geoterra.data.model.responses.UpdateUserResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.UserResponse
 import ucr.ac.cr.inii.geoterra.data.model.requests.UserUpdateRequest
 import ucr.ac.cr.inii.geoterra.data.model.responses.MetaResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.UpdatePasswordResponse
 import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
 
 class UserRepository(private val client: HttpClient) : UserRepositoryInterface {
@@ -58,6 +60,33 @@ class UserRepository(private val client: HttpClient) : UserRepositoryInterface {
 			)
 		)
 	}
+
+	override suspend fun updatePassword(
+		request: UpdatePasswordRequest
+		): Result<String> = try {
+		val response = client.put("users/me/password") {
+			setBody(request)
+		}
+		val envelope = response.body<ApiResponseModel<UpdatePasswordResponse, MetaResponse>>()
+		val message = envelope.data?.message
+
+		if (!message.isNullOrEmpty()) {
+			Result.success(message)
+		} else {
+			handleErrorResponse(response)
+		}
+	}
+	catch (e: Exception) {
+		Result.failure(
+			ApiException(
+				ApiError(
+					code = ApiError.INTERNAL_ERROR,
+					message = e.message ?: "Error de red: verifica tu conexión a internet."
+				)
+			)
+		)
+	}
+
 
 	override suspend fun deleteMe(): Result<String> = try {
 		val response = client.delete("users/me")
