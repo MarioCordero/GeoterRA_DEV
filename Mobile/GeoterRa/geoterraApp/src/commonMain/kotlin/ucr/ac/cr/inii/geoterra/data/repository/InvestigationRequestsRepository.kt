@@ -11,6 +11,7 @@ import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
 import ucr.ac.cr.inii.geoterra.data.model.requests.InvestigationRequestRequest
 import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.MetaResponse
 import ucr.ac.cr.inii.geoterra.domain.repository.InvestigationRequestsRepositoryInterface
 
 class InvestigationRequestsRepository(
@@ -22,7 +23,7 @@ class InvestigationRequestsRepository(
 			val response = client.get("analysis-requests")
 
 			if (response.status.isSuccess()) {
-				val envelope = response.body<ApiResponseModel<List<InvestigationRequestResponse>, JsonElement>>()
+				val envelope = response.body<ApiResponseModel<List<InvestigationRequestResponse>, MetaResponse>>()
 
 				if (envelope.errors.isNotEmpty()) {
 					return Result.failure(ApiException(envelope.errors.first()))
@@ -50,7 +51,7 @@ class InvestigationRequestsRepository(
 			val response = client.get("analysis-requests/$id/states")
 			if (response.status.isSuccess()) {
 				val envelope =
-					response.body<ApiResponseModel<List<InvestigationRequestResponse.StateResponse>, JsonElement>>()
+					response.body<ApiResponseModel<List<InvestigationRequestResponse.StateResponse>, MetaResponse>>()
 				if (envelope.errors.isNotEmpty()) {
 					return Result.failure(ApiException(envelope.errors.first()))
 				}
@@ -77,7 +78,7 @@ class InvestigationRequestsRepository(
 				setBody(form)
 			}
 			if (response.status.isSuccess()){
-				val envelope = response.body<ApiResponseModel<JsonElement, JsonElement>>()
+				val envelope = response.body<ApiResponseModel<JsonElement, MetaResponse>>()
 
 				if (envelope.errors.isNotEmpty()) {
 					return Result.failure(ApiException(envelope.errors.first()))
@@ -106,7 +107,7 @@ class InvestigationRequestsRepository(
 				setBody(form)
 			}
 			if (response.status.isSuccess()) {
-				val envelope = response.body<ApiResponseModel<JsonElement, JsonElement>>()
+				val envelope = response.body<ApiResponseModel<JsonElement, MetaResponse>>()
 
 				if (envelope.errors.isNotEmpty()) {
 					return Result.failure(ApiException(envelope.errors.first()))
@@ -135,7 +136,7 @@ class InvestigationRequestsRepository(
 					return Result.success(Unit)
 				}
 
-				val envelope = response.body<ApiResponseModel<JsonElement, JsonElement>>()
+				val envelope = response.body<ApiResponseModel<JsonElement, MetaResponse>>()
 
 				if (envelope.errors.isNotEmpty()) {
 					return Result.failure(ApiException(envelope.errors.first()))

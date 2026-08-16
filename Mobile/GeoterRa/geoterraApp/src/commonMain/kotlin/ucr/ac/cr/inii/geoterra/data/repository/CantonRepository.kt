@@ -10,6 +10,7 @@ import ucr.ac.cr.inii.geoterra.core.network.ApiException
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.CantonResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.MetaResponse
 import ucr.ac.cr.inii.geoterra.domain.repository.CantonRepositoryInterface
 
 class CantonRepository(private val client: HttpClient) : CantonRepositoryInterface {
@@ -19,7 +20,7 @@ class CantonRepository(private val client: HttpClient) : CantonRepositoryInterfa
       val response = client.get("cantons")
 
       if (response.status.isSuccess()) {
-        val envelope = response.body<ApiResponseModel<List<CantonResponse>, JsonElement>>()
+        val envelope = response.body<ApiResponseModel<List<CantonResponse>, MetaResponse>>()
         Result.success(envelope.data ?: emptyList())
       } else {
         handleErrorResponse(response)

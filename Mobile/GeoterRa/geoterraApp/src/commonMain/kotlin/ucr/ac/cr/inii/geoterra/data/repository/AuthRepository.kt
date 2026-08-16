@@ -20,6 +20,7 @@ import ucr.ac.cr.inii.geoterra.data.model.responses.LoginResponse
 import ucr.ac.cr.inii.geoterra.data.model.requests.RefreshAccessTokenRequest
 import ucr.ac.cr.inii.geoterra.data.model.responses.RefreshAccessTokenResponse
 import ucr.ac.cr.inii.geoterra.data.model.requests.RegisterRequest
+import ucr.ac.cr.inii.geoterra.data.model.responses.MetaResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.RegisterResponse
 import ucr.ac.cr.inii.geoterra.domain.repository.AuthRepositoryInterface
 
@@ -50,7 +51,7 @@ class AuthRepository(
 			}
 
 			if (response.status.isSuccess()) {
-				val envelope = response.body<ApiResponseModel<RegisterResponse, JsonElement>>()
+				val envelope = response.body<ApiResponseModel<RegisterResponse, MetaResponse>>()
 				if (envelope.data != null) {
 					return Result.success(Unit)
 				}
@@ -84,7 +85,7 @@ class AuthRepository(
 			}
 
 			if (response.status.isSuccess()) {
-				val envelope = response.body<ApiResponseModel<LoginResponse, JsonElement>>()
+				val envelope = response.body<ApiResponseModel<LoginResponse, MetaResponse>>()
 				if (envelope.data != null) {
 					tokenManager.saveTokens(envelope.data.access_token, envelope.data.refresh_token)
 					invalidateAuthTokens()
@@ -137,7 +138,7 @@ class AuthRepository(
 			val envelope = client.post("auth/refresh") {
 				contentType(Application.Json)
 				setBody(RefreshAccessTokenRequest(refreshToken))
-			}.body<ApiResponseModel<RefreshAccessTokenResponse, JsonElement>>()
+			}.body<ApiResponseModel<RefreshAccessTokenResponse, MetaResponse>>()
 
 			val data = envelope.data
 				?: return Result.failure(
@@ -178,7 +179,7 @@ class AuthRepository(
 			}
 
 			if (response.status.isSuccess()) {
-				val envelope = response.body<ApiResponseModel<JsonElement, JsonElement>>()
+				val envelope = response.body<ApiResponseModel<JsonElement, MetaResponse>>()
 				if (envelope.errors.isEmpty()) {
 					return Result.success(Unit)
 				} else {
@@ -215,7 +216,7 @@ class AuthRepository(
 			}
 
 			if (response.status.isSuccess()) {
-				val envelope = response.body<ApiResponseModel<JsonElement, JsonElement>>()
+				val envelope = response.body<ApiResponseModel<JsonElement, MetaResponse>>()
 				if (envelope.errors.isEmpty()) {
 					return Result.success(Unit)
 				} else {

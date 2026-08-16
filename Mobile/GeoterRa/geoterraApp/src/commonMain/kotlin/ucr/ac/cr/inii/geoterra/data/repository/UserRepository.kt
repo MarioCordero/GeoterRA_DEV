@@ -14,12 +14,13 @@ import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.UpdateUserResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.UserResponse
 import ucr.ac.cr.inii.geoterra.data.model.requests.UserUpdateRequest
+import ucr.ac.cr.inii.geoterra.data.model.responses.MetaResponse
 import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
 
 class UserRepository(private val client: HttpClient) : UserRepositoryInterface {
 	override suspend fun getMe(): Result<UserResponse> = try {
 		val response = client.get("users/me")
-		val envelope = response.body<ApiResponseModel<UserResponse, JsonElement>>()
+		val envelope = response.body<ApiResponseModel<UserResponse, MetaResponse>>()
 		if (envelope.data != null) Result.success(envelope.data)
 		else handleErrorResponse(response)
 	} catch (e: Exception) {
@@ -39,7 +40,7 @@ class UserRepository(private val client: HttpClient) : UserRepositoryInterface {
 		val response = client.put("users/me") {
 			setBody(request)
 		}
-		val envelope = response.body<ApiResponseModel<UpdateUserResponse, JsonElement>>()
+		val envelope = response.body<ApiResponseModel<UpdateUserResponse, MetaResponse>>()
 		val message = envelope.data?.message
 
 		if (!message.isNullOrEmpty()) {
@@ -60,7 +61,7 @@ class UserRepository(private val client: HttpClient) : UserRepositoryInterface {
 
 	override suspend fun deleteMe(): Result<String> = try {
 		val response = client.delete("users/me")
-		val envelope = response.body<ApiResponseModel<UpdateUserResponse, JsonElement>>()
+		val envelope = response.body<ApiResponseModel<UpdateUserResponse, MetaResponse>>()
 		val message = envelope.data?.message
 
 		if (!message.isNullOrEmpty()) {

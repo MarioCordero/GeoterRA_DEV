@@ -15,6 +15,7 @@ import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationFilters
 import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.MetaResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.PaginatedManifestationsRemote
 import ucr.ac.cr.inii.geoterra.data.model.responses.PaginationResponse
 import ucr.ac.cr.inii.geoterra.domain.repository.GeomanifestationsRepositoryInterface
@@ -45,17 +46,10 @@ class GeomanifestationsRepository(private val client: HttpClient) :
 			}
 
 			if (response.status.isSuccess()) {
-				val envelope = response.body<ApiResponseModel<List<GeomanifestationResponse>, JsonElement>>()
+				val envelope = response.body<ApiResponseModel<List<GeomanifestationResponse>, MetaResponse>>()
 
 				val dataList = envelope.data ?: throw Exception("Empty data received.")
-
-				val metaMap = envelope.meta
-
-				val paginationJsonElement = metaMap["pagination"] ?: JsonObject(metaMap)
-
-				val pagination = json.decodeFromJsonElement<PaginationResponse>(
-					paginationJsonElement
-				)
+				val pagination = envelope.meta?.pagination ?: throw Exception("Pagination data missing.")
 
 				val paginatedManifestationsRemote = PaginatedManifestationsRemote(
 					data = dataList,
@@ -85,7 +79,7 @@ class GeomanifestationsRepository(private val client: HttpClient) :
 			val response = client.get("geomanifestations/$id")
 
 			if (response.status.isSuccess()) {
-				val envelope = response.body<ApiResponseModel<GeomanifestationResponse>>()
+				val envelope = response.body<ApiResponseModel<GeomanifestationResponse, MetaResponse>>()
 				Result.success(envelope.data ?: throw Exception("Empty response body received."))
 			} else {
 				handleErrorResponse(response)

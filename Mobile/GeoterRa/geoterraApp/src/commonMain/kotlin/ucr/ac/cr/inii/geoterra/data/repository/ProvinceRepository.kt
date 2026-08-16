@@ -9,6 +9,7 @@ import ucr.ac.cr.inii.geoterra.core.network.ApiError
 import ucr.ac.cr.inii.geoterra.core.network.ApiException
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.MetaResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.ProvinceResponse
 import ucr.ac.cr.inii.geoterra.domain.repository.ProvinceRepositoryInterface
 
@@ -19,7 +20,7 @@ class ProvinceRepository(private val client: HttpClient) : ProvinceRepositoryInt
 			val response = client.get("provinces")
 
 			if (response.status.isSuccess()) {
-				val envelope = response.body<ApiResponseModel<List<ProvinceResponse>, JsonElement>>()
+				val envelope = response.body<ApiResponseModel<List<ProvinceResponse>, MetaResponse>>()
 				Result.success(envelope.data ?: emptyList())
 			} else {
 				handleErrorResponse(response)

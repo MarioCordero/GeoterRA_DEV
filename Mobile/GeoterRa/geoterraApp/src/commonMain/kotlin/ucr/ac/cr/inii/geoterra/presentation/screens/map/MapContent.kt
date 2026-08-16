@@ -7,6 +7,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -123,39 +124,40 @@ fun MapContent(
           )
         }
       }
-      
-      val manifestationSource = rememberGeoJsonSource(
-        data = remember(state.markers) {
-          val jsonString = state.markers.toGeoJsonString()
-          GeoJsonData.JsonString(jsonString)
-        }
-      )
-      
-      SymbolLayer(
-        id = "manifestations-layer",
-        source = manifestationSource,
-        iconImage = image(markerIcon),
-        iconSize = interpolate(
-          linear(),
-          zoom(),
-          5f to const(2.5f),
-          10f to const(4f),
-          18f to const(2f)
-        ),
-        iconAllowOverlap = const(true),
-        iconIgnorePlacement = const(true),
-        iconAnchor = const(SymbolAnchor.Bottom),
-        onClick = { features ->
-          val rawId = features.firstOrNull()?.properties?.get("id")?.toString()
-          val cleanId = rawId?.replace("\"", "")
-          
-          println("DEBUG: Click detectado en ID: $cleanId")
-          if (cleanId != null) {
-            onManifestationMarkerClick(cleanId)
-          }
-          ClickResult.Consume
-        }
-      )
+
+			key(state.markers) {
+				val manifestationSource = rememberGeoJsonSource(
+					data = remember(state.markers) {
+						val jsonString = state.markers.toGeoJsonString()
+						GeoJsonData.JsonString(jsonString)
+					}
+				)
+
+				SymbolLayer(
+					id = "manifestations-layer",
+					source = manifestationSource,
+					iconImage = image(markerIcon),
+					iconSize = interpolate(
+						linear(),
+						zoom(),
+						5f to const(2.5f),
+						10f to const(4f),
+						18f to const(2f)
+					),
+					iconAllowOverlap = const(true),
+					iconIgnorePlacement = const(true),
+					iconAnchor = const(SymbolAnchor.Bottom),
+					onClick = { features ->
+						val rawId = features.firstOrNull()?.properties?.get("id")?.toString()
+						val cleanId = rawId?.replace("\"", "")
+
+						if (cleanId != null) {
+							onManifestationMarkerClick(cleanId)
+						}
+						ClickResult.Consume
+					}
+				)
+			}
       
       val userMarkerIcon = painterResource(Res.drawable.ic_userMarker)
       
