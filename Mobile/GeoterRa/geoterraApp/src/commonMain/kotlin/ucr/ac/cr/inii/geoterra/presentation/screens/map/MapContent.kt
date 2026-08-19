@@ -47,83 +47,85 @@ fun MapContent(
 	onDetailsClick: (GeomanifestationResponse) -> Unit,
 	onDismissPanel: () -> Unit
 ) {
-  Box(modifier = modifier.fillMaxSize()) {
-    
-    val markerIcon = painterResource(Res.drawable.ic_marker)
-    
-    val cameraState = rememberCameraState(
-      firstPosition = (
-        CameraPosition(
-          target = Position (latitude = 9.934739, longitude = -84.087502),
-          zoom = 7.5)
-        )
-    )
-    
-    LaunchedEffect(state.selectedManifestation) {
-      state.selectedManifestation?.let { manifestation ->
-        val targetZoom = cameraState.position.zoom.coerceAtLeast(14.0)
-        cameraState.animateTo(
-          CameraPosition(
-            target = Position(
-              latitude = manifestation.location.latitude,
-              longitude = manifestation.location.longitude
-            ),
-            zoom = targetZoom
-          )
-        )
-      }
-    }
+	Box(modifier = modifier.fillMaxSize()) {
 
-    LaunchedEffect(
-      state.isUserLocationSelected,
-      state.userLocationTrigger,
-      state.userLocation)
-    {
-      if (state.isUserLocationSelected) {
-        state.userLocation?.let { userLoc ->
-          val targetZoom = cameraState.position.zoom.coerceAtLeast(14.0)
-          cameraState.animateTo(
-            CameraPosition(
-              target = Position(
-                latitude = userLoc.latitude,
-                longitude = userLoc.longitude
-              ),
-              zoom = targetZoom
-            )
-          )
-        }
-      }
-    }
-    
-    MaplibreMap(
-      modifier = Modifier.fillMaxSize(),
-      baseStyle = BaseStyle.Uri(state.baseStyleUrl),
-      cameraState = cameraState,
-      onMapClick = { pos, offset ->
-        onDismissPanel()
-        ClickResult.Pass
-      },
-      onMapLongClick = { pos, offset ->
-        println("Long click at $pos")
-        ClickResult.Pass
-      }
-    
-    ) {
+		val markerIcon = painterResource(Res.drawable.ic_marker)
 
-      state.availableStyleLayers.filter { it.id in state.selectedLayerIds }.forEach { layer ->
-        layer.snitRasterUrl?.let { rasterUrl ->
+		val cameraState = rememberCameraState(
+			firstPosition = (
+					CameraPosition(
+						target = Position(latitude = 9.934739, longitude = -84.087502),
+						zoom = 7.5
+					)
+					)
+		)
 
-          val snitRasterSource = rememberRasterSource(
-            tiles = listOf(rasterUrl),
-            tileSize = 256
-          )
+		LaunchedEffect(state.selectedManifestation) {
+			state.selectedManifestation?.let { manifestation ->
+				val targetZoom = cameraState.position.zoom.coerceAtLeast(14.0)
+				cameraState.animateTo(
+					CameraPosition(
+						target = Position(
+							latitude = manifestation.location.latitude,
+							longitude = manifestation.location.longitude
+						),
+						zoom = targetZoom
+					)
+				)
+			}
+		}
 
-          RasterLayer(
-            id = "snit-raster-layer-${layer.id}",
-            source = snitRasterSource
-          )
-        }
-      }
+		LaunchedEffect(
+			state.isUserLocationSelected,
+			state.userLocationTrigger,
+			state.userLocation
+		)
+		{
+			if (state.isUserLocationSelected) {
+				state.userLocation?.let { userLoc ->
+					val targetZoom = cameraState.position.zoom.coerceAtLeast(14.0)
+					cameraState.animateTo(
+						CameraPosition(
+							target = Position(
+								latitude = userLoc.latitude,
+								longitude = userLoc.longitude
+							),
+							zoom = targetZoom
+						)
+					)
+				}
+			}
+		}
+
+		MaplibreMap(
+			modifier = Modifier.fillMaxSize(),
+			baseStyle = BaseStyle.Uri(state.baseStyleUrl),
+			cameraState = cameraState,
+			onMapClick = { pos, offset ->
+				onDismissPanel()
+				ClickResult.Pass
+			},
+			onMapLongClick = { pos, offset ->
+				println("Long click at $pos")
+				ClickResult.Pass
+			}
+
+		) {
+
+			state.availableStyleLayers.filter { it.id in state.selectedLayerIds }.forEach { layer ->
+				layer.snitRasterUrl?.let { rasterUrl ->
+
+					val snitRasterSource = rememberRasterSource(
+						tiles = listOf(rasterUrl),
+						tileSize = 256
+					)
+
+					RasterLayer(
+						id = "snit-raster-layer-${layer.id}",
+						source = snitRasterSource
+					)
+				}
+			}
 
 			key(state.markers) {
 				val manifestationSource = rememberGeoJsonSource(
@@ -158,12 +160,12 @@ fun MapContent(
 					}
 				)
 			}
-      
-      val userMarkerIcon = painterResource(Res.drawable.ic_userMarker)
-      
-      state.userLocation?.let { userLoc ->
-        val userGeoJson = remember(userLoc.latitude, userLoc.longitude) {
-          """
+
+			val userMarkerIcon = painterResource(Res.drawable.ic_userMarker)
+
+			state.userLocation?.let { userLoc ->
+				val userGeoJson = remember(userLoc.latitude, userLoc.longitude) {
+					"""
           {
             "type": "FeatureCollection",
             "features": [
@@ -178,51 +180,51 @@ fun MapContent(
             ]
           }
           """.trimIndent()
-        }
+				}
 
-        val userSource = rememberGeoJsonSource(
-          data = GeoJsonData.JsonString(userGeoJson)
-        )
-        
-        SymbolLayer(
-          id = "user-location-layer",
-          source = userSource,
-          iconImage = image(userMarkerIcon),
-          iconSize = interpolate(
-            linear(),
-            zoom(),
-            5f to const(2.5f),
-            10f to const(4f),
-            18f to const(2f)
-          ),
-          iconAllowOverlap = const(false),
-          iconIgnorePlacement = const(true),
-          onClick = {
-            onUserMarkerClick()
-            ClickResult.Consume
-          }
-        )
-      }
-    }
+				val userSource = rememberGeoJsonSource(
+					data = GeoJsonData.JsonString(userGeoJson)
+				)
 
-    state.selectedManifestation?.let { manifestation ->
-      ManifestationInfoPanel(
-        modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding(),
-        manifestation = manifestation,
-        onViewFullDetails = { onDetailsClick(manifestation) }
-      )
-    }
+				SymbolLayer(
+					id = "user-location-layer",
+					source = userSource,
+					iconImage = image(userMarkerIcon),
+					iconSize = interpolate(
+						linear(),
+						zoom(),
+						5f to const(2.5f),
+						10f to const(4f),
+						18f to const(2f)
+					),
+					iconAllowOverlap = const(false),
+					iconIgnorePlacement = const(true),
+					onClick = {
+						onUserMarkerClick()
+						ClickResult.Consume
+					}
+				)
+			}
+		}
 
-    if (state.isUserLocationSelected && state.userLocation != null) {
-      UserLocationInfoPanel(
-        modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding(),
-        latitude = state.userLocation.latitude,
-        longitude = state.userLocation.longitude
-      )
-    }
+		state.selectedManifestation?.let { manifestation ->
+			ManifestationInfoPanel(
+				modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding(),
+				manifestation = manifestation,
+				onViewFullDetails = { onDetailsClick(manifestation) }
+			)
+		}
 
-    if (state.isLoading) {
-      CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-    }
-  }
+		if (state.isUserLocationSelected && state.userLocation != null) {
+			UserLocationInfoPanel(
+				modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding(),
+				latitude = state.userLocation.latitude,
+				longitude = state.userLocation.longitude
+			)
+		}
+
+		if (state.isLoading) {
+			CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+		}
+	}
 }

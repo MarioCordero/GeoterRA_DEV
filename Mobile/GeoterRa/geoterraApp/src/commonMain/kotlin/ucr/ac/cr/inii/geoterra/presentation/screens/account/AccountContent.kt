@@ -176,7 +176,7 @@ fun AccountContent(
 		if (showLogoutDialog) {
 			ConfirmDialog(
 				title = "¿Cerrar sesión?",
-				message = "Tu sesión actual finalizará. Deberás ingresar tus credenciales la próxima vez.",
+				message = "Su sesión actual finalizará. Deberá de ingresar sus credenciales la próxima vez.",
 				confirmText = "Salir",
 				onConfirm = {
 					onLogoutClick()

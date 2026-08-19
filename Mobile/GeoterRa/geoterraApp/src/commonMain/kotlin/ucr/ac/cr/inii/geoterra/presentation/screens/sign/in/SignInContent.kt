@@ -120,7 +120,7 @@ fun SignInContent(
 						)
 
 						Text(
-							text = "Ingresa tus credenciales para continuar",
+							text = "Ingrese sus credenciales para continuar",
 							style = MaterialTheme.typography.bodySmall,
 							color = MaterialTheme.colorScheme.onSurface,
 						)
@@ -186,9 +186,9 @@ fun SignInContent(
 
 							Text(
 								text = buildAnnotatedString {
-									append("¿No tiene cuenta? ")
+									append("¿No tiene una cuenta? ")
 									withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-										append("Regístrate aquí")
+										append("Regístrese aquí")
 									}
 								},
 								color = MaterialTheme.colorScheme.onSurface,

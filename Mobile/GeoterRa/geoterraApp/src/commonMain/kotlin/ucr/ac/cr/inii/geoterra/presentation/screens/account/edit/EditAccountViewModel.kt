@@ -123,7 +123,7 @@ class EditAccountViewModel(
 							isLoading = false,
 							isSuccess = true,
 							snackBarMessage = SnackbarMessage(
-								"Perfil actualizado exitosamente.",
+								"Cuenta actualizada exitosamente.",
 								SnackbarType.SUCCESS
 							)
 						)
@@ -135,7 +135,7 @@ class EditAccountViewModel(
 							isLoading = false,
 							isSuccess = false,
 							snackBarMessage = SnackbarMessage(
-								error.message ?: "Ha ocurrido un error al actualizar el perfil.",
+								error.message ?: "Ha ocurrido un error al actualizar su cuenta.",
 								SnackbarType.ERROR
 							)
 						)

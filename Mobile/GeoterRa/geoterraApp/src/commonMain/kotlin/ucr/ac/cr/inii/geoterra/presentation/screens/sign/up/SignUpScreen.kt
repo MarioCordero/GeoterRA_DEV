@@ -22,6 +22,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import kotlinx.coroutines.delay
 import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
@@ -43,6 +44,13 @@ class SignUpScreen : Screen {
 				isVisible = state.isLoading,
 				message = "Creando cuenta..."
 			)
+		}
+
+		LaunchedEffect(state.isSuccess) {
+			if (state.isSuccess) {
+				delay(1500)
+				navigator.pop()
+			}
 		}
 
 		LaunchedEffect(state.snackBarMessage) {

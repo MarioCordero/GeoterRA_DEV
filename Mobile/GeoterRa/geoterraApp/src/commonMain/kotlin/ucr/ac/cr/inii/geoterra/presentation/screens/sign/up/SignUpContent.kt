@@ -1,6 +1,7 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.sign
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -28,8 +29,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import geoterra.geoterraapp.generated.resources.Res
 import geoterra.geoterraapp.generated.resources.logo_GeoterRA
@@ -41,55 +45,55 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.PasswordField
 
 @Composable
 fun SignUpContent(
-  modifier: Modifier = Modifier,
-  state: SignUpState,
-  onEvent: SignUpViewModel,
-  onBack: () -> Unit
+	modifier: Modifier = Modifier,
+	state: SignUpState,
+	onEvent: SignUpViewModel,
+	onBack: () -> Unit
 ) {
-  Column(
-    modifier = modifier
-      .fillMaxSize()
-      .verticalScroll(rememberScrollState()),
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Center
-  ) {
-    Spacer(modifier = Modifier.height(16.dp))
+	Column(
+		modifier = modifier
+			.fillMaxSize()
+			.verticalScroll(rememberScrollState()),
+		horizontalAlignment = Alignment.CenterHorizontally,
+		verticalArrangement = Arrangement.Center
+	) {
+		Spacer(modifier = Modifier.height(16.dp))
 
-    Image(
-      painter = painterResource(Res.drawable.logo_GeoterRA),
-      contentDescription = null,
-      modifier = Modifier.height(80.dp).padding(bottom = 32.dp)
-    )
+		Image(
+			painter = painterResource(Res.drawable.logo_GeoterRA),
+			contentDescription = null,
+			modifier = Modifier.height(80.dp).padding(bottom = 32.dp)
+		)
 
-    Surface(
-      modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-      shape = RoundedCornerShape(32.dp),
-      color = MaterialTheme.colorScheme.surface,
-    ) {
-      Column(
-        modifier = Modifier.padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-      ) {
-        FormSection(
+		Surface(
+			modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+			shape = RoundedCornerShape(32.dp),
+			color = MaterialTheme.colorScheme.surface,
+		) {
+			Column(
+				modifier = Modifier.padding(24.dp),
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.spacedBy(16.dp)
+			) {
+				FormSection(
 					title = "Nombre Completo",
 					icon = Icons.Default.Person
 				) {
-          CustomTextField(
-            value = state.name,
-            onValueChange = onEvent::onNameChanged,
-            label = "Nombre(s)",
-            isError = state.fieldErrors["name"] != null,
-            errorMessage = state.fieldErrors["name"]
-          )
-          CustomTextField(
-            value = state.lastname,
-            onValueChange = onEvent::onLastnameChanged,
-            label = "Apellidos",
-            isError = state.fieldErrors["lastname"] != null,
-            errorMessage = state.fieldErrors["lastname"]
-          )
-        }
+					CustomTextField(
+						value = state.name,
+						onValueChange = onEvent::onNameChanged,
+						label = "Nombre(s)",
+						isError = state.fieldErrors["name"] != null,
+						errorMessage = state.fieldErrors["name"]
+					)
+					CustomTextField(
+						value = state.lastname,
+						onValueChange = onEvent::onLastnameChanged,
+						label = "Apellidos",
+						isError = state.fieldErrors["lastname"] != null,
+						errorMessage = state.fieldErrors["lastname"]
+					)
+				}
 
 				FormSection(
 					title = "Información de Contacto",
@@ -147,16 +151,27 @@ fun SignUpContent(
 						onClick = onEvent::register,
 					)
 
-					TextButton(onClick = onBack) {
-						Text("¿Ya tienes cuenta? Inicia sesión",
-							fontWeight = FontWeight.Bold,
-							color = MaterialTheme.colorScheme.onSurface)
-					}
+					Text(
+						text = buildAnnotatedString {
+							append("¿Ya tiene una cuenta? ")
+							withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+								append("Inicie sesión")
+							}
+						},
+						color = MaterialTheme.colorScheme.onSurface,
+						style = MaterialTheme.typography.bodySmall,
+						modifier = Modifier
+							.clickable { onBack() }
+							.padding(
+								top = 8.dp,
+								start = 8.dp,
+								end = 8.dp
+							)
+					)
 				}
+			}
+		}
 
-      }
-    }
-
-    Spacer(modifier = Modifier.height(16.dp))
-  }
+		Spacer(modifier = Modifier.height(16.dp))
+	}
 }

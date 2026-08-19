@@ -88,7 +88,7 @@ fun PasswordRecoveryContent(
 				) {
 					Text(
 						text = if (state.step == PasswordRecoveryState.Step.REQUEST_EMAIL) {
-							"Ingresa tu correo para recibir un código de recuperación"
+							"Ingrese su correo para recibir un código de recuperación"
 						} else {
 							"Ingresa el código OTP y tu nueva contraseña"
 						},
@@ -159,9 +159,9 @@ fun PasswordRecoveryContent(
 					) {
 						Text(
 							text = buildAnnotatedString {
-								append("¿Lo recordaste? ")
+								append("¿Recordó su contraseña? ")
 								withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-									append("Inicia sesión")
+									append("Inicie sesión")
 								}
 							},
 							color = MaterialTheme.colorScheme.onSurface,

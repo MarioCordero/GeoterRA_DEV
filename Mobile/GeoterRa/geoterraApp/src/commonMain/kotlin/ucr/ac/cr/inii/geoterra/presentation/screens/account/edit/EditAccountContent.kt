@@ -38,56 +38,56 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.FormSection
 
 @Composable
 fun EditProfileContent(
-  modifier: Modifier = Modifier,
-  state: EditAccountState,
-  onEvent: EditAccountViewModel,
+	modifier: Modifier = Modifier,
+	state: EditAccountState,
+	onEvent: EditAccountViewModel,
 ) {
 
-  Column(
-    modifier = modifier
-      .fillMaxSize()
-      .verticalScroll(rememberScrollState()),
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Center
-  ) {
-    Spacer(modifier = Modifier.height(16.dp))
+	Column(
+		modifier = modifier
+			.fillMaxSize()
+			.verticalScroll(rememberScrollState()),
+		horizontalAlignment = Alignment.CenterHorizontally,
+		verticalArrangement = Arrangement.Center
+	) {
+		Spacer(modifier = Modifier.height(16.dp))
 
-    Image(
-      painter = painterResource(Res.drawable.logo_GeoterRA),
-      contentDescription = null,
-      modifier = Modifier.height(80.dp).padding(bottom = 32.dp)
-    )
+		Image(
+			painter = painterResource(Res.drawable.logo_GeoterRA),
+			contentDescription = null,
+			modifier = Modifier.height(80.dp).padding(bottom = 32.dp)
+		)
 
-    Surface(
-      modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-      shape = RoundedCornerShape(32.dp),
-      color = MaterialTheme.colorScheme.surface,
-    ) {
-      Column(
-        modifier = Modifier.padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-      ) {
+		Surface(
+			modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+			shape = RoundedCornerShape(32.dp),
+			color = MaterialTheme.colorScheme.surface,
+		) {
+			Column(
+				modifier = Modifier.padding(24.dp),
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.spacedBy(16.dp)
+			) {
 
-        FormSection(
+				FormSection(
 					title = "Nombre Completo",
 					icon = Icons.Default.Person
 				) {
-          CustomTextField(
-            value = state.payload.first_name,
-            onValueChange = onEvent::onNameChanged,
-            label = "Nombre(s)",
-            isError = state.fieldErrors["name"] != null,
-            errorMessage = state.fieldErrors["name"]
-          )
-          CustomTextField(
-            value = state.payload.last_name,
-            onValueChange = onEvent::onLastnameChanged,
-            label = "Apellidos",
-            isError = state.fieldErrors["lastname"] != null,
-            errorMessage = state.fieldErrors["lastname"]
-          )
-        }
+					CustomTextField(
+						value = state.payload.first_name,
+						onValueChange = onEvent::onNameChanged,
+						label = "Nombre(s)",
+						isError = state.fieldErrors["name"] != null,
+						errorMessage = state.fieldErrors["name"]
+					)
+					CustomTextField(
+						value = state.payload.last_name,
+						onValueChange = onEvent::onLastnameChanged,
+						label = "Apellidos",
+						isError = state.fieldErrors["lastname"] != null,
+						errorMessage = state.fieldErrors["lastname"]
+					)
+				}
 
 				FormSection(
 					title = "Información de Contacto",
@@ -116,9 +116,9 @@ fun EditProfileContent(
 					text = "Actualizar",
 					onClick = onEvent::updateProfile,
 				)
-      }
-    }
+			}
+		}
 
-    Spacer(modifier = Modifier.height(8.dp))
-  }
+		Spacer(modifier = Modifier.height(8.dp))
+	}
 }
