@@ -442,18 +442,35 @@ final class AuthService
   public function prepareWebResponse(array $result): array
   {
     $accessToken = $result['data']['access_token'];
+    $refreshToken = $result['data']['refresh_token'];
     $expiresIn = $result['meta']['expires_in'] ?? 5400;
+    $refreshTtl = 3600 * 24 * 30; // 30 days
 
     $useSecure = EnvironmentDetector::shouldUseSecureCookie();
     $sameSite = EnvironmentDetector::getSameSiteValue();
     $domain = EnvironmentDetector::getCookieDomain();
 
+    // Access token cookie – sent on every request
     setcookie(
       'geoterra_session_token',
       $accessToken,
       [
         'expires' => time() + $expiresIn,
         'path' => '/',
+        'domain' => $domain,
+        'secure' => $useSecure,
+        'httponly' => true,
+        'samesite' => $sameSite,
+      ]
+    );
+
+    // Refresh token cookie – only sent to /api/auth/ endpoints (refresh & logout)
+    setcookie(
+      'geoterra_refresh_token',
+      $refreshToken,
+      [
+        'expires' => time() + $refreshTtl,
+        'path' => '/api/auth/',
         'domain' => $domain,
         'secure' => $useSecure,
         'httponly' => true,
