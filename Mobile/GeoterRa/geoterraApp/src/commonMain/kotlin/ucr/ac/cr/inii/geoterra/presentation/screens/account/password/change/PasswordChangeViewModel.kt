@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.requests.UpdatePasswordRequest
 import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
+import ucr.ac.cr.inii.geoterra.domain.validation.PasswordValidator
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
@@ -16,8 +17,19 @@ class PasswordChangeViewModel(
 		updateState { it.copy(currentPassword = newValue, fieldErrors = it.fieldErrors - "currentPassword") }
 	}
 
-	fun onNewPasswordChanged(newValue: String) {
-		updateState { it.copy(newPassword = newValue, fieldErrors = it.fieldErrors - "newPassword") }
+	fun onNewPasswordChanged(v: String) = updateState { state ->
+		val errorMessage = PasswordValidator.getMissingRequirementsMessage(v)
+
+		val newFieldErrors = if (errorMessage != null) {
+			state.fieldErrors + ("newPassword" to errorMessage)
+		} else {
+			state.fieldErrors - "newPassword"
+		}
+
+		state.copy(
+			newPassword = v,
+			fieldErrors = newFieldErrors
+		)
 	}
 
 	fun onConfirmPasswordChanged(newValue: String) {
@@ -38,16 +50,13 @@ class PasswordChangeViewModel(
 		val newPassword = state.value.newPassword.trim()
 		val confirmPassword = state.value.confirmPassword.trim()
 
-		val passwordPattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_]).{8,64}$".toRegex()
-
 		if (currentPassword.isBlank()) {
 			errors["currentPassword"] = "La contraseña actual es requerida."
 		}
 
-		if (newPassword.isBlank()) {
-			errors["newPassword"] = "La nueva contraseña es requerida."
-		} else if (!newPassword.matches(passwordPattern)) {
-			errors["newPassword"] = "La contraseña debe tener al menos 8 caracteres, incluir al menos una letra mayúscula, una letra minúscula, un número y un carácter especial."
+		val passwordError = PasswordValidator.getMissingRequirementsMessage(newPassword)
+		if (passwordError != null) {
+			errors["newPassword"] = passwordError
 		} else if (newPassword != confirmPassword) {
 			errors["newPassword"] = "Las contraseñas no coinciden."
 		} else if (currentPassword == newPassword) {

@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.requests.RegisterRequest
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
+import ucr.ac.cr.inii.geoterra.domain.validation.PasswordValidator
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
@@ -16,8 +17,23 @@ class SignUpViewModel(
   fun onLastnameChanged(v: String) = updateState { it.copy(lastname = v, fieldErrors = it.fieldErrors - "lastname") }
   fun onEmailChanged(v: String) = updateState { it.copy(email = v, fieldErrors = it.fieldErrors - "email") }
   fun onPhoneChanged(v: String) = updateState { it.copy(phoneNumber = v, fieldErrors = it.fieldErrors - "phone") }
-  fun onPasswordChanged(v: String) = updateState { it.copy(password = v, fieldErrors = it.fieldErrors - "password") }
-  fun onConfirmPasswordChanged(v: String) = updateState { it.copy(confirmPassword = v) }
+
+	fun onPasswordChanged(v: String) = updateState { state ->
+		val errorMessage = PasswordValidator.getMissingRequirementsMessage(v)
+
+		val newFieldErrors = if (errorMessage != null) {
+			state.fieldErrors + ("password" to errorMessage)
+		} else {
+			state.fieldErrors - "password"
+		}
+
+		state.copy(
+			password = v,
+			fieldErrors = newFieldErrors
+		)
+	}
+
+	fun onConfirmPasswordChanged(v: String) = updateState { it.copy(confirmPassword = v) }
   fun togglePasswordVisibility() = updateState { it.copy(isPasswordVisible = !it.isPasswordVisible) }
   fun onSnackbarDismissed() = updateState { it.copy(snackBarMessage = null, isSuccess = false) }
 	
@@ -90,12 +106,12 @@ class SignUpViewModel(
       if (!s.phoneNumber.trim().matches(phoneRegex)) errors["phone"] = "Debe ser un número de teléfono válido."
     }
 
-    if (s.password.length < 8) {
-      errors["password"] = "La contraseña debe tener al menos 8 caracteres, incluir al menos" +
-						" una letra mayúscula, una letra minúscula, un número y un carácter especial."
-    } else if (s.password != s.confirmPassword) {
-      errors["password"] = "Las contraseñas no coinciden."
-    }
+		val passwordError = PasswordValidator.getMissingRequirementsMessage(s.password)
+		if (passwordError != null) {
+			errors["password"] = passwordError
+		} else if (s.password != s.confirmPassword) {
+			errors["password"] = "Las contraseñas no coinciden."
+		}
 
     updateState { it.copy(fieldErrors = errors) }
     return errors.isEmpty()

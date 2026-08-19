@@ -152,7 +152,7 @@ fun SignInContent(
 					Column(
 						modifier = Modifier.fillMaxWidth(),
 						horizontalAlignment = Alignment.CenterHorizontally,
-						verticalArrangement = Arrangement.spacedBy(8.dp)
+						verticalArrangement = Arrangement.spacedBy(12.dp)
 					) {
 						ActionButton(
 							isLoading = state.isLoading,
@@ -163,7 +163,7 @@ fun SignInContent(
 						Column(
 							modifier = Modifier.fillMaxWidth(),
 							horizontalAlignment = Alignment.CenterHorizontally,
-							verticalArrangement = Arrangement.spacedBy(4.dp)
+							verticalArrangement = Arrangement.spacedBy(8.dp)
 						) {
 							Text(
 								text = buildAnnotatedString {
@@ -176,11 +176,10 @@ fun SignInContent(
 								style = MaterialTheme.typography.bodySmall,
 								modifier = Modifier
 									.clickable { onPasswordRecoveryClick() }
-									.padding(vertical = 4.dp, horizontal = 8.dp)
+									.padding(horizontal = 8.dp)
 							)
 
 							HorizontalDivider(
-								modifier = Modifier.padding(vertical = 12.dp),
 								thickness = 0.5.dp,
 								color = MaterialTheme.colorScheme.outlineVariant
 							)
@@ -196,7 +195,11 @@ fun SignInContent(
 								style = MaterialTheme.typography.bodySmall,
 								modifier = Modifier
 									.clickable { onRegisterClick() }
-									.padding(vertical = 4.dp, horizontal = 8.dp)
+									.padding(
+										top = 8.dp,
+										start = 8.dp,
+										end = 8.dp
+									)
 							)
 						}
 					}

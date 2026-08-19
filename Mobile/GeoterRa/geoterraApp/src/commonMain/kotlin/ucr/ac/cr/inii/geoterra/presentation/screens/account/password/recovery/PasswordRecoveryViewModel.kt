@@ -3,6 +3,7 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.account.password.recovery
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
+import ucr.ac.cr.inii.geoterra.domain.validation.PasswordValidator
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
@@ -38,11 +39,23 @@ class PasswordRecoveryViewModel(
 	/**
 	 * Updates the new password state and clears its associated error.
 	 *
-	 * @param newValue The new password string.
+	 * @param v The new password string.
 	 */
-	fun onPasswordChanged(newValue: String) {
-		updateState { it.copy(newPassword = newValue, fieldErrors = it.fieldErrors - "newPassword") }
+	fun onPasswordChanged(v: String) = updateState { state ->
+		val errorMessage = PasswordValidator.getMissingRequirementsMessage(v)
+
+		val newFieldErrors = if (errorMessage != null) {
+			state.fieldErrors + ("newPassword" to errorMessage)
+		} else {
+			state.fieldErrors - "newPassword"
+		}
+
+		state.copy(
+			newPassword = v,
+			fieldErrors = newFieldErrors
+		)
 	}
+
 
 	/**
 	 * Updates the confirm password state.
@@ -88,17 +101,13 @@ class PasswordRecoveryViewModel(
 		val password = state.value.newPassword.trim()
 		val confirmPassword = state.value.confirmPassword.trim()
 
-		val passwordPattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_]).{8,64}$".toRegex()
-
 		if (token.isBlank()) {
 			errors["token"] = "El código OTP es requerido."
 		}
 
-		if (password.isBlank()) {
-			errors["newPassword"] = "La nueva contraseña es requerida."
-		} else if (!password.matches(passwordPattern)) {
-			errors["newPassword"] =
-				"La contraseña debe tener al menos 8 caracteres, incluir al menos una letra mayúscula, una letra minúscula, un número y un carácter especial."
+		val passwordError = PasswordValidator.getMissingRequirementsMessage(password)
+		if (passwordError != null) {
+			errors["newPassword"] = passwordError
 		} else if (password != confirmPassword) {
 			errors["newPassword"] = "Las contraseñas no coinciden."
 		}
