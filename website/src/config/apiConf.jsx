@@ -207,15 +207,39 @@ export const autoDetectEnvironment = () => {
 // API CALL ABSTRACTION LAYER
 // ============================================
 
+// --- Token Refresh Interceptor State ---
+let _isRefreshing = false;
+let _refreshQueue = []; // Queue of { resolve, reject } for requests waiting on refresh
+
 /**
- * Generic API call handler
- * @param {string} endpoint - Full API endpoint URL
- * @param {string} method - HTTP method (GET, POST, PUT, DELETE)
- * @param {object} payload - Request body data
- * @param {object} customHeaders - Additional headers to override defaults (optional)
- * @returns {Promise<{ok: boolean, status: number, data: object, error: string|null}>}
+ * Process the queue of pending requests after a refresh attempt.
+ * @param {boolean} success - Whether the refresh succeeded
  */
-export const callApi = async (endpoint, method = 'GET', payload = null, customHeaders = {}) => {
+const _processRefreshQueue = (success) => {
+  _refreshQueue.forEach(({ resolve, reject }) => {
+    if (success) {
+      resolve();
+    } else {
+      reject(new Error('Session expired'));
+    }
+  });
+  _refreshQueue = [];
+};
+
+/**
+ * Check if an endpoint is an auth endpoint (to avoid refresh loops).
+ * @param {string} endpoint
+ * @returns {boolean}
+ */
+const _isAuthEndpoint = (endpoint) => {
+  const authPaths = ['/auth/login', '/auth/refresh', '/auth/logout', '/auth/password-reset'];
+  return authPaths.some(path => endpoint.includes(path));
+};
+
+/**
+ * Low-level fetch wrapper (no interceptor). Used internally to avoid recursion.
+ */
+const _rawCallApi = async (endpoint, method = 'GET', payload = null, customHeaders = {}) => {
   try {
     const headers = {
       ...API_CONFIG.defaultHeaders,
@@ -243,7 +267,6 @@ export const callApi = async (endpoint, method = 'GET', payload = null, customHe
     const response = await fetch(endpoint, options);
     const data = await response.json().catch(() => ({}));
 
-
     // Extract error message from different response formats
     const getErrorMessage = () => {
       if (data.message) return data.message;
@@ -266,6 +289,74 @@ export const callApi = async (endpoint, method = 'GET', payload = null, customHe
       data: null,
       error: error.message || 'Connection error',
     };
+  }
+};
+
+/**
+ * Generic API call handler with automatic token refresh on 401.
+ *
+ * When a 401 is received on a non-auth endpoint:
+ * 1. Calls POST /auth/refresh (refresh token travels via HttpOnly cookie automatically)
+ * 2. If refresh succeeds → retries the original request with the renewed session cookie
+ * 3. If refresh fails → returns the 401 (session is truly expired, UI should redirect to login)
+ *
+ * Uses a mutex pattern: if multiple requests get 401 simultaneously,
+ * only one refresh call is made and all others wait in a queue.
+ *
+ * @param {string} endpoint - Full API endpoint URL
+ * @param {string} method - HTTP method (GET, POST, PUT, DELETE)
+ * @param {object} payload - Request body data
+ * @param {object} customHeaders - Additional headers to override defaults (optional)
+ * @returns {Promise<{ok: boolean, status: number, data: object, error: string|null}>}
+ */
+export const callApi = async (endpoint, method = 'GET', payload = null, customHeaders = {}) => {
+  const result = await _rawCallApi(endpoint, method, payload, customHeaders);
+
+  // If not a 401, or it's an auth endpoint, return immediately (no refresh loop)
+  if (result.status !== 401 || _isAuthEndpoint(endpoint)) {
+    return result;
+  }
+
+  // --- 401 on a protected endpoint: attempt silent refresh ---
+
+  if (_isRefreshing) {
+    // Another refresh is already in progress — wait for it
+    try {
+      await new Promise((resolve, reject) => {
+        _refreshQueue.push({ resolve, reject });
+      });
+      // Refresh succeeded — retry original request
+      return _rawCallApi(endpoint, method, payload, customHeaders);
+    } catch {
+      // Refresh failed — return original 401
+      return result;
+    }
+  }
+
+  // We are the first to detect 401 — start the refresh
+  _isRefreshing = true;
+
+  try {
+    const refreshUrl = buildApiUrl(API_CONFIG.endpoints.auth.refresh);
+    const refreshResult = await _rawCallApi(refreshUrl, 'POST');
+
+    if (refreshResult.ok) {
+      // Refresh succeeded — new access cookie is already set by the backend
+      _processRefreshQueue(true);
+      // Retry the original request
+      return _rawCallApi(endpoint, method, payload, customHeaders);
+    } else {
+      // Refresh failed — session truly expired
+      _processRefreshQueue(false);
+      console.warn('⚠️ [callApi] Session expired. Refresh token is invalid or expired.');
+      return result;
+    }
+  } catch (err) {
+    _processRefreshQueue(false);
+    console.error('❌ [callApi] Error during token refresh:', err);
+    return result;
+  } finally {
+    _isRefreshing = false;
   }
 };
 
