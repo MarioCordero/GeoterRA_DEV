@@ -39,7 +39,7 @@ return [
   ['method' => 'GET', 'path' => '/maintenance/database/tables', 'controller' => 'MaintenanceController', 'action' => 'getAllDatabaseTables'],
 
   ['method' => 'GET', 'path' => '/provinces', 'controller' => 'ProvinceController', 'action' => 'index'],
-
+  
   ['method' => 'GET', 'path' => '/admin/provinces/{id}', 'controller' => 'ProvinceController', 'action' => 'show'],
   ['method' => 'GET', 'path' => '/admin/provinces/snit/{code}', 'controller' => 'ProvinceController', 'action' => 'showBySnitCode'],
   ['method' => 'POST', 'path' => '/admin/provinces', 'controller' => 'ProvinceController', 'action' => 'store'],
