@@ -10,6 +10,7 @@ import {
   BulbOutlined,
   BarChartOutlined,
   FileSearchOutlined,
+  GlobalOutlined,
 } from '@ant-design/icons';
 
 /**
@@ -95,6 +96,15 @@ export const getMenuItems = (permissions) => {
     });
   }
 
+  if (permissions.hasManageTerritory) {
+    menuItems.push({
+      key: '12',
+      icon: <GlobalOutlined style={{ fontSize: '18px' }} />,
+      label: 'Territorio',
+      shortLabel: 'Territorio',
+    });
+  }
+
   // ─── Sección mantenimiento ─────────────────────────────────────────────
   if (permissions.hasManageUsers) {
     menuItems.push({
@@ -149,6 +159,5 @@ export const createPermissionsObject = (hasPermissionFn, PERMISSIONS) => ({
   hasManageInsituTests: hasPermissionFn(PERMISSIONS.MANAGE_INSITU_TESTS),
   hasManageInlabTests: hasPermissionFn(PERMISSIONS.MANAGE_INLAB_TESTS),
   hasManageGeoreports: hasPermissionFn(PERMISSIONS.MANAGE_GEOREPORTS),
+  hasManageTerritory: hasPermissionFn(PERMISSIONS.MANAGE_TERRITORY),
 });
-
-
