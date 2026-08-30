@@ -373,19 +373,28 @@ const _rawCallApi = async (endpoint, method = 'GET', payload = null, customHeade
       }
     });
 
+    let finalEndpoint = endpoint;
+    if (method === 'GET' && payload && typeof payload === 'object') {
+      const queryParams = new URLSearchParams(payload).toString();
+      if (queryParams) {
+        finalEndpoint = finalEndpoint.includes('?') ? `${finalEndpoint}&${queryParams}` : `${finalEndpoint}?${queryParams}`;
+      }
+    }
+
     const options = {
       method,
       credentials: 'include',
       headers,
     };
 
-    // Add body for POST/PUT/PATCH/GET with payload
-    if (payload && ['POST', 'PUT', 'PATCH', 'GET'].includes(method)) {
+    // Add body for POST/PUT/PATCH with payload
+    if (payload && ['POST', 'PUT', 'PATCH'].includes(method)) {
       options.body = JSON.stringify(payload);
     }
 
-    const response = await fetch(endpoint, options);
+    const response = await fetch(finalEndpoint, options);
     const data = await response.json().catch(() => ({}));
+    console.log(`📡 [API RES] ${method} ${endpoint} (Status: ${response.status})`, data);
 
     // Extract error message from different response formats
     const getErrorMessage = () => {
@@ -400,6 +409,7 @@ const _rawCallApi = async (endpoint, method = 'GET', payload = null, customHeade
       ok: response.ok,
       status: response.status,
       data: data.data || data,
+      raw: data,
       error: response.ok ? null : getErrorMessage(),
     };
   } catch (error) {
