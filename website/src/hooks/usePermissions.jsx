@@ -29,6 +29,7 @@ const PERMISSIONS = {
   // Infraestructura / Sistema
   VIEW_INFRASTRUCTURE:      'VIEW_INFRASTRUCTURE',
   VIEW_SYSTEM_LOGS:         'VIEW_SYSTEM_LOGS',
+  MANAGE_TERRITORY:         'MANAGE_TERRITORY',
 
   // Exportacion
   EXPORT_PDF:               'EXPORT_PDF',
@@ -83,6 +84,9 @@ const ROLE_PERMISSIONS = {
     PERMISSIONS.MANAGE_INSITU_TESTS,
     PERMISSIONS.MANAGE_INLAB_TESTS,
     PERMISSIONS.MANAGE_GEOREPORTS,
+
+    // Territorio
+    PERMISSIONS.MANAGE_TERRITORY,
   ],
 
   // ──────────────────────────────────────────────────────────

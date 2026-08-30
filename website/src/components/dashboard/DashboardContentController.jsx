@@ -16,6 +16,7 @@ import GeomanifeStationsManager from '../loggedComponents/views/geoscience/Geoma
 import InsituTestsManager from '../loggedComponents/views/geoscience/InsituTestsManager';
 import InlabTestsManager from '../loggedComponents/views/geoscience/InlabTestsManager';
 import GeoreportsManager from '../loggedComponents/views/geoscience/GeoreportsManager';
+import TerritoryManager from '../loggedComponents/views/territory/TerritoryManager';
 
 const DashboardContentController = ({ selectedKey }) => {
   const { hasPermission, PERMISSIONS } = usePermissions();
@@ -105,6 +106,13 @@ const DashboardContentController = ({ selectedKey }) => {
         return <div style={{ padding: '24px', color: 'red' }}>Acceso denegado</div>;
       }
       return <GeoreportsManager />;
+
+    case '12':
+      // Territorio - admin only
+      if (!hasPermission(PERMISSIONS.MANAGE_TERRITORY)) {
+        return <div style={{ padding: '24px', color: 'red' }}>Acceso denegado</div>;
+      }
+      return <TerritoryManager />;
 
     default:
       // Fallback to home view based on role

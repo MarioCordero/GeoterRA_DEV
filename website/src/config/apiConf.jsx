@@ -97,14 +97,14 @@ const API_CONFIG = {
     // 7. Geomanifestations (Geomanifestaciones)
     // ==========================================
     geomanifestations: {
-      index: '/geomanifestations',                            // 7.1 GET    - Listado público [Público]
-      show: (id) => `/geomanifestations/${id}`,               // 7.2 GET    - Detalle público [Público]
-      adminIndex: '/admin/geomanifestations',                 // 7.3 GET    - Listado admin (incluye ocultas) [Admin]
-      adminShow: (id) => `/admin/geomanifestations/${id}`,    // 7.4 GET    - Detalle admin [Admin]
-      adminStore: '/admin/geomanifestations',                 // 7.5 POST   - Crea manifestación [Admin]
-      adminUpdate: (id) => `/admin/geomanifestations/${id}`,  // 7.6 PUT    - Actualiza manifestación [Admin]
-      adminDelete: (id) => `/admin/geomanifestations/${id}`,  // 7.7 DELETE - Elimina manifestación [Admin]
-      adminSetVisibility: (id) => `/admin/geomanifestations/${id}/visibility`, // 7.8 PATCH - Visibilidad [Admin]
+      index: (params) => params ? `/geomanifestations?${new URLSearchParams(params).toString()}` : '/geomanifestations?limit=1000',
+      show: (id) => `/geomanifestations/${id}`,
+      adminIndex: (params) => params ? `/admin/geomanifestations?${new URLSearchParams(params).toString()}` : '/admin/geomanifestations?limit=1000',
+      adminShow: (id) => `/admin/geomanifestations/${id}`,
+      adminStore: '/admin/geomanifestations',
+      adminUpdate: (id) => `/admin/geomanifestations/${id}`,
+      adminDelete: (id) => `/admin/geomanifestations/${id}`,
+      adminSetVisibility: (id) => `/admin/geomanifestations/${id}/visibility`,
     },
 
     // ==========================================
@@ -164,7 +164,7 @@ export const buildApiUrl = (endpoint) => {
     return `${baseUrl}${endpoint}`.replace(/\/+/g, '/');
   }
 
-  return `${baseUrl}${endpoint}`.replace(/([^:]\/)\\/+/g, '$1');
+  return `${baseUrl}${endpoint}`.replace(/([^:]\/)\/+/g, '$1');
 };
 
 // ============================================
@@ -246,9 +246,9 @@ export const districts = {
 // 7. GEOMANIFESTATIONS ENDPOINTS
 // ============================================
 export const geomanifestations = {
-  index: () => buildApiUrl(API_CONFIG.endpoints.geomanifestations.index),
+  index: (params) => buildApiUrl(API_CONFIG.endpoints.geomanifestations.index(params)),
   show: (id) => buildApiUrl(API_CONFIG.endpoints.geomanifestations.show(id)),
-  adminIndex: () => buildApiUrl(API_CONFIG.endpoints.geomanifestations.adminIndex),
+  adminIndex: (params) => buildApiUrl(API_CONFIG.endpoints.geomanifestations.adminIndex(params)),
   adminShow: (id) => buildApiUrl(API_CONFIG.endpoints.geomanifestations.adminShow(id)),
   adminStore: () => buildApiUrl(API_CONFIG.endpoints.geomanifestations.adminStore),
   adminUpdate: (id) => buildApiUrl(API_CONFIG.endpoints.geomanifestations.adminUpdate(id)),
@@ -373,8 +373,8 @@ const _rawCallApi = async (endpoint, method = 'GET', payload = null, customHeade
       headers,
     };
 
-    // Add body for POST/PUT/PATCH with payload
-    if (payload && ['POST', 'PUT', 'PATCH'].includes(method)) {
+    // Add body for POST/PUT/PATCH/GET with payload
+    if (payload && ['POST', 'PUT', 'PATCH', 'GET'].includes(method)) {
       options.body = JSON.stringify(payload);
     }
 
@@ -575,6 +575,10 @@ export const analysisRequestAdminAddState = async (id, payload) => {
   return callApi(analysisRequest.adminAddState(id), 'POST', payload);
 };
 
+export const analysisRequestAdminUpdate = analysisRequestUpdate;
+export const analysisRequestAdminDelete = analysisRequestDelete;
+export const analysisRequestAdminGetStates = analysisRequestAdminStates;
+
 // ============================================
 // 4. PROVINCES API FUNCTIONS
 // ============================================
@@ -659,16 +663,16 @@ export const districtsAdminDelete = async (id) => {
 // ============================================
 // 7. GEOMANIFESTATIONS API FUNCTIONS
 // ============================================
-export const geomanifestationsIndex = async () => {
-  return callApi(geomanifestations.index(), 'GET');
+export const geomanifestationsIndex = async (params) => {
+  return callApi(geomanifestations.index(params), 'GET');
 };
 
 export const geomanifestationsShow = async (id) => {
   return callApi(geomanifestations.show(id), 'GET');
 };
 
-export const geomanifestationsAdminIndex = async () => {
-  return callApi(geomanifestations.adminIndex(), 'GET');
+export const geomanifestationsAdminIndex = async (params) => {
+  return callApi(geomanifestations.adminIndex(params), 'GET');
 };
 
 export const geomanifestationsAdminShow = async (id) => {
@@ -782,16 +786,5 @@ export const maintenanceSystemLogs = async () => {
 export const maintenanceAllTables = async () => {
   return callApi(maintenance.allTables(), 'GET');
 };
-
-// ============================================
-// LEGACY ALIASES (backward compatibility)
-// Remove these once all imports are updated
-// ============================================
-export const registeredManifestationsStore = geomanifestationsAdminStore;
-export const regionsIndex = provincesIndex;
-export const maintenanceUpdateUserRole = userAdminUpdateRole;
-export const analysisRequestAdminUpdate = analysisRequestUpdate;
-export const analysisRequestAdminDelete = analysisRequestAdminShow; // placeholder, not in API
-export const analysisRequestAdminGetStates = analysisRequestAdminStates;
 
 export default API_CONFIG;

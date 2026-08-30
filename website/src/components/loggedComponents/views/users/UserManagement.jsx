@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { maintenanceAllUsers, maintenanceUpdateUserRole } from '../../../../config/apiConf';
+import { maintenanceAllUsers, userAdminUpdateRole } from '../../../../config/apiConf';
 import { usePermissions } from '../../../../hooks/usePermissions';
 import { Table, Card, Spin, Tag, message, Button, Space, Modal, Select } from 'antd';
 import { ReloadOutlined, EditOutlined } from '@ant-design/icons';
@@ -54,7 +54,7 @@ const UserManagement = () => {
 
     setIsSaving(true);
     try {
-      const result = await maintenanceUpdateUserRole(editingUser.user_id, {
+      const result = await userAdminUpdateRole(editingUser.user_id, {
         role: selectedRole,
       });
 
@@ -127,43 +127,40 @@ const UserManagement = () => {
         const colors = {
           admin: 'blue',
           maintenance: 'green',
+          field_investigator: 'orange',
+          investigator: 'purple',
           user: 'default',
         };
-        return <Tag color={colors[role] || 'default'}>{role.toUpperCase()}</Tag>;
+        return <Tag color={colors[role] || 'default'}>{(role || '').toUpperCase()}</Tag>;
       },
       filters: [
         { text: 'Admin', value: 'admin' },
         { text: 'Maintenance', value: 'maintenance' },
-        { text: 'User', value: 'user' },
+        { text: 'Investigador de Campo', value: 'field_investigator' },
+        { text: 'Investigador', value: 'investigator' },
+        { text: 'Usuario', value: 'user' },
       ],
       onFilter: (value, record) => record.role === value,
     },
     {
       title: 'Estado',
-      dataIndex: 'is_active',
-      key: 'is_active',
-      render: (isActive) => (
-        <Tag color={isActive ? 'green' : 'red'}>
-          {isActive ? '✅ Activo' : '❌ Inactivo'}
+      dataIndex: 'is_deleted',
+      key: 'is_deleted',
+      render: (isDeleted) => (
+        <Tag color={!isDeleted ? 'green' : 'red'}>
+          {!isDeleted ? '✅ Activo' : '❌ Eliminado'}
         </Tag>
       ),
-      filters: [
-        { text: 'Activo', value: 1 },
-        { text: 'Inactivo', value: 0 },
-      ],
-      onFilter: (value, record) => record.is_active === value,
     },
     {
       title: 'Fecha de Registro',
       dataIndex: 'created_at',
       key: 'created_at',
-      render: (date) => new Date(date).toLocaleDateString('es-ES', {
+      render: (date) => date ? new Date(date).toLocaleDateString('es-ES', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
+      }) : 'N/A',
       sorter: (a, b) => new Date(a.created_at) - new Date(b.created_at),
     },
     {
@@ -188,22 +185,7 @@ const UserManagement = () => {
     <div className="p-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Gestionar Usuarios</h1>
-        <p className="text-gray-500">Administra todos los usuarios del sistema</p>
-        
-        <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-sm text-gray-700 mb-2">
-            <strong>¿Qué puedes hacer aquí?</strong>
-          </p>
-          <ul className="text-sm text-gray-600 space-y-1">
-            <li>✓ Ver la lista completa de usuarios del sistema</li>
-            <li>✓ Consultar detalles de cada usuario (nombre, email, teléfono, rol, estado)</li>
-            <li>✓ Editar el rol de los usuarios (Admin, Maintenance, User)</li>
-            <li>✓ Filtrar usuarios por rol o estado (Activo/Inactivo)</li>
-            <li>✓ Ordenar la tabla por diferentes columnas</li>
-            <li>✓ Ver la fecha de registro de cada usuario</li>
-            <li>✓ Actualizar la lista de usuarios</li>
-          </ul>
-        </div>
+        <p className="text-gray-500">Administra todos los usuarios del sistema y sus roles</p>
       </div>
 
       <Card
@@ -224,7 +206,7 @@ const UserManagement = () => {
           <Table
             columns={columns}
             dataSource={users}
-            rowKey="user_id"
+            rowKey={(r) => r.user_id || r.id}
             pagination={{
               pageSize: 10,
               total: total,
@@ -233,7 +215,6 @@ const UserManagement = () => {
               pageSizeOptions: ['5', '10', '20', '50'],
             }}
             bordered
-            striped
           />
         </Spin>
       </Card>
@@ -263,16 +244,18 @@ const UserManagement = () => {
                 value={selectedRole}
                 onChange={setSelectedRole}
                 options={[
-                  { label: 'Admin', value: 'admin' },
-                  { label: 'Maintenance', value: 'maintenance' },
-                  { label: 'User', value: 'user' },
+                  { label: 'Administrador (admin)', value: 'admin' },
+                  { label: 'Mantenimiento (maintenance)', value: 'maintenance' },
+                  { label: 'Investigador de Campo (field_investigator)', value: 'field_investigator' },
+                  { label: 'Investigador (investigator)', value: 'investigator' },
+                  { label: 'Usuario (user)', value: 'user' },
                 ]}
                 placeholder="Seleccionar rol"
               />
             </div>
             <div className="bg-blue-50 p-3 rounded text-sm">
               <p className="font-semibold mb-1">Rol actual:</p>
-              <p>{editingUser.role.toUpperCase()}</p>
+              <p>{(editingUser.role || '').toUpperCase()}</p>
             </div>
           </div>
         )}
