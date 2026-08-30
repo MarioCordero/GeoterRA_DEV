@@ -11,10 +11,12 @@ import {
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { Timeline } from 'antd';
 import {
   analysisRequestShow,
   analysisRequestUpdate,
-  analysisRequestDelete
+  analysisRequestDelete,
+  analysisRequestStates
 } from '../../config/apiConf';
 import MapCoordinatePicker from './MapCoordinatePicker';
 import PhoneInput from './PhoneInput';
@@ -42,7 +44,7 @@ function RecenterMap({ center }) {
  * RequestDetails Modal Component
  * 
  * Full-width/spacious modal displaying complete request information.
- * - View Mode: Displays summary cards, single interactive Leaflet map, and action buttons.
+ * - View Mode: Displays summary cards, single interactive Leaflet map, state history timeline, and action buttons.
  * - Edit Mode: Displays form with embedded MapCoordinatePicker under GPS section.
  */
 const RequestDetails = ({
@@ -58,6 +60,7 @@ const RequestDetails = ({
   const [deleting, setDeleting] = useState(false);
 
   const [requestData, setRequestData] = useState(null);
+  const [statesHistory, setStatesHistory] = useState([]);
   const [editMode, setEditMode] = useState(false);
 
   // Coordinates state
@@ -69,6 +72,7 @@ const RequestDetails = ({
       loadRequestDetails();
     } else {
       setRequestData(null);
+      setStatesHistory([]);
       setEditMode(false);
       setLatLng({ lat: null, lng: null });
     }
@@ -89,6 +93,14 @@ const RequestDetails = ({
       } else {
         message.error(res.error || 'Error al cargar detalles de la solicitud');
         onClose();
+      }
+
+      // Load state history timeline (endpoint 3.6)
+      const resStates = await analysisRequestStates(requestId);
+      if (resStates.ok && Array.isArray(resStates.data)) {
+        setStatesHistory(resStates.data);
+      } else {
+        setStatesHistory([]);
       }
     } catch (err) {
       console.error(err);
@@ -347,6 +359,27 @@ const RequestDetails = ({
                   <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
                     {requestData.details}
                   </p>
+                </Card>
+              )}
+
+              {/* State History Timeline Section */}
+              {statesHistory && statesHistory.length > 0 && (
+                <Card className="shadow-sm border border-gray-200 rounded-xl">
+                  <p className="text-xs text-gray-500 font-semibold uppercase mb-4">Historial de Estados y Seguimiento</p>
+                  <Timeline
+                    items={statesHistory.map((st) => ({
+                      color: st.value === 'Aprobada' ? 'green' : st.value === 'Rechazada' ? 'red' : st.value === 'Revisión' ? 'orange' : 'blue',
+                      children: (
+                        <div>
+                          <p className="font-semibold text-sm m-0 text-gray-800">{st.value}</p>
+                          {st.description && <p className="text-xs text-gray-600 m-0 mt-0.5">{st.description}</p>}
+                          <p className="text-xs text-gray-400 m-0 mt-1">
+                            📅 {st.created_at ? new Date(st.created_at).toLocaleString('es-ES') : ''}
+                          </p>
+                        </div>
+                      ),
+                    }))}
+                  />
                 </Card>
               )}
 
