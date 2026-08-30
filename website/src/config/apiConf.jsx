@@ -98,7 +98,7 @@ const API_CONFIG = {
     // ==========================================
     geomanifestations: {
       index: (params) => {
-        const merged = { show_all: 'true', limit: 1000, ...(params || {}) };
+        const merged = { limit: 1000, ...(params || {}) };
         return `/geomanifestations?${new URLSearchParams(merged).toString()}`;
       },
       show: (id) => `/geomanifestations/${id}`,
