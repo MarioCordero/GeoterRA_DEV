@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Typography, Tag, Button, Modal, Form, InputNumber, Input, Select, Table, message, Space, Spin, Popconfirm, Tabs } from 'antd';
+import { Card, Typography, Tag, Button, Modal, Form, InputNumber, Input, Table, message, Space, Spin, Popconfirm } from 'antd';
 import { BarChartOutlined, PlusOutlined, ReloadOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import GeomanifestationPicker from '../../../common/GeomanifestationPicker';
 import {
   inlabTestsIndex,
   inlabTestsStore,
@@ -11,6 +12,15 @@ import {
 } from '../../../../config/apiConf';
 
 const { Title, Paragraph, Text } = Typography;
+
+const extractList = (resData) => {
+  if (!resData) return [];
+  if (Array.isArray(resData)) return resData;
+  if (Array.isArray(resData.data)) return resData.data;
+  if (Array.isArray(resData.data?.data)) return resData.data.data;
+  if (Array.isArray(resData.items)) return resData.items;
+  return [];
+};
 
 const InlabTestsManager = () => {
   const [manifestations, setManifestations] = useState([]);
@@ -25,18 +35,16 @@ const InlabTestsManager = () => {
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm();
 
-  // Load list of geomanifestations for dropdown
+  // Load list of geomanifestations for dropdown/picker
   const loadGeomanifestations = async () => {
     try {
       setLoadingGeos(true);
-      let res = await geomanifestationsAdminIndex();
+      let res = await geomanifestationsAdminIndex({ show_all: 'true', limit: 1000 });
       if (!res.ok) {
-        res = await geomanifestationsIndex();
+        res = await geomanifestationsIndex({ show_all: 'true', limit: 1000 });
       }
       if (res.ok && res.data) {
-        const list = Array.isArray(res.data) 
-          ? res.data 
-          : (res.data.data && Array.isArray(res.data.data) ? res.data.data : []);
+        const list = extractList(res.data);
         setManifestations(list);
         if (list.length > 0 && !selectedGeoId) {
           const firstId = list[0].geomanifestation_id || list[0].id;
@@ -57,7 +65,7 @@ const InlabTestsManager = () => {
       setLoading(true);
       const res = await inlabTestsIndex({ geomanifestation_id: geoId });
       if (res.ok && res.data) {
-        const list = Array.isArray(res.data) ? res.data : [];
+        const list = extractList(res.data);
         setTests(list);
       } else {
         setTests([]);
@@ -235,41 +243,7 @@ const InlabTestsManager = () => {
             </div>
           </div>
 
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={() => loadTests(selectedGeoId)}
-            loading={loading}
-            disabled={!selectedGeoId}
-          >
-            Actualizar
-          </Button>
-        </div>
-
-        {/* Geomanifestation Selector */}
-        <Card type="inner" style={{ marginBottom: 16, background: '#fafafa' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            <Text strong>Seleccionar Geomanifestación:</Text>
-            {loadingGeos ? (
-              <Spin size="small" />
-            ) : (
-              <Select
-                style={{ minWidth: 300, flex: 1 }}
-                placeholder="Selecciona una geomanifestación"
-                value={selectedGeoId}
-                onChange={setSelectedGeoId}
-              >
-                {manifestations.map((item) => {
-                  const id = item.geomanifestation_id || item.id;
-                  const name = item.name || item.geomanifestation_name || `Punto ${id}`;
-                  return (
-                    <Select.Option key={id} value={id}>
-                      {name} ({item.location?.province || 'Costa Rica'})
-                    </Select.Option>
-                  );
-                })}
-              </Select>
-            )}
-
+          <Space flexWrap>
             <Button
               type="primary"
               icon={<PlusOutlined />}
@@ -279,8 +253,25 @@ const InlabTestsManager = () => {
             >
               Nueva Prueba de Laboratorio
             </Button>
-          </div>
-        </Card>
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={() => loadTests(selectedGeoId)}
+              loading={loading}
+              disabled={!selectedGeoId}
+            >
+              Actualizar Listado
+            </Button>
+          </Space>
+        </div>
+
+        {/* Scalable Geomanifestation Picker */}
+        <GeomanifestationPicker
+          selectedGeoId={selectedGeoId}
+          onSelectGeo={(id) => setSelectedGeoId(id)}
+          manifestations={manifestations}
+          loading={loadingGeos}
+          onRefresh={loadGeomanifestations}
+        />
 
         {loading ? (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
@@ -291,7 +282,7 @@ const InlabTestsManager = () => {
             dataSource={tests}
             columns={columns}
             rowKey={(item) => item.inlab_test_id || item.id}
-            pagination={{ pageSize: 8 }}
+            pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50'] }}
             locale={{ emptyText: selectedGeoId ? 'No hay pruebas de laboratorio registradas para esta manifestación' : 'Selecciona una geomanifestación' }}
           />
         )}

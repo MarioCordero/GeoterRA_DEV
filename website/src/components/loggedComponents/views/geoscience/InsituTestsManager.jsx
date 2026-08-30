@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Typography, Tag, Button, Modal, Form, InputNumber, Input, Select, Table, message, Space, Spin, Popconfirm } from 'antd';
+import { Card, Typography, Tag, Button, Modal, Form, InputNumber, Input, Table, message, Space, Spin, Popconfirm } from 'antd';
 import { BulbOutlined, PlusOutlined, ReloadOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import GeomanifestationPicker from '../../../common/GeomanifestationPicker';
 import {
   insituTestsIndex,
   insituTestsStore,
@@ -11,6 +12,15 @@ import {
 } from '../../../../config/apiConf';
 
 const { Title, Paragraph, Text } = Typography;
+
+const extractList = (resData) => {
+  if (!resData) return [];
+  if (Array.isArray(resData)) return resData;
+  if (Array.isArray(resData.data)) return resData.data;
+  if (Array.isArray(resData.data?.data)) return resData.data.data;
+  if (Array.isArray(resData.items)) return resData.items;
+  return [];
+};
 
 const InsituTestsManager = () => {
   const [manifestations, setManifestations] = useState([]);
@@ -25,26 +35,27 @@ const InsituTestsManager = () => {
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm();
 
-  // Load list of geomanifestations for dropdown
+  // Load list of geomanifestations for picker
   const loadGeomanifestations = async () => {
     try {
       setLoadingGeos(true);
-      let res = await geomanifestationsAdminIndex();
+      console.log('📍 [InsituTestsManager] Fetching geomanifestations list...');
+      let res = await geomanifestationsAdminIndex({ show_all: 'true', limit: 1000 });
       if (!res.ok) {
-        res = await geomanifestationsIndex();
+        res = await geomanifestationsIndex({ show_all: 'true', limit: 1000 });
       }
       if (res.ok && res.data) {
-        const list = Array.isArray(res.data) 
-          ? res.data 
-          : (res.data.data && Array.isArray(res.data.data) ? res.data.data : []);
+        const list = extractList(res.data);
+        console.log('📍 [InsituTestsManager] Loaded geomanifestations count:', list.length, list);
         setManifestations(list);
         if (list.length > 0 && !selectedGeoId) {
           const firstId = list[0].geomanifestation_id || list[0].id;
+          console.log('📍 [InsituTestsManager] Auto-selecting first geomanifestation_id:', firstId);
           setSelectedGeoId(firstId);
         }
       }
     } catch (err) {
-      console.error('❌ Error loading geomanifestations:', err);
+      console.error('❌ [InsituTestsManager] Error loading geomanifestations:', err);
     } finally {
       setLoadingGeos(false);
     }
@@ -55,15 +66,19 @@ const InsituTestsManager = () => {
     if (!geoId) return;
     try {
       setLoading(true);
+      console.log('🧪 [InsituTestsManager] Loading insitu tests for geoId:', geoId);
       const res = await insituTestsIndex({ geomanifestation_id: geoId });
+      console.log('🧪 [InsituTestsManager] insituTestsIndex res:', res);
       if (res.ok && res.data) {
-        const list = Array.isArray(res.data) ? res.data : [];
+        const list = extractList(res.data);
+        console.log('✅ [InsituTestsManager] Extracted tests count:', list.length, list);
         setTests(list);
       } else {
+        console.warn('⚠️ [InsituTestsManager] Failed to load insitu tests:', res);
         setTests([]);
       }
     } catch (err) {
-      console.error('❌ Error loading insitu tests:', err);
+      console.error('❌ [InsituTestsManager] Error loading insitu tests:', err);
       setTests([]);
     } finally {
       setLoading(false);
@@ -227,41 +242,7 @@ const InsituTestsManager = () => {
             </div>
           </div>
 
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={() => loadTests(selectedGeoId)}
-            loading={loading}
-            disabled={!selectedGeoId}
-          >
-            Actualizar
-          </Button>
-        </div>
-
-        {/* Geomanifestation Selector */}
-        <Card type="inner" style={{ marginBottom: 16, background: '#fafafa' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            <Text strong>Seleccionar Geomanifestación:</Text>
-            {loadingGeos ? (
-              <Spin size="small" />
-            ) : (
-              <Select
-                style={{ minWidth: 300, flex: 1 }}
-                placeholder="Selecciona una geomanifestación"
-                value={selectedGeoId}
-                onChange={setSelectedGeoId}
-              >
-                {manifestations.map((item) => {
-                  const id = item.geomanifestation_id || item.id;
-                  const name = item.name || item.geomanifestation_name || `Punto ${id}`;
-                  return (
-                    <Select.Option key={id} value={id}>
-                      {name} ({item.location?.province || 'Costa Rica'})
-                    </Select.Option>
-                  );
-                })}
-              </Select>
-            )}
-
+          <Space flexWrap>
             <Button
               type="primary"
               icon={<PlusOutlined />}
@@ -271,8 +252,25 @@ const InsituTestsManager = () => {
             >
               Nueva Prueba In-Situ
             </Button>
-          </div>
-        </Card>
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={() => loadTests(selectedGeoId)}
+              loading={loading}
+              disabled={!selectedGeoId}
+            >
+              Actualizar Listado
+            </Button>
+          </Space>
+        </div>
+
+        {/* Scalable Geomanifestation Picker */}
+        <GeomanifestationPicker
+          selectedGeoId={selectedGeoId}
+          onSelectGeo={(id) => setSelectedGeoId(id)}
+          manifestations={manifestations}
+          loading={loadingGeos}
+          onRefresh={loadGeomanifestations}
+        />
 
         {loading ? (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
@@ -283,7 +281,7 @@ const InsituTestsManager = () => {
             dataSource={tests}
             columns={columns}
             rowKey={(item) => item.insitu_test_id || item.id}
-            pagination={{ pageSize: 8 }}
+            pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50'] }}
             locale={{ emptyText: selectedGeoId ? 'No hay pruebas in-situ registradas para esta manifestación' : 'Selecciona una geomanifestación' }}
           />
         )}

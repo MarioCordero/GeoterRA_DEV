@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Typography, Tag, Button, Modal, Form, Input, Select, Checkbox, Table, message, Space, Spin, Popconfirm } from 'antd';
 import { FileSearchOutlined, PlusOutlined, ReloadOutlined, EditOutlined, DeleteOutlined, StarOutlined, StarFilled } from '@ant-design/icons';
+import GeomanifestationPicker from '../../../common/GeomanifestationPicker';
 import {
   georeportsCurrent,
   georeportsAdminIndex,
@@ -14,6 +15,15 @@ import {
 } from '../../../../config/apiConf';
 
 const { Title, Paragraph, Text } = Typography;
+
+const extractList = (resData) => {
+  if (!resData) return [];
+  if (Array.isArray(resData)) return resData;
+  if (Array.isArray(resData.data)) return resData.data;
+  if (Array.isArray(resData.data?.data)) return resData.data.data;
+  if (Array.isArray(resData.items)) return resData.items;
+  return [];
+};
 
 const GeoreportsManager = () => {
   const [manifestations, setManifestations] = useState([]);
@@ -31,18 +41,16 @@ const GeoreportsManager = () => {
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm();
 
-  // Load list of geomanifestations for dropdown
+  // Load list of geomanifestations for picker
   const loadGeomanifestations = async () => {
     try {
       setLoadingGeos(true);
-      let res = await geomanifestationsAdminIndex();
+      let res = await geomanifestationsAdminIndex({ show_all: 'true', limit: 1000 });
       if (!res.ok) {
-        res = await geomanifestationsIndex();
+        res = await geomanifestationsIndex({ show_all: 'true', limit: 1000 });
       }
       if (res.ok && res.data) {
-        const list = Array.isArray(res.data) 
-          ? res.data 
-          : (res.data.data && Array.isArray(res.data.data) ? res.data.data : []);
+        const list = extractList(res.data);
         setManifestations(list);
         if (list.length > 0 && !selectedGeoId) {
           const firstId = list[0].geomanifestation_id || list[0].id;
@@ -65,7 +73,7 @@ const GeoreportsManager = () => {
       // Load all reports for this geomanifestation
       const resIndex = await georeportsAdminIndex({ geomanifestation_id: geoId });
       if (resIndex.ok && resIndex.data) {
-        const list = Array.isArray(resIndex.data) ? resIndex.data : (resIndex.data.data && Array.isArray(resIndex.data.data) ? resIndex.data.data : []);
+        const list = extractList(resIndex.data);
         setReports(list);
       } else {
         setReports([]);
@@ -73,7 +81,7 @@ const GeoreportsManager = () => {
 
       // Load current report
       const resCurrent = await georeportsCurrent({ geomanifestation_id: geoId });
-      if (resCurrent.ok && resCurrent.data && resCurrent.data.georeport_id) {
+      if (resCurrent.ok && resCurrent.data && (resCurrent.data.georeport_id || resCurrent.data.id)) {
         setCurrentReport(resCurrent.data);
       } else {
         setCurrentReport(null);
@@ -92,15 +100,15 @@ const GeoreportsManager = () => {
     if (!geoId) return;
     try {
       const resInsitu = await insituTestsIndex({ geomanifestation_id: geoId });
-      if (resInsitu.ok && Array.isArray(resInsitu.data)) {
-        setInsituOptions(resInsitu.data);
+      if (resInsitu.ok && resInsitu.data) {
+        setInsituOptions(extractList(resInsitu.data));
       } else {
         setInsituOptions([]);
       }
 
       const resInlab = await inlabTestsIndex({ geomanifestation_id: geoId });
-      if (resInlab.ok && Array.isArray(resInlab.data)) {
-        setInlabOptions(resInlab.data);
+      if (resInlab.ok && resInlab.data) {
+        setInlabOptions(extractList(resInlab.data));
       } else {
         setInlabOptions([]);
       }
@@ -274,41 +282,7 @@ const GeoreportsManager = () => {
             </div>
           </div>
 
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={() => loadReports(selectedGeoId)}
-            loading={loading}
-            disabled={!selectedGeoId}
-          >
-            Actualizar
-          </Button>
-        </div>
-
-        {/* Geomanifestation Selector */}
-        <Card type="inner" style={{ marginBottom: 16, background: '#fafafa' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            <Text strong>Seleccionar Geomanifestación:</Text>
-            {loadingGeos ? (
-              <Spin size="small" />
-            ) : (
-              <Select
-                style={{ minWidth: 300, flex: 1 }}
-                placeholder="Selecciona una geomanifestación"
-                value={selectedGeoId}
-                onChange={setSelectedGeoId}
-              >
-                {manifestations.map((item) => {
-                  const id = item.geomanifestation_id || item.id;
-                  const name = item.name || item.geomanifestation_name || `Punto ${id}`;
-                  return (
-                    <Select.Option key={id} value={id}>
-                      {name} ({item.location?.province || 'Costa Rica'})
-                    </Select.Option>
-                  );
-                })}
-              </Select>
-            )}
-
+          <Space flexWrap>
             <Button
               type="primary"
               icon={<PlusOutlined />}
@@ -318,15 +292,32 @@ const GeoreportsManager = () => {
             >
               Nuevo Georeporte
             </Button>
-          </div>
-        </Card>
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={() => loadReports(selectedGeoId)}
+              loading={loading}
+              disabled={!selectedGeoId}
+            >
+              Actualizar Listado
+            </Button>
+          </Space>
+        </div>
+
+        {/* Scalable Geomanifestation Picker */}
+        <GeomanifestationPicker
+          selectedGeoId={selectedGeoId}
+          onSelectGeo={(id) => setSelectedGeoId(id)}
+          manifestations={manifestations}
+          loading={loadingGeos}
+          onRefresh={loadGeomanifestations}
+        />
 
         {currentReport && (
           <Card size="small" style={{ marginBottom: 16, borderLeft: '4px solid #fa8c16', background: '#fffbe6' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <StarFilled style={{ color: '#fa8c16' }} />
               <Text strong style={{ color: '#d46b08' }}>Reporte Vigente Actual:</Text>
-              <span className="font-mono text-xs">{currentReport.georeport_id}</span>
+              <span className="font-mono text-xs">{currentReport.georeport_id || currentReport.id}</span>
               <span style={{ margin: '0 8px', color: '#ccc' }}>|</span>
               <Text type="secondary">{currentReport.details || 'Sin detalles'}</Text>
             </div>
@@ -342,7 +333,7 @@ const GeoreportsManager = () => {
             dataSource={reports}
             columns={columns}
             rowKey={(item) => item.georeport_id || item.id}
-            pagination={{ pageSize: 8 }}
+            pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50'] }}
             locale={{ emptyText: selectedGeoId ? 'No hay georeportes registrados para esta manifestación' : 'Selecciona una geomanifestación' }}
           />
         )}
