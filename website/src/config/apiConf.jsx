@@ -97,9 +97,15 @@ const API_CONFIG = {
     // 7. Geomanifestations (Geomanifestaciones)
     // ==========================================
     geomanifestations: {
-      index: (params) => params ? `/geomanifestations?${new URLSearchParams(params).toString()}` : '/geomanifestations?limit=1000',
+      index: (params) => {
+        const merged = { show_all: 'true', limit: 1000, ...(params || {}) };
+        return `/geomanifestations?${new URLSearchParams(merged).toString()}`;
+      },
       show: (id) => `/geomanifestations/${id}`,
-      adminIndex: (params) => params ? `/admin/geomanifestations?${new URLSearchParams(params).toString()}` : '/admin/geomanifestations?limit=1000',
+      adminIndex: (params) => {
+        const merged = { show_all: 'true', limit: 1000, ...(params || {}) };
+        return `/admin/geomanifestations?${new URLSearchParams(merged).toString()}`;
+      },
       adminShow: (id) => `/admin/geomanifestations/${id}`,
       adminStore: '/admin/geomanifestations',
       adminUpdate: (id) => `/admin/geomanifestations/${id}`,
