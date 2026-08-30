@@ -1,10 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Typography, Tag, Button, Modal, Form, Input, InputNumber, Select, Table, message, Space, Spin, Tabs, Badge } from 'antd';
-import { EnvironmentOutlined, PlusOutlined, ReloadOutlined, EyeOutlined, EyeInvisibleOutlined, CheckCircleOutlined, FileTextOutlined } from '@ant-design/icons';
+import { Card, Typography, Tag, Button, Modal, Form, Input, InputNumber, Select, Table, message, Space, Spin, Tabs, Switch, Popconfirm } from 'antd';
+import { EnvironmentOutlined, PlusOutlined, ReloadOutlined, EyeOutlined, EyeInvisibleOutlined, CheckCircleOutlined, EditOutlined, DeleteOutlined, InfoCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import MapCoordinatePicker from '../../../common/MapCoordinatePicker';
-import { geomanifestationsIndex, geomanifestationsAdminIndex, registeredManifestationsStore, provincesIndex, regionsIndex } from '../../../../config/apiConf';
+import {
+  geomanifestationsIndex,
+  geomanifestationsAdminIndex,
+  geomanifestationsAdminShow,
+  geomanifestationsAdminStore,
+  geomanifestationsAdminUpdate,
+  geomanifestationsAdminDelete,
+  geomanifestationsAdminSetVisibility,
+  provincesIndex,
+  cantonsIndex,
+  districtsIndex
+} from '../../../../config/apiConf';
 
 const { Title, Paragraph, Text } = Typography;
+
+const extractList = (resData) => {
+  if (!resData) return [];
+  if (Array.isArray(resData)) return resData;
+  if (Array.isArray(resData.data)) return resData.data;
+  if (Array.isArray(resData.data?.data)) return resData.data.data;
+  if (Array.isArray(resData.items)) return resData.items;
+  return [];
+};
 
 const GeomanifeStationsManager = () => {
   const [manifestations, setManifestations] = useState([]);
@@ -12,36 +32,94 @@ const GeomanifeStationsManager = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('1');
 
-  // Manual point modal states
-  const [addManualPointModalVisible, setAddManualPointModalVisible] = useState(false);
-  const [addPointForm] = Form.useForm();
+  // Search & Filters
+  const [searchText, setSearchText] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+
+  // Manual point & Edit modal states
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingItem, setEditingItem] = useState(null); // null = create, object = edit
+  const [form] = Form.useForm();
   const [selectedCoordinates, setSelectedCoordinates] = useState(null);
   const [provinces, setProvinces] = useState([]);
-  const [submittingManualPoint, setSubmittingManualPoint] = useState(false);
+  const [cantons, setCantons] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Detail Modal
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
+  const [detailData, setDetailData] = useState(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+
+  // Normalize backend record
+  const normalizeItem = (item, provincesList = provinces) => {
+    const id = item.geomanifestation_id || item.id;
+    const name = item.geomanifestation_name || item.name || `Geomanifestación ${id}`;
+    const lat = item.location?.latitude ?? item.latitude;
+    const lng = item.location?.longitude ?? item.longitude;
+    const vis = item.visibility;
+    const isVisible = vis === true || vis === 1 || vis === '1';
+
+    let provName = item.location?.province || item.province;
+    if (!provName && item.province_snit_code) {
+      const foundProv = provincesList.find(p => p.province_snit_code == item.province_snit_code || p.province_id == item.province_snit_code);
+      if (foundProv) provName = foundProv.province_name;
+    }
+
+    const cantonName = item.location?.canton || item.canton || (item.canton_snit_code ? `Cantón ${item.canton_snit_code}` : '');
+    const districtName = item.location?.district || item.district || (item.district_snit_code ? `Distrito ${item.district_snit_code}` : '');
+
+    const parts = [provName, cantonName, districtName].filter(Boolean);
+    const locationText = parts.length > 0 ? parts.join(', ') : 'Costa Rica';
+
+    return {
+      ...item,
+      id,
+      geomanifestation_id: id,
+      name,
+      geomanifestation_name: name,
+      latitude: lat ? parseFloat(lat) : null,
+      longitude: lng ? parseFloat(lng) : null,
+      locationText,
+      isVisible,
+      visibility: isVisible ? 1 : 0,
+      hasRequestId: Boolean(item.request_id && String(item.request_id).trim() !== ''),
+    };
+  };
+
+  // Load provinces for form select
+  const loadProvinces = async () => {
+    try {
+      const res = await provincesIndex();
+      if (res.ok && Array.isArray(res.data)) {
+        setProvinces(res.data);
+        return res.data;
+      }
+    } catch (err) {
+      console.error('❌ Error loading provinces:', err);
+    }
+    return [];
+  };
 
   // Load geomanifestations
-  const loadManifestations = async () => {
+  const loadManifestations = async (currentProvinces = provinces) => {
     try {
       setLoading(true);
       
-      // Try admin endpoint first, then public endpoint
-      let res = await geomanifestationsAdminIndex();
+      // Fetch with limit=1000 to ensure all records are returned without page truncation
+      let res = await geomanifestationsAdminIndex({ limit: 1000 });
       if (!res.ok) {
-        res = await geomanifestationsIndex();
+        res = await geomanifestationsIndex({ limit: 1000 });
       }
 
       if (res.ok && res.data) {
-        const list = Array.isArray(res.data) 
-          ? res.data 
-          : (res.data.data && Array.isArray(res.data.data) ? res.data.data : []);
+        const rawList = extractList(res.data);
+        const normalizedList = rawList.map(item => normalizeItem(item, currentProvinces));
 
-        // Filter active/public manifestations vs accepted request drafts
-        const activeList = list.filter(item => item.visibility !== false && item.visibility !== 0);
-        const acceptedDrafts = list.filter(item => item.visibility === false || item.visibility === 0 || item.description?.includes('solicitud') || item.description?.includes('Solicitud'));
+        const acceptedDrafts = normalizedList.filter(item => !item.isVisible || item.hasRequestId);
 
-        // If no filter matched, put all in activeList
-        setManifestations(list);
-        setAcceptedRequestsManifestations(acceptedDrafts.length > 0 ? acceptedDrafts : list.filter(i => !i.visibility));
+        setManifestations(normalizedList);
+        setAcceptedRequestsManifestations(acceptedDrafts);
       } else {
         setManifestations([]);
         setAcceptedRequestsManifestations([]);
@@ -53,109 +131,226 @@ const GeomanifeStationsManager = () => {
     }
   };
 
-  // Load provinces for form select
-  const loadProvinces = async () => {
+  // Load cantons on province select
+  const handleProvinceChange = async (provCode) => {
+    form.setFieldsValue({ canton_snit_code: undefined, district_snit_code: undefined });
+    setCantons([]);
+    setDistricts([]);
+    if (!provCode) return;
     try {
-      let res = await provincesIndex();
-      if (!res.ok || !Array.isArray(res.data) || res.data.length === 0) {
-        res = await regionsIndex();
-      }
+      const res = await cantonsIndex(provCode);
       if (res.ok && Array.isArray(res.data)) {
-        setProvinces(res.data);
+        setCantons(res.data);
       }
     } catch (err) {
-      console.error('❌ Error loading provinces:', err);
+      console.error('❌ Error loading cantons:', err);
+    }
+  };
+
+  // Load districts on canton select
+  const handleCantonChange = async (cantonCode) => {
+    form.setFieldsValue({ district_snit_code: undefined });
+    setDistricts([]);
+    if (!cantonCode) return;
+    try {
+      const res = await districtsIndex(cantonCode);
+      if (res.ok && Array.isArray(res.data)) {
+        setDistricts(res.data);
+      }
+    } catch (err) {
+      console.error('❌ Error loading districts:', err);
     }
   };
 
   useEffect(() => {
-    loadManifestations();
-    loadProvinces();
+    const initData = async () => {
+      const provs = await loadProvinces();
+      await loadManifestations(provs);
+    };
+    initData();
   }, []);
 
-  const handleAddManualPointModalClose = () => {
-    setAddManualPointModalVisible(false);
+  const handleModalClose = () => {
+    setModalVisible(false);
+    setEditingItem(null);
     setSelectedCoordinates(null);
-    addPointForm.resetFields();
+    form.resetFields();
   };
 
-  const handleSubmitManualPoint = async (values) => {
+  const handleOpenCreate = () => {
+    setEditingItem(null);
+    setSelectedCoordinates(null);
+    form.resetFields();
+    setModalVisible(true);
+  };
+
+  const handleOpenEdit = (record) => {
+    setEditingItem(record);
+    const lat = record.latitude;
+    const lng = record.longitude;
+    if (lat && lng) {
+      setSelectedCoordinates({ lat: parseFloat(lat), lng: parseFloat(lng) });
+    } else {
+      setSelectedCoordinates(null);
+    }
+
+    const provCode = record.location?.province_snit_code ?? record.province_snit_code;
+    const cantonCode = record.location?.canton_snit_code ?? record.canton_snit_code;
+    const distCode = record.location?.district_snit_code ?? record.district_snit_code;
+
+    if (provCode) handleProvinceChange(provCode);
+    if (cantonCode) handleCantonChange(cantonCode);
+
+    form.setFieldsValue({
+      name: record.name || record.geomanifestation_name,
+      description: record.description,
+      latitude: lat ? parseFloat(lat) : undefined,
+      longitude: lng ? parseFloat(lng) : undefined,
+      province_snit_code: provCode,
+      canton_snit_code: cantonCode,
+      district_snit_code: distCode,
+      visibility: record.isVisible,
+    });
+
+    setModalVisible(true);
+  };
+
+  const handleToggleVisibility = async (record, currentVal) => {
+    const id = record.geomanifestation_id || record.id;
+    const newVisibility = !currentVal;
     try {
-      if (!selectedCoordinates) {
-        message.error('Por favor selecciona las coordenadas en el mapa primero');
-        return;
+      const res = await geomanifestationsAdminSetVisibility(id, { visibility: newVisibility });
+      if (res.ok) {
+        message.success(`Visibilidad ${newVisibility ? 'pública' : 'oculta'} actualizada`);
+        loadManifestations();
+      } else {
+        message.error(res.error || 'Error al cambiar la visibilidad');
       }
-
-      setSubmittingManualPoint(true);
-
-      const payload = {
-        name: values.name,
-        region_id: values.region_id || provinces[0]?.province_snit_code || 1,
-        latitude: selectedCoordinates.lat,
-        longitude: selectedCoordinates.lng,
-        description: values.description || null,
-        temperature: values.temperature ? parseFloat(values.temperature) : null,
-        field_pH: values.field_pH ? parseFloat(values.field_pH) : null,
-        field_conductivity: values.field_conductivity ? parseFloat(values.field_conductivity) : null,
-        lab_pH: values.lab_pH ? parseFloat(values.lab_pH) : null,
-        lab_conductivity: values.lab_conductivity ? parseFloat(values.lab_conductivity) : null,
-        cl: values.cl ? parseFloat(values.cl) : null,
-        ca: values.ca ? parseFloat(values.ca) : null,
-        hco3: values.hco3 ? parseFloat(values.hco3) : null,
-        so4: values.so4 ? parseFloat(values.so4) : null,
-        fe: values.fe ? parseFloat(values.fe) : null,
-        si: values.si ? parseFloat(values.si) : null,
-        b: values.b ? parseFloat(values.b) : null,
-        li: values.li ? parseFloat(values.li) : null,
-        f: values.f ? parseFloat(values.f) : null,
-        na: values.na ? parseFloat(values.na) : null,
-        k: values.k ? parseFloat(values.k) : null,
-        mg: values.mg ? parseFloat(values.mg) : null,
-      };
-
-      const result = await registeredManifestationsStore(payload);
-
-      if (!result.ok) {
-        throw new Error(result.error || 'Error al registrar geomanifestación');
-      }
-
-      message.success('📍 Geomanifestación registrada correctamente');
-      handleAddManualPointModalClose();
-      loadManifestations();
     } catch (err) {
-      console.error('❌ Error submitting manual point:', err);
-      message.error(err.message || 'Error al agregar la geomanifestación');
-    } finally {
-      setSubmittingManualPoint(false);
+      message.error(err.message || 'Error de conexión');
     }
   };
 
+  const handleDelete = async (record) => {
+    const id = record.geomanifestation_id || record.id;
+    try {
+      const res = await geomanifestationsAdminDelete(id);
+      if (res.ok) {
+        message.success('Geomanifestación eliminada permanentemente');
+        loadManifestations();
+      } else {
+        message.error(res.error || 'Error al eliminar');
+      }
+    } catch (err) {
+      message.error(err.message || 'Error de conexión');
+    }
+  };
+
+  const handleShowDetail = async (record) => {
+    const id = record.geomanifestation_id || record.id;
+    setDetailModalVisible(true);
+    setLoadingDetail(true);
+    try {
+      const res = await geomanifestationsAdminShow(id);
+      if (res.ok && res.data) {
+        setDetailData(res.data.data || res.data);
+      } else {
+        setDetailData(record);
+      }
+    } catch {
+      setDetailData(record);
+    } finally {
+      setLoadingDetail(false);
+    }
+  };
+
+  const handleSubmit = async (values) => {
+    try {
+      const lat = selectedCoordinates ? selectedCoordinates.lat : values.latitude;
+      const lng = selectedCoordinates ? selectedCoordinates.lng : values.longitude;
+
+      if (!lat || !lng) {
+        message.error('Por favor selecciona las coordenadas en el mapa o ingrésalas');
+        return;
+      }
+
+      setSubmitting(true);
+
+      const payload = {
+        name: values.name,
+        latitude: parseFloat(lat),
+        longitude: parseFloat(lng),
+        province_snit_code: values.province_snit_code || null,
+        canton_snit_code: values.canton_snit_code || null,
+        district_snit_code: values.district_snit_code || null,
+        description: values.description || null,
+        visibility: values.visibility !== undefined ? values.visibility : false,
+      };
+
+      let result;
+      if (editingItem) {
+        const id = editingItem.geomanifestation_id || editingItem.id;
+        result = await geomanifestationsAdminUpdate(id, payload);
+      } else {
+        result = await geomanifestationsAdminStore(payload);
+      }
+
+      if (!result.ok) {
+        throw new Error(result.error || 'Error al guardar la geomanifestación');
+      }
+
+      message.success(`📍 Geomanifestación ${editingItem ? 'actualizada' : 'registrada'} correctamente`);
+      handleModalClose();
+      loadManifestations();
+    } catch (err) {
+      console.error('❌ Error submitting:', err);
+      message.error(err.message || 'Error al guardar');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const filteredManifestations = manifestations.filter(item => {
+    const matchesSearch = !searchText ||
+      (item.name && item.name.toLowerCase().includes(searchText.toLowerCase())) ||
+      (item.geomanifestation_id && item.geomanifestation_id.toLowerCase().includes(searchText.toLowerCase())) ||
+      (item.description && item.description.toLowerCase().includes(searchText.toLowerCase()));
+
+    const matchesStatus = statusFilter === 'all' ||
+      (statusFilter === 'public' && item.isVisible) ||
+      (statusFilter === 'hidden' && !item.isVisible);
+
+    return matchesSearch && matchesStatus;
+  });
+
   const columnsActive = [
     {
-      title: 'Nombre',
+      title: 'Nombre / ID',
       dataIndex: 'name',
       key: 'name',
       render: (text, record) => (
-        <span className="font-semibold text-gray-800">
-          {text || record.geomanifestation_name || `Punto ${record.geomanifestation_id || record.id}`}
-        </span>
+        <div>
+          <span className="font-semibold text-gray-800 block">
+            {text || record.geomanifestation_name || `Punto ${record.geomanifestation_id || record.id}`}
+          </span>
+          <Text type="secondary" style={{ fontSize: '11px' }} className="font-mono">
+            ID: {record.geomanifestation_id || record.id}
+          </Text>
+        </div>
       ),
     },
     {
       title: 'Ubicación',
-      key: 'location',
-      render: (_, record) => {
-        const loc = record.location || {};
-        const parts = [loc.province, loc.canton, loc.district].filter(Boolean);
-        return parts.join(', ') || 'Costa Rica';
-      },
+      dataIndex: 'locationText',
+      key: 'locationText',
+      render: (text) => text || 'Costa Rica',
     },
     {
       title: 'Coordenadas GPS',
       key: 'coords',
       render: (_, record) => {
-        const lat = record.location?.latitude ?? record.latitude;
-        const lng = record.location?.longitude ?? record.longitude;
+        const lat = record.latitude;
+        const lng = record.longitude;
         return lat && lng ? (
           <span className="font-mono text-xs text-gray-600">
             {parseFloat(lat).toFixed(4)}°, {parseFloat(lng).toFixed(4)}°
@@ -177,10 +372,30 @@ const GeomanifeStationsManager = () => {
     },
     {
       title: 'Visibilidad',
-      dataIndex: 'visibility',
+      dataIndex: 'isVisible',
       key: 'visibility',
-      render: (val) => (
-        val !== false && val !== 0 ? <Tag icon={<EyeOutlined />} color="success">Pública</Tag> : <Tag icon={<EyeInvisibleOutlined />} color="default">Oculta / Borrador</Tag>
+      render: (isVisible, record) => (
+        <Space>
+          {isVisible ? <Tag icon={<EyeOutlined />} color="success">Pública</Tag> : <Tag icon={<EyeInvisibleOutlined />} color="default">Oculta / Borrador</Tag>}
+          <Switch
+            size="small"
+            checked={isVisible}
+            onChange={() => handleToggleVisibility(record, isVisible)}
+          />
+        </Space>
+      ),
+    },
+    {
+      title: 'Acciones',
+      key: 'actions',
+      render: (_, record) => (
+        <Space size="small">
+          <Button icon={<InfoCircleOutlined />} size="small" onClick={() => handleShowDetail(record)} title="Ver Detalles" />
+          <Button icon={<EditOutlined />} size="small" type="primary" onClick={() => handleOpenEdit(record)} title="Editar" />
+          <Popconfirm title="¿Eliminar geomanifestación?" onConfirm={() => handleDelete(record)} okText="Sí" cancelText="No">
+            <Button icon={<DeleteOutlined />} size="small" danger title="Eliminar" />
+          </Popconfirm>
+        </Space>
       ),
     },
   ];
@@ -196,17 +411,23 @@ const GeomanifeStationsManager = () => {
             {text || record.geomanifestation_name || `Geomanifestación-${record.geomanifestation_id || record.id}`}
           </span>
           <Text type="secondary" style={{ fontSize: '11px' }}>
-            Originada de Solicitud Aceptada
+            {record.hasRequestId ? `Solicitud: ${record.request_id}` : 'Borrador sin publicar'}
           </Text>
         </div>
       ),
     },
     {
+      title: 'Ubicación',
+      dataIndex: 'locationText',
+      key: 'locationText',
+      render: (text) => text || 'Costa Rica',
+    },
+    {
       title: 'Coordenadas GPS',
       key: 'coords',
       render: (_, record) => {
-        const lat = record.location?.latitude ?? record.latitude;
-        const lng = record.location?.longitude ?? record.longitude;
+        const lat = record.latitude;
+        const lng = record.longitude;
         return lat && lng ? (
           <span className="font-mono text-xs text-gray-700 bg-gray-100 px-2 py-1 rounded">
             Lat: {parseFloat(lat).toFixed(4)}° | Lng: {parseFloat(lng).toFixed(4)}°
@@ -231,11 +452,17 @@ const GeomanifeStationsManager = () => {
       },
     },
     {
-      title: 'Descripción / Origen',
-      dataIndex: 'description',
-      key: 'description',
-      ellipsis: true,
-      render: (text) => text || 'Sin descripción adicional',
+      title: 'Acciones',
+      key: 'actions',
+      render: (_, record) => (
+        <Space size="small">
+          <Button icon={<InfoCircleOutlined />} size="small" onClick={() => handleShowDetail(record)} title="Ver Detalles" />
+          <Button icon={<EditOutlined />} size="small" type="primary" onClick={() => handleOpenEdit(record)} title="Editar" />
+          <Popconfirm title="¿Eliminar borrador?" onConfirm={() => handleDelete(record)} okText="Sí" cancelText="No">
+            <Button icon={<DeleteOutlined />} size="small" danger title="Eliminar" />
+          </Popconfirm>
+        </Space>
+      ),
     },
   ];
 
@@ -245,20 +472,37 @@ const GeomanifeStationsManager = () => {
       label: (
         <span>
           <EnvironmentOutlined />
-          Geomanifestaciones Registradas ({manifestations.length})
+          Todas las Geomanifestaciones ({manifestations.length})
         </span>
       ),
       children: (
         <div>
+          {/* Controls bar */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
-            <Text type="secondary">
-              Listado general de geomanifestaciones hidrogeotérmicas registradas en el sistema.
-            </Text>
+            <Space flexWrap style={{ gap: 12 }}>
+              <Input
+                placeholder="Buscar por nombre, ID o descripción..."
+                prefix={<SearchOutlined style={{ color: '#aaa' }} />}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                style={{ width: 280 }}
+                allowClear
+              />
+              <Select
+                value={statusFilter}
+                onChange={setStatusFilter}
+                style={{ width: 180 }}
+              >
+                <Select.Option value="all">Todos los estados</Select.Option>
+                <Select.Option value="public">Solo Públicas</Select.Option>
+                <Select.Option value="hidden">Solo Ocultas / Borradores</Select.Option>
+              </Select>
+            </Space>
 
             <Button
               type="primary"
               icon={<PlusOutlined />}
-              onClick={() => setAddManualPointModalVisible(true)}
+              onClick={handleOpenCreate}
               style={{ backgroundColor: '#1890ff' }}
             >
               Agregar Punto Manualmente
@@ -266,10 +510,10 @@ const GeomanifeStationsManager = () => {
           </div>
 
           <Table
-            dataSource={manifestations}
+            dataSource={filteredManifestations}
             columns={columnsActive}
             rowKey={(item) => item.geomanifestation_id || item.id}
-            pagination={{ pageSize: 8 }}
+            pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100'] }}
             locale={{ emptyText: 'No hay geomanifestaciones registradas' }}
           />
         </div>
@@ -287,15 +531,15 @@ const GeomanifeStationsManager = () => {
         <div>
           <div style={{ marginBottom: 16 }}>
             <Text type="secondary">
-              Geomanifestaciones creadas en borrador a partir de solicitudes de usuarios aceptadas por el equipo técnico. Listas para el registro de estudios in-situ y análisis químicos.
+              Geomanifestaciones creadas en borrador u originadas de solicitudes de usuarios aceptadas. Listas para el registro de estudios in-situ y análisis químicos.
             </Text>
           </div>
 
           <Table
-            dataSource={acceptedRequestsManifestations.length > 0 ? acceptedRequestsManifestations : manifestations}
+            dataSource={acceptedRequestsManifestations}
             columns={columnsAcceptedRequests}
             rowKey={(item) => item.geomanifestation_id || item.id}
-            pagination={{ pageSize: 8 }}
+            pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100'] }}
             locale={{ emptyText: 'No hay solicitudes aceptadas pendientes de estudio' }}
           />
         </div>
@@ -311,13 +555,13 @@ const GeomanifeStationsManager = () => {
             <EnvironmentOutlined style={{ fontSize: 32, color: '#1890ff' }} />
             <div>
               <Title level={3} style={{ margin: 0 }}>Gestión de Geomanifestaciones</Title>
-              <Tag color="processing">Módulo de Puntos Geotérmicos y Solicitudes Aceptadas</Tag>
+              <Tag color="processing">Módulo Integral de Puntos Geotérmicos ({manifestations.length} puntos totales)</Tag>
             </div>
           </div>
 
           <Button
             icon={<ReloadOutlined />}
-            onClick={loadManifestations}
+            onClick={() => loadManifestations()}
             loading={loading}
           >
             Actualizar
@@ -337,20 +581,20 @@ const GeomanifeStationsManager = () => {
         )}
       </Card>
 
-      {/* Manual Point Form Modal with Embedded Map */}
+      {/* Manual Point / Edit Modal */}
       <Modal
         title={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <EnvironmentOutlined style={{ color: '#1890ff' }} />
-            <span>Agregar Punto Manualmente</span>
+            <span>{editingItem ? 'Editar Geomanifestación' : 'Agregar Punto Manualmente'}</span>
           </div>
         }
-        open={addManualPointModalVisible}
-        onOk={() => addPointForm.submit()}
-        onCancel={handleAddManualPointModalClose}
-        okText="Guardar Geomanifestación"
+        open={modalVisible}
+        onOk={() => form.submit()}
+        onCancel={handleModalClose}
+        okText={editingItem ? 'Guardar Cambios' : 'Guardar Geomanifestación'}
         cancelText="Cancelar"
-        confirmLoading={submittingManualPoint}
+        confirmLoading={submitting}
         width={800}
         centered
         styles={{
@@ -362,17 +606,16 @@ const GeomanifeStationsManager = () => {
         }}
       >
         <Form
-          form={addPointForm}
+          form={form}
           layout="vertical"
-          onFinish={handleSubmitManualPoint}
+          onFinish={handleSubmit}
         >
-          {/* Map Coordinate Picker */}
           <Form.Item label="Seleccionar Coordenadas GPS en el Mapa">
             <MapCoordinatePicker
               latLng={selectedCoordinates}
               onCoordinatesChange={(coords) => {
                 setSelectedCoordinates(coords);
-                addPointForm.setFieldsValue({
+                form.setFieldsValue({
                   latitude: coords.lat,
                   longitude: coords.lng,
                 });
@@ -405,114 +648,87 @@ const GeomanifeStationsManager = () => {
             </Form.Item>
 
             <Form.Item
-              name="region_id"
-              label="Provincia / Región"
-              rules={[{ required: true, message: 'Selecciona una provincia' }]}
+              name="province_snit_code"
+              label="Provincia"
             >
-              <Select placeholder="Selecciona una provincia">
+              <Select placeholder="Selecciona una provincia" onChange={handleProvinceChange} allowClear>
                 {provinces.map((prov) => (
-                  <Select.Option key={prov.province_snit_code || prov.id} value={prov.province_snit_code || prov.id}>
-                    {prov.province_name || prov.name}
+                  <Select.Option key={prov.province_snit_code || prov.province_id} value={prov.province_snit_code}>
+                    {prov.province_name}
                   </Select.Option>
                 ))}
               </Select>
             </Form.Item>
           </div>
 
-          <Form.Item
-            name="description"
-            label="Descripción"
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Form.Item name="canton_snit_code" label="Cantón">
+              <Select placeholder="Selecciona un cantón" onChange={handleCantonChange} allowClear disabled={cantons.length === 0}>
+                {cantons.map((c) => (
+                  <Select.Option key={c.canton_snit_code || c.canton_id} value={c.canton_snit_code}>
+                    {c.canton_name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item name="district_snit_code" label="Distrito">
+              <Select placeholder="Selecciona un distrito" allowClear disabled={districts.length === 0}>
+                {districts.map((d) => (
+                  <Select.Option key={d.district_snit_code || d.district_id} value={d.district_snit_code}>
+                    {d.district_name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </div>
+
+          <Form.Item name="description" label="Descripción">
             <Input.TextArea rows={2} placeholder="Descripción de la manifestación geotermal" />
           </Form.Item>
 
-          <hr className="my-4" />
-          <h3 className="font-semibold text-base mb-4">🌡️ Mediciones de Campo (Opcional)</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Form.Item
-              name="temperature"
-              label="Temperatura (°C)"
-            >
-              <InputNumber style={{ width: '100%' }} placeholder="45.5" step={0.1} />
-            </Form.Item>
-
-            <Form.Item
-              name="field_pH"
-              label="pH Campo"
-            >
-              <InputNumber style={{ width: '100%' }} placeholder="6.8" step={0.01} min={0} max={14} />
-            </Form.Item>
-
-            <Form.Item
-              name="field_conductivity"
-              label="Conductividad Campo (μS/cm)"
-            >
-              <InputNumber style={{ width: '100%' }} placeholder="500" step={0.01} />
-            </Form.Item>
-          </div>
-
-          <hr className="my-4" />
-          <h3 className="font-semibold text-base mb-4">🧪 Mediciones de Laboratorio (Opcional)</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Form.Item
-              name="lab_pH"
-              label="pH Laboratorio"
-            >
-              <InputNumber style={{ width: '100%' }} placeholder="7.0" step={0.01} min={0} max={14} />
-            </Form.Item>
-
-            <Form.Item
-              name="lab_conductivity"
-              label="Conductividad Lab (μS/cm)"
-            >
-              <InputNumber style={{ width: '100%' }} placeholder="520" step={0.01} />
-            </Form.Item>
-          </div>
-
-          <hr className="my-4" />
-          <h3 className="font-semibold text-base mb-4">⚗️ Elementos Químicos (Opcional - mg/L)</h3>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Form.Item name="cl" label="Cl">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="10" />
-            </Form.Item>
-            <Form.Item name="ca" label="Ca">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="20" />
-            </Form.Item>
-            <Form.Item name="hco3" label="HCO3">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="30" />
-            </Form.Item>
-            <Form.Item name="so4" label="SO4">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="40" />
-            </Form.Item>
-            <Form.Item name="fe" label="Fe">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="0.5" />
-            </Form.Item>
-            <Form.Item name="si" label="Si">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="50" />
-            </Form.Item>
-            <Form.Item name="b" label="B">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="1.0" />
-            </Form.Item>
-            <Form.Item name="li" label="Li">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="1" />
-            </Form.Item>
-            <Form.Item name="f" label="F">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="0.5" />
-            </Form.Item>
-            <Form.Item name="na" label="Na">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="60" />
-            </Form.Item>
-            <Form.Item name="k" label="K">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="70" />
-            </Form.Item>
-            <Form.Item name="mg" label="Mg">
-              <InputNumber style={{ width: '100%' }} step={0.0001} placeholder="80" />
-            </Form.Item>
-          </div>
+          <Form.Item name="visibility" valuePropName="checked" label="Visibilidad pública">
+            <Switch checkedChildren="Pública" unCheckedChildren="Oculta" />
+          </Form.Item>
         </Form>
+      </Modal>
+
+      {/* Detail Modal */}
+      <Modal
+        title="Detalle de la Geomanifestación"
+        open={detailModalVisible}
+        onCancel={() => setDetailModalVisible(false)}
+        footer={[<Button key="close" onClick={() => setDetailModalVisible(false)}>Cerrar</Button>]}
+        width={700}
+      >
+        {loadingDetail ? (
+          <Spin style={{ display: 'block', margin: '20px auto' }} />
+        ) : detailData ? (
+          <div>
+            <Title level={4}>{detailData.geomanifestation_name || detailData.name}</Title>
+            <p><strong>ID:</strong> <span className="font-mono">{detailData.geomanifestation_id || detailData.id}</span></p>
+            <p><strong>Descripción:</strong> {detailData.description || 'Sin descripción'}</p>
+            <p><strong>Visibilidad:</strong> {detailData.visibility || detailData.isVisible ? <Tag color="green">Pública</Tag> : <Tag color="gray">Oculta / Borrador</Tag>}</p>
+            {detailData.request_id && <p><strong>Origen Solicitud ID:</strong> <span className="font-mono text-blue-600">{detailData.request_id}</span></p>}
+            <p><strong>Ubicación:</strong> {detailData.locationText || [detailData.location?.province, detailData.location?.canton, detailData.location?.district].filter(Boolean).join(', ') || 'Costa Rica'}</p>
+            <p><strong>Coordenadas GPS:</strong> Lat {detailData.location?.latitude ?? detailData.latitude}, Lng {detailData.location?.longitude ?? detailData.longitude}</p>
+
+            {detailData.insitu_test && (
+              <div style={{ marginTop: 16, background: '#fafafa', padding: 12, borderRadius: 6 }}>
+                <Text strong>Prueba In-Situ:</Text>
+                <div>Temp: {detailData.insitu_test.temperature}°C | pH: {detailData.insitu_test.ph} | Cond: {detailData.insitu_test.conductivity}</div>
+              </div>
+            )}
+
+            {detailData.inlab_test && (
+              <div style={{ marginTop: 16, background: '#fafafa', padding: 12, borderRadius: 6 }}>
+                <Text strong>Prueba de Laboratorio (Geoquímica):</Text>
+                <div>pH: {detailData.inlab_test.ph} | Cond: {detailData.inlab_test.conductivity}</div>
+                <div>Cl: {detailData.inlab_test.cl} | Ca: {detailData.inlab_test.ca} | HCO3: {detailData.inlab_test.hco3} | SO4: {detailData.inlab_test.so4}</div>
+              </div>
+            )}
+          </div>
+        ) : null}
       </Modal>
     </div>
   );
