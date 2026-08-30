@@ -6,8 +6,6 @@ import { useSession } from '../../hooks/useSession';
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import {
   geomanifestationsIndex,
-  registeredManifestationsIndex,
-  regionsIndex,
   provincesIndex,
   cantonsIndex,
   districtsIndex
@@ -35,7 +33,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png",
 });
 
-// Function to fetch all geomanifestations with fallback to registered manifestations
+// Function to fetch all geomanifestations
 const fetchGeomanifestations = async () => {
   try {
     const res = await geomanifestationsIndex();
@@ -48,14 +46,6 @@ const fetchGeomanifestations = async () => {
         rawData = res.data.data.data;
       } else if (Array.isArray(res.data)) {
         rawData = res.data;
-      }
-    }
-
-    // Fallback to registeredManifestationsIndex if geomanifestations is empty
-    if (rawData.length === 0) {
-      const regRes = await registeredManifestationsIndex();
-      if (regRes.ok && Array.isArray(regRes.data)) {
-        rawData = regRes.data;
       }
     }
 

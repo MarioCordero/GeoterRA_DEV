@@ -11,7 +11,7 @@ import {
 } from 'react-icons/fa';
 import PiperDiagram from './PiperDiagram';
 import LindalDiagram from './LindalDiagram';
-import { geomanifestationsShow, registeredManifestationsShow } from '../../config/apiConf';
+import { geomanifestationsShow } from '../../config/apiConf';
 
 /**
  * Utility function to transform API response into normalized component data structure.
@@ -142,17 +142,9 @@ const transformManifestationData = (apiData, fallbackRegionName = 'Región desco
 // Function to fetch single point data
 const fetchPointData = async (pointId) => {
   try {
-    // 1. Try geomanifestationsShow endpoint first
     const geoResult = await geomanifestationsShow(pointId);
     if (geoResult.ok && geoResult.data) {
       const dataObj = geoResult.data.data || geoResult.data;
-      return transformManifestationData(dataObj);
-    }
-
-    // 2. Fallback to registeredManifestationsShow
-    const regResult = await registeredManifestationsShow(pointId);
-    if (regResult.ok && regResult.data) {
-      const dataObj = regResult.data.data || regResult.data;
       return transformManifestationData(dataObj);
     }
 

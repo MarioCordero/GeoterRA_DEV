@@ -5,7 +5,7 @@ import MapCoordinatePicker from '../../../common/MapCoordinatePicker';
 import NotImplementedModal from '../../../common/NotImplementedModal';
 import { EyeOutlined, DeleteOutlined, CheckOutlined, EnvironmentOutlined, SyncOutlined, EditOutlined } from '@ant-design/icons';
 import { Spin, Tag, Button, Modal, Form, Input, InputNumber, message, Select, Collapse } from 'antd';
-import { analysisRequestAdminIndex, analysisRequestAdminUpdate, analysisRequestAdminDelete, analysisRequestAdminShow, analysisRequestAdminAddState, geomanifestationsAdminStore, registeredManifestationsStore, regionsIndex, provincesIndex } from '../../../../config/apiConf';
+import { analysisRequestAdminIndex, analysisRequestAdminUpdate, analysisRequestAdminDelete, analysisRequestAdminShow, analysisRequestAdminAddState, geomanifestationsAdminStore, provincesIndex } from '../../../../config/apiConf';
 
 const defaultPosition = [9.93333, -84.08333];
 
