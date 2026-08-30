@@ -33,8 +33,7 @@ final class GeoreportController
   public function index(): void
   {
     try {
-      $body = Request::parseJsonRequest();
-      $geomanifestationId = $body['geomanifestation_id'] ?? '';
+      $geomanifestationId = $_GET['geomanifestation_id'] ?? '';
 
       if (empty($geomanifestationId)) {
         throw new ApiException(
@@ -59,8 +58,7 @@ final class GeoreportController
   public function current(): void
   {
     try {
-      $body = Request::parseJsonRequest();
-      $geomanifestationId = $body['geomanifestation_id'] ?? '';
+      $geomanifestationId = $_GET['geomanifestation_id'] ?? '';
 
       if (empty($geomanifestationId)) {
         throw new ApiException(
