@@ -107,6 +107,7 @@ CREATE TABLE `georeports` (
   `insitu_test_id` char(26) NOT NULL,
   `inlab_test_id` char(26) NOT NULL,
   `details` varchar(500) DEFAULT NULL,
+  `visibility` tinyint(1) NOT NULL DEFAULT 0,
   `created_by` char(26) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -137,6 +138,7 @@ CREATE TABLE `inlab_tests` (
   `k` double(10,4) NOT NULL DEFAULT 0.0000,
   `mg` double(10,4) NOT NULL DEFAULT 0.0000,
   `description` varchar(255) DEFAULT NULL,
+  `visibility` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_by` char(26) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -156,6 +158,7 @@ CREATE TABLE `insitu_tests` (
   `conductivity` double(10,2) NOT NULL DEFAULT 0.00,
   `ph` double(4,2) NOT NULL DEFAULT 0.00,
   `description` varchar(255) DEFAULT NULL,
+  `visibility` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_by` char(26) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -403,7 +406,8 @@ ALTER TABLE `georeports`
   ADD KEY `fk_gr_created_by` (`created_by`),
   ADD KEY `fk_gr_geomanifestation_id` (`geomanifestation_id`),
   ADD KEY `fk_gr_inlab_test_id` (`inlab_test_id`),
-  ADD KEY `fk_gr_insitu_test_id` (`insitu_test_id`);
+  ADD KEY `fk_gr_insitu_test_id` (`insitu_test_id`),
+  ADD KEY `idx_gr_visibility` (`visibility`) USING BTREE;
 
 --
 -- Indices de la tabla `inlab_tests`
@@ -411,7 +415,8 @@ ALTER TABLE `georeports`
 ALTER TABLE `inlab_tests`
   ADD PRIMARY KEY (`inlab_test_id`),
   ADD KEY `fk_inlabt_geomanifestation_id` (`geomanifestation_id`) USING BTREE,
-  ADD KEY `fk_inlabt_created_by` (`created_by`) USING BTREE;
+  ADD KEY `fk_inlabt_created_by` (`created_by`) USING BTREE,
+  ADD KEY `idx_inlabt_visibility` (`visibility`) USING BTREE;
 
 --
 -- Indices de la tabla `insitu_tests`
@@ -419,7 +424,8 @@ ALTER TABLE `inlab_tests`
 ALTER TABLE `insitu_tests`
   ADD PRIMARY KEY (`insitu_test_id`),
   ADD KEY `fk_insitut_created_by` (`created_by`) USING BTREE,
-  ADD KEY `fk_insitut_manifestation_id` (`geomanifestation_id`) USING BTREE;
+  ADD KEY `fk_insitut_manifestation_id` (`geomanifestation_id`) USING BTREE,
+  ADD KEY `idx_insitut_visibility` (`visibility`) USING BTREE;
 
 --
 -- Indices de la tabla `logs`
