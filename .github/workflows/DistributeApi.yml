@@ -40,9 +40,10 @@ jobs:
       - name: Preparar Base de Datos MySQL
         working-directory: ./API
         run: |
-          mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE GeoterRA;"
-          mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE GeoterRA_test;"
-          mysql -h 127.0.0.1 -u root -proot GeoterRA < tests/Fixtures/database_schema.sql
+          mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE IF NOT EXISTS GeoterRA;"
+          mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE IF NOT EXISTS GeoterRA_test;"
+          mysql -h 127.0.0.1 -u root -proot GeoterRA < ../database/GeoterRA_schema.sql
+          mysql -h 127.0.0.1 -u root -proot GeoterRA_test < ../database/GeoterRA_schema.sql
 
       - name: Ejecutar Pruebas Unitarias
         working-directory: ./API
