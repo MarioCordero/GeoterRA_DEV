@@ -21,7 +21,7 @@ final class GeomanifestationRepository extends Repository
   {
     $sql = "SELECT g.geomanifestation_id, g.province_snit_code, g.canton_snit_code, g.district_snit_code,
                        g.current_georeport_id, r.request_id, r.request_name, g.geomanifestation_name,
-                       g.latitude, g.longitude, g.description, g.visibility, g.created_at, g.created_by
+                       g.latitude, g.longitude, g.description, g.visibility, g.field_trip_id, g.created_at, g.created_by
                 FROM geomanifestations g
                 LEFT JOIN requests r on g.request_id = r.request_id
                 WHERE LOWER(geomanifestation_name) = LOWER(:name)
@@ -48,7 +48,7 @@ final class GeomanifestationRepository extends Repository
 
     $sql = "SELECT g.geomanifestation_id, g.province_snit_code, g.canton_snit_code, g.district_snit_code,
                        g.current_georeport_id, r.request_id, r.request_name, g.geomanifestation_name,
-                       g.latitude, g.longitude, g.description, g.visibility, g.created_at, g.created_by
+                       g.latitude, g.longitude, g.description, g.visibility, g.field_trip_id, g.created_at, g.created_by
                 FROM geomanifestations g
                 LEFT JOIN requests r on g.request_id = r.request_id
                 ORDER BY g.created_at DESC
@@ -111,7 +111,7 @@ final class GeomanifestationRepository extends Repository
 
     $sql = "SELECT g.geomanifestation_id, g.province_snit_code, g.canton_snit_code, g.district_snit_code,
                    g.current_georeport_id, r.request_id, r.request_name, g.geomanifestation_name,
-                   g.latitude, g.longitude, g.description, g.visibility, g.created_at, g.created_by
+                   g.latitude, g.longitude, g.description, g.visibility, g.field_trip_id, g.created_at, g.created_by
             FROM geomanifestations g
             LEFT JOIN requests r on g.request_id = r.request_id
             $whereClause
@@ -145,7 +145,7 @@ final class GeomanifestationRepository extends Repository
 
     $sql = "SELECT g.geomanifestation_id, g.province_snit_code, g.canton_snit_code, g.district_snit_code,
                        g.current_georeport_id, r.request_id, r.request_name, g.geomanifestation_name,
-                       g.latitude, g.longitude, g.description, g.visibility, g.created_at, g.created_by
+                       g.latitude, g.longitude, g.description, g.visibility, g.field_trip_id, g.created_at, g.created_by
                 FROM geomanifestations g
                 LEFT JOIN requests r on g.request_id = r.request_id
                 WHERE g.province_snit_code = :province_snit
@@ -168,7 +168,7 @@ final class GeomanifestationRepository extends Repository
    *
    * @param array<string,mixed> $data Associative array with keys: name, latitude, longitude,
    *        province_snit_code, canton_snit_code, district_snit_code, current_georeport_id,
-   *        description, visibility (0/1), request_id
+   *        description, visibility (0/1), request_id, field_trip_id
    * @param string $userId
    * @return array The generated row
    */
@@ -179,11 +179,11 @@ final class GeomanifestationRepository extends Repository
     $sql = "INSERT INTO geomanifestations (
                     geomanifestation_id, province_snit_code, canton_snit_code, district_snit_code,
                     current_georeport_id, geomanifestation_name, request_id, latitude, longitude, description,
-                    visibility, created_by, created_at
+                    visibility, field_trip_id, created_by, created_at
                 ) VALUES (
                     :id, :province_snit, :canton_snit, :district_snit,
                     :current_georeport, :name, :request_id, :lat, :lng, :desc,
-                    :visibility, :created_by, NOW()
+                    :visibility, :field_trip_id, :created_by, NOW()
                 )";
 
     $this->execute(
@@ -199,6 +199,7 @@ final class GeomanifestationRepository extends Repository
         ':lng' => $data['longitude'],
         ':desc' => $data['description'] ?? null,
         ':visibility' => $data['visibility'] ?? 0,
+        ':field_trip_id' => $data['field_trip_id'] ?? null,
         ':created_by' => $userId
       ]
     );
@@ -216,7 +217,7 @@ final class GeomanifestationRepository extends Repository
   {
     $sql = "SELECT g.geomanifestation_id, g.province_snit_code, g.canton_snit_code, g.district_snit_code,
                        g.current_georeport_id, r.request_id, r.request_name, g.geomanifestation_name,
-                       g.latitude, g.longitude, g.description, g.visibility,
+                       g.latitude, g.longitude, g.description, g.visibility, g.field_trip_id,
                        g.created_at, g.created_by
                 FROM geomanifestations g
                 LEFT JOIN requests r on g.request_id = r.request_id
