@@ -99,7 +99,6 @@ function initializeTestDatabase(): PDO
     exit(1);
   }
 
-  // Always drop and recreate test database to ensure clean schema load
   try {
     if (!empty($socket)) {
       $serverDsn = "mysql:unix_socket={$socket};charset=utf8mb4";
@@ -112,8 +111,15 @@ function initializeTestDatabase(): PDO
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
       ]
     );
-    $serverPdo->exec("DROP DATABASE IF EXISTS `{$testDbName}`");
-    $serverPdo->exec("CREATE DATABASE `{$testDbName}`");
+
+    $stmt = $serverPdo->query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{$testDbName}'");
+    $dbExists = (bool)$stmt->fetchColumn();
+
+    $forceRecreate = !empty(getenv('FORCE_RECREATE_TEST_DB'));
+    if (!$dbExists || $forceRecreate) {
+      $serverPdo->exec("DROP DATABASE IF EXISTS `{$testDbName}`");
+      $serverPdo->exec("CREATE DATABASE `{$testDbName}`");
+    }
 
     if (!empty($socket)) {
       $testDsn = "mysql:unix_socket={$socket};dbname={$testDbName};charset=utf8mb4";
@@ -121,20 +127,26 @@ function initializeTestDatabase(): PDO
       $testDsn = "mysql:host={$host};port={$port};dbname={$testDbName};charset=utf8mb4";
     }
 
-    $testPdo = new PDO(
-      $testDsn, $user, $password, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-      ]
-    );
-    echo "[✓] Recreated and connected to test database: {$testDbName}\n";
+    $pdoOptions = [
+      PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+      PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ];
+    if (defined('Pdo\\Mysql::ATTR_MULTI_STATEMENTS')) {
+      $pdoOptions[\Pdo\Mysql::ATTR_MULTI_STATEMENTS] = true;
+    } elseif (defined('PDO::MYSQL_ATTR_MULTI_STATEMENTS')) {
+      $pdoOptions[\PDO::MYSQL_ATTR_MULTI_STATEMENTS] = true;
+    }
+
+    $testPdo = new PDO($testDsn, $user, $password, $pdoOptions);
+    echo "[✓] Connected to test database: {$testDbName}\n";
+
+    if (!$dbExists || $forceRecreate) {
+      loadTestSchema($testPdo);
+    }
   } catch (PDOException $e) {
-    echo "[✗] Failed to recreate test database: " . $e->getMessage() . "\n";
+    echo "[✗] Failed to connect/recreate test database: " . $e->getMessage() . "\n";
     exit(1);
   }
-
-  // Initialize schema and initial DML from the master GeoterRA.sql dump
-  loadTestSchema($testPdo);
 
   return $testPdo;
 }
