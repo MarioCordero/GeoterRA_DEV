@@ -57,6 +57,21 @@ CREATE TABLE `cantons` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `comments`
+--
+
+CREATE TABLE `comments` (
+  `comment_id` char(26) NOT NULL,
+  `entity_type` enum('field_trip','request','geomanifestation') NOT NULL,
+  `entity_id` char(26) NOT NULL,
+  `user_id` char(26) NOT NULL,
+  `comment_text` varchar(500) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `districts`
 --
 
@@ -70,6 +85,38 @@ CREATE TABLE `districts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `field_trips`
+--
+
+CREATE TABLE `field_trips` (
+  `field_trip_id` char(26) NOT NULL,
+  `field_trip_name` varchar(110) NOT NULL,
+  `field_trip_scheduled_date` datetime NOT NULL,
+  `field_trip_start_date` datetime DEFAULT NULL,
+  `field_trip_finish_date` datetime DEFAULT NULL,
+  `field_trip_creator_id` char(26) NOT NULL,
+  `field_trip_is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `province_snit_code` mediumint(9) UNSIGNED DEFAULT NULL,
+  `canton_snit_code` mediumint(9) UNSIGNED DEFAULT NULL,
+  `district_snit_code` mediumint(9) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `field_trip_participants`
+--
+
+CREATE TABLE `field_trip_participants` (
+  `field_trip_id` char(26) NOT NULL,
+  `user_id` char(26) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -88,6 +135,7 @@ CREATE TABLE `geomanifestations` (
   `longitude` double NOT NULL,
   `description` varchar(255) DEFAULT NULL,
   `visibility` tinyint(1) NOT NULL DEFAULT 0,
+  `field_trip_id` char(26) DEFAULT NULL,
   `request_id` char(26) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_by` char(26) NOT NULL
@@ -377,6 +425,14 @@ ALTER TABLE `cantons`
   ADD KEY `fk_canton_province_snit_code` (`province_snit_code`);
 
 --
+-- Indices de la tabla `comments`
+--
+ALTER TABLE `comments`
+  ADD PRIMARY KEY (`comment_id`),
+  ADD KEY `idx_comments_entity` (`entity_type`,`entity_id`),
+  ADD KEY `fk_comments_user_id` (`user_id`);
+
+--
 -- Indices de la tabla `districts`
 --
 ALTER TABLE `districts`
@@ -384,6 +440,24 @@ ALTER TABLE `districts`
   ADD UNIQUE KEY `unique_district_snit_code` (`district_snit_code`),
   ADD KEY `fk_district_created_by` (`created_by`),
   ADD KEY `fk_district_canton_snit_code` (`canton_snit_code`);
+
+--
+-- Indices de la tabla `field_trips`
+--
+ALTER TABLE `field_trips`
+  ADD PRIMARY KEY (`field_trip_id`),
+  ADD KEY `fk_ft_creator_id` (`field_trip_creator_id`),
+  ADD KEY `fk_ft_province_snit_code` (`province_snit_code`),
+  ADD KEY `fk_ft_canton_snit_code` (`canton_snit_code`),
+  ADD KEY `fk_ft_district_snit_code` (`district_snit_code`),
+  ADD KEY `idx_ft_is_active` (`field_trip_is_active`);
+
+--
+-- Indices de la tabla `field_trip_participants`
+--
+ALTER TABLE `field_trip_participants`
+  ADD PRIMARY KEY (`field_trip_id`,`user_id`),
+  ADD KEY `fk_ftp_user_id` (`user_id`);
 
 --
 -- Indices de la tabla `geomanifestations`
@@ -396,6 +470,7 @@ ALTER TABLE `geomanifestations`
   ADD KEY `fk_gm_district_snit_code` (`district_snit_code`) USING BTREE,
   ADD KEY `idx_gm_visibility` (`visibility`) USING BTREE,
   ADD KEY `fk_gm_current_georeport_id` (`current_georeport_id`) USING BTREE,
+  ADD KEY `fk_gm_field_trip_id` (`field_trip_id`) USING BTREE,
   ADD KEY `idx_request_id` (`request_id`);
 
 --
@@ -521,11 +596,33 @@ ALTER TABLE `cantons`
   ADD CONSTRAINT `fk_canton_province_snit_code` FOREIGN KEY (`province_snit_code`) REFERENCES `provinces` (`province_snit_code`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Filtros para la tabla `comments`
+--
+ALTER TABLE `comments`
+  ADD CONSTRAINT `fk_comments_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Filtros para la tabla `districts`
 --
 ALTER TABLE `districts`
   ADD CONSTRAINT `fk_district_canton_snit_code` FOREIGN KEY (`canton_snit_code`) REFERENCES `cantons` (`canton_snit_code`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_district_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `field_trips`
+--
+ALTER TABLE `field_trips`
+  ADD CONSTRAINT `fk_ft_canton_snit_code` FOREIGN KEY (`canton_snit_code`) REFERENCES `cantons` (`canton_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_ft_creator_id` FOREIGN KEY (`field_trip_creator_id`) REFERENCES `users` (`user_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_ft_district_snit_code` FOREIGN KEY (`district_snit_code`) REFERENCES `districts` (`district_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_ft_province_snit_code` FOREIGN KEY (`province_snit_code`) REFERENCES `provinces` (`province_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `field_trip_participants`
+--
+ALTER TABLE `field_trip_participants`
+  ADD CONSTRAINT `fk_ftp_field_trip_id` FOREIGN KEY (`field_trip_id`) REFERENCES `field_trips` (`field_trip_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_ftp_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `geomanifestations`
@@ -534,6 +631,7 @@ ALTER TABLE `geomanifestations`
   ADD CONSTRAINT `fk_gm_canton_snit_code` FOREIGN KEY (`canton_snit_code`) REFERENCES `cantons` (`canton_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_gm_current_georeport_id` FOREIGN KEY (`current_georeport_id`) REFERENCES `georeports` (`georeport_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_gm_district_snit_code` FOREIGN KEY (`district_snit_code`) REFERENCES `districts` (`district_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_gm_field_trip_id` FOREIGN KEY (`field_trip_id`) REFERENCES `field_trips` (`field_trip_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_gm_province_snit_code` FOREIGN KEY (`province_snit_code`) REFERENCES `provinces` (`province_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
