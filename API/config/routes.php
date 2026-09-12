@@ -170,6 +170,8 @@ return [
   ['method' => 'PUT', 'path' => '/admin/georeports/{id}', 'controller' => 'GeoreportController', 'action' => 'update'],
   // 10.6 Elimina un georeporte [Admin]
   ['method' => 'DELETE', 'path' => '/admin/georeports/{id}', 'controller' => 'GeoreportController', 'action' => 'delete'],
+  // 10.7 Promueve un georeporte como vigente y propaga visibilidad [Admin]
+  ['method' => 'PATCH', 'path' => '/admin/georeports/{id}/promote', 'controller' => 'GeoreportController', 'action' => 'promote'],
 
   // ==========================================
   // 11. Maintenance (Mantenimiento)
@@ -182,4 +184,46 @@ return [
   ['method' => 'GET', 'path' => '/maintenance/system/logs', 'controller' => 'MaintenanceController', 'action' => 'getSystemLogs'],
   // 11.4 Retorna información de todas las tablas de la BD [Admin / Maintenance]
   ['method' => 'GET', 'path' => '/maintenance/database/tables', 'controller' => 'MaintenanceController', 'action' => 'getAllDatabaseTables'],
+
+  // ==========================================
+  // 12. Field Trips (Giras de Campo)
+  // ==========================================
+  // 12.1 Retorna listado paginado de giras de campo [Admin / Investigator / Maintenance]
+  ['method' => 'GET', 'path' => '/field-trips', 'controller' => 'FieldTripController', 'action' => 'index'],
+  // 12.2 Retorna listado de giras asignadas al usuario autenticado [Requerida]
+  ['method' => 'GET', 'path' => '/field-trips/my', 'controller' => 'FieldTripController', 'action' => 'myFieldTrips'],
+  // 12.3 Retorna una gira de campo por ID con participantes y manifestaciones [Requerida]
+  ['method' => 'GET', 'path' => '/field-trips/{id}', 'controller' => 'FieldTripController', 'action' => 'show'],
+  // 12.4 Crea una nueva gira de campo [Admin / Investigator]
+  ['method' => 'POST', 'path' => '/field-trips', 'controller' => 'FieldTripController', 'action' => 'store'],
+  // 12.5 Actualiza una gira de campo existente [Admin / Investigator]
+  ['method' => 'PUT', 'path' => '/field-trips/{id}', 'controller' => 'FieldTripController', 'action' => 'update'],
+  // 12.6 Cambia el estado activo/inactivo de una gira [Admin / Investigator]
+  ['method' => 'PATCH', 'path' => '/field-trips/{id}/active', 'controller' => 'FieldTripController', 'action' => 'toggleActive'],
+  // 12.7 Agrega un participante a una gira [Admin / Investigator]
+  ['method' => 'POST', 'path' => '/field-trips/{id}/participants', 'controller' => 'FieldTripController', 'action' => 'addParticipant'],
+  // 12.8 Remueve un participante de una gira [Admin / Investigator]
+  ['method' => 'DELETE', 'path' => '/field-trips/{id}/participants/{userId}', 'controller' => 'FieldTripController', 'action' => 'removeParticipant'],
+  // 12.9 Asocia una manifestación a una gira [Admin / Investigator]
+  ['method' => 'POST', 'path' => '/field-trips/{id}/geomanifestations', 'controller' => 'FieldTripController', 'action' => 'linkManifestation'],
+  // 12.10 Desvincula una manifestación de una gira [Admin / Investigator]
+  ['method' => 'DELETE', 'path' => '/field-trips/{id}/geomanifestations/{gmId}', 'controller' => 'FieldTripController', 'action' => 'unlinkManifestation'],
+  // 12.11 Elimina una gira de campo (creador o admin) [Admin / Investigator]
+  ['method' => 'DELETE', 'path' => '/field-trips/{id}', 'controller' => 'FieldTripController', 'action' => 'delete'],
+  // 12.12 Elimina permanentemente una gira de campo [Admin]
+  // ['method' => 'DELETE', 'path' => '/admin/field-trips/{id}', 'controller' => 'FieldTripController', 'action' => 'delete'], //DEPRECATED
+
+  // ==========================================
+  // 13. Comments (Comentarios)
+  // ==========================================
+  // 13.1 Retorna comentarios de una entidad (field_trip, request, geomanifestation) [Requerida]
+  ['method' => 'GET', 'path' => '/comments/{entity_type}/{entity_id}', 'controller' => 'CommentController', 'action' => 'index'],
+  // 13.2 Crea un nuevo comentario en una entidad [Requerida]
+  ['method' => 'POST', 'path' => '/comments/{entity_type}/{entity_id}', 'controller' => 'CommentController', 'action' => 'store'],
+  // 13.3 Edita un comentario por ID (autor o admin) [Requerida]
+  ['method' => 'PUT', 'path' => '/comments/{id}', 'controller' => 'CommentController', 'action' => 'update'],
+  // 13.4 Elimina un comentario por ID (autor o admin) [Requerida]
+  ['method' => 'DELETE', 'path' => '/comments/{id}', 'controller' => 'CommentController', 'action' => 'delete'],
+  // 13.5 Elimina un comentario por ID [Admin]
+  // ['method' => 'DELETE', 'path' => '/admin/comments/{id}', 'controller' => 'CommentController', 'action' => 'delete'], // DEPRECATED
 ];
