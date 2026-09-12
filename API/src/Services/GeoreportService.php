@@ -62,26 +62,47 @@ final class GeoreportService
     $this->validateGeomanifestationExists($dto->geomanifestationId);
     $this->validateTestsExist($dto->insituTestId, $dto->inlabTestId);
 
-    $created = $this->repository->create($dto, $auth['user_id']);
-    if (!$created) {
-      throw new ApiException(
-        ErrorType::internal('Failed to create georeport'), 500
-      );
-    }
+    try {
+      $this->pdo->beginTransaction();
 
-    if ($setAsCurrent) {
-      $updated = $this->repository->setAsCurrentForManifestation(
-        $dto->geomanifestationId,
-        $created['georeport_id']
-      );
-      if (!$updated) {
-        // Log or ignore; report already created.
-        // We throw exception to inform the client.
+      $created = $this->repository->create($dto, $auth['user_id']);
+      if (!$created) {
         throw new ApiException(
-          ErrorType::internal('Failed to set as current georeport'), 500
+          ErrorType::internal('Failed to create georeport'), 500
         );
       }
+
+      if ($setAsCurrent) {
+        $updated = $this->repository->setAsCurrentForManifestation(
+          $dto->geomanifestationId,
+          $created['georeport_id']
+        );
+        if (!$updated) {
+          throw new ApiException(
+            ErrorType::internal('Failed to set as current georeport'), 500
+          );
+        }
+
+        $manifestation = $this->geomanifestationRepository->findById($dto->geomanifestationId);
+        if ($manifestation && (bool)$manifestation['visibility']) {
+          $this->repository->promoteVisibility($created['georeport_id'], $dto->geomanifestationId);
+          $this->insituTestRepository->promoteVisibility($dto->insituTestId, $dto->geomanifestationId);
+          $this->inlabTestRepository->promoteVisibility($dto->inlabTestId, $dto->geomanifestationId);
+        }
+      }
+
+      $this->pdo->commit();
+    } catch (\Throwable $e) {
+      if ($this->pdo->inTransaction()) {
+        $this->pdo->rollBack();
+      }
+      if ($e instanceof ApiException) {
+        throw $e;
+      }
+      throw new ApiException(ErrorType::internal($e->getMessage()), 500);
     }
+
+    $created = $this->repository->findById($created['georeport_id']);
 
     $user = $this->userRepository->findById($auth['user_id']);
     if ($user) {
@@ -102,6 +123,65 @@ final class GeoreportService
     }
 
     return $this->formatReport($created);
+  }
+
+  /**
+   * Promotes a georeport to be the current one for its manifestation,
+   * propagating visibility if the manifestation is visible.
+   *
+   * @param string $georeportId
+   * @return array
+   * @throws ApiException
+   */
+  public function promoteGeoreport(string $georeportId): array
+  {
+    Request::requireRole(
+      [
+        AllowedUserRoles::ADMIN,
+        AllowedUserRoles::FIELD_INVESTIGATOR,
+        AllowedUserRoles::INVESTIGATOR
+      ]
+    );
+
+    $georeport = $this->repository->findById($georeportId);
+    if (!$georeport) {
+      throw new ApiException(ErrorType::notFound('Georeport'), 404);
+    }
+
+    $manifestationId = $georeport['geomanifestation_id'];
+    $manifestation = $this->geomanifestationRepository->findById($manifestationId);
+    if (!$manifestation) {
+      throw new ApiException(ErrorType::notFound('Geothermal manifestation'), 404);
+    }
+
+    try {
+      $this->pdo->beginTransaction();
+
+      $this->repository->setAsCurrentForManifestation($manifestationId, $georeportId);
+
+      if ((bool)$manifestation['visibility']) {
+        $this->repository->promoteVisibility($georeportId, $manifestationId);
+        if (!empty($georeport['insitu_test_id'])) {
+          $this->insituTestRepository->promoteVisibility($georeport['insitu_test_id'], $manifestationId);
+        }
+        if (!empty($georeport['inlab_test_id'])) {
+          $this->inlabTestRepository->promoteVisibility($georeport['inlab_test_id'], $manifestationId);
+        }
+      }
+
+      $this->pdo->commit();
+    } catch (\Throwable $e) {
+      if ($this->pdo->inTransaction()) {
+        $this->pdo->rollBack();
+      }
+      if ($e instanceof ApiException) {
+        throw $e;
+      }
+      throw new ApiException(ErrorType::internal($e->getMessage()), 500);
+    }
+
+    $updated = $this->repository->findById($georeportId);
+    return $this->formatReport($updated);
   }
 
   /**
@@ -162,6 +242,7 @@ final class GeoreportService
       'insitu_test_id' => $row['insitu_test_id'],
       'inlab_test_id' => $row['inlab_test_id'],
       'details' => $row['details'],
+      'visibility' => (bool)($row['visibility'] ?? 0),
       'created_at' => $row['created_at'],
       'created_by_first_name' => $row['created_by_first_name'] ?? null,
       'created_by_last_name' => $row['created_by_last_name'] ?? null,
