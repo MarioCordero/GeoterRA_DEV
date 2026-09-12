@@ -14,6 +14,9 @@ use Repositories\CantonRepository;
 use Repositories\DistrictRepository;
 use Repositories\GeomanifestationRepository;
 use Repositories\GeomanifestationViewRepository;
+use Repositories\GeoreportRepository;
+use Repositories\InlabTestRepository;
+use Repositories\InsituTestRepository;
 use Repositories\ProvinceRepository;
 use Repositories\UserRepository;
 
@@ -24,6 +27,9 @@ final class GeomanifestationService
 {
   private GeomanifestationRepository $repository;
   private GeomanifestationViewRepository $viewRepository;
+  private GeoreportRepository $georeportRepository;
+  private InsituTestRepository $insituTestRepository;
+  private InlabTestRepository $inlabTestRepository;
   private ProvinceRepository $provinceRepository;
   private CantonRepository $cantonRepository;
   private DistrictRepository $districtRepository;
@@ -35,6 +41,9 @@ final class GeomanifestationService
   {
     $this->repository = new GeomanifestationRepository($this->pdo);
     $this->viewRepository = new GeomanifestationViewRepository($this->pdo);
+    $this->georeportRepository = new GeoreportRepository($this->pdo);
+    $this->insituTestRepository = new InsituTestRepository($this->pdo);
+    $this->inlabTestRepository = new InlabTestRepository($this->pdo);
     $this->provinceRepository = new ProvinceRepository($pdo);
     $this->cantonRepository = new CantonRepository($pdo);
     $this->districtRepository = new DistrictRepository($pdo);
@@ -72,6 +81,9 @@ final class GeomanifestationService
 
     $auth = $this->authService->requireAuth();
     $created = $this->repository->create($dto->toArray(), $auth['user_id']);
+    if ($dto->visibility) {
+      $this->propagateVisibility($created['geomanifestation_id'], true, $dto->currentGeoreportId);
+    }
     $user = $this->userRepository->findById($auth['user_id']);
     // Fetch the created record from the view (include hidden because it's admin operation)
     $viewRow = $this->viewRepository->findById(
@@ -259,9 +271,29 @@ final class GeomanifestationService
 
     $updateFields = $dto->toArray();
     if (!empty($updateFields)) {
-      $updated = $this->repository->update($id, $updateFields);
-      if (!$updated) {
-        throw new ApiException(ErrorType::manifestationUpdateFailed(), 500);
+      try {
+        $this->pdo->beginTransaction();
+
+        $updated = $this->repository->update($id, $updateFields);
+        if (!$updated) {
+          throw new ApiException(ErrorType::manifestationUpdateFailed(), 500);
+        }
+
+        if ($dto->visibility !== null || $dto->currentGeoreportId !== null) {
+          $effectiveVisibility = $dto->visibility ?? (bool)$existing['visibility'];
+          $effectiveCurrentGeoreport = $dto->currentGeoreportId ?? $existing['current_georeport_id'];
+          $this->propagateVisibility($id, $effectiveVisibility, $effectiveCurrentGeoreport);
+        }
+
+        $this->pdo->commit();
+      } catch (\Throwable $e) {
+        if ($this->pdo->inTransaction()) {
+          $this->pdo->rollBack();
+        }
+        if ($e instanceof ApiException) {
+          throw $e;
+        }
+        throw new ApiException(ErrorType::internal('Update failed: ' . $e->getMessage()), 500);
       }
     }
 
@@ -334,7 +366,7 @@ final class GeomanifestationService
   }
 
   /**
-   * Updates only the visibility flag.
+   * Updates only the visibility flag with atomic cascade to linked entities.
    *
    * @param string $id
    * @param bool $visible
@@ -358,21 +390,22 @@ final class GeomanifestationService
       );
     }
 
-    if ((bool)$existing['visibility'] === $visible) {
-      // No change needed, but we still return the current record from view
-      $viewRow = $this->viewRepository->findById($id, true);
-      if (!$viewRow) {
-        throw new ApiException(
-          ErrorType::internal('Failed to retrieve manifestation'), 500
-        );
-      }
-      return $this->formatManifestationView($viewRow, true);
-    }
+    try {
+      $this->pdo->beginTransaction();
 
-    $updated = $this->repository->updateVisibility($id, $visible);
-    if (!$updated) {
+      $this->repository->updateVisibility($id, $visible);
+      $this->propagateVisibility($id, $visible, $existing['current_georeport_id'] ?? null);
+
+      $this->pdo->commit();
+    } catch (\Throwable $e) {
+      if ($this->pdo->inTransaction()) {
+        $this->pdo->rollBack();
+      }
+      if ($e instanceof ApiException) {
+        throw $e;
+      }
       throw new ApiException(
-        ErrorType::internal('Failed to update visibility'), 500
+        ErrorType::internal('Failed to update visibility: ' . $e->getMessage()), 500
       );
     }
 
@@ -384,6 +417,43 @@ final class GeomanifestationService
     }
 
     return $this->formatManifestationView($viewRow, true);
+  }
+
+  /**
+   * Propagates visibility state to linked current georeport and its tests.
+   *
+   * @param string $manifestationId
+   * @param bool $visible
+   * @param string|null $currentGeoreportId
+   * @return void
+   */
+  private function propagateVisibility(
+    string $manifestationId,
+    bool $visible,
+    ?string $currentGeoreportId = null
+  ): void {
+    if ($visible) {
+      if ($currentGeoreportId) {
+        $georeport = $this->georeportRepository->findById($currentGeoreportId);
+        if ($georeport) {
+          $this->georeportRepository->promoteVisibility($currentGeoreportId, $manifestationId);
+          if (!empty($georeport['insitu_test_id'])) {
+            $this->insituTestRepository->promoteVisibility($georeport['insitu_test_id'], $manifestationId);
+          }
+          if (!empty($georeport['inlab_test_id'])) {
+            $this->inlabTestRepository->promoteVisibility($georeport['inlab_test_id'], $manifestationId);
+          }
+          return;
+        }
+      }
+      $this->georeportRepository->resetVisibilityForManifestation($manifestationId);
+      $this->insituTestRepository->resetVisibilityForManifestation($manifestationId);
+      $this->inlabTestRepository->resetVisibilityForManifestation($manifestationId);
+    } else {
+      $this->georeportRepository->resetVisibilityForManifestation($manifestationId);
+      $this->insituTestRepository->resetVisibilityForManifestation($manifestationId);
+      $this->inlabTestRepository->resetVisibilityForManifestation($manifestationId);
+    }
   }
 
   /**
