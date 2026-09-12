@@ -1,202 +1,691 @@
--- MySQL dump 10.13  Distrib 8.0.45, for Linux (x86_64)
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
 --
--- Host: localhost    Database: GeoterRA
--- ------------------------------------------------------
--- Server version	8.0.45-0ubuntu0.24.04.1
+-- Servidor: localhost
+-- Tiempo de generación: 09-08-2026 a las 02:17:06
+-- Versión del servidor: 10.4.28-MariaDB
+-- Versión de PHP: 8.0.28
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8mb4 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
--- Table structure for table `access_tokens`
+-- Base de datos: `GeoterRA`
 --
 
-DROP TABLE IF EXISTS `access_tokens`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `access_tokens`
+--
+
 CREATE TABLE `access_tokens` (
-  `user_id` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `token_hash` char(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `expires_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `access_token_id` char(26) NOT NULL,
+  `user_id` char(26) NOT NULL,
+  `access_token_hash` char(64) NOT NULL,
+  `expires_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `revoked_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`user_id`),
-  UNIQUE KEY `token_hash` (`token_hash`),
-  UNIQUE KEY `user_id` (`user_id`) USING BTREE,
-  CONSTRAINT `fk_access_tokens_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `analysis_requests`
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `cantons`
 --
 
-DROP TABLE IF EXISTS `analysis_requests`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `analysis_requests` (
-  `id` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'SOLI-XXXXX',
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `owner_contact_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `owner_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `temperature_sensation` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `bubbles` tinyint(1) DEFAULT '0',
-  `details` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
-  `current_usage` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `latitude` decimal(10,7) DEFAULT NULL,
-  `longitude` decimal(10,7) DEFAULT NULL,
-  `state` enum('Pendiente','En revisi?n','Analizada','Eliminada') CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL DEFAULT 'Pendiente',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `created_by` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `modified_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `deleted_at` datetime DEFAULT NULL,
-  `region_id` tinyint DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`),
-  UNIQUE KEY `id` (`id`),
-  KEY `fk_analysis_requests_user` (`created_by`),
-  KEY `fk_analysis_region` (`region_id`),
-  CONSTRAINT `fk_analysis_region` FOREIGN KEY (`region_id`) REFERENCES `regions` (`id`),
-  CONSTRAINT `fk_analysis_requests_user` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+CREATE TABLE `cantons` (
+  `canton_id` char(26) NOT NULL,
+  `province_snit_code` mediumint(9) UNSIGNED NOT NULL,
+  `canton_snit_code` mediumint(9) UNSIGNED NOT NULL,
+  `canton_name` varchar(55) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` char(26) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `refresh_tokens`
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `comments`
 --
 
-DROP TABLE IF EXISTS `refresh_tokens`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `comments` (
+  `comment_id` char(26) NOT NULL,
+  `entity_type` enum('field_trip','request','geomanifestation') NOT NULL,
+  `entity_id` char(26) NOT NULL,
+  `user_id` char(26) NOT NULL,
+  `comment_text` varchar(500) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `districts`
+--
+
+CREATE TABLE `districts` (
+  `district_id` char(26) NOT NULL,
+  `canton_snit_code` mediumint(9) UNSIGNED NOT NULL,
+  `district_snit_code` mediumint(9) UNSIGNED NOT NULL,
+  `district_name` varchar(55) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` char(26) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `field_trips`
+--
+
+CREATE TABLE `field_trips` (
+  `field_trip_id` char(26) NOT NULL,
+  `field_trip_name` varchar(110) NOT NULL,
+  `field_trip_scheduled_date` datetime NOT NULL,
+  `field_trip_start_date` datetime DEFAULT NULL,
+  `field_trip_finish_date` datetime DEFAULT NULL,
+  `field_trip_creator_id` char(26) NOT NULL,
+  `field_trip_is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `province_snit_code` mediumint(9) UNSIGNED DEFAULT NULL,
+  `canton_snit_code` mediumint(9) UNSIGNED DEFAULT NULL,
+  `district_snit_code` mediumint(9) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `field_trip_participants`
+--
+
+CREATE TABLE `field_trip_participants` (
+  `field_trip_id` char(26) NOT NULL,
+  `user_id` char(26) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `geomanifestations`
+--
+
+CREATE TABLE `geomanifestations` (
+  `geomanifestation_id` char(26) NOT NULL,
+  `province_snit_code` mediumint(9) UNSIGNED DEFAULT NULL,
+  `canton_snit_code` mediumint(9) UNSIGNED DEFAULT NULL,
+  `district_snit_code` mediumint(9) UNSIGNED DEFAULT NULL,
+  `current_georeport_id` char(26) DEFAULT NULL,
+  `geomanifestation_name` varchar(110) NOT NULL DEFAULT 'GM - Sin Nombre',
+  `latitude` double NOT NULL,
+  `longitude` double NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `visibility` tinyint(1) NOT NULL DEFAULT 0,
+  `field_trip_id` char(26) DEFAULT NULL,
+  `request_id` char(26) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` char(26) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `georeports`
+--
+
+CREATE TABLE `georeports` (
+  `georeport_id` char(26) NOT NULL,
+  `geomanifestation_id` char(26) NOT NULL,
+  `insitu_test_id` char(26) NOT NULL,
+  `inlab_test_id` char(26) NOT NULL,
+  `details` varchar(500) DEFAULT NULL,
+  `visibility` tinyint(1) NOT NULL DEFAULT 0,
+  `created_by` char(26) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `inlab_tests`
+--
+
+CREATE TABLE `inlab_tests` (
+  `inlab_test_id` char(26) NOT NULL,
+  `geomanifestation_id` char(26) NOT NULL,
+  `ph` double(10,2) NOT NULL DEFAULT 0.00,
+  `conductivity` double(10,4) NOT NULL DEFAULT 0.0000,
+  `cl` double(10,4) NOT NULL DEFAULT 0.0000,
+  `ca` decimal(10,4) NOT NULL DEFAULT 0.0000,
+  `hco3` double(10,4) NOT NULL DEFAULT 0.0000,
+  `so4` decimal(10,4) NOT NULL DEFAULT 0.0000,
+  `fe` double(10,4) NOT NULL DEFAULT 0.0000,
+  `si` double(10,4) NOT NULL DEFAULT 0.0000,
+  `b` double(10,4) NOT NULL DEFAULT 0.0000,
+  `li` double(10,4) NOT NULL DEFAULT 0.0000,
+  `f` double(10,4) NOT NULL DEFAULT 0.0000,
+  `na` double(10,4) NOT NULL DEFAULT 0.0000,
+  `k` double(10,4) NOT NULL DEFAULT 0.0000,
+  `mg` double(10,4) NOT NULL DEFAULT 0.0000,
+  `description` varchar(255) DEFAULT NULL,
+  `visibility` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` char(26) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `insitu_tests`
+--
+
+CREATE TABLE `insitu_tests` (
+  `insitu_test_id` char(26) NOT NULL,
+  `geomanifestation_id` char(26) NOT NULL,
+  `temperature` double(6,2) NOT NULL DEFAULT 0.00,
+  `conductivity` double(10,2) NOT NULL DEFAULT 0.00,
+  `ph` double(4,2) NOT NULL DEFAULT 0.00,
+  `description` varchar(255) DEFAULT NULL,
+  `visibility` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` char(26) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `logs`
+--
+
+CREATE TABLE `logs` (
+  `id` bigint(20) NOT NULL,
+  `auto_id` bigint(20) NOT NULL DEFAULT 0,
+  `table_name` varchar(100) NOT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `updated_by` bigint(20) NOT NULL DEFAULT 0,
+  `updated_by_name` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `logs_entries`
+--
+
+CREATE TABLE `logs_entries` (
+  `id` bigint(20) NOT NULL,
+  `log_id` bigint(20) NOT NULL DEFAULT 0,
+  `field_name` varchar(100) NOT NULL,
+  `old_value` text DEFAULT NULL,
+  `new_value` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `password_reset_tokens`
+--
+
+CREATE TABLE `password_reset_tokens` (
+  `user_id` varchar(36) NOT NULL,
+  `token` varchar(128) NOT NULL,
+  `token_expiry` bigint(20) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `provinces`
+--
+
+CREATE TABLE `provinces` (
+  `province_id` char(26) NOT NULL,
+  `province_snit_code` mediumint(9) UNSIGNED NOT NULL,
+  `province_name` varchar(55) NOT NULL,
+  `created_by` char(26) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `refresh_tokens`
+--
+
 CREATE TABLE `refresh_tokens` (
-  `user_id` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `token_hash` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `expires_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `revoked_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`user_id`),
-  UNIQUE KEY `token_hash` (`token_hash`),
-  CONSTRAINT `fk_refresh_tokens_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+  `refresh_token_id` char(26) NOT NULL,
+  `user_id` char(26) NOT NULL,
+  `token_hash` char(64) NOT NULL,
+  `family_id` char(26) DEFAULT NULL,
+  `expires_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `used_at` timestamp NULL DEFAULT NULL,
+  `is_rotated` tinyint(1) NOT NULL DEFAULT 0,
+  `revoked_at` timestamp NULL DEFAULT NULL,
+  `replaced_by` char(26) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `regions`
---
-
-DROP TABLE IF EXISTS `regions`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `regions` (
-  `id` tinyint NOT NULL AUTO_INCREMENT,
-  `name` enum('Guanacaste','Alajuela','San José','Puntarenas','Limón','Heredia','Cartago') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `registered_geothermal_manifestations`
+-- Disparadores `refresh_tokens`
+--
+DELIMITER $$
+CREATE TRIGGER `prevent_double_use_before_insert` BEFORE UPDATE ON `refresh_tokens` FOR EACH ROW BEGIN
+    IF OLD.used_at IS NOT NULL AND NEW.used_at IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot unset used_at on a token';
+    END IF;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `requests`
 --
 
-DROP TABLE IF EXISTS `registered_geothermal_manifestations`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `registered_geothermal_manifestations` (
-  `id` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'SOLI-XXXXX',
-  `latitude` decimal(10,7) NOT NULL,
-  `longitude` decimal(10,7) NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
-  `temperature` decimal(6,2) DEFAULT NULL,
-  `field_pH` decimal(4,2) DEFAULT NULL,
-  `field_conductivity` decimal(10,2) DEFAULT NULL,
-  `lab_pH` decimal(4,2) DEFAULT NULL,
-  `lab_conductivity` decimal(10,2) DEFAULT NULL,
-  `cl` decimal(10,4) DEFAULT NULL,
-  `ca` decimal(10,4) DEFAULT NULL,
-  `hco3` decimal(10,4) DEFAULT NULL,
-  `so4` decimal(10,4) DEFAULT NULL,
-  `fe` decimal(10,4) DEFAULT NULL,
-  `si` decimal(10,4) DEFAULT NULL,
-  `b` decimal(10,4) DEFAULT NULL,
-  `li` decimal(10,4) DEFAULT NULL,
-  `f` decimal(10,4) DEFAULT NULL,
-  `na` decimal(10,4) DEFAULT NULL,
-  `k` decimal(10,4) DEFAULT NULL,
-  `mg` decimal(10,4) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `created_by` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `modified_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `modified_by` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `deleted_at` datetime DEFAULT NULL,
-  `deleted_by` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `region_id` tinyint DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`),
-  UNIQUE KEY `id` (`id`),
-  KEY `fk_rgm_created_by_user` (`created_by`),
-  KEY `fk_rgm_modified_by_user` (`modified_by`),
-  KEY `region_id` (`region_id`),
-  CONSTRAINT `fk_rgm_created_by_user` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_rgm_modified_by_user` FOREIGN KEY (`modified_by`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `registered_geothermal_manifestations_ibfk_1` FOREIGN KEY (`region_id`) REFERENCES `regions` (`id`)
+CREATE TABLE `requests` (
+  `request_id` char(26) NOT NULL,
+  `province_snit_code` mediumint(9) UNSIGNED NOT NULL,
+  `canton_snit_code` mediumint(9) UNSIGNED NOT NULL,
+  `district_snit_code` mediumint(9) UNSIGNED NOT NULL,
+  `user_id` char(26) NOT NULL,
+  `request_name` varchar(110) NOT NULL DEFAULT 'SOLI-XXXXX',
+  `owner_name` varchar(110) DEFAULT NULL,
+  `owner_phone_number` varchar(14) DEFAULT NULL,
+  `owner_email` varchar(255) DEFAULT NULL,
+  `current_usage` enum('Residencial','Comercial','Turístico','Conservación','Ganadería','Otro') NOT NULL DEFAULT 'Otro',
+  `temperature_sensation` enum('Hirviendo','Muy Caliente','Caliente','Templado','Natural','Sin Especificar') NOT NULL DEFAULT 'Sin Especificar',
+  `bubbles` tinyint(1) DEFAULT 0,
+  `details` varchar(255) DEFAULT NULL,
+  `exact_address` varchar(500) DEFAULT NULL,
+  `latitude` double(10,7) DEFAULT NULL,
+  `longitude` double(10,7) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `relation_with_owner` enum('Familiar','Empleado','Socio','Conocido','Titular') DEFAULT 'Titular'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `users`
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `requests_state`
 --
 
-DROP TABLE IF EXISTS `users`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `requests_state` (
+  `request_status_id` char(26) NOT NULL,
+  `request_id` char(26) NOT NULL,
+  `value` enum('Pendiente','Revisión','Procesada','') NOT NULL DEFAULT 'Pendiente',
+  `description` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` char(26) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `users`
+--
+
 CREATE TABLE `users` (
-  `user_id` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `first_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `last_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `phone_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `password_hash` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `role` enum('admin','user','maintenance') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'user',
-  `is_active` tinyint(1) NOT NULL DEFAULT '1',
-  `is_verified` tinyint(1) NOT NULL DEFAULT '0',
-  `failed_login_attempts` int NOT NULL DEFAULT '0',
-  `last_login_at` datetime DEFAULT NULL,
-  `password_changed_at` datetime DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `deleted_at` datetime DEFAULT NULL,
-  `deleted_by` char(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  PRIMARY KEY (`user_id`),
-  UNIQUE KEY `email` (`email`),
-  UNIQUE KEY `user_id` (`user_id`),
-  KEY `idx_email` (`email`),
-  KEY `idx_role` (`role`),
-  KEY `fk_deleted_by_user` (`deleted_by`),
-  CONSTRAINT `fk_deleted_by_user` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`user_id`)
+  `user_id` char(26) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `phone_number` varchar(14) DEFAULT NULL,
+  `first_name` varchar(55) NOT NULL,
+  `last_name` varchar(110) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `role` enum('admin','user','maintenance','investigator','field_investigator') NOT NULL DEFAULT 'user',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `is_verified` tinyint(1) NOT NULL DEFAULT 0,
+  `failed_login_attempts` tinyint(1) UNSIGNED DEFAULT 0,
+  `last_login_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estructura Stand-in para la vista `view_logs_entries`
+-- (Véase abajo para la vista actual)
+--
+CREATE TABLE `view_logs_entries` (
+`id` bigint(20)
+,`log_id` bigint(20)
+,`field_name` varchar(100)
+,`old_value` text
+,`new_value` text
+,`auto_id` bigint(20)
+,`table_name` varchar(100)
+,`updated_at` datetime
+,`updated_by` bigint(20)
+,`updated_by_name` varchar(100)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura para la vista `view_logs_entries`
+--
+DROP TABLE IF EXISTS `view_logs_entries`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_logs_entries`  AS SELECT `le`.`id` AS `id`, `le`.`log_id` AS `log_id`, `le`.`field_name` AS `field_name`, `le`.`old_value` AS `old_value`, `le`.`new_value` AS `new_value`, `l`.`auto_id` AS `auto_id`, `l`.`table_name` AS `table_name`, `l`.`updated_at` AS `updated_at`, `l`.`updated_by` AS `updated_by`, `l`.`updated_by_name` AS `updated_by_name` FROM (`logs_entries` `le` left join `logs` `l` on(`le`.`log_id` = `l`.`id`)) ;
+
+--
+-- Índices para tablas volcadas
+--
+
+--
+-- Indices de la tabla `access_tokens`
+--
+ALTER TABLE `access_tokens`
+  ADD PRIMARY KEY (`access_token_id`),
+  ADD UNIQUE KEY `unique_accesst_hash` (`access_token_hash`) USING BTREE,
+  ADD KEY `fk_accesst_user_id` (`user_id`) USING BTREE;
+
+--
+-- Indices de la tabla `cantons`
+--
+ALTER TABLE `cantons`
+  ADD PRIMARY KEY (`canton_id`),
+  ADD UNIQUE KEY `unique_canton_snit_code` (`canton_snit_code`),
+  ADD KEY `fk_canton_created_by` (`created_by`),
+  ADD KEY `fk_canton_province_snit_code` (`province_snit_code`);
+
+--
+-- Indices de la tabla `comments`
+--
+ALTER TABLE `comments`
+  ADD PRIMARY KEY (`comment_id`),
+  ADD KEY `idx_comments_entity` (`entity_type`,`entity_id`),
+  ADD KEY `fk_comments_user_id` (`user_id`);
+
+--
+-- Indices de la tabla `districts`
+--
+ALTER TABLE `districts`
+  ADD PRIMARY KEY (`district_id`),
+  ADD UNIQUE KEY `unique_district_snit_code` (`district_snit_code`),
+  ADD KEY `fk_district_created_by` (`created_by`),
+  ADD KEY `fk_district_canton_snit_code` (`canton_snit_code`);
+
+--
+-- Indices de la tabla `field_trips`
+--
+ALTER TABLE `field_trips`
+  ADD PRIMARY KEY (`field_trip_id`),
+  ADD KEY `fk_ft_creator_id` (`field_trip_creator_id`),
+  ADD KEY `fk_ft_province_snit_code` (`province_snit_code`),
+  ADD KEY `fk_ft_canton_snit_code` (`canton_snit_code`),
+  ADD KEY `fk_ft_district_snit_code` (`district_snit_code`),
+  ADD KEY `idx_ft_is_active` (`field_trip_is_active`);
+
+--
+-- Indices de la tabla `field_trip_participants`
+--
+ALTER TABLE `field_trip_participants`
+  ADD PRIMARY KEY (`field_trip_id`,`user_id`),
+  ADD KEY `fk_ftp_user_id` (`user_id`);
+
+--
+-- Indices de la tabla `geomanifestations`
+--
+ALTER TABLE `geomanifestations`
+  ADD PRIMARY KEY (`geomanifestation_id`),
+  ADD KEY `fk_gm_created_by_user` (`created_by`) USING BTREE,
+  ADD KEY `fk_gm_canton_snit_code` (`canton_snit_code`) USING BTREE,
+  ADD KEY `fk_gm_province_snit_code` (`province_snit_code`) USING BTREE,
+  ADD KEY `fk_gm_district_snit_code` (`district_snit_code`) USING BTREE,
+  ADD KEY `idx_gm_visibility` (`visibility`) USING BTREE,
+  ADD KEY `fk_gm_current_georeport_id` (`current_georeport_id`) USING BTREE,
+  ADD KEY `fk_gm_field_trip_id` (`field_trip_id`) USING BTREE,
+  ADD KEY `idx_request_id` (`request_id`);
+
+--
+-- Indices de la tabla `georeports`
+--
+ALTER TABLE `georeports`
+  ADD PRIMARY KEY (`georeport_id`),
+  ADD KEY `fk_gr_created_by` (`created_by`),
+  ADD KEY `fk_gr_geomanifestation_id` (`geomanifestation_id`),
+  ADD KEY `fk_gr_inlab_test_id` (`inlab_test_id`),
+  ADD KEY `fk_gr_insitu_test_id` (`insitu_test_id`),
+  ADD KEY `idx_gr_visibility` (`visibility`) USING BTREE;
+
+--
+-- Indices de la tabla `inlab_tests`
+--
+ALTER TABLE `inlab_tests`
+  ADD PRIMARY KEY (`inlab_test_id`),
+  ADD KEY `fk_inlabt_geomanifestation_id` (`geomanifestation_id`) USING BTREE,
+  ADD KEY `fk_inlabt_created_by` (`created_by`) USING BTREE,
+  ADD KEY `idx_inlabt_visibility` (`visibility`) USING BTREE;
+
+--
+-- Indices de la tabla `insitu_tests`
+--
+ALTER TABLE `insitu_tests`
+  ADD PRIMARY KEY (`insitu_test_id`),
+  ADD KEY `fk_insitut_created_by` (`created_by`) USING BTREE,
+  ADD KEY `fk_insitut_manifestation_id` (`geomanifestation_id`) USING BTREE,
+  ADD KEY `idx_insitut_visibility` (`visibility`) USING BTREE;
+
+--
+-- Indices de la tabla `logs`
+--
+ALTER TABLE `logs`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `logs_entries`
+--
+ALTER TABLE `logs_entries`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `log_id` (`log_id`);
+
+--
+-- Indices de la tabla `password_reset_tokens`
+--
+ALTER TABLE `password_reset_tokens`
+  ADD PRIMARY KEY (`user_id`,`token`),
+  ADD UNIQUE KEY `token` (`token`);
+
+--
+-- Indices de la tabla `provinces`
+--
+ALTER TABLE `provinces`
+  ADD PRIMARY KEY (`province_id`),
+  ADD UNIQUE KEY `unique_province_name` (`province_name`) USING BTREE,
+  ADD UNIQUE KEY `unique_province_snit_code` (`province_snit_code`) USING BTREE,
+  ADD KEY `fk_province_created_by` (`created_by`) USING BTREE;
+
+--
+-- Indices de la tabla `refresh_tokens`
+--
+ALTER TABLE `refresh_tokens`
+  ADD PRIMARY KEY (`refresh_token_id`),
+  ADD UNIQUE KEY `unique_refresht_hash` (`token_hash`) USING BTREE,
+  ADD KEY `fk_refresht_replaced_by` (`replaced_by`),
+  ADD KEY `idx_refresh_family` (`family_id`),
+  ADD KEY `idx_refresh_user_family` (`user_id`,`family_id`);
+
+--
+-- Indices de la tabla `requests`
+--
+ALTER TABLE `requests`
+  ADD PRIMARY KEY (`request_id`),
+  ADD KEY `idx_r_temperature_sensation` (`temperature_sensation`) USING BTREE,
+  ADD KEY `fk_r_canton_snit_code` (`canton_snit_code`) USING BTREE,
+  ADD KEY `fk_r_province_snit_code` (`province_snit_code`) USING BTREE,
+  ADD KEY `idx_r_current_usage` (`current_usage`) USING BTREE,
+  ADD KEY `fk_r_user` (`user_id`) USING BTREE,
+  ADD KEY `fk_r_district_snit_code` (`district_snit_code`) USING BTREE;
+
+--
+-- Indices de la tabla `requests_state`
+--
+ALTER TABLE `requests_state`
+  ADD PRIMARY KEY (`request_status_id`),
+  ADD KEY `fk_rs_request_id` (`request_id`);
+
+--
+-- Indices de la tabla `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`user_id`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD KEY `idx_users_active` (`deleted_at`,`is_deleted`);
+
+--
+-- AUTO_INCREMENT de las tablas volcadas
+--
+
+--
+-- AUTO_INCREMENT de la tabla `logs`
+--
+ALTER TABLE `logs`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3870;
+
+--
+-- AUTO_INCREMENT de la tabla `logs_entries`
+--
+ALTER TABLE `logs_entries`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7212;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `cantons`
+--
+ALTER TABLE `cantons`
+  ADD CONSTRAINT `fk_canton_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_canton_province_snit_code` FOREIGN KEY (`province_snit_code`) REFERENCES `provinces` (`province_snit_code`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `comments`
+--
+ALTER TABLE `comments`
+  ADD CONSTRAINT `fk_comments_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `districts`
+--
+ALTER TABLE `districts`
+  ADD CONSTRAINT `fk_district_canton_snit_code` FOREIGN KEY (`canton_snit_code`) REFERENCES `cantons` (`canton_snit_code`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_district_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `field_trips`
+--
+ALTER TABLE `field_trips`
+  ADD CONSTRAINT `fk_ft_canton_snit_code` FOREIGN KEY (`canton_snit_code`) REFERENCES `cantons` (`canton_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_ft_creator_id` FOREIGN KEY (`field_trip_creator_id`) REFERENCES `users` (`user_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_ft_district_snit_code` FOREIGN KEY (`district_snit_code`) REFERENCES `districts` (`district_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_ft_province_snit_code` FOREIGN KEY (`province_snit_code`) REFERENCES `provinces` (`province_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `field_trip_participants`
+--
+ALTER TABLE `field_trip_participants`
+  ADD CONSTRAINT `fk_ftp_field_trip_id` FOREIGN KEY (`field_trip_id`) REFERENCES `field_trips` (`field_trip_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_ftp_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `geomanifestations`
+--
+ALTER TABLE `geomanifestations`
+  ADD CONSTRAINT `fk_gm_canton_snit_code` FOREIGN KEY (`canton_snit_code`) REFERENCES `cantons` (`canton_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_gm_current_georeport_id` FOREIGN KEY (`current_georeport_id`) REFERENCES `georeports` (`georeport_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_gm_district_snit_code` FOREIGN KEY (`district_snit_code`) REFERENCES `districts` (`district_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_gm_field_trip_id` FOREIGN KEY (`field_trip_id`) REFERENCES `field_trips` (`field_trip_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_gm_province_snit_code` FOREIGN KEY (`province_snit_code`) REFERENCES `provinces` (`province_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `georeports`
+--
+ALTER TABLE `georeports`
+  ADD CONSTRAINT `fk_gr_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_gr_geomanifestation_id` FOREIGN KEY (`geomanifestation_id`) REFERENCES `geomanifestations` (`geomanifestation_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_gr_inlab_test_id` FOREIGN KEY (`inlab_test_id`) REFERENCES `inlab_tests` (`inlab_test_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_gr_insitu_test_id` FOREIGN KEY (`insitu_test_id`) REFERENCES `insitu_tests` (`insitu_test_id`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `inlab_tests`
+--
+ALTER TABLE `inlab_tests`
+  ADD CONSTRAINT `fk_inlab_tests_manifestation_id` FOREIGN KEY (`geomanifestation_id`) REFERENCES `geomanifestations` (`geomanifestation_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_inlabt_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `insitu_tests`
+--
+ALTER TABLE `insitu_tests`
+  ADD CONSTRAINT `fk_insitu_test_manifestation_id` FOREIGN KEY (`geomanifestation_id`) REFERENCES `geomanifestations` (`geomanifestation_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_insitut_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `logs_entries`
+--
+ALTER TABLE `logs_entries`
+  ADD CONSTRAINT `logs_entries_ibfk_1` FOREIGN KEY (`log_id`) REFERENCES `logs` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `refresh_tokens`
+--
+ALTER TABLE `refresh_tokens`
+  ADD CONSTRAINT `fk_refresht_replaced_by` FOREIGN KEY (`replaced_by`) REFERENCES `refresh_tokens` (`refresh_token_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_refresht_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `requests`
+--
+ALTER TABLE `requests`
+  ADD CONSTRAINT `fk_r_canton_snit_code` FOREIGN KEY (`canton_snit_code`) REFERENCES `cantons` (`canton_snit_code`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_r_district_snit_code` FOREIGN KEY (`district_snit_code`) REFERENCES `districts` (`district_snit_code`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_r_province_snit_code` FOREIGN KEY (`province_snit_code`) REFERENCES `provinces` (`province_snit_code`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_r_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `requests_state`
+--
+ALTER TABLE `requests_state`
+  ADD CONSTRAINT `fk_rs_request_id` FOREIGN KEY (`request_id`) REFERENCES `requests` (`request_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+COMMIT;
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2026-04-16 19:04:55

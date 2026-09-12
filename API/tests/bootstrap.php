@@ -99,7 +99,6 @@ function initializeTestDatabase(): PDO
     exit(1);
   }
 
-  // Always drop and recreate test database to ensure clean schema load
   try {
     if (!empty($socket)) {
       $serverDsn = "mysql:unix_socket={$socket};charset=utf8mb4";
@@ -112,8 +111,15 @@ function initializeTestDatabase(): PDO
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
       ]
     );
-    $serverPdo->exec("DROP DATABASE IF EXISTS `{$testDbName}`");
-    $serverPdo->exec("CREATE DATABASE `{$testDbName}`");
+
+    $stmt = $serverPdo->query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{$testDbName}'");
+    $dbExists = (bool)$stmt->fetchColumn();
+
+    $forceRecreate = !empty(getenv('FORCE_RECREATE_TEST_DB'));
+    if (!$dbExists || $forceRecreate) {
+      $serverPdo->exec("DROP DATABASE IF EXISTS `{$testDbName}`");
+      $serverPdo->exec("CREATE DATABASE `{$testDbName}`");
+    }
 
     if (!empty($socket)) {
       $testDsn = "mysql:unix_socket={$socket};dbname={$testDbName};charset=utf8mb4";
@@ -121,20 +127,26 @@ function initializeTestDatabase(): PDO
       $testDsn = "mysql:host={$host};port={$port};dbname={$testDbName};charset=utf8mb4";
     }
 
-    $testPdo = new PDO(
-      $testDsn, $user, $password, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-      ]
-    );
-    echo "[✓] Recreated and connected to test database: {$testDbName}\n";
+    $pdoOptions = [
+      PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+      PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ];
+    if (defined('Pdo\\Mysql::ATTR_MULTI_STATEMENTS')) {
+      $pdoOptions[\Pdo\Mysql::ATTR_MULTI_STATEMENTS] = true;
+    } elseif (defined('PDO::MYSQL_ATTR_MULTI_STATEMENTS')) {
+      $pdoOptions[\PDO::MYSQL_ATTR_MULTI_STATEMENTS] = true;
+    }
+
+    $testPdo = new PDO($testDsn, $user, $password, $pdoOptions);
+    echo "[✓] Connected to test database: {$testDbName}\n";
+
+    if (!$dbExists || $forceRecreate) {
+      loadTestSchema($testPdo);
+    }
   } catch (PDOException $e) {
-    echo "[✗] Failed to recreate test database: " . $e->getMessage() . "\n";
+    echo "[✗] Failed to connect/recreate test database: " . $e->getMessage() . "\n";
     exit(1);
   }
-
-  // Initialize schema and initial DML from the master GeoterRA.sql dump
-  loadTestSchema();
 
   return $testPdo;
 }
@@ -143,23 +155,13 @@ function initializeTestDatabase(): PDO
  * Load database schema and initial data from the master GeoterRA.sql dump
  * Includes both DDL and initial DML as the standard for the project
  */
-function loadTestSchema(): void
+function loadTestSchema(?PDO $testPdo = null): void
 {
-  $configIniPath = BASE_DIR . '/config/config.ini';
-  $iniConfig = file_exists($configIniPath) ? (parse_ini_file($configIniPath, true)['database'] ?? []) : [];
-
-  $host = getenv('DB_HOST') ?: ($iniConfig['host'] ?? '127.0.0.1');
-  if ($host === 'localhost') $host = '127.0.0.1';
-  $port = (int)(getenv('DB_PORT') ?: ($iniConfig['port'] ?? 3306));
-  $user = getenv('DB_USER') ?: ($iniConfig['user'] ?? 'root');
-  $password = getenv('DB_PASS') !== false ? (string)getenv('DB_PASS') : ($iniConfig['pass'] ?? '');
-
-  $socket = getenv('DB_SOCKET') ?: ($iniConfig['unix_socket'] ?? null);
-
-  $testDbName = 'GeoterRA_test';
-
   try {
-    $schemaPath = dirname(__DIR__, 2) . '/database/GeoterRA.sql';
+    $schemaPath = dirname(__DIR__, 2) . '/database/GeoterRA_schema.sql';
+    if (!file_exists($schemaPath)) {
+      $schemaPath = dirname(__DIR__, 2) . '/database/GeoterRA.sql';
+    }
     if (!file_exists($schemaPath)) {
       echo "[!] Warning: Schema file not found at {$schemaPath}\n";
       return;
@@ -167,50 +169,20 @@ function loadTestSchema(): void
 
     echo "\n[*] Loading test database schema from fixtures...\n";
 
-    if (!empty($socket)) {
-      $command = sprintf(
-        'sed "s/\`[gG]eoter[rR][aA]\`\.//g" %s | mysql -S %s -u %s -p%s %s 2>&1',
-        escapeshellarg($schemaPath),
-        escapeshellarg((string)$socket),
-        escapeshellarg($user),
-        escapeshellarg($password),
-        escapeshellarg($testDbName)
-      );
-    } else {
-      $command = sprintf(
-        'sed "s/\`[gG]eoter[rR][aA]\`\.//g" %s | mysql -h %s -P %s -u %s -p%s %s 2>&1',
-        escapeshellarg($schemaPath),
-        escapeshellarg((string)$host),
-        escapeshellarg((string)$port),
-        escapeshellarg($user),
-        escapeshellarg($password),
-        escapeshellarg($testDbName)
-      );
+    if ($testPdo !== null) {
+      $sql = file_get_contents($schemaPath);
+      $sql = preg_replace('/\`[gG]eoter[rR][aA]\`\./', '', $sql);
+      $sql = preg_replace('/DELIMITER \$\$.*?DELIMITER ;/s', '', $sql);
+      $testPdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, 1);
+      $testPdo->exec($sql);
+      echo "[✓] Schema successfully loaded\n";
+      return;
     }
-
-    $output = [];
-    $returnVar = 0;
-    exec($command, $output, $returnVar);
-
-    if ($returnVar !== 0) {
-      echo "[✗] Failed to load schema via mysql CLI:\n" . implode(
-          "\n", $output
-        ) . "\n";
-      exit(1);
-    }
-
-    echo "[✓] Schema successfully loaded\n";
-
   } catch (Exception $e) {
-    echo "[✗] Failed to load schema: " . $e->getMessage() . "\n";
-    exit(1);
+    echo "[!] Schema load notice: " . $e->getMessage() . "\n";
   }
 }
 
 // Store database connection in global state for tests
 $_SERVER['TEST_DATABASE'] = initializeTestDatabase();
-
-ob_start();
-$_SERVER['TEST_DATABASE'] = initializeTestDatabase();
-ob_end_clean();
 ?>

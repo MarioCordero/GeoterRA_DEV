@@ -147,6 +147,7 @@ final class InsituTestService
       ) : null,
       'ph' => isset($row['ph']) ? round((float)$row['ph'], 2) : null,
       'description' => $row['description'],
+      'visibility' => (bool)($row['visibility'] ?? 0),
       'created_at' => $row['created_at'],
       'created_by_first_name' => $row['created_by_first_name'] ?? null,
       'created_by_last_name' => $row['created_by_last_name'] ?? null,

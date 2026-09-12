@@ -257,7 +257,11 @@ final class Request
    */
   public static function getHeaders(): array
   {
-    return getallheaders();
+    if (function_exists('getallheaders')) {
+      $headers = getallheaders();
+      return is_array($headers) ? $headers : [];
+    }
+    return [];
   }
 
   /**
