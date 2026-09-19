@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Typography, Tag, Button, Modal, Form, InputNumber, Input, Table, message, Space, Spin, Popconfirm } from 'antd';
 import { BarChartOutlined, PlusOutlined, ReloadOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import GeomanifestationPicker from '../../../common/GeomanifestationPicker';
+import EntityNavigatorPicker from '../../../common/EntityNavigatorPicker';
 import {
   inlabTestsIndex,
   inlabTestsStore,
@@ -35,7 +35,7 @@ const InlabTestsManager = () => {
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm();
 
-  // Load list of geomanifestations for dropdown/picker
+  // Load list of geomanifestations for picker
   const loadGeomanifestations = async () => {
     try {
       setLoadingGeos(true);
@@ -264,13 +264,15 @@ const InlabTestsManager = () => {
           </Space>
         </div>
 
-        {/* Scalable Geomanifestation Picker */}
-        <GeomanifestationPicker
-          selectedGeoId={selectedGeoId}
-          onSelectGeo={(id) => setSelectedGeoId(id)}
-          manifestations={manifestations}
+        {/* Explorative Entity Navigator */}
+        <EntityNavigatorPicker
+          entityType="geomanifestations"
+          selectedId={selectedGeoId}
+          onSelect={(id) => setSelectedGeoId(id)}
+          items={manifestations}
           loading={loadingGeos}
           onRefresh={loadGeomanifestations}
+          label="GEOMANIFESTACIÓN DE LA PRUEBA:"
         />
 
         {loading ? (

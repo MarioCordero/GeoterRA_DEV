@@ -145,6 +145,7 @@ const API_CONFIG = {
       adminStore: '/admin/georeports',                        // 10.4 POST   - Crea georeporte [Admin]
       adminUpdate: (id) => `/admin/georeports/${id}`,         // 10.5 PUT    - Actualiza georeporte [Admin]
       adminDelete: (id) => `/admin/georeports/${id}`,         // 10.6 DELETE - Elimina georeporte [Admin]
+      adminPromote: (id) => `/admin/georeports/${id}/promote`,// 10.7 PATCH - Promueve georeporte a vigente [Admin]
     },
 
     // ==========================================
@@ -155,6 +156,37 @@ const API_CONFIG = {
       allUsers: '/maintenance/users',                         // 11.2 GET - Lista usuarios [Admin/Maintenance]
       systemLogs: '/maintenance/system/logs',                 // 11.3 GET - Logs del sistema [Admin/Maintenance]
       allTables: '/maintenance/database/tables',              // 11.4 GET - Tablas BD [Admin/Maintenance]
+    },
+
+    // ==========================================
+    // 12. Field Trips (Giras de Campo)
+    // ==========================================
+    fieldTrips: {
+      index: (params) => {
+        if (!params) return '/field-trips';
+        const query = new URLSearchParams(params).toString();
+        return query ? `/field-trips?${query}` : '/field-trips';
+      },                                                      // 12.1 GET    - Listar giras [Admin/Investigator/Maintenance]
+      my: '/field-trips/my',                                  // 12.2 GET    - Giras asignadas al usuario [Auth]
+      show: (id) => `/field-trips/${id}`,                     // 12.3 GET    - Detalle gira [Auth]
+      store: '/field-trips',                                  // 12.4 POST   - Crear gira [Admin/Investigator]
+      update: (id) => `/field-trips/${id}`,                   // 12.5 PUT    - Actualizar gira [Admin/Investigator]
+      toggleActive: (id) => `/field-trips/${id}/active`,      // 12.6 PATCH  - Cambiar estado activo [Admin/Investigator]
+      addParticipant: (id) => `/field-trips/${id}/participants`, // 12.7 POST - Agregar participante [Admin/Investigator]
+      removeParticipant: (id, userId) => `/field-trips/${id}/participants/${userId}`, // 12.8 DELETE - Remover participante [Admin/Investigator]
+      linkManifestation: (id) => `/field-trips/${id}/geomanifestations`, // 12.9 POST - Vincular manifestación [Admin/Investigator]
+      unlinkManifestation: (id, gmId) => `/field-trips/${id}/geomanifestations/${gmId}`, // 12.10 DELETE - Desvincular manifestación [Admin/Investigator]
+      delete: (id) => `/field-trips/${id}`,                   // 12.11 DELETE - Eliminar gira [Admin/Investigator]
+    },
+
+    // ==========================================
+    // 13. Comments (Comentarios)
+    // ==========================================
+    comments: {
+      index: (entityType, entityId) => `/comments/${entityType}/${entityId}`, // 13.1 GET - Listar comentarios [Auth]
+      store: (entityType, entityId) => `/comments/${entityType}/${entityId}`, // 13.2 POST - Crear comentario [Auth]
+      update: (id) => `/comments/${id}`,                     // 13.3 PUT - Actualizar comentario [Auth]
+      delete: (id) => `/comments/${id}`,                     // 13.4 DELETE - Eliminar comentario [Auth]
     },
   }
 };
@@ -294,6 +326,7 @@ export const georeports = {
   adminStore: () => buildApiUrl(API_CONFIG.endpoints.georeports.adminStore),
   adminUpdate: (id) => buildApiUrl(API_CONFIG.endpoints.georeports.adminUpdate(id)),
   adminDelete: (id) => buildApiUrl(API_CONFIG.endpoints.georeports.adminDelete(id)),
+  adminPromote: (id) => buildApiUrl(API_CONFIG.endpoints.georeports.adminPromote(id)),
 };
 
 // ============================================
@@ -304,6 +337,33 @@ export const maintenance = {
   allUsers: () => buildApiUrl(API_CONFIG.endpoints.maintenance.allUsers),
   systemLogs: () => buildApiUrl(API_CONFIG.endpoints.maintenance.systemLogs),
   allTables: () => buildApiUrl(API_CONFIG.endpoints.maintenance.allTables),
+};
+
+// ============================================
+// 12. FIELD TRIPS ENDPOINTS
+// ============================================
+export const fieldTrips = {
+  index: (params) => buildApiUrl(API_CONFIG.endpoints.fieldTrips.index(params)),
+  my: () => buildApiUrl(API_CONFIG.endpoints.fieldTrips.my),
+  show: (id) => buildApiUrl(API_CONFIG.endpoints.fieldTrips.show(id)),
+  store: () => buildApiUrl(API_CONFIG.endpoints.fieldTrips.store),
+  update: (id) => buildApiUrl(API_CONFIG.endpoints.fieldTrips.update(id)),
+  toggleActive: (id) => buildApiUrl(API_CONFIG.endpoints.fieldTrips.toggleActive(id)),
+  addParticipant: (id) => buildApiUrl(API_CONFIG.endpoints.fieldTrips.addParticipant(id)),
+  removeParticipant: (id, userId) => buildApiUrl(API_CONFIG.endpoints.fieldTrips.removeParticipant(id, userId)),
+  linkManifestation: (id) => buildApiUrl(API_CONFIG.endpoints.fieldTrips.linkManifestation(id)),
+  unlinkManifestation: (id, gmId) => buildApiUrl(API_CONFIG.endpoints.fieldTrips.unlinkManifestation(id, gmId)),
+  delete: (id) => buildApiUrl(API_CONFIG.endpoints.fieldTrips.delete(id)),
+};
+
+// ============================================
+// 13. COMMENTS ENDPOINTS
+// ============================================
+export const comments = {
+  index: (entityType, entityId) => buildApiUrl(API_CONFIG.endpoints.comments.index(entityType, entityId)),
+  store: (entityType, entityId) => buildApiUrl(API_CONFIG.endpoints.comments.store(entityType, entityId)),
+  update: (id) => buildApiUrl(API_CONFIG.endpoints.comments.update(id)),
+  delete: (id) => buildApiUrl(API_CONFIG.endpoints.comments.delete(id)),
 };
 
 // ============================================
@@ -784,6 +844,10 @@ export const georeportsAdminDelete = async (id) => {
   return callApi(georeports.adminDelete(id), 'DELETE');
 };
 
+export const georeportsAdminPromote = async (id) => {
+  return callApi(georeports.adminPromote(id), 'PATCH');
+};
+
 // ============================================
 // 11. MAINTENANCE API FUNCTIONS
 // ============================================
@@ -801,6 +865,72 @@ export const maintenanceSystemLogs = async () => {
 
 export const maintenanceAllTables = async () => {
   return callApi(maintenance.allTables(), 'GET');
+};
+
+// ============================================
+// 12. FIELD TRIPS API FUNCTIONS
+// ============================================
+export const fieldTripsIndex = async (params) => {
+  return callApi(fieldTrips.index(params), 'GET');
+};
+
+export const fieldTripsMy = async () => {
+  return callApi(fieldTrips.my(), 'GET');
+};
+
+export const fieldTripsShow = async (id) => {
+  return callApi(fieldTrips.show(id), 'GET');
+};
+
+export const fieldTripsStore = async (payload) => {
+  return callApi(fieldTrips.store(), 'POST', payload);
+};
+
+export const fieldTripsUpdate = async (id, payload) => {
+  return callApi(fieldTrips.update(id), 'PUT', payload);
+};
+
+export const fieldTripsToggleActive = async (id, isActive) => {
+  return callApi(fieldTrips.toggleActive(id), 'PATCH', { is_active: Boolean(isActive) });
+};
+
+export const fieldTripsAddParticipant = async (id, userId) => {
+  return callApi(fieldTrips.addParticipant(id), 'POST', { user_id: userId });
+};
+
+export const fieldTripsRemoveParticipant = async (id, userId) => {
+  return callApi(fieldTrips.removeParticipant(id, userId), 'DELETE');
+};
+
+export const fieldTripsLinkManifestation = async (id, geomanifestationId) => {
+  return callApi(fieldTrips.linkManifestation(id), 'POST', { geomanifestation_id: geomanifestationId });
+};
+
+export const fieldTripsUnlinkManifestation = async (id, gmId) => {
+  return callApi(fieldTrips.unlinkManifestation(id, gmId), 'DELETE');
+};
+
+export const fieldTripsDelete = async (id) => {
+  return callApi(fieldTrips.delete(id), 'DELETE');
+};
+
+// ============================================
+// 13. COMMENTS API FUNCTIONS
+// ============================================
+export const commentsIndex = async (entityType, entityId) => {
+  return callApi(comments.index(entityType, entityId), 'GET');
+};
+
+export const commentsStore = async (entityType, entityId, payload) => {
+  return callApi(comments.store(entityType, entityId), 'POST', payload);
+};
+
+export const commentsUpdate = async (id, payload) => {
+  return callApi(comments.update(id), 'PUT', payload);
+};
+
+export const commentsDelete = async (id) => {
+  return callApi(comments.delete(id), 'DELETE');
 };
 
 export default API_CONFIG;

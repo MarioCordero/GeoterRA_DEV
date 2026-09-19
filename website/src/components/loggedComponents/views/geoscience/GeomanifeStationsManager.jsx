@@ -1,11 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Typography, Tag, Button, Modal, Form, Input, InputNumber, Select, Table, message, Space, Spin, Tabs, Switch, Popconfirm, Badge, Progress, Tooltip } from 'antd';
+import {
+  Card,
+  Typography,
+  Tag,
+  Button,
+  Modal,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  Table,
+  message,
+  Space,
+  Spin,
+  Tabs,
+  Switch,
+  Popconfirm,
+  Badge,
+  Progress,
+  Tooltip,
+  Divider,
+} from 'antd';
 import {
   EnvironmentOutlined, PlusOutlined, ReloadOutlined, EyeOutlined, EyeInvisibleOutlined,
   CheckCircleOutlined, EditOutlined, DeleteOutlined, InfoCircleOutlined, SearchOutlined,
-  RocketOutlined, ExperimentOutlined, BarChartOutlined, FileSearchOutlined, BulbOutlined
+  RocketOutlined, ExperimentOutlined, BarChartOutlined, FileSearchOutlined, BulbOutlined,
+  CompassOutlined,
 } from '@ant-design/icons';
 import MapCoordinatePicker from '../../../common/MapCoordinatePicker';
+import CommentsPanel from '../../../common/CommentsPanel';
 import {
   geomanifestationsIndex,
   geomanifestationsAdminIndex,
@@ -25,7 +48,8 @@ import {
   inlabTestsIndex,
   georeportsAdminStore,
   georeportsAdminUpdate,
-  georeportsAdminIndex
+  georeportsAdminIndex,
+  fieldTripsIndex,
 } from '../../../../config/apiConf';
 
 const { Title, Paragraph, Text } = Typography;
@@ -42,6 +66,7 @@ const extractList = (resData) => {
 const GeomanifeStationsManager = () => {
   const [manifestations, setManifestations] = useState([]);
   const [acceptedRequestsManifestations, setAcceptedRequestsManifestations] = useState([]);
+  const [fieldTripsList, setFieldTripsList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('1');
 
@@ -134,6 +159,18 @@ const GeomanifeStationsManager = () => {
     return [];
   };
 
+  // Load field trips for association
+  const loadFieldTrips = async () => {
+    try {
+      const res = await fieldTripsIndex({ limit: 1000 });
+      if (res.ok && res.data) {
+        setFieldTripsList(extractList(res.data));
+      }
+    } catch (err) {
+      console.error('❌ Error loading field trips:', err);
+    }
+  };
+
   // Load geomanifestations
   const loadManifestations = async (currentProvinces = provinces) => {
     try {
@@ -199,11 +236,12 @@ const GeomanifeStationsManager = () => {
   };
 
   useEffect(() => {
-    const initData = async () => {
+    const init = async () => {
       const provs = await loadProvinces();
       await loadManifestations(provs);
+      loadFieldTrips();
     };
-    initData();
+    init();
   }, []);
 
   const handleModalClose = () => {
@@ -240,6 +278,7 @@ const GeomanifeStationsManager = () => {
     form.setFieldsValue({
       name: record.name || record.geomanifestation_name,
       description: record.description,
+      field_trip_id: record.field_trip_id || undefined,
       latitude: lat ? parseFloat(lat) : undefined,
       longitude: lng ? parseFloat(lng) : undefined,
       province_snit_code: provCode,
@@ -334,6 +373,7 @@ const GeomanifeStationsManager = () => {
         province_snit_code: values.province_snit_code || null,
         canton_snit_code: values.canton_snit_code || null,
         district_snit_code: values.district_snit_code || null,
+        field_trip_id: values.field_trip_id || null,
         description: values.description || null,
         visibility: values.visibility !== undefined ? values.visibility : false,
       };
@@ -341,8 +381,10 @@ const GeomanifeStationsManager = () => {
       let result;
       if (editingItem) {
         const id = editingItem.geomanifestation_id || editingItem.id;
+        payload.geomanifestation_name = values.name;
         result = await geomanifestationsAdminUpdate(id, payload);
       } else {
+        payload.geomanifestation_name = values.name;
         result = await geomanifestationsAdminStore(payload);
       }
 
@@ -1059,6 +1101,16 @@ const GeomanifeStationsManager = () => {
             </Form.Item>
           </div>
 
+          <Form.Item name="field_trip_id" label="Gira de Campo Vinculada (Opcional)">
+            <Select placeholder="Selecciona una gira de campo" allowClear showSearch optionFilterProp="label">
+              {fieldTripsList.map((trip) => (
+                <Select.Option key={trip.field_trip_id || trip.id} value={trip.field_trip_id || trip.id}>
+                  {trip.field_trip_name} {trip.field_trip_scheduled_date ? `(${trip.field_trip_scheduled_date})` : ''}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
           <Form.Item name="description" label="Descripción">
             <Input.TextArea rows={2} placeholder="Descripción de la manifestación geotermal" />
           </Form.Item>
@@ -1075,7 +1127,7 @@ const GeomanifeStationsManager = () => {
         open={detailModalVisible}
         onCancel={() => setDetailModalVisible(false)}
         footer={[<Button key="close" onClick={() => setDetailModalVisible(false)}>Cerrar</Button>]}
-        width={700}
+        width={750}
       >
         {loadingDetail ? (
           <Spin style={{ display: 'block', margin: '20px auto' }} />
@@ -1085,6 +1137,14 @@ const GeomanifeStationsManager = () => {
             <p><strong>ID:</strong> <span className="font-mono">{detailData.geomanifestation_id || detailData.id}</span></p>
             <p><strong>Descripción:</strong> {detailData.description || 'Sin descripción'}</p>
             <p><strong>Visibilidad:</strong> {detailData.visibility || detailData.isVisible ? <Tag color="green">Pública</Tag> : <Tag color="gray">Oculta / Borrador</Tag>}</p>
+            {detailData.field_trip_id && (
+              <p>
+                <strong>Gira de Campo:</strong>{' '}
+                <Tag color="orange" icon={<CompassOutlined />}>
+                  <span className="font-mono">{detailData.field_trip_id}</span>
+                </Tag>
+              </p>
+            )}
             {detailData.request_id && <p><strong>Origen Solicitud ID:</strong> <span className="font-mono text-blue-600">{detailData.request_id}</span></p>}
             <p><strong>Ubicación:</strong> {detailData.locationText || [detailData.location?.province, detailData.location?.canton, detailData.location?.district].filter(Boolean).join(', ') || 'Costa Rica'}</p>
             <p><strong>Coordenadas GPS:</strong> Lat {detailData.location?.latitude ?? detailData.latitude}, Lng {detailData.location?.longitude ?? detailData.longitude}</p>
@@ -1103,6 +1163,14 @@ const GeomanifeStationsManager = () => {
                 <div>Cl: {detailData.inlab_test.cl} | Ca: {detailData.inlab_test.ca} | HCO3: {detailData.inlab_test.hco3} | SO4: {detailData.inlab_test.so4}</div>
               </div>
             )}
+
+            <Divider style={{ margin: '20px 0 12px' }} />
+            <CommentsPanel
+              entityType="geomanifestation"
+              entityId={detailData.geomanifestation_id || detailData.id}
+              title="Bitácora y Comentarios de la Geomanifestación"
+              compact
+            />
           </div>
         ) : null}
       </Modal>

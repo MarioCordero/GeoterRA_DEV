@@ -11,6 +11,7 @@ import {
   BarChartOutlined,
   FileSearchOutlined,
   GlobalOutlined,
+  CompassOutlined,
 } from '@ant-design/icons';
 
 /**
@@ -59,7 +60,16 @@ export const getMenuItems = (permissions) => {
     shortLabel: 'Perfil',
   });
 
-  // ─── Sección admin: gestión geociencia ─────────────────────────────────
+  // ─── Sección admin / investigación: gestión geociencia ───────────────────
+  if (permissions.hasFieldTrips) {
+    menuItems.push({
+      key: '13',
+      icon: <CompassOutlined style={{ fontSize: '18px' }} />,
+      label: 'Giras de Campo',
+      shortLabel: 'Giras',
+    });
+  }
+
   if (permissions.hasManageGeomanifestations) {
     menuItems.push({
       key: '8',
@@ -148,13 +158,18 @@ export const createPermissionsObject = (hasPermissionFn, PERMISSIONS) => ({
     hasPermissionFn(PERMISSIONS.VIEW_OWN_REQUESTS) ||
     hasPermissionFn(PERMISSIONS.REVIEW_REQUESTS),
 
+  // Field Trips
+  hasFieldTrips:
+    hasPermissionFn(PERMISSIONS.VIEW_FIELD_TRIPS) ||
+    hasPermissionFn(PERMISSIONS.MANAGE_FIELD_TRIPS),
+
   // Maintenance
   hasManageUsers: hasPermissionFn(PERMISSIONS.MANAGE_USERS),
   hasViewInfrastructure: hasPermissionFn(PERMISSIONS.VIEW_INFRASTRUCTURE),
   hasExportData: hasPermissionFn(PERMISSIONS.EXPORT_DATA),
   hasSystemLogs: hasPermissionFn(PERMISSIONS.VIEW_SYSTEM_LOGS),
 
-  // Geoscience (admin only at API level)
+  // Geoscience
   hasManageGeomanifestations: hasPermissionFn(PERMISSIONS.MANAGE_GEOMANIFESTATIONS),
   hasManageInsituTests: hasPermissionFn(PERMISSIONS.MANAGE_INSITU_TESTS),
   hasManageInlabTests: hasPermissionFn(PERMISSIONS.MANAGE_INLAB_TESTS),

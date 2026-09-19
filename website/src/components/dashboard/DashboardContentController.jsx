@@ -17,6 +17,7 @@ import InsituTestsManager from '../loggedComponents/views/geoscience/InsituTests
 import InlabTestsManager from '../loggedComponents/views/geoscience/InlabTestsManager';
 import GeoreportsManager from '../loggedComponents/views/geoscience/GeoreportsManager';
 import TerritoryManager from '../loggedComponents/views/territory/TerritoryManager';
+import FieldTripsManager from '../loggedComponents/views/fieldTrips/FieldTripsManager';
 
 const DashboardContentController = ({ selectedKey }) => {
   const { hasPermission, PERMISSIONS } = usePermissions();
@@ -113,6 +114,16 @@ const DashboardContentController = ({ selectedKey }) => {
         return <div style={{ padding: '24px', color: 'red' }}>Acceso denegado</div>;
       }
       return <TerritoryManager />;
+
+    case '13':
+      // Giras de Campo - admin, investigator, field_investigator, maintenance
+      if (
+        !hasPermission(PERMISSIONS.VIEW_FIELD_TRIPS) &&
+        !hasPermission(PERMISSIONS.MANAGE_FIELD_TRIPS)
+      ) {
+        return <div style={{ padding: '24px', color: 'red' }}>Acceso denegado</div>;
+      }
+      return <FieldTripsManager />;
 
     default:
       // Fallback to home view based on role

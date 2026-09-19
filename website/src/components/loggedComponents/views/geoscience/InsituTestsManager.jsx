@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Typography, Tag, Button, Modal, Form, InputNumber, Input, Table, message, Space, Spin, Popconfirm } from 'antd';
 import { BulbOutlined, PlusOutlined, ReloadOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import GeomanifestationPicker from '../../../common/GeomanifestationPicker';
+import EntityNavigatorPicker from '../../../common/EntityNavigatorPicker';
 import {
   insituTestsIndex,
   insituTestsStore,
@@ -39,23 +39,20 @@ const InsituTestsManager = () => {
   const loadGeomanifestations = async () => {
     try {
       setLoadingGeos(true);
-      console.log('📍 [InsituTestsManager] Fetching geomanifestations list...');
       let res = await geomanifestationsAdminIndex({ show_all: 'true', limit: 1000 });
       if (!res.ok) {
         res = await geomanifestationsIndex({ show_all: 'true', limit: 1000 });
       }
       if (res.ok && res.data) {
         const list = extractList(res.data);
-        console.log('📍 [InsituTestsManager] Loaded geomanifestations count:', list.length, list);
         setManifestations(list);
         if (list.length > 0 && !selectedGeoId) {
           const firstId = list[0].geomanifestation_id || list[0].id;
-          console.log('📍 [InsituTestsManager] Auto-selecting first geomanifestation_id:', firstId);
           setSelectedGeoId(firstId);
         }
       }
     } catch (err) {
-      console.error('❌ [InsituTestsManager] Error loading geomanifestations:', err);
+      console.error('❌ Error loading geomanifestations:', err);
     } finally {
       setLoadingGeos(false);
     }
@@ -66,19 +63,15 @@ const InsituTestsManager = () => {
     if (!geoId) return;
     try {
       setLoading(true);
-      console.log('🧪 [InsituTestsManager] Loading insitu tests for geoId:', geoId);
       const res = await insituTestsIndex({ geomanifestation_id: geoId });
-      console.log('🧪 [InsituTestsManager] insituTestsIndex res:', res);
       if (res.ok && res.data) {
         const list = extractList(res.data);
-        console.log('✅ [InsituTestsManager] Extracted tests count:', list.length, list);
         setTests(list);
       } else {
-        console.warn('⚠️ [InsituTestsManager] Failed to load insitu tests:', res);
         setTests([]);
       }
     } catch (err) {
-      console.error('❌ [InsituTestsManager] Error loading insitu tests:', err);
+      console.error('❌ Error loading insitu tests:', err);
       setTests([]);
     } finally {
       setLoading(false);
@@ -263,13 +256,15 @@ const InsituTestsManager = () => {
           </Space>
         </div>
 
-        {/* Scalable Geomanifestation Picker */}
-        <GeomanifestationPicker
-          selectedGeoId={selectedGeoId}
-          onSelectGeo={(id) => setSelectedGeoId(id)}
-          manifestations={manifestations}
+        {/* Explorative Entity Navigator */}
+        <EntityNavigatorPicker
+          entityType="geomanifestations"
+          selectedId={selectedGeoId}
+          onSelect={(id) => setSelectedGeoId(id)}
+          items={manifestations}
           loading={loadingGeos}
           onRefresh={loadGeomanifestations}
+          label="GEOMANIFESTACIÓN DE LA PRUEBA:"
         />
 
         {loading ? (

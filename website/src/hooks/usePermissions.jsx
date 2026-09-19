@@ -25,6 +25,8 @@ const PERMISSIONS = {
   MANAGE_INSITU_TESTS:      'MANAGE_INSITU_TESTS',
   MANAGE_INLAB_TESTS:       'MANAGE_INLAB_TESTS',
   MANAGE_GEOREPORTS:        'MANAGE_GEOREPORTS',
+  MANAGE_FIELD_TRIPS:       'MANAGE_FIELD_TRIPS',
+  VIEW_FIELD_TRIPS:         'VIEW_FIELD_TRIPS',
 
   // Infraestructura / Sistema
   VIEW_INFRASTRUCTURE:      'VIEW_INFRASTRUCTURE',
@@ -84,6 +86,8 @@ const ROLE_PERMISSIONS = {
     PERMISSIONS.MANAGE_INSITU_TESTS,
     PERMISSIONS.MANAGE_INLAB_TESTS,
     PERMISSIONS.MANAGE_GEOREPORTS,
+    PERMISSIONS.MANAGE_FIELD_TRIPS,
+    PERMISSIONS.VIEW_FIELD_TRIPS,
 
     // Territorio
     PERMISSIONS.MANAGE_TERRITORY,
@@ -98,12 +102,13 @@ const ROLE_PERMISSIONS = {
     PERMISSIONS.VIEW_INFRASTRUCTURE,
     PERMISSIONS.VIEW_SYSTEM_LOGS,
     PERMISSIONS.EXPORT_DATA,
+    PERMISSIONS.VIEW_FIELD_TRIPS,
   ],
 
   // ──────────────────────────────────────────────────────────
   // investigator: solicitudes + geociencia completa
   //   (Geomanifestaciones, Pruebas de Campo, Pruebas de Lab,
-  //    Georeportes). El backend controla la autorizacion final.
+  //    Georeportes, Giras de Campo). El backend controla la autorizacion final.
   // ──────────────────────────────────────────────────────────
   investigator: [
     // Solicitudes
@@ -122,11 +127,13 @@ const ROLE_PERMISSIONS = {
     PERMISSIONS.MANAGE_INSITU_TESTS,
     PERMISSIONS.MANAGE_INLAB_TESTS,
     PERMISSIONS.MANAGE_GEOREPORTS,
+    PERMISSIONS.MANAGE_FIELD_TRIPS,
+    PERMISSIONS.VIEW_FIELD_TRIPS,
   ],
 
   // ──────────────────────────────────────────────────────────
   // field_investigator: solicitudes + geomanifestaciones +
-  //   pruebas de campo + georeportes.
+  //   pruebas de campo + georeportes + giras de campo.
   //   SIN acceso a Pruebas de Laboratorio.
   // ──────────────────────────────────────────────────────────
   field_investigator: [
@@ -141,6 +148,8 @@ const ROLE_PERMISSIONS = {
     PERMISSIONS.MANAGE_GEOMANIFESTATIONS,
     PERMISSIONS.MANAGE_INSITU_TESTS,
     PERMISSIONS.MANAGE_GEOREPORTS,
+    PERMISSIONS.MANAGE_FIELD_TRIPS,
+    PERMISSIONS.VIEW_FIELD_TRIPS,
   ],
 
 };
