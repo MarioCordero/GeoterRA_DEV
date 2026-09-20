@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
+import ucr.ac.cr.inii.geoterra.domain.Util
 import ucr.ac.cr.inii.geoterra.presentation.components.common.InfoBadge
 
 @Composable
@@ -72,8 +73,8 @@ fun ManifestationInfoPanel(
             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
           )
           Text(
-            text = "Lat: ${manifestation.location.latitude.toString().take(10)}," +
-              " Lon: ${manifestation.location.longitude.toString().take(10)}",
+            text = "Lat: ${Util.truncateDecimal(manifestation.location.latitude, 6)}," +
+              " Lon: ${Util.truncateDecimal(manifestation.location.longitude, 6)}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = Modifier.padding(top = 2.dp)

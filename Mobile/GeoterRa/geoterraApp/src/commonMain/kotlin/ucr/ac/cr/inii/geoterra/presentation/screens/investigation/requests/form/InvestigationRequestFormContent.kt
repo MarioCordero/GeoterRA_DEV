@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ucr.ac.cr.inii.geoterra.domain.Util
 import ucr.ac.cr.inii.geoterra.presentation.components.common.ActionButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomTextField
 import ucr.ac.cr.inii.geoterra.presentation.components.common.FormSection
@@ -231,7 +232,7 @@ fun InvestigationRequestFormContent(
 				horizontalArrangement = Arrangement.spacedBy(8.dp)
 			) {
 				CustomTextField(
-					value = state.request.latitude.toString().take(10),
+					value = Util.truncateDecimal(state.request.latitude, 6),
 					onValueChange = { onEvent(AnalysisFormEvent.LatChanged(it)) },
 					label = "Latitud",
 					modifier = Modifier.weight(1f),
@@ -242,7 +243,7 @@ fun InvestigationRequestFormContent(
 				)
 
 				CustomTextField(
-					value = state.request.longitude.toString().take(10),
+					value = Util.truncateDecimal(state.request.longitude, 6),
 					onValueChange = { onEvent(AnalysisFormEvent.LonChanged(it)) },
 					label = "Longitud",
 					modifier = Modifier.weight(1f),
