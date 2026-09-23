@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Card, Button, Modal, Table, Input, Tag, Space, Typography, Tabs, Tooltip, Row, Col, Badge, Empty } from 'antd';
+import { Card, Button, Modal, Table, Input, Tag, Space, Typography, Tabs, Tooltip, Row, Col, Badge, Empty, Select } from 'antd';
 import {
   EnvironmentOutlined,
   FileSearchOutlined,
@@ -13,10 +13,20 @@ import {
   RightOutlined,
   CompassOutlined,
   SwapOutlined,
-  InfoCircleOutlined
+  InfoCircleOutlined,
 } from '@ant-design/icons';
+import { fieldTripsIndex } from '../../config/apiConf';
 
 const { Text, Title } = Typography;
+
+const extractList = (resData) => {
+  if (!resData) return [];
+  if (Array.isArray(resData)) return resData;
+  if (Array.isArray(resData.data)) return resData.data;
+  if (Array.isArray(resData.data?.data)) return resData.data.data;
+  if (Array.isArray(resData.items)) return resData.items;
+  return [];
+};
 
 // Schema metadata definitions for all 5 core GeoterRA entities
 export const ENTITY_SCHEMAS = {
@@ -38,7 +48,9 @@ export const ENTITY_SCHEMAS = {
       const desc = String(item.description || '').toLowerCase();
       const prov = String(item.location?.province || item.province || '').toLowerCase();
       const canton = String(item.location?.canton || item.canton || '').toLowerCase();
-      return id.includes(term) || name.includes(term) || desc.includes(term) || prov.includes(term) || canton.includes(term);
+      const tripId = String(item.field_trip_id || '').toLowerCase();
+      const tripName = String(item.field_trip_name || '').toLowerCase();
+      return id.includes(term) || name.includes(term) || desc.includes(term) || prov.includes(term) || canton.includes(term) || tripId.includes(term) || tripName.includes(term);
     },
   },
   georeports: {
@@ -131,15 +143,46 @@ const EntityNavigatorPicker = ({
   const [currentType, setCurrentType] = useState(entityType);
   const [modalVisible, setModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const [fieldTripFilter, setFieldTripFilter] = useState('all'); // 'all' | 'in_trip' | 'no_trip' | specific field_trip_id
+  const [fieldTrips, setFieldTrips] = useState([]);
 
   useEffect(() => {
     setCurrentType(entityType);
   }, [entityType]);
 
+  // Load field trips to show names and filter options
+  useEffect(() => {
+    let isMounted = true;
+    const loadFieldTrips = async () => {
+      try {
+        const res = await fieldTripsIndex({ limit: 1000 });
+        if (isMounted && res.ok && res.data) {
+          setFieldTrips(extractList(res.data));
+        }
+      } catch (err) {
+        console.error('Error loading field trips in navigator:', err);
+      }
+    };
+
+    loadFieldTrips();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const fieldTripsMap = useMemo(() => {
+    const map = {};
+    (fieldTrips || []).forEach((trip) => {
+      const id = trip.field_trip_id || trip.id;
+      if (id) map[id] = trip;
+    });
+    return map;
+  }, [fieldTrips]);
+
   const activeSchema = ENTITY_SCHEMAS[currentType] || ENTITY_SCHEMAS.geomanifestations;
   const activeSelectedId = selectedId !== null && selectedId !== undefined ? selectedId : value;
 
-  // Filter items by search text & filterParams if passed
+  // Filter items by search text, field trip filter, & filterParams
   const filteredItems = useMemo(() => {
     let list = Array.isArray(items) ? items : [];
 
@@ -152,10 +195,21 @@ const EntityNavigatorPicker = ({
       });
     }
 
+    // Filter by field trip (for geomanifestations)
+    if (currentType === 'geomanifestations' && fieldTripFilter !== 'all') {
+      if (fieldTripFilter === 'in_trip') {
+        list = list.filter((item) => Boolean(item.field_trip_id));
+      } else if (fieldTripFilter === 'no_trip') {
+        list = list.filter((item) => !item.field_trip_id);
+      } else {
+        list = list.filter((item) => String(item.field_trip_id) === String(fieldTripFilter));
+      }
+    }
+
     if (!searchText) return list;
     const term = searchText.toLowerCase();
     return list.filter((item) => activeSchema.searchMatcher(item, term));
-  }, [items, searchText, activeSchema, filterParams]);
+  }, [items, searchText, activeSchema, filterParams, currentType, fieldTripFilter]);
 
   // Find currently selected item
   const selectedItem = useMemo(() => {
@@ -204,6 +258,38 @@ const EntityNavigatorPicker = ({
     if (currentType === 'geomanifestations') {
       baseColumns.push(
         {
+          title: 'Gira de Campo',
+          key: 'field_trip',
+          width: 170,
+          render: (_, record) => {
+            const tripId = record.field_trip_id;
+            const trip = tripId ? fieldTripsMap[tripId] : null;
+            const tripName = trip?.field_trip_name || record.field_trip_name;
+
+            return tripId ? (
+              <Tooltip title={`Gira: ${tripName || tripId} ${trip?.field_trip_scheduled_date ? `(${trip.field_trip_scheduled_date})` : ''}`}>
+                <Tag
+                  color="orange"
+                  icon={<CompassOutlined />}
+                  style={{
+                    fontWeight: 500,
+                    maxWidth: 155,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    verticalAlign: 'middle',
+                  }}
+                >
+                  {tripName || `Gira: ${String(tripId).slice(0, 8)}...`}
+                </Tag>
+              </Tooltip>
+            ) : (
+              <Tag color="default" style={{ color: '#8c8c8c' }}>
+                Sin Gira
+              </Tag>
+            );
+          },
+        },
+        {
           title: 'Ubicación / Coordenadas',
           key: 'coords',
           render: (_, record) => {
@@ -221,7 +307,7 @@ const EntityNavigatorPicker = ({
         {
           title: 'Visibilidad',
           key: 'vis',
-          width: 110,
+          width: 100,
           render: (_, record) => {
             const isPublic = record.visibility === 1 || record.visibility === true || record.visibility === '1';
             return isPublic ? <Tag color="green">Pública</Tag> : <Tag color="default">Borrador</Tag>;
@@ -315,7 +401,7 @@ const EntityNavigatorPicker = ({
     });
 
     return baseColumns;
-  }, [currentType, activeSchema, activeSelectedId, customColumns]);
+  }, [currentType, activeSchema, activeSelectedId, customColumns, fieldTripsMap]);
 
   // Form Compact / Button Trigger Mode
   if (mode === 'compact' || mode === 'button') {
@@ -335,9 +421,16 @@ const EntityNavigatorPicker = ({
                 {selectedItem ? activeSchema.titleField(selectedItem) : `Explorar y seleccionar ${activeSchema.name.toLowerCase()}...`}
               </span>
             </span>
-            <Tag color={selectedItem ? activeSchema.color : 'default'} style={{ marginLeft: 8 }}>
-              {selectedItem ? `ID: ${activeSelectedId}` : `${items.length} disponibles`}
-            </Tag>
+            <Space size={4}>
+              {selectedItem?.field_trip_id && (
+                <Tag color="orange" icon={<CompassOutlined />} style={{ margin: 0 }}>
+                  Gira
+                </Tag>
+              )}
+              <Tag color={selectedItem ? activeSchema.color : 'default'} style={{ margin: 0 }}>
+                {selectedItem ? `ID: ${activeSelectedId}` : `${items.length} disponibles`}
+              </Tag>
+            </Space>
           </Button>
 
           {onRefresh && (
@@ -358,18 +451,45 @@ const EntityNavigatorPicker = ({
           open={modalVisible}
           onCancel={() => setModalVisible(false)}
           footer={[<Button key="close" onClick={() => setModalVisible(false)}>Cerrar</Button>]}
-          width={880}
+          width={920}
           centered
         >
-          <Input
-            placeholder="Buscar por ID, nombre o palabras clave..."
-            prefix={<SearchOutlined style={{ color: '#aaa' }} />}
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            allowClear
-            size="large"
-            style={{ marginBottom: 16 }}
-          />
+          <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+            <Input
+              placeholder="Buscar por ID, nombre, gira o palabras clave..."
+              prefix={<SearchOutlined style={{ color: '#aaa' }} />}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              allowClear
+              size="middle"
+              style={{ flex: 1, minWidth: 240 }}
+            />
+
+            {currentType === 'geomanifestations' && (
+              <Select
+                value={fieldTripFilter}
+                onChange={setFieldTripFilter}
+                style={{ minWidth: 230 }}
+                options={[
+                  { value: 'all', label: '🧭 Todas las Geomanifestaciones' },
+                  { value: 'in_trip', label: '⭐ Solo en Giras de Campo' },
+                  { value: 'no_trip', label: '📍 Solo Sin Gira de Campo' },
+                  ...(fieldTrips.length > 0
+                    ? [
+                        {
+                          label: 'Filtrar por Gira Específica',
+                          options: fieldTrips.map((t) => ({
+                            value: t.field_trip_id || t.id,
+                            label: `🧭 ${t.field_trip_name} (${t.field_trip_scheduled_date || 'Sin fecha'})`,
+                          })),
+                        },
+                      ]
+                    : []),
+                ]}
+              />
+            )}
+          </div>
+
           <Table
             dataSource={filteredItems}
             columns={columns}
@@ -434,13 +554,21 @@ const EntityNavigatorPicker = ({
             </div>
 
             {selectedItem && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4, flexWrap: 'wrap' }}>
                 <Text type="secondary" style={{ fontSize: '12px' }}>
                   📍 {activeSchema.subtitleField(selectedItem)}
                 </Text>
                 <Text type="secondary" style={{ fontSize: '11px' }} className="font-mono bg-white px-2 py-0.5 rounded border border-gray-200">
                   ID: {activeSelectedId}
                 </Text>
+
+                {selectedItem.field_trip_id && (
+                  <Tooltip title={`ID de Gira: ${selectedItem.field_trip_id}`}>
+                    <Tag color="orange" icon={<CompassOutlined />} style={{ borderRadius: 10, fontWeight: 500 }}>
+                      Gira: {fieldTripsMap[selectedItem.field_trip_id]?.field_trip_name || selectedItem.field_trip_name || String(selectedItem.field_trip_id).slice(0, 8)}
+                    </Tag>
+                  </Tooltip>
+                )}
               </div>
             )}
           </div>
@@ -487,7 +615,7 @@ const EntityNavigatorPicker = ({
             Cerrar Navegador
           </Button>,
         ]}
-        width={920}
+        width={960}
         centered
       >
         {/* Category Tabs if allowed */}
@@ -497,6 +625,7 @@ const EntityNavigatorPicker = ({
             onChange={(type) => {
               setCurrentType(type);
               setSearchText('');
+              setFieldTripFilter('all');
             }}
             size="middle"
             style={{ marginBottom: 16 }}
@@ -515,15 +644,42 @@ const EntityNavigatorPicker = ({
           />
         )}
 
-        <div style={{ marginBottom: 16 }}>
+        {/* Search and Filters Toolbar */}
+        <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
           <Input
-            placeholder={`Buscar por ID, nombre, provincia o detalles para filtrar ${activeSchema.plural.toLowerCase()}...`}
+            placeholder={`Buscar por ID, nombre, provincia o gira...`}
             prefix={<SearchOutlined style={{ color: '#aaa' }} />}
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             allowClear
             size="large"
+            style={{ flex: 1, minWidth: 260 }}
           />
+
+          {currentType === 'geomanifestations' && (
+            <Select
+              size="large"
+              value={fieldTripFilter}
+              onChange={setFieldTripFilter}
+              style={{ minWidth: 240 }}
+              options={[
+                { value: 'all', label: '🧭 Todas las Geomanifestaciones' },
+                { value: 'in_trip', label: '⭐ Solo en Giras de Campo' },
+                { value: 'no_trip', label: '📍 Solo Sin Gira de Campo' },
+                ...(fieldTrips.length > 0
+                  ? [
+                      {
+                        label: 'Filtrar por Gira Específica',
+                        options: fieldTrips.map((t) => ({
+                          value: t.field_trip_id || t.id,
+                          label: `🧭 ${t.field_trip_name} (${t.field_trip_scheduled_date || 'Sin fecha'})`,
+                        })),
+                      },
+                    ]
+                  : []),
+              ]}
+            />
+          )}
         </div>
 
         <Table
