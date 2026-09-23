@@ -42,6 +42,9 @@ abstract class TestCase extends PHPUnitTestCase
     {
         $this->defaultUser = null;
         $this->pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
+        $this->pdo->exec('DELETE FROM comments');
+        $this->pdo->exec('DELETE FROM field_trip_participants');
+        $this->pdo->exec('DELETE FROM field_trips');
         $this->pdo->exec('DELETE FROM logs_entries');
         $this->pdo->exec('DELETE FROM logs');
         $this->pdo->exec('DELETE FROM insitu_tests');

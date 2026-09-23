@@ -33,8 +33,7 @@ final class InlabTestController
   public function index(): void
   {
     try {
-      $body = Request::parseJsonRequest();
-      $geomanifestationId = $body['geomanifestation_id'] ?? '';
+      $geomanifestationId = $_GET['geomanifestation_id'] ?? '';
 
       if (empty($geomanifestationId)) {
         throw new ApiException(

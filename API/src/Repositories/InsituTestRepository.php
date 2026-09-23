@@ -124,4 +124,31 @@ final class InsituTestRepository extends Repository
     $stmt = $this->execute($sql, [':id' => $id]);
     return $stmt->rowCount() > 0;
   }
+
+  /**
+   * Resets visibility to 0 for all in-situ tests belonging to a geomanifestation.
+   *
+   * @param string $geomanifestationId
+   * @return void
+   */
+  public function resetVisibilityForManifestation(string $geomanifestationId): void
+  {
+    $sql = "UPDATE insitu_tests SET visibility = 0 WHERE geomanifestation_id = :gm_id";
+    $this->execute($sql, [':gm_id' => $geomanifestationId]);
+  }
+
+  /**
+   * Sets visibility to 1 for a specific in-situ test and 0 for all other tests
+   * of the same geomanifestation.
+   *
+   * @param string $id
+   * @param string $geomanifestationId
+   * @return void
+   */
+  public function promoteVisibility(string $id, string $geomanifestationId): void
+  {
+    $this->resetVisibilityForManifestation($geomanifestationId);
+    $sql = "UPDATE insitu_tests SET visibility = 1 WHERE insitu_test_id = :id AND geomanifestation_id = :gm_id";
+    $this->execute($sql, [':id' => $id, ':gm_id' => $geomanifestationId]);
+  }
 }

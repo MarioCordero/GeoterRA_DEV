@@ -103,24 +103,50 @@ final class AuthController
   public function refresh(): void
   {
     try {
-      $body = Request::parseJsonRequest();
-      if (empty($body['refresh_token'])) {
+      // For web: read refresh token from HttpOnly cookie
+      // For mobile: read from JSON body (existing behavior)
+      if (Request::isWeb()) {
+        $refreshToken = $_COOKIE['geoterra_refresh_token'] ?? null;
+      } else {
+        $body = Request::parseJsonRequest();
+        $refreshToken = $body['refresh_token'] ?? null;
+      }
+
+      if (empty($refreshToken)) {
         throw new ApiException(
           ErrorType::missingField('refresh_token'),
           400
         );
       }
 
-      $result = $this->authService->refreshTokens($body['refresh_token']);
+      $result = $this->authService->refreshTokens($refreshToken);
       if (Request::isWeb()) {
         $accessToken = $result['data']['access_token'];
+        $newRefreshToken = $result['data']['refresh_token'];
         $expiresIn = $result['meta']['expires_in'] ?? 60 * 5;
+        $refreshTtl = 3600 * 24 * 30; // 30 days
+
+        // Renew access token cookie
         setcookie(
           'geoterra_session_token',
           $accessToken,
           [
             'expires' => time() + $expiresIn,
             'path' => '/',
+            'domain' => '',
+            'secure' => false,
+            'httponly' => true,
+            'samesite' => 'Lax',
+          ]
+        );
+
+        // Renew rotated refresh token cookie
+        setcookie(
+          'geoterra_refresh_token',
+          $newRefreshToken,
+          [
+            'expires' => time() + $refreshTtl,
+            'path' => '/api/auth/',
             'domain' => '',
             'secure' => false,
             'httponly' => true,
@@ -247,10 +273,23 @@ final class AuthController
       $this->authService->logout();
 
       if (Request::isWeb()) {
+        // Clear access token cookie
         setcookie(
           'geoterra_session_token', '', [
             'expires' => time() - 60 * 5,
             'path' => '/',
+            'domain' => '',
+            'secure' => false,
+            'httponly' => true,
+            'samesite' => 'Lax',
+          ]
+        );
+
+        // Clear refresh token cookie
+        setcookie(
+          'geoterra_refresh_token', '', [
+            'expires' => time() - 60 * 5,
+            'path' => '/api/auth/',
             'domain' => '',
             'secure' => false,
             'httponly' => true,

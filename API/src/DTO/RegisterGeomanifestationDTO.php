@@ -34,6 +34,7 @@ final class RegisterGeomanifestationDTO
     public ?string $description = null,
     public ?string $currentGeoreportId = null,
     public ?string $request_id = null,
+    public ?string $fieldTripId = null,
     public bool $visibility = false
   ) {}
 
@@ -75,6 +76,7 @@ final class RegisterGeomanifestationDTO
       description : $data['description'] ?? null,
       currentGeoreportId : $data['current_georeport_id'] ?? null,
       request_id : $data['request_id'] ?? null,
+      fieldTripId : $data['field_trip_id'] ?? null,
       visibility : isset($data['visibility']) && $data['visibility']
     );
   }
@@ -95,6 +97,7 @@ final class RegisterGeomanifestationDTO
       'district_snit_code' => $this->districtSnitCode,
       'current_georeport_id' => $this->currentGeoreportId,
       'request_id' => $this->request_id,
+      'field_trip_id' => $this->fieldTripId,
       'description' => $this->description,
       'visibility' => $this->visibility ? 1 : 0,
     ];

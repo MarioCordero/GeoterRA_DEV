@@ -33,6 +33,7 @@ final class UpdateGeomanifestationDTO
     public ?int $districtSnitCode = null,
     public ?string $currentGeoreportId = null,
     public ?string $requestId = null,
+    public ?string $fieldTripId = null,
     public ?string $description = null,
     public ?bool $visibility = null
   ) {}
@@ -61,6 +62,7 @@ final class UpdateGeomanifestationDTO
         ? (int) $data['district_snit_code'] : null,
       currentGeoreportId: $data['current_georeport_id'] ?? null,
       requestId: $data['request_id'] ?? null,
+      fieldTripId: $data['field_trip_id'] ?? null,
       description: $data['description'] ?? null,
       visibility: isset($data['visibility']) ? (bool) $data['visibility'] : null
     );
@@ -99,6 +101,9 @@ final class UpdateGeomanifestationDTO
     }
     if ($this->requestId !== null) {
       $update['request_id'] = $this->requestId;
+    }
+    if ($this->fieldTripId !== null) {
+      $update['field_trip_id'] = $this->fieldTripId;
     }
     if ($this->description !== null) {
       $update['description'] = $this->description;

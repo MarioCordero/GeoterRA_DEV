@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.3
 -- https://www.phpmyadmin.net/
 --
--- Servidor: localhost
--- Tiempo de generación: 16-08-2026 a las 03:09:39
--- Versión del servidor: 10.4.28-MariaDB
--- Versión de PHP: 8.0.28
+-- Host: localhost
+-- Generation Time: Sep 12, 2026 at 01:03 PM
+-- Server version: 12.3.3-MariaDB
+-- PHP Version: 8.5.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `GeoterRA`
+-- Database: `GeoterRA`
 --
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `access_tokens`
+-- Table structure for table `access_tokens`
 --
 
 CREATE TABLE `access_tokens` (
@@ -37,16 +37,34 @@ CREATE TABLE `access_tokens` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `access_tokens`
+-- Dumping data for table `access_tokens`
 --
 
 INSERT INTO `access_tokens` (`access_token_id`, `user_id`, `access_token_hash`, `expires_at`, `revoked_at`, `created_at`) VALUES
-('01M03HCEY8EZ3QXQQCDF3JGADE', '06F43H2S28KNWX71TSF7MWWTA4', '508465ca267e7d7f6a6580aea569de875957d50c22fbfa5256e87a074328d7c3', '2026-08-16 02:26:32', NULL, '2026-08-16 02:21:32');
+('01KSDHET7NPWD52F4RY10WE8B1', '01KSDHAZHHKK02DG47168ZX7TV', '21608c106795ece560855e805a1effd68c79edde65dce91fd5ec53b2a53c449f', '2026-05-25 03:15:21', NULL, '2026-05-25 01:45:21'),
+('01KSDHF3762P7K0DP5N4N71GYS', '01KSDHAZHHKK02DG47168ZX7TV', 'a41a58bd9595e2fe937756252582b8bca77c9705da06e1a759952136f4ee5e2e', '2026-05-25 03:15:30', NULL, '2026-05-25 01:45:30'),
+('01KSDHHKN0WP64426GRDHK8XDM', '01KSDHAZHHKK02DG47168ZX7TV', '14b12b8bf956031ade60e10c1905ab373494d6f4c77503c317035e4276000c9d', '2026-05-25 03:16:52', NULL, '2026-05-25 01:46:52'),
+('01KSDHK6BGF4NKETFCABK6KM9E', '01KSDHAZHHKK02DG47168ZX7TV', '4ff5257329bc0fe9615e593ba7c1e8c8e57677353e12cde28aed4e0848fef694', '2026-05-25 03:17:44', NULL, '2026-05-25 01:47:44'),
+('01KV46NMFBH11NYN5CQNAPN2DC', '01KV1Y23C22RQFF7TVRQ0BYEE7', '02413b865d3cb06ceb4a78f30e7fa8e80715e17288f973c43e538c605f7c6f16', '2026-06-15 06:45:04', NULL, '2026-06-15 05:15:04'),
+('01KV46P26D6GQV6DHTC38A67M6', '01KV1Y23C22RQFF7TVRQ0BYEE7', 'd6f9728903d20dc8e61546e2e2041ca7f11de877a80c3ab8961a989a2e863a13', '2026-06-15 06:45:18', NULL, '2026-06-15 05:15:18'),
+('01KVNQGYQNY9CQGM9H17G362N9', '01KVNQFNTSZNSE9WP5YKE3XQKY', 'a72f944452b15e053616cbc1daa2318dbdb1d729d0e9e5d69225c7dbdc4121e2', '2026-06-22 02:06:42', NULL, '2026-06-22 00:36:42'),
+('01KVNQHHFAFEJ5AVK7B7YEFBQ4', '01KVNQFNTSZNSE9WP5YKE3XQKY', '4303e1f00d69e83e9a72079b10fe60cbaead503dad69e76ebc2cb545e16fac5e', '2026-06-22 02:07:01', NULL, '2026-06-22 00:37:01'),
+('01KVNQJ3BR3PQR7RR3V1W49XP5', '01KVNQFNTSZNSE9WP5YKE3XQKY', 'a432738977e3ba72d4ebbb28429bd6efb3ce4f83ef4abe8e2f92e782db478acf', '2026-06-22 02:07:19', NULL, '2026-06-22 00:37:19'),
+('01KVNQJ90HT6SNQEBEY4YRFT9Q', '01KVNQFNTSZNSE9WP5YKE3XQKY', '88a32f124e6139b268f43624fa19e902ce18d8f6197664e1d085a27094c6c6a7', '2026-06-22 02:07:25', NULL, '2026-06-22 00:37:25'),
+('01KVNQNWJXQDR852C24BVZ4B1E', '01KVNQFNTSZNSE9WP5YKE3XQKY', 'fd231530aa02d15009256b286035f7bafbc7d38a491cd80b7e0307c6f251be24', '2026-06-22 02:09:23', NULL, '2026-06-22 00:39:23'),
+('01KVNR8PSGSZDH6VYBJX96R78G', '01KVNQFNTSZNSE9WP5YKE3XQKY', '3e8d3e680a67eb97dba224b6f872d2a777c0d877a73f0acfc60af40eb78d3beb', '2026-06-22 02:19:40', NULL, '2026-06-22 00:49:40'),
+('01KVNRG4HNNZD3NPVHDSCRXX08', '01KVNQFNTSZNSE9WP5YKE3XQKY', '4b9deea0b496fa97ef42714a5626f79772a7b0c7322e3be98df483f2d9cad252', '2026-06-22 02:23:43', NULL, '2026-06-22 00:53:43'),
+('01KVNRK5SEFFAWQZVQZH2CKMTB', '01KVNQFNTSZNSE9WP5YKE3XQKY', 'd6c81b71676842b62fc1aefb30acba6d7a13b20ee969a644859d418c72adea3c', '2026-06-22 02:25:23', NULL, '2026-06-22 00:55:23'),
+('01KZD10BZPZ4066VW4CV2Z265F', '06F43H2S28KNWX71TSF7MWWTA4', 'b79c1029a4fd6a24f022b4273ea8c2af47e6d82764b3efceedc20bfbe312de50', '2026-08-07 08:37:01', NULL, '2026-08-07 08:32:01'),
+('01M28H3C5SE06EAV9ZTQS90XP7', '01KZJEG8D46K1T5WD7MZMCMAZ5', '872ca7141da54e00cde2be804cae6bd7ea2266f63e9c7d21707a499a747bfa97', '2026-09-11 21:29:10', NULL, '2026-09-11 21:24:10'),
+('01M28H86NKDW4ACRN90JSEQY6R', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '08f33eace4d7ccad74a9fa8edc324ea4749e652ff09ba88c37840ed44d30d2ea', '2026-09-11 21:31:49', NULL, '2026-09-11 21:26:49'),
+('01M28HBDZ6FC4507KR2X6W057M', '01KVNRKQ1HW3YH0NRXQF744JK9', 'c6c43d7b3f30aad487550e427487d64b5e645ae4ddc92c26172190c3f9e4ec0b', '2026-09-11 21:33:34', NULL, '2026-09-11 21:28:34'),
+('01M29QD0629VBM5M107F11J3GB', '01KZJDNCW6W7WEWSQGG02SY3XV', '1ccd38cd5721975202e56d170b1da940119d8132f179c33219ed22a64eb17cf1', '2026-09-12 08:38:32', NULL, '2026-09-12 08:33:32');
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `cantons`
+-- Table structure for table `cantons`
 --
 
 CREATE TABLE `cantons` (
@@ -59,7 +77,7 @@ CREATE TABLE `cantons` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `cantons`
+-- Dumping data for table `cantons`
 --
 
 INSERT INTO `cantons` (`canton_id`, `province_snit_code`, `canton_snit_code`, `canton_name`, `created_at`, `created_by`) VALUES
@@ -152,7 +170,22 @@ INSERT INTO `cantons` (`canton_id`, `province_snit_code`, `canton_snit_code`, `c
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `districts`
+-- Table structure for table `comments`
+--
+
+CREATE TABLE `comments` (
+  `comment_id` char(26) NOT NULL,
+  `entity_type` enum('field_trip','request','geomanifestation') NOT NULL,
+  `entity_id` char(26) NOT NULL,
+  `user_id` char(26) NOT NULL,
+  `comment_text` varchar(500) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `districts`
 --
 
 CREATE TABLE `districts` (
@@ -165,7 +198,7 @@ CREATE TABLE `districts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `districts`
+-- Dumping data for table `districts`
 --
 
 INSERT INTO `districts` (`district_id`, `canton_snit_code`, `district_snit_code`, `district_name`, `created_at`, `created_by`) VALUES
@@ -669,7 +702,54 @@ INSERT INTO `districts` (`district_id`, `canton_snit_code`, `district_snit_code`
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `geomanifestations`
+-- Table structure for table `field_trips`
+--
+
+CREATE TABLE `field_trips` (
+  `field_trip_id` char(26) NOT NULL,
+  `field_trip_name` varchar(110) NOT NULL,
+  `field_trip_scheduled_date` datetime NOT NULL,
+  `field_trip_start_date` datetime DEFAULT NULL,
+  `field_trip_finish_date` datetime DEFAULT NULL,
+  `field_trip_creator_id` char(26) NOT NULL,
+  `field_trip_is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `province_snit_code` mediumint(9) UNSIGNED DEFAULT NULL,
+  `canton_snit_code` mediumint(9) UNSIGNED DEFAULT NULL,
+  `district_snit_code` mediumint(9) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `field_trips`
+--
+
+INSERT INTO `field_trips` (`field_trip_id`, `field_trip_name`, `field_trip_scheduled_date`, `field_trip_start_date`, `field_trip_finish_date`, `field_trip_creator_id`, `field_trip_is_active`, `province_snit_code`, `canton_snit_code`, `district_snit_code`, `created_at`) VALUES
+('01M29NWHJZ1BJH73ENT3AP80J5', 'Gira Geotérmica Guanacaste 2026', '2026-10-15 08:00:00', '2026-10-15 08:30:00', '2026-10-18 17:00:00', '01KZJDNCW6W7WEWSQGG02SY3XV', 1, 5, 501, 50101, '2026-09-12 02:07:04');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `field_trip_participants`
+--
+
+CREATE TABLE `field_trip_participants` (
+  `field_trip_id` char(26) NOT NULL,
+  `user_id` char(26) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `field_trip_participants`
+--
+
+INSERT INTO `field_trip_participants` (`field_trip_id`, `user_id`, `created_at`) VALUES
+('01M29NWHJZ1BJH73ENT3AP80J5', '01KVNRKQ1HW3YH0NRXQF744JK9', '2026-09-12 02:07:05'),
+('01M29NWHJZ1BJH73ENT3AP80J5', '01KZJDNCW6W7WEWSQGG02SY3XV', '2026-09-12 02:07:05');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `geomanifestations`
 --
 
 CREATE TABLE `geomanifestations` (
@@ -683,32 +763,36 @@ CREATE TABLE `geomanifestations` (
   `longitude` double NOT NULL,
   `description` varchar(255) DEFAULT NULL,
   `visibility` tinyint(1) NOT NULL DEFAULT 0,
+  `field_trip_id` char(26) DEFAULT NULL,
   `request_id` char(26) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_by` char(26) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `geomanifestations`
+-- Dumping data for table `geomanifestations`
 --
 
-INSERT INTO `geomanifestations` (`geomanifestation_id`, `province_snit_code`, `canton_snit_code`, `district_snit_code`, `current_georeport_id`, `geomanifestation_name`, `latitude`, `longitude`, `description`, `visibility`, `request_id`, `created_at`, `created_by`) VALUES
-('01KZPW48VQK3HX66A75T2AGMM2', 5, 504, 50401, '01KZPW48VVN1KDDC1MV9SS06R0', 'Termal Sitio U-1', 10.68176273, -88.22942008, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal Sitio U-1).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48VX1QD60FKQGVQX7SNX', 5, 504, 50401, '01KZPW48VZJR9P92PZC7JVEZSB', 'Termal CTP-1', 10.67182293, -85.20778864, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal CTP-1).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48W123WBDF19W66N9S9G', 5, 504, 50401, '01KZPW48W35ENZ7EHN460P2HAR', 'Termal CTP-2', 10.6689596, -85.20824697, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal CTP-2).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48W4SV1TEYD30N2AS472', 5, 504, 50401, '01KZPW48W7Z7Y4QNAP7GQD9KWV', 'Termal CTP-3', 10.66895126, -85.20804531, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal CTP-3).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48W80Z3QBTE5HRJ4ZBE5', 5, 504, 50401, '01KZPW48W9QC9HDRR0Y43KT3WW', 'Termal Guayabal', 10.75191725, -85.18751709, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal Guayabal).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WAX5SPDKKN9Y4HEZK3', 5, 504, 50401, '01KZPW48WBS3K9MR0THR2JE1HJ', 'Termal Josue Ulate', 10.73772339, -85.19228275, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal Josue Ulate).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WCWFNCEY425CW0QA32', 5, 504, 50401, '01KZPW48WD38D533BX25MMJ59P', 'Termal R. Perdido-1', 10.59536039, -85.20076053, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal R. Perdido-1).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WEEVZ518Q9S26RZTR4', 5, 504, 50401, '01KZPW48WFQ6YF44EQPTNPF0GZ', 'Termal R. Perdido-2', 10.59519134, -85.2007085, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal R. Perdido-2).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WGDKWK9MBEJJB7Y1CZ', 5, 504, 50401, '01KZPW48WH24E48FXJFCHZ5147', 'Termal R. Perdido-3', 10.59498786, -85.20063151, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal R. Perdido-3).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WJT58KDJH5V51MJVPZ', 5, 504, 50401, '01KZPW48WK0ZBWR4PCM5GV9TF9', 'Termal R. Perdido-4', 10.59467643, -85.20068915, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal R. Perdido-4).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WK0ZBWR4PCM5GV9TFA', 5, 504, 50401, '01KZPW48WM0Q5PS1WP94RGJ53P', 'Termal Guayacan', 10.71769071, -85.19420058, 'Manifestación geotérmica registrada en el sector de Bagaces, Guanacaste (Sitio: Termal Guayacan).', 1, NULL, '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4');
+INSERT INTO `geomanifestations` (`geomanifestation_id`, `province_snit_code`, `canton_snit_code`, `district_snit_code`, `current_georeport_id`, `geomanifestation_name`, `latitude`, `longitude`, `description`, `visibility`, `field_trip_id`, `request_id`, `created_at`, `created_by`) VALUES
+('01KS1GQQFB2806DZH3Z3ZWED5W', 5, 504, 50401, '01KVNN45RN0W7QYCC7RQ0RGRE8', 'Termal Sitio U-1', 10.68176273, -88.22942008, 'Imported from Bagaces test data', 1, NULL, '01KSDMN7M3K0VPMETMKBD7QHFG', '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQFR29SPWGPGMEM0QNPS', 5, 504, 50401, '01KS1GQQFWQB3YCM8CEKFEP0D4', 'Termal CTP-1', 10.67182293, -85.20778864, 'Imported from Bagaces test data', 1, NULL, NULL, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQG0YEQ8MM4F4J6QRD4J', 5, 504, 50401, '01KS1GQQG20BAEFEMFBNKYZ2D5', 'Termal CTP-2', 10.6689596, -85.20824697, 'Imported from Bagaces test data', 1, NULL, NULL, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQG3HVE0AWZ4YVE8Z56K', 5, 504, 50401, '01KS1GQQG4XMKEGJ6NG5DH00FS', 'Termal CTP-3', 10.66895126, -85.20804531, 'Imported from Bagaces test data', 1, NULL, NULL, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQG59TQQ1KKS57X4S8D0', 5, 504, 50401, '01KS1GQQG654QE46W5CDZ0HEDP', 'Termal Guayabal', 10.75191725, -85.18751709, 'Imported from Bagaces test data', 1, NULL, NULL, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQG7Y7827339A1NTHSEP', 5, 504, 50401, '01KS1GQQG80HSGC9Z1CCRSRN62', 'Termal Josue Ulate', 10.73772339, -85.19228275, 'Imported from Bagaces test data', 1, NULL, NULL, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQG9F68TKK82J8FR6CN2', 5, 504, 50401, '01KS1GQQGA9ZJRMMPQQ3B7HPTH', 'Termal R. Perdido-2', 10.59519134, -85.2007085, 'Imported from Bagaces test data', 1, NULL, NULL, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQGCZTSM0JWVKPGFMXSS', 5, 504, 50401, '01KS1GQQGDSSQQ09JNBM18R05P', 'Termal R. Perdido-3', 10.59498786, -85.20063151, 'Imported from Bagaces test data', 1, NULL, NULL, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQGEGT626AE1ZRE719A0', 5, 504, 50401, '01KS1GQQGFRBJ6DXH4T1FHRBD5', 'Termal R. Perdido-4', 10.59467643, -85.20068915, 'Imported from Bagaces test data', 1, NULL, NULL, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQGFRBJ6DXH4T1FHRBD6', 5, 504, 50401, '01KS1GQQGGXA38WKA3CHTQM9JP', 'Termal Guayacan', 10.71769071, -85.19420058, 'Imported from Bagaces test data', 1, NULL, NULL, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KVMCKPPVGP9QMPGWXXZP1DH3', 5, 504, 50401, NULL, 'Termal CTP-13 TEST', 8.2145281, -85.5209198, 'Imported from Bagaces test data', 0, NULL, NULL, '2026-06-21 06:06:43', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KVMDMJ4GJJCGXF0P3A9YWRAF', 5, 504, 50401, NULL, 'Termal CTP-14 TEST', 8.2145281, -85.5209198, 'Imported from Bagaces test data', 0, NULL, NULL, '2026-06-21 06:24:40', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KZCB1NSNFQCB1DRK1Q1K71MN', 1, 105, 10503, NULL, 'Termal de Pruebas', 9.5821734605751, -84.059829711914, 'Geomanifestacion de prueba, pero en tarrazú.', 0, NULL, NULL, '2026-08-06 20:08:15', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z'),
+('01M28GFH9NJQ6RDP10MFFEE3GZ', 5, 504, 50401, NULL, 'Termal de Pruebas API nueva', 8.2145281, -85.5209198, 'Geomanifestacion de prueba con API NUEVA', 1, '01M29NWHJZ1BJH73ENT3AP80J5', NULL, '2026-09-11 15:13:20', '01KZJDNCW6W7WEWSQGG02SY3XV');
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `georeports`
+-- Table structure for table `georeports`
 --
 
 CREATE TABLE `georeports` (
@@ -717,31 +801,35 @@ CREATE TABLE `georeports` (
   `insitu_test_id` char(26) NOT NULL,
   `inlab_test_id` char(26) NOT NULL,
   `details` varchar(500) DEFAULT NULL,
+  `visibility` tinyint(1) NOT NULL DEFAULT 0,
   `created_by` char(26) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `georeports`
+-- Dumping data for table `georeports`
 --
 
-INSERT INTO `georeports` (`georeport_id`, `geomanifestation_id`, `insitu_test_id`, `inlab_test_id`, `details`, `created_by`, `created_at`) VALUES
-('01KZPW48VVN1KDDC1MV9SS06R0', '01KZPW48VQK3HX66A75T2AGMM2', '01KZPW48VSNS1Z366AXX4EQHBZ', '01KZPW48VVN1KDDC1MV9SS06QZ', 'Informe geotérmico consolidado para Termal Sitio U-1 (Bagaces, Guanacaste). Registra parámetros in-situ (ID: 01KZPW48VSNS1Z366AXX4EQHBZ) y resultados hidroquímicos de laboratorio (ID: 01KZPW48VVN1KDDC1MV9SS06QZ).', '06F43H2S28KNWX71TSF7MWWTA4', '2026-08-10 22:19:11'),
-('01KZPW48VZJR9P92PZC7JVEZSB', '01KZPW48VX1QD60FKQGVQX7SNX', '01KZPW48VYR3Y9BQ0NP4AQHNWW', '01KZPW48VYR3Y9BQ0NP4AQHNWX', 'Informe geotérmico consolidado para Termal CTP-1 (Bagaces, Guanacaste). Registra parámetros in-situ (ID: 01KZPW48VYR3Y9BQ0NP4AQHNWW) y resultados hidroquímicos de laboratorio (ID: 01KZPW48VYR3Y9BQ0NP4AQHNWX).', '06F43H2S28KNWX71TSF7MWWTA4', '2026-08-10 22:19:11'),
-('01KZPW48W35ENZ7EHN460P2HAR', '01KZPW48W123WBDF19W66N9S9G', '01KZPW48W2MJ7Y7STMR2GNNW1D', '01KZPW48W35ENZ7EHN460P2HAQ', 'Informe geotérmico consolidado para Termal CTP-2 (Bagaces, Guanacaste). Registra parámetros in-situ (ID: 01KZPW48W2MJ7Y7STMR2GNNW1D) y resultados hidroquímicos de laboratorio (ID: 01KZPW48W35ENZ7EHN460P2HAQ).', '06F43H2S28KNWX71TSF7MWWTA4', '2026-08-10 22:19:11'),
-('01KZPW48W7Z7Y4QNAP7GQD9KWV', '01KZPW48W4SV1TEYD30N2AS472', '01KZPW48W5KVDHV9J33TS3CN1R', '01KZPW48W5KVDHV9J33TS3CN1S', 'Informe geotérmico consolidado para Termal CTP-3 (Bagaces, Guanacaste). Registra parámetros in-situ (ID: 01KZPW48W5KVDHV9J33TS3CN1R) y resultados hidroquímicos de laboratorio (ID: 01KZPW48W5KVDHV9J33TS3CN1S).', '06F43H2S28KNWX71TSF7MWWTA4', '2026-08-10 22:19:11'),
-('01KZPW48W9QC9HDRR0Y43KT3WW', '01KZPW48W80Z3QBTE5HRJ4ZBE5', '01KZPW48W80Z3QBTE5HRJ4ZBE6', '01KZPW48W80Z3QBTE5HRJ4ZBE7', 'Informe geotérmico consolidado para Termal Guayabal (Bagaces, Guanacaste). Registra parámetros in-situ (ID: 01KZPW48W80Z3QBTE5HRJ4ZBE6) y resultados hidroquímicos de laboratorio (ID: 01KZPW48W80Z3QBTE5HRJ4ZBE7).', '06F43H2S28KNWX71TSF7MWWTA4', '2026-08-10 22:19:11'),
-('01KZPW48WBS3K9MR0THR2JE1HJ', '01KZPW48WAX5SPDKKN9Y4HEZK3', '01KZPW48WAX5SPDKKN9Y4HEZK4', '01KZPW48WBS3K9MR0THR2JE1HH', 'Informe geotérmico consolidado para Termal Josue Ulate (Bagaces, Guanacaste). Registra parámetros in-situ (ID: 01KZPW48WAX5SPDKKN9Y4HEZK4) y resultados hidroquímicos de laboratorio (ID: 01KZPW48WBS3K9MR0THR2JE1HH).', '06F43H2S28KNWX71TSF7MWWTA4', '2026-08-10 22:19:11'),
-('01KZPW48WD38D533BX25MMJ59P', '01KZPW48WCWFNCEY425CW0QA32', '01KZPW48WCWFNCEY425CW0QA33', '01KZPW48WD38D533BX25MMJ59N', 'Informe geotérmico consolidado para Termal R. Perdido-1 (Bagaces, Guanacaste). Registra parámetros in-situ (ID: 01KZPW48WCWFNCEY425CW0QA33) y resultados hidroquímicos de laboratorio (ID: 01KZPW48WD38D533BX25MMJ59N).', '06F43H2S28KNWX71TSF7MWWTA4', '2026-08-10 22:19:11'),
-('01KZPW48WFQ6YF44EQPTNPF0GZ', '01KZPW48WEEVZ518Q9S26RZTR4', '01KZPW48WEEVZ518Q9S26RZTR5', '01KZPW48WEEVZ518Q9S26RZTR6', 'Informe geotérmico consolidado para Termal R. Perdido-2 (Bagaces, Guanacaste). Registra parámetros in-situ (ID: 01KZPW48WEEVZ518Q9S26RZTR5) y resultados hidroquímicos de laboratorio (ID: 01KZPW48WEEVZ518Q9S26RZTR6).', '06F43H2S28KNWX71TSF7MWWTA4', '2026-08-10 22:19:11'),
-('01KZPW48WH24E48FXJFCHZ5147', '01KZPW48WGDKWK9MBEJJB7Y1CZ', '01KZPW48WGDKWK9MBEJJB7Y1D0', '01KZPW48WGDKWK9MBEJJB7Y1D1', 'Informe geotérmico consolidado para Termal R. Perdido-3 (Bagaces, Guanacaste). Registra parámetros in-situ (ID: 01KZPW48WGDKWK9MBEJJB7Y1D0) y resultados hidroquímicos de laboratorio (ID: 01KZPW48WGDKWK9MBEJJB7Y1D1).', '06F43H2S28KNWX71TSF7MWWTA4', '2026-08-10 22:19:11'),
-('01KZPW48WK0ZBWR4PCM5GV9TF9', '01KZPW48WJT58KDJH5V51MJVPZ', '01KZPW48WJT58KDJH5V51MJVQ0', '01KZPW48WJT58KDJH5V51MJVQ1', 'Informe geotérmico consolidado para Termal R. Perdido-4 (Bagaces, Guanacaste). Registra parámetros in-situ (ID: 01KZPW48WJT58KDJH5V51MJVQ0) y resultados hidroquímicos de laboratorio (ID: 01KZPW48WJT58KDJH5V51MJVQ1).', '06F43H2S28KNWX71TSF7MWWTA4', '2026-08-10 22:19:11'),
-('01KZPW48WM0Q5PS1WP94RGJ53P', '01KZPW48WK0ZBWR4PCM5GV9TFA', '01KZPW48WM0Q5PS1WP94RGJ53M', '01KZPW48WM0Q5PS1WP94RGJ53N', 'Informe geotérmico consolidado para Termal Guayacan (Bagaces, Guanacaste). Registra parámetros in-situ (ID: 01KZPW48WM0Q5PS1WP94RGJ53M) y resultados hidroquímicos de laboratorio (ID: 01KZPW48WM0Q5PS1WP94RGJ53N).', '06F43H2S28KNWX71TSF7MWWTA4', '2026-08-10 22:19:11');
+INSERT INTO `georeports` (`georeport_id`, `geomanifestation_id`, `insitu_test_id`, `inlab_test_id`, `details`, `visibility`, `created_by`, `created_at`) VALUES
+('01KS1GQQFWQB3YCM8CEKFEP0D4', '01KS1GQQFR29SPWGPGMEM0QNPS', '01KS1GQQFS3MCQ6XVFEW30DVRE', '01KS1GQQFTENKANP3ZZ4EPDJNW', 'Initial import from Bagaces data', 0, '06F43H2S28KNWX71TSF7MWWTA4', '2026-05-20 01:41:51'),
+('01KS1GQQG20BAEFEMFBNKYZ2D5', '01KS1GQQG0YEQ8MM4F4J6QRD4J', '01KS1GQQG1T3MA9G8K7QRQ4PWF', '01KS1GQQG1T3MA9G8K7QRQ4PWG', 'Initial import from Bagaces data', 1, '06F43H2S28KNWX71TSF7MWWTA4', '2026-05-20 01:41:51'),
+('01KS1GQQG4XMKEGJ6NG5DH00FS', '01KS1GQQG3HVE0AWZ4YVE8Z56K', '01KS1GQQG3HVE0AWZ4YVE8Z56M', '01KS1GQQG4XMKEGJ6NG5DH00FR', 'Initial import from Bagaces data', 0, '06F43H2S28KNWX71TSF7MWWTA4', '2026-05-20 01:41:51'),
+('01KS1GQQG654QE46W5CDZ0HEDP', '01KS1GQQG59TQQ1KKS57X4S8D0', '01KS1GQQG654QE46W5CDZ0HEDM', '01KS1GQQG654QE46W5CDZ0HEDN', 'Initial import from Bagaces data', 0, '06F43H2S28KNWX71TSF7MWWTA4', '2026-05-20 01:41:51'),
+('01KS1GQQG80HSGC9Z1CCRSRN62', '01KS1GQQG7Y7827339A1NTHSEP', '01KS1GQQG80HSGC9Z1CCRSRN60', '01KS1GQQG80HSGC9Z1CCRSRN61', 'Initial import from Bagaces data', 0, '06F43H2S28KNWX71TSF7MWWTA4', '2026-05-20 01:41:51'),
+('01KS1GQQGA9ZJRMMPQQ3B7HPTH', '01KS1GQQG9F68TKK82J8FR6CN2', '01KS1GQQGA9ZJRMMPQQ3B7HPTF', '01KS1GQQGA9ZJRMMPQQ3B7HPTG', 'Initial import from Bagaces data', 0, '06F43H2S28KNWX71TSF7MWWTA4', '2026-05-20 01:41:51'),
+('01KS1GQQGDSSQQ09JNBM18R05P', '01KS1GQQGCZTSM0JWVKPGFMXSS', '01KS1GQQGCZTSM0JWVKPGFMXST', '01KS1GQQGDSSQQ09JNBM18R05N', 'Initial import from Bagaces data', 0, '06F43H2S28KNWX71TSF7MWWTA4', '2026-05-20 01:41:51'),
+('01KS1GQQGFRBJ6DXH4T1FHRBD5', '01KS1GQQGEGT626AE1ZRE719A0', '01KS1GQQGEGT626AE1ZRE719A1', '01KS1GQQGEGT626AE1ZRE719A2', 'Initial import from Bagaces data', 0, '06F43H2S28KNWX71TSF7MWWTA4', '2026-05-20 01:41:51'),
+('01KS1GQQGGXA38WKA3CHTQM9JP', '01KS1GQQGFRBJ6DXH4T1FHRBD6', '01KS1GQQGGXA38WKA3CHTQM9JM', '01KS1GQQGGXA38WKA3CHTQM9JN', 'Initial import from Bagaces data', 0, '06F43H2S28KNWX71TSF7MWWTA4', '2026-05-20 01:41:51'),
+('01KVMB0MMV26P9JAB49B3M1ESE', '01KS1GQQFB2806DZH3Z3ZWED5W', '01KVMA42YA25B2FYQ4TX1NZK3D', '01KVM8ZYWZANKNET61YN9VMPKK', NULL, 0, '06F43H2S28KNWX71TSF7MWWTA4', '2026-06-21 05:38:50'),
+('01KVMEJ4DAAK71ZM5N7ASAQQX2', '01KS1GQQFB2806DZH3Z3ZWED5W', '01KVMA42YA25B2FYQ4TX1NZK3D', '01KVM8ZYWZANKNET61YN9VMPKK', NULL, 0, '06F43H2S28KNWX71TSF7MWWTA4', '2026-06-21 06:40:49'),
+('01KVMENRPYH0R1BVS6TJRENH1M', '01KS1GQQFB2806DZH3Z3ZWED5W', '01KVMA42YA25B2FYQ4TX1NZK3D', '01KVM8ZYWZANKNET61YN9VMPKK', NULL, 0, '06F43H2S28KNWX71TSF7MWWTA4', '2026-06-21 06:42:48'),
+('01KVNG6YD54D713J6HQXMK0057', '01KS1GQQFB2806DZH3Z3ZWED5W', '01KVMA42YA25B2FYQ4TX1NZK3D', '01KVM8ZYWZANKNET61YN9VMPKK', NULL, 0, '06F43H2S28KNWX71TSF7MWWTA4', '2026-06-21 16:28:54'),
+('01KVNN45RN0W7QYCC7RQ0RGRE8', '01KS1GQQFB2806DZH3Z3ZWED5W', '01KVMA42YA25B2FYQ4TX1NZK3D', '01KVM8ZYWZANKNET61YN9VMPKK', NULL, 0, '06F43H2S28KNWX71TSF7MWWTA4', '2026-06-21 17:54:46');
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `inlab_tests`
+-- Table structure for table `inlab_tests`
 --
 
 CREATE TABLE `inlab_tests` (
@@ -762,31 +850,38 @@ CREATE TABLE `inlab_tests` (
   `k` double(10,4) NOT NULL DEFAULT 0.0000,
   `mg` double(10,4) NOT NULL DEFAULT 0.0000,
   `description` varchar(255) DEFAULT NULL,
+  `visibility` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_by` char(26) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `inlab_tests`
+-- Dumping data for table `inlab_tests`
 --
 
-INSERT INTO `inlab_tests` (`inlab_test_id`, `geomanifestation_id`, `ph`, `conductivity`, `cl`, `ca`, `hco3`, `so4`, `fe`, `si`, `b`, `li`, `f`, `na`, `k`, `mg`, `description`, `created_at`, `created_by`) VALUES
-('01KZPW48VVN1KDDC1MV9SS06QZ', '01KZPW48VQK3HX66A75T2AGMM2', 6.96, 523.0000, 9.8000, 58.9000, 246.0000, 60.8000, 0.0000, 157.0000, 1.0000, 0.0000, 0.0000, 57.7000, 11.2000, 16.9000, 'Análisis fisicoquímico de laboratorio para Termal Sitio U-1. Parámetros sin detección/no medidos (registrados en 0): FE, LI, F.', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48VYR3Y9BQ0NP4AQHNWX', '01KZPW48VX1QD60FKQGVQX7SNX', 6.37, 665.0000, 12.2000, 59.8000, 389.0000, 42.1000, 0.0000, 142.0000, 0.0000, 0.0000, 0.0000, 68.8000, 15.5000, 32.7000, 'Análisis fisicoquímico de laboratorio para Termal CTP-1. Parámetros sin detección/no medidos (registrados en 0): FE, B, LI, F.', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48W35ENZ7EHN460P2HAQ', '01KZPW48W123WBDF19W66N9S9G', 6.74, 915.0000, 16.2000, 78.4000, 578.0000, 58.1000, 0.0000, 150.0000, 0.0000, 0.0000, 0.0000, 104.2000, 10.6000, 46.3000, 'Análisis fisicoquímico de laboratorio para Termal CTP-2. Parámetros sin detección/no medidos (registrados en 0): FE, B, LI, F.', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48W5KVDHV9J33TS3CN1S', '01KZPW48W4SV1TEYD30N2AS472', 6.38, 912.0000, 15.9000, 79.2000, 551.5000, 57.4000, 0.0000, 150.0000, 0.0000, 0.0000, 0.0000, 107.1000, 14.1000, 45.9000, 'Análisis fisicoquímico de laboratorio para Termal CTP-3. Parámetros sin detección/no medidos (registrados en 0): FE, B, LI, F.', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48W80Z3QBTE5HRJ4ZBE7', '01KZPW48W80Z3QBTE5HRJ4ZBE5', 2.17, 7480.0000, 728.0000, 104.0000, 0.0000, 3344.0000, 103.0000, 265.0000, 4.0000, 0.0000, 0.0000, 55.0000, 3.0000, 37.0000, 'Análisis fisicoquímico de laboratorio para Termal Guayabal. Parámetros sin detección/no medidos (registrados en 0): HCO3, LI, F.', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WBS3K9MR0THR2JE1HH', '01KZPW48WAX5SPDKKN9Y4HEZK3', 2.78, 2770.0000, 188.0000, 203.0000, 0.0000, 1383.0000, 2.9200, 162.0000, 2.0000, 0.0000, 0.0000, 56.0000, 9.0000, 65.0000, 'Análisis fisicoquímico de laboratorio para Termal Josue Ulate. Parámetros sin detección/no medidos (registrados en 0): HCO3, LI, F.', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WD38D533BX25MMJ59N', '01KZPW48WCWFNCEY425CW0QA32', 6.17, 876.0000, 75.9000, 58.8000, 443.5000, 14.3000, 0.0000, 156.0000, 4.0000, 0.0000, 0.0000, 167.0000, 17.5000, 26.7000, 'Análisis fisicoquímico de laboratorio para Termal R. Perdido-1. Parámetros sin detección/no medidos (registrados en 0): FE, LI, F.', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WEEVZ518Q9S26RZTR6', '01KZPW48WEEVZ518Q9S26RZTR4', 6.24, 900.0000, 80.1000, 59.4000, 447.0000, 14.2000, 0.0000, 155.0000, 0.0000, 0.0000, 0.0000, 184.3000, 16.6000, 26.8000, 'Análisis fisicoquímico de laboratorio para Termal R. Perdido-2. Parámetros sin detección/no medidos (registrados en 0): FE, B, LI, F.', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WGDKWK9MBEJJB7Y1D1', '01KZPW48WGDKWK9MBEJJB7Y1CZ', 6.09, 482.0000, 6.2000, 45.3000, 327.5000, 5.6000, 0.0000, 131.0000, 0.0000, 0.0000, 0.0000, 59.6000, 8.8000, 21.0000, 'Análisis fisicoquímico de laboratorio para Termal R. Perdido-3. Parámetros sin detección/no medidos (registrados en 0): FE, B, LI, F.', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WJT58KDJH5V51MJVQ1', '01KZPW48WJT58KDJH5V51MJVPZ', 6.05, 368.0000, 5.6000, 36.8000, 251.0000, 2.9000, 0.0000, 120.0000, 0.0000, 0.0000, 0.0000, 40.0000, 8.7000, 17.0000, 'Análisis fisicoquímico de laboratorio para Termal R. Perdido-4. Parámetros sin detección/no medidos (registrados en 0): FE, B, LI, F.', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WM0Q5PS1WP94RGJ53N', '01KZPW48WK0ZBWR4PCM5GV9TFA', 5.86, 416.0000, 8.1000, 46.5000, 201.0000, 43.5000, 0.0000, 124.0000, 0.0000, 0.0000, 0.0000, 41.9000, 14.5000, 14.3000, 'Análisis fisicoquímico de laboratorio para Termal Guayacan. Parámetros sin detección/no medidos (registrados en 0): FE, B, LI, F.', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4');
+INSERT INTO `inlab_tests` (`inlab_test_id`, `geomanifestation_id`, `ph`, `conductivity`, `cl`, `ca`, `hco3`, `so4`, `fe`, `si`, `b`, `li`, `f`, `na`, `k`, `mg`, `description`, `visibility`, `created_at`, `created_by`) VALUES
+('01KS1GQQFGF6XMHDSHQ369BMFQ', '01KS1GQQFB2806DZH3Z3ZWED5W', 6.96, 523.0000, 9.8000, 58.9000, 246.0000, 60.8000, 0.0000, 157.0000, 1.0000, 0.0000, 0.0000, 57.7000, 11.2000, 16.9000, 'Laboratory analysis', 0, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQFTENKANP3ZZ4EPDJNW', '01KS1GQQFR29SPWGPGMEM0QNPS', 6.37, 665.0000, 12.2000, 59.8000, 389.0000, 42.1000, 0.0000, 142.0000, 0.0000, 0.0000, 0.0000, 68.8000, 15.5000, 32.7000, 'Laboratory analysis', 0, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQG1T3MA9G8K7QRQ4PWG', '01KS1GQQG0YEQ8MM4F4J6QRD4J', 6.74, 915.0000, 16.2000, 78.4000, 578.0000, 58.1000, 0.0000, 150.0000, 0.0000, 0.0000, 0.0000, 104.2000, 10.6000, 46.3000, 'Laboratory analysis', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQG4XMKEGJ6NG5DH00FR', '01KS1GQQG3HVE0AWZ4YVE8Z56K', 6.38, 912.0000, 15.9000, 79.2000, 551.5000, 57.4000, 0.0000, 150.0000, 0.0000, 0.0000, 0.0000, 107.1000, 14.1000, 45.9000, 'Laboratory analysis', 0, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQG654QE46W5CDZ0HEDN', '01KS1GQQG59TQQ1KKS57X4S8D0', 2.17, 7480.0000, 728.0000, 104.0000, 0.0000, 3344.0000, 103.0000, 265.0000, 4.0000, 0.0000, 0.0000, 55.0000, 3.0000, 37.0000, 'Laboratory analysis', 0, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQG80HSGC9Z1CCRSRN61', '01KS1GQQG7Y7827339A1NTHSEP', 2.78, 2770.0000, 188.0000, 203.0000, 0.0000, 1383.0000, 2.9200, 162.0000, 2.0000, 0.0000, 0.0000, 56.0000, 9.0000, 65.0000, 'Laboratory analysis', 0, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQGA9ZJRMMPQQ3B7HPTG', '01KS1GQQG9F68TKK82J8FR6CN2', 6.24, 900.0000, 80.1000, 59.4000, 447.0000, 14.2000, 0.0000, 155.0000, 0.0000, 0.0000, 0.0000, 184.3000, 16.6000, 26.8000, 'Laboratory analysis', 0, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQGDSSQQ09JNBM18R05N', '01KS1GQQGCZTSM0JWVKPGFMXSS', 6.09, 482.0000, 6.2000, 45.3000, 327.5000, 5.6000, 0.0000, 131.0000, 0.0000, 0.0000, 0.0000, 59.6000, 8.8000, 21.0000, 'Laboratory analysis', 0, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQGEGT626AE1ZRE719A2', '01KS1GQQGEGT626AE1ZRE719A0', 6.05, 368.0000, 5.6000, 36.8000, 251.0000, 2.9000, 0.0000, 120.0000, 0.0000, 0.0000, 0.0000, 40.0000, 8.7000, 17.0000, 'Laboratory analysis', 0, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQGGXA38WKA3CHTQM9JN', '01KS1GQQGFRBJ6DXH4T1FHRBD6', 6.70, 1800.0000, 45.0000, 120.0000, 850.0000, 15.0000, 0.5000, 85.0000, 2.5000, 0.8000, 1.2000, 280.0000, 25.0000, 18.0000, 'Análisis realizado en laboratorio UCR Editadop', 0, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KVM8T6P8TBQ95J409HB48DT0', '01KS1GQQFB2806DZH3Z3ZWED5W', 0.00, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, NULL, 0, '2026-06-21 05:00:22', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KVM8ZYWZANKNET61YN9VMPKK', '01KS1GQQFB2806DZH3Z3ZWED5W', 0.00, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, NULL, 0, '2026-06-21 05:03:30', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KVMEJ48XV9Z1161RXHBR32YM', '01KS1GQQFB2806DZH3Z3ZWED5W', 0.00, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, NULL, 0, '2026-06-21 06:40:48', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KVMENRJEEGDG6T0NW9HS90NW', '01KS1GQQFB2806DZH3Z3ZWED5W', 0.00, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, NULL, 0, '2026-06-21 06:42:48', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KVNG6Y96G6N2NJ9D1M7TC5JJ', '01KS1GQQFB2806DZH3Z3ZWED5W', 0.00, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, NULL, 0, '2026-06-21 16:28:53', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KVNN3W1AKP3DA2WF3PATV7QK', '01KS1GQQFB2806DZH3Z3ZWED5W', 0.00, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, NULL, 0, '2026-06-21 17:54:36', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01M0DDNAVS6BHC9TRSW7M6CM9W', '01KS1GQQGFRBJ6DXH4T1FHRBD6', 6.70, 1800.0000, 45.0000, 120.0000, 850.0000, 15.0000, 0.5000, 85.0000, 2.5000, 0.8000, 1.2000, 280.0000, 25.0000, 18.0000, 'Análisis realizado en laboratorio UCR', 0, '2026-08-19 16:28:53', '01KZJDNCW6W7WEWSQGG02SY3XV');
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `insitu_tests`
+-- Table structure for table `insitu_tests`
 --
 
 CREATE TABLE `insitu_tests` (
@@ -796,31 +891,32 @@ CREATE TABLE `insitu_tests` (
   `conductivity` double(10,2) NOT NULL DEFAULT 0.00,
   `ph` double(4,2) NOT NULL DEFAULT 0.00,
   `description` varchar(255) DEFAULT NULL,
+  `visibility` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_by` char(26) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `insitu_tests`
+-- Dumping data for table `insitu_tests`
 --
 
-INSERT INTO `insitu_tests` (`insitu_test_id`, `geomanifestation_id`, `temperature`, `conductivity`, `ph`, `description`, `created_at`, `created_by`) VALUES
-('01KZPW48VSNS1Z366AXX4EQHBZ', '01KZPW48VQK3HX66A75T2AGMM2', 46.50, 532.00, 6.80, 'Mediciones in-situ registradas para el sitio Termal Sitio U-1. [Temperatura: 46.5 °C | pH: 6.8 | Conductividad: 532 µS/cm]', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48VYR3Y9BQ0NP4AQHNWW', '01KZPW48VX1QD60FKQGVQX7SNX', 41.00, 685.00, 6.51, 'Mediciones in-situ registradas para el sitio Termal CTP-1. [Temperatura: 41 °C | pH: 6.51 | Conductividad: 685 µS/cm]', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48W2MJ7Y7STMR2GNNW1D', '01KZPW48W123WBDF19W66N9S9G', 46.00, 940.00, 6.70, 'Mediciones in-situ registradas para el sitio Termal CTP-2. [Temperatura: 46 °C | pH: 6.7 | Conductividad: 940 µS/cm]', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48W5KVDHV9J33TS3CN1R', '01KZPW48W4SV1TEYD30N2AS472', 46.00, 1070.00, 6.26, 'Mediciones in-situ registradas para el sitio Termal CTP-3. [Temperatura: 46 °C | pH: 6.26 | Conductividad: 1070 µS/cm]', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48W80Z3QBTE5HRJ4ZBE6', '01KZPW48W80Z3QBTE5HRJ4ZBE5', 59.00, 0.00, 0.00, 'Mediciones in-situ registradas para el sitio Termal Guayabal. [Temperatura: 59 °C | pH sin medición de campo | Conductividad no reportada]', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WAX5SPDKKN9Y4HEZK4', '01KZPW48WAX5SPDKKN9Y4HEZK3', 36.00, 0.00, 2.83, 'Mediciones in-situ registradas para el sitio Termal Josue Ulate. [Temperatura: 36 °C | pH: 2.83 | Conductividad no reportada]', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WCWFNCEY425CW0QA33', '01KZPW48WCWFNCEY425CW0QA32', 42.00, 1100.00, 6.20, 'Mediciones in-situ registradas para el sitio Termal R. Perdido-1. [Temperatura: 42 °C | pH: 6.2 | Conductividad: 1100 µS/cm]', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WEEVZ518Q9S26RZTR5', '01KZPW48WEEVZ518Q9S26RZTR4', 44.60, 1080.00, 6.18, 'Mediciones in-situ registradas para el sitio Termal R. Perdido-2. [Temperatura: 44.6 °C | pH: 6.18 | Conductividad: 1080 µS/cm]', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WGDKWK9MBEJJB7Y1D0', '01KZPW48WGDKWK9MBEJJB7Y1CZ', 0.00, 0.00, 6.05, 'Mediciones in-situ registradas para el sitio Termal R. Perdido-3. [Temperatura no registrada o en 0 | pH: 6.05 | Conductividad no reportada]', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WJT58KDJH5V51MJVQ0', '01KZPW48WJT58KDJH5V51MJVPZ', 31.20, 0.00, 6.04, 'Mediciones in-situ registradas para el sitio Termal R. Perdido-4. [Temperatura: 31.2 °C | pH: 6.04 | Conductividad no reportada]', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZPW48WM0Q5PS1WP94RGJ53M', '01KZPW48WK0ZBWR4PCM5GV9TFA', 39.00, 420.00, 5.85, 'Mediciones in-situ registradas para el sitio Termal Guayacan. [Temperatura: 39 °C | pH: 5.85 | Conductividad: 420 µS/cm]', '2026-08-10 22:19:11', '06F43H2S28KNWX71TSF7MWWTA4');
+INSERT INTO `insitu_tests` (`insitu_test_id`, `geomanifestation_id`, `temperature`, `conductivity`, `ph`, `description`, `visibility`, `created_at`, `created_by`) VALUES
+('01KS1GQQFS3MCQ6XVFEW30DVRE', '01KS1GQQFR29SPWGPGMEM0QNPS', 41.00, 685.00, 6.51, 'Field measurement', 0, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQG1T3MA9G8K7QRQ4PWF', '01KS1GQQG0YEQ8MM4F4J6QRD4J', 46.00, 940.00, 6.70, 'Field measurement', 1, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQG3HVE0AWZ4YVE8Z56M', '01KS1GQQG3HVE0AWZ4YVE8Z56K', 46.00, 1070.00, 6.26, 'Field measurement', 0, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQG654QE46W5CDZ0HEDM', '01KS1GQQG59TQQ1KKS57X4S8D0', 59.00, 0.00, 0.00, 'Field measurement', 0, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQG80HSGC9Z1CCRSRN60', '01KS1GQQG7Y7827339A1NTHSEP', 36.00, 0.00, 2.83, 'Field measurement', 0, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQGA9ZJRMMPQQ3B7HPTF', '01KS1GQQG9F68TKK82J8FR6CN2', 44.60, 1080.00, 6.18, 'Field measurement', 0, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQGCZTSM0JWVKPGFMXST', '01KS1GQQGCZTSM0JWVKPGFMXSS', 0.00, 0.00, 6.05, 'Field measurement', 0, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQGEGT626AE1ZRE719A1', '01KS1GQQGEGT626AE1ZRE719A0', 31.20, 0.00, 6.04, 'Field measurement', 0, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KS1GQQGGXA38WKA3CHTQM9JM', '01KS1GQQGFRBJ6DXH4T1FHRBD6', 39.00, 420.00, 5.85, 'Field measurement', 0, '2026-05-20 01:41:51', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KVMA42YA25B2FYQ4TX1NZK3D', '01KS1GQQFB2806DZH3Z3ZWED5W', 90.00, 1.00, 14.00, 'Medición realizada el día de las madres.', 0, '2026-06-21 05:23:14', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01M0DCY5GF9BPMDHPJ74B01E20', '01KS1GQQGFRBJ6DXH4T1FHRBD6', 30.00, 0.00, 0.00, NULL, 0, '2026-08-19 16:16:14', '01KZJDNCW6W7WEWSQGG02SY3XV');
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `logs`
+-- Table structure for table `logs`
 --
 
 CREATE TABLE `logs` (
@@ -835,7 +931,7 @@ CREATE TABLE `logs` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `logs_entries`
+-- Table structure for table `logs_entries`
 --
 
 CREATE TABLE `logs_entries` (
@@ -844,12 +940,12 @@ CREATE TABLE `logs_entries` (
   `field_name` varchar(100) NOT NULL,
   `old_value` text DEFAULT NULL,
   `new_value` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `password_reset_tokens`
+-- Table structure for table `password_reset_tokens`
 --
 
 CREATE TABLE `password_reset_tokens` (
@@ -858,10 +954,17 @@ CREATE TABLE `password_reset_tokens` (
   `token_expiry` bigint(20) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `password_reset_tokens`
+--
+
+INSERT INTO `password_reset_tokens` (`user_id`, `token`, `token_expiry`) VALUES
+('01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '8139e94cddda4e2ea7616bbeca3737a4a11f31247c61d33963b2791355537709', 1785950961);
+
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `provinces`
+-- Table structure for table `provinces`
 --
 
 CREATE TABLE `provinces` (
@@ -873,7 +976,7 @@ CREATE TABLE `provinces` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `provinces`
+-- Dumping data for table `provinces`
 --
 
 INSERT INTO `provinces` (`province_id`, `province_snit_code`, `province_name`, `created_by`, `created_at`) VALUES
@@ -889,7 +992,7 @@ INSERT INTO `provinces` (`province_id`, `province_snit_code`, `province_name`, `
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `refresh_tokens`
+-- Table structure for table `refresh_tokens`
 --
 
 CREATE TABLE `refresh_tokens` (
@@ -906,20 +1009,344 @@ CREATE TABLE `refresh_tokens` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `refresh_tokens`
+-- Dumping data for table `refresh_tokens`
 --
 
 INSERT INTO `refresh_tokens` (`refresh_token_id`, `user_id`, `token_hash`, `family_id`, `expires_at`, `used_at`, `is_rotated`, `revoked_at`, `replaced_by`, `created_at`) VALUES
-('01KZSZV7HWW1FP4Q5PQ6VMGRJM', '06F43H2S28KNWX71TSF7MWWTA4', 'bdd4ae09462fea4de651aafaef779715fefb000bc319d51edb73cf78b2293d4f', '01KZSZV7HWW1FP4Q5PQ6VMGRJK', '2026-09-11 09:21:52', NULL, 0, '2026-08-12 03:35:53', NULL, '2026-08-12 09:21:52'),
-('01KZT0MWGDF486K59K0EN4749G', '06F43H2S28KNWX71TSF7MWWTA4', 'baf9c8bd970bf4feda379e85a147a308830f33a953a8e3a996334bad47cdc6c6', '01KZT0MWGDF486K59K0EN4749F', '2026-09-11 09:35:53', NULL, 0, '2026-08-14 20:57:04', NULL, '2026-08-12 09:35:53'),
-('01M0110SN27VH5BN6WHSF4SQW2', '06F43H2S28KNWX71TSF7MWWTA4', '6cef148aac9078c22e21f22177b0f40c81522914c632c5a66b646ae7463acf83', '01M0110SN27VH5BN6WHSF4SQW1', '2026-09-14 02:57:04', NULL, 0, '2026-08-15 04:14:43', NULL, '2026-08-15 02:57:04'),
-('01M01T25CCHF9AF48WFH6CN95D', '06F43H2S28KNWX71TSF7MWWTA4', 'c3192f4e403134e8fb9ac512afaac3355f6efccba0f5dce04e14deff82b84029', '01M01T25CCHF9AF48WFH6CN95C', '2026-09-14 10:14:43', NULL, 0, '2026-08-15 04:28:17', NULL, '2026-08-15 10:14:43'),
-('01M01TV0ACA8YER0ZJMB9QVWY8', '06F43H2S28KNWX71TSF7MWWTA4', '0315e2e75e09e2553673d9d98faefcb4f7e90e1c84cb9de44f189e0702317952', '01M01TV0ABDKFECK63Y1FFFDGA', '2026-09-14 10:28:17', NULL, 0, '2026-08-15 18:44:26', NULL, '2026-08-15 10:28:17'),
-('01M03BTN40BNK1G9VY85Y06J5E', '06F43H2S28KNWX71TSF7MWWTA4', '1428ba472a46064f3cc463a3120dad39597800432cd48da55c6238eaf19115f9', '01M03BTN40BNK1G9VY85Y06J5D', '2026-09-15 00:44:26', NULL, 0, '2026-08-15 20:21:32', NULL, '2026-08-16 00:44:26'),
-('01M03HCEY8EZ3QXQQCDF3JGADD', '06F43H2S28KNWX71TSF7MWWTA4', '597faa6a503b89f1d2fbcdced7b97ecba89f657fe54c6f129122465e3fafad41', '01M03HCEY8EZ3QXQQCDF3JGADC', '2026-09-15 02:21:32', NULL, 0, NULL, NULL, '2026-08-16 02:21:32');
+('01KSD7HM22PWK4BVXW0458Q8HC', '06F43H2S28KNWX71TSF7MWWTA4', '18c2b132a639f9dd2fbe13b52d47b01eb7e2a6985568be9ebb4c84b0c1193f82', '01KSD7HM21S7V7X3F38K3CAM8S', '2026-06-23 22:52:07', NULL, 0, '2026-05-24 17:10:57', NULL, '2026-05-24 22:52:07'),
+('01KSDE1D0JM13113HFVYPVGKRY', '06F43H2S28KNWX71TSF7MWWTA4', '66190a68c6fb7b5424203613baeb0dc6e7d46b632f4e861c31877a76117d1a5c', '01KSDE1D0H6R2R1A3RQEBTCKVN', '2026-06-24 00:45:36', NULL, 0, '2026-05-24 17:10:57', NULL, '2026-05-25 00:45:36'),
+('01KSDGWWK8RXFBBV4BZ93QD9ET', '06F43H2S28KNWX71TSF7MWWTA4', 'd6ee894c25e0be5ef69689d0d877a091171ad4d2614b4ee4b2ceb8ae4b8d177d', '01KSDGWWK6PY0WNVMEPGQFJVNM', '2026-06-24 01:35:33', NULL, 0, '2026-05-24 17:35:37', NULL, '2026-05-25 01:35:33'),
+('01KSDHDK3P32R19S8HE361QQS2', '01KSDHAZHHKK02DG47168ZX7TV', 'd31c2e8ad13c806c8f40e2e464daf132f29122b98761b48787ea66a83f237385', '01KSDHDK3P32R19S8HE361QQS1', '2026-06-24 01:44:41', NULL, 0, '2026-05-24 17:44:59', NULL, '2026-05-25 01:44:41'),
+('01KSDHET7KF4WQ2HB7EBCFPHNM', '01KSDHAZHHKK02DG47168ZX7TV', 'ed6fed31b1aeb283ffdfb48a0b94e0362268dbd77b6c3eb7487f305c0247b689', '01KSDHET7KF4WQ2HB7EBCFPHNK', '2026-06-24 01:45:21', NULL, 0, NULL, NULL, '2026-05-25 01:45:21'),
+('01KSDHF37415HF0PZM8D578HDS', '01KSDHAZHHKK02DG47168ZX7TV', '79ff3630ee09a929c40fb964d545097fb731d5fcc497654998a92ae1a461b97f', '01KSDHF37415HF0PZM8D578HDR', '2026-06-24 01:45:30', NULL, 0, NULL, NULL, '2026-05-25 01:45:30'),
+('01KSDHHKMXB53ES9HFCD30EQMP', '01KSDHAZHHKK02DG47168ZX7TV', 'c25e2486553ad8d9db20b897936b8530e3d1c8fbe0f40934909651004a892e72', '01KSDHHKMXB53ES9HFCD30EQMN', '2026-06-24 01:46:52', NULL, 0, NULL, NULL, '2026-05-25 01:46:52'),
+('01KSDHK6BFHG4FZ6Q8K1MBTDNZ', '01KSDHAZHHKK02DG47168ZX7TV', '0d9b6ccf07805af8f60554199e3fee15d4d6ee8233e05204f50469e0775a0001', '01KSDHK6BENZMEX9V23FQ5PQZR', '2026-06-24 01:47:44', NULL, 0, NULL, NULL, '2026-05-25 01:47:44'),
+('01KSDHMNZS4KDXB46TWWD84SGT', '06F43H2S28KNWX71TSF7MWWTA4', '60fb74a42f584696907c708d74f2c704864083242d281a680273cedc36bcac1c', '01KSDHMNZS4KDXB46TWWD84SGS', '2026-06-24 01:48:33', NULL, 0, '2026-05-24 17:49:14', NULL, '2026-05-25 01:48:33'),
+('01KSDHP67GFZ9991WQ8M9P0JPA', '06F43H2S28KNWX71TSF7MWWTA4', '55441dbbdf2c2d6df3eb33123614b4bf7b6885fcb6f567e7325a2db628640a03', '01KSDHP67GFZ9991WQ8M9P0JP9', '2026-06-24 01:49:23', NULL, 0, '2026-05-24 18:25:40', NULL, '2026-05-25 01:49:23'),
+('01KSDHWPPKC3K3TP512XSNXF7G', '06F43H2S28KNWX71TSF7MWWTA4', '75d8b3be5827f2cbc12263f8500ea5f9798d21b63b05d0869e80f7cbbccbe830', '01KSDHWPPH5W59288JJWCDAA14', '2026-06-24 01:52:56', NULL, 0, '2026-05-24 18:25:40', NULL, '2026-05-25 01:52:56'),
+('01KSDKRVP6XXW5HXJ7QFFP8ZAC', '06F43H2S28KNWX71TSF7MWWTA4', 'd16fbaca310b03a73cfb4aafaa27552efc91582203f29118f9c264d012a3f403', '01KSDKRVP6XXW5HXJ7QFFP8ZAB', '2026-06-24 02:25:47', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-05-25 02:25:47'),
+('01KSDS4DW2RWFEVTFN0SNRB573', '06F43H2S28KNWX71TSF7MWWTA4', '3a89fe223cafd1dcb19273da4e99d892e9634e72bc5855c76e3f5ae306a83410', '01KSDS4DW2RWFEVTFN0SNRB572', '2026-06-24 03:59:29', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-05-25 03:59:29'),
+('01KSFS731B80FNNRXPA762CF1X', '06F43H2S28KNWX71TSF7MWWTA4', '529c2298a54d20bef7a7213be62573dab8fcad2ebbbdc69f2fbcc015286bf846', '01KSFS731939QVQ5SSZB7JBMPP', '2026-06-24 22:39:25', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-05-25 22:39:25'),
+('01KSFTN36VN8CV8XX9TSV965NJ', '06F43H2S28KNWX71TSF7MWWTA4', '2c23b959c3c3cc98d688d4de3cefb258e24a37ef00ebb3f609be0e44b671056b', '01KSFTN36S0ZC9MKFE2Q7N8JN1', '2026-06-24 23:04:33', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-05-25 23:04:33'),
+('01KSG0ATHYPPYM56S892YMKGE7', '06F43H2S28KNWX71TSF7MWWTA4', 'a3228a39ad20dee66582f68b3e9f83e7be78a83ad767049b63de81e95c2bd0a8', '01KSG0ATHYPPYM56S892YMKGE6', '2026-06-25 00:43:48', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-05-26 00:43:48'),
+('01KSK5QGC89H1GK8TGTFDVQ7CT', '06F43H2S28KNWX71TSF7MWWTA4', 'd4007f2d266cb45252186f261567635d88ac14900d51fc62d5bef3957586a604', '01KSK5QGC89H1GK8TGTFDVQ7CS', '2026-06-26 04:15:49', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-05-27 04:15:49'),
+('01KTJPWKBSXQTYTGRG3EQETDBQ', '06F43H2S28KNWX71TSF7MWWTA4', 'fc49a1654aed5391c7f9d9c315da324ac21d748549703078600b5a360a6831a0', '01KTJPWKBSXQTYTGRG3EQETDBP', '2026-07-08 10:12:09', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-06-08 10:12:09'),
+('01KTJQDCA6HWNF67SCSZR9MDZF', '06F43H2S28KNWX71TSF7MWWTA4', 'ffdbb4c04779f6593ff446ae5b33f8617ae03cc91efd7d39b116af68e52628b5', '01KTJQDCA6HWNF67SCSZR9MDZE', '2026-07-08 10:21:19', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-06-08 10:21:19'),
+('01KTJQDFS1W9D0WX59YKAQ5XDG', '06F43H2S28KNWX71TSF7MWWTA4', '69375ef5fec937e938bbf6add6122cb0e179fe8694a798bde1f8140172c99340', '01KTJQDFS1W9D0WX59YKAQ5XDF', '2026-07-08 10:21:23', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-06-08 10:21:23'),
+('01KTJQDYE80CK0ZCV7B2DSNNHK', '06F43H2S28KNWX71TSF7MWWTA4', 'b9176e1c71fab7f84661b42fff583183d5b87c5f2bd7e9060b6f47e34f528e57', '01KTJQDYE80CK0ZCV7B2DSNNHJ', '2026-07-08 10:21:38', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-06-08 10:21:38'),
+('01KTJQE2SBFGVQGZM2EBK9749F', '06F43H2S28KNWX71TSF7MWWTA4', '797d86db2c3a01cae47c8f6f40a973b92ce7e93c654bbf8ff4e535d2d68e8e79', '01KTJQE2SBFGVQGZM2EBK9749E', '2026-07-08 10:21:42', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-06-08 10:21:42'),
+('01KTJQEE7GJG97WBW3KWE71NCB', '06F43H2S28KNWX71TSF7MWWTA4', '3e873065ee3b995ab84faa6bd2cdeaef85cbe0122aafbf665cfaea80fb5554e0', '01KTJQEE7GJG97WBW3KWE71NCA', '2026-07-08 10:21:54', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-06-08 10:21:54'),
+('01KTJQG3NVMBRZTASZ0BKJJYKV', '06F43H2S28KNWX71TSF7MWWTA4', 'b1be5333ed2e277df10ad0939cad0042a2f23a09771a113887b8566953c09f1d', '01KTJQG3NVMBRZTASZ0BKJJYKT', '2026-07-08 10:22:49', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-06-08 10:22:49'),
+('01KTJQJKG9JJ859FR32DEZWYNJ', '06F43H2S28KNWX71TSF7MWWTA4', '9773b946941d2ef1d6f4c3fb69a2ecc1964cb687096865328e1304c6520a76ec', '01KTJQJKG9JJ859FR32DEZWYNH', '2026-07-08 10:24:11', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-06-08 10:24:11'),
+('01KTJQK18FKQDFD9Y437Y28ZBA', '06F43H2S28KNWX71TSF7MWWTA4', '245705de160797c1b14c80a29499a199731384649624cad9c55f9565f6b3f1b9', '01KTJQK18FKQDFD9Y437Y28ZB9', '2026-07-08 10:24:25', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-06-08 10:24:25'),
+('01KTJQKYTNJ3ZRDT0EKKF8KM5M', '06F43H2S28KNWX71TSF7MWWTA4', 'fdf9062757b5d3d328a0a2296db0a1deeaf834287fc5de31b02a496566ca4071', '01KTJQKYTNJ3ZRDT0EKKF8KM5K', '2026-07-08 10:24:55', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-06-08 10:24:55'),
+('01KTM20A9Z83X98V4N965685R5', '06F43H2S28KNWX71TSF7MWWTA4', 'ace5eab44fa78ae79739c2e6289b2f9c259de9f463c83c90aa27899f1da2b6e1', '01KTM20A9Z83X98V4N965685R4', '2026-07-08 22:45:40', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-06-08 22:45:40'),
+('01KTPY251WGEGBADP7RXV8HENB', '06F43H2S28KNWX71TSF7MWWTA4', 'cfae2ed6a607ab6b3dc65f30c36b69d60c6901dbd2312cb21552473dd5fdc995', '01KTPY251WGEGBADP7RXV8HENA', '2026-07-10 01:34:29', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-06-10 01:34:29'),
+('01KTPY38XFGRW23A15P9CMNSB4', '06F43H2S28KNWX71TSF7MWWTA4', '9e9c6866e011e0a1b92e81e0d3f389574f4846265796e8c00288a951c65154fa', '01KTPY38XFGRW23A15P9CMNSB3', '2026-07-10 01:35:06', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-06-10 01:35:06'),
+('01KTPY3F91MKDK9P9E3VM4Y005', '06F43H2S28KNWX71TSF7MWWTA4', '27611d68936e10ce180b5ea74a47a51d8c710025f42ec19b882143b61ecac945', '01KTPY3F91MKDK9P9E3VM4Y004', '2026-07-10 01:35:12', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-06-10 01:35:12'),
+('01KTPY5GY5FD97PHZS4H7TQRBE', '06F43H2S28KNWX71TSF7MWWTA4', '2ed6552b57284427b6422fe8413a92810b5a31e7632c885226a7761ef4fb658f', '01KTPY5GY5FD97PHZS4H7TQRBD', '2026-07-10 01:36:20', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-06-10 01:36:20'),
+('01KTQ23S3A05QFSW6AFQCFXRCE', '06F43H2S28KNWX71TSF7MWWTA4', '6ecdf8b5018bed2effb3c4d5a74ada0bde6e3b9642adf595926bdae576269805', '01KTQ23S3A05QFSW6AFQCFXRCD', '2026-07-10 02:45:17', NULL, 0, '2026-06-09 20:56:45', NULL, '2026-06-10 02:45:17'),
+('01KTQ2YMYPN9PH9H4P3YGQZQ3S', '06F43H2S28KNWX71TSF7MWWTA4', '511394d4bdb7dcd86c4812113867b70888ded1cdabc73d7b3349d41d19e873b4', '01KTQ2YMYPN9PH9H4P3YGQZQ3R', '2026-07-10 02:59:57', NULL, 0, '2026-06-09 21:49:28', NULL, '2026-06-10 02:59:57'),
+('01KTQ5TE132J5SGTCGHCDBEA17', '06F43H2S28KNWX71TSF7MWWTA4', '862b75caf2d56f5b7e577246cae69b15fdf1bc8af8310d551c41c4a06eaa2b5e', '01KTQ5TE132J5SGTCGHCDBEA16', '2026-07-10 03:50:05', NULL, 0, '2026-06-11 23:16:04', NULL, '2026-06-10 03:50:05'),
+('01KTWFGEGQPWHY8EDGKBSTSVQ0', '06F43H2S28KNWX71TSF7MWWTA4', '46261ddd3a30ab05f6656a70f5f1e731affa1b443ce97a6d765ab2f15961cff0', '01KTWFGEGQPWHY8EDGKBSTSVPZ', '2026-07-12 05:15:36', NULL, 0, '2026-06-11 23:16:04', NULL, '2026-06-12 05:15:36'),
+('01KTWFJ7YEN9QRWP70T0C6413J', '06F43H2S28KNWX71TSF7MWWTA4', 'c6378f100eeddb32d0c1b554010b7e1b15b0d6be9432bd5351ff1748215463a8', '01KTWFJ7YEN9QRWP70T0C6413H', '2026-07-12 05:16:34', NULL, 0, '2026-06-11 23:16:53', NULL, '2026-06-12 05:16:34'),
+('01KTWJFRBBACXGRXSBZCA7QW3F', '06F43H2S28KNWX71TSF7MWWTA4', 'bf3a91a4f82a0314f2aea561403f2446dae4266514c9aa7c7d69acf36fcb46b7', '01KTWJFRBBACXGRXSBZCA7QW3E', '2026-07-12 06:07:39', NULL, 0, '2026-06-12 00:10:31', NULL, '2026-06-12 06:07:39'),
+('01KTWJFYXTYWP5GWA0C4KEA4XT', '06F43H2S28KNWX71TSF7MWWTA4', '9cd8e3bcd7835a8896d6d1265de5eb4aaff51ae5d3071740686991dad58dac00', '01KTWJFYXTYWP5GWA0C4KEA4XS', '2026-07-12 06:07:45', NULL, 0, '2026-06-12 00:10:31', NULL, '2026-06-12 06:07:45'),
+('01KTWJGC290TX2B67510620EXP', '06F43H2S28KNWX71TSF7MWWTA4', '79bbca3b19dda167e8307895b2a518ca1d3cc83b2bb217b0c35a9ef0aa9e2a61', '01KTWJGC290TX2B67510620EXN', '2026-07-12 06:07:59', NULL, 0, '2026-06-12 00:10:31', NULL, '2026-06-12 06:07:59'),
+('01KTWJJM1JZHGQ9TBC0HFEMCRM', '06F43H2S28KNWX71TSF7MWWTA4', '59c33e4684c6baef3bb38015270f2c8dcf9fffe7f6e82a6c71a85c9bb206311f', '01KTWJJM1JZHGQ9TBC0HFEMCRK', '2026-07-12 06:09:13', NULL, 0, '2026-06-12 00:10:31', NULL, '2026-06-12 06:09:13'),
+('01KTZQG6M2KB8G8AGQCVEXACYZ', '06F43H2S28KNWX71TSF7MWWTA4', 'dae693caf6498e8cb4ff9144f4daad8f061cb3b71fc0eef60e69b50bc8bc2720', '01KTZQG6M2KB8G8AGQCVEXACYY', '2026-07-13 11:32:59', NULL, 0, '2026-06-13 05:38:58', NULL, '2026-06-13 11:32:59'),
+('01KTZQGCDG0FNAE6GYR2VBG8CE', '06F43H2S28KNWX71TSF7MWWTA4', 'a83ee45db0e427937ba8e4c03e66155067324ff003372c5573e2361a2f1c0198', '01KTZQGCDG0FNAE6GYR2VBG8CD', '2026-07-13 11:33:05', NULL, 0, '2026-06-13 05:38:58', NULL, '2026-06-13 11:33:05'),
+('01KTZQHWWPGZ5JHQPM4JWAV3KN', '06F43H2S28KNWX71TSF7MWWTA4', 'ab0491a49666248825dbbd566030a4a79e41291256428a1128e41c8d5c9e94dd', '01KTZQHWWPGZ5JHQPM4JWAV3KM', '2026-07-13 11:33:55', NULL, 0, '2026-06-13 05:38:58', NULL, '2026-06-13 11:33:55'),
+('01KTZQKMQFG40RY56YXTF5G8K7', '06F43H2S28KNWX71TSF7MWWTA4', '073fb15efc60e0caec5474cd8cf03c15da5ae6a2c355641973872f59e5baac14', '01KTZQKMQFG40RY56YXTF5G8K6', '2026-07-13 11:34:52', NULL, 0, '2026-06-13 05:38:58', NULL, '2026-06-13 11:34:52'),
+('01KTZQP3MAJNN92YJTR5TAH1XA', '06F43H2S28KNWX71TSF7MWWTA4', '2731a4527000cd38c069ef03cc8a57f7c09d0b5d573efb99db46f1227720e5d0', '01KTZQP3MAJNN92YJTR5TAH1X9', '2026-07-13 11:36:13', NULL, 0, '2026-06-13 05:38:58', NULL, '2026-06-13 11:36:13'),
+('01KTZQS5W8D2C6G5PXJGNYRBPA', '06F43H2S28KNWX71TSF7MWWTA4', '7e5c36f09c2c8df3e9e7ccdfcfa0887b4fe45d328e11107133baa82af1490a97', '01KTZQS5W8D2C6G5PXJGNYRBP9', '2026-07-13 11:37:54', NULL, 0, '2026-06-13 05:38:58', NULL, '2026-06-13 11:37:54'),
+('01KTZQT31M64GAPVK78H33BR1J', '06F43H2S28KNWX71TSF7MWWTA4', 'a6cf0d4a2a043145568de753826caf3f9724a19992cdd37b0425cbf7726b6f49', '01KTZQT31M64GAPVK78H33BR1H', '2026-07-13 11:38:23', NULL, 0, '2026-06-13 05:38:58', NULL, '2026-06-13 11:38:23'),
+('01KTZQWWDDQS52QVEK9J0MWD4M', '06F43H2S28KNWX71TSF7MWWTA4', '6c471025e09a11fbcc4855c188e3deb233320d03399e2761dd804ecd523224fd', '01KTZQWWDDQS52QVEK9J0MWD4K', '2026-07-13 11:39:55', NULL, 0, '2026-06-13 20:24:47', NULL, '2026-06-13 11:39:55'),
+('01KTZQWX80SAATKX0DXAMTXTBP', '06F43H2S28KNWX71TSF7MWWTA4', 'a4ef5f552b181dc56c0401b91b9fb1bd55d7dc65d548580e6a96f735d5eea694', '01KTZQWX80SAATKX0DXAMTXTBN', '2026-07-13 11:39:56', NULL, 0, '2026-06-13 20:24:47', NULL, '2026-06-13 11:39:56'),
+('01KTZR86T9FJ8R18FYYYHC3SWQ', '06F43H2S28KNWX71TSF7MWWTA4', 'ac8f9a4bd5c5c7f6af733ac04df4a3d84576b544316f2e13177df3d217dc2495', '01KTZR86T9FJ8R18FYYYHC3SWP', '2026-07-13 11:46:06', NULL, 0, '2026-06-13 20:24:47', NULL, '2026-06-13 11:46:06'),
+('01KTZRDGAW39FQ8ERE760DJP9Z', '06F43H2S28KNWX71TSF7MWWTA4', '7127582f46cd3d94730cedc05578100a6cfd4116a623fa53523cd1d948b04f24', '01KTZRDGAW39FQ8ERE760DJP9Y', '2026-07-13 11:49:00', NULL, 0, '2026-06-13 20:24:47', NULL, '2026-06-13 11:49:00'),
+('01KTZRR6BK8Z3HSCFVBCFHSA1J', '06F43H2S28KNWX71TSF7MWWTA4', 'a43a1334c3e694694ae635e28a2355c664459e100decfa554646e6a230e82b8c', '01KTZRR6BK8Z3HSCFVBCFHSA1H', '2026-07-13 11:54:50', NULL, 0, '2026-06-13 20:24:47', NULL, '2026-06-13 11:54:50'),
+('01KTZRSB1M2J6550DN7RSKAEN2', '06F43H2S28KNWX71TSF7MWWTA4', 'a3a52ee866cb6c42493cee851ceb7640a3e59990d20485814289db2be9b0160f', '01KTZRSB1M2J6550DN7RSKAEN1', '2026-07-13 11:55:27', NULL, 0, '2026-06-13 20:24:47', NULL, '2026-06-13 11:55:27'),
+('01KTZRSE5VYXNYSZE415SYGJ6Q', '06F43H2S28KNWX71TSF7MWWTA4', 'eedd9b27dcf2739cfb993b8e37a7ebfd448f7dfc7b2450172335b98f07cf16b1', '01KTZRSE5VYXNYSZE415SYGJ6P', '2026-07-13 11:55:31', NULL, 0, '2026-06-13 20:24:47', NULL, '2026-06-13 11:55:31'),
+('01KTZRT936A874WN274SWDFZX1', '06F43H2S28KNWX71TSF7MWWTA4', 'd1cd24ffc00f236fa24ec5253e748b80e150297549539393b0487f2c42559bb4', '01KTZRT936A874WN274SWDFZX0', '2026-07-13 11:55:58', NULL, 0, '2026-06-13 20:24:47', NULL, '2026-06-13 11:55:58'),
+('01KTZS0Z48CH2QRQR4PA8AP3QX', '06F43H2S28KNWX71TSF7MWWTA4', '6d04655c56b228214c097e90d2d58bf6c6bddd5358eee1cf188e96465f322acf', '01KTZS0Z48CH2QRQR4PA8AP3QW', '2026-07-13 11:59:37', NULL, 0, '2026-06-13 20:24:47', NULL, '2026-06-13 11:59:37'),
+('01KTZS41Y2W7WVQKRAFF68JWJX', '06F43H2S28KNWX71TSF7MWWTA4', '7e51f0e78455c23e5172f3d8a050b3362c99db49b7b0576496a0a2ad29028293', '01KTZS41Y1QHKED1EZ58QVN5V0', '2026-07-13 14:01:19', NULL, 0, '2026-06-13 20:24:47', NULL, '2026-06-13 14:01:19'),
+('01KTZS5DKCKHEPS6RH0Q660X5J', '06F43H2S28KNWX71TSF7MWWTA4', '2a817c3050294a17d607345a3d1be6f6d977eec39f1647578fefd696db707a3a', '01KTZS5DKCKHEPS6RH0Q660X5H', '2026-07-13 14:02:03', NULL, 0, '2026-06-13 20:24:47', NULL, '2026-06-13 14:02:03'),
+('01KTZSEFQYRYDEB9SWHKQKHM4F', '06F43H2S28KNWX71TSF7MWWTA4', '23479e18a2fda1b4f1c8ac5b7c15ef252aaa397d227e970de3775ae82475c74b', '01KTZSEFQYRYDEB9SWHKQKHM4E', '2026-07-13 12:07:00', NULL, 0, '2026-06-13 20:24:47', NULL, '2026-06-13 12:07:00'),
+('01KTZSEP3AR5G0FM40R46PPG2S', '06F43H2S28KNWX71TSF7MWWTA4', '8e174a9d7805f17dcb9b71fbccaead7ef61d65c307660322e6cd0eea06d4640a', '01KTZSEP3AR5G0FM40R46PPG2R', '2026-07-13 12:07:07', NULL, 0, '2026-06-13 20:24:47', NULL, '2026-06-13 12:07:07'),
+('01KTZSJ071AK3NDRS6MQ8Y2F4B', '06F43H2S28KNWX71TSF7MWWTA4', 'cd196e97f18687608558a3e39799d9f655e04a940c754359196a108799cc6b80', '01KTZSJ071AK3NDRS6MQ8Y2F4A', '2026-07-13 12:08:56', NULL, 0, '2026-06-13 20:24:47', NULL, '2026-06-13 12:08:56'),
+('01KTZSSBQCYBSAX265XN4JYNHH', '06F43H2S28KNWX71TSF7MWWTA4', 'd1c53e9a4d0d6cbcee0f6023e2921259940b9f4fd51d9e78db01f17f10be9a2e', '01KTZSSBQCYBSAX265XN4JYNHG', '2026-07-13 12:12:57', NULL, 0, '2026-06-13 20:24:47', NULL, '2026-06-13 12:12:57'),
+('01KV1AA6P7PB2ZBT2S23TNZ8VF', '06F43H2S28KNWX71TSF7MWWTA4', '15eab36d5445b633a1f7c83b4aecb1ee8e365edecf8182a01d29f3dbe12aafcd', '01KV1AA6P6GHCVR4849RF0DTP5', '2026-07-14 02:21:00', NULL, 0, '2026-06-13 20:24:47', NULL, '2026-06-14 02:21:00'),
+('01KV1ACGYK5278RHT21MPW4AWA', '06F43H2S28KNWX71TSF7MWWTA4', '4ae876b0103a5d5f8ff4be03f0cbbae0fc38b53250727ef47bbfc957e0748385', '01KV1ACGYK5278RHT21MPW4AW9', '2026-07-14 02:22:16', NULL, 0, '2026-06-13 20:24:47', NULL, '2026-06-14 02:22:16'),
+('01KV1AFWV9MXM77NXMFQSSKDWJ', '06F43H2S28KNWX71TSF7MWWTA4', 'b82926ccca887d6e00ec63009adf124b65dd82bc84f6e9ca0b0d8d812c94d90a', '01KV1AFWV9MXM77NXMFQSSKDWH', '2026-07-14 02:24:07', NULL, 0, '2026-06-13 20:24:47', NULL, '2026-06-14 02:24:07'),
+('01KV1AGNX858QK13AF9MB6NTG2', '06F43H2S28KNWX71TSF7MWWTA4', '34bc7c41d80d72e14fe2951c0fefed134267a508caab8e1f10f535dcc4484954', '01KV1AGNX858QK13AF9MB6NTG1', '2026-07-14 02:24:32', NULL, 0, '2026-06-13 20:24:47', NULL, '2026-06-14 02:24:32'),
+('01KV1AH9VPF187XZSWBV4D3D97', '06F43H2S28KNWX71TSF7MWWTA4', 'b4f71cdd82099803b49d5a022fca939c729ccfafe3fdfd07ef89cb1c2023397f', '01KV1AH9VPF187XZSWBV4D3D96', '2026-07-14 02:24:53', NULL, 0, '2026-06-13 22:52:25', NULL, '2026-06-14 02:24:53'),
+('01KV1JYXMA645F42FBYTB4JEQF', '06F43H2S28KNWX71TSF7MWWTA4', '1812613e175e941375a0c855b306a530ae7af48e4c5515853b6f47ea6112a893', '01KV1JYXMA645F42FBYTB4JEQE', '2026-07-14 04:52:08', NULL, 0, '2026-06-13 22:52:25', NULL, '2026-06-14 04:52:08'),
+('01KV1KV8TFTGKJSD8KM5BEGSBJ', '06F43H2S28KNWX71TSF7MWWTA4', '0219dd5b2aa804fcfcc66845dcdf1503e0a0ea863697854b6a2702953e72aa1f', '01KV1KV8TFTGKJSD8KM5BEGSBH', '2026-07-14 05:07:37', NULL, 0, '2026-06-14 05:45:14', NULL, '2026-06-14 05:07:37'),
+('01KV1M1PNKQ8F97DR4JTYK4WFK', '06F43H2S28KNWX71TSF7MWWTA4', 'ed5ce75373886bd59c59189150b7fe6d8f1d1372045096728229c4da956605cb', '01KV1M1PNKQ8F97DR4JTYK4WFJ', '2026-07-14 05:11:07', NULL, 0, '2026-06-14 05:45:14', NULL, '2026-06-14 05:11:07'),
+('01KV1M29PW7RX0NNF6BN4FDGQA', '06F43H2S28KNWX71TSF7MWWTA4', '09731fa146a2a6a95f441b8de04d40d9c33c3f1436efeb0bfb94828c33e11e74', '01KV1M29PW7RX0NNF6BN4FDGQ9', '2026-07-14 05:11:27', NULL, 0, '2026-06-14 05:45:14', NULL, '2026-06-14 05:11:27'),
+('01KV1MVB9S2KG9SSPAQ5H6CN2A', '06F43H2S28KNWX71TSF7MWWTA4', 'fb12ed6078f57f0b5094989aa7896a6c9986218639cd0fc5dbaf7df2d81e3e1d', '01KV1MVB9S2KG9SSPAQ5H6CN29', '2026-07-14 05:25:08', NULL, 0, '2026-06-14 05:45:14', NULL, '2026-06-14 05:25:08'),
+('01KV1MVQQPNF894T5CC4P6G832', '06F43H2S28KNWX71TSF7MWWTA4', '12775fa732cf41b341bfe149f1422f751f9ef31862f5dd96fa28f99b166f0832', '01KV1MVQQPNF894T5CC4P6G831', '2026-07-14 05:25:21', NULL, 0, '2026-06-14 05:45:14', NULL, '2026-06-14 05:25:21'),
+('01KV1N3THRYVQKVCZR5GJS0303', '06F43H2S28KNWX71TSF7MWWTA4', 'ad59d6a8f310eaad4e50eff9317e46ce983552cf882ff46f665c041b8f1e49e5', '01KV1N3THRYVQKVCZR5GJS0302', '2026-07-14 05:29:46', NULL, 0, '2026-06-14 05:45:14', NULL, '2026-06-14 05:29:46'),
+('01KV1NB0MF6HYRRF1AT360VN5H', '06F43H2S28KNWX71TSF7MWWTA4', '3f3a9c38ec48b7bfd09b871b4aca6f7fe3171e2923d89570ddbbe1f59fe5dc40', '01KV1NB0MF6HYRRF1AT360VN5G', '2026-07-14 05:33:41', NULL, 0, '2026-06-14 05:45:14', NULL, '2026-06-14 05:33:41'),
+('01KV1NNEZHXMD0V3ZC84JV59XZ', '06F43H2S28KNWX71TSF7MWWTA4', 'c9e5c60f7541e5afbfdf6ed4315fc389b2c7d9c62c28e6dcafad3d2b6db8267b', '01KV1NNEZHXMD0V3ZC84JV59XY', '2026-07-14 05:39:24', NULL, 0, '2026-06-14 05:45:14', NULL, '2026-06-14 05:39:24'),
+('01KV1NXRB219ZZ4PGGMG24RA3B', '06F43H2S28KNWX71TSF7MWWTA4', 'fad69de9a44cba92c457d836662c3181ebfe406e0250d40f00fa3a44496faa33', '01KV1NXRB219ZZ4PGGMG24RA3A', '2026-07-14 05:43:55', NULL, 0, '2026-06-14 05:45:14', NULL, '2026-06-14 05:43:55'),
+('01KV1NXZFG2K5NQQK8P9ZEPM9V', '06F43H2S28KNWX71TSF7MWWTA4', '8573022dd42b862813c44fc3d65b6b86e5540f59670cf34ce141df9a3dd1d3b6', '01KV1NXZFG2K5NQQK8P9ZEPM9T', '2026-07-14 05:44:03', NULL, 0, '2026-06-14 05:45:14', NULL, '2026-06-14 05:44:03'),
+('01KV1NYATQ4MTVA2E576TXRKER', '06F43H2S28KNWX71TSF7MWWTA4', '3c8b5c67a9d439b682f20e24083df42d4b94d76f4c376107c1cd514e5d0b85af', '01KV1NYATQ4MTVA2E576TXRKEQ', '2026-07-14 05:44:14', NULL, 0, '2026-06-14 05:45:14', NULL, '2026-06-14 05:44:14'),
+('01KV1NYYHAYEEJKB8X377RGPPF', '06F43H2S28KNWX71TSF7MWWTA4', 'e137fa800b455081a5ac3883abb29047bba1f9b59b3b7d89093ad24f25a10b68', '01KV1NYYH9TCG80W0EE957A62F', '2026-07-14 05:44:34', NULL, 0, '2026-06-14 05:45:14', NULL, '2026-06-14 05:44:34'),
+('01KV1P0BSA7EG5PSVDS0670MKG', '06F43H2S28KNWX71TSF7MWWTA4', '299d88a03ebf56e29c39f64733d7ee8538b1a22898788af7500354f3fc65b70c', '01KV1P0BSA7EG5PSVDS0670MKF', '2026-07-14 05:45:21', NULL, 0, '2026-06-14 05:56:35', NULL, '2026-06-14 05:45:21'),
+('01KV1P1W7Y3KDC2NNWK3REM7RZ', '06F43H2S28KNWX71TSF7MWWTA4', '657fabdad95cbbb38b27fd43e464f0a4eccd5a43d18f1811c5bcdbf4671ae288', '01KV1P1W7Y3KDC2NNWK3REM7RY', '2026-07-14 05:46:10', NULL, 0, '2026-06-14 05:56:35', NULL, '2026-06-14 05:46:10'),
+('01KV1P2RS3E1V15HKVXJZ07F0X', '06F43H2S28KNWX71TSF7MWWTA4', '6090610638962fd6c5971a4723c820862186b075effa6fd3676729b834cf623d', '01KV1P2RS3E1V15HKVXJZ07F0W', '2026-07-14 05:46:40', NULL, 0, '2026-06-14 05:56:35', NULL, '2026-06-14 05:46:40'),
+('01KV1PB0W7VWVMKK92EEB4P3BB', '06F43H2S28KNWX71TSF7MWWTA4', 'df4b6544aab25e30071dbeb784381c0acb0386802e6c6e51e9e9155d486ecfb4', '01KV1PB0W7VWVMKK92EEB4P3BA', '2026-07-14 05:51:10', NULL, 0, '2026-06-14 05:56:35', NULL, '2026-06-14 05:51:10'),
+('01KV1PBQJYHG4B2CA250KJS81T', '06F43H2S28KNWX71TSF7MWWTA4', '05903033b09b6eb0c6c822da2822604fb836dafa3f9da046a27d64b12e1156d2', '01KV1PBQJYHG4B2CA250KJS81S', '2026-07-14 05:51:33', NULL, 0, '2026-06-14 05:56:35', NULL, '2026-06-14 05:51:33'),
+('01KV1PBZMPHMVQHFXGM1RJ4PTJ', '06F43H2S28KNWX71TSF7MWWTA4', 'a4e8954134523bf5fffc0e0918c14bec46a427f966b57285203c4233f306fb48', '01KV1PBZMPHMVQHFXGM1RJ4PTH', '2026-07-14 05:51:41', NULL, 0, '2026-06-14 05:56:35', NULL, '2026-06-14 05:51:41'),
+('01KV1PD9BNQQ3H2GCN5P7VD27V', '06F43H2S28KNWX71TSF7MWWTA4', 'edc9e9896c87f9db789051ba9eb96c9332e8d4cde8f6c4b3a01a9935f84c3967', '01KV1PD9BNQQ3H2GCN5P7VD27T', '2026-07-14 05:52:24', NULL, 0, '2026-06-14 05:56:35', NULL, '2026-06-14 05:52:24'),
+('01KV1PHMDQ64DRQAVXTJR7GS0P', '06F43H2S28KNWX71TSF7MWWTA4', '54ed55ad7fe96796556d80b263f9ac23eda07aaea0c121edc2ae630649033a31', '01KV1PHMDQ64DRQAVXTJR7GS0N', '2026-07-14 05:54:47', NULL, 0, '2026-06-14 05:56:35', NULL, '2026-06-14 05:54:47'),
+('01KV1PM4T3PC3MRWT6WGJT17W2', '06F43H2S28KNWX71TSF7MWWTA4', '600727d667546799c2b1157bc0c946c8de52cf5e1c9856d01b82e1d837a46e62', '01KV1PM4T3PC3MRWT6WGJT17W1', '2026-07-14 05:56:09', NULL, 0, '2026-06-14 05:56:35', NULL, '2026-06-14 05:56:09'),
+('01KV1PMC598EW1ZGYFA8HVWEAB', '06F43H2S28KNWX71TSF7MWWTA4', '633eb1096b678ca2e31ef72a61f477fcfaf8a1d70260f6ed76bd0c486c81ffc3', '01KV1PMC598EW1ZGYFA8HVWEAA', '2026-07-14 05:56:16', NULL, 0, '2026-06-14 05:56:35', NULL, '2026-06-14 05:56:16'),
+('01KV1PN1R16249E8JCZMSG0E7J', '06F43H2S28KNWX71TSF7MWWTA4', '918527b1577f2112238d85ffe82cc8db4acbbdef1adb3dfe771371f779a30443', '01KV1PN1R16249E8JCZMSG0E7H', '2026-07-14 05:56:39', NULL, 0, '2026-06-14 05:59:47', NULL, '2026-06-14 05:56:39'),
+('01KV1PQQD76RQY69CQFFDMK65H', '06F43H2S28KNWX71TSF7MWWTA4', '4209df57e179776adadf6350c1df1b601d2be2ac9c1f7643c8b5077b76a09762', '01KV1PQQD76RQY69CQFFDMK65G', '2026-07-14 05:58:06', NULL, 0, '2026-06-14 05:59:47', NULL, '2026-06-14 05:58:06'),
+('01KV1PRYS220T3ZGD7PKWST15A', '06F43H2S28KNWX71TSF7MWWTA4', '0a932ed592b6a928a20e8b8c4cbe55904ab20775768876dc5e088032a38e317e', '01KV1PRYS220T3ZGD7PKWST159', '2026-07-14 05:58:47', NULL, 0, '2026-06-14 05:59:47', NULL, '2026-06-14 05:58:47'),
+('01KV1PT5X8N0S9BYMQW2BKJTT9', '06F43H2S28KNWX71TSF7MWWTA4', '8ede229767cc5b1fff7c67a70c59e7a6f975f0050f3c0525b4dd6a943b57c669', '01KV1PT5X8N0S9BYMQW2BKJTT8', '2026-07-14 05:59:27', NULL, 0, '2026-06-14 05:59:47', NULL, '2026-06-14 05:59:27'),
+('01KV1PTXA2NKTX6BD00VJKM3EK', '06F43H2S28KNWX71TSF7MWWTA4', '123f5f4d9258ce18c8a7dce8dade9510d479022609db7065fa8955a5c2bd7540', '01KV1PTXA2NKTX6BD00VJKM3EJ', '2026-07-14 05:59:51', NULL, 0, '2026-06-14 00:53:15', NULL, '2026-06-14 05:59:51'),
+('01KV1R655HDDRYT9J58KY4768J', '06F43H2S28KNWX71TSF7MWWTA4', '9b0ac7f7898532bc52983e35357c90b620f1fe6dc24315ce6746159f00f9cd47', '01KV1R655HDDRYT9J58KY4768H', '2026-07-14 06:23:28', NULL, 0, '2026-06-14 00:53:15', NULL, '2026-06-14 06:23:28'),
+('01KV1S4ZVJ6ZM9AV0E5JR1VE1T', '06F43H2S28KNWX71TSF7MWWTA4', 'b916b21ee90cc2be46c053b808cf98a742ecb3de3c0e038d7989d58b3300167c', '01KV1S4ZVJ6ZM9AV0E5JR1VE1S', '2026-07-14 06:40:18', NULL, 0, '2026-06-14 00:53:15', NULL, '2026-06-14 06:40:18'),
+('01KV1SHJRZGG15RQ521TD198GS', '06F43H2S28KNWX71TSF7MWWTA4', '9a469536ccc2f2a2e9dddd8a19ee15bfe7eb50a626cbac4f8e98b22e436bae81', '01KV1SHJRZGG15RQ521TD198GR', '2026-07-14 06:47:11', NULL, 0, '2026-06-14 00:53:15', NULL, '2026-06-14 06:47:11'),
+('01KV1SM61T71Z5XDHY2ZQBP7BE', '06F43H2S28KNWX71TSF7MWWTA4', '6cf6b8f1abd50ea75105b8f0e9c9a1f25ac7baee99043d3cb5c5f0b3ea504d00', '01KV1SM61T71Z5XDHY2ZQBP7BD', '2026-07-14 06:48:36', NULL, 0, '2026-06-14 00:53:15', NULL, '2026-06-14 06:48:36'),
+('01KV1XWEY9XJ5XYEQ6DPK00H8N', '06F43H2S28KNWX71TSF7MWWTA4', 'e970440e0c712abf6d0a3a6da98e77e83c3b957a468ada58f29a63a08fd30c1c', '01KV1XWEY9XJ5XYEQ6DPK00H8M', '2026-07-14 08:03:01', NULL, 0, '2026-06-18 23:44:41', NULL, '2026-06-14 08:03:01'),
+('01KV1Y3A0HYTQ6H3EQMKNT6AKS', '01KV1Y23C22RQFF7TVRQ0BYEE7', '306a1bdba2b7a1690f9bac1e59875d2b148a572738037fc476b70a160cb6d234', '01KV1Y3A0HYTQ6H3EQMKNT6AKR', '2026-07-14 08:06:46', NULL, 0, '2026-06-14 23:14:11', NULL, '2026-06-14 08:06:46'),
+('01KV44XQ4VV9VDC27VNJV2AGGH', '01KV1Y23C22RQFF7TVRQ0BYEE7', '6d92415387cba1212080e901c3caf00f361874bcc4bf28dd9c20ab6976a1e33a', '01KV44XQ4VV9VDC27VNJV2AGGG', '2026-07-15 04:44:32', NULL, 0, '2026-06-14 23:14:11', NULL, '2026-06-15 04:44:32'),
+('01KV44Z1070M68YV9XJ81Y5TS2', '01KV1Y23C22RQFF7TVRQ0BYEE7', '7f781b0fd0d57d3b9b6a0f1c53ffece5b6da9eb261f5fad8786a6d206c9b981c', '01KV44Z1070M68YV9XJ81Y5TS1', '2026-07-15 04:45:14', NULL, 0, '2026-06-14 23:14:11', NULL, '2026-06-15 04:45:14'),
+('01KV46KFW9D4SRV40BJH82Q32T', '01KV1Y23C22RQFF7TVRQ0BYEE7', '18d14946870c499affd27bb8889a134231c23186f1f8cebb7ea8165835e7a927', '01KV46KFW9D4SRV40BJH82Q32S', '2026-07-15 05:13:54', NULL, 0, '2026-06-14 23:14:11', NULL, '2026-06-15 05:13:54'),
+('01KV46KV84WEPJQMSNDXC27E1Z', '01KV1Y23C22RQFF7TVRQ0BYEE7', 'd96cbb6cf7383a9b5c8260ec0ad5415b6065a899aeeeb21099a857e45e81fbbb', '01KV46KV84WEPJQMSNDXC27E1Y', '2026-07-15 05:14:05', NULL, 0, '2026-06-14 23:14:11', NULL, '2026-06-15 05:14:05'),
+('01KV46NMF9KSXWTTHD0MZMYHR2', '01KV1Y23C22RQFF7TVRQ0BYEE7', '85958a34f4876f3df763d3154eaa492731566973cf17ff46a1bfef5d00f3ca35', '01KV46NMF9KSXWTTHD0MZMYHR1', '2026-07-15 05:15:04', NULL, 0, NULL, NULL, '2026-06-15 05:15:04'),
+('01KV46P26CV72AK9W95DMMW8ZW', '01KV1Y23C22RQFF7TVRQ0BYEE7', '0a3a1f94cc8d3bfb9bbebe90761900003c01e92b7c20b190a8674be1f2c99fc2', '01KV46P26CV72AK9W95DMMW8ZV', '2026-07-15 05:15:18', NULL, 0, NULL, NULL, '2026-06-15 05:15:18'),
+('01KV46PF9NWYSEF2A4YKWF7H8T', '06F43H2S28KNWX71TSF7MWWTA4', '7dbbb4ece8c3dbb03c372129d72c224092a5f27471c054e019c2b4dbee5dd4fb', '01KV46PF9NWYSEF2A4YKWF7H8S', '2026-07-15 05:15:31', NULL, 0, '2026-06-18 23:44:41', NULL, '2026-06-15 05:15:31'),
+('01KVDPG3VX5XHWT181B2K94DM0', '06F43H2S28KNWX71TSF7MWWTA4', 'e160b6c1849e2ef02fb4e516c92e4a6fb9e31f8353cde6e0f956a4f6c4d2321f', '01KVDPG3VX5XHWT181B2K94DKZ', '2026-07-18 21:44:50', NULL, 0, '2026-06-18 23:44:41', NULL, '2026-06-18 21:44:50'),
+('01KVDQ0T8HGPZ6QP63NZZ3JZ8A', '06F43H2S28KNWX71TSF7MWWTA4', '96c8555513b68098f6e9692783e7e0bccc7b35dac0a33379e49b667c1a32b5c1', '01KVDQ0T8HGPZ6QP63NZZ3JZ89', '2026-07-18 21:53:57', NULL, 0, '2026-06-18 23:44:41', NULL, '2026-06-18 21:53:57'),
+('01KVDQ1HZB75C6MGBQ6W2ARTPY', '06F43H2S28KNWX71TSF7MWWTA4', 'b82accc9efc489252ea69ea3dbb3023f62de1c6790af79fe2b87f0a66b6c5831', '01KVDQ1HZB75C6MGBQ6W2ARTPX', '2026-07-18 21:54:22', NULL, 0, '2026-06-18 23:44:41', NULL, '2026-06-18 21:54:22'),
+('01KVE6EEPKTR8W9N443Q5PY4MY', '06F43H2S28KNWX71TSF7MWWTA4', 'eb84a50e6e25e1af5e156e56bd182f0a9f7d63c4fe7dc588541696c5b9edc0c2', '01KVE6EEPKTR8W9N443Q5PY4MX', '2026-07-19 02:23:33', NULL, 0, '2026-06-18 23:44:41', NULL, '2026-06-19 02:23:33'),
+('01KVE7BWFPNJYYKCPQ4CV164GS', '06F43H2S28KNWX71TSF7MWWTA4', 'bb4c3b299b5fc3163ff6d969dcaabedde5614cc8ceb80fc12840ccc504c3b1ef', '01KVE7BWFPNJYYKCPQ4CV164GR', '2026-07-19 02:39:37', NULL, 0, '2026-06-18 23:44:41', NULL, '2026-06-19 02:39:37'),
+('01KVE7W6D0HYH4DDCZNT1XEPPK', '06F43H2S28KNWX71TSF7MWWTA4', 'a926d61f0fde387fb62fa7d7fd95df2f8e313609d48d0cbb248db344d3046125', '01KVE7W6D0HYH4DDCZNT1XEPPJ', '2026-07-19 02:48:32', NULL, 0, '2026-06-18 23:44:41', NULL, '2026-06-19 02:48:32'),
+('01KVED16XD2KJN8DCKNXKYHT76', '06F43H2S28KNWX71TSF7MWWTA4', '39192f53ea4c09b4e1b2891ee18446efc9b0c027ea85d8d4de0e187cd2593bdd', '01KVED16XD2KJN8DCKNXKYHT75', '2026-07-19 04:18:39', NULL, 0, '2026-06-18 23:44:41', NULL, '2026-06-19 04:18:39'),
+('01KVEFA9W6W5RFJZQ2RVNW2DE2', '06F43H2S28KNWX71TSF7MWWTA4', '9a27db10bce07e85b892a0ce5c693b1de0e53078ab5762a05e51198429d72349', '01KVEFA9W6W5RFJZQ2RVNW2DE1', '2026-07-19 04:58:34', NULL, 0, '2026-06-18 23:44:41', NULL, '2026-06-19 04:58:34'),
+('01KVEHT7FJAE8YP44D1YVHP0ZG', '06F43H2S28KNWX71TSF7MWWTA4', '05d5265cd3b9444060e17055e7f83cde8050241f32588c19072637f3718f35a8', '01KVEHT7FJAE8YP44D1YVHP0ZF', '2026-07-19 05:42:13', NULL, 0, '2026-06-18 23:44:41', NULL, '2026-06-19 05:42:13'),
+('01KVEHX9TGDRCHBW6D095BFSB0', '06F43H2S28KNWX71TSF7MWWTA4', '9653e60361b632deef22e492504271e0b834b9a7df2406ccc6427d77276bd1b7', '01KVEHX9TGDRCHBW6D095BFSAZ', '2026-07-19 05:43:54', NULL, 0, '2026-06-18 23:44:41', NULL, '2026-06-19 05:43:54'),
+('01KVEHXQMSNB3J30G7X91E5N4T', '06F43H2S28KNWX71TSF7MWWTA4', '901798301ae10c2305d3a587511db2c0010c12936dafcfc50586d58fabb90f74', '01KVEHXQMRBW623VWQNEF7MH5G', '2026-07-19 05:44:08', NULL, 0, '2026-06-18 23:44:41', NULL, '2026-06-19 05:44:08'),
+('01KVEHYMMEWBRYX5M6KFYMJAD6', '06F43H2S28KNWX71TSF7MWWTA4', '493280ac2be486178c70a2c80e66e8d515c8097fddcc1974ef3f974527a47447', '01KVEHYMMEWBRYX5M6KFYMJAD5', '2026-07-19 05:44:38', NULL, 0, '2026-06-18 23:44:41', NULL, '2026-06-19 05:44:38'),
+('01KVEJ66JZ5BFYP8Q1DS944YSK', '06F43H2S28KNWX71TSF7MWWTA4', 'b1844c5551442ebfc61212967e7c38716c295d7a0288035404f343ba630af2d3', '01KVEJ66JZ5BFYP8Q1DS944YSJ', '2026-07-19 05:48:45', NULL, 0, '2026-06-21 06:26:19', NULL, '2026-06-19 05:48:45'),
+('01KVKPV0RPFD5Q68NBCVJBQ9KZ', '06F43H2S28KNWX71TSF7MWWTA4', '3e6ade203aeaf4ab353451bc9340331f15ebb2765fa909d8d6557d8684cdd9ee', '01KVKPV0RPFD5Q68NBCVJBQ9KY', '2026-07-21 05:46:14', NULL, 0, '2026-06-21 06:26:19', NULL, '2026-06-21 05:46:14'),
+('01KVKQ5DDBX7WDA1EHW19969K8', '06F43H2S28KNWX71TSF7MWWTA4', 'bd216c4f9d91b467c225d420f94ed2dcbc3031c10eb1e0fc7c87f64b4a631dfb', '01KVKQ5DDBX7WDA1EHW19969K7', '2026-07-21 05:51:55', NULL, 0, '2026-06-21 06:26:19', NULL, '2026-06-21 05:51:55'),
+('01KVM6NXRMH4P4C91RN364B5W8', '06F43H2S28KNWX71TSF7MWWTA4', '66a16851ebd37dd8d2b1b30f3af6123da9ffee27aa1c92e1b927906bea967b13', '01KVM6NXRMH4P4C91RN364B5W7', '2026-07-21 10:23:04', NULL, 0, '2026-06-21 06:26:19', NULL, '2026-06-21 10:23:04'),
+('01KVMC2NEY0QBKV8M66SFP8Q5A', '06F43H2S28KNWX71TSF7MWWTA4', '7719e5c930a25df0338bf4507c6f789ee3f16c4142cfe46840ea5a91dbd04759', '01KVMC2NEY0QBKV8M66SFP8Q59', '2026-07-21 11:57:25', NULL, 0, '2026-06-21 06:26:19', NULL, '2026-06-21 11:57:25'),
+('01KVMDQJNF1EC037032ADVB7SB', '06F43H2S28KNWX71TSF7MWWTA4', 'e3e895f858d08eccda1683fe5a59e0c454da14d93b510d9e27bb72b7cd8961c9', '01KVMDQJNEF4P9XQCMWGN2WC3B', '2026-07-21 12:26:18', NULL, 0, '2026-06-21 06:26:19', NULL, '2026-06-21 12:26:18'),
+('01KVMDQJVTJ1DX2AZW0V1DSEYH', '06F43H2S28KNWX71TSF7MWWTA4', '7bdc618970fc4eb47452aad0735540b56cfa4a07c4a47d0968d302751350b53e', '01KVMDQJVTJ1DX2AZW0V1DSEYG', '2026-07-21 12:26:19', NULL, 0, '2026-06-21 06:26:19', NULL, '2026-06-21 12:26:19'),
+('01KVMDQK1ZPZCK8ZXZ7XEXHBS9', '06F43H2S28KNWX71TSF7MWWTA4', '22699d470a2ce1d0a6ef2fb403febb319079b983fa0db5489248e3c6687d5430', '01KVMDQK1ZPZCK8ZXZ7XEXHBS8', '2026-07-21 12:26:19', NULL, 0, '2026-06-21 06:26:19', NULL, '2026-06-21 12:26:19'),
+('01KVME742KDG2GC8071PS29YXQ', '06F43H2S28KNWX71TSF7MWWTA4', '3683ff93b3876c1a8ca11cd351f452fea85460313db263e7bdcfa6964b3698c6', '01KVME742KDG2GC8071PS29YXP', '2026-07-21 12:34:48', NULL, 0, '2026-06-21 06:34:48', NULL, '2026-06-21 12:34:48'),
+('01KVME74AHTWKBKSBW8V5AEQ7S', '06F43H2S28KNWX71TSF7MWWTA4', 'a520c68a9542ec063e8b7c74c5e7a928adb703ca97069950853eb7605ea06b18', '01KVME74AHTWKBKSBW8V5AEQ7R', '2026-07-21 12:34:48', NULL, 0, '2026-06-21 06:34:48', NULL, '2026-06-21 12:34:48'),
+('01KVME74GD3RFQ6J74ZREPV1DS', '06F43H2S28KNWX71TSF7MWWTA4', 'f56db502071a206fa7325433d7a0edc44f94f02b4d14dd0fc275add7e87f65dc', '01KVME74GD3RFQ6J74ZREPV1DR', '2026-07-21 12:34:48', NULL, 0, '2026-06-21 06:34:48', NULL, '2026-06-21 12:34:48'),
+('01KVMEE0A5R8KN605WAJJRXKG4', '06F43H2S28KNWX71TSF7MWWTA4', '0edb79aa84081e19dd53aa2e843e6109a256205b5ad2f03fc6b4a5fada0b7285', '01KVMEE0A5R8KN605WAJJRXKG3', '2026-07-21 12:38:33', NULL, 0, '2026-06-21 06:38:34', NULL, '2026-06-21 12:38:33'),
+('01KVMEE0KRGREH5VGN0A59JEH5', '06F43H2S28KNWX71TSF7MWWTA4', '1174074aebdb783adc7a8eb8978bcde9faadcb3420745dad395892fa188fffa2', '01KVMEE0KRGREH5VGN0A59JEH4', '2026-07-21 12:38:34', NULL, 0, '2026-06-21 06:38:34', NULL, '2026-06-21 12:38:34'),
+('01KVMEE0TEQZGWKJ5XJPHPGBM5', '06F43H2S28KNWX71TSF7MWWTA4', '554abef07dfdc217450c77c7a691c717107185e0f21fb7861391528be69f2a45', '01KVMEE0TEQZGWKJ5XJPHPGBM4', '2026-07-21 12:38:34', NULL, 0, '2026-06-21 06:38:34', NULL, '2026-06-21 12:38:34'),
+('01KVMEGEVA9229941XFZ5WR2Y9', '06F43H2S28KNWX71TSF7MWWTA4', '704a4e4485e61e2619d8ec6306e6b71267b03fa0f55c59170b01745b974f217b', '01KVMEGEVA9229941XFZ5WR2Y8', '2026-07-21 12:39:54', NULL, 0, '2026-06-21 06:39:54', NULL, '2026-06-21 12:39:54'),
+('01KVMEGF1QVTEDTVP1CWVH2H78', '06F43H2S28KNWX71TSF7MWWTA4', 'b4488b8f91de5ec0558aeb367980fa3337775b2afc905b42c440b76eb633660a', '01KVMEGF1QVTEDTVP1CWVH2H77', '2026-07-21 12:39:54', NULL, 0, '2026-06-21 06:39:54', NULL, '2026-06-21 12:39:54'),
+('01KVMEGF7TJSM61N156KD02WPA', '06F43H2S28KNWX71TSF7MWWTA4', '801f01314ac641be846d0e4a8c24f34fa48d8efb3a290c82b7dc4ddd93146bae', '01KVMEGF7TJSM61N156KD02WP9', '2026-07-21 12:39:54', NULL, 0, '2026-06-21 06:39:54', NULL, '2026-06-21 12:39:54'),
+('01KVMEHNT99BGMFDHXSQPF0GJ8', '06F43H2S28KNWX71TSF7MWWTA4', 'a8dd3ff1ab2b040b8a49986bda90a194e8c13686a899a85abc73347d8d8a0cab', '01KVMEHNT99BGMFDHXSQPF0GJ7', '2026-07-21 12:40:34', NULL, 0, '2026-06-21 06:40:34', NULL, '2026-06-21 12:40:34'),
+('01KVMEHP2E44M7GJARP5KM2VXE', '06F43H2S28KNWX71TSF7MWWTA4', '6704ffc5db4a4ffb33445da99d8de80bb0064b235db1b4cc415fbeea5d626c16', '01KVMEHP2E44M7GJARP5KM2VXD', '2026-07-21 12:40:34', NULL, 0, '2026-06-21 06:40:34', NULL, '2026-06-21 12:40:34'),
+('01KVMEHP9WBA7ZAYTHWZN3JCM2', '06F43H2S28KNWX71TSF7MWWTA4', '97db9b80c1770e70a3864fd207877606e14b5cb795eee4aa01f58b1937195cfc', '01KVMEHP9WBA7ZAYTHWZN3JCM1', '2026-07-21 12:40:34', NULL, 0, '2026-06-21 06:40:34', NULL, '2026-06-21 12:40:34'),
+('01KVMEJ3F73D2ZJY4M2MXA34HS', '06F43H2S28KNWX71TSF7MWWTA4', 'ae82675e0ecec3a069342fe27e31367fd993d1cb5903721286858a4941ce5141', '01KVMEJ3F73D2ZJY4M2MXA34HR', '2026-07-21 12:40:48', NULL, 0, '2026-06-21 06:40:48', NULL, '2026-06-21 12:40:48'),
+('01KVMEJ3NPBT13YXT2R3ZT5CBZ', '06F43H2S28KNWX71TSF7MWWTA4', '2049760783227f2e0f02a95514df5ba57b77c5cdbc316c95cf4e632fb346719f', '01KVMEJ3NPBT13YXT2R3ZT5CBY', '2026-07-21 12:40:48', NULL, 0, '2026-06-21 06:40:48', NULL, '2026-06-21 12:40:48'),
+('01KVMEJ3W3N1XR21KPE4WRTMZ3', '06F43H2S28KNWX71TSF7MWWTA4', 'd80302909b900710dbb94f4bab7d3c02e2690f03b19491ddca96d2edf4364b64', '01KVMEJ3W3N1XR21KPE4WRTMZ2', '2026-07-21 12:40:48', NULL, 0, '2026-06-21 06:42:47', NULL, '2026-06-21 12:40:48'),
+('01KVMENQR89QC9J88HTRJPP7EY', '06F43H2S28KNWX71TSF7MWWTA4', '3f85491c6275f96625d91b175a983c5dbab7c58dec5586483786a81bae018b67', '01KVMENQR89QC9J88HTRJPP7EX', '2026-07-21 12:42:47', NULL, 0, '2026-06-21 06:42:47', NULL, '2026-06-21 12:42:47'),
+('01KVMENQYBK8QT79D220TBRR59', '06F43H2S28KNWX71TSF7MWWTA4', 'ac0206c3f0ecdfea63a66d55d19cead545860aa7be81c0f75a007929217c3457', '01KVMENQYBK8QT79D220TBRR58', '2026-07-21 12:42:47', NULL, 0, '2026-06-21 06:42:47', NULL, '2026-06-21 12:42:47'),
+('01KVMENR4P0X92HW90TK0HWST7', '06F43H2S28KNWX71TSF7MWWTA4', '3f82069ec0c1f5cb1af2f0d2f15402260b6cfa9cf08e8a8f233833b417f8f289', '01KVMENR4P0X92HW90TK0HWST6', '2026-07-21 12:42:47', NULL, 0, '2026-06-21 16:28:53', NULL, '2026-06-21 12:42:47'),
+('01KVNFKYF3A6RQ52G9RJHS2DWK', '06F43H2S28KNWX71TSF7MWWTA4', '0597c3f552315937155941c7b814011ac095c7990cf741dc4618e0a77b6d8716', '01KVNFKYF3A6RQ52G9RJHS2DWJ', '2026-07-21 22:18:31', NULL, 0, '2026-06-21 16:28:53', NULL, '2026-06-21 22:18:31'),
+('01KVNG6XDHFSF8SYFP5K8PCRPP', '06F43H2S28KNWX71TSF7MWWTA4', '020bb8667bb6cdb4b1fe35b3fe96d27edb058104f0e7917a994b520a004fa098', '01KVNG6XDHFSF8SYFP5K8PCRPN', '2026-07-21 22:28:53', NULL, 0, '2026-06-21 16:28:53', NULL, '2026-06-21 22:28:53'),
+('01KVNG6XKN3M9J6TRFK8AZE2QQ', '06F43H2S28KNWX71TSF7MWWTA4', 'e072573a6e16dd8d5f0c40d7c4bca4eaaff86614e4fe625a2623cfbeef88f233', '01KVNG6XKN3M9J6TRFK8AZE2QP', '2026-07-21 22:28:53', NULL, 0, '2026-06-21 16:28:53', NULL, '2026-06-21 22:28:53'),
+('01KVNG6XT244MYXRTCP5F0168E', '06F43H2S28KNWX71TSF7MWWTA4', '59859035596bc1a0bed482077f32fbc8034b0b804281496254a3ad84daf9bc6d', '01KVNG6XT244MYXRTCP5F0168D', '2026-07-21 22:28:53', NULL, 0, '2026-06-21 18:37:14', NULL, '2026-06-21 22:28:53'),
+('01KVNNPMGQXGV1RCD9WQ1Z3RVH', '06F43H2S28KNWX71TSF7MWWTA4', '5fa431c283df1e098e5ed1d36fb0d958748b1fcf605e97c4563bf425b31231c5', '01KVNNPMGQXGV1RCD9WQ1Z3RVG', '2026-07-22 00:04:51', NULL, 0, '2026-06-21 18:37:14', NULL, '2026-06-22 00:04:51'),
+('01KVNQGYQMADSN68VS1CVA4PZ7', '01KVNQFNTSZNSE9WP5YKE3XQKY', 'e92e81f7779d5532281893317a5bd882fd3370887504ef4d71f040b496499f2a', '01KVNQGYQMADSN68VS1CVA4PZ6', '2026-07-22 00:36:42', NULL, 0, NULL, NULL, '2026-06-22 00:36:42'),
+('01KVNQHHF9TVMSD2HVZWTXG7V6', '01KVNQFNTSZNSE9WP5YKE3XQKY', 'b5d1cf2bb8974c6160b656ded5dd5af296ad4f26e06485cd9c3c47f6d1129b76', '01KVNQHHF9TVMSD2HVZWTXG7V5', '2026-07-22 00:37:01', NULL, 0, NULL, NULL, '2026-06-22 00:37:01'),
+('01KVNQJ3BQXT84JJAZ16H41W0T', '01KVNQFNTSZNSE9WP5YKE3XQKY', 'e5c48cbc3ee0cec920451f8a6abf269fe9bba2bad35dd04f62d82488159e60ed', '01KVNQJ3BQXT84JJAZ16H41W0S', '2026-07-22 00:37:19', NULL, 0, NULL, NULL, '2026-06-22 00:37:19'),
+('01KVNQJ90GKB5WD01CX1YC76NT', '01KVNQFNTSZNSE9WP5YKE3XQKY', '4e50da73968a0759e54029cc1d02710a562706eafc945ec813e073dbf867b38e', '01KVNQJ90GKB5WD01CX1YC76NS', '2026-07-22 00:37:25', NULL, 0, NULL, NULL, '2026-06-22 00:37:25'),
+('01KVNQNWJVNYXEGW22GRC3D97D', '01KVNQFNTSZNSE9WP5YKE3XQKY', 'c9934653ac7bd27aea5a9c0a041137eb9491416af869f2f7bdff75d06908c5bc', '01KVNQNWJVNYXEGW22GRC3D97C', '2026-07-22 00:39:23', NULL, 0, NULL, NULL, '2026-06-22 00:39:23'),
+('01KVNQP3M9S9SFTYHJKCAVAC7X', '06F43H2S28KNWX71TSF7MWWTA4', 'bf8d3d8fbf8ebf6b381dde54ff0b9f0aedb95313807f78dfe953b911c3d55b99', '01KVNQP3M9S9SFTYHJKCAVAC7W', '2026-07-22 00:39:30', NULL, 0, '2026-06-22 01:02:02', NULL, '2026-06-22 00:39:30'),
+('01KVNR8F4NXP4CY6T6R94HRKV6', '06F43H2S28KNWX71TSF7MWWTA4', '1926ed641ed86f9124e579e0a12275ba66c2e19c498cac7fb169e4f2acf000b9', '01KVNR8F4NXP4CY6T6R94HRKV5', '2026-07-22 00:49:32', NULL, 0, '2026-06-22 01:02:02', NULL, '2026-06-22 00:49:32'),
+('01KVNR8PSEVX09ANS13JZ7BDVA', '01KVNQFNTSZNSE9WP5YKE3XQKY', '923b0b6c9d810033f57dd76313a2f9d226e23bb405667612d32cfc636d72848f', '01KVNR8PSEVX09ANS13JZ7BDV9', '2026-07-22 00:49:40', NULL, 0, NULL, NULL, '2026-06-22 00:49:40'),
+('01KVNRG4HK3PFRME6MX4MC24ZH', '01KVNQFNTSZNSE9WP5YKE3XQKY', '36511dcbe4607f1c7eeeee7b259529b105a5f2e9cf3ac2b89792f955431ceec6', '01KVNRG4HK3PFRME6MX4MC24ZG', '2026-07-22 00:53:43', NULL, 0, NULL, NULL, '2026-06-22 00:53:43'),
+('01KVNRK5SCB5G1JW838QNS30HB', '01KVNQFNTSZNSE9WP5YKE3XQKY', 'f34f6452f3e36c15813bbb4e1eed4a2030abc9f8d2de841312eaa8ae6eecc5d5', '01KVNRK5SCB5G1JW838QNS30HA', '2026-07-22 00:55:23', NULL, 0, NULL, NULL, '2026-06-22 00:55:23'),
+('01KVNRM1VQ1F8TCF8Q8R5KPZ16', '01KVNRKQ1HW3YH0NRXQF744JK9', '7aac43ec2acb873fa08c488bdc4de4a5a9d7b693f668ddb13e7b7b352b3ce894', '01KVNRM1VQ1F8TCF8Q8R5KPZ15', '2026-07-22 00:55:52', NULL, 0, '2026-06-21 19:03:53', NULL, '2026-06-22 00:55:52'),
+('01KVNRXBAMXS9TCYEFYX96YGDB', '01KVNRKQ1HW3YH0NRXQF744JK9', 'cf778016ff6493e5d2be534b48e2e5942fe6029fc4de4108e09bf12ff00a444a', '01KVNRXBAMXS9TCYEFYX96YGDA', '2026-07-22 01:00:56', NULL, 0, '2026-06-21 19:03:53', NULL, '2026-06-22 01:00:56'),
+('01KVNRXFWDS2DFE691KJ411K71', '01KVNRKQ1HW3YH0NRXQF744JK9', '250533239d72f6e97d84f8bb4c980bfb3c5392d6bc7ad82bb78e04d564640e88', '01KVNRXFWDS2DFE691KJ411K70', '2026-07-22 01:01:01', NULL, 0, '2026-06-21 19:03:53', NULL, '2026-06-22 01:01:01'),
+('01KVNRYRG8BG8B57ZQ9SVX5XPD', '01KVNRKQ1HW3YH0NRXQF744JK9', 'c547c8f3be343ddf18034b0f011a759e880ec9abbef21717f46dbaf63662ae5f', '01KVNRYRG8BG8B57ZQ9SVX5XPC', '2026-07-22 01:01:43', NULL, 0, '2026-06-21 19:03:53', NULL, '2026-06-22 01:01:43'),
+('01KVPDCJKS83X445ZXGQMNZS2M', '01KVNRKQ1HW3YH0NRXQF744JK9', 'c14c41edd01d52f666a1e4ac541cd3355a901936005a1cbf5e88b1591f67df10', '01KVPDCJKS83X445ZXGQMNZS2K', '2026-07-22 06:58:47', NULL, 0, '2026-09-11 15:28:34', NULL, '2026-06-22 06:58:47'),
+('01KVPDJ75P9JGCF2ZMW4FP7WCP', '06F43H2S28KNWX71TSF7MWWTA4', '43babaa3b0c5072f07f319fc608de7e46a08acd40e9697cc67ab377db1cc5de8', '01KVPDJ75P9JGCF2ZMW4FP7WCN', '2026-07-22 07:01:52', NULL, 0, '2026-06-22 01:02:02', NULL, '2026-06-22 07:01:52'),
+('01KVPDJS9G2QY193PGZNK0DHNP', '06F43H2S28KNWX71TSF7MWWTA4', '6d6cf7eb2ae79c913d5b9d29ca64c81abfe158600cca749c3221e1b602573dde', '01KVPDJS9G2QY193PGZNK0DHNN', '2026-07-22 07:02:10', NULL, 0, '2026-08-05 03:06:14', NULL, '2026-06-22 07:02:10'),
+('01KVPE7FP5G11BB7N1RZ36FS9E', '06F43H2S28KNWX71TSF7MWWTA4', 'b2f19b6210fcd072bea7ea004cdb13aade3cde5b9bac2f9db1e5e434874be5b5', '01KVPE7FP5G11BB7N1RZ36FS9D', '2026-07-22 07:13:29', NULL, 0, '2026-08-05 03:06:14', NULL, '2026-06-22 07:13:29'),
+('01KVPE7NGETMCEJBZFNQ2XQ948', '01KVNRKQ1HW3YH0NRXQF744JK9', '88912e6ee4afb843f8616106cbc1b1f83f6c0fa901c4342e648996f550130323', '01KVPE7NGETMCEJBZFNQ2XQ947', '2026-07-22 07:13:34', NULL, 0, '2026-09-11 15:28:34', NULL, '2026-06-22 07:13:34'),
+('01KVPED5JMWBJE25F5P6FE37E7', '06F43H2S28KNWX71TSF7MWWTA4', '820ff0e8a1c0a33c9461313f1c85799539f6db0e70b62c4d49983662a5d77407', '01KVPED5JMWBJE25F5P6FE37E6', '2026-07-22 07:16:35', NULL, 0, '2026-08-05 03:06:14', NULL, '2026-06-22 07:16:35'),
+('01KVPEFQARWHYWHZHKD7XVRRP5', '06F43H2S28KNWX71TSF7MWWTA4', 'e8f3b95f8b32a31a7eed3e5f168dbf238d55fe79f6709bb635d14540874dabdf', '01KVPEFQARWHYWHZHKD7XVRRP4', '2026-07-22 07:17:59', NULL, 0, '2026-08-05 03:06:14', NULL, '2026-06-22 07:17:59'),
+('01KVPEG2XK5EESGGNP30196ZCV', '01KVNRKQ1HW3YH0NRXQF744JK9', '6c3eb2ed0e8251676cee04168cf06d1c22e6055f172eeae41bb11d3926fcb133', '01KVPEG2XK5EESGGNP30196ZCT', '2026-07-22 07:18:10', NULL, 0, '2026-09-11 15:28:34', NULL, '2026-06-22 07:18:10'),
+('01KVPQ4NJJZTAM5WXRZB0FS3K4', '01KVNRKQ1HW3YH0NRXQF744JK9', '878020f04a72209d97efb691ddc270e7266afb514d03e0f9d38edf458fa3dc22', '01KVPQ4NJJZTAM5WXRZB0FS3K3', '2026-07-22 09:49:13', NULL, 0, '2026-09-11 15:28:34', NULL, '2026-06-22 09:49:13'),
+('01KZ5E9QS80RK8P106ZX8ZJBRJ', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '26e54b2bb09642f31c163e10dfdd5df7deec2f44ecf9e345eefa855b04677fed', '01KZ5E9QS80RK8P106ZX8ZJBRH', '2026-09-03 09:50:24', NULL, 0, '2026-08-04 04:01:38', NULL, '2026-08-04 09:50:24'),
+('01KZ5EYA2TSKDD8J32R58PZ125', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '96aa2ef20b976fa8e544e32129b865e25f34641a5f8f6bbbe704011d8253ba77', '01KZ5EYA2TSKDD8J32R58PZ124', '2026-09-03 10:01:38', NULL, 0, '2026-08-04 04:04:45', NULL, '2026-08-04 10:01:38'),
+('01KZ5F40E7MQ34XPWTTRX7Y3N7', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '57fb6f0968e176241e2229ff8e90a4f84a03fb55707f3bb5038187986993c041', '01KZ5F40E7MQ34XPWTTRX7Y3N6', '2026-09-03 10:04:45', NULL, 0, '2026-08-04 04:30:30', NULL, '2026-08-04 10:04:45'),
+('01KZ5GK5BXJPV1P5GFRCZYX5M1', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '926acc859a50adf4f0be80b94fb60a2ecd3aea95ed3a310885a9ec5c035a7dce', '01KZ5GK5BXJPV1P5GFRCZYX5M0', '2026-09-03 10:30:30', NULL, 0, '2026-08-04 04:31:33', NULL, '2026-08-04 10:30:30'),
+('01KZ5GN2B7AS0KN8KFVT3GYD0K', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', 'c8f8063e54dceeb854f6b97908f840d9b7fdf54edfaeb99178447253c21d876c', '01KZ5GN2B7AS0KN8KFVT3GYD0J', '2026-09-03 10:31:33', NULL, 0, '2026-08-04 04:45:09', NULL, '2026-08-04 10:31:33'),
+('01KZ5HDZ9HD4WCB52SHA3MQ7SW', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '23274915108ceab5ba3027e57297988b4da64761ecc9d22ba66c9f238bdb2b4e', '01KZ5HDZ9HD4WCB52SHA3MQ7SV', '2026-09-03 10:45:09', NULL, 0, '2026-08-04 04:48:42', NULL, '2026-08-04 10:45:09'),
+('01KZ5HMFF6BXKVG22M2V8B243G', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '299596724f4c01098d1895de81b7a1bdc1cb901bd2bc0d76eec8f906518601ac', '01KZ5HMFF6BXKVG22M2V8B243F', '2026-09-03 10:48:42', NULL, 0, '2026-08-04 04:50:54', NULL, '2026-08-04 10:48:42'),
+('01KZ5HRGMXH7DVZT66A8ZS8796', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '1aa15f85d9e9a531ed10a03b18716cee0a1d5d0f549ab607cc5a413eb3213d46', '01KZ5HRGMXH7DVZT66A8ZS8795', '2026-09-03 10:50:54', NULL, 0, '2026-08-04 04:58:36', NULL, '2026-08-04 10:50:54'),
+('01KZ5J6KM4S8V9ZZ9MX32DJMB0', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', 'eafff546b645f1c7cacdca9152b87cadf6101e18d1b0d421b3a71028666c2acc', '01KZ5J6KM4S8V9ZZ9MX32DJMAZ', '2026-09-03 10:58:36', NULL, 0, '2026-08-04 04:59:09', NULL, '2026-08-04 10:58:36'),
+('01KZ5J7KVJP9KZ28991NJ8RMBX', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '67b96586b62d9b41bbadfadd80cc52e1f401f51135376359500a261f4977f813', '01KZ5J7KVJP9KZ28991NJ8RMBW', '2026-09-03 10:59:09', NULL, 0, '2026-08-04 05:04:26', NULL, '2026-08-04 10:59:09'),
+('01KZ5JH9SGQ86AJWGWBMQ47F5B', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '158ab56591d35959b15fed1e34e79660683f39b5ab3b47095d811df76069fc95', '01KZ5JH9SGQ86AJWGWBMQ47F5A', '2026-09-03 11:04:26', NULL, 0, '2026-08-04 05:04:51', NULL, '2026-08-04 11:04:26'),
+('01KZ5JJ24ABQ3TWRH65J1EJKHV', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '8a66cbd8d2ee6fb24c4df188658dd99864d01c9ca3937269fba1400ce10bafb4', '01KZ5JJ24ABQ3TWRH65J1EJKHT', '2026-09-03 11:04:51', NULL, 0, '2026-08-04 05:08:39', NULL, '2026-08-04 11:04:51'),
+('01KZ5JS0ANK9JASP5SGV910P10', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '97bdc78f302fce3f346ac52773d70f9f46146eaaf821ef3ba724b8cbf3b35a73', '01KZ5JS0ANK9JASP5SGV910P0Z', '2026-09-03 11:08:39', NULL, 0, '2026-08-04 20:55:13', NULL, '2026-08-04 11:08:39'),
+('01KZ78Y6ZN18ZZCYT6XFYHS9ET', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', 'e9a1ae713084875ccb655473315fc17c8be246a9ec1f80acba69e5c3de3459e1', '01KZ78Y6ZN18ZZCYT6XFYHS9ES', '2026-09-04 02:55:13', NULL, 0, '2026-08-04 20:55:55', NULL, '2026-08-05 02:55:13'),
+('01KZ78ZGBSNPD8CH047NJMNT92', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '8ba1bc77ef41e2842d24f2903ed28cd62119f399b2408efe8724e39eba860214', '01KZ78ZGBSNPD8CH047NJMNT91', '2026-09-04 02:55:55', NULL, 0, '2026-08-04 21:01:34', NULL, '2026-08-05 02:55:55'),
+('01KZ799VNGBDRVM4MYP3Q8NCVF', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', 'd4d02ed53ba1fb8458c4bc936a9ea851c7d19c53eff80eac94ad5161bd018304', '01KZ799VNGBDRVM4MYP3Q8NCVE', '2026-09-04 03:01:34', NULL, 0, '2026-08-05 01:13:07', NULL, '2026-08-05 03:01:34'),
+('01KZ7QPEKA6S3EMZD4BKG0MJN7', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '6cbf0a4ca0f0bb873d4a903a55912c16f33b7a1a48a16d64d65641602b01c6af', '01KZ7QPEKA6S3EMZD4BKG0MJN6', '2026-09-04 07:13:07', NULL, 0, '2026-08-05 01:17:28', NULL, '2026-08-05 07:13:07'),
+('01KZ7XYNWHNAMXSCYMQP6VAWT9', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '0bd0d3931596485da02e55159aca22133c2324ead2c4ad86039da51bfdf83e1f', '01KZ7XYNWHNAMXSCYMQP6VAWT8', '2026-09-04 09:02:28', NULL, 0, '2026-08-05 03:11:25', NULL, '2026-08-05 09:02:28'),
+('01KZ7Y5K2CK00CAY6EW7VECSVC', '06F43H2S28KNWX71TSF7MWWTA4', 'a1dbb705c0077ac7ce8f2e7c72892490aff5fb88840dd62177485ace8b1548b3', '01KZ7Y5K2CK00CAY6EW7VECSVB', '2026-09-04 09:06:14', NULL, 0, '2026-08-05 03:13:06', NULL, '2026-08-05 09:06:14'),
+('01KZ7YF2KS760WRMKENRW7QSPD', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '585fe4995679be7687fe7124b8f0c5adfd3ef6978011eaf53ddfbad57feb23a7', '01KZ7YF2KS760WRMKENRW7QSPC', '2026-09-04 09:11:25', NULL, 0, '2026-08-05 16:56:27', NULL, '2026-08-05 09:11:25'),
+('01KZ7YJ590JGXFZY8V7JPES2WE', '06F43H2S28KNWX71TSF7MWWTA4', '98357a5ca9497b4c519728cc5d9a6aba990fce78c95b381fa673658d386a04ac', '01KZ7YJ590JGXFZY8V7JPES2WD', '2026-09-04 09:13:06', NULL, 0, '2026-08-05 17:03:47', NULL, '2026-08-05 09:13:06'),
+('01KZ9DNR5895X9BZ26MS569W58', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '934484f5c457b63834980eebbdedcc41f703ea89c741f1af8af61babe5415a5d', '01KZ9DNR5895X9BZ26MS569W57', '2026-09-04 22:56:27', NULL, 0, '2026-08-05 16:59:42', NULL, '2026-08-05 22:56:27'),
+('01KZ9DVP34HQS0A6AVWBVAC2RG', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '64f3783c5df10fd1a3afe41135355c6cde813f5d5d88c1fb1ab261ca9fc78b9d', '01KZ9DVP34HQS0A6AVWBVAC2RF', '2026-09-04 22:59:42', NULL, 0, '2026-08-05 17:03:30', NULL, '2026-08-05 22:59:42'),
+('01KZ9E35MR64C8M6N1NAMMF5JF', '06F43H2S28KNWX71TSF7MWWTA4', 'c13a03fe13210c8e359610336e831a27c53f21600aa66821054a04392fd07ffe', '01KZ9E35MR64C8M6N1NAMMF5JE', '2026-09-04 23:03:47', NULL, 0, '2026-08-05 17:14:28', NULL, '2026-08-05 23:03:47'),
+('01KZ9EPQXZBRED4SR2F10K4P4J', '06F43H2S28KNWX71TSF7MWWTA4', '267795cba60de3253e008c82f3c3db915ae3562c08601a24100b1322f4110d39', '01KZ9EPQXZBRED4SR2F10K4P4H', '2026-09-04 23:14:28', NULL, 0, '2026-08-05 17:25:46', NULL, '2026-08-05 23:14:28'),
+('01KZ9ER4TB0FAAPYN8KSAAT93Q', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '5e398964a16ee59f3891779afbe42230fbb966e05d7bc6707d4affa82e6a06e8', '01KZ9ER4TB0FAAPYN8KSAAT93P', '2026-09-04 23:15:14', NULL, 0, '2026-08-05 17:18:40', NULL, '2026-08-05 23:15:14'),
+('01KZ9EYDMT7Y014XJ9H59CG09J', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', 'e4bb33c8da751f4a84b1764172d40a66c36ee31dccc9361cc2e25c09cc73a404', '01KZ9EYDMT7Y014XJ9H59CG09H', '2026-09-04 23:18:40', NULL, 0, '2026-08-05 17:22:56', NULL, '2026-08-05 23:18:40'),
+('01KZ9F67FDBFY5139730F6877E', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '835445eb9120bd00590c89e8cf24f8927322397cc34038c84cc1fabb00044061', '01KZ9F67FDBFY5139730F6877D', '2026-09-04 23:22:56', NULL, 0, '2026-08-05 18:21:45', NULL, '2026-08-05 23:22:56'),
+('01KZ9FBE68MT0ZJXZWSYHP3T1C', '06F43H2S28KNWX71TSF7MWWTA4', '5c59ba39aef351e3b7e942888a89f06e201aad5467f65d34cc3c4da18294eb9f', '01KZ9FBE68MT0ZJXZWSYHP3T1B', '2026-09-04 23:25:46', NULL, 0, '2026-08-06 19:40:42', NULL, '2026-08-05 23:25:46'),
+('01KZ9JHYCGAC7330CNSV4Q55QE', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '2517f63579aa345a577c4f0bb56e5e982105db6cf4eba4565e7a0563f7974547', '01KZ9JHYCGAC7330CNSV4Q55QD', '2026-09-05 00:21:45', NULL, 0, '2026-08-06 02:06:22', NULL, '2026-08-06 00:21:45'),
+('01KZAD4NY7ATSS3HX5TDGCDBWJ', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', 'd21f8d46e211b2cbcc723a6cee54ab1caabbb88c50af10a38cbb3539b0a90d0e', '01KZAD4NY7ATSS3HX5TDGCDBWH', '2026-09-05 08:06:22', NULL, 0, '2026-08-06 19:49:35', NULL, '2026-08-06 08:06:22');
+INSERT INTO `refresh_tokens` (`refresh_token_id`, `user_id`, `token_hash`, `family_id`, `expires_at`, `used_at`, `is_rotated`, `revoked_at`, `replaced_by`, `created_at`) VALUES
+('01KZC9F6ZHC7BTRSQ89519WH8Z', '06F43H2S28KNWX71TSF7MWWTA4', '026f5ded0790edb7b7e5f7053d3f7eb8fd670084aac8406d1627283861029be1', '01KZC9F6ZHC7BTRSQ89519WH8Y', '2026-09-06 01:40:42', NULL, 0, '2026-08-06 19:48:56', NULL, '2026-08-07 01:40:42'),
+('01KZC9Y9T6K4554H8GZEEFF1C8', '06F43H2S28KNWX71TSF7MWWTA4', '10d5d48aae7f5694d29f16f4d2c6cc6ff687e80c3e1f941096a8bbed5b8af96c', '01KZC9Y9T6K4554H8GZEEFF1C7', '2026-09-06 01:48:56', NULL, 0, '2026-08-06 19:50:37', NULL, '2026-08-07 01:48:56'),
+('01KZC9ZFW2Y4JBGVCXHN4388NH', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', 'bfce8b3ff817c9bdacb0729b542e65ce96a47a78ab9c2035f90cd1a59686d953', '01KZC9ZFW2Y4JBGVCXHN4388NG', '2026-09-06 01:49:35', NULL, 0, '2026-08-06 19:51:12', NULL, '2026-08-07 01:49:35'),
+('01KZCA1BRC2ZTDWPJFT4ZJCTBG', '06F43H2S28KNWX71TSF7MWWTA4', '98393e457e17b8eb0d7b00e0a93b82317104cd8793bab819c2e7d46f92184dca', '01KZCA1BRC2ZTDWPJFT4ZJCTBF', '2026-09-06 01:50:37', NULL, 0, '2026-08-07 02:32:01', NULL, '2026-08-07 01:50:37'),
+('01KZCA2E2RGERQCPNDTWQ35R8R', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '08eebcf90a413d04490890f79332d495ad284e6ee72fe2fc1e1c9f74e2e996d8', '01KZCA2E2RGERQCPNDTWQ35R8Q', '2026-09-06 01:51:12', NULL, 0, '2026-08-06 19:58:31', NULL, '2026-08-07 01:51:12'),
+('01KZCAFTN3XD2PX6NEG06VABH6', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', 'c5be4ce852fe295f655efc1348cc08e633c3dce5425b08b110b0f56ec1005ad8', '01KZCAFTN3XD2PX6NEG06VABH5', '2026-09-06 01:58:31', NULL, 0, '2026-08-06 20:03:46', NULL, '2026-08-07 01:58:31'),
+('01KZCASEH7K6J9DN9KWR1XANBY', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '7f21c982e1d0b66cb9c9c1776a5139c263c63a21a20bec9594baa442566248fe', '01KZCASEH7K6J9DN9KWR1XANBX', '2026-09-06 02:03:46', NULL, 0, '2026-08-06 20:09:25', NULL, '2026-08-07 02:03:46'),
+('01KZCB3SZ5MN7HMW76T3CMGQBW', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '5c06deee2c986c204e81eab34a55df5dcc9391ca6344ceb73382a554520a800a', '01KZCB3SZ5MN7HMW76T3CMGQBV', '2026-09-06 02:09:25', NULL, 0, '2026-08-06 20:18:22', NULL, '2026-08-07 02:09:25'),
+('01KZCBM5TCWEDPC6Y1AZXX0XG8', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '72516a78a09ac4f6e921a4a63bfea556359525ebfce0fcafce6ef2ac201699ea', '01KZCBM5TCWEDPC6Y1AZXX0XG7', '2026-09-06 02:18:22', NULL, 0, '2026-08-06 20:18:54', NULL, '2026-08-07 02:18:22'),
+('01KZCBN5MX0NTPD3CNDNDF1ASX', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', 'd051804ea3ff5bdb859a432ee9646b56604d2462d53c4139263ace7d8d042fd3', '01KZCBN5MX0NTPD3CNDNDF1ASW', '2026-09-06 02:18:54', NULL, 0, '2026-08-06 20:24:30', NULL, '2026-08-07 02:18:54'),
+('01KZCBZDYX2674VCHD26NYVRPD', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', 'a509febc9aae24f33c4e81def2852298936e14b0a412a65f70e94458b9c5bf9b', '01KZCBZDYX2674VCHD26NYVRPC', '2026-09-06 02:24:30', NULL, 0, '2026-08-07 02:31:14', NULL, '2026-08-07 02:24:30'),
+('01KZD0YY09MF9QYK09TAZPJXFR', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', '92014b726db46bba5a0aaefe71f0ceb2c51fca79a0a6f3401f9ec63f44e69df4', '01KZD0YY09MF9QYK09TAZPJXFQ', '2026-09-06 08:31:14', NULL, 0, '2026-09-11 15:26:49', NULL, '2026-08-07 08:31:14'),
+('01KZD10BZK9N9NF9VWHQXTEKFP', '06F43H2S28KNWX71TSF7MWWTA4', '17684d780fbc620e19e320e2759194217c506d8d854f000946256d6827e75197', '01KZD10BZK9N9NF9VWHQXTEKFN', '2026-09-06 08:32:01', NULL, 0, NULL, NULL, '2026-08-07 08:32:01'),
+('01KZJDNMJ8ZHBHF56AKEBP2WRQ', '01KZJDNCW6W7WEWSQGG02SY3XV', '6db8d16d462e473dd8c1109deaa152ffa22e53dc94150857902e003eb6e21cd6', '01KZJDNMJ8ZHBHF56AKEBP2WRP', '2026-09-08 10:49:33', NULL, 0, '2026-08-09 04:54:26', NULL, '2026-08-09 10:49:33'),
+('01KZJE91HV9DMFVVKBTFKB8K4Y', '01KZJDNCW6W7WEWSQGG02SY3XV', '5cfcf60da3d414ad9aa6c1bceaa80a3561e29d07e462f137d6aaaab1d7fd4fe4', '01KZJE91HV9DMFVVKBTFKB8K4X', '2026-09-08 11:00:09', NULL, 0, '2026-08-09 05:03:06', NULL, '2026-08-09 11:00:09'),
+('01KZJEPJ1VT9DBVANH8EPWP5V7', '01KZJEG8D46K1T5WD7MZMCMAZ5', 'e97f8cbb2cbe4b73f83b0b3f8aef49710aefeac8341b0347906c0a2392a25197', '01KZJEPJ1VT9DBVANH8EPWP5V6', '2026-09-08 11:07:32', NULL, 0, '2026-08-09 05:14:40', NULL, '2026-08-09 11:07:32'),
+('01KZJF3KJW64PHFSN91KM5JJR2', '01KZJEG8D46K1T5WD7MZMCMAZ5', '4ea50be2a47ca9adf3892ce4f4edf0693ea7e2344c61729766c345e5d2de1161', '01KZJF3KJW64PHFSN91KM5JJR1', '2026-09-08 11:14:40', NULL, 0, '2026-08-09 05:20:29', NULL, '2026-08-09 11:14:40'),
+('01KZJFE98A66KQBDXA6A6WZ9NJ', '01KZJEG8D46K1T5WD7MZMCMAZ5', 'c686afd8076e36be84f33d3b8445fda28264abc9b430b259c672a22b3b8604a7', '01KZJFE98A66KQBDXA6A6WZ9NH', '2026-09-08 11:20:29', NULL, 0, '2026-08-09 05:20:46', NULL, '2026-08-09 11:20:29'),
+('01KZJFFD48RCY3Q58NA60M1C6B', '01KZJEG8D46K1T5WD7MZMCMAZ5', 'd7319fe86c8cf0c2d23cc5fb0e9adc003123a87e25996f4fab9d29f5006b69d7', '01KZJFFD48RCY3Q58NA60M1C6A', '2026-09-08 11:21:06', NULL, 0, '2026-08-09 05:21:51', NULL, '2026-08-09 11:21:06'),
+('01KZJFN9J0MHM9K9SK21ZX0JCW', '01KZJDNCW6W7WEWSQGG02SY3XV', 'bab67bf582186b6cf7b503e02d2a52b6f4788d6f7b072a8f40076c292def6a22', '01KZJFN9J0MHM9K9SK21ZX0JCV', '2026-09-08 11:24:19', NULL, 0, '2026-08-09 05:27:11', NULL, '2026-08-09 11:24:19'),
+('01KZP6V6CWGB55P3BEVFHXEB8C', '01KZJDNCW6W7WEWSQGG02SY3XV', '4bb46a9a59f62c5c9ac9a9eb13b5a1df7fcb3c4981e92fcf41ab36378f0c2c2c', '01KZP6V6CWGB55P3BEVFHXEB8B', '2026-09-09 22:07:13', NULL, 0, '2026-08-10 16:07:50', NULL, '2026-08-10 22:07:13'),
+('01KZP7CTJFKTQ6T26E45XKXQD9', '01KZJDNCW6W7WEWSQGG02SY3XV', '055ffd103ba7b8786ef0f6e62a03a1aac70ffdef1ef7ef77befb7cf349c04eed', '01KZP7CTJFKTQ6T26E45XKXQD8', '2026-09-09 22:16:51', NULL, 0, '2026-08-10 16:26:22', NULL, '2026-08-10 22:16:51'),
+('01KZP7Y89B2YTYJXEZ24Y1NCQQ', '01KZJDNCW6W7WEWSQGG02SY3XV', '605edb6818771e81b2411839a96d98fefc1e8b28f8a4d24e8f30904da9c90e52', '01KZP7Y89B2YTYJXEZ24Y1NCQP', '2026-09-09 22:26:22', NULL, 0, '2026-08-10 16:36:37', NULL, '2026-08-10 22:26:22'),
+('01KZP8H17VGTWGTP48JJWFV317', '01KZJDNCW6W7WEWSQGG02SY3XV', '29786a09d75a4680c6a0ff2a769c76c4bd54d2a0455c26732f8f72db7a662d6f', '01KZP8H17VGTWGTP48JJWFV316', '2026-09-09 22:36:37', NULL, 0, '2026-08-10 16:37:46', NULL, '2026-08-10 22:36:37'),
+('01KZP8KVAQYJ8YDQJFDC8XSEAG', '01KZJDNCW6W7WEWSQGG02SY3XV', 'f3cf591d7b904e012f3a69b466f230c8ae768632cb4087c0b75433ab67cba41c', '01KZP8KVAQYJ8YDQJFDC8XSEAF', '2026-09-09 22:38:10', NULL, 0, '2026-08-10 16:39:40', NULL, '2026-08-10 22:38:10'),
+('01KZPBM12TRGVA3DBFXTXHHNKD', '01KZJEG8D46K1T5WD7MZMCMAZ5', '6ef3853f241c9f00c9bff5888bbb8865722dbae5aab9594c3bea245dbdb22774', '01KZPBM12TRGVA3DBFXTXHHNKC', '2026-09-09 23:30:41', NULL, 0, '2026-08-10 23:07:06', NULL, '2026-08-10 23:30:41'),
+('01KZPYW1446YA88EEWQTR6PKYE', '01KZJEG8D46K1T5WD7MZMCMAZ5', 'efb294e3942922e6b9df2f093f3c5cfb86d776caec594fa32f3d97032ec0f835', '01KZPYW1446YA88EEWQTR6PKYD', '2026-09-10 05:07:06', NULL, 0, '2026-08-15 09:46:40', NULL, '2026-08-11 05:07:06'),
+('01M02D1Z75RQM55GD8CWJ0MM7Z', '01KZJEG8D46K1T5WD7MZMCMAZ5', '081241d8fc69ec507f4f97eabea72984795c2cfb27945c9dd8a37731ce0dd5cd', '01M02D1Z75RQM55GD8CWJ0MM7Y', '2026-09-14 15:46:40', NULL, 0, '2026-08-15 09:47:55', NULL, '2026-08-15 15:46:40'),
+('01M02D51KC0DZE8Y0QG3WNP6ZK', '01KZJDNCW6W7WEWSQGG02SY3XV', '47d9ad4e30405028e1665a0843db1ea48147472335eb73a51f50a71470eddc75', '01M02D51KC0DZE8Y0QG3WNP6ZJ', '2026-09-14 15:48:20', NULL, 0, '2026-08-15 10:29:16', NULL, '2026-08-15 15:48:20'),
+('01M02FFZ7SHEMQFJE0PTW84YDA', '01KZJDNCW6W7WEWSQGG02SY3XV', 'fe448afca08d2eac3cb5a6c9d9fbc6fc477365999ad68b3c806eeacac4a4846c', '01M02FFZ7SHEMQFJE0PTW84YD9', '2026-09-14 16:29:16', NULL, 0, '2026-08-15 10:34:33', NULL, '2026-08-15 16:29:16'),
+('01M02FSMX063Y954CHB68ZHQPF', '01KZJDNCW6W7WEWSQGG02SY3XV', 'ce558c4d041cfced8ec386d5d6c46c70022007eae7d9e513a4dbe73244a7f6c7', '01M02FSMX063Y954CHB68ZHQPE', '2026-09-14 16:34:33', NULL, 0, '2026-08-15 10:44:18', NULL, '2026-08-15 16:34:33'),
+('01M02GBFZ3Z58WB3ZNKA70QGET', '01KZJDNCW6W7WEWSQGG02SY3XV', '11d7be62bed22349e43fbac678e95d4bc28f78c153a335a3643353ce65d7f7f5', '01M02GBFZ3Z58WB3ZNKA70QGES', '2026-09-14 16:44:18', NULL, 0, '2026-08-15 10:52:54', NULL, '2026-08-15 16:44:18'),
+('01M02GV8Q9VHMTZFV8F3VYHPKE', '01KZJDNCW6W7WEWSQGG02SY3XV', 'a159533cb2f2fcf8612be96f6fb7cfb146f8a46052fac35844a4ba07aabbc374', '01M02GV8Q9VHMTZFV8F3VYHPKD', '2026-09-14 16:52:54', NULL, 0, '2026-08-15 11:00:41', NULL, '2026-08-15 16:52:54'),
+('01M02H3TF7E2WFY7FNRZ9900YP', '01KZJEG8D46K1T5WD7MZMCMAZ5', 'd99a28e5c8857ad882c97bf2f713ab6cbfc173e081a64d832586f0f732495755', '01M02H3TF7E2WFY7FNRZ9900YN', '2026-09-14 16:57:35', NULL, 0, '2026-09-11 15:24:10', NULL, '2026-08-15 16:57:35'),
+('01M02H9GDRSTNVJ0AJ61C1VAE5', '01KZJDNCW6W7WEWSQGG02SY3XV', '0c021db562e55904673bb7ae972fbb3e9b62fee880476cceeaee7b9f17a686c0', '01M02H9GDRSTNVJ0AJ61C1VAE4', '2026-09-14 17:00:41', NULL, 0, '2026-08-15 11:07:52', NULL, '2026-08-15 17:00:41'),
+('01M02HPNHTF9H7EG4AHF0KQM9G', '01KZJDNCW6W7WEWSQGG02SY3XV', 'cf70832b91fc3469dc017dd8c2b53c4036807d5cbc7977460ee8d68f9da47b70', '01M02HPNHTF9H7EG4AHF0KQM9F', '2026-09-14 17:07:52', NULL, 0, '2026-08-15 11:09:28', NULL, '2026-08-15 17:07:52'),
+('01M02HSJWVXBHJF8G7RQSMEQBD', '01KZJDNCW6W7WEWSQGG02SY3XV', '068100d613b4420f80e3578b5800c9a956af2a5039f0529f9a9a336030691a91', '01M02HSJWVXBHJF8G7RQSMEQBC', '2026-09-14 17:09:28', NULL, 0, '2026-08-15 11:12:33', NULL, '2026-08-15 17:09:28'),
+('01M02HZAP7VET6M0020S8T72Q5', '01KZJDNCW6W7WEWSQGG02SY3XV', 'a070482e4e7b11008a4afa69a6885ae2e64685ea37b2b72e5c567fc8b826c6ac', '01M02HZAP7VET6M0020S8T72Q4', '2026-09-14 17:12:36', NULL, 0, '2026-08-15 11:15:04', NULL, '2026-08-15 17:12:36'),
+('01M02J3VHFNNZE7CCGV1GG1PRA', '01KZJDNCW6W7WEWSQGG02SY3XV', '0ac5026e9368810a7a8862d3c137b0cc99944f76ffd211d984405725629cfe57', '01M02J3VHFNNZE7CCGV1GG1PR9', '2026-09-14 17:15:04', NULL, 0, '2026-08-15 11:22:52', NULL, '2026-08-15 17:15:04'),
+('01M02JJ4GZ7Y2HKQ9P8Y0NW0GY', '01KZJDNCW6W7WEWSQGG02SY3XV', '4847565a59fd376addfd3096c0c9b27b8e75e5fc80ca42b83e11a9db17b67b6b', '01M02JJ4GZ7Y2HKQ9P8Y0NW0GX', '2026-09-14 17:22:52', NULL, 0, '2026-08-15 11:28:47', NULL, '2026-08-15 17:22:52'),
+('01M02JWZ6ET5AM4NZ0WGXVM6JX', '01KZJDNCW6W7WEWSQGG02SY3XV', '492b88e57a6a0f6074bfa3a822df08f92ac05892bba5d38d65694cd6301d8b80', '01M02JWZ6ET5AM4NZ0WGXVM6JW', '2026-09-14 17:28:47', NULL, 0, '2026-08-15 11:30:05', NULL, '2026-08-15 17:28:47'),
+('01M02JZBBVJQPC7FSQD56ZYN48', '01KZJDNCW6W7WEWSQGG02SY3XV', 'fc0548b533a08af2c8f52d39aa846ecd2446ed4c4c2eadbcddf90e08a6f8ac9e', '01M02JZBBVJQPC7FSQD56ZYN47', '2026-09-14 17:30:05', NULL, 0, '2026-08-15 17:44:13', NULL, '2026-08-15 17:30:05'),
+('01M038CCTB7V56ZMCJQ7CBV9R3', '01KZJDNCW6W7WEWSQGG02SY3XV', '5c21bbf8fa170ac139fc6f68a53604d82eaa3e1d59863c828ea862a67891c0e3', '01M038CCTB7V56ZMCJQ7CBV9R2', '2026-09-14 23:44:13', NULL, 0, '2026-08-15 17:50:24', NULL, '2026-08-15 23:44:13'),
+('01M038QQET7Q708EFVJ0DC079W', '01KZJDNCW6W7WEWSQGG02SY3XV', 'cdcafcd72e1de27bbd2e684c1b1af593d78bd79808cc9c511ad898977c7c0433', '01M038QQET7Q708EFVJ0DC079V', '2026-09-14 23:50:24', NULL, 0, '2026-08-15 17:56:36', NULL, '2026-08-15 23:50:24'),
+('01M03932X59RT7JC7W05698SK6', '01KZJDNCW6W7WEWSQGG02SY3XV', '55cd22af8ceb82e5994f03e76f3cef8a48c40946227506f6fde9951b23cde708', '01M03932X59RT7JC7W05698SK5', '2026-09-14 23:56:36', NULL, 0, '2026-08-15 18:02:36', NULL, '2026-08-15 23:56:36'),
+('01M039E1SFJQW0VRYW1CJYK1WF', '01KZJDNCW6W7WEWSQGG02SY3XV', '77f934652c4f08a524a8a09dd72a167b528c9b5362b31e864bee3e5d9e9f57de', '01M039E1SFJQW0VRYW1CJYK1WE', '2026-09-15 00:02:36', NULL, 0, '2026-08-15 18:03:55', NULL, '2026-08-16 00:02:36'),
+('01M039GEXD73C19XPJAVP4CR8F', '01KZJDNCW6W7WEWSQGG02SY3XV', '566957c798a70f06b7bda2421fc46d33278f724715f8489e2a434a4c06e6537b', '01M039GEXD73C19XPJAVP4CR8E', '2026-09-15 00:03:55', NULL, 0, '2026-08-15 18:10:12', NULL, '2026-08-16 00:03:55'),
+('01M039VZJZKJXDRH9TZQ9MYET2', '01KZJDNCW6W7WEWSQGG02SY3XV', 'd1b39eb9e82abadf147d612eb29d6ff1caabfd235755d3053c7b9d76a63ed516', '01M039VZJYBZ34N4V3C9QH9YQP', '2026-09-15 00:10:12', NULL, 0, '2026-08-15 18:52:44', NULL, '2026-08-16 00:10:12'),
+('01M03C9V6K175DNPXM9H7APX6R', '01KZJDNCW6W7WEWSQGG02SY3XV', '5a65df10a0de2ec9474812d03ef4903a3342092fc944a14fc6c79ed68401896b', '01M03C9V6K175DNPXM9H7APX6Q', '2026-09-15 00:52:44', NULL, 0, '2026-08-15 19:01:13', NULL, '2026-08-16 00:52:44'),
+('01M03CSCG0ZVKKV9XCMMBKF3A8', '01KZJDNCW6W7WEWSQGG02SY3XV', '0e3262af58a773595b99f01c4aad4f1c06d3c3b4785331956463b32b330c6bd1', '01M03CSCG0ZVKKV9XCMMBKF3A7', '2026-09-15 01:01:13', NULL, 0, '2026-08-15 19:07:14', NULL, '2026-08-16 01:01:13'),
+('01M03D4D93RSVCQ71GT9G87NHG', '01KZJDNCW6W7WEWSQGG02SY3XV', 'ff77c30c055d05f05aec8545814718097dd1e4f04e0fc458a26cc390dc588807', '01M03D4D93RSVCQ71GT9G87NHF', '2026-09-15 01:07:14', NULL, 0, '2026-08-15 19:14:04', NULL, '2026-08-16 01:07:14'),
+('01M03DGY19YGACWM8V9YG2KN07', '01KZJDNCW6W7WEWSQGG02SY3XV', '59884262ff6f7b888df2d15e4669213ea298c907190e202607a70d34b271f61d', '01M03DGY19YGACWM8V9YG2KN06', '2026-09-15 01:14:04', NULL, 0, '2026-08-15 19:19:56', NULL, '2026-08-16 01:14:04'),
+('01M03DVMWR0E55N0ENDWN0Q0XZ', '01KZJDNCW6W7WEWSQGG02SY3XV', '237ca37e5a8be376c6a239be6d5424e93220dbec30d320fcc6f5513185711f2b', '01M03DVMWR0E55N0ENDWN0Q0XY', '2026-09-15 01:19:56', NULL, 0, '2026-08-19 16:01:24', NULL, '2026-08-16 01:19:56'),
+('01M0DC310XTE08RHW45W3B49QN', '01KZJDNCW6W7WEWSQGG02SY3XV', 'a795a1cc764c5dc76dfd3b7ea8732c6a1323bd6d3401dfff752b981f729addc8', '01M0DC310XTE08RHW45W3B49QM', '2026-09-18 22:01:25', NULL, 0, '2026-08-19 16:09:22', NULL, '2026-08-19 22:01:25'),
+('01M0DCHKE338V1N4YJ7M86Q2TH', '01KZJDNCW6W7WEWSQGG02SY3XV', '39b05012e6352dc6e5835aeb73a624ad40d6a6a6b41fa6ec7ad787a541f7258e', '01M0DCHKE338V1N4YJ7M86Q2TG', '2026-09-18 22:09:22', NULL, 0, '2026-08-19 16:15:27', NULL, '2026-08-19 22:09:22'),
+('01M0DCWR47FGFDF4JA695VN59J', '01KZJDNCW6W7WEWSQGG02SY3XV', '41168aa87c7dcca858781dffd0946c05e15515ea15d609d79926eb8261b075e8', '01M0DCWR47FGFDF4JA695VN59H', '2026-09-18 22:15:27', NULL, 0, '2026-08-19 16:22:25', NULL, '2026-08-19 22:15:27'),
+('01M0DD9G1DBGCCQR8GFPSKZ7CA', '01KZJDNCW6W7WEWSQGG02SY3XV', 'e4ff06661120909c2b4084d8396ba971aee3e63d635394874ff2ef472a38fb0d', '01M0DD9G1DBGCCQR8GFPSKZ7C9', '2026-09-18 22:22:25', NULL, 0, '2026-08-19 16:28:43', NULL, '2026-08-19 22:22:25'),
+('01M0DDN170B0FRRFNHE5JAR9WC', '01KZJDNCW6W7WEWSQGG02SY3XV', 'f53a42e4afc8ea1a49685aa455451074aa8d93e0741cdc07fbbdfadd5389b101', '01M0DDN170B0FRRFNHE5JAR9WB', '2026-09-18 22:28:43', NULL, 0, '2026-08-19 16:37:29', NULL, '2026-08-19 22:28:43'),
+('01M0DE52XBGFA3BFC3H65FDPPJ', '01KZJDNCW6W7WEWSQGG02SY3XV', '1b978b0dab48c208d692deacb3d78260bd81690fde06cf2c317670c170186d3f', '01M0DE52XBGFA3BFC3H65FDPPH', '2026-09-18 22:37:29', NULL, 0, '2026-08-20 03:13:34', NULL, '2026-08-19 22:37:29'),
+('01M0EJHSZZVN1YFRN9B143REQ7', '01KZJDNCW6W7WEWSQGG02SY3XV', 'f882d50e7fbc22753581479a861b00b6e6ec8fdd66b127db37620a555eb62122', '01M0EJHSZZVN1YFRN9B143REQ6', '2026-09-19 09:13:35', NULL, 0, '2026-08-20 03:18:53', NULL, '2026-08-20 09:13:35'),
+('01M0EJVGKEJCYDQHGTNQKAXJEZ', '01KZJDNCW6W7WEWSQGG02SY3XV', '6221a61455fd2b9d391bf030605636de0783ada3aeb5532da8189b15e4e4ddd5', '01M0EJVGKEJCYDQHGTNQKAXJEY', '2026-09-19 09:18:53', NULL, 0, '2026-08-20 03:24:47', NULL, '2026-08-20 09:18:53'),
+('01M0EK6AP8VER7673F8HFGYSQS', '01KZJDNCW6W7WEWSQGG02SY3XV', 'f2643b81036c0444e07f4fd87b9c3af183a673c122a1fbdf43e6d7ff0d537446', '01M0EK6AP8VER7673F8HFGYSQR', '2026-09-19 09:24:47', NULL, 0, '2026-08-20 03:32:50', NULL, '2026-08-20 09:24:47'),
+('01M0EKN1X8CFDTMVQHQ3NG51MG', '01KZJDNCW6W7WEWSQGG02SY3XV', 'd49dbc4ee51b984bf46e769e6a711b9c76fdef16457be4cf714990e8c6237d1b', '01M0EKN1X8CFDTMVQHQ3NG51MF', '2026-09-19 09:32:50', NULL, 0, '2026-08-20 03:49:27', NULL, '2026-08-20 09:32:50'),
+('01M0EMKG7J7RPJVKQQRYBNERQ3', '01KZJDNCW6W7WEWSQGG02SY3XV', 'ea959815c69a81690af1a7e9059c2cfbac8c8ff2efa2c7ac13fd6eeefb9dcc78', '01M0EMKG7J7RPJVKQQRYBNERQ2', '2026-09-19 09:49:27', NULL, 0, '2026-08-20 04:01:03', NULL, '2026-08-20 09:49:27'),
+('01M0EN8QANC17BAZHWHG6CS29Z', '01KZJDNCW6W7WEWSQGG02SY3XV', '3ab781b08ccf21344c8a494b91e96db21b7fe5562ed0f5fe182b10fdbf7a8f84', '01M0EN8QANC17BAZHWHG6CS29Y', '2026-09-19 10:01:03', NULL, 0, '2026-08-25 15:54:34', NULL, '2026-08-20 10:01:03'),
+('01M0WT2T5Q81PKHNA38874C7A1', '01KZJDNCW6W7WEWSQGG02SY3XV', '28fd29ce726a77122dbd474728ac22ad6db45fc4ae06d60475fb308bc9043798', '01M0WT2T5Q81PKHNA38874C7A0', '2026-09-24 21:54:34', NULL, 0, '2026-08-29 23:33:15', NULL, '2026-08-25 21:54:34'),
+('01M17XXHTCB6E3RBVFSRZD1X4S', '01KZJDNCW6W7WEWSQGG02SY3XV', '9883d85ed7ead81d1e1f764ec9c1c9338876fe9cdd6851433c30fb84a944ca44', '01M17XXHTCB6E3RBVFSRZD1X4R', '2026-09-29 05:33:15', '2026-08-29 23:39:41', 1, '2026-08-29 23:54:53', '01M17Y9AN38BET5NJJQY481SH3', '2026-08-30 05:33:15'),
+('01M17Y9AN38BET5NJJQY481SH3', '01KZJDNCW6W7WEWSQGG02SY3XV', '18bcb4bdd57a003e287f647961e602a31fcd5683ae2039ded6b93eafa7b43f60', '01M17XXHTCB6E3RBVFSRZD1X4R', '2026-09-29 05:39:41', '2026-08-29 23:45:39', 1, '2026-08-29 23:54:53', '01M17YM8FWD4MV4CNKG3P0JVSE', '2026-08-30 05:39:41'),
+('01M17YM8FWD4MV4CNKG3P0JVSE', '01KZJDNCW6W7WEWSQGG02SY3XV', '2bb3d3b294cb4265e5067421f7f835c0b9ec6bef6d92e4e9cdfe83e4306f0c36', '01M17XXHTCB6E3RBVFSRZD1X4R', '2026-09-29 05:45:39', NULL, 0, '2026-08-29 23:54:53', NULL, '2026-08-30 05:45:39'),
+('01M17Z561HB7Z3KTXH7WD963XP', '01KZJDNCW6W7WEWSQGG02SY3XV', '5a3d6ef5e2f809acb4f78f178bbc0bd7ecbeab19b06caea7bca918d166bb288b', '01M17Z561HB7Z3KTXH7WD963XN', '2026-09-29 05:54:53', '2026-08-30 03:36:41', 1, '2026-08-30 05:11:58', '01M18BV9K9MMM7WB8H5XQH6ES8', '2026-08-30 05:54:53'),
+('01M18BV9K9MMM7WB8H5XQH6ES8', '01KZJDNCW6W7WEWSQGG02SY3XV', 'f43d95c2cff4ca0eba6e95b6a729cbc9a37af5e9804609abf52e4784b77aed00', '01M17Z561HB7Z3KTXH7WD963XN', '2026-09-29 09:36:41', '2026-08-30 03:53:29', 1, '2026-08-30 05:11:58', '01M18CT1ZBJEKD7CF224K70443', '2026-08-30 09:36:41'),
+('01M18CT1ZBJEKD7CF224K70443', '01KZJDNCW6W7WEWSQGG02SY3XV', '01217b87a7355e4aab8457e3b4127141c2bbf84884b5848d670d69d556fd8170', '01M17Z561HB7Z3KTXH7WD963XN', '2026-09-29 09:53:29', '2026-08-30 03:58:44', 1, '2026-08-30 05:11:58', '01M18D3NQ7GFTJRVCNZQDDDHX2', '2026-08-30 09:53:29'),
+('01M18D3NQ7GFTJRVCNZQDDDHX2', '01KZJDNCW6W7WEWSQGG02SY3XV', 'a2da765b891106b293ae9c45a41c64b07be7f1ba537aa5b80f33b8109c074228', '01M17Z561HB7Z3KTXH7WD963XN', '2026-09-29 09:58:44', '2026-08-30 04:04:37', 1, '2026-08-30 05:11:58', '01M18DEE8AVFGY0473P65K36GD', '2026-08-30 09:58:44'),
+('01M18DEE8AVFGY0473P65K36GD', '01KZJDNCW6W7WEWSQGG02SY3XV', '40d81c2a0fe4a8e905b7321eddf4bddbcb04c7e7fefd7c287707cecc8d2c9b53', '01M17Z561HB7Z3KTXH7WD963XN', '2026-09-29 10:04:37', '2026-08-30 04:53:51', 1, '2026-08-30 05:11:58', '01M18G8JS1K21Z9YEX5SQSH6K5', '2026-08-30 10:04:37'),
+('01M18G8JS1K21Z9YEX5SQSH6K5', '01KZJDNCW6W7WEWSQGG02SY3XV', '575b1cae2fcfdf227b2b11df2a955d9dd903997d2f4fea82282b599986341cf1', '01M17Z561HB7Z3KTXH7WD963XN', '2026-09-29 10:53:51', NULL, 0, '2026-08-30 05:11:58', NULL, '2026-08-30 10:53:51'),
+('01M18H9RBT3VY9CXRXCFHFFE8Y', '01KZJDNCW6W7WEWSQGG02SY3XV', '5c4229366619d2b23de2d4695629b68348ea65c7fd69b9c5599a7374fad13ce8', '01M18H9RBT3VY9CXRXCFHFFE8X', '2026-09-29 11:11:58', NULL, 0, '2026-08-30 05:18:47', NULL, '2026-08-30 11:11:58'),
+('01M18HP7SVH0E76WSEA63R5QH2', '01KZJDNCW6W7WEWSQGG02SY3XV', '4328667f94a27bb393d0c06cb2f5cea2a8b167c1d423dc7b8b4de90cebfdc1a3', '01M18HP7SVH0E76WSEA63R5QH1', '2026-09-29 11:18:47', '2026-08-30 05:24:17', 1, '2026-08-30 05:24:19', '01M18J0A7QTKDJK13X2J3S3TJV', '2026-08-30 11:18:47'),
+('01M18J0A7QTKDJK13X2J3S3TJV', '01KZJDNCW6W7WEWSQGG02SY3XV', 'ccb722e3c18332e15ba703dbff424073f719c45e88a6ba0a71042421334c5377', '01M18HP7SVH0E76WSEA63R5QH1', '2026-09-29 11:24:17', NULL, 0, '2026-08-30 05:24:19', NULL, '2026-08-30 11:24:17'),
+('01M18J5T4VMF5X9WSGFG0CK5BK', '01KZJDNCW6W7WEWSQGG02SY3XV', '5dd0d477d0bcf2e9b7d31ec4f7c2aa60cef6713bb867209d47bde3187cd7dcdb', '01M18J5T4VMF5X9WSGFG0CK5BJ', '2026-09-29 11:27:17', '2026-08-30 05:32:51', 1, '2026-08-30 05:46:06', '01M18JG0D574ETAZG4TNPAGXSZ', '2026-08-30 11:27:17'),
+('01M18JG0D574ETAZG4TNPAGXSZ', '01KZJDNCW6W7WEWSQGG02SY3XV', '05d2b3cc4e14560515d0ea1348da75b1a0cad4b1dda9426118717d0d495ea260', '01M18J5T4VMF5X9WSGFG0CK5BJ', '2026-09-29 11:32:51', '2026-08-30 05:42:03', 1, '2026-08-30 05:46:06', '01M18K0VQAHKQV5NBMN06SY96G', '2026-08-30 11:32:51'),
+('01M18K0VQAHKQV5NBMN06SY96G', '01KZJDNCW6W7WEWSQGG02SY3XV', '8c6bedd89f15f5b1c2fa15bba76196df4d446b7dae7a76ed5183eddd76c1210a', '01M18J5T4VMF5X9WSGFG0CK5BJ', '2026-09-29 11:42:03', NULL, 0, '2026-08-30 05:46:06', NULL, '2026-08-30 11:42:03'),
+('01M18K88KQXP23PNXGKJFZE0C9', '01KZJDNCW6W7WEWSQGG02SY3XV', 'ca26dbe4f04fc23622d95e67cf842eebbf8f15cbc8484b7e436c38e560ec04f5', '01M18K88KQXP23PNXGKJFZE0C8', '2026-09-29 11:46:06', NULL, 0, '2026-08-30 05:51:00', NULL, '2026-08-30 11:46:06'),
+('01M18KH7P5Y6KR7KWEM95HGFMC', '01KZJDNCW6W7WEWSQGG02SY3XV', 'e40cd0536a361fa8c4467d41e51caf58d12ded38c358cf3c7421666f82d59e6e', '01M18KH7P5Y6KR7KWEM95HGFMB', '2026-09-29 11:51:00', NULL, 0, '2026-08-30 05:57:13', NULL, '2026-08-30 11:51:00'),
+('01M18KWM12DJ5HK9FMHN8SDE6B', '01KZJDNCW6W7WEWSQGG02SY3XV', '8c85d862945ade49e25228c47e219061ce2f5cb1f4e012b9f8ec045b37de1703', '01M18KWM12DJ5HK9FMHN8SDE6A', '2026-09-29 11:57:13', NULL, 0, '2026-08-30 06:00:06', NULL, '2026-08-30 11:57:13'),
+('01M18M1X7BZDM001VSY9A2BGN3', '01KZJDNCW6W7WEWSQGG02SY3XV', 'f9e1c2a16048acc4bdd84626d47bdd0b172f6f52a92859f6e6c6a623a515e498', '01M18M1X7BZDM001VSY9A2BGN2', '2026-09-29 12:00:06', '2026-08-30 15:23:51', 1, '2026-09-11 15:04:23', '01M19MA512GK66M6B5S4BH6W7A', '2026-08-30 12:00:06'),
+('01M19MA512GK66M6B5S4BH6W7A', '01KZJDNCW6W7WEWSQGG02SY3XV', 'a6fb08e8d4d8b545b21aec7a2ded22ac3da9ec4f0593806dfe419013d49a949a', '01M18M1X7BZDM001VSY9A2BGN2', '2026-09-29 21:23:51', '2026-08-31 20:09:43', 1, '2026-09-11 15:04:23', '01M1CQ29S07M3AM4KRN4GA6KKT', '2026-08-30 21:23:51'),
+('01M1CQ29S07M3AM4KRN4GA6KKT', '01KZJDNCW6W7WEWSQGG02SY3XV', '04a4b67230916d39ae0fe8abdf790c9bb02e46ea387903e6c50f0c8c6899f929', '01M18M1X7BZDM001VSY9A2BGN2', '2026-10-01 02:09:42', '2026-09-07 19:03:56', 1, '2026-09-11 15:04:23', '01M1YM2WC4797D7N67K3JHCM5V', '2026-09-01 02:09:42'),
+('01M1YM2WC4797D7N67K3JHCM5V', '01KZJDNCW6W7WEWSQGG02SY3XV', '77867381edf27b15c801d6d4680a169fe35bd66d929ee16b28c2f474762fa246', '01M18M1X7BZDM001VSY9A2BGN2', '2026-10-08 01:03:56', '2026-09-07 19:23:08', 1, '2026-09-11 15:04:23', '01M1YN5WZM3RR4A23T9ZH7KBNS', '2026-09-08 01:03:56'),
+('01M1YN5WZM3RR4A23T9ZH7KBNS', '01KZJDNCW6W7WEWSQGG02SY3XV', '1a1952c063564b7f7ef3315b0664545d55380c40384c991baa6634fbcb1f2fda', '01M18M1X7BZDM001VSY9A2BGN2', '2026-10-08 01:23:03', '2026-09-08 06:33:55', 1, '2026-09-11 15:04:23', '01M1ZVJ9JA5MWFJDATR8CBPNVG', '2026-09-08 01:23:03'),
+('01M1ZVJ9JA5MWFJDATR8CBPNVG', '01KZJDNCW6W7WEWSQGG02SY3XV', 'c2c64d8a40ac37cbaecaf07433772cebf7c340b3b1386e714e84ba8c005de69c', '01M18M1X7BZDM001VSY9A2BGN2', '2026-10-08 12:33:55', '2026-09-08 06:57:10', 1, '2026-09-11 15:04:23', '01M1ZWWVNTYRY7EH3F4CAFY3BD', '2026-09-08 12:33:55'),
+('01M1ZWWVNTYRY7EH3F4CAFY3BD', '01KZJDNCW6W7WEWSQGG02SY3XV', 'a51865180824be5b135ea5ae0e8175d6ea0b356ce6a05ff859fa2ed35e107866', '01M18M1X7BZDM001VSY9A2BGN2', '2026-10-08 12:57:10', '2026-09-08 07:02:28', 1, '2026-09-11 15:04:23', '01M1ZX6JGEAWMWK9359BTBJDCD', '2026-09-08 12:57:10'),
+('01M1ZX6JGEAWMWK9359BTBJDCD', '01KZJDNCW6W7WEWSQGG02SY3XV', '994a5b36327898b1e382d23d11aa64caeeda1d97a60fa6d19566131edf025317', '01M18M1X7BZDM001VSY9A2BGN2', '2026-10-08 13:02:28', '2026-09-08 15:07:41', 1, '2026-09-11 15:04:23', '01M20RZ1DV9H1X8XHCM25FFRE2', '2026-09-08 13:02:28'),
+('01M20RZ1DV9H1X8XHCM25FFRE2', '01KZJDNCW6W7WEWSQGG02SY3XV', '9f2bf174f1cde238f4f6cc2e80e8e8da3b59f32496d619d20c3c675186e70fba', '01M18M1X7BZDM001VSY9A2BGN2', '2026-10-08 21:07:41', '2026-09-08 15:20:43', 1, '2026-09-11 15:04:23', '01M20SPX5ESACS83T72H4N811H', '2026-09-08 21:07:41'),
+('01M20SPX5ESACS83T72H4N811H', '01KZJDNCW6W7WEWSQGG02SY3XV', 'a1aaf49eb5a95573007653c54d958e224d2c28d29ce427290147b20cc40a09ca', '01M18M1X7BZDM001VSY9A2BGN2', '2026-10-08 21:20:43', '2026-09-08 15:28:27', 1, '2026-09-11 15:04:23', '01M20T51QYEYPGRXA4ACGRME1P', '2026-09-08 21:20:43'),
+('01M20T51QYEYPGRXA4ACGRME1P', '01KZJDNCW6W7WEWSQGG02SY3XV', 'db195cfc606cd51f06d8cc75a75f9d60c047e8236bf52c1eda1492c7a812d7fb', '01M18M1X7BZDM001VSY9A2BGN2', '2026-10-08 21:28:27', '2026-09-08 15:37:39', 1, '2026-09-11 15:04:23', '01M20TNWVWKVM5BC4HFZG4SMV8', '2026-09-08 21:28:27'),
+('01M20TNWVWKVM5BC4HFZG4SMV8', '01KZJDNCW6W7WEWSQGG02SY3XV', 'c2c3908ba7eee95a79ae2887584300b84e0ea578b3ebf86948f46cb7026594b6', '01M18M1X7BZDM001VSY9A2BGN2', '2026-10-08 21:37:39', '2026-09-08 19:29:51', 1, '2026-09-11 15:04:23', '01M217Z2KN3GMHJ2MS2175Z1HC', '2026-09-08 21:37:39'),
+('01M217Z2KN3GMHJ2MS2175Z1HC', '01KZJDNCW6W7WEWSQGG02SY3XV', '305426726e212871b57c89f115fa88e16e8f434dd42229448b1bac6963457006', '01M18M1X7BZDM001VSY9A2BGN2', '2026-10-09 01:29:51', '2026-09-08 19:41:59', 1, '2026-09-11 15:04:23', '01M218N8VGZVDER1AVERQQ8N16', '2026-09-09 01:29:51'),
+('01M218N8VGZVDER1AVERQQ8N16', '01KZJDNCW6W7WEWSQGG02SY3XV', '7520af425ead56781ccbc566ee7dd9701d032205ae0968d2b4f45fd9d673da12', '01M18M1X7BZDM001VSY9A2BGN2', '2026-10-09 01:41:59', '2026-09-08 19:47:03', 1, '2026-09-11 15:04:23', '01M218YJN34XQ8YDJYGDGWX5P2', '2026-09-09 01:41:59'),
+('01M218YJN34XQ8YDJYGDGWX5P2', '01KZJDNCW6W7WEWSQGG02SY3XV', 'a4af2653b9f6fe27e028b3d6e835dce27d8ef8f6fe4ab93bb5ab7bdbdb04598c', '01M18M1X7BZDM001VSY9A2BGN2', '2026-10-09 01:47:03', '2026-09-08 20:00:28', 1, '2026-09-11 15:04:23', '01M219Q4AX71HMB5PW8X9RSY8M', '2026-09-09 01:47:03'),
+('01M219Q4AX71HMB5PW8X9RSY8M', '01KZJDNCW6W7WEWSQGG02SY3XV', '2fde3a3bec3872ded6f4934fb4e251058e964be1121911485287e557392f3bf3', '01M18M1X7BZDM001VSY9A2BGN2', '2026-10-09 02:00:28', '2026-09-09 03:57:47', 1, '2026-09-11 15:04:23', '01M22513V8YR08SEDF2QVH8FQD', '2026-09-09 02:00:28'),
+('01M22513V8YR08SEDF2QVH8FQD', '01KZJDNCW6W7WEWSQGG02SY3XV', '2c2b9fbf8c414bc37695a421f06a8cac0e1bf6b592dc38a9bf339d2dbd8d6718', '01M18M1X7BZDM001VSY9A2BGN2', '2026-10-09 09:57:47', '2026-09-09 04:05:01', 1, '2026-09-11 15:04:23', '01M225ECBDFEWEJSX5CPFFB7ZG', '2026-09-09 09:57:47'),
+('01M225ECBDFEWEJSX5CPFFB7ZG', '01KZJDNCW6W7WEWSQGG02SY3XV', '3672faf4f13b9940e576e30fcebfdcc71c8defd0413f941b853ecf34b9378436', '01M18M1X7BZDM001VSY9A2BGN2', '2026-10-09 10:05:01', '2026-09-09 04:25:45', 1, '2026-09-11 15:04:23', '01M226MB3BKDEC6C44DV0J1JYS', '2026-09-09 10:05:01'),
+('01M226MB3BKDEC6C44DV0J1JYS', '01KZJDNCW6W7WEWSQGG02SY3XV', 'c5555e85632bfaf9c24b9ad01fdee08dea8bb621c7ef5091e4c0f527fe8ca5e1', '01M18M1X7BZDM001VSY9A2BGN2', '2026-10-09 10:25:45', NULL, 0, '2026-09-11 15:04:23', NULL, '2026-09-09 10:25:45'),
+('01M28FZ4X00MW1TN8PCGC5CZB5', '01KZJDNCW6W7WEWSQGG02SY3XV', '64a728c489e060846ee938a8e4485408afb8badc232619c8a44a49698b314ea8', '01M28FZ4X00MW1TN8PCGC5CZB4', '2026-10-11 21:04:23', NULL, 0, '2026-09-11 15:13:09', NULL, '2026-09-11 21:04:23'),
+('01M28GF62FGGB8RZVGAGGDXSJ6', '01KZJDNCW6W7WEWSQGG02SY3XV', 'a2d26aff1f26c28002c1dc833f011459f14bee1721320715dcddaed0721a6e11', '01M28GF62FGGB8RZVGAGGDXSJ5', '2026-10-11 21:13:09', NULL, 0, '2026-09-11 18:15:46', NULL, '2026-09-11 21:13:09'),
+('01M28H3C5SE06EAV9ZTQS90XP6', '01KZJEG8D46K1T5WD7MZMCMAZ5', 'b3c41aef7d3d2864783c45568a124b3d3a84fd1805ec378f3258519bee9d3628', '01M28H3C5SE06EAV9ZTQS90XP5', '2026-10-11 21:24:10', NULL, 0, NULL, NULL, '2026-09-11 21:24:10'),
+('01M28H86NKDW4ACRN90JSEQY6Q', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', 'b52e96258141c98459046b73e1a6810699633ee3c03e950ca68470b768652781', '01M28H86NKDW4ACRN90JSEQY6P', '2026-10-11 21:26:49', NULL, 0, NULL, NULL, '2026-09-11 21:26:49'),
+('01M28HBDZ51BS2W9J2N58P1MM4', '01KVNRKQ1HW3YH0NRXQF744JK9', '98fb153da92e8ad9ab117113aad315c64cb6c56661e01a5873e8edc6d5dc5d35', '01M28HBDZ51BS2W9J2N58P1MM3', '2026-10-11 21:28:34', NULL, 0, NULL, NULL, '2026-09-11 21:28:34'),
+('01M28TXJFAW4G4K3ZR1J303NFH', '01KZJDNCW6W7WEWSQGG02SY3XV', '6a73e42945511ee4cab996870ff97994dda2ff9174608fac5b969ba7700e3ea9', '01M28TXJFAW4G4K3ZR1J303NFG', '2026-10-12 00:15:46', NULL, 0, '2026-09-11 18:22:43', NULL, '2026-09-12 00:15:46'),
+('01M28VAA6XVR1F32H0PT5AMM5X', '01KZJDNCW6W7WEWSQGG02SY3XV', 'c7a990376ed8bca91a596541ec26808d0f387282434fb437f1aaf61e6c7e660c', '01M28VAA6XVR1F32H0PT5AMM5W', '2026-10-12 00:22:43', NULL, 0, '2026-09-11 18:48:32', NULL, '2026-09-12 00:22:43'),
+('01M28WSJWGX2RCQRMYGX2DJJ5M', '01KZJDNCW6W7WEWSQGG02SY3XV', '24ded03d69c6cfd1dfb208fc1c4e8b5687f4eee3815bcddae01c75b5dd0235f7', '01M28WSJWGX2RCQRMYGX2DJJ5K', '2026-10-12 00:48:32', NULL, 0, '2026-09-11 18:55:55', NULL, '2026-09-12 00:48:32'),
+('01M28X72Q15GA22ARTK5YS5JDC', '01KZJDNCW6W7WEWSQGG02SY3XV', '235abc518e481550fdc77f82d3dc890ea8664f7f6120e14a2197091497fea376', '01M28X72Q15GA22ARTK5YS5JDB', '2026-10-12 00:55:55', NULL, 0, '2026-09-12 00:09:23', NULL, '2026-09-12 00:55:55'),
+('01M29F51YR038TY613GMBQRF67', '01KZJDNCW6W7WEWSQGG02SY3XV', '89cddca5b1f04bcbe188c659163dcc303d43060b8f9c48058575cce089417ffb', '01M29F51YR038TY613GMBQRF66', '2026-10-12 06:09:23', NULL, 0, '2026-09-12 00:14:59', NULL, '2026-09-12 06:09:23'),
+('01M29FFAV91Q2HAAZE72WJ5V9G', '01KZJDNCW6W7WEWSQGG02SY3XV', 'f4d90b24e02ba0e72410488a0c6db1d8eaa06c3430452c875bbab287578723d5', '01M29FFAV91Q2HAAZE72WJ5V9F', '2026-10-12 06:14:59', NULL, 0, '2026-09-12 00:25:53', NULL, '2026-09-12 06:14:59'),
+('01M29G398M6Q3ADJCXWS4Y33R7', '01KZJDNCW6W7WEWSQGG02SY3XV', 'd5138ed0b510148042e4dc2e494e73203e1f623be282a1abde369dacea97bae7', '01M29G398KJ45QE3ARDT0RBDNY', '2026-10-12 06:25:53', NULL, 0, '2026-09-12 00:31:03', NULL, '2026-09-12 06:25:53'),
+('01M29GCR6H9TAF3CVH7YQKZA82', '01KZJDNCW6W7WEWSQGG02SY3XV', 'e02dccd7b2b90fe4264caaf8bf1c0a674aef3be084fc5a84c10a17c3424f0ea6', '01M29GCR6H9TAF3CVH7YQKZA81', '2026-10-12 06:31:03', NULL, 0, '2026-09-12 00:36:28', NULL, '2026-09-12 06:31:03'),
+('01M29GPNNFMQXWVH2R8VBQRPV7', '01KZJDNCW6W7WEWSQGG02SY3XV', '290d1e243ba8387d0d1f280d71eb9791c207a93de6aaee950c9e7e1c4c459e76', '01M29GPNNFMQXWVH2R8VBQRPV6', '2026-10-12 06:36:28', NULL, 0, '2026-09-12 00:41:20', NULL, '2026-09-12 06:36:28'),
+('01M29GZJ00N5BF2T1P73FT1N3W', '01KZJDNCW6W7WEWSQGG02SY3XV', 'b415e2ff9bdf05d570485b9596d8e4f17107fd1c65a0bb9f18c50203792585d5', '01M29GZJ00N5BF2T1P73FT1N3V', '2026-10-12 06:41:20', NULL, 0, '2026-09-12 01:44:27', NULL, '2026-09-12 06:41:20'),
+('01M29MK532EN2RGP3M2NWW8JGJ', '01KZJDNCW6W7WEWSQGG02SY3XV', '4b0d2cceb69bf87324d5019b7d0440fca2cc1a17a45f869cf3eaddd38af1aeb6', '01M29MK532EN2RGP3M2NWW8JGH', '2026-10-12 07:44:28', NULL, 0, '2026-09-12 01:50:04', NULL, '2026-09-12 07:44:28'),
+('01M29MXDRJVFZTSW72W9D0J7CV', '01KZJDNCW6W7WEWSQGG02SY3XV', 'd525c511e98c0c5d684d19aa1a22ec5b62002257a657034bc1df7855ade31369', '01M29MXDRJVFZTSW72W9D0J7CT', '2026-10-12 07:50:04', NULL, 0, '2026-09-12 02:06:49', NULL, '2026-09-12 07:50:04'),
+('01M29NW3G8X34Z8RBSE4VEZSGX', '01KZJDNCW6W7WEWSQGG02SY3XV', 'afc18aaa4e0d167f86ed1d2a4713ea8b48f644ba3c27024f62255441e38ef655', '01M29NW3G8X34Z8RBSE4VEZSGW', '2026-10-12 08:06:49', NULL, 0, '2026-09-12 02:14:13', NULL, '2026-09-12 08:06:49'),
+('01M29P9N0ZWN47F0BJ6CJV80R3', '01KZJDNCW6W7WEWSQGG02SY3XV', 'bc536d0580ded4beb46901490efd8c1199ab656cf5ab219f51158c494b9655cc', '01M29P9N0ZWN47F0BJ6CJV80R2', '2026-10-12 08:14:13', NULL, 0, '2026-09-12 02:24:23', NULL, '2026-09-12 08:14:13'),
+('01M29PW8KHWAPW5XDN6M2VVFXN', '01KZJDNCW6W7WEWSQGG02SY3XV', '5771dae82cac07ac2982e889aeced1f6bcac91a44954404cafe9d588cdf81e06', '01M29PW8KHWAPW5XDN6M2VVFXM', '2026-10-12 08:24:23', NULL, 0, '2026-09-12 02:33:32', NULL, '2026-09-12 08:24:23'),
+('01M29QD0629VBM5M107F11J3GA', '01KZJDNCW6W7WEWSQGG02SY3XV', 'e6586b52a24efae971238863d693e2b7a345a724566b1a49fc0031096cccc6cf', '01M29QD0629VBM5M107F11J3G9', '2026-10-12 08:33:32', NULL, 0, NULL, NULL, '2026-09-12 08:33:32');
 
 --
--- Disparadores `refresh_tokens`
+-- Triggers `refresh_tokens`
 --
 DELIMITER $$
 CREATE TRIGGER `prevent_double_use_before_insert` BEFORE UPDATE ON `refresh_tokens` FOR EACH ROW BEGIN
@@ -933,7 +1360,7 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `requests`
+-- Table structure for table `requests`
 --
 
 CREATE TABLE `requests` (
@@ -958,7 +1385,7 @@ CREATE TABLE `requests` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `requests`
+-- Dumping data for table `requests`
 --
 
 INSERT INTO `requests` (`request_id`, `province_snit_code`, `canton_snit_code`, `district_snit_code`, `user_id`, `request_name`, `owner_name`, `owner_phone_number`, `owner_email`, `current_usage`, `temperature_sensation`, `bubbles`, `details`, `exact_address`, `latitude`, `longitude`, `created_at`, `relation_with_owner`) VALUES
@@ -974,15 +1401,17 @@ INSERT INTO `requests` (`request_id`, `province_snit_code`, `canton_snit_code`, 
 ('01KVNNWRWB06E0ACFN5099T65W', 5, 504, 50401, '06F43H2S28KNWX71TSF7MWWTA4', 'SOLI-9T65W', NULL, NULL, NULL, 'Ganadería', 'Caliente', 1, 'Se observa emanación de vapor', 'Camino a Bagaces, 200 m norte de escuela', 10.1234560, -85.1234560, '2026-06-21 18:08:12', 'Titular'),
 ('01KVNP3JZFXGZP3HWT1GMCCAGW', 5, 504, 50401, '06F43H2S28KNWX71TSF7MWWTA4', 'SOLI-CCAGW', NULL, NULL, NULL, 'Ganadería', 'Caliente', 1, 'Se observa emanación de vapor', 'Camino a Bagaces, 200 m norte de escuela', 10.1234560, -85.1234560, '2026-06-21 18:11:55', 'Titular'),
 ('01KVNPJ10APWW29KV1WW8QY19N', 5, 504, 50401, '06F43H2S28KNWX71TSF7MWWTA4', 'SOLI-QY19N', NULL, NULL, NULL, 'Ganadería', 'Caliente', 1, 'Se observa emanación de vapor', 'Camino a Bagaces, 200 m norte de escuela', 10.1234560, -85.1234560, '2026-06-21 18:19:48', 'Titular'),
+('01KVNRZMQFZHMQTQ40N38N6K4J', 5, 504, 50401, '01KVNRKQ1HW3YH0NRXQF744JK9', 'SOLI-N6K4J', NULL, NULL, NULL, 'Ganadería', 'Caliente', 1, 'Se observa emanación de vapor', 'Camino a Bagaces, 200 m norte de escuela', 10.1234560, -85.1234560, '2026-06-21 19:02:11', 'Titular'),
 ('01KZ7Y0FXHSVB1GMX85XZS8GRG', 5, 504, 50401, '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', 'SOLI-50401-01KZ7Y0FXH', 'Aaron AA Sanchez SS', '84624161', 'aaroncz032@gmail.com', 'Ganadería', 'Caliente', 1, 'Se observa emanación de vapor', 'Camino a Bagaces, 200 m norte de escuela', 10.1234560, -85.1234560, '2026-08-05 03:03:27', 'Titular'),
 ('01KZ9E0VFVGNVW5SZA0TP2SMGM', 5, 204, 50405, '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', 'SOLI-50401-01KZ9E0VFV', 'Aaron AA Sanchez SS', '84624161', 'aaroncz032@gmail.com', 'Ganadería', 'Templado', 0, 'Se observa deterioro en tuberia', 'Camino a Cartago', 10.1234560, -85.1234560, '2026-08-05 17:02:31', 'Titular'),
 ('01KZ9FA5XZDCDT6GE1CF05NTCQ', 5, 204, 50405, '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', 'SOLI-50401-01KZ9FA5XZ', 'Aaron AA Sanchez SS', '84624161', 'aaroncz032@gmail.com', 'Ganadería', 'Templado', 0, 'Se observa deterioro en tuberia', 'Camino a Cartago', 10.1234560, -85.1234560, '2026-08-05 17:25:05', 'Titular'),
-('01KZ9JK8XE2R6XEZ5ZCFQACXPG', 5, 204, 50405, '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', 'SOLI-50401-01KZ9JK8XE', 'Aaron AA Sanchez SS', '84624161', 'aaroncz032@gmail.com', 'Ganadería', 'Templado', 0, 'Se observa deterioro en tuberia', 'Camino a Cartago', 10.1234560, -85.1234560, '2026-08-05 18:22:29', 'Titular');
+('01KZ9JK8XE2R6XEZ5ZCFQACXPG', 5, 204, 50405, '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', 'SOLI-50401-01KZ9JK8XE', 'Aaron AA Sanchez SS', '84624161', 'aaroncz032@gmail.com', 'Ganadería', 'Templado', 0, 'Se observa deterioro en tuberia', 'Camino a Cartago', 10.1234560, -85.1234560, '2026-08-05 18:22:29', 'Titular'),
+('01M02D3Y2D1FK8SN6ERVWQ2P7V', 3, 301, 30109, '01KZJEG8D46K1T5WD7MZMCMAZ5', 'SOLI-30109-01M02D3Y2D', NULL, NULL, NULL, 'Residencial', 'Muy Caliente', 0, 'Nada, vayan rápido', 'Frente a la Iglesia 200m sur', 9.9825520, -84.1875240, '2026-08-15 09:47:44', NULL);
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `requests_state`
+-- Table structure for table `requests_state`
 --
 
 CREATE TABLE `requests_state` (
@@ -995,7 +1424,7 @@ CREATE TABLE `requests_state` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `requests_state`
+-- Dumping data for table `requests_state`
 --
 
 INSERT INTO `requests_state` (`request_status_id`, `request_id`, `value`, `description`, `created_at`, `created_by`) VALUES
@@ -1022,7 +1451,9 @@ INSERT INTO `requests_state` (`request_status_id`, `request_id`, `value`, `descr
 ('01KVNNWRWC38JWPEYA8NEBS0QZ', '01KVNNWRWB06E0ACFN5099T65W', 'Pendiente', 'Solicitud creada', '2026-06-21 18:08:12', '06F43H2S28KNWX71TSF7MWWTA4'),
 ('01KVNP3JZGAYEK64Q95ZXAY401', '01KVNP3JZFXGZP3HWT1GMCCAGW', 'Pendiente', 'Solicitud creada', '2026-06-21 18:11:55', '06F43H2S28KNWX71TSF7MWWTA4'),
 ('01KVNPJ10CCMQ81AR2DQK7P3TA', '01KVNPJ10APWW29KV1WW8QY19N', 'Pendiente', 'Solicitud creada', '2026-06-21 18:19:48', '06F43H2S28KNWX71TSF7MWWTA4'),
+('01KVNRZMQJWP2ZBPHGYYYPPC55', '01KVNRZMQFZHMQTQ40N38N6K4J', 'Pendiente', 'Solicitud creada', '2026-06-21 19:02:11', '01KVNRKQ1HW3YH0NRXQF744JK9'),
 ('01KZ7Y0FXMWB9HD4AQ4GKJHZZV', '01KZ7Y0FXHSVB1GMX85XZS8GRG', 'Pendiente', 'Solicitud creada', '2026-08-05 03:03:27', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z'),
+('01KZ7YC1ZPN7MG516PYTFJYGVB', '01KVNRZMQFZHMQTQ40N38N6K4J', 'Revisión', 'El equipo técnico proceso la solicitud', '2026-08-05 03:09:46', '06F43H2S28KNWX71TSF7MWWTA4'),
 ('01KZ7YJMN1F4DV1APTM626H23J', '01KZ7Y0FXHSVB1GMX85XZS8GRG', 'Revisión', 'El equipo técnico proceso la solicitud', '2026-08-05 03:13:22', '06F43H2S28KNWX71TSF7MWWTA4'),
 ('01KZ9E0VFWX6S340TE62Z2VN0R', '01KZ9E0VFVGNVW5SZA0TP2SMGM', 'Pendiente', 'Solicitud creada', '2026-08-05 17:02:31', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z'),
 ('01KZ9E3KYHPQMYPYN0WK12NMX5', '01KZ9E0VFVGNVW5SZA0TP2SMGM', 'Revisión', 'El equipo técnico proceso la solicitud', '2026-08-05 17:04:02', '06F43H2S28KNWX71TSF7MWWTA4'),
@@ -1030,12 +1461,18 @@ INSERT INTO `requests_state` (`request_status_id`, `request_id`, `value`, `descr
 ('01KZ9FA5Y02XNQ25P389NBD22Z', '01KZ9FA5XZDCDT6GE1CF05NTCQ', 'Pendiente', 'Solicitud creada', '2026-08-05 17:25:05', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z'),
 ('01KZ9FCC94W2778V4CNSST9SRG', '01KZ9FA5XZDCDT6GE1CF05NTCQ', 'Revisión', 'El equipo técnico esta revisando la solicitud', '2026-08-05 17:26:17', '06F43H2S28KNWX71TSF7MWWTA4'),
 ('01KZ9FCZ93S50TAXYWS1N7QRS4', '01KZ9FA5XZDCDT6GE1CF05NTCQ', 'Procesada', 'El equipo técnico proceso la solicitud', '2026-08-05 17:26:37', '06F43H2S28KNWX71TSF7MWWTA4'),
-('01KZ9JK8XFJM2X045A63GKFA9T', '01KZ9JK8XE2R6XEZ5ZCFQACXPG', 'Pendiente', 'Solicitud creada', '2026-08-05 18:22:29', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z');
+('01KZ9JK8XFJM2X045A63GKFA9T', '01KZ9JK8XE2R6XEZ5ZCFQACXPG', 'Pendiente', 'Solicitud creada', '2026-08-05 18:22:29', '01KZ5E6SQ2VA3HG0BW2MT2ZK1Z'),
+('01M02D3Y30CTKVEGBEXZ474EAA', '01M02D3Y2D1FK8SN6ERVWQ2P7V', 'Pendiente', 'Solicitud creada', '2026-08-15 09:47:44', '01KZJEG8D46K1T5WD7MZMCMAZ5'),
+('01M02GVTYEG8H10MTJPFXEE7B8', '01M02D3Y2D1FK8SN6ERVWQ2P7V', 'Revisión', 'El equipo técnico proceso la solicitud', '2026-08-15 10:53:13', '01KZJDNCW6W7WEWSQGG02SY3XV'),
+('01M02GW82C68CZH9QJHCSAYEMG', '01M02D3Y2D1FK8SN6ERVWQ2P7V', 'Procesada', 'El equipo técnico proceso la solicitud', '2026-08-15 10:53:26', '01KZJDNCW6W7WEWSQGG02SY3XV'),
+('01M02GWHJWENV5A3E0AWXCZ0XJ', '01M02D3Y2D1FK8SN6ERVWQ2P7V', 'Revisión', 'El equipo técnico proceso la solicitud', '2026-08-15 10:53:36', '01KZJDNCW6W7WEWSQGG02SY3XV'),
+('01M02HYGM7SCMDCQW8B0QQ4MPQ', '01M02D3Y2D1FK8SN6ERVWQ2P7V', 'Pendiente', 'Lo devolvimos', '2026-08-15 11:12:09', '01KZJDNCW6W7WEWSQGG02SY3XV'),
+('01M039RZEFSN9G6JTYPXQKFN2M', '01M02D3Y2D1FK8SN6ERVWQ2P7V', 'Procesada', 'Solicitud aceptada y convertida en geomanifestación (borrador)', '2026-08-15 18:08:34', '01KZJDNCW6W7WEWSQGG02SY3XV');
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
@@ -1055,18 +1492,24 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `users`
+-- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`user_id`, `email`, `phone_number`, `first_name`, `last_name`, `password_hash`, `role`, `is_deleted`, `is_verified`, `failed_login_attempts`, `last_login_at`, `deleted_at`, `created_at`) VALUES
-('01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', 'aaroncz032@gmail.com', '84624161', 'Aaron AA', 'Sanchez SS', '$2y$12$Q3WPyU/pP0/fNku/aX56Q.FlKF7BTDlNn/NoUEv62ABRqvhT4tIFu', 'maintenance', 0, 0, 0, NULL, NULL, '2026-08-04 03:48:48'),
+('01KSDHAZHHKK02DG47168ZX7TV', 'juancarlos@example.com', '87654321', 'Juan Carlos', 'Pérez Gómez', '$2y$10$gRipQdtJbLdnA3DwaVQ/Y.2yNzJGZFzCx0aZZ3ZDuJFatK9cszA0S', 'user', 0, 0, 0, NULL, NULL, '2026-05-24 17:43:15'),
+('01KV1Y23C22RQFF7TVRQ0BYEE7', 'aaron.carmona@geoterra.com', NULL, 'Aaron', 'Carmona Sanchez', '$2y$12$LiDfgxB4Eobi.4vMyNp83OJn..7H0vmL44RbXEXFSA0ju.dWdmwLa', 'user', 0, 0, 0, NULL, NULL, '2026-06-14 02:06:06'),
+('01KVNQFNTSZNSE9WP5YKE3XQKY', 'aaron.carmona@ucr.ac.cr', NULL, 'Aaron AA', 'Sanchez SS', '$2y$12$Zqxwp8N8jqx6ks3/ZJHFzeQt9lzfvwCmFaDM3n8h5Aibd3qP8fV3C', 'user', 0, 0, 0, NULL, NULL, '2026-06-21 18:36:00'),
+('01KVNRKQ1HW3YH0NRXQF744JK9', 'aaron.carmona1@ucr.ac.cr', NULL, 'Aaron AA', 'Sanchez SS', '$2y$12$JyPO8aV1ZL6S.e0yIOpup./wbh08vuXHXr8Z3Lrywi8vTxmfyTrBe', 'field_investigator', 0, 0, 0, NULL, NULL, '2026-06-21 18:55:41'),
+('01KZ5E6SQ2VA3HG0BW2MT2ZK1Z', 'aaroncz032@gmail.com', '84624161', 'Aaron AA', 'Sanchez SS', '$2y$12$JyPO8aV1ZL6S.e0yIOpup./wbh08vuXHXr8Z3Lrywi8vTxmfyTrBe', 'field_investigator', 0, 0, 0, NULL, NULL, '2026-08-04 03:48:48'),
+('01KZJDNCW6W7WEWSQGG02SY3XV', 'corderomariogabriel@gmail.com', '83443610', 'Mario', 'Cordero', '$2y$12$JyPO8aV1ZL6S.e0yIOpup./wbh08vuXHXr8Z3Lrywi8vTxmfyTrBe', 'admin', 0, 0, 0, NULL, NULL, '2026-08-09 04:49:25'),
+('01KZJEG8D46K1T5WD7MZMCMAZ5', 'mariogabriel.cordero@ucr.ac.cr', '83443610', 'Mario', 'Cordero Investigador', '$2y$12$Yff.qHnbWbxV88sw5WpPleqNjFHZkYhjHYsaaIfZUs0/0IlZUC0/u', 'field_investigator', 0, 0, 0, NULL, NULL, '2026-08-09 05:04:06'),
 ('06F43H2S28KNWX71TSF7MWWTA4', 'system@geoterra.com', NULL, 'System', 'Importer', '$2y$12$maFlo43rQpKj8KpN4PAssu6CiBsWF3oqJRKwk.SPPzUxPf3Jemnbe', 'admin', 0, 1, 0, NULL, NULL, '2026-05-19 19:44:07');
 
 -- --------------------------------------------------------
 
 --
--- Estructura Stand-in para la vista `view_logs_entries`
--- (Véase abajo para la vista actual)
+-- Stand-in structure for view `view_logs_entries`
+-- (See below for the actual view)
 --
 CREATE TABLE `view_logs_entries` (
 `id` bigint(20)
@@ -1081,21 +1524,12 @@ CREATE TABLE `view_logs_entries` (
 ,`updated_by_name` varchar(100)
 );
 
--- --------------------------------------------------------
-
 --
--- Estructura para la vista `view_logs_entries`
---
-DROP TABLE IF EXISTS `view_logs_entries`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY INVOKER VIEW `geoterra`.`view_logs_entries`  AS SELECT `le`.`id` AS `id`, `le`.`log_id` AS `log_id`, `le`.`field_name` AS `field_name`, `le`.`old_value` AS `old_value`, `le`.`new_value` AS `new_value`, `l`.`auto_id` AS `auto_id`, `l`.`table_name` AS `table_name`, `l`.`updated_at` AS `updated_at`, `l`.`updated_by` AS `updated_by`, `l`.`updated_by_name` AS `updated_by_name` FROM (`geoterra`.`logs_entries` `le` left join `geoterra`.`logs` `l` on(`le`.`log_id` = `l`.`id`)) ;
-
---
--- Índices para tablas volcadas
+-- Indexes for dumped tables
 --
 
 --
--- Indices de la tabla `access_tokens`
+-- Indexes for table `access_tokens`
 --
 ALTER TABLE `access_tokens`
   ADD PRIMARY KEY (`access_token_id`),
@@ -1103,7 +1537,7 @@ ALTER TABLE `access_tokens`
   ADD KEY `fk_accesst_user_id` (`user_id`) USING BTREE;
 
 --
--- Indices de la tabla `cantons`
+-- Indexes for table `cantons`
 --
 ALTER TABLE `cantons`
   ADD PRIMARY KEY (`canton_id`),
@@ -1112,7 +1546,15 @@ ALTER TABLE `cantons`
   ADD KEY `fk_canton_province_snit_code` (`province_snit_code`);
 
 --
--- Indices de la tabla `districts`
+-- Indexes for table `comments`
+--
+ALTER TABLE `comments`
+  ADD PRIMARY KEY (`comment_id`),
+  ADD KEY `idx_comments_entity` (`entity_type`,`entity_id`),
+  ADD KEY `fk_comments_user_id` (`user_id`);
+
+--
+-- Indexes for table `districts`
 --
 ALTER TABLE `districts`
   ADD PRIMARY KEY (`district_id`),
@@ -1121,7 +1563,25 @@ ALTER TABLE `districts`
   ADD KEY `fk_district_canton_snit_code` (`canton_snit_code`);
 
 --
--- Indices de la tabla `geomanifestations`
+-- Indexes for table `field_trips`
+--
+ALTER TABLE `field_trips`
+  ADD PRIMARY KEY (`field_trip_id`),
+  ADD KEY `fk_ft_creator_id` (`field_trip_creator_id`),
+  ADD KEY `fk_ft_province_snit_code` (`province_snit_code`),
+  ADD KEY `fk_ft_canton_snit_code` (`canton_snit_code`),
+  ADD KEY `fk_ft_district_snit_code` (`district_snit_code`),
+  ADD KEY `idx_ft_is_active` (`field_trip_is_active`);
+
+--
+-- Indexes for table `field_trip_participants`
+--
+ALTER TABLE `field_trip_participants`
+  ADD PRIMARY KEY (`field_trip_id`,`user_id`),
+  ADD KEY `fk_ftp_user_id` (`user_id`);
+
+--
+-- Indexes for table `geomanifestations`
 --
 ALTER TABLE `geomanifestations`
   ADD PRIMARY KEY (`geomanifestation_id`),
@@ -1131,56 +1591,60 @@ ALTER TABLE `geomanifestations`
   ADD KEY `fk_gm_district_snit_code` (`district_snit_code`) USING BTREE,
   ADD KEY `idx_gm_visibility` (`visibility`) USING BTREE,
   ADD KEY `fk_gm_current_georeport_id` (`current_georeport_id`) USING BTREE,
-  ADD KEY `idx_request_id` (`request_id`);
+  ADD KEY `idx_request_id` (`request_id`),
+  ADD KEY `fk_gm_field_trip_id` (`field_trip_id`);
 
 --
--- Indices de la tabla `georeports`
+-- Indexes for table `georeports`
 --
 ALTER TABLE `georeports`
   ADD PRIMARY KEY (`georeport_id`),
   ADD KEY `fk_gr_created_by` (`created_by`),
   ADD KEY `fk_gr_geomanifestation_id` (`geomanifestation_id`),
   ADD KEY `fk_gr_inlab_test_id` (`inlab_test_id`),
-  ADD KEY `fk_gr_insitu_test_id` (`insitu_test_id`);
+  ADD KEY `fk_gr_insitu_test_id` (`insitu_test_id`),
+  ADD KEY `idx_gr_visibility` (`visibility`) USING BTREE;
 
 --
--- Indices de la tabla `inlab_tests`
+-- Indexes for table `inlab_tests`
 --
 ALTER TABLE `inlab_tests`
   ADD PRIMARY KEY (`inlab_test_id`),
   ADD KEY `fk_inlabt_geomanifestation_id` (`geomanifestation_id`) USING BTREE,
-  ADD KEY `fk_inlabt_created_by` (`created_by`) USING BTREE;
+  ADD KEY `fk_inlabt_created_by` (`created_by`) USING BTREE,
+  ADD KEY `idx_inlabt_visibility` (`visibility`) USING BTREE;
 
 --
--- Indices de la tabla `insitu_tests`
+-- Indexes for table `insitu_tests`
 --
 ALTER TABLE `insitu_tests`
   ADD PRIMARY KEY (`insitu_test_id`),
   ADD KEY `fk_insitut_created_by` (`created_by`) USING BTREE,
-  ADD KEY `fk_insitut_manifestation_id` (`geomanifestation_id`) USING BTREE;
+  ADD KEY `fk_insitut_manifestation_id` (`geomanifestation_id`) USING BTREE,
+  ADD KEY `idx_insitut_visibility` (`visibility`) USING BTREE;
 
 --
--- Indices de la tabla `logs`
+-- Indexes for table `logs`
 --
 ALTER TABLE `logs`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indices de la tabla `logs_entries`
+-- Indexes for table `logs_entries`
 --
 ALTER TABLE `logs_entries`
   ADD PRIMARY KEY (`id`),
   ADD KEY `log_id` (`log_id`);
 
 --
--- Indices de la tabla `password_reset_tokens`
+-- Indexes for table `password_reset_tokens`
 --
 ALTER TABLE `password_reset_tokens`
   ADD PRIMARY KEY (`user_id`,`token`),
   ADD UNIQUE KEY `token` (`token`);
 
 --
--- Indices de la tabla `provinces`
+-- Indexes for table `provinces`
 --
 ALTER TABLE `provinces`
   ADD PRIMARY KEY (`province_id`),
@@ -1189,7 +1653,7 @@ ALTER TABLE `provinces`
   ADD KEY `fk_province_created_by` (`created_by`) USING BTREE;
 
 --
--- Indices de la tabla `refresh_tokens`
+-- Indexes for table `refresh_tokens`
 --
 ALTER TABLE `refresh_tokens`
   ADD PRIMARY KEY (`refresh_token_id`),
@@ -1199,7 +1663,7 @@ ALTER TABLE `refresh_tokens`
   ADD KEY `idx_refresh_user_family` (`user_id`,`family_id`);
 
 --
--- Indices de la tabla `requests`
+-- Indexes for table `requests`
 --
 ALTER TABLE `requests`
   ADD PRIMARY KEY (`request_id`),
@@ -1211,14 +1675,14 @@ ALTER TABLE `requests`
   ADD KEY `fk_r_district_snit_code` (`district_snit_code`) USING BTREE;
 
 --
--- Indices de la tabla `requests_state`
+-- Indexes for table `requests_state`
 --
 ALTER TABLE `requests_state`
   ADD PRIMARY KEY (`request_status_id`),
   ADD KEY `fk_rs_request_id` (`request_id`);
 
 --
--- Indices de la tabla `users`
+-- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`user_id`),
@@ -1226,50 +1690,82 @@ ALTER TABLE `users`
   ADD KEY `idx_users_active` (`deleted_at`,`is_deleted`);
 
 --
--- AUTO_INCREMENT de las tablas volcadas
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT de la tabla `logs`
+-- AUTO_INCREMENT for table `logs`
 --
 ALTER TABLE `logs`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3870;
 
 --
--- AUTO_INCREMENT de la tabla `logs_entries`
+-- AUTO_INCREMENT for table `logs_entries`
 --
 ALTER TABLE `logs_entries`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7212;
 
+-- --------------------------------------------------------
+
 --
--- Restricciones para tablas volcadas
+-- Structure for view `view_logs_entries`
+--
+DROP TABLE IF EXISTS `view_logs_entries`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_logs_entries`  AS SELECT `le`.`id` AS `id`, `le`.`log_id` AS `log_id`, `le`.`field_name` AS `field_name`, `le`.`old_value` AS `old_value`, `le`.`new_value` AS `new_value`, `l`.`auto_id` AS `auto_id`, `l`.`table_name` AS `table_name`, `l`.`updated_at` AS `updated_at`, `l`.`updated_by` AS `updated_by`, `l`.`updated_by_name` AS `updated_by_name` FROM (`logs_entries` `le` left join `logs` `l` on(`le`.`log_id` = `l`.`id`)) ;
+
+--
+-- Constraints for dumped tables
 --
 
 --
--- Filtros para la tabla `cantons`
+-- Constraints for table `cantons`
 --
 ALTER TABLE `cantons`
   ADD CONSTRAINT `fk_canton_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_canton_province_snit_code` FOREIGN KEY (`province_snit_code`) REFERENCES `provinces` (`province_snit_code`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `districts`
+-- Constraints for table `comments`
+--
+ALTER TABLE `comments`
+  ADD CONSTRAINT `fk_comments_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `districts`
 --
 ALTER TABLE `districts`
   ADD CONSTRAINT `fk_district_canton_snit_code` FOREIGN KEY (`canton_snit_code`) REFERENCES `cantons` (`canton_snit_code`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_district_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `geomanifestations`
+-- Constraints for table `field_trips`
+--
+ALTER TABLE `field_trips`
+  ADD CONSTRAINT `fk_ft_canton_snit_code` FOREIGN KEY (`canton_snit_code`) REFERENCES `cantons` (`canton_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_ft_creator_id` FOREIGN KEY (`field_trip_creator_id`) REFERENCES `users` (`user_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_ft_district_snit_code` FOREIGN KEY (`district_snit_code`) REFERENCES `districts` (`district_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_ft_province_snit_code` FOREIGN KEY (`province_snit_code`) REFERENCES `provinces` (`province_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Constraints for table `field_trip_participants`
+--
+ALTER TABLE `field_trip_participants`
+  ADD CONSTRAINT `fk_ftp_field_trip_id` FOREIGN KEY (`field_trip_id`) REFERENCES `field_trips` (`field_trip_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_ftp_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `geomanifestations`
 --
 ALTER TABLE `geomanifestations`
   ADD CONSTRAINT `fk_gm_canton_snit_code` FOREIGN KEY (`canton_snit_code`) REFERENCES `cantons` (`canton_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_gm_current_georeport_id` FOREIGN KEY (`current_georeport_id`) REFERENCES `georeports` (`georeport_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_gm_district_snit_code` FOREIGN KEY (`district_snit_code`) REFERENCES `districts` (`district_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_gm_field_trip_id` FOREIGN KEY (`field_trip_id`) REFERENCES `field_trips` (`field_trip_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_gm_province_snit_code` FOREIGN KEY (`province_snit_code`) REFERENCES `provinces` (`province_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `georeports`
+-- Constraints for table `georeports`
 --
 ALTER TABLE `georeports`
   ADD CONSTRAINT `fk_gr_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON UPDATE CASCADE,
@@ -1278,34 +1774,34 @@ ALTER TABLE `georeports`
   ADD CONSTRAINT `fk_gr_insitu_test_id` FOREIGN KEY (`insitu_test_id`) REFERENCES `insitu_tests` (`insitu_test_id`) ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `inlab_tests`
+-- Constraints for table `inlab_tests`
 --
 ALTER TABLE `inlab_tests`
   ADD CONSTRAINT `fk_inlab_tests_manifestation_id` FOREIGN KEY (`geomanifestation_id`) REFERENCES `geomanifestations` (`geomanifestation_id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_inlabt_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `insitu_tests`
+-- Constraints for table `insitu_tests`
 --
 ALTER TABLE `insitu_tests`
   ADD CONSTRAINT `fk_insitu_test_manifestation_id` FOREIGN KEY (`geomanifestation_id`) REFERENCES `geomanifestations` (`geomanifestation_id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_insitut_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `logs_entries`
+-- Constraints for table `logs_entries`
 --
 ALTER TABLE `logs_entries`
   ADD CONSTRAINT `logs_entries_ibfk_1` FOREIGN KEY (`log_id`) REFERENCES `logs` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `refresh_tokens`
+-- Constraints for table `refresh_tokens`
 --
 ALTER TABLE `refresh_tokens`
   ADD CONSTRAINT `fk_refresht_replaced_by` FOREIGN KEY (`replaced_by`) REFERENCES `refresh_tokens` (`refresh_token_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_refresht_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `requests`
+-- Constraints for table `requests`
 --
 ALTER TABLE `requests`
   ADD CONSTRAINT `fk_r_canton_snit_code` FOREIGN KEY (`canton_snit_code`) REFERENCES `cantons` (`canton_snit_code`) ON DELETE NO ACTION ON UPDATE CASCADE,
@@ -1314,7 +1810,7 @@ ALTER TABLE `requests`
   ADD CONSTRAINT `fk_r_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `requests_state`
+-- Constraints for table `requests_state`
 --
 ALTER TABLE `requests_state`
   ADD CONSTRAINT `fk_rs_request_id` FOREIGN KEY (`request_id`) REFERENCES `requests` (`request_id`) ON DELETE CASCADE ON UPDATE CASCADE;

@@ -33,8 +33,7 @@ final class GeoreportController
   public function index(): void
   {
     try {
-      $body = Request::parseJsonRequest();
-      $geomanifestationId = $body['geomanifestation_id'] ?? '';
+      $geomanifestationId = $_GET['geomanifestation_id'] ?? '';
 
       if (empty($geomanifestationId)) {
         throw new ApiException(
@@ -59,8 +58,7 @@ final class GeoreportController
   public function current(): void
   {
     try {
-      $body = Request::parseJsonRequest();
-      $geomanifestationId = $body['geomanifestation_id'] ?? '';
+      $geomanifestationId = $_GET['geomanifestation_id'] ?? '';
 
       if (empty($geomanifestationId)) {
         throw new ApiException(
@@ -150,6 +148,24 @@ final class GeoreportController
     try {
       $this->service->delete($id);
       Response::success(['deleted' => true]);
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getHttpStatus());
+    } catch (Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
+
+  /**
+   * PATCH /admin/georeports/{id}/promote
+   * Promotes a georeport as the current one for its manifestation and cascades visibility.
+   *
+   * @param string $id
+   */
+  public function promote(string $id): void
+  {
+    try {
+      $report = $this->service->promoteGeoreport($id);
+      Response::success($report);
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
     } catch (Throwable $e) {
