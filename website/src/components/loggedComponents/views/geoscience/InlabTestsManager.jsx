@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Typography, Tag, Button, Modal, Form, InputNumber, Input, Table, message, Space, Spin, Popconfirm } from 'antd';
 import { BarChartOutlined, PlusOutlined, ReloadOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import EntityNavigatorPicker from '../../../common/EntityNavigatorPicker';
+import { renderDateWithProse } from '../../../../utils/dateFormatter';
 import {
   inlabTestsIndex,
   inlabTestsStore,
@@ -210,10 +211,10 @@ const InlabTestsManager = () => {
       ),
     },
     {
-      title: 'Fecha',
+      title: 'Fecha de Registro',
       dataIndex: 'created_at',
       key: 'created_at',
-      render: (val) => val ? new Date(val).toLocaleDateString() : 'N/A',
+      render: (val) => renderDateWithProse(val, { showIcon: true }),
     },
     {
       title: 'Acciones',
