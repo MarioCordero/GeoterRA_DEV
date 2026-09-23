@@ -13,6 +13,7 @@ import {
   Typography,
   Card,
   message,
+  Badge,
 } from 'antd';
 import {
   CommentOutlined,
@@ -23,6 +24,7 @@ import {
   CloseOutlined,
   UserOutlined,
   ReloadOutlined,
+  ClockCircleOutlined,
 } from '@ant-design/icons';
 import {
   commentsIndex,
@@ -31,6 +33,7 @@ import {
   commentsDelete,
 } from '../../config/apiConf';
 import { useSession } from '../../hooks/useSession';
+import { formatDateProse, formatDateDDMMYYYY } from '../../utils/dateFormatter';
 
 const { Text, Paragraph } = Typography;
 
@@ -44,19 +47,43 @@ const extractList = (resData) => {
 };
 
 const getRoleTag = (role) => {
-  switch (role) {
+  const normalized = String(role || '').toLowerCase().trim();
+  switch (normalized) {
     case 'admin':
-      return <Tag color="red">Admin</Tag>;
+    case 'administrador':
+      return <Tag color="red" style={{ fontWeight: 500, borderRadius: 4 }}>Administrador</Tag>;
     case 'investigator':
-      return <Tag color="blue">Investigador</Tag>;
+    case 'investigador':
+      return <Tag color="blue" style={{ fontWeight: 500, borderRadius: 4 }}>Investigador</Tag>;
     case 'field_investigator':
-      return <Tag color="cyan">Investigador Campo</Tag>;
+    case 'investigador_campo':
+    case 'investigador de campo':
+      return <Tag color="cyan" style={{ fontWeight: 500, borderRadius: 4 }}>Investigador de Campo</Tag>;
     case 'maintenance':
-      return <Tag color="orange">Mantenimiento</Tag>;
+    case 'mantenimiento':
+      return <Tag color="orange" style={{ fontWeight: 500, borderRadius: 4 }}>Mantenimiento</Tag>;
     case 'user':
+    case 'usuario':
     default:
-      return <Tag color="default">Usuario</Tag>;
+      return <Tag color="default" style={{ fontWeight: 500, borderRadius: 4 }}>Usuario</Tag>;
   }
+};
+
+const formatCommentTime = (dateVal) => {
+  if (!dateVal) return '';
+  const d = new Date(dateVal);
+  if (isNaN(d.getTime())) return String(dateVal);
+
+  const prose = formatDateProse(d);
+  const numeric = formatDateDDMMYYYY(d);
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+
+  return {
+    display: `${prose} a las ${hours}:${minutes}`,
+    numeric,
+    full: `${prose} — ${hours}:${minutes} (${numeric})`,
+  };
 };
 
 /**
@@ -193,7 +220,9 @@ const CommentsPanel = ({
 
   const canModifyComment = (item) => {
     if (isAdmin) return true;
-    if (currentUserId && item.user_id && String(item.user_id) === String(currentUserId)) {
+    const authorObj = item.author || {};
+    const authorId = authorObj.user_id || item.user_id;
+    if (currentUserId && authorId && String(authorId).trim() === String(currentUserId).trim()) {
       return true;
     }
     return false;
@@ -230,7 +259,7 @@ const CommentsPanel = ({
       {/* List of comments */}
       <div
         style={{
-          maxHeight: compact ? '280px' : '400px',
+          maxHeight: compact ? '280px' : '420px',
           overflowY: 'auto',
           paddingRight: 6,
           marginBottom: 16,
@@ -253,25 +282,37 @@ const CommentsPanel = ({
             renderItem={(item) => {
               const cId = item.comment_id || item.id;
               const isEditing = editingId === cId;
-              const authorName =
-                [item.first_name, item.last_name].filter(Boolean).join(' ') ||
-                item.email ||
-                'Usuario';
-              const isAuthor =
-                currentUserId && item.user_id && String(item.user_id) === String(currentUserId);
-              const createdAtFormatted = item.created_at
-                ? new Date(item.created_at).toLocaleString()
-                : '';
+
+              // Robust extraction supporting both nested author object and flat fields
+              const authorObj = item.author || {};
+              const authorId = authorObj.user_id || item.user_id;
+              const firstName = (authorObj.first_name || item.first_name || '').trim();
+              const lastName = (authorObj.last_name || item.last_name || '').trim();
+              const fullName = [firstName, lastName].filter(Boolean).join(' ');
+              const email = authorObj.email || item.email || '';
+              const authorName = fullName || email || 'Usuario';
+              const role = authorObj.role || item.role || 'user';
+
+              const isAuthor = Boolean(
+                currentUserId &&
+                authorId &&
+                String(authorId).trim() === String(currentUserId).trim()
+              );
+
+              const timeInfo = formatCommentTime(item.created_at);
 
               return (
                 <List.Item
                   key={cId}
                   style={{
-                    padding: '10px 12px',
-                    backgroundColor: isAuthor ? '#fff' : '#f9f9f9',
+                    padding: '12px 14px',
+                    backgroundColor: isAuthor ? '#f0f7ff' : '#ffffff',
                     borderRadius: 8,
-                    marginBottom: 8,
-                    border: '1px solid #f0f0f0',
+                    marginBottom: 10,
+                    border: isAuthor ? '1px solid #bae0ff' : '1px solid #f0f0f0',
+                    borderLeft: isAuthor ? '4px solid #1890ff' : '4px solid #fa8c16',
+                    boxShadow: isAuthor ? '0 2px 6px rgba(24,144,255,0.06)' : '0 1px 3px rgba(0,0,0,0.03)',
+                    transition: 'all 0.2s ease',
                   }}
                   actions={
                     !isEditing && canModifyComment(item)
@@ -306,22 +347,41 @@ const CommentsPanel = ({
                         style={{
                           backgroundColor: isAuthor ? '#1890ff' : '#fa8c16',
                           verticalAlign: 'middle',
+                          fontWeight: 'bold',
                         }}
-                        icon={<UserOutlined />}
+                        icon={!authorName ? <UserOutlined /> : undefined}
                       >
                         {authorName.charAt(0).toUpperCase()}
                       </Avatar>
                     }
                     title={
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                        <Text strong style={{ fontSize: 13 }}>
+                        <Text strong style={{ fontSize: 13, color: isAuthor ? '#096dd9' : '#262626' }}>
                           {authorName}
                         </Text>
-                        {getRoleTag(item.role)}
-                        {createdAtFormatted && (
-                          <Text type="secondary" style={{ fontSize: 11 }}>
-                            {createdAtFormatted}
-                          </Text>
+                        {isAuthor && (
+                          <Tag
+                            color="#108ee9"
+                            style={{
+                              margin: 0,
+                              fontSize: 10,
+                              fontWeight: 700,
+                              borderRadius: 10,
+                              padding: '0 6px',
+                              lineHeight: '18px',
+                            }}
+                          >
+                            Tú
+                          </Tag>
+                        )}
+                        {getRoleTag(role)}
+                        {timeInfo.display && (
+                          <Tooltip title={timeInfo.full}>
+                            <Text type="secondary" style={{ fontSize: 11, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                              <ClockCircleOutlined style={{ fontSize: 10 }} />
+                              {timeInfo.display}
+                            </Text>
+                          </Tooltip>
                         )}
                       </div>
                     }
@@ -354,10 +414,11 @@ const CommentsPanel = ({
                       ) : (
                         <Paragraph
                           style={{
-                            margin: '4px 0 0',
+                            margin: '6px 0 0',
                             whiteSpace: 'pre-wrap',
                             color: '#262626',
                             fontSize: 13,
+                            lineHeight: 1.5,
                           }}
                         >
                           {item.comment_text}
@@ -388,7 +449,7 @@ const CommentsPanel = ({
             }
           }}
         />
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '15px' }}>
           <Text type="secondary" style={{ fontSize: 11 }}>
             Presiona Ctrl + Enter para enviar
           </Text>
