@@ -600,10 +600,9 @@ ALTER TABLE `field_trip_participants`
   ADD CONSTRAINT `fk_ftp_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
-<<<<<<< Updated upstream
--- Filtros para la tabla `geomanifestations`
-=======
 -- Constraints for table `geomanifestations`
+--
+ALTER TABLE `geomanifestations`
   ADD CONSTRAINT `fk_gm_canton_snit_code` FOREIGN KEY (`canton_snit_code`) REFERENCES `cantons` (`canton_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_gm_district_snit_code` FOREIGN KEY (`district_snit_code`) REFERENCES `districts` (`district_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_gm_field_trip_id` FOREIGN KEY (`field_trip_id`) REFERENCES `field_trips` (`field_trip_id`) ON DELETE SET NULL ON UPDATE CASCADE,
