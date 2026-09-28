@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.3
 -- https://www.phpmyadmin.net/
 --
--- Servidor: localhost
--- Tiempo de generación: 09-08-2026 a las 02:17:06
--- Versión del servidor: 10.4.28-MariaDB
--- Versión de PHP: 8.0.28
+-- Host: localhost
+-- Generation Time: Sep 12, 2026 at 01:03 PM
+-- Server version: 12.3.3-MariaDB
+-- PHP Version: 8.5.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -17,13 +17,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `GeoterRA`
+-- Database: `GeoterRA`
 --
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `access_tokens`
+-- Table structure for table `access_tokens`
 --
 
 CREATE TABLE `access_tokens` (
@@ -35,12 +35,10 @@ CREATE TABLE `access_tokens` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
-
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `cantons`
+-- Table structure for table `cantons`
 --
 
 CREATE TABLE `cantons` (
@@ -52,12 +50,10 @@ CREATE TABLE `cantons` (
   `created_by` char(26) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
-
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `comments`
+-- Table structure for table `comments`
 --
 
 CREATE TABLE `comments` (
@@ -72,7 +68,7 @@ CREATE TABLE `comments` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `districts`
+-- Table structure for table `districts`
 --
 
 CREATE TABLE `districts` (
@@ -84,12 +80,10 @@ CREATE TABLE `districts` (
   `created_by` char(26) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
-
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `field_trips`
+-- Table structure for table `field_trips`
 --
 
 CREATE TABLE `field_trips` (
@@ -109,7 +103,7 @@ CREATE TABLE `field_trips` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `field_trip_participants`
+-- Table structure for table `field_trip_participants`
 --
 
 CREATE TABLE `field_trip_participants` (
@@ -121,7 +115,7 @@ CREATE TABLE `field_trip_participants` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `geomanifestations`
+-- Table structure for table `geomanifestations`
 --
 
 CREATE TABLE `geomanifestations` (
@@ -141,12 +135,10 @@ CREATE TABLE `geomanifestations` (
   `created_by` char(26) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
-
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `georeports`
+-- Table structure for table `georeports`
 --
 
 CREATE TABLE `georeports` (
@@ -160,12 +152,10 @@ CREATE TABLE `georeports` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
-
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `inlab_tests`
+-- Table structure for table `inlab_tests`
 --
 
 CREATE TABLE `inlab_tests` (
@@ -191,12 +181,10 @@ CREATE TABLE `inlab_tests` (
   `created_by` char(26) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
-
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `insitu_tests`
+-- Table structure for table `insitu_tests`
 --
 
 CREATE TABLE `insitu_tests` (
@@ -211,12 +199,10 @@ CREATE TABLE `insitu_tests` (
   `created_by` char(26) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
-
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `logs`
+-- Table structure for table `logs`
 --
 
 CREATE TABLE `logs` (
@@ -231,7 +217,7 @@ CREATE TABLE `logs` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `logs_entries`
+-- Table structure for table `logs_entries`
 --
 
 CREATE TABLE `logs_entries` (
@@ -240,12 +226,12 @@ CREATE TABLE `logs_entries` (
   `field_name` varchar(100) NOT NULL,
   `old_value` text DEFAULT NULL,
   `new_value` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `password_reset_tokens`
+-- Table structure for table `password_reset_tokens`
 --
 
 CREATE TABLE `password_reset_tokens` (
@@ -254,12 +240,10 @@ CREATE TABLE `password_reset_tokens` (
   `token_expiry` bigint(20) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
-
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `provinces`
+-- Table structure for table `provinces`
 --
 
 CREATE TABLE `provinces` (
@@ -270,12 +254,10 @@ CREATE TABLE `provinces` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
-
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `refresh_tokens`
+-- Table structure for table `refresh_tokens`
 --
 
 CREATE TABLE `refresh_tokens` (
@@ -292,9 +274,7 @@ CREATE TABLE `refresh_tokens` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
-
---
--- Disparadores `refresh_tokens`
+-- Triggers `refresh_tokens`
 --
 DELIMITER $$
 CREATE TRIGGER `prevent_double_use_before_insert` BEFORE UPDATE ON `refresh_tokens` FOR EACH ROW BEGIN
@@ -308,7 +288,7 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `requests`
+-- Table structure for table `requests`
 --
 
 CREATE TABLE `requests` (
@@ -332,12 +312,10 @@ CREATE TABLE `requests` (
   `relation_with_owner` enum('Familiar','Empleado','Socio','Conocido','Titular') DEFAULT 'Titular'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
-
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `requests_state`
+-- Table structure for table `requests_state`
 --
 
 CREATE TABLE `requests_state` (
@@ -349,12 +327,10 @@ CREATE TABLE `requests_state` (
   `created_by` char(26) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
-
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
@@ -373,14 +349,13 @@ CREATE TABLE `users` (
   `created_at` timestamp NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
-
 -- --------------------------------------------------------
 
 --
--- Estructura Stand-in para la vista `view_logs_entries`
--- (Véase abajo para la vista actual)
+-- Stand-in structure for view `view_logs_entries`
+-- (See below for the actual view)
 --
+
 CREATE TABLE `view_logs_entries` (
 `id` bigint(20)
 ,`log_id` bigint(20)
@@ -394,21 +369,12 @@ CREATE TABLE `view_logs_entries` (
 ,`updated_by_name` varchar(100)
 );
 
--- --------------------------------------------------------
-
 --
--- Estructura para la vista `view_logs_entries`
---
-DROP TABLE IF EXISTS `view_logs_entries`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_logs_entries`  AS SELECT `le`.`id` AS `id`, `le`.`log_id` AS `log_id`, `le`.`field_name` AS `field_name`, `le`.`old_value` AS `old_value`, `le`.`new_value` AS `new_value`, `l`.`auto_id` AS `auto_id`, `l`.`table_name` AS `table_name`, `l`.`updated_at` AS `updated_at`, `l`.`updated_by` AS `updated_by`, `l`.`updated_by_name` AS `updated_by_name` FROM (`logs_entries` `le` left join `logs` `l` on(`le`.`log_id` = `l`.`id`)) ;
-
---
--- Índices para tablas volcadas
+-- Indexes for dumped tables
 --
 
 --
--- Indices de la tabla `access_tokens`
+-- Indexes for table `access_tokens`
 --
 ALTER TABLE `access_tokens`
   ADD PRIMARY KEY (`access_token_id`),
@@ -416,7 +382,7 @@ ALTER TABLE `access_tokens`
   ADD KEY `fk_accesst_user_id` (`user_id`) USING BTREE;
 
 --
--- Indices de la tabla `cantons`
+-- Indexes for table `cantons`
 --
 ALTER TABLE `cantons`
   ADD PRIMARY KEY (`canton_id`),
@@ -425,7 +391,7 @@ ALTER TABLE `cantons`
   ADD KEY `fk_canton_province_snit_code` (`province_snit_code`);
 
 --
--- Indices de la tabla `comments`
+-- Indexes for table `comments`
 --
 ALTER TABLE `comments`
   ADD PRIMARY KEY (`comment_id`),
@@ -433,7 +399,7 @@ ALTER TABLE `comments`
   ADD KEY `fk_comments_user_id` (`user_id`);
 
 --
--- Indices de la tabla `districts`
+-- Indexes for table `districts`
 --
 ALTER TABLE `districts`
   ADD PRIMARY KEY (`district_id`),
@@ -442,7 +408,7 @@ ALTER TABLE `districts`
   ADD KEY `fk_district_canton_snit_code` (`canton_snit_code`);
 
 --
--- Indices de la tabla `field_trips`
+-- Indexes for table `field_trips`
 --
 ALTER TABLE `field_trips`
   ADD PRIMARY KEY (`field_trip_id`),
@@ -453,14 +419,14 @@ ALTER TABLE `field_trips`
   ADD KEY `idx_ft_is_active` (`field_trip_is_active`);
 
 --
--- Indices de la tabla `field_trip_participants`
+-- Indexes for table `field_trip_participants`
 --
 ALTER TABLE `field_trip_participants`
   ADD PRIMARY KEY (`field_trip_id`,`user_id`),
   ADD KEY `fk_ftp_user_id` (`user_id`);
 
 --
--- Indices de la tabla `geomanifestations`
+-- Indexes for table `geomanifestations`
 --
 ALTER TABLE `geomanifestations`
   ADD PRIMARY KEY (`geomanifestation_id`),
@@ -470,11 +436,11 @@ ALTER TABLE `geomanifestations`
   ADD KEY `fk_gm_district_snit_code` (`district_snit_code`) USING BTREE,
   ADD KEY `idx_gm_visibility` (`visibility`) USING BTREE,
   ADD KEY `fk_gm_current_georeport_id` (`current_georeport_id`) USING BTREE,
-  ADD KEY `fk_gm_field_trip_id` (`field_trip_id`) USING BTREE,
-  ADD KEY `idx_request_id` (`request_id`);
+  ADD KEY `idx_request_id` (`request_id`),
+  ADD KEY `fk_gm_field_trip_id` (`field_trip_id`);
 
 --
--- Indices de la tabla `georeports`
+-- Indexes for table `georeports`
 --
 ALTER TABLE `georeports`
   ADD PRIMARY KEY (`georeport_id`),
@@ -485,7 +451,7 @@ ALTER TABLE `georeports`
   ADD KEY `idx_gr_visibility` (`visibility`) USING BTREE;
 
 --
--- Indices de la tabla `inlab_tests`
+-- Indexes for table `inlab_tests`
 --
 ALTER TABLE `inlab_tests`
   ADD PRIMARY KEY (`inlab_test_id`),
@@ -494,7 +460,7 @@ ALTER TABLE `inlab_tests`
   ADD KEY `idx_inlabt_visibility` (`visibility`) USING BTREE;
 
 --
--- Indices de la tabla `insitu_tests`
+-- Indexes for table `insitu_tests`
 --
 ALTER TABLE `insitu_tests`
   ADD PRIMARY KEY (`insitu_test_id`),
@@ -503,27 +469,27 @@ ALTER TABLE `insitu_tests`
   ADD KEY `idx_insitut_visibility` (`visibility`) USING BTREE;
 
 --
--- Indices de la tabla `logs`
+-- Indexes for table `logs`
 --
 ALTER TABLE `logs`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indices de la tabla `logs_entries`
+-- Indexes for table `logs_entries`
 --
 ALTER TABLE `logs_entries`
   ADD PRIMARY KEY (`id`),
   ADD KEY `log_id` (`log_id`);
 
 --
--- Indices de la tabla `password_reset_tokens`
+-- Indexes for table `password_reset_tokens`
 --
 ALTER TABLE `password_reset_tokens`
   ADD PRIMARY KEY (`user_id`,`token`),
   ADD UNIQUE KEY `token` (`token`);
 
 --
--- Indices de la tabla `provinces`
+-- Indexes for table `provinces`
 --
 ALTER TABLE `provinces`
   ADD PRIMARY KEY (`province_id`),
@@ -532,7 +498,7 @@ ALTER TABLE `provinces`
   ADD KEY `fk_province_created_by` (`created_by`) USING BTREE;
 
 --
--- Indices de la tabla `refresh_tokens`
+-- Indexes for table `refresh_tokens`
 --
 ALTER TABLE `refresh_tokens`
   ADD PRIMARY KEY (`refresh_token_id`),
@@ -542,7 +508,7 @@ ALTER TABLE `refresh_tokens`
   ADD KEY `idx_refresh_user_family` (`user_id`,`family_id`);
 
 --
--- Indices de la tabla `requests`
+-- Indexes for table `requests`
 --
 ALTER TABLE `requests`
   ADD PRIMARY KEY (`request_id`),
@@ -554,14 +520,14 @@ ALTER TABLE `requests`
   ADD KEY `fk_r_district_snit_code` (`district_snit_code`) USING BTREE;
 
 --
--- Indices de la tabla `requests_state`
+-- Indexes for table `requests_state`
 --
 ALTER TABLE `requests_state`
   ADD PRIMARY KEY (`request_status_id`),
   ADD KEY `fk_rs_request_id` (`request_id`);
 
 --
--- Indices de la tabla `users`
+-- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`user_id`),
@@ -569,47 +535,56 @@ ALTER TABLE `users`
   ADD KEY `idx_users_active` (`deleted_at`,`is_deleted`);
 
 --
--- AUTO_INCREMENT de las tablas volcadas
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT de la tabla `logs`
+-- AUTO_INCREMENT for table `logs`
 --
 ALTER TABLE `logs`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3870;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `logs_entries`
+-- AUTO_INCREMENT for table `logs_entries`
 --
 ALTER TABLE `logs_entries`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7212;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+
+-- --------------------------------------------------------
 
 --
--- Restricciones para tablas volcadas
+-- Structure for view `view_logs_entries`
+--
+DROP TABLE IF EXISTS `view_logs_entries`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_logs_entries`  AS SELECT `le`.`id` AS `id`, `le`.`log_id` AS `log_id`, `le`.`field_name` AS `field_name`, `le`.`old_value` AS `old_value`, `le`.`new_value` AS `new_value`, `l`.`auto_id` AS `auto_id`, `l`.`table_name` AS `table_name`, `l`.`updated_at` AS `updated_at`, `l`.`updated_by` AS `updated_by`, `l`.`updated_by_name` AS `updated_by_name` FROM (`logs_entries` `le` left join `logs` `l` on(`le`.`log_id` = `l`.`id`)) ;
+
+--
+-- Constraints for dumped tables
 --
 
 --
--- Filtros para la tabla `cantons`
+-- Constraints for table `cantons`
 --
 ALTER TABLE `cantons`
   ADD CONSTRAINT `fk_canton_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_canton_province_snit_code` FOREIGN KEY (`province_snit_code`) REFERENCES `provinces` (`province_snit_code`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `comments`
+-- Constraints for table `comments`
 --
 ALTER TABLE `comments`
   ADD CONSTRAINT `fk_comments_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `districts`
+-- Constraints for table `districts`
 --
 ALTER TABLE `districts`
   ADD CONSTRAINT `fk_district_canton_snit_code` FOREIGN KEY (`canton_snit_code`) REFERENCES `cantons` (`canton_snit_code`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_district_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `field_trips`
+-- Constraints for table `field_trips`
 --
 ALTER TABLE `field_trips`
   ADD CONSTRAINT `fk_ft_canton_snit_code` FOREIGN KEY (`canton_snit_code`) REFERENCES `cantons` (`canton_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE,
@@ -618,24 +593,24 @@ ALTER TABLE `field_trips`
   ADD CONSTRAINT `fk_ft_province_snit_code` FOREIGN KEY (`province_snit_code`) REFERENCES `provinces` (`province_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `field_trip_participants`
+-- Constraints for table `field_trip_participants`
 --
 ALTER TABLE `field_trip_participants`
   ADD CONSTRAINT `fk_ftp_field_trip_id` FOREIGN KEY (`field_trip_id`) REFERENCES `field_trips` (`field_trip_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_ftp_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+<<<<<<< Updated upstream
 -- Filtros para la tabla `geomanifestations`
---
-ALTER TABLE `geomanifestations`
+=======
+-- Constraints for table `geomanifestations`
   ADD CONSTRAINT `fk_gm_canton_snit_code` FOREIGN KEY (`canton_snit_code`) REFERENCES `cantons` (`canton_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_gm_current_georeport_id` FOREIGN KEY (`current_georeport_id`) REFERENCES `georeports` (`georeport_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_gm_district_snit_code` FOREIGN KEY (`district_snit_code`) REFERENCES `districts` (`district_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_gm_field_trip_id` FOREIGN KEY (`field_trip_id`) REFERENCES `field_trips` (`field_trip_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_gm_province_snit_code` FOREIGN KEY (`province_snit_code`) REFERENCES `provinces` (`province_snit_code`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `georeports`
+-- Constraints for table `georeports`
 --
 ALTER TABLE `georeports`
   ADD CONSTRAINT `fk_gr_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON UPDATE CASCADE,
@@ -644,34 +619,34 @@ ALTER TABLE `georeports`
   ADD CONSTRAINT `fk_gr_insitu_test_id` FOREIGN KEY (`insitu_test_id`) REFERENCES `insitu_tests` (`insitu_test_id`) ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `inlab_tests`
+-- Constraints for table `inlab_tests`
 --
 ALTER TABLE `inlab_tests`
   ADD CONSTRAINT `fk_inlab_tests_manifestation_id` FOREIGN KEY (`geomanifestation_id`) REFERENCES `geomanifestations` (`geomanifestation_id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_inlabt_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `insitu_tests`
+-- Constraints for table `insitu_tests`
 --
 ALTER TABLE `insitu_tests`
   ADD CONSTRAINT `fk_insitu_test_manifestation_id` FOREIGN KEY (`geomanifestation_id`) REFERENCES `geomanifestations` (`geomanifestation_id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_insitut_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `logs_entries`
+-- Constraints for table `logs_entries`
 --
 ALTER TABLE `logs_entries`
   ADD CONSTRAINT `logs_entries_ibfk_1` FOREIGN KEY (`log_id`) REFERENCES `logs` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `refresh_tokens`
+-- Constraints for table `refresh_tokens`
 --
 ALTER TABLE `refresh_tokens`
   ADD CONSTRAINT `fk_refresht_replaced_by` FOREIGN KEY (`replaced_by`) REFERENCES `refresh_tokens` (`refresh_token_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_refresht_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `requests`
+-- Constraints for table `requests`
 --
 ALTER TABLE `requests`
   ADD CONSTRAINT `fk_r_canton_snit_code` FOREIGN KEY (`canton_snit_code`) REFERENCES `cantons` (`canton_snit_code`) ON DELETE NO ACTION ON UPDATE CASCADE,
@@ -680,10 +655,11 @@ ALTER TABLE `requests`
   ADD CONSTRAINT `fk_r_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `requests_state`
+-- Constraints for table `requests_state`
 --
 ALTER TABLE `requests_state`
   ADD CONSTRAINT `fk_rs_request_id` FOREIGN KEY (`request_id`) REFERENCES `requests` (`request_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
