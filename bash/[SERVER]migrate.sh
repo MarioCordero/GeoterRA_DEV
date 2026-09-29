@@ -3,11 +3,9 @@
 # SCRIPT DE MIGRACIÓN DE BASE DE DATOS (INCREMENTAL) - GeoterRA
 # ==============================================================================
 # Rutas de instalación en el servidor:
-#   - En el repositorio: /home/proyecto/GeoterRA_DEV/bash/[SERVER]migrate.sh
 #   - En el servidor web (CGI): /var/www/cgi-bin/migrate.sh (o /usr/lib/cgi-bin/migrate.sh)
 #
 # Para desplegar en CGI-BIN:
-#   sudo cp /home/proyecto/GeoterRA_DEV/bash/[SERVER]migrate.sh /var/www/cgi-bin/migrate.sh
 #   sudo chmod +x /var/www/cgi-bin/migrate.sh
 #
 # Invocación remota con curl (ejemplo):
