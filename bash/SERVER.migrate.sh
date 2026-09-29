@@ -9,7 +9,7 @@
 #   1. Consultar estado (GET):
 #      curl -k https://163.178.171.105/cgi-bin/SERVER.migrate.sh
 #
-#   2. Ejecutar migraciones pendientes (POST):
+#   2. Actualizar Git (pull) y Ejecutar migraciones pendientes (POST):
 #      curl -k -X POST -H 'X-Auth-Token: GeoterRA2026(!"#*' https://163.178.171.105/cgi-bin/SERVER.migrate.sh
 # ==============================================================================
 
@@ -87,7 +87,7 @@ if [ "$REQUEST_METHOD" == "GET" ] || [ "$1" == "--status" ]; then
     echo "📋 Total migraciones en BD: $TOTAL_APPLIED"
     echo ""
 
-    # Contar migraciones pendientes
+    # Contar migraciones pendientes en disco
     APPLIED_LIST=$("$MYSQL_BIN" -h"$DB_HOST" -u"$DB_USER" "$DB_NAME" -sN -e "
         SELECT \`migration_name\` FROM \`schema_migrations\`;
     ")
@@ -109,7 +109,7 @@ if [ "$REQUEST_METHOD" == "GET" ] || [ "$1" == "--status" ]; then
         echo "✨ Base de datos 100% al día. No hay migraciones pendientes."
     else
         echo ""
-        echo "⚠️ Hay $PENDING_COUNT migración(es) pendiente(s). Ejecuta con POST para aplicarlas."
+        echo "⚠️ Hay $PENDING_COUNT migración(es) pendiente(s). Ejecuta con POST para sincronizar Git y aplicarlas."
     fi
     echo "============================================================"
 
@@ -154,11 +154,27 @@ echo "📂 Directorio de migraciones: $MIGRATIONS_DIR"
 echo "🗄️ Base de datos objetivo:    $DB_NAME (Host: $DB_HOST)"
 
 # ------------------------------------------------------------------------------
-# 5. Respaldo Preventivo Obligatorio
+# 5. Sincronización Automática con Git (Pull de main antes de migrar)
+# ------------------------------------------------------------------------------
+echo ""
+echo "📦 Trayendo últimos cambios de Git (rama main)..."
+if [ -d "$PROJECT_ROOT/.git" ]; then
+    cd "$PROJECT_ROOT"
+    git config --global --add safe.directory "$PROJECT_ROOT" 2>/dev/null || true
+    git checkout main 2>&1 || true
+    PULL_OUTPUT=$(git pull origin main 2>&1 || true)
+    echo "   $PULL_OUTPUT"
+else
+    echo "⚠️ Advertencia: No se detectó repositorio Git en $PROJECT_ROOT."
+fi
+
+# ------------------------------------------------------------------------------
+# 6. Respaldo Preventivo Obligatorio
 # ------------------------------------------------------------------------------
 TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 BACKUP_FILE="${DB_DIR}/GeoterRA_[server]_${TIMESTAMP}.sql"
 
+echo ""
 echo "💾 Generando respaldo preventivo en: $(basename "$BACKUP_FILE")..."
 if "$DUMP_BIN" --routines --triggers -h"$DB_HOST" -u"$DB_USER" "$DB_NAME" > "$BACKUP_FILE" 2>/dev/null; then
     BACKUP_SIZE=$(ls -lh "$BACKUP_FILE" | awk '{print $5}')
@@ -168,7 +184,7 @@ else
 fi
 
 # ------------------------------------------------------------------------------
-# 6. Obtener Migraciones ya Aplicadas y Calcular Próximo Lote (Batch)
+# 7. Obtener Migraciones ya Aplicadas y Calcular Próximo Lote (Batch)
 # ------------------------------------------------------------------------------
 APPLIED_MIGRATIONS=$("$MYSQL_BIN" -h"$DB_HOST" -u"$DB_USER" "$DB_NAME" -sN -e "
     SELECT \`migration_name\` FROM \`schema_migrations\`;
@@ -179,7 +195,7 @@ NEXT_BATCH=$("$MYSQL_BIN" -h"$DB_HOST" -u"$DB_USER" "$DB_NAME" -sN -e "
 ")
 
 # ------------------------------------------------------------------------------
-# 7. Ejecución de Migraciones Pendientes
+# 8. Ejecución de Migraciones Pendientes
 # ------------------------------------------------------------------------------
 shopt -s nullglob
 MIGRATION_FILES=("$MIGRATIONS_DIR"/*.sql)
@@ -233,7 +249,7 @@ for FILE_PATH in "${SORTED_FILES[@]}"; do
 done
 
 # ------------------------------------------------------------------------------
-# 8. Resumen Final
+# 9. Resumen Final
 # ------------------------------------------------------------------------------
 LAST_APPLIED_NOW=$("$MYSQL_BIN" -h"$DB_HOST" -u"$DB_USER" "$DB_NAME" -sN -e "
     SELECT \`migration_name\` FROM \`schema_migrations\` ORDER BY \`migration_id\` DESC LIMIT 1;
