@@ -2,15 +2,61 @@
 -- GeoterRA - Migración 003: Módulo de Salidas de Campo, Comentarios y Vistas
 -- ==============================================================================
 -- Archivo:      003_add_field_trips_and_comments.sql
--- Descripción:  Agrega las tablas field_trips, field_trip_participants, comments,
---               la relación field_trip_id en geomanifestations y la vista de logs.
+-- Descripción:  Asegura índices en catálogos, agrega las tablas field_trips,
+--               field_trip_participants, comments, la relación field_trip_id
+--               en geomanifestations y la vista view_logs_entries.
 -- ==============================================================================
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
+SET @dbname = DATABASE();
+
 -- ------------------------------------------------------------------------------
--- 1. Tabla: field_trips (Salidas de Campo)
+-- 1. Asegurar índices en catálogos (requeridos para llaves foráneas)
+-- ------------------------------------------------------------------------------
+
+-- Índice en provinces (province_snit_code)
+SET @preparedStatement = (SELECT IF(
+  (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = @dbname AND TABLE_NAME = 'provinces' AND COLUMN_NAME = 'province_snit_code'
+  ) > 0,
+  "SELECT 1",
+  "ALTER TABLE `provinces` ADD UNIQUE KEY `unique_province_snit_code` (`province_snit_code`);"
+));
+PREPARE stmt FROM @preparedStatement;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Índice en cantons (canton_snit_code)
+SET @preparedStatement = (SELECT IF(
+  (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = @dbname AND TABLE_NAME = 'cantons' AND COLUMN_NAME = 'canton_snit_code'
+  ) > 0,
+  "SELECT 1",
+  "ALTER TABLE `cantons` ADD UNIQUE KEY `unique_canton_snit_code` (`canton_snit_code`);"
+));
+PREPARE stmt FROM @preparedStatement;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Índice en districts (district_snit_code)
+SET @preparedStatement = (SELECT IF(
+  (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = @dbname AND TABLE_NAME = 'districts' AND COLUMN_NAME = 'district_snit_code'
+  ) > 0,
+  "SELECT 1",
+  "ALTER TABLE `districts` ADD UNIQUE KEY `unique_district_snit_code` (`district_snit_code`);"
+));
+PREPARE stmt FROM @preparedStatement;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- ------------------------------------------------------------------------------
+-- 2. Tabla: field_trips (Salidas de Campo)
 -- ------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `field_trips` (
   `field_trip_id` char(26) NOT NULL,
@@ -37,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `field_trips` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ------------------------------------------------------------------------------
--- 2. Tabla: field_trip_participants (Participantes de Salidas de Campo)
+-- 3. Tabla: field_trip_participants (Participantes de Salidas de Campo)
 -- ------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `field_trip_participants` (
   `field_trip_id` char(26) NOT NULL,
@@ -50,7 +96,7 @@ CREATE TABLE IF NOT EXISTS `field_trip_participants` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ------------------------------------------------------------------------------
--- 3. Tabla: comments (Comentarios en Entidades)
+-- 4. Tabla: comments (Comentarios en Entidades)
 -- ------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `comments` (
   `comment_id` char(26) NOT NULL,
@@ -66,9 +112,8 @@ CREATE TABLE IF NOT EXISTS `comments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ------------------------------------------------------------------------------
--- 4. Modificación: Agregar field_trip_id a geomanifestations (si no existe)
+-- 5. Modificación: Agregar field_trip_id a geomanifestations (si no existe)
 -- ------------------------------------------------------------------------------
-SET @dbname = DATABASE();
 SET @tablename = "geomanifestations";
 SET @columnname = "field_trip_id";
 
@@ -99,7 +144,7 @@ EXECUTE addFkIfNotExists;
 DEALLOCATE PREPARE addFkIfNotExists;
 
 -- ------------------------------------------------------------------------------
--- 5. Vista: view_logs_entries
+-- 6. Vista: view_logs_entries
 -- ------------------------------------------------------------------------------
 CREATE OR REPLACE VIEW `view_logs_entries` AS 
 SELECT 
