@@ -1,0 +1,82 @@
+name: CONFIG - Distribuir .gitignore a otras ramas
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_branch:
+        description: 'Rama de origen con el .gitignore definitivo:'
+        required: true
+        default: 'develop'
+        type: choice
+        options:
+          - develop
+          - API
+          - main
+          - web
+          - mobile
+
+permissions:
+  contents: write
+
+jobs:
+  distribute-gitignore:
+    name: Distribuir .gitignore
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT || github.token }}
+
+      - name: Configurar identidad de Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin
+
+      - name: Validar y copiar .gitignore a todas las ramas
+        run: |
+          SOURCE="${{ inputs.source_branch }}"
+          echo "📥 Rama de origen seleccionada: $SOURCE"
+
+          # Ramas destino a sincronizar
+          TARGET_BRANCHES=("develop" "main" "API" "web" "mobile")
+
+          # Obtener la versión de .gitignore de la rama origen y guardarla temporalmente
+          git checkout "origin/$SOURCE" -- .gitignore
+          cp .gitignore /tmp/gitignore_source
+
+          echo "🚀 Iniciando distribución de .gitignore..."
+
+          for BRANCH in "${TARGET_BRANCHES[@]}"; do
+            # Omitir la rama origen
+            if [ "$BRANCH" == "$SOURCE" ]; then
+              echo "⏭️ Omitiendo $BRANCH (es la rama origen)."
+              continue
+            fi
+
+            # Verificar si la rama existe en origin
+            if ! git show-ref --verify --quiet "refs/remotes/origin/$BRANCH"; then
+              echo "⚠️ Rama $BRANCH no encontrada en el repositorio remoto. Omitiendo."
+              continue
+            fi
+
+            echo "🔄 Actualizando .gitignore en rama: $BRANCH..."
+            git checkout "$BRANCH" || git checkout -b "$BRANCH" "origin/$BRANCH"
+
+            # Reemplazar con el archivo origen
+            cp /tmp/gitignore_source .gitignore
+            git add .gitignore
+
+            if ! git diff --cached --quiet; then
+              git commit -m "🔧 CI: Sincronización de .gitignore desde rama $SOURCE [skip ci]"
+              git push origin "$BRANCH"
+              echo "   ✅ .gitignore actualizado en $BRANCH."
+            else
+              echo "   ℹ️ .gitignore ya estaba al día en $BRANCH."
+            fi
+          done
+
+          echo "🎉 Distribución de .gitignore completada con éxito."

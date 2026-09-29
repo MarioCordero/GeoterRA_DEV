@@ -1,0 +1,85 @@
+name: MOBILE - Distribución de Mobile a Develop y Main
+
+on:
+  push:
+    branches:
+      - mobile
+      - Mobile
+    paths:
+      - 'Mobile/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-mobile:
+    name: Sincronizar carpeta Mobile/
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT || github.token }}
+
+      - name: Configurar identidad de Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin
+
+      # ------------------------------------------------------------------------
+      # 1. Sincronizar carpeta Mobile/ en rama develop
+      # ------------------------------------------------------------------------
+      - name: Sincronizar Mobile/ en develop
+        run: |
+          echo "🔄 Sincronizando Mobile/ en develop..."
+          
+          # Detectar si la rama remota es 'Mobile' o 'mobile'
+          SRC_BRANCH="mobile"
+          if git show-ref --verify --quiet refs/remotes/origin/Mobile; then
+            SRC_BRANCH="Mobile"
+          fi
+
+          git checkout develop || git checkout -b develop origin/develop
+          
+          rm -rf Mobile/
+          git checkout "origin/$SRC_BRANCH" -- Mobile/
+          git add Mobile/
+
+          if ! git diff --cached --quiet; then
+            git commit -m "📱 CI: Sincronización automática de Mobile/ desde rama $SRC_BRANCH [skip ci]"
+            git push origin develop
+            echo "✅ Mobile/ sincronizado en develop exitosamente."
+          else
+            echo "ℹ️ No hay cambios en Mobile/ para la rama develop."
+          fi
+
+      # ------------------------------------------------------------------------
+      # 2. Sincronizar carpeta Mobile/ en rama main
+      # ------------------------------------------------------------------------
+      - name: Sincronizar Mobile/ en main
+        run: |
+          echo "🔄 Sincronizando Mobile/ en main..."
+          
+          # Detectar si la rama remota es 'Mobile' o 'mobile'
+          SRC_BRANCH="mobile"
+          if git show-ref --verify --quiet refs/remotes/origin/Mobile; then
+            SRC_BRANCH="Mobile"
+          fi
+
+          git checkout main || git checkout -b main origin/main
+          
+          rm -rf Mobile/
+          git checkout "origin/$SRC_BRANCH" -- Mobile/
+          git add Mobile/
+
+          if ! git diff --cached --quiet; then
+            git commit -m "📱 CI: Sincronización automática de Mobile/ desde rama $SRC_BRANCH [skip ci]"
+            git push origin main
+            echo "✅ Mobile/ sincronizado en main exitosamente."
+          else
+            echo "ℹ️ No hay cambios en Mobile/ para la rama main."
+          fi

@@ -1,0 +1,73 @@
+name: DATABASE - Distribución de Database (Branch API) a Develop y Main
+
+on:
+  push:
+    branches:
+      - API
+    paths:
+      - 'database/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-database:
+    name: Sincronizar carpeta database/
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio completo
+        uses: actions/checkout@v4
+        with:
+          ref: API
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT || github.token }}
+
+      - name: Configurar identidad de Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin
+
+      # ------------------------------------------------------------------------
+      # 1. Sincronizar en la rama develop (Default)
+      # ------------------------------------------------------------------------
+      - name: Sincronizar database/ en rama develop
+        run: |
+          echo "🔄 Sincronizando en develop..."
+          git checkout develop || git checkout -b develop origin/develop
+          
+          # Limpiar y traer la versión exacta de database/ desde API
+          rm -rf database/
+          git checkout origin/API -- database/
+          git add database/
+
+          if ! git diff --cached --quiet; then
+            git commit -m "🗄️ CI: Sincronización automática de database/ desde rama API [skip ci]"
+            git push origin develop
+            echo "✅ Cambios de database/ enviados a develop exitosamente."
+          else
+            echo "ℹ️ No hay cambios pendientes en database/ para la rama develop."
+          fi
+
+      # ------------------------------------------------------------------------
+      # 2. Sincronizar en la rama main
+      # ------------------------------------------------------------------------
+      - name: Sincronizar database/ en rama main
+        run: |
+          echo "🔄 Sincronizando en main..."
+          git checkout main || git checkout -b main origin/main
+          
+          # Limpiar y traer la versión exacta de database/ desde API
+          rm -rf database/
+          git checkout origin/API -- database/
+          git add database/
+
+          if ! git diff --cached --quiet; then
+            git commit -m "🗄️ CI: Sincronización automática de database/ desde rama API [skip ci]"
+            git push origin main
+            echo "✅ Cambios de database/ enviados a main exitosamente."
+          else
+            echo "ℹ️ No hay cambios pendientes en database/ para la rama main."
+          fi
