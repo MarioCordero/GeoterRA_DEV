@@ -79,7 +79,7 @@ final class CommentController
 
   /**
    * DELETE /comments/{id}
-   * Deletes a comment by ID (author or admin).
+   * Deletes a comment by ID (author only).
    */
   public function delete(string $id): void
   {

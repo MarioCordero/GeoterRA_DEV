@@ -126,7 +126,7 @@ final class CommentService
 
   /**
    * Deletes a comment by ID.
-   * A user can only delete their own comment, whereas an admin can delete any comment.
+   * Only the author of the comment can delete it.
    *
    * @param string $id
    * @return void
@@ -148,7 +148,7 @@ final class CommentService
     }
 
     $auth = $this->authService->requireAuth();
-    if ($auth['role'] !== AllowedUserRoles::ADMIN && $comment['user_id'] !== $auth['user_id']) {
+    if ($comment['user_id'] !== $auth['user_id']) {
       throw new ApiException(ErrorType::forbidden('You can only delete your own comments'), 403);
     }
 
