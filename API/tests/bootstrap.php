@@ -77,7 +77,8 @@ function initializeTestDatabase(): PDO
 
   // Names of the databases
   $prodDbName = 'GeoterRA';
-  $testDbName = 'GeoterRA_test';
+  $testToken = getenv('TEST_TOKEN') ?: ($_SERVER['TEST_TOKEN'] ?? ($_ENV['TEST_TOKEN'] ?? ''));
+  $testDbName = 'GeoterRA_test' . ($testToken !== '' ? '_' . $testToken : '');
 
   // Connect to production database (to read schema)
   if (!empty($socket)) {

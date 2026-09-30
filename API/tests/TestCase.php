@@ -75,7 +75,7 @@ abstract class TestCase extends PHPUnitTestCase
         $userId = $overrides['user_id'] ?? $overrides['id'] ?? UlidGenerator::generate();
         $firstName = $overrides['first_name'] ?? $overrides['name'] ?? 'Test';
         $lastName = $overrides['last_name'] ?? $overrides['lastname'] ?? 'User';
-        $email = $overrides['email'] ?? 'testuser' . rand(1000, 9999) . '@example.com';
+        $email = $overrides['email'] ?? 'testuser_' . UlidGenerator::generate() . '@example.com';
         $password = $overrides['password'] ?? 'Password123!';
         $passwordHash = $overrides['password_hash'] ?? password_hash($password, PASSWORD_BCRYPT);
         $phone = $overrides['phone_number'] ?? $overrides['phone'] ?? null;
