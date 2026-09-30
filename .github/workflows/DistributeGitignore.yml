@@ -1,4 +1,4 @@
-name: CONFIG - Distribuir .gitignore a otras ramas
+name: GITIGNORE - Distribuir .gitignore a otras ramas
 
 on:
   workflow_dispatch:

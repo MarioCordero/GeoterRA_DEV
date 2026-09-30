@@ -7,8 +7,16 @@ permissions:
   contents: write
 
 jobs:
-  test-and-sync:
+  # ----------------------------------------------------------------------------
+  # FASE 1: PRUEBAS AUTOMATIZADAS (TESTS)
+  # ----------------------------------------------------------------------------
+  test:
+    name: Pruebas Unitarias API (${{ matrix.suite }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        suite: ['DTO', 'Services']
 
     services:
       mysql:
@@ -25,17 +33,26 @@ jobs:
         with:
           ref: API
           fetch-depth: 0 
-          token: ${{ secrets.GH_PAT }} # Requerido si tienes ramas protegidas
+          token: ${{ secrets.GH_PAT }}
 
       - name: Configurar PHP 8.3
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
           extensions: pdo, pdo_mysql 
-          
+          coverage: none
+
+      - name: Cache de dependencias Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache/files
+          key: ${{ runner.os }}-composer-${{ hashFiles('API/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
       - name: Instalar Dependencias
         working-directory: ./API
-        run: composer install --no-interaction --prefer-dist
+        run: composer install --no-interaction --prefer-dist --no-progress
 
       - name: Preparar Base de Datos MySQL
         working-directory: ./API
@@ -45,58 +62,52 @@ jobs:
           mysql -h 127.0.0.1 -u root -proot GeoterRA < ../database/GeoterRA_schema.sql
           mysql -h 127.0.0.1 -u root -proot GeoterRA_test < ../database/GeoterRA_schema.sql
 
-      - name: Ejecutar Pruebas Unitarias
+      - name: Ejecutar Suite de Pruebas (${{ matrix.suite }})
         working-directory: ./API
         env:
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
           DB_USER: root
           DB_PASS: root
-        run: ./vendor/bin/phpunit 
+        run: ./vendor/bin/phpunit --testsuite ${{ matrix.suite }} --no-coverage
+
+  # ----------------------------------------------------------------------------
+  # FASE 2: DISTRIBUCIÓN PARALELA A RAMAS DE DESTINO
+  # ----------------------------------------------------------------------------
+  distribute:
+    name: Sincronizar API en rama ${{ matrix.target_branch }}
+    needs: [test]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target_branch: [develop, web, mobile]
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+        with:
+          ref: API
+          fetch-depth: 0 
+          token: ${{ secrets.GH_PAT }}
 
       - name: Configurar usuario de Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin # Nos aseguramos de tener todas las ramas remotas actualizadas
+          git fetch origin
 
-      # --- SINCRONIZACIÓN EXCLUSIVA DE API/ ---
-
-      - name: Sincronizar API en develop
+      - name: Sincronizar API en ${{ matrix.target_branch }}
         run: |
-          git checkout develop || git checkout -b develop origin/develop
+          echo "🔄 Sincronizando API/ en ${{ matrix.target_branch }}..."
+          git checkout ${{ matrix.target_branch }} || git checkout -b ${{ matrix.target_branch }} origin/${{ matrix.target_branch }}
           rm -rf API/
           git checkout origin/API -- API/
           git add API/
           if ! git diff --cached --quiet; then
             git commit -m "🚀 CI: Auto-sync de API/ desde rama API [skip ci]"
-            git push origin develop
+            git push origin ${{ matrix.target_branch }}
+            echo "✅ API/ sincronizado en ${{ matrix.target_branch }} exitosamente."
           else
-            echo "No hay cambios nuevos en API para la rama develop."
-          fi
-
-      - name: Sincronizar API en web
-        run: |
-          git checkout web || git checkout -b web origin/web
-          rm -rf API/
-          git checkout origin/API -- API/
-          git add API/
-          if ! git diff --cached --quiet; then
-            git commit -m "🚀 CI: Auto-sync de API/ desde rama API [skip ci]"
-            git push origin web
-          else
-            echo "No hay cambios nuevos en API para la rama web."
-          fi
-
-      - name: Sincronizar API en mobile
-        run: |
-          git checkout mobile || git checkout -b mobile origin/mobile
-          rm -rf API/
-          git checkout origin/API -- API/
-          git add API/
-          if ! git diff --cached --quiet; then
-            git commit -m "🚀 CI: Auto-sync de API/ desde rama API [skip ci]"
-            git push origin mobile
-          else
-            echo "No hay cambios nuevos en API para la rama mobile."
+            echo "ℹ️ No hay cambios nuevos en API para la rama ${{ matrix.target_branch }}."
           fi
