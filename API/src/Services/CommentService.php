@@ -46,7 +46,7 @@ final class CommentService
    */
   public function create(string $entityType, string $entityId, RegisterCommentDTO $dto): array
   {
-    Request::requireRole([
+    $auth = Request::requireRole([
       AllowedUserRoles::ADMIN,
       AllowedUserRoles::FIELD_INVESTIGATOR,
       AllowedUserRoles::INVESTIGATOR,
@@ -56,7 +56,6 @@ final class CommentService
     $dto->validate($entityType);
     $this->validateEntityExists($entityType, $entityId);
 
-    $auth = $this->authService->requireAuth();
     $created = $this->repository->create($entityType, $entityId, $auth['user_id'], $dto->commentText);
 
     return $this->formatComment($created);
@@ -100,7 +99,7 @@ final class CommentService
    */
   public function update(string $id, UpdateCommentDTO $dto): array
   {
-    Request::requireRole([
+    $auth = Request::requireRole([
       AllowedUserRoles::ADMIN,
       AllowedUserRoles::FIELD_INVESTIGATOR,
       AllowedUserRoles::INVESTIGATOR,
@@ -115,7 +114,6 @@ final class CommentService
       throw new ApiException(ErrorType::notFound('Comment'), 404);
     }
 
-    $auth = $this->authService->requireAuth();
     if ($comment['user_id'] !== $auth['user_id']) {
       throw new ApiException(ErrorType::forbidden('You can only edit your own comments'), 403);
     }
@@ -126,7 +124,7 @@ final class CommentService
 
   /**
    * Deletes a comment by ID.
-   * A user can only delete their own comment, whereas an admin can delete any comment.
+   * Only the author of the comment can delete it.
    *
    * @param string $id
    * @return void
@@ -134,7 +132,7 @@ final class CommentService
    */
   public function delete(string $id): void
   {
-    Request::requireRole([
+    $auth = Request::requireRole([
       AllowedUserRoles::ADMIN,
       AllowedUserRoles::FIELD_INVESTIGATOR,
       AllowedUserRoles::INVESTIGATOR,
@@ -147,8 +145,7 @@ final class CommentService
       throw new ApiException(ErrorType::notFound('Comment'), 404);
     }
 
-    $auth = $this->authService->requireAuth();
-    if ($auth['role'] !== AllowedUserRoles::ADMIN && $comment['user_id'] !== $auth['user_id']) {
+    if ($comment['user_id'] !== $auth['user_id']) {
       throw new ApiException(ErrorType::forbidden('You can only delete your own comments'), 403);
     }
 

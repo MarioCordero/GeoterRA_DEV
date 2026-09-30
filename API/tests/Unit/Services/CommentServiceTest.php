@@ -137,7 +137,7 @@ class CommentServiceTest extends TestCase
     $this->service->update(UlidGenerator::generate(), $dto);
   }
 
-  public function testAdminCanDeleteAnyComment(): void
+  public function testAdminCannotDeleteAnotherUsersComment(): void
   {
     $author = $this->createTestUser(['role' => AllowedUserRoles::USER]);
     $admin = $this->createTestUser(['role' => AllowedUserRoles::ADMIN]);
@@ -145,11 +145,11 @@ class CommentServiceTest extends TestCase
     $comment = $this->createComment($author['user_id'], 'Comentario a borrar');
 
     $this->authenticateAs($admin);
-    $this->service->delete($comment['comment_id']);
 
-    $stmt = $this->pdo->prepare("SELECT * FROM comments WHERE comment_id = :id");
-    $stmt->execute(['id' => $comment['comment_id']]);
-    $this->assertFalse($stmt->fetch());
+    $this->expectException(ApiException::class);
+    $this->expectExceptionCode(403);
+
+    $this->service->delete($comment['comment_id']);
   }
 
   public function testAuthorCanDeleteOwnComment(): void
