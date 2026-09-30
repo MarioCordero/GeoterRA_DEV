@@ -61,7 +61,7 @@ final class CommentController
 
   /**
    * PUT /comments/{id}
-   * Updates an existing comment (author or admin).
+   * Updates an existing comment (author only).
    */
   public function update(string $id): void
   {
