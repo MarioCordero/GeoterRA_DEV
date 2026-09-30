@@ -91,7 +91,7 @@ final class CommentService
 
   /**
    * Updates an existing comment.
-   * A user can only update their own comment, whereas an admin can update any comment.
+   * Only the author of the comment can update it.
    *
    * @param string $id
    * @param UpdateCommentDTO $dto
@@ -116,7 +116,7 @@ final class CommentService
     }
 
     $auth = $this->authService->requireAuth();
-    if ($auth['role'] !== AllowedUserRoles::ADMIN && $comment['user_id'] !== $auth['user_id']) {
+    if ($comment['user_id'] !== $auth['user_id']) {
       throw new ApiException(ErrorType::forbidden('You can only edit your own comments'), 403);
     }
 
