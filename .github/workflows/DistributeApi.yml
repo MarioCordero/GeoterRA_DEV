@@ -1,4 +1,4 @@
-name: API - Distribución de API a Develop, Web y Mobile
+name: API - Distribución de API a Develop, Main, Web y Mobile
 
 on:
   workflow_dispatch:
@@ -81,7 +81,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target_branch: [develop, web, mobile]
+        target_branch: [develop, main, web, mobile]
 
     steps:
       - name: Descargar el código
