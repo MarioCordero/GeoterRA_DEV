@@ -168,6 +168,8 @@ final class GeomanifestationService
       'geomanifestation_id' => $row['geomanifestation_id'],
       'geomanifestation_name' => $row['geomanifestation_name'],
       'description' => $row['manifestation_description'],
+      'field_trip_id' => $row['field_trip_id'] ?? null,
+      'field_trip_name' => $row['field_trip_name'] ?? null,
       'created_at' => $row['manifestation_created_at'],
       'location' => [
         'province' => $row['province_name'],

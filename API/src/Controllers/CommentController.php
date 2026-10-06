@@ -61,7 +61,7 @@ final class CommentController
 
   /**
    * PUT /comments/{id}
-   * Updates an existing comment (author or admin).
+   * Updates an existing comment (author only).
    */
   public function update(string $id): void
   {
@@ -79,7 +79,7 @@ final class CommentController
 
   /**
    * DELETE /comments/{id}
-   * Deletes a comment by ID (author or admin).
+   * Deletes a comment by ID (author only).
    */
   public function delete(string $id): void
   {
