@@ -1,4 +1,4 @@
-name: TODO WEBSITE - Build y Distribución de Website a Develop y Main
+name: WEBSITE - Build y Distribución de Website a Develop y Main
 
 on:
   push:
@@ -28,12 +28,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'website/package-lock.json'
 
       - name: Instalar Dependencias y Construir Frontend
         working-directory: ./website
         run: |
           npm ci || npm install
           npm run build
+
+      - name: Respaldar build temporalmente
+        run: |
+          mkdir -p /tmp/website_dist
+          cp -r website/dist/. /tmp/website_dist/
+          echo "📦 Contenido del build generado en website/dist/:"
+          ls -la /tmp/website_dist
 
       - name: Configurar identidad de Git
         run: |
@@ -42,7 +51,7 @@ jobs:
           git fetch origin
 
       # ------------------------------------------------------------------------
-      # 1. Sincronizar carpeta website/ en rama develop
+      # 1. Sincronizar carpeta website/ en rama develop (código fuente)
       # ------------------------------------------------------------------------
       - name: Sincronizar website/ en develop
         run: |
@@ -64,22 +73,37 @@ jobs:
       # ------------------------------------------------------------------------
       # 2. Sincronizar carpeta website/ y build de producción en rama main
       # ------------------------------------------------------------------------
-      - name: Sincronizar website/ en main
+      - name: Sincronizar website/ y dist en main
         run: |
-          echo "🔄 Sincronizando website/ en main..."
+          echo "🔄 Sincronizando website/ y dist/ en main..."
           git checkout main || git checkout -b main origin/main
           
+          # 1. Sincronizar código fuente desde origin/web
           rm -rf website/
           git checkout origin/web -- website/
           
-          # Inyectar el build compilado en website/dist
-          git checkout origin/web -- website/
+          # 2. Restaurar la distribución compilada en website/dist/
+          rm -rf website/dist
+          mkdir -p website/dist
+          cp -r /tmp/website_dist/. website/dist/
+          
+          # 3. Registrar cambios en git (forzando dist/ ya que está en .gitignore)
           git add website/
+          git add -f website/dist/
+          git add -u website/dist/
 
           if ! git diff --cached --quiet; then
-            git commit -m "🌐 CI: Sincronización automática de website/ desde rama web [skip ci]"
+            git commit -m "🌐 CI: Sincronización automática de website/ y build de producción en main [skip ci]"
             git push origin main
-            echo "✅ website/ sincronizado en main exitosamente."
+            echo "✅ website/ y dist/ sincronizados en main exitosamente."
           else
-            echo "ℹ️ No hay cambios en website/ para la rama main."
+            echo "ℹ️ No hay cambios en website/ ni dist/ para la rama main."
           fi
+
+      # ------------------------------------------------------------------------
+      # 3. Notificar al servidor de producción para desplegar la actualización
+      # ------------------------------------------------------------------------
+      - name: Actualizar servidor de producción (SERVER.pull.sh)
+        run: |
+          echo "🚀 Notificando al servidor de producción para ejecutar git pull..."
+          curl -k https://163.178.171.105/cgi-bin/SERVER.pull.sh
