@@ -409,7 +409,7 @@ const GeomanifeStationsManager = () => {
         throw new Error(resReport.error || 'Error al guardar el georeporte');
       }
 
-      message.success(`📋 Georeporte ${editingGeoreport ? 'actualizado' : 'asociado'} exitosamente`);
+      message.success(`Georeporte ${editingGeoreport ? 'actualizado' : 'asociado'} exitosamente 📋`);
       setGeoreportModalVisible(false);
       setEditingGeoreport(null);
       georeportForm.resetFields();
@@ -429,7 +429,7 @@ const GeomanifeStationsManager = () => {
       setPromotingId(id);
       const res = await georeportsAdminPromote(id);
       if (res.ok) {
-        message.success('⭐ Georeporte establecido como vigente oficial para el mapa');
+        message.success('Georeporte establecido como vigente oficial para el mapa ⭐');
         loadStudiesForGeo(selectedGeo?.geomanifestation_id || selectedGeo?.id);
         loadManifestations();
       } else {
@@ -501,7 +501,7 @@ const GeomanifeStationsManager = () => {
       }
 
       if (res.ok) {
-        message.success(editingInsituTest ? '🌿 Prueba In-Situ actualizada exitosamente' : '🌿 Prueba In-Situ registrada exitosamente');
+        message.success(editingInsituTest ? 'Prueba In-Situ actualizada exitosamente 🌿' : 'Prueba In-Situ registrada exitosamente🌿');
         setQuickInsituModalVisible(false);
         setEditingInsituTest(null);
         quickInsituForm.resetFields();
@@ -588,7 +588,7 @@ const GeomanifeStationsManager = () => {
       }
 
       if (res.ok) {
-        message.success(editingInlabTest ? '🧪 Prueba de Laboratorio actualizada exitosamente' : '🧪 Prueba de Laboratorio registrada exitosamente');
+        message.success(editingInlabTest ? 'Prueba de Laboratorio actualizada exitosamente 🧪' : 'Prueba de Laboratorio registrada exitosamente 🧪');
         setQuickInlabModalVisible(false);
         setEditingInlabTest(null);
         quickInlabForm.resetFields();
@@ -753,7 +753,7 @@ const GeomanifeStationsManager = () => {
         throw new Error(result.error || 'Error al guardar la geomanifestación');
       }
 
-      message.success(`📍 Geomanifestación ${editingItem ? 'actualizada' : 'registrada en borrador'} correctamente`);
+      message.success(`Geomanifestación ${editingItem ? 'actualizada' : 'registrada en borrador'} correctamente 📍`);
       handleModalClose();
       loadManifestations();
     } catch (err) {
@@ -1228,11 +1228,10 @@ const GeomanifeStationsManager = () => {
         {/* Total */}
         <div
           onClick={() => setActiveTab('1')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            activeTab === '1'
-              ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${activeTab === '1'
+            ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Sitios</span>
@@ -1252,11 +1251,10 @@ const GeomanifeStationsManager = () => {
         {/* Publicas en Mapa */}
         <div
           onClick={() => setActiveTab('1')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            activeTab === '1'
-              ? 'border-emerald-400 shadow-md ring-2 ring-emerald-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${activeTab === '1'
+            ? 'border-emerald-400 shadow-md ring-2 ring-emerald-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Públicas en Mapa</span>
@@ -1274,11 +1272,10 @@ const GeomanifeStationsManager = () => {
         {/* Borradores */}
         <div
           onClick={() => setActiveTab('2')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            activeTab === '2'
-              ? 'border-amber-400 shadow-md ring-2 ring-amber-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${activeTab === '2'
+            ? 'border-amber-400 shadow-md ring-2 ring-amber-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">Borradores / En Estudio</span>
@@ -1453,7 +1450,7 @@ const GeomanifeStationsManager = () => {
                             onClick={() => handleOpenCreateGeoreportModal(selectedGeo)}
                             style={{ backgroundColor: '#fa8c16', borderColor: '#fa8c16' }}
                           >
-                            + Asociar Georeporte
+                            Asociar Georeporte
                           </Button>
                           <Button
                             icon={<ReloadOutlined />}
@@ -1505,7 +1502,7 @@ const GeomanifeStationsManager = () => {
                                     <Text strong style={{ fontSize: 14 }}>Georeporte #{repId}</Text>
                                     {isCurrent ? (
                                       <Tag color="gold" icon={<StarFilled />} style={{ fontWeight: 'bold' }}>
-                                        ⭐ Vigente Oficial en Mapa
+                                        Vigente Oficial en Mapa
                                       </Tag>
                                     ) : (
                                       <Tag color="default">Histórico</Tag>
@@ -1702,7 +1699,7 @@ const GeomanifeStationsManager = () => {
                           onClick={handleOpenCreateInsitu}
                           style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
                         >
-                          + Agregar Medición In-Situ
+                          Agregar Medición In-Situ
                         </Button>
                       </div>
 
@@ -1803,7 +1800,7 @@ const GeomanifeStationsManager = () => {
                           onClick={handleOpenCreateInlab}
                           style={{ backgroundColor: '#722ed1', borderColor: '#722ed1' }}
                         >
-                          + Agregar Prueba de Lab
+                          Agregar Prueba de Lab
                         </Button>
                       </div>
 

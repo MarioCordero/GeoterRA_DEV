@@ -166,12 +166,22 @@ const RequestsManager = () => {
 
   const submitApprovedPoint = async (pointData) => {
     try {
+      const requestId = selectedRequest.id_soli || selectedRequest.request_id || selectedRequest.id;
+      const gmName = (selectedRequest.name || selectedRequest.request_name || `GM-${requestId}`).trim();
+      const pCode = Number(selectedRequest.province_snit_code || selectedRequest.region_id);
+      const cCode = Number(selectedRequest.canton_snit_code);
+      const dCode = Number(selectedRequest.district_snit_code);
+
       const manifestationPayload = {
-        name: selectedRequest.name,
-        province_snit_code: parseInt(selectedRequest.province_snit_code || selectedRequest.region_id) || 1,
-        latitude: parseFloat(pointData.latitude),
-        longitude: parseFloat(pointData.longitude),
-        description: pointData.description || selectedRequest.details || `Manifestación generada desde la solicitud ${selectedRequest.name}`,
+        geomanifestation_name: gmName,
+        name: gmName,
+        province_snit_code: (!isNaN(pCode) && pCode > 0) ? pCode : 1,
+        canton_snit_code: (!isNaN(cCode) && cCode > 0) ? cCode : null,
+        district_snit_code: (!isNaN(dCode) && dCode > 0) ? dCode : null,
+        latitude: parseFloat(pointData.latitude) || parseFloat(selectedRequest.latitude) || 9.9333,
+        longitude: parseFloat(pointData.longitude) || parseFloat(selectedRequest.longitude) || -84.0833,
+        description: pointData.description || selectedRequest.details || `Manifestación generada desde la solicitud ${gmName}`,
+        request_id: requestId,
         visibility: false,
       };
 
@@ -298,7 +308,7 @@ const RequestsManager = () => {
     Modal.confirm({
       title: (
         <span className="poppins-bold text-lg text-geoterra-blue flex items-center gap-2">
-          <CheckCircleOutlined className="text-emerald-600" /> ¿Aceptar Solicitud y Crear Geomanifestación?
+          ¿Aceptar Solicitud y Crear Geomanifestación?
         </span>
       ),
       content: (
@@ -326,15 +336,21 @@ const RequestsManager = () => {
       onOk: async () => {
         try {
           const requestId = request.id_soli || request.request_id || request.id;
+          const gmName = (request.name || request.request_name || `GM-${requestId}`).trim();
+          const pCode = Number(request.province_snit_code || request.region_id);
+          const cCode = Number(request.canton_snit_code);
+          const dCode = Number(request.district_snit_code);
 
           const manifestationPayload = {
-            name: request.name || request.request_name || `Geomanifestación-${requestId}`,
+            geomanifestation_name: gmName,
+            name: gmName,
             latitude: parseFloat(request.latitude) || 9.9333,
             longitude: parseFloat(request.longitude) || -84.0833,
-            province_snit_code: parseInt(request.province_snit_code || request.region_id) || 1,
-            canton_snit_code: parseInt(request.canton_snit_code) || null,
-            district_snit_code: parseInt(request.district_snit_code) || null,
-            description: request.details || request.description || `Manifestación generada desde la solicitud ${request.name}`,
+            province_snit_code: (!isNaN(pCode) && pCode > 0) ? pCode : 1,
+            canton_snit_code: (!isNaN(cCode) && cCode > 0) ? cCode : null,
+            district_snit_code: (!isNaN(dCode) && dCode > 0) ? dCode : null,
+            description: request.details || request.description || `Manifestación generada desde la solicitud ${gmName}`,
+            request_id: requestId,
             visibility: false,
           };
 
@@ -348,7 +364,7 @@ const RequestsManager = () => {
             description: 'Solicitud aceptada y convertida en geomanifestación (borrador)',
           });
 
-          message.success('✅ Solicitud aceptada. Se creó la geomanifestación en Geomanifestaciones.');
+          message.success('Solicitud aceptada. Se creó la geomanifestación en Geomanifestaciones.');
           await refreshRequests();
         } catch (err) {
           console.error('❌ Error al aceptar solicitud:', err);
@@ -657,8 +673,8 @@ const RequestsManager = () => {
       align: 'right',
       render: (_, record) => {
         const isProcessed = (record.state || '').toLowerCase().includes('proc') ||
-                            (record.state || '').toLowerCase().includes('analiz') ||
-                            (record.state || '').toLowerCase().includes('acept');
+          (record.state || '').toLowerCase().includes('analiz') ||
+          (record.state || '').toLowerCase().includes('acept');
         return (
           <div className="flex items-center justify-end gap-1.5 flex-wrap poppins">
             {/* Aceptar / Convertir a Geomanifestación */}
@@ -733,8 +749,8 @@ const RequestsManager = () => {
   // Mobile card component
   const MobileRequestCard = ({ request }) => {
     const isProcessed = (request.state || '').toLowerCase().includes('proc') ||
-                        (request.state || '').toLowerCase().includes('analiz') ||
-                        (request.state || '').toLowerCase().includes('acept');
+      (request.state || '').toLowerCase().includes('analiz') ||
+      (request.state || '').toLowerCase().includes('acept');
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-3 space-y-3 poppins transition hover:shadow-md">
         <div className="flex justify-between items-start">
@@ -908,11 +924,10 @@ const RequestsManager = () => {
           {/* Card: Total */}
           <div
             onClick={() => setStateFilter('ALL')}
-            className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-              stateFilter === 'ALL'
-                ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
-                : 'border-gray-200 shadow-sm hover:border-gray-300'
-            }`}
+            className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'ALL'
+              ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
+              : 'border-gray-200 shadow-sm hover:border-gray-300'
+              }`}
           >
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Recibidas</span>
@@ -932,11 +947,10 @@ const RequestsManager = () => {
           {/* Card: Pendientes */}
           <div
             onClick={() => setStateFilter('Pendiente')}
-            className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-              stateFilter === 'Pendiente'
-                ? 'border-amber-400 shadow-md ring-2 ring-amber-100'
-                : 'border-gray-200 shadow-sm hover:border-gray-300'
-            }`}
+            className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'Pendiente'
+              ? 'border-amber-400 shadow-md ring-2 ring-amber-100'
+              : 'border-gray-200 shadow-sm hover:border-gray-300'
+              }`}
           >
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">Pendientes</span>
@@ -956,11 +970,10 @@ const RequestsManager = () => {
           {/* Card: En Revision */}
           <div
             onClick={() => setStateFilter('Revisión')}
-            className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-              stateFilter === 'Revisión'
-                ? 'border-blue-400 shadow-md ring-2 ring-blue-100'
-                : 'border-gray-200 shadow-sm hover:border-gray-300'
-            }`}
+            className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'Revisión'
+              ? 'border-blue-400 shadow-md ring-2 ring-blue-100'
+              : 'border-gray-200 shadow-sm hover:border-gray-300'
+              }`}
           >
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider">En Revisión</span>
@@ -980,11 +993,10 @@ const RequestsManager = () => {
           {/* Card: Procesadas */}
           <div
             onClick={() => setStateFilter('Procesada')}
-            className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-              stateFilter === 'Procesada'
-                ? 'border-emerald-400 shadow-md ring-2 ring-emerald-100'
-                : 'border-gray-200 shadow-sm hover:border-gray-300'
-            }`}
+            className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'Procesada'
+              ? 'border-emerald-400 shadow-md ring-2 ring-emerald-100'
+              : 'border-gray-200 shadow-sm hover:border-gray-300'
+              }`}
           >
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Aceptadas / Procesadas</span>
@@ -1128,22 +1140,22 @@ const RequestsManager = () => {
         onCancel={() => setViewModalVisible(false)}
         footer={[
           selectedRequest &&
-            !(selectedRequest.state || '').toLowerCase().includes('proc') &&
-            !(selectedRequest.state || '').toLowerCase().includes('analiz') &&
-            !(selectedRequest.state || '').toLowerCase().includes('acept') && (
-              <Button
-                key="accept"
-                type="primary"
-                icon={<CheckOutlined />}
-                onClick={() => {
-                  setViewModalVisible(false);
-                  handleAcceptRequest(selectedRequest);
-                }}
-                className="bg-emerald-600 hover:bg-emerald-700 poppins-bold border-0"
-              >
-                Aceptar Solicitud
-              </Button>
-            ),
+          !(selectedRequest.state || '').toLowerCase().includes('proc') &&
+          !(selectedRequest.state || '').toLowerCase().includes('analiz') &&
+          !(selectedRequest.state || '').toLowerCase().includes('acept') && (
+            <Button
+              key="accept"
+              type="primary"
+              icon={<CheckOutlined />}
+              onClick={() => {
+                setViewModalVisible(false);
+                handleAcceptRequest(selectedRequest);
+              }}
+              className="bg-emerald-600 hover:bg-emerald-700 poppins-bold border-0"
+            >
+              Aceptar Solicitud
+            </Button>
+          ),
           <Button
             key="state"
             icon={<SyncOutlined />}
