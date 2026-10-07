@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import {
   UserOutlined,
   MailOutlined,
@@ -5,11 +6,13 @@ import {
   CalendarOutlined,
   IdcardOutlined,
   SafetyCertificateOutlined,
-  TagOutlined
+  TagOutlined,
+  CheckCircleOutlined
 } from '@ant-design/icons';
-import React, { useState, useEffect } from 'react';
 import { userMe } from '../../../../config/apiConf';
-import { Card, Row, Col, Tag, Spin, Alert } from 'antd';
+import { Tag, Spin, Alert } from 'antd';
+import '../../../../colorModule.css';
+import '../../../../fontsModule.css';
 
 const UserInfo = () => {
   const [userData, setUserData] = useState(null);
@@ -39,7 +42,7 @@ const UserInfo = () => {
   if (loading) {
     return (
       <div className="w-full flex justify-center items-center py-8">
-        <Spin size="medium" tip="Cargando información de usuario..." />
+        <Spin tip="Cargando información de usuario..." />
       </div>
     );
   }
@@ -51,94 +54,155 @@ const UserInfo = () => {
         description={error}
         type="error"
         showIcon
-        className="mb-8"
+        className="mb-6 rounded-xl"
       />
     );
   }
 
   if (!userData) return null;
 
-  // Helper to translate roles and assign colors
   const getRoleBadge = (role) => {
     switch (role) {
       case 'admin':
-        return <Tag color="blue" icon={<UserOutlined />}>👨‍💼 Administrador de App</Tag>;
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-[#12467E] border border-blue-200">
+            <UserOutlined /> Administrador Global
+          </span>
+        );
       case 'maintenance':
-        return <Tag color="green" icon={<UserOutlined />}>🔧 Mantenimiento</Tag>;
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+            <SafetyCertificateOutlined /> Soporte / Mantenimiento
+          </span>
+        );
       case 'field_investigator':
       case 'fieldInvestigator':
       case 'fieldInvestigastor':
-        return <Tag color="green" icon={<UserOutlined />}>⛏️ Investigador de campo</Tag>;
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-cyan-50 text-cyan-800 border border-cyan-200">
+            <UserOutlined /> Investigador de Campo
+          </span>
+        );
       case 'investigator':
-        return <Tag color="green" icon={<UserOutlined />}>🔬 Investigador</Tag>;
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-800 border border-indigo-200">
+            <UserOutlined /> Investigador Científico
+          </span>
+        );
       default:
-        return <Tag color="orange" icon={<UserOutlined />}>👤 Usuario</Tag>;
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700 border border-gray-200">
+            <UserOutlined /> Usuario Institucional
+          </span>
+        );
     }
   };
 
   const fullName = `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || 'Usuario';
 
   return (
-    <Card className="mb-8 shadow-sm hover:shadow-md transition-shadow duration-300" title="👤 Información del Usuario Autenticado">
-      <Row gutter={[16, 16]}>
-        <Col xs={24} sm={12} md={6}>
-          <div className="flex flex-col">
-            <span className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-1 flex items-center">
-              <IdcardOutlined className="mr-1" /> Nombre Completo
+    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4 mb-6 poppins">
+      <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+        <div className="flex items-center gap-2">
+          <IdcardOutlined className="text-xl text-[#12467E]" />
+          <div>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-geoterra-orange poppins block">
+              SESIÓN ACTIVA • IDENTIDAD INSTITUCIONAL
             </span>
-            <span className="font-medium text-gray-800 text-sm truncate">{fullName}</span>
+            <h3 className="text-base font-bold text-geoterra-blue m-0 poppins">
+              Información del Usuario Autenticado
+            </h3>
           </div>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <div className="flex flex-col">
-            <span className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-1 flex items-center">
-              <MailOutlined className="mr-1" /> Correo Electrónico
-            </span>
-            <span className="font-medium text-gray-800 text-sm truncate">{userData.email}</span>
+        </div>
+        <div>
+          {userData.is_verified ? (
+            <Tag color="success" className="px-2.5 py-0.5 rounded-full text-xs font-semibold">
+              <CheckCircleOutlined className="mr-1" /> Verificado
+            </Tag>
+          ) : (
+            <Tag color="warning" className="px-2.5 py-0.5 rounded-full text-xs font-semibold">
+              Pendiente de Verificación
+            </Tag>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="bg-gray-50 p-3.5 rounded-xl border border-gray-100 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-blue-50 text-[#12467E] flex items-center justify-center text-lg shrink-0">
+            <UserOutlined />
           </div>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <div className="flex flex-col">
-            <span className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-1 flex items-center">
-              <TagOutlined className="mr-1" /> Rol Asignado
+          <div className="min-w-0">
+            <span className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider block">
+              Nombre Completo
             </span>
-            <div className="mt-0.5">{getRoleBadge(userData.role)}</div>
+            <span className="font-bold text-gray-800 text-sm truncate block">
+              {fullName}
+            </span>
           </div>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <div className="flex flex-col">
-            <span className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-1 flex items-center">
-              <SafetyCertificateOutlined className="mr-1" /> Verificación
-            </span>
-            <div className="mt-0.5">
-              <Tag color={userData.is_verified ? 'green' : 'orange'}>
-                {userData.is_verified ? '✅ Verificado' : '⏳ Pendiente'}
-              </Tag>
-            </div>
+        </div>
+
+        <div className="bg-gray-50 p-3.5 rounded-xl border border-gray-100 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-blue-50 text-[#12467E] flex items-center justify-center text-lg shrink-0">
+            <MailOutlined />
           </div>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <div className="flex flex-col">
-            <span className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-1 flex items-center">
-              <PhoneOutlined className="mr-1" /> Teléfono
+          <div className="min-w-0">
+            <span className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider block">
+              Correo Electrónico
             </span>
-            <span className="font-medium text-gray-800 text-sm">
+            <span className="font-bold text-gray-800 text-sm truncate block">
+              {userData.email}
+            </span>
+          </div>
+        </div>
+
+        <div className="bg-gray-50 p-3.5 rounded-xl border border-gray-100 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-blue-50 text-[#12467E] flex items-center justify-center text-lg shrink-0">
+            <TagOutlined />
+          </div>
+          <div className="min-w-0">
+            <span className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider block mb-1">
+              Rol del Sistema
+            </span>
+            <div>{getRoleBadge(userData.role)}</div>
+          </div>
+        </div>
+
+        <div className="bg-gray-50 p-3.5 rounded-xl border border-gray-100 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-blue-50 text-[#12467E] flex items-center justify-center text-lg shrink-0">
+            <PhoneOutlined />
+          </div>
+          <div className="min-w-0">
+            <span className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider block">
+              Teléfono
+            </span>
+            <span className="font-bold text-gray-800 text-sm truncate block">
               {userData.phone_number || 'No especificado'}
             </span>
           </div>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <div className="flex flex-col">
-            <span className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-1 flex items-center">
-              <CalendarOutlined className="mr-1" /> Fecha de Registro
+        </div>
+
+        <div className="bg-gray-50 p-3.5 rounded-xl border border-gray-100 flex items-center gap-3 sm:col-span-2 lg:col-span-2">
+          <div className="w-10 h-10 rounded-lg bg-blue-50 text-[#12467E] flex items-center justify-center text-lg shrink-0">
+            <CalendarOutlined />
+          </div>
+          <div className="min-w-0">
+            <span className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider block">
+              Fecha de Incorporación
             </span>
-            <span className="font-medium text-gray-800 text-sm">
-              {userData.created_at ? new Date(userData.created_at).toLocaleDateString() : 'N/A'}
+            <span className="font-bold text-gray-800 text-sm truncate block">
+              {userData.created_at
+                ? new Date(userData.created_at).toLocaleDateString('es-ES', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })
+                : 'Registro Fundacional'}
             </span>
           </div>
-        </Col>
-      </Row>
-    </Card>
+        </div>
+      </div>
+    </div>
   );
 };
 

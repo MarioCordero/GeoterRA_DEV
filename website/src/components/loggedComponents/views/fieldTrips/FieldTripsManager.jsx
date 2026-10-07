@@ -950,14 +950,16 @@ const FieldTripsManager = () => {
       align: 'center',
       render: (val, record) => (
         canManage ? (
-          <Tooltip title={`Clic para ${val ? 'desactivar' : 'activar'}`}>
-            <Switch
-              size="small"
-              checked={Boolean(val)}
-              onChange={(checked) => handleToggleActive(record, checked)}
-              style={{ backgroundColor: val ? '#52c41a' : '#bfbfbf' }}
-            />
-          </Tooltip>
+          <div onClick={(e) => e.stopPropagation()}>
+            <Tooltip title={`Clic para ${val ? 'desactivar' : 'activar'}`}>
+              <Switch
+                size="small"
+                checked={Boolean(val)}
+                onChange={(checked) => handleToggleActive(record, checked)}
+                style={{ backgroundColor: val ? '#52c41a' : '#bfbfbf' }}
+              />
+            </Tooltip>
+          </div>
         ) : (
           <Tag color={val ? 'green' : 'default'}>
             {val ? 'Activa' : 'Inactiva'}
@@ -971,9 +973,9 @@ const FieldTripsManager = () => {
       key: 'field_trip_name',
       render: (val, record) => (
         <div>
-          <Text strong style={{ fontSize: 14, color: '#262626' }}>
+          <span className="font-semibold text-blue-600 hover:text-blue-800 block cursor-pointer">
             {val}
-          </Text>
+          </span>
           <div style={{ fontSize: 11, color: '#8c8c8c' }} className="font-mono">
             {record.field_trip_id || record.id}
           </div>
@@ -1036,183 +1038,221 @@ const FieldTripsManager = () => {
         );
       },
     },
-    {
+    ...(canManage ? [{
       title: 'Acciones',
       key: 'actions',
       align: 'right',
       render: (_, record) => (
-        <Space size="small">
-          {canFastPoint && (
-            <Tooltip title="Punto Rápido (Crear manifestación y medición in-situ en esta gira)">
-              <Button
-                type="text"
-                size="small"
-                icon={<ThunderboltOutlined style={{ color: '#13c2c2', fontSize: 16 }} />}
-                onClick={() => handleOpenFastPoint(record)}
-              />
-            </Tooltip>
-          )}
-
-          <Tooltip title="Ver Detalle y Bitácora">
+        <Space size="small" onClick={(e) => e.stopPropagation()}>
+          <Tooltip title="Editar Gira">
             <Button
-              type="default"
+              type="primary"
               size="small"
-              icon={<EyeOutlined />}
-              onClick={() => handleOpenDetail(record)}
+              icon={<EditOutlined />}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOpenEdit(record);
+              }}
             />
           </Tooltip>
 
-          {canManage && (
-            <>
-              <Tooltip title="Editar Gira">
-                <Button
-                  type="primary"
-                  size="small"
-                  icon={<EditOutlined />}
-                  onClick={() => handleOpenEdit(record)}
-                />
-              </Tooltip>
-
-              <Popconfirm
-                title="¿Eliminar esta gira de campo?"
-                description="Se desvincularán los participantes y manifestaciones asociadas."
-                onConfirm={() => handleDeleteTrip(record)}
-                okText="Sí, eliminar"
-                cancelText="Cancelar"
-                okButtonProps={{ danger: true }}
-              >
-                <Tooltip title="Eliminar Gira">
-                  <Button type="text" danger size="small" icon={<DeleteOutlined />} />
-                </Tooltip>
-              </Popconfirm>
-            </>
-          )}
+          <Popconfirm
+            title="¿Eliminar esta gira de campo?"
+            description="Se desvincularán los participantes y manifestaciones asociadas."
+            onConfirm={(e) => {
+              e?.stopPropagation();
+              handleDeleteTrip(record);
+            }}
+            okText="Sí, eliminar"
+            cancelText="Cancelar"
+            okButtonProps={{ danger: true }}
+          >
+            <Tooltip title="Eliminar Gira">
+              <Button
+                type="text"
+                danger
+                size="small"
+                icon={<DeleteOutlined />}
+                onClick={(e) => e.stopPropagation()}
+              />
+            </Tooltip>
+          </Popconfirm>
         </Space>
       ),
-    },
+    }] : []),
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
-      <Card style={{ borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
-        {/* Header */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 16,
-            marginBottom: 20,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <CompassOutlined style={{ fontSize: 32, color: '#fa8c16' }} />
-            <div>
-              <Title level={3} style={{ margin: 0 }}>
-                Giras de Campo
-              </Title>
-              <Paragraph type="secondary" style={{ margin: 0 }}>
-                Planificación, coordinación de investigadores, sitios geotermales y bitácora de campo.
-              </Paragraph>
-            </div>
+    <div className="w-full p-4 md:p-8 space-y-6 poppins">
+      {/* ========================================================================= */}
+      {/* HEADER SECTION                                                            */}
+      {/* ========================================================================= */}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs uppercase tracking-wider font-bold text-geoterra-orange poppins">
+              Operaciones de Campo • GeoterRA
+            </span>
+            <Tag className="rounded-full font-semibold text-[11px] bg-blue-50 text-geoterra-blue border-blue-200">
+              {trips.length} Giras Registradas
+            </Tag>
           </div>
-
-          <Space wrap>
-            {canFastPoint && (
-              <Button
-                type="primary"
-                icon={<ThunderboltOutlined />}
-                onClick={() => handleOpenFastPoint()}
-                style={{
-                  background: 'linear-gradient(135deg, #13c2c2 0%, #08979c 100%)',
-                  borderColor: '#13c2c2',
-                  fontWeight: 600,
-                  boxShadow: '0 2px 6px rgba(19, 194, 194, 0.35)',
-                }}
-              >
-                Punto Rápido
-              </Button>
-            )}
-            {canManage && (
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={handleOpenCreate}
-                style={{ backgroundColor: '#fa8c16', borderColor: '#fa8c16' }}
-              >
-                Nueva Gira de Campo
-              </Button>
-            )}
-            <Button icon={<ReloadOutlined />} onClick={loadTrips} loading={loading}>
-              Actualizar
-            </Button>
-          </Space>
+          <h1 className="text-2xl md:text-3xl poppins-bold text-geoterra-blue m-0 flex items-center gap-2.5">
+            <CompassOutlined className="text-geoterra-blue" /> Gestión de Giras de Campo
+          </h1>
+          <p className="text-xs md:text-sm text-gray-500 m-0 mt-1 poppins">
+            Planificación operativa, asignación de investigadores, bitácora científica y registro rápido de manifestaciones geotermales.
+          </p>
         </div>
 
-        {/* Statistics Cards */}
-        <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
-          <Col xs={12} sm={6}>
-            <Card size="small" style={{ borderRadius: 8, background: '#fafafa', border: '1px solid #f0f0f0' }}>
-              <Statistic
-                title="Total Giras"
-                value={stats.total}
-                prefix={<CompassOutlined style={{ color: '#1890ff' }} />}
-              />
-            </Card>
-          </Col>
-          <Col xs={12} sm={6}>
-            <Card size="small" style={{ borderRadius: 8, background: '#f6ffed', border: '1px solid #b7eb8f' }}>
-              <Statistic
-                title="Giras Activas"
-                value={stats.active}
-                valueStyle={{ color: '#52c41a' }}
-                prefix={<CheckCircleOutlined />}
-              />
-            </Card>
-          </Col>
-          <Col xs={12} sm={6}>
-            <Card size="small" style={{ borderRadius: 8, background: '#fff7e6', border: '1px solid #ffd591' }}>
-              <Statistic
-                title="Mis Asignadas"
-                value={stats.myCount}
-                valueStyle={{ color: '#fa8c16' }}
-                prefix={<TeamOutlined />}
-              />
-            </Card>
-          </Col>
-          <Col xs={12} sm={6}>
-            <Card size="small" style={{ borderRadius: 8, background: '#fafafa', border: '1px solid #f0f0f0' }}>
-              <Statistic
-                title="Inactivas / Concluidas"
-                value={stats.inactive}
-                valueStyle={{ color: '#8c8c8c' }}
-                prefix={<ClockCircleOutlined />}
-              />
-            </Card>
-          </Col>
-        </Row>
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {canFastPoint && (
+            <Button
+              type="primary"
+              icon={<ThunderboltOutlined />}
+              onClick={() => handleOpenFastPoint()}
+              className="bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white font-semibold border-0 shadow-sm poppins"
+            >
+              Punto Rápido
+            </Button>
+          )}
+          {canManage && (
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={handleOpenCreate}
+              style={{ backgroundColor: '#12467E', borderColor: '#12467E' }}
+              className="poppins-bold"
+            >
+              Nueva Gira de Campo
+            </Button>
+          )}
+          <Button
+            icon={<ReloadOutlined spin={loading} />}
+            onClick={loadTrips}
+            loading={loading}
+            className="poppins font-medium border-gray-300"
+          >
+            Actualizar
+          </Button>
+        </div>
+      </div>
 
-        {/* Filters and Tabs */}
+      {/* ========================================================================= */}
+      {/* METRICS DASHBOARD                                                         */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 12,
-            marginBottom: 16,
+          onClick={() => {
+            setActiveTab('all');
+            setStatusFilter('all');
           }}
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
+            activeTab === 'all' && statusFilter === 'all'
+              ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
+              : 'border-gray-200 shadow-sm hover:border-gray-300'
+          }`}
         >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Giras</span>
+            <div className="w-9 h-9 rounded-lg bg-blue-50 text-geoterra-blue flex items-center justify-center text-base">
+              <CompassOutlined />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold poppins text-gray-900">{stats.total}</span>
+            <span className="text-xs text-gray-400">expediciones</span>
+          </div>
+          <div className="mt-2 text-xs text-gray-500">Planificadas en el sistema</div>
+        </div>
+
+        <div
+          onClick={() => {
+            setActiveTab('all');
+            setStatusFilter('active');
+          }}
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
+            statusFilter === 'active'
+              ? 'border-emerald-400 shadow-md ring-2 ring-emerald-100'
+              : 'border-gray-200 shadow-sm hover:border-gray-300'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Giras Activas</span>
+            <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-base">
+              <CheckCircleOutlined />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold poppins text-emerald-900">{stats.active}</span>
+            <span className="text-xs text-emerald-600">en curso</span>
+          </div>
+          <div className="mt-2 text-xs text-emerald-700 font-medium">Listas para captura en campo</div>
+        </div>
+
+        <div
+          onClick={() => {
+            setActiveTab('my');
+            setStatusFilter('all');
+          }}
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
+            activeTab === 'my'
+              ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
+              : 'border-gray-200 shadow-sm hover:border-gray-300'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider">Mis Asignadas</span>
+            <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-base">
+              <TeamOutlined />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold poppins text-blue-900">{stats.myCount}</span>
+            <span className="text-xs text-blue-600">con mi usuario</span>
+          </div>
+          <div className="mt-2 text-xs text-blue-700 font-medium">Asignado como investigador</div>
+        </div>
+
+        <div
+          onClick={() => {
+            setActiveTab('all');
+            setStatusFilter('inactive');
+          }}
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
+            statusFilter === 'inactive'
+              ? 'border-gray-400 shadow-md ring-2 ring-gray-100'
+              : 'border-gray-200 shadow-sm hover:border-gray-300'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Concluidas / Inactivas</span>
+            <div className="w-9 h-9 rounded-lg bg-gray-100 text-gray-600 flex items-center justify-center text-base">
+              <ClockCircleOutlined />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold poppins text-gray-700">{stats.inactive}</span>
+            <span className="text-xs text-gray-400">finalizadas</span>
+          </div>
+          <div className="mt-2 text-xs text-gray-500">Histórico de campo</div>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* FILTER & DATA TABLE CARD                                                  */}
+      {/* ========================================================================= */}
+      <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
           <Tabs
             activeKey={activeTab}
             onChange={setActiveTab}
-            style={{ marginBottom: 0 }}
+            className="poppins mb-0"
             items={[
               {
                 key: 'all',
                 label: (
-                  <span>
+                  <span className="font-semibold flex items-center gap-1.5">
                     <CompassOutlined /> Todas las Giras ({trips.length})
                   </span>
                 ),
@@ -1220,7 +1260,7 @@ const FieldTripsManager = () => {
               {
                 key: 'my',
                 label: (
-                  <span>
+                  <span className="font-semibold flex items-center gap-1.5">
                     <TeamOutlined /> Mis Giras Asignadas ({myTrips.length})
                   </span>
                 ),
@@ -1228,50 +1268,58 @@ const FieldTripsManager = () => {
             ]}
           />
 
-          <Space wrap>
+          <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
             <Input
-              prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
+              prefix={<SearchOutlined className="text-gray-400" />}
               placeholder="Buscar por nombre o ID..."
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
-              style={{ width: 220 }}
+              className="w-full sm:w-64 rounded-lg py-1.5"
               allowClear
             />
             <Select
               value={statusFilter}
               onChange={setStatusFilter}
-              style={{ width: 150 }}
+              className="w-full sm:w-44"
               options={[
                 { value: 'all', label: 'Todos los estados' },
-                { value: 'active', label: 'Solo Activas' },
-                { value: 'inactive', label: 'Solo Inactivas' },
+                { value: 'active', label: '🟢 Solo Activas' },
+                { value: 'inactive', label: '⚪ Solo Inactivas' },
               ]}
             />
-          </Space>
+          </div>
         </div>
 
         {/* Table */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
+          <div className="text-center py-16">
             <Spin size="large" tip="Cargando giras de campo..." />
           </div>
         ) : (
-          <Table
-            dataSource={filteredTrips}
-            columns={columns}
-            rowKey={(item) => item.field_trip_id || item.id}
-            pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50'] }}
-            locale={{ emptyText: 'No se encontraron giras de campo' }}
-          />
+          <div className="overflow-x-auto rounded-xl border border-gray-100">
+            <Table
+              dataSource={filteredTrips}
+              columns={columns}
+              rowKey={(item) => item.field_trip_id || item.id}
+              onRow={(record) => ({
+                onClick: () => handleOpenDetail(record),
+                style: { cursor: 'pointer' },
+              })}
+              pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50'] }}
+              locale={{ emptyText: 'No se encontraron giras de campo con los filtros seleccionados' }}
+              className="poppins"
+            />
+          </div>
         )}
-      </Card>
+      </div>
 
       {/* Modal: Create / Edit Field Trip */}
       <Modal
         title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <CompassOutlined style={{ color: '#fa8c16' }} />
-            <span>{editingTrip ? 'Editar Gira de Campo' : 'Crear Nueva Gira de Campo'}</span>
+          <div className="flex items-center gap-2 py-2 pr-6 border-b border-gray-100">
+            <span className="poppins-bold text-xl text-geoterra-blue flex items-center gap-2">
+              <CompassOutlined /> {editingTrip ? 'Editar Gira de Campo' : 'Crear Nueva Gira de Campo'}
+            </span>
           </div>
         }
         open={modalVisible}
@@ -1281,128 +1329,148 @@ const FieldTripsManager = () => {
           setLoadingEditModal(false);
         }}
         confirmLoading={submitting}
-        okButtonProps={{ disabled: loadingEditModal }}
+        okButtonProps={{
+          disabled: loadingEditModal,
+          style: { backgroundColor: '#12467E', borderColor: '#12467E' },
+          className: 'poppins-bold',
+        }}
+        cancelButtonProps={{ className: 'poppins' }}
         okText={editingTrip ? 'Guardar Cambios' : 'Crear Gira'}
         cancelText="Cancelar"
-        width={720}
+        width={760}
         centered
       >
         <Spin spinning={loadingEditModal} tip="Cargando datos de la gira...">
-          <Form form={form} layout="vertical" onFinish={handleSubmit}>
-            <Form.Item
-              name="field_trip_name"
-              label="Nombre de la Gira"
-              rules={[
-                { required: true, message: 'El nombre es requerido' },
-                { max: 110, message: 'Máximo 110 caracteres' },
-              ]}
-            >
-              <Input placeholder="Ej: Gira de Monitoreo Volcán Miravalles 2026" maxLength={110} showCount />
-            </Form.Item>
+          <Form form={form} layout="vertical" className="poppins space-y-4 pt-3" onFinish={handleSubmit}>
+            {/* Sección 1: Información General */}
+            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+              <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2.5 flex items-center gap-2 m-0">
+                <CompassOutlined /> Información General de la Gira
+              </h3>
 
-            <Row gutter={16}>
-              <Col xs={24} sm={8}>
-                <Form.Item
-                  name="field_trip_scheduled_date"
-                  label="Fecha Programada"
-                  rules={[{ required: true, message: 'Fecha programada requerida' }]}
-                >
-                  <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" placeholder="Seleccionar" />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={8}>
-                <Form.Item name="field_trip_start_date" label="Fecha Inicio Real">
-                  <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" placeholder="Opcional" />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={8}>
-                <Form.Item name="field_trip_finish_date" label="Fecha Fin Real">
-                  <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" placeholder="Opcional" />
-                </Form.Item>
-              </Col>
-            </Row>
+              <Form.Item
+                name="field_trip_name"
+                label="Nombre de la Gira"
+                rules={[
+                  { required: true, message: 'El nombre es requerido' },
+                  { max: 110, message: 'Máximo 110 caracteres' },
+                ]}
+              >
+                <Input placeholder="Ej: Gira de Monitoreo Volcán Miravalles 2026" maxLength={110} showCount size="middle" />
+              </Form.Item>
 
-            <Divider orientation="left" style={{ margin: '12px 0' }}>
-              <span style={{ fontSize: 13, color: '#8c8c8c' }}>Ubicación Geográfica</span>
-            </Divider>
+              <Row gutter={16}>
+                <Col xs={24} sm={8}>
+                  <Form.Item
+                    name="field_trip_scheduled_date"
+                    label="Fecha Programada"
+                    rules={[{ required: true, message: 'Fecha programada requerida' }]}
+                  >
+                    <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" placeholder="Seleccionar" size="middle" />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={8}>
+                  <Form.Item name="field_trip_start_date" label="Fecha Inicio Real">
+                    <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" placeholder="Opcional" size="middle" />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={8}>
+                  <Form.Item name="field_trip_finish_date" label="Fecha Fin Real">
+                    <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" placeholder="Opcional" size="middle" />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </div>
 
-            <Row gutter={16}>
-              <Col xs={24} sm={8}>
-                <Form.Item name="province_snit_code" label="Provincia">
-                  <Select placeholder="Selecciona provincia" onChange={handleProvinceChange} allowClear>
-                    {provinces.map((prov) => (
-                      <Select.Option key={prov.province_snit_code || prov.province_id} value={prov.province_snit_code}>
-                        {prov.province_name}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={8}>
-                <Form.Item name="canton_snit_code" label="Cantón">
-                  <Select placeholder="Selecciona cantón" onChange={handleCantonChange} allowClear disabled={cantons.length === 0}>
-                    {cantons.map((c) => (
-                      <Select.Option key={c.canton_snit_code || c.canton_id} value={c.canton_snit_code}>
-                        {c.canton_name}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={8}>
-                <Form.Item name="district_snit_code" label="Distrito">
-                  <Select placeholder="Selecciona distrito" allowClear disabled={districts.length === 0}>
-                    {districts.map((d) => (
-                      <Select.Option key={d.district_snit_code || d.district_id} value={d.district_snit_code}>
-                        {d.district_name}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Col>
-            </Row>
+            {/* Sección 2: Ubicación Geográfica */}
+            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+              <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2.5 flex items-center gap-2 m-0">
+                <EnvironmentOutlined /> Ubicación Geográfica
+              </h3>
 
-            <Divider orientation="left" style={{ margin: '12px 0' }}>
-              <span style={{ fontSize: 13, color: '#8c8c8c' }}>Participantes y Manifestaciones</span>
-            </Divider>
+              <Row gutter={16}>
+                <Col xs={24} sm={8}>
+                  <Form.Item name="province_snit_code" label="Provincia">
+                    <Select placeholder="Selecciona provincia" onChange={handleProvinceChange} allowClear size="middle">
+                      {provinces.map((prov) => (
+                        <Select.Option key={prov.province_snit_code || prov.province_id} value={prov.province_snit_code}>
+                          {prov.province_name}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={8}>
+                  <Form.Item name="canton_snit_code" label="Cantón">
+                    <Select placeholder="Selecciona cantón" onChange={handleCantonChange} allowClear disabled={cantons.length === 0} size="middle">
+                      {cantons.map((c) => (
+                        <Select.Option key={c.canton_snit_code || c.canton_id} value={c.canton_snit_code}>
+                          {c.canton_name}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={8}>
+                  <Form.Item name="district_snit_code" label="Distrito">
+                    <Select placeholder="Selecciona distrito" allowClear disabled={districts.length === 0} size="middle">
+                      {districts.map((d) => (
+                        <Select.Option key={d.district_snit_code || d.district_id} value={d.district_snit_code}>
+                          {d.district_name}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+              </Row>
+            </div>
 
-            <Form.Item
-              name="participants"
-              label="Participantes (Investigadores / Personal Asignado)"
-              help="Selecciona los miembros del equipo que participarán en esta gira"
-            >
-              <Select
-                mode="multiple"
-                placeholder="Buscar y seleccionar participantes..."
-                allowClear
-                optionFilterProp="label"
-                options={allUsers.map((u) => ({
-                  value: u.user_id || u.id,
-                  label: `${[u.first_name, u.last_name].filter(Boolean).join(' ') || u.email} (${u.role || 'Usuario'})`,
-                }))}
-              />
-            </Form.Item>
+            {/* Sección 3: Participantes y Manifestaciones */}
+            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+              <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2.5 flex items-center gap-2 m-0">
+                <TeamOutlined /> Participantes y Manifestaciones
+              </h3>
 
-            <Form.Item
-              name="geomanifestations"
-              label="Geomanifestaciones Vinculadas"
-              help="Sitios termales o manifestaciones que se estudiarán en esta gira"
-            >
-              <Select
-                mode="multiple"
-                placeholder="Buscar y seleccionar geomanifestaciones..."
-                allowClear
-                optionFilterProp="label"
-                options={allManifestations.map((m) => ({
-                  value: m.geomanifestation_id || m.id,
-                  label: `${m.geomanifestation_name || m.name} ${m.location?.canton ? `— ${m.location.canton}` : ''}`,
-                }))}
-              />
-            </Form.Item>
+              <Form.Item
+                name="participants"
+                label="Participantes (Investigadores / Personal Asignado)"
+                help="Selecciona los miembros del equipo que participarán en esta gira"
+              >
+                <Select
+                  mode="multiple"
+                  placeholder="Buscar y seleccionar participantes..."
+                  allowClear
+                  optionFilterProp="label"
+                  size="middle"
+                  options={allUsers.map((u) => ({
+                    value: u.user_id || u.id,
+                    label: `${[u.first_name, u.last_name].filter(Boolean).join(' ') || u.email} (${u.role || 'Usuario'})`,
+                  }))}
+                />
+              </Form.Item>
 
-            <Form.Item name="field_trip_is_active" valuePropName="checked" label="Estado de la Gira">
-              <Switch checkedChildren="Activa" unCheckedChildren="Inactiva / Cerrada" />
-            </Form.Item>
+              <Form.Item
+                name="geomanifestations"
+                label="Geomanifestaciones Vinculadas"
+                help="Sitios termales o manifestaciones que se estudiarán en esta gira"
+              >
+                <Select
+                  mode="multiple"
+                  placeholder="Buscar y seleccionar geomanifestaciones..."
+                  allowClear
+                  optionFilterProp="label"
+                  size="middle"
+                  options={allManifestations.map((m) => ({
+                    value: m.geomanifestation_id || m.id,
+                    label: `${m.geomanifestation_name || m.name} ${m.location?.canton ? `— ${m.location.canton}` : ''}`,
+                  }))}
+                />
+              </Form.Item>
+
+              <Form.Item name="field_trip_is_active" valuePropName="checked" label="Estado de la Gira" style={{ marginBottom: 0 }}>
+                <Switch checkedChildren="Activa" unCheckedChildren="Inactiva / Cerrada" />
+              </Form.Item>
+            </div>
           </Form>
         </Spin>
       </Modal>
@@ -1410,29 +1478,10 @@ const FieldTripsManager = () => {
       {/* Modal: Fast Point (Punto Rápido en Campo) */}
       <Modal
         title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div
-              style={{
-                width: 38,
-                height: 38,
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #13c2c2 0%, #08979c 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#fff',
-                fontSize: 20,
-                boxShadow: '0 2px 6px rgba(19, 194, 194, 0.35)',
-              }}
-            >
-              <ThunderboltOutlined />
-            </div>
-            <div>
-              <div style={{ fontWeight: 600, fontSize: 16 }}>Punto Rápido en Campo (Fast Point)</div>
-              <div style={{ fontSize: 12, color: '#8c8c8c', fontWeight: 400 }}>
-                Crea una geomanifestación y su medición in-situ en un solo paso
-              </div>
-            </div>
+          <div className="flex items-center gap-2 py-2 pr-6 border-b border-gray-100">
+            <span className="poppins-bold text-xl text-geoterra-blue flex items-center gap-2">
+              <ThunderboltOutlined style={{ color: '#F39C29' }} /> Punto Rápido en Campo (Fast Point)
+            </span>
           </div>
         }
         open={fastPointModalVisible}
@@ -1443,14 +1492,14 @@ const FieldTripsManager = () => {
           setShowMapPicker(false);
         }}
         footer={null}
-        width={680}
+        width={720}
         destroyOnClose
       >
         <Form
           form={fastPointForm}
           layout="vertical"
+          className="poppins space-y-4 pt-2"
           onFinish={handleFastPointSubmit}
-          style={{ marginTop: 14 }}
         >
           {/* Coordinates stored in form (hidden by default) */}
           <Form.Item name="latitude" hidden>
@@ -1461,23 +1510,13 @@ const FieldTripsManager = () => {
           </Form.Item>
 
           {/* 1. Gira de Campo Asociada */}
-          <Card
-            size="small"
-            style={{
-              borderRadius: 8,
-              background: '#f0f5ff',
-              border: '1px solid #adc6ff',
-              marginBottom: 14,
-            }}
-          >
+          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2 flex items-center gap-2 m-0">
+              <CompassOutlined /> Gira de Campo Asociada
+            </h3>
             <Form.Item
               name="field_trip_id"
-              label={
-                <span style={{ fontWeight: 600, color: '#1d39c4' }}>
-                  <CompassOutlined style={{ marginRight: 6 }} />
-                  Gira de Campo
-                </span>
-              }
+              label="Seleccionar Gira de Campo"
               rules={[{ required: true, message: 'Selecciona la gira a la que pertenece este punto' }]}
               style={{ marginBottom: 0 }}
             >
@@ -1485,6 +1524,7 @@ const FieldTripsManager = () => {
                 placeholder="Selecciona la gira de campo..."
                 onChange={handleFastPointTripChange}
                 showSearch
+                size="large"
                 optionFilterProp="label"
                 options={trips.map((t) => {
                   const tId = t.field_trip_id || t.id;
@@ -1499,22 +1539,14 @@ const FieldTripsManager = () => {
                 })}
               />
             </Form.Item>
-          </Card>
+          </div>
 
-          {/* 2. Ubicación GPS (1 solo toque) */}
-          <div style={{ marginBottom: 14 }}>
-            <div
-              style={{
-                marginBottom: 6,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <span style={{ fontWeight: 600, color: '#08979c', fontSize: 13 }}>
-                <AimOutlined style={{ marginRight: 6 }} />
-                Ubicación Satelital (GPS)
-              </span>
+          {/* 2. Ubicación GPS */}
+          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <div className="flex justify-between items-center border-b border-gray-100 pb-2">
+              <h3 className="text-base font-bold text-geoterra-blue flex items-center gap-2 m-0">
+                <AimOutlined /> Ubicación Satelital (GPS)
+              </h3>
               {gpsAccuracy && (
                 <Tag color="cyan" style={{ margin: 0 }}>
                   Precisión: {gpsAccuracy}
@@ -1528,7 +1560,7 @@ const FieldTripsManager = () => {
                   background: '#f6ffed',
                   border: '1px solid #b7eb8f',
                   borderRadius: 8,
-                  padding: '10px 14px',
+                  padding: '12px 16px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -1581,22 +1613,23 @@ const FieldTripsManager = () => {
                   height: 48,
                   fontSize: 15,
                   fontWeight: 700,
-                  background: 'linear-gradient(135deg, #13c2c2 0%, #08979c 100%)',
-                  borderColor: '#13c2c2',
+                  backgroundColor: '#12467E',
+                  borderColor: '#12467E',
                   borderRadius: 8,
                 }}
+                className="poppins-bold"
               >
                 {gettingGps ? 'Obteniendo señal satelital GPS...' : '📍 Capturar Ubicación GPS Actual'}
               </Button>
             )}
 
             {/* Toggle for Map and Manual Coordinates ONLY if user needs fallback */}
-            <div style={{ textAlign: 'right', marginTop: 6 }}>
+            <div style={{ textAlign: 'right', marginTop: 4 }}>
               <Button
                 type="link"
                 size="small"
                 onClick={() => setShowMapPicker((prev) => !prev)}
-                style={{ color: '#08979c', padding: 0, fontSize: 12 }}
+                style={{ color: '#12467E', padding: 0, fontSize: 12 }}
               >
                 {showMapPicker
                   ? '▲ Ocultar mapa interactivo'
@@ -1606,15 +1639,7 @@ const FieldTripsManager = () => {
 
             {/* Interactive Map and Manual Lat/Lng inputs (shown ONLY on demand) */}
             {showMapPicker && (
-              <Card
-                size="small"
-                style={{
-                  marginTop: 8,
-                  borderRadius: 8,
-                  border: '1px dashed #13c2c2',
-                  background: '#fafafa',
-                }}
-              >
+              <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
                 <div style={{ marginBottom: 12 }}>
                   <MapCoordinatePicker
                     latLng={{
@@ -1668,56 +1693,45 @@ const FieldTripsManager = () => {
                     </Form.Item>
                   </Col>
                 </Row>
-              </Card>
+              </div>
             )}
           </div>
 
-          {/* 3. Nombre del Punto (Pre-generado automáticamente) */}
-          <Form.Item
-            name="geomanifestation_name"
-            label={
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                  alignItems: 'center',
-                }}
-              >
-                <span style={{ fontWeight: 600 }}>Nombre del Punto</span>
-                <Tag color="blue" style={{ fontSize: 11, fontWeight: 'normal', margin: 0 }}>
-                  Generado automáticamente
-                </Tag>
-              </div>
-            }
-            extra={
-              <span style={{ fontSize: 11, color: '#8c8c8c' }}>
-                ⚡ No necesitas escribirlo ahora bajo el sol. Eso se cambia luego con calma en el laboratorio.
-              </span>
-            }
-            rules={[
-              { required: true, message: 'Ingresa un nombre para la geomanifestación' },
-              { max: 255, message: 'Máximo 255 caracteres' },
-            ]}
-            style={{ marginBottom: 14 }}
-          >
-            <Input placeholder="Ej: Punto #1 - Gira (10:15)" />
-          </Form.Item>
+          {/* 3. Nombre del Punto */}
+          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2 flex items-center gap-2 m-0">
+              <EnvironmentOutlined /> Identificación del Punto
+            </h3>
+            <Form.Item
+              name="geomanifestation_name"
+              label={
+                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                  <span style={{ fontWeight: 600 }}>Nombre del Punto</span>
+                  <Tag color="blue" style={{ fontSize: 11, fontWeight: 'normal', margin: 0 }}>
+                    Generado automáticamente
+                  </Tag>
+                </div>
+              }
+              extra={
+                <span style={{ fontSize: 11, color: '#8c8c8c' }}>
+                  ⚡ No necesitas escribirlo ahora bajo el sol. Se cambia luego con calma en el laboratorio.
+                </span>
+              }
+              rules={[
+                { required: true, message: 'Ingresa un nombre para la geomanifestación' },
+                { max: 255, message: 'Máximo 255 caracteres' },
+              ]}
+              style={{ marginBottom: 0 }}
+            >
+              <Input size="large" placeholder="Ej: Punto #1 - Gira (10:15)" />
+            </Form.Item>
+          </div>
 
           {/* 4. Mediciones In-Situ */}
-          <Card
-            size="small"
-            style={{
-              background: '#fffbe6',
-              border: '1px solid #ffe58f',
-              borderRadius: 8,
-              marginBottom: 16,
-            }}
-          >
-            <div style={{ fontWeight: 600, color: '#d46b08', fontSize: 13, marginBottom: 10 }}>
-              <ExperimentOutlined style={{ marginRight: 6 }} />
-              Parámetros Físico-Químicos In-Situ
-            </div>
+          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2 flex items-center gap-2 m-0">
+              <ExperimentOutlined /> Parámetros Físico-Químicos In-Situ
+            </h3>
             <Row gutter={12}>
               <Col xs={24} sm={8}>
                 <Form.Item
@@ -1732,6 +1746,7 @@ const FieldTripsManager = () => {
                     max={200}
                     addonAfter="°C"
                     placeholder="Ej: 91.5"
+                    size="middle"
                   />
                 </Form.Item>
               </Col>
@@ -1748,6 +1763,7 @@ const FieldTripsManager = () => {
                     max={14}
                     addonAfter="pH"
                     placeholder="Ej: 3.2"
+                    size="middle"
                   />
                 </Form.Item>
               </Col>
@@ -1763,6 +1779,7 @@ const FieldTripsManager = () => {
                     step={1}
                     addonAfter="µS/cm"
                     placeholder="Ej: 2150"
+                    size="middle"
                   />
                 </Form.Item>
               </Col>
@@ -1773,13 +1790,15 @@ const FieldTripsManager = () => {
               label={<span style={{ fontSize: 12 }}>Notas breves (opcional)</span>}
               style={{ marginBottom: 0 }}
             >
-              <Input placeholder="Ej: Fumarola activa, olor a azufre, agua turbia" />
+              <Input placeholder="Ej: Fumarola activa, olor a azufre, agua turbia" size="middle" />
             </Form.Item>
-          </Card>
+          </div>
 
           {/* Submit Actions */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, paddingTop: 8 }}>
             <Button
+              size="large"
+              className="poppins"
               onClick={() => {
                 setFastPointModalVisible(false);
                 fastPointForm.resetFields();
@@ -1791,18 +1810,16 @@ const FieldTripsManager = () => {
             </Button>
             <Button
               type="primary"
+              size="large"
               htmlType="submit"
               loading={fastPointSubmitting}
               icon={<ThunderboltOutlined />}
               style={{
-                minWidth: 190,
-                height: 40,
-                fontWeight: 700,
-                fontSize: 14,
-                background: 'linear-gradient(135deg, #fa8c16 0%, #d46b08 100%)',
-                borderColor: '#fa8c16',
-                boxShadow: '0 2px 8px rgba(250, 140, 22, 0.35)',
+                minWidth: 200,
+                backgroundColor: '#12467E',
+                borderColor: '#12467E',
               }}
+              className="poppins-bold"
             >
               Guardar Punto Rápido
             </Button>
@@ -1813,20 +1830,22 @@ const FieldTripsManager = () => {
       {/* Drawer: Detailed Trip View + Participants + Manifestations + Comments */}
       <Drawer
         title={
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingRight: 24 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <CompassOutlined style={{ color: '#fa8c16', fontSize: 20 }} />
+          <div className="flex items-center justify-between w-full pr-6 py-1 border-b border-gray-100 poppins">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-lg bg-blue-50 text-geoterra-blue flex items-center justify-center text-lg flex-shrink-0">
+                <CompassOutlined />
+              </div>
               <div>
-                <Text strong style={{ fontSize: 16 }}>
+                <span className="poppins-bold text-base text-geoterra-blue block">
                   {selectedTrip?.field_trip_name || 'Detalle de la Gira'}
-                </Text>
-                <div style={{ fontSize: 12, color: '#8c8c8c' }} className="font-mono">
-                  {selectedTrip?.field_trip_id || selectedTrip?.id}
-                </div>
+                </span>
+                <span className="text-xs text-gray-400 font-mono">
+                  #{selectedTrip?.field_trip_id || selectedTrip?.id}
+                </span>
               </div>
             </div>
             {selectedTrip && (
-              <Tag color={selectedTrip.field_trip_is_active ? 'green' : 'default'} style={{ fontSize: 13, padding: '2px 8px' }}>
+              <Tag color={selectedTrip.field_trip_is_active ? 'green' : 'default'} className="rounded-full text-xs font-semibold px-2.5 py-0.5">
                 {selectedTrip.field_trip_is_active ? 'Activa' : 'Inactiva / Concluida'}
               </Tag>
             )}
@@ -2146,9 +2165,10 @@ const FieldTripsManager = () => {
       {/* Modal: Lab Revision - Rename Geomanifestation */}
       <Modal
         title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <EditOutlined style={{ color: '#1890ff' }} />
-            <span>Revisión de Laboratorio: Renombrar Geomanifestación</span>
+          <div className="flex items-center gap-2 py-2 pr-6 border-b border-gray-100">
+            <span className="poppins-bold text-xl text-geoterra-blue flex items-center gap-2">
+              <EditOutlined className="text-geoterra-blue" /> Revisión de Laboratorio: Renombrar Geomanifestación
+            </span>
           </div>
         }
         open={renameModalVisible}
@@ -2161,36 +2181,49 @@ const FieldTripsManager = () => {
         confirmLoading={renameSubmitting}
         okText="Guardar Nombre Formal"
         cancelText="Cancelar"
+        okButtonProps={{
+          style: { backgroundColor: '#12467E', borderColor: '#12467E' },
+          className: 'poppins-bold',
+        }}
+        cancelButtonProps={{
+          className: 'poppins',
+        }}
         destroyOnClose
       >
-        <div style={{ marginBottom: 16, color: '#595959', fontSize: 13 }}>
-          Asigna el nombre formal y completa los detalles de laboratorio para el punto registrado en campo.
+        <div className="py-2 space-y-4 poppins">
+          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <p className="text-xs text-gray-500 m-0 poppins">
+              Asigna el nombre formal y completa los detalles de laboratorio para el punto registrado en campo.
+            </p>
+            <Form
+              form={renameForm}
+              layout="vertical"
+              onFinish={handleRenameSubmit}
+              className="poppins"
+            >
+              <Form.Item
+                name="geomanifestation_name"
+                label={<span className="font-semibold text-gray-700">Nombre Formal de la Geomanifestación</span>}
+                rules={[
+                  { required: true, message: 'Ingresa el nombre formal' },
+                  { max: 255, message: 'Máximo 255 caracteres' },
+                ]}
+              >
+                <Input placeholder="Ej: Fumarola Las Hornillas Sector B" autoFocus className="rounded-lg py-1.5" />
+              </Form.Item>
+              <Form.Item
+                name="description"
+                label={<span className="font-semibold text-gray-700">Descripción y Notas de Laboratorio (opcional)</span>}
+              >
+                <Input.TextArea
+                  rows={3}
+                  placeholder="Detalles geológicos, contexto del muestreo o notas adicionales..."
+                  className="rounded-lg"
+                />
+              </Form.Item>
+            </Form>
+          </div>
         </div>
-        <Form
-          form={renameForm}
-          layout="vertical"
-          onFinish={handleRenameSubmit}
-        >
-          <Form.Item
-            name="geomanifestation_name"
-            label="Nombre Formal de la Geomanifestación"
-            rules={[
-              { required: true, message: 'Ingresa el nombre formal' },
-              { max: 255, message: 'Máximo 255 caracteres' },
-            ]}
-          >
-            <Input placeholder="Ej: Fumarola Las Hornillas Sector B" autoFocus />
-          </Form.Item>
-          <Form.Item
-            name="description"
-            label="Descripción y Notas de Laboratorio (opcional)"
-          >
-            <Input.TextArea
-              rows={3}
-              placeholder="Detalles geológicos, contexto del muestreo o notas adicionales..."
-            />
-          </Form.Item>
-        </Form>
       </Modal>
     </div>
   );

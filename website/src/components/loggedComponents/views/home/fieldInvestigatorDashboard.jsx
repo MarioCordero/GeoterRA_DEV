@@ -1,7 +1,15 @@
 import React from 'react';
-import { Card, Row, Col } from 'antd';
+import { Tag, Spin } from 'antd';
+import {
+  CompassOutlined,
+  EnvironmentOutlined,
+  ThunderboltOutlined,
+  CheckCircleOutlined
+} from '@ant-design/icons';
 import { useSession } from '../../../../hooks/useSession';
 import UserInfo from './userInfo';
+import '../../../../colorModule.css';
+import '../../../../fontsModule.css';
 
 const FieldInvestigatorDashboard = () => {
   const { user: sessionUser, loading } = useSession();
@@ -9,70 +17,91 @@ const FieldInvestigatorDashboard = () => {
   if (loading) {
     return (
       <div className="w-full min-h-96 flex items-center justify-center">
-        <p>Cargando...</p>
+        <Spin size="large" tip="Cargando panel de campo..." />
       </div>
     );
   }
 
   return (
-    <div className="w-full min-h-screen p-4 md:p-6">
-      {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg p-8 mb-6">
-        <h1 className="text-4xl font-bold mb-2">
-          ¡Bienvenido, {sessionUser?.first_name || sessionUser?.email}!
-        </h1>
-        <p className="text-emerald-100">Panel de Investigador de Campo - GeoterRA</p>
+    <div className="w-full p-4 md:p-8 space-y-6 poppins">
+      {/* Header Card */}
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-geoterra-orange poppins">
+              OPERACIONES DE CAMPO • GEOTERRA
+            </span>
+            <Tag color="cyan" className="m-0 text-[11px] font-semibold">
+              Investigador de Campo
+            </Tag>
+          </div>
+          <h1 className="text-2xl md:text-3xl font-bold text-geoterra-blue m-0 poppins">
+            ¡Bienvenido, {sessionUser?.first_name || sessionUser?.name || 'Investigador de Campo'}!
+          </h1>
+          <p className="text-sm text-gray-500 mt-1 mb-0 max-w-2xl">
+            Gestión expedita para toma de mediciones bajo condiciones de alta temperatura y registro rápido en terreno.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Tag color="success" className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+            <CheckCircleOutlined /> Modo Terreno Habilitado
+          </Tag>
+        </div>
       </div>
 
       {/* User Info Cards */}
       <UserInfo />
 
-      {/* Role Description: Field Investigator */}
-      <Card className="mb-8 bg-green-50 border-l-4 border-green-500">
-        <h3 className="text-xl font-bold mb-3">📋 Descripción del Rol: Investigador de Campo</h3>
-        <p className="text-gray-700 mb-4">
-          Como Investigador de Campo, tu enfoque principal está en el terreno. Tienes la autoridad para participar,
-          iniciar y gestionar estudios directamente asociados a giras de campo.
-        </p>
-        <h4 className="font-semibold text-gray-800 mb-2">🎯 Responsabilidades Principales:</h4>
-        <ul style={{ margin: '0', paddingLeft: '20px', color: '#333' }}>
-          <li>Participar activamente en estudios de campo (Gira).</li>
-          <li>Iniciar estudios de un punto de manifestación durante una gira.</li>
-          <li>Revisar estudios iniciados en el contexto de giras.</li>
-          <li>Eliminar estudios de giras cuando sea necesario.</li>
-        </ul>
-      </Card>
+      {/* Quick Navigation Cards */}
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+        <div className="border-b border-gray-100 pb-3">
+          <span className="text-xs font-bold uppercase tracking-wider text-geoterra-orange poppins block">
+            OPERACIONES EN TERRENO
+          </span>
+          <h3 className="text-lg font-bold text-geoterra-blue m-0 poppins">
+            Herramientas de Expedición y Levantamiento
+          </h3>
+        </div>
 
-      {/* Capabilities: Field Investigator */}
-      <Card className="mb-8 bg-emerald-50 border-l-4 border-emerald-500">
-        <h3 className="text-lg font-bold mb-4">🎯 ¿Qué puedes hacer aquí?</h3>
-        <Row gutter={16}>
-          <Col xs={24} sm={12} md={6}>
-            <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-green-600 mb-2">🎒 Participar en Giras</h4>
-              <p className="text-sm text-gray-600">Únete y colabora en estudios de campo programados en el sistema.</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-[#12467E] transition-all group">
+            <div className="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-700 flex items-center justify-center text-lg mb-3">
+              <CompassOutlined />
             </div>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-green-600 mb-2">📍 Iniciar Estudio (Gira)</h4>
-              <p className="text-sm text-gray-600">Registra un nuevo punto de manifestación encontrado durante el trabajo de campo.</p>
+            <h4 className="font-bold text-gray-800 text-base m-0 mb-1 group-hover:text-[#12467E] transition-colors">
+              Giras Asignadas
+            </h4>
+            <p className="text-xs text-gray-500 m-0">
+              Consulta las giras vigentes, bitácoras y miembros del equipo de expedición.
+            </p>
+          </div>
+
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-[#12467E] transition-all group">
+            <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center text-lg mb-3">
+              <ThunderboltOutlined />
             </div>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-green-600 mb-2">📋 Revisar Giras</h4>
-              <p className="text-sm text-gray-600">Visualiza el progreso y los detalles de los estudios de terreno iniciados.</p>
+            <h4 className="font-bold text-gray-800 text-base m-0 mb-1 group-hover:text-[#12467E] transition-colors">
+              Puntos Rápidos
+            </h4>
+            <p className="text-xs text-gray-500 m-0">
+              Captura inmediata de coordenadas GPS, fotos y temperatura en fumarolas o manantiales.
+            </p>
+          </div>
+
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-[#12467E] transition-all group">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#12467E] flex items-center justify-center text-lg mb-3">
+              <EnvironmentOutlined />
             </div>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-green-600 mb-2">❌ Gestión de Giras</h4>
-              <p className="text-sm text-gray-600">Elimina registros de estudios de campo que contengan errores o sean obsoletos.</p>
-            </div>
-          </Col>
-        </Row>
-      </Card>
+            <h4 className="font-bold text-gray-800 text-base m-0 mb-1 group-hover:text-[#12467E] transition-colors">
+              Borradores en Estudio
+            </h4>
+            <p className="text-xs text-gray-500 m-0">
+              Sitios pendientes de revisión de laboratorio antes de la publicación oficial en el mapa.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

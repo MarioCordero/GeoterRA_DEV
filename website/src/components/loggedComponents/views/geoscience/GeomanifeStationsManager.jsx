@@ -91,8 +91,9 @@ const GeomanifeStationsManager = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('1');
 
-  // Search
+  // Search & Filters
   const [searchText, setSearchText] = useState('');
+  const [selectedFieldTripFilter, setSelectedFieldTripFilter] = useState('all');
 
   // Main Point Form / Modal states
   const [modalVisible, setModalVisible] = useState(false);
@@ -775,7 +776,23 @@ const GeomanifeStationsManager = () => {
   };
 
   const filteredPublicList = filterList(manifestations);
-  const filteredDraftList = filterList(acceptedRequestsManifestations);
+  const filteredDraftList = acceptedRequestsManifestations.filter(item => {
+    const matchesSearch = !searchText ||
+      (item.name && item.name.toLowerCase().includes(searchText.toLowerCase())) ||
+      (item.geomanifestation_id && item.geomanifestation_id.toLowerCase().includes(searchText.toLowerCase())) ||
+      (item.description && item.description.toLowerCase().includes(searchText.toLowerCase()));
+
+    let matchesTrip = true;
+    if (selectedFieldTripFilter && selectedFieldTripFilter !== 'all') {
+      if (selectedFieldTripFilter === 'none') {
+        matchesTrip = !item.field_trip_id;
+      } else {
+        matchesTrip = String(item.field_trip_id) === String(selectedFieldTripFilter);
+      }
+    }
+
+    return matchesSearch && matchesTrip;
+  });
 
   // --- COLUMNS FOR TAB 1 (PÚBLICAS) ---
   const columnsPublic = [
@@ -906,16 +923,27 @@ const GeomanifeStationsManager = () => {
       title: 'Geomanifestación en Borrador',
       dataIndex: 'name',
       key: 'name',
-      render: (text, record) => (
-        <div>
-          <span className="font-semibold text-blue-600 hover:text-blue-800 block cursor-pointer">
-            {text || record.geomanifestation_name || `Geomanifestación-${record.geomanifestation_id || record.id}`}
-          </span>
-          <Text type="secondary" style={{ fontSize: '11px' }} className="block font-mono">
-            {record.hasRequestId ? `Originada de Solicitud: ${record.request_id}` : `ID Borrador: ${record.geomanifestation_id || record.id}`}
-          </Text>
-        </div>
-      ),
+      render: (text, record) => {
+        const linkedTrip = record.field_trip_id
+          ? fieldTripsList.find(t => String(t.field_trip_id || t.id) === String(record.field_trip_id))
+          : null;
+
+        return (
+          <div>
+            <span className="font-semibold text-blue-600 hover:text-blue-800 block cursor-pointer">
+              {text || record.geomanifestation_name || `Geomanifestación-${record.geomanifestation_id || record.id}`}
+            </span>
+            <Text type="secondary" style={{ fontSize: '11px' }} className="block font-mono">
+              {record.hasRequestId ? `Originada de Solicitud: ${record.request_id}` : `ID Borrador: ${record.geomanifestation_id || record.id}`}
+            </Text>
+            {linkedTrip && (
+              <Tag color="orange" icon={<CompassOutlined />} style={{ fontSize: '11px', marginTop: 3 }}>
+                {linkedTrip.field_trip_name || `Gira #${record.field_trip_id}`}
+              </Tag>
+            )}
+          </div>
+        );
+      },
     },
     {
       title: 'Ubicación GPS',
@@ -1093,14 +1121,53 @@ const GeomanifeStationsManager = () => {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
-            <Input
-              placeholder="Buscar borradores por nombre, ID o descripción..."
-              prefix={<SearchOutlined style={{ color: '#aaa' }} />}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              style={{ width: 340 }}
-              allowClear
-            />
+            <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+              <Input
+                placeholder="Buscar borradores por nombre, ID o descripción..."
+                prefix={<SearchOutlined style={{ color: '#aaa' }} />}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                style={{ width: 300 }}
+                allowClear
+              />
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fafafa', padding: '4px 12px', borderRadius: 6, border: '1px solid #d9d9d9' }}>
+                <CompassOutlined style={{ color: '#fa8c16' }} />
+                <span style={{ fontSize: '13px', fontWeight: 500, color: '#595959' }}>
+                  Mostrar borradores de:
+                </span>
+                <Select
+                  value={selectedFieldTripFilter}
+                  onChange={(val) => setSelectedFieldTripFilter(val)}
+                  style={{ minWidth: 260 }}
+                  placeholder="Seleccionar gira"
+                >
+                  <Select.Option value="all">Todas las giras ({acceptedRequestsManifestations.length})</Select.Option>
+                  <Select.Option value="none">Sin gira asignada ({acceptedRequestsManifestations.filter(d => !d.field_trip_id).length})</Select.Option>
+                  {fieldTripsList.map((trip) => {
+                    const tripId = trip.field_trip_id || trip.id;
+                    const tripName = trip.field_trip_name || trip.name || `Gira #${tripId}`;
+                    const dateStr = trip.field_trip_scheduled_date || trip.scheduled_date;
+                    const count = acceptedRequestsManifestations.filter(d => String(d.field_trip_id) === String(tripId)).length;
+                    return (
+                      <Select.Option key={tripId} value={tripId}>
+                        {tripName} {dateStr ? `(${dateStr})` : ''} ({count})
+                      </Select.Option>
+                    );
+                  })}
+                </Select>
+              </div>
+            </div>
+
+            {selectedFieldTripFilter && selectedFieldTripFilter !== 'all' && (
+              <Tag color="orange" closable onClose={() => setSelectedFieldTripFilter('all')} style={{ margin: 0, padding: '4px 8px', fontSize: '12px' }}>
+                Filtrado por:{' '}
+                {selectedFieldTripFilter === 'none'
+                  ? 'Sin gira asignada'
+                  : (fieldTripsList.find(t => String(t.field_trip_id || t.id) === String(selectedFieldTripFilter))?.field_trip_name || `Gira #${selectedFieldTripFilter}`)}
+                {' '}({filteredDraftList.length} de {acceptedRequestsManifestations.length})
+              </Tag>
+            )}
           </div>
 
           <Table
@@ -1120,40 +1187,150 @@ const GeomanifeStationsManager = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
-      <Card style={{ borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <EnvironmentOutlined style={{ fontSize: 32, color: '#1890ff' }} />
-            <div>
-              <Title level={3} style={{ margin: 0 }}>Gestión de Geomanifestaciones</Title>
-              <Paragraph type="secondary" style={{ margin: 0 }}>
-                {manifestations.length} Públicas en Mapa | {acceptedRequestsManifestations.length} En Borrador / Estudio
-              </Paragraph>
-            </div>
+    <div className="w-full p-4 md:p-8 space-y-6 poppins">
+      {/* ========================================================================= */}
+      {/* HEADER SECTION                                                            */}
+      {/* ========================================================================= */}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs uppercase tracking-wider font-bold text-geoterra-orange poppins">
+              Geociencias • Inventario Geotérmico
+            </span>
+            <Tag className="rounded-full font-semibold text-[11px] bg-blue-50 text-geoterra-blue border-blue-200">
+              {manifestations.length + acceptedRequestsManifestations.length} Registros
+            </Tag>
           </div>
+          <h1 className="text-2xl md:text-3xl poppins-bold text-geoterra-blue m-0 flex items-center gap-2.5">
+            <EnvironmentOutlined className="text-geoterra-blue" /> Gestión de Geomanifestaciones
+          </h1>
+          <p className="text-xs md:text-sm text-gray-500 m-0 mt-1 poppins">
+            Inventario geoquímico, georeportes consolidados, mediciones geotermales y publicación cartográfica oficial.
+          </p>
+        </div>
 
+        <div className="flex items-center gap-2.5 flex-wrap">
           <Button
-            icon={<ReloadOutlined />}
+            icon={<ReloadOutlined spin={loading} />}
             onClick={() => loadManifestations()}
             loading={loading}
+            className="poppins font-medium border-gray-300"
           >
             Actualizar
           </Button>
         </div>
+      </div>
 
+      {/* ========================================================================= */}
+      {/* METRICS DASHBOARD                                                         */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total */}
+        <div
+          onClick={() => setActiveTab('1')}
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
+            activeTab === '1'
+              ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
+              : 'border-gray-200 shadow-sm hover:border-gray-300'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Sitios</span>
+            <div className="w-9 h-9 rounded-lg bg-blue-50 text-geoterra-blue flex items-center justify-center text-base">
+              <EnvironmentOutlined />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold poppins text-gray-900">
+              {manifestations.length + acceptedRequestsManifestations.length}
+            </span>
+            <span className="text-xs text-gray-400">sitios</span>
+          </div>
+          <div className="mt-2 text-xs text-gray-500">Públicas y en estudio</div>
+        </div>
+
+        {/* Publicas en Mapa */}
+        <div
+          onClick={() => setActiveTab('1')}
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
+            activeTab === '1'
+              ? 'border-emerald-400 shadow-md ring-2 ring-emerald-100'
+              : 'border-gray-200 shadow-sm hover:border-gray-300'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Públicas en Mapa</span>
+            <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-base">
+              <EyeOutlined />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold poppins text-emerald-900">{manifestations.length}</span>
+            <span className="text-xs text-emerald-600">visibles</span>
+          </div>
+          <div className="mt-2 text-xs text-emerald-700 font-medium">Publicadas oficialmente</div>
+        </div>
+
+        {/* Borradores */}
+        <div
+          onClick={() => setActiveTab('2')}
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
+            activeTab === '2'
+              ? 'border-amber-400 shadow-md ring-2 ring-amber-100'
+              : 'border-gray-200 shadow-sm hover:border-gray-300'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">Borradores / En Estudio</span>
+            <div className="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-base">
+              <ExperimentOutlined />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold poppins text-amber-900">{acceptedRequestsManifestations.length}</span>
+            <span className="text-xs text-amber-600">en preparación</span>
+          </div>
+          <div className="mt-2 text-xs text-amber-700 font-medium">Requieren completar georeporte</div>
+        </div>
+
+        {/* Listas para Publicar */}
+        <div
+          onClick={() => setActiveTab('2')}
+          className="cursor-pointer bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:border-blue-300 transition-all"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider">Listas para Publicar</span>
+            <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-base">
+              <RocketOutlined />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold poppins text-blue-900">
+              {acceptedRequestsManifestations.filter((d) => d.hasGeoreport).length}
+            </span>
+            <span className="text-xs text-blue-600">con georeporte</span>
+          </div>
+          <div className="mt-2 text-xs text-blue-700 font-medium">Listas para subir al mapa</div>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* DATA TABS CARD                                                            */}
+      {/* ========================================================================= */}
+      <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-4">
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
+          <div className="text-center py-16">
             <Spin size="large" tip="Cargando geomanifestaciones..." />
           </div>
         ) : (
           <Tabs
             activeKey={activeTab}
             onChange={setActiveTab}
+            className="poppins"
             items={tabItems}
           />
         )}
-      </Card>
+      </div>
 
       {/* ========================================================================= */}
       {/* COMPREHENSIVE HIERARCHICAL DRAWER: GEOMANIFESTATION -> GEOREPORTS -> TESTS*/}
@@ -1163,27 +1340,24 @@ const GeomanifeStationsManager = () => {
         onClose={() => setDrawerVisible(false)}
         width={Math.min(980, typeof window !== 'undefined' ? window.innerWidth * 0.95 : 980)}
         title={
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%', gap: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <EnvironmentOutlined style={{ fontSize: 26, color: '#1890ff', marginTop: 2 }} />
+          <div className="flex items-center justify-between w-full pr-6 py-1 border-b border-gray-100 poppins">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-blue-50 text-geoterra-blue flex items-center justify-center text-lg flex-shrink-0">
+                <EnvironmentOutlined />
+              </div>
               <div>
-                <Title level={4} style={{ margin: 0, lineHeight: 1.2 }}>
+                <span className="poppins-bold text-lg text-geoterra-blue block">
                   {selectedGeo?.name || selectedGeo?.geomanifestation_name || 'Geomanifestación'}
-                </Title>
-                <Space size="small" wrap style={{ marginTop: 4 }}>
-                  <span className="font-mono text-xs text-gray-500">ID: {selectedGeo?.geomanifestation_id || selectedGeo?.id}</span>
+                </span>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="font-mono text-xs text-gray-400">ID: #{selectedGeo?.geomanifestation_id || selectedGeo?.id}</span>
                   {selectedGeo?.isVisible ? (
-                    <Tag color="success" icon={<EyeOutlined />}>Pública en Mapa</Tag>
+                    <Tag color="success" icon={<EyeOutlined />} className="rounded-full text-[11px] m-0">Pública en Mapa</Tag>
                   ) : (
-                    <Tag color="warning" icon={<EyeInvisibleOutlined />}>Borrador / Estudio</Tag>
+                    <Tag color="warning" icon={<EyeInvisibleOutlined />} className="rounded-full text-[11px] m-0">Borrador / Estudio</Tag>
                   )}
-                  {selectedGeo?.locationText && <Tag color="blue">{selectedGeo.locationText}</Tag>}
-                  {selectedGeo?.latitude && selectedGeo?.longitude && (
-                    <Tag className="font-mono text-xs">
-                      GPS: {parseFloat(selectedGeo.latitude).toFixed(4)}°, {parseFloat(selectedGeo.longitude).toFixed(4)}°
-                    </Tag>
-                  )}
-                </Space>
+                  {selectedGeo?.locationText && <Tag color="blue" className="rounded-full text-[11px] m-0">{selectedGeo.locationText}</Tag>}
+                </div>
               </div>
             </div>
 
@@ -1202,6 +1376,7 @@ const GeomanifeStationsManager = () => {
                   size="small"
                   disabled={!selectedGeo?.hasGeoreport}
                   style={{ backgroundColor: selectedGeo?.hasGeoreport ? '#52c41a' : undefined, borderColor: selectedGeo?.hasGeoreport ? '#52c41a' : undefined }}
+                  className="poppins-bold"
                 >
                   Publicar en Mapa
                 </Button>
@@ -1765,11 +1940,15 @@ const GeomanifeStationsManager = () => {
       {/* ========================================================================= */}
       {/* MODAL: ASSOCIATE GEOREPORT (SELECT IN-SITU + SELECT IN-LAB)                */}
       {/* ========================================================================= */}
+      {/* ========================================================================= */}
+      {/* ========================================================================= */}
+      {/* MODAL: ASSOCIATE GEOREPORT (SELECT IN-SITU + SELECT IN-LAB)                */}
+      {/* ========================================================================= */}
       <Modal
         title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <FileSearchOutlined style={{ color: '#fa8c16' }} />
-            <span>
+          <div className="flex items-center gap-2 py-2 pr-6 border-b border-gray-100">
+            <span className="poppins-bold text-xl text-geoterra-blue flex items-center gap-2">
+              <FileSearchOutlined className="text-geoterra-blue" />
               {editingGeoreport ? 'Editar Asociación de Georeporte' : 'Asociar Georeporte'} — {selectedGeo?.name}
             </span>
           </div>
@@ -1783,6 +1962,13 @@ const GeomanifeStationsManager = () => {
         confirmLoading={submittingGeoreport}
         okText={editingGeoreport ? 'Guardar Cambios' : 'Asociar Georeporte'}
         cancelText="Cancelar"
+        okButtonProps={{
+          style: { backgroundColor: '#12467E', borderColor: '#12467E' },
+          className: 'poppins-bold',
+        }}
+        cancelButtonProps={{
+          className: 'poppins',
+        }}
         width={750}
         styles={{
           body: {
@@ -1796,29 +1982,28 @@ const GeomanifeStationsManager = () => {
           form={georeportForm}
           layout="vertical"
           onFinish={handleSaveGeoreport}
+          className="poppins space-y-4 py-2"
         >
-          <div style={{ marginBottom: 16 }}>
-            <Text type="secondary">
-              Selecciona una medición de campo (In-Situ) y un análisis de laboratorio (Geoquímica) ya registrados para consolidar este georeporte.
-            </Text>
-          </div>
+          <p className="text-xs text-gray-500 m-0 poppins">
+            Selecciona una medición de campo (In-Situ) y un análisis de laboratorio (Geoquímica) ya registrados para consolidar este georeporte.
+          </p>
 
           {(insituTests.length === 0 || inlabTests.length === 0) && (
             <Alert
               type="warning"
               showIcon
-              style={{ marginBottom: 16 }}
-              message="Pruebas requeridas para asociar"
+              className="rounded-xl border border-amber-200"
+              message={<span className="poppins-bold text-amber-900">Pruebas requeridas para asociar</span>}
               description={
-                <div style={{ fontSize: '12px' }}>
+                <div className="text-xs poppins text-amber-800">
                   Un georeporte requiere vincular tanto una prueba in-situ como una de laboratorio.
                   {insituTests.length === 0 && (
-                    <div style={{ marginTop: 4 }}>
+                    <div className="mt-1">
                       • <strong>Falta prueba in-situ:</strong> Puedes registrarla en la pestaña <em>Pruebas In-Situ</em>.
                     </div>
                   )}
                   {inlabTests.length === 0 && (
-                    <div style={{ marginTop: 4 }}>
+                    <div className="mt-1">
                       • <strong>Falta análisis de laboratorio:</strong> Puedes registrarlo en la pestaña <em>Pruebas de Laboratorio</em>.
                     </div>
                   )}
@@ -1828,18 +2013,13 @@ const GeomanifeStationsManager = () => {
           )}
 
           {/* 1. SECCIÓN: PRUEBA IN-SITU */}
-          <Card
-            size="small"
-            style={{ marginBottom: 16, background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 8 }}
-            title={
-              <span style={{ color: '#237804', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <BulbOutlined /> 1. Prueba de Campo (In-Situ)
-              </span>
-            }
-          >
+          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2.5 flex items-center gap-2 m-0">
+              <BulbOutlined className="text-geoterra-blue" /> 1. Prueba de Campo (In-Situ)
+            </h3>
             <Form.Item
               name="insitu_test_id"
-              label="Seleccionar Medición In-Situ"
+              label={<span className="font-semibold text-gray-700">Seleccionar Medición In-Situ</span>}
               rules={[{ required: true, message: 'Selecciona una prueba in-situ' }]}
               style={{ marginBottom: 0 }}
             >
@@ -1847,6 +2027,7 @@ const GeomanifeStationsManager = () => {
                 placeholder={insituTests.length === 0 ? "No hay pruebas in-situ disponibles" : "Selecciona una prueba in-situ para asociar"}
                 disabled={insituTests.length === 0}
                 allowClear
+                className="w-full rounded-lg"
               >
                 {insituTests.map((t) => (
                   <Select.Option key={t.insitu_test_id || t.id} value={t.insitu_test_id || t.id}>
@@ -1855,21 +2036,16 @@ const GeomanifeStationsManager = () => {
                 ))}
               </Select>
             </Form.Item>
-          </Card>
+          </div>
 
           {/* 2. SECCIÓN: PRUEBA DE LABORATORIO */}
-          <Card
-            size="small"
-            style={{ marginBottom: 16, background: '#f9f0ff', border: '1px solid #d3adf7', borderRadius: 8 }}
-            title={
-              <span style={{ color: '#531dab', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <BarChartOutlined /> 2. Prueba de Laboratorio (Geoquímica)
-              </span>
-            }
-          >
+          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2.5 flex items-center gap-2 m-0">
+              <BarChartOutlined className="text-geoterra-blue" /> 2. Prueba de Laboratorio (Geoquímica)
+            </h3>
             <Form.Item
               name="inlab_test_id"
-              label="Seleccionar Análisis de Laboratorio"
+              label={<span className="font-semibold text-gray-700">Seleccionar Análisis de Laboratorio</span>}
               rules={[{ required: true, message: 'Selecciona una prueba de laboratorio' }]}
               style={{ marginBottom: 0 }}
             >
@@ -1877,6 +2053,7 @@ const GeomanifeStationsManager = () => {
                 placeholder={inlabTests.length === 0 ? "No hay análisis de laboratorio disponibles" : "Selecciona una prueba de laboratorio para asociar"}
                 disabled={inlabTests.length === 0}
                 allowClear
+                className="w-full rounded-lg"
               >
                 {inlabTests.map((t) => (
                   <Select.Option key={t.inlab_test_id || t.id} value={t.inlab_test_id || t.id}>
@@ -1885,21 +2062,16 @@ const GeomanifeStationsManager = () => {
                 ))}
               </Select>
             </Form.Item>
-          </Card>
+          </div>
 
           {/* 3. SECCIÓN: DETALLES DEL GEOREPORTE */}
-          <Card
-            size="small"
-            style={{ background: '#fffbe6', border: '1px solid #ffe58f', borderRadius: 8 }}
-            title={
-              <span style={{ color: '#d46b08', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <FileSearchOutlined /> 3. Diagnóstico y Publicación del Georeporte
-              </span>
-            }
-          >
+          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2.5 flex items-center gap-2 m-0">
+              <FileSearchOutlined className="text-geoterra-blue" /> 3. Diagnóstico y Publicación del Georeporte
+            </h3>
             <Form.Item
               name="details"
-              label="Conclusiones de la Evaluación Geotérmica"
+              label={<span className="font-semibold text-gray-700">Conclusiones de la Evaluación Geotérmica</span>}
               rules={[{ max: 500, message: 'Máximo 500 caracteres' }]}
             >
               <Input.TextArea
@@ -1907,15 +2079,16 @@ const GeomanifeStationsManager = () => {
                 placeholder="Diagnóstico geotérmico del recurso, estimación de temperatura profunda, clasificación hidrogeoquímica..."
                 maxLength={500}
                 showCount
+                className="rounded-lg"
               />
             </Form.Item>
 
             <Form.Item name="set_as_current" valuePropName="checked" style={{ marginBottom: 0 }}>
               <Checkbox>
-                <strong style={{ color: '#d46b08' }}>⭐ Establecer como Georeporte Vigente oficial</strong> (publicado en el mapa de GeoterRA)
+                <span className="poppins-bold text-geoterra-blue">⭐ Establecer como Georeporte Vigente oficial</span> <span className="text-xs text-gray-500">(publicado en el mapa de GeoterRA)</span>
               </Checkbox>
             </Form.Item>
-          </Card>
+          </div>
         </Form>
       </Modal>
 
@@ -1924,9 +2097,11 @@ const GeomanifeStationsManager = () => {
       {/* ========================================================================= */}
       <Modal
         title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <EnvironmentOutlined style={{ color: '#1890ff' }} />
-            <span>{editingItem ? 'Editar Geomanifestación' : 'Agregar Punto Manualmente'}</span>
+          <div className="flex items-center gap-2 py-2 pr-6 border-b border-gray-100">
+            <span className="poppins-bold text-xl text-geoterra-blue flex items-center gap-2">
+              <EnvironmentOutlined className="text-geoterra-blue" />
+              {editingItem ? 'Editar Geomanifestación' : 'Agregar Punto Manualmente'}
+            </span>
           </div>
         }
         open={modalVisible}
@@ -1935,6 +2110,13 @@ const GeomanifeStationsManager = () => {
         okText={editingItem ? 'Guardar Cambios' : 'Guardar Geomanifestación'}
         cancelText="Cancelar"
         confirmLoading={submitting}
+        okButtonProps={{
+          style: { backgroundColor: '#12467E', borderColor: '#12467E' },
+          className: 'poppins-bold',
+        }}
+        cancelButtonProps={{
+          className: 'poppins',
+        }}
         width={800}
         centered
         styles={{
@@ -1949,97 +2131,125 @@ const GeomanifeStationsManager = () => {
           form={form}
           layout="vertical"
           onFinish={handleSubmit}
+          className="poppins space-y-4 py-2"
         >
-          <Form.Item label="Seleccionar Coordenadas GPS en el Mapa">
-            <MapCoordinatePicker
-              latLng={selectedCoordinates}
-              onCoordinatesChange={(coords) => {
-                setSelectedCoordinates(coords);
-                form.setFieldsValue({
-                  latitude: coords.lat,
-                  longitude: coords.lng,
-                });
-              }}
-              title="Coordenadas GPS"
-              mapHeight="320px"
-              showApplyButton={false}
-              showClearButton={true}
-            />
-          </Form.Item>
-
-          <Form.Item name="latitude" hidden>
-            <InputNumber />
-          </Form.Item>
-
-          <Form.Item name="longitude" hidden>
-            <InputNumber />
-          </Form.Item>
-
-          <hr className="my-4" />
-          <h3 className="font-semibold text-base mb-4">ℹ️ Información del Punto</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Form.Item
-              name="name"
-              label="Nombre del Punto"
-              rules={[{ required: true, message: 'El nombre es requerido' }]}
-            >
-              <Input placeholder="Ej: Termal Sitio U1" />
+          {/* Seccion 1: Coordenadas GPS */}
+          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2.5 flex items-center gap-2 m-0">
+              <EnvironmentOutlined className="text-geoterra-blue" /> Ubicación y Coordenadas GPS
+            </h3>
+            <Form.Item style={{ marginBottom: 0 }}>
+              <MapCoordinatePicker
+                latLng={selectedCoordinates}
+                onCoordinatesChange={(coords) => {
+                  setSelectedCoordinates(coords);
+                  form.setFieldsValue({
+                    latitude: coords.lat,
+                    longitude: coords.lng,
+                  });
+                }}
+                title="Coordenadas GPS"
+                mapHeight="320px"
+                showApplyButton={false}
+                showClearButton={true}
+              />
             </Form.Item>
 
-            <Form.Item
-              name="province_snit_code"
-              label="Provincia"
-            >
-              <Select placeholder="Selecciona una provincia" onChange={handleProvinceChange} allowClear>
-                {provinces.map((prov) => (
-                  <Select.Option key={prov.province_snit_code || prov.province_id} value={prov.province_snit_code}>
-                    {prov.province_name}
-                  </Select.Option>
-                ))}
-              </Select>
+            <Form.Item name="latitude" hidden>
+              <InputNumber />
+            </Form.Item>
+
+            <Form.Item name="longitude" hidden>
+              <InputNumber />
             </Form.Item>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Form.Item name="canton_snit_code" label="Cantón">
-              <Select placeholder="Selecciona un cantón" onChange={handleCantonChange} allowClear disabled={cantons.length === 0}>
-                {cantons.map((c) => (
-                  <Select.Option key={c.canton_snit_code || c.canton_id} value={c.canton_snit_code}>
-                    {c.canton_name}
+          {/* Seccion 2: Informacion del Punto */}
+          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2.5 flex items-center gap-2 m-0">
+              <InfoCircleOutlined className="text-geoterra-blue" /> Información del Punto y División Territorial
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Form.Item
+                name="name"
+                label={<span className="font-semibold text-gray-700">Nombre del Punto</span>}
+                rules={[{ required: true, message: 'El nombre es requerido' }]}
+              >
+                <Input placeholder="Ej: Termal Sitio U1" className="rounded-lg py-1.5" />
+              </Form.Item>
+
+              <Form.Item
+                name="province_snit_code"
+                label={<span className="font-semibold text-gray-700">Provincia</span>}
+              >
+                <Select placeholder="Selecciona una provincia" onChange={handleProvinceChange} allowClear className="rounded-lg">
+                  {provinces.map((prov) => (
+                    <Select.Option key={prov.province_snit_code || prov.province_id} value={prov.province_snit_code}>
+                      {prov.province_name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Form.Item
+                name="canton_snit_code"
+                label={<span className="font-semibold text-gray-700">Cantón</span>}
+              >
+                <Select placeholder="Selecciona un cantón" onChange={handleCantonChange} allowClear disabled={cantons.length === 0} className="rounded-lg">
+                  {cantons.map((c) => (
+                    <Select.Option key={c.canton_snit_code || c.canton_id} value={c.canton_snit_code}>
+                      {c.canton_name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+
+              <Form.Item
+                name="district_snit_code"
+                label={<span className="font-semibold text-gray-700">Distrito</span>}
+              >
+                <Select placeholder="Selecciona un distrito" allowClear disabled={districts.length === 0} className="rounded-lg">
+                  {districts.map((d) => (
+                    <Select.Option key={d.district_snit_code || d.district_id} value={d.district_snit_code}>
+                      {d.district_name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </div>
+
+            <Form.Item
+              name="field_trip_id"
+              label={<span className="font-semibold text-gray-700">Gira de Campo Vinculada (Opcional)</span>}
+            >
+              <Select placeholder="Selecciona una gira de campo" allowClear showSearch optionFilterProp="label" className="rounded-lg">
+                {fieldTripsList.map((trip) => (
+                  <Select.Option key={trip.field_trip_id || trip.id} value={trip.field_trip_id || trip.id}>
+                    {trip.field_trip_name} {trip.field_trip_scheduled_date ? `(${trip.field_trip_scheduled_date})` : ''}
                   </Select.Option>
                 ))}
               </Select>
             </Form.Item>
 
-            <Form.Item name="district_snit_code" label="Distrito">
-              <Select placeholder="Selecciona un distrito" allowClear disabled={districts.length === 0}>
-                {districts.map((d) => (
-                  <Select.Option key={d.district_snit_code || d.district_id} value={d.district_snit_code}>
-                    {d.district_name}
-                  </Select.Option>
-                ))}
-              </Select>
+            <Form.Item
+              name="description"
+              label={<span className="font-semibold text-gray-700">Descripción</span>}
+            >
+              <Input.TextArea rows={2} placeholder="Descripción de la manifestación geotermal" className="rounded-lg" />
+            </Form.Item>
+
+            <Form.Item
+              name="visibility"
+              valuePropName="checked"
+              label={<span className="font-semibold text-gray-700">Visibilidad pública</span>}
+              style={{ marginBottom: 0 }}
+            >
+              <Switch checkedChildren="Pública" unCheckedChildren="Oculta / Borrador" />
             </Form.Item>
           </div>
-
-          <Form.Item name="field_trip_id" label="Gira de Campo Vinculada (Opcional)">
-            <Select placeholder="Selecciona una gira de campo" allowClear showSearch optionFilterProp="label">
-              {fieldTripsList.map((trip) => (
-                <Select.Option key={trip.field_trip_id || trip.id} value={trip.field_trip_id || trip.id}>
-                  {trip.field_trip_name} {trip.field_trip_scheduled_date ? `(${trip.field_trip_scheduled_date})` : ''}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="description" label="Descripción">
-            <Input.TextArea rows={2} placeholder="Descripción de la manifestación geotermal" />
-          </Form.Item>
-
-          <Form.Item name="visibility" valuePropName="checked" label="Visibilidad pública">
-            <Switch checkedChildren="Pública" unCheckedChildren="Oculta / Borrador" />
-          </Form.Item>
         </Form>
       </Modal>
 
@@ -2048,9 +2258,11 @@ const GeomanifeStationsManager = () => {
       {/* ========================================================================= */}
       <Modal
         title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <BulbOutlined style={{ color: '#52c41a' }} />
-            <span>{editingInsituTest ? 'Editar Prueba In-Situ' : 'Registrar Medición In-Situ'}</span>
+          <div className="flex items-center gap-2 py-2 pr-6 border-b border-gray-100">
+            <span className="poppins-bold text-xl text-geoterra-blue flex items-center gap-2">
+              <BulbOutlined className="text-geoterra-blue" />
+              {editingInsituTest ? 'Editar Prueba In-Situ' : 'Registrar Medición In-Situ'}
+            </span>
           </div>
         }
         open={quickInsituModalVisible}
@@ -2062,28 +2274,54 @@ const GeomanifeStationsManager = () => {
         confirmLoading={submittingInsitu}
         okText={editingInsituTest ? 'Guardar Cambios' : 'Registrar Medición'}
         cancelText="Cancelar"
+        okButtonProps={{
+          style: { backgroundColor: '#12467E', borderColor: '#12467E' },
+          className: 'poppins-bold',
+        }}
+        cancelButtonProps={{
+          className: 'poppins',
+        }}
       >
-        <Form form={quickInsituForm} layout="vertical" onFinish={handleSaveQuickInsitu}>
-          <Form.Item
-            name="temperature"
-            label="Temperatura (°C)"
-            rules={[{ required: true, message: 'La temperatura es requerida' }]}
-          >
-            <InputNumber style={{ width: '100%' }} placeholder="Ej: 55.4" step={0.1} min={0} max={200} />
-          </Form.Item>
+        <div className="py-2 space-y-4 poppins">
+          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2.5 flex items-center gap-2 m-0">
+              <BulbOutlined className="text-geoterra-blue" /> Parámetros In-Situ de Campo
+            </h3>
+            <Form form={quickInsituForm} layout="vertical" onFinish={handleSaveQuickInsitu} className="poppins">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <Form.Item
+                  name="temperature"
+                  label={<span className="font-semibold text-gray-700">Temperatura (°C)</span>}
+                  rules={[{ required: true, message: 'La temperatura es requerida' }]}
+                >
+                  <InputNumber style={{ width: '100%' }} placeholder="Ej: 55.4" step={0.1} min={0} max={200} className="rounded-lg py-1" />
+                </Form.Item>
 
-          <Form.Item name="conductivity" label="Conductividad Eléctrica (μS/cm)">
-            <InputNumber style={{ width: '100%' }} placeholder="Ej: 1200" min={0} step={1} />
-          </Form.Item>
+                <Form.Item
+                  name="conductivity"
+                  label={<span className="font-semibold text-gray-700">Conductividad (μS/cm)</span>}
+                >
+                  <InputNumber style={{ width: '100%' }} placeholder="Ej: 1200" min={0} step={1} className="rounded-lg py-1" />
+                </Form.Item>
 
-          <Form.Item name="ph" label="pH Campo">
-            <InputNumber style={{ width: '100%' }} placeholder="Ej: 6.5" min={0} max={14} step={0.01} />
-          </Form.Item>
+                <Form.Item
+                  name="ph"
+                  label={<span className="font-semibold text-gray-700">pH Campo</span>}
+                >
+                  <InputNumber style={{ width: '100%' }} placeholder="Ej: 6.5" min={0} max={14} step={0.01} className="rounded-lg py-1" />
+                </Form.Item>
+              </div>
 
-          <Form.Item name="description" label="Notas / Descripción de Campo">
-            <Input.TextArea rows={3} placeholder="Condiciones de medición, clima, color del agua..." />
-          </Form.Item>
-        </Form>
+              <Form.Item
+                name="description"
+                label={<span className="font-semibold text-gray-700">Notas / Descripción de Campo</span>}
+                style={{ marginBottom: 0 }}
+              >
+                <Input.TextArea rows={3} placeholder="Condiciones de medición, clima, color del agua..." className="rounded-lg" />
+              </Form.Item>
+            </Form>
+          </div>
+        </div>
       </Modal>
 
       {/* ========================================================================= */}
@@ -2091,9 +2329,11 @@ const GeomanifeStationsManager = () => {
       {/* ========================================================================= */}
       <Modal
         title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <BarChartOutlined style={{ color: '#722ed1' }} />
-            <span>{editingInlabTest ? 'Editar Análisis de Laboratorio' : 'Registrar Análisis de Laboratorio'}</span>
+          <div className="flex items-center gap-2 py-2 pr-6 border-b border-gray-100">
+            <span className="poppins-bold text-xl text-geoterra-blue flex items-center gap-2">
+              <BarChartOutlined className="text-geoterra-blue" />
+              {editingInlabTest ? 'Editar Análisis de Laboratorio' : 'Registrar Análisis de Laboratorio'}
+            </span>
           </div>
         }
         open={quickInlabModalVisible}
@@ -2105,43 +2345,101 @@ const GeomanifeStationsManager = () => {
         confirmLoading={submittingInlab}
         okText={editingInlabTest ? 'Guardar Cambios' : 'Registrar Prueba de Lab'}
         cancelText="Cancelar"
+        okButtonProps={{
+          style: { backgroundColor: '#12467E', borderColor: '#12467E' },
+          className: 'poppins-bold',
+        }}
+        cancelButtonProps={{
+          className: 'poppins',
+        }}
         width={750}
+        styles={{
+          body: {
+            maxHeight: 'calc(100vh - 160px)',
+            overflowY: 'auto',
+            paddingRight: 8
+          }
+        }}
       >
-        <Form form={quickInlabForm} layout="vertical" onFinish={handleSaveQuickInlab}>
-          <div className="grid grid-cols-2 gap-4">
-            <Form.Item name="ph" label="pH Laboratorio">
-              <InputNumber style={{ width: '100%' }} min={0} max={14} step={0.01} placeholder="7.2" />
+        <Form form={quickInlabForm} layout="vertical" onFinish={handleSaveQuickInlab} className="poppins space-y-4 py-2">
+          {/* Seccion 1: Parametros Fisico-Quimicos */}
+          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2.5 flex items-center gap-2 m-0">
+              <BarChartOutlined className="text-geoterra-blue" /> Parámetros Físico-Químicos de Laboratorio
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Form.Item name="ph" label={<span className="font-semibold text-gray-700">pH Laboratorio</span>} style={{ marginBottom: 0 }}>
+                <InputNumber style={{ width: '100%' }} min={0} max={14} step={0.01} placeholder="7.2" className="rounded-lg py-1" />
+              </Form.Item>
+              <Form.Item name="conductivity" label={<span className="font-semibold text-gray-700">Conductividad (μS/cm)</span>} style={{ marginBottom: 0 }}>
+                <InputNumber style={{ width: '100%' }} min={0} step={1} placeholder="1250" className="rounded-lg py-1" />
+              </Form.Item>
+            </div>
+          </div>
+
+          {/* Seccion 2: Iones Mayores */}
+          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2.5 flex items-center gap-2 m-0">
+              <ExperimentOutlined className="text-geoterra-blue" /> Iones Mayores (mg/L)
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <Form.Item name="cl" label={<span className="font-semibold text-gray-700">Cl</span>} style={{ marginBottom: 0 }}>
+                <InputNumber style={{ width: '100%' }} min={0} step={0.01} className="rounded-lg" />
+              </Form.Item>
+              <Form.Item name="ca" label={<span className="font-semibold text-gray-700">Ca</span>} style={{ marginBottom: 0 }}>
+                <InputNumber style={{ width: '100%' }} min={0} step={0.01} className="rounded-lg" />
+              </Form.Item>
+              <Form.Item name="hco3" label={<span className="font-semibold text-gray-700">HCO3</span>} style={{ marginBottom: 0 }}>
+                <InputNumber style={{ width: '100%' }} min={0} step={0.01} className="rounded-lg" />
+              </Form.Item>
+              <Form.Item name="so4" label={<span className="font-semibold text-gray-700">SO4</span>} style={{ marginBottom: 0 }}>
+                <InputNumber style={{ width: '100%' }} min={0} step={0.01} className="rounded-lg" />
+              </Form.Item>
+              <Form.Item name="na" label={<span className="font-semibold text-gray-700">Na</span>} style={{ marginBottom: 0 }}>
+                <InputNumber style={{ width: '100%' }} min={0} step={0.01} className="rounded-lg" />
+              </Form.Item>
+              <Form.Item name="k" label={<span className="font-semibold text-gray-700">K</span>} style={{ marginBottom: 0 }}>
+                <InputNumber style={{ width: '100%' }} min={0} step={0.01} className="rounded-lg" />
+              </Form.Item>
+              <Form.Item name="mg" label={<span className="font-semibold text-gray-700">Mg</span>} style={{ marginBottom: 0 }}>
+                <InputNumber style={{ width: '100%' }} min={0} step={0.01} className="rounded-lg" />
+              </Form.Item>
+              <Form.Item name="si" label={<span className="font-semibold text-gray-700">Si</span>} style={{ marginBottom: 0 }}>
+                <InputNumber style={{ width: '100%' }} min={0} step={0.01} className="rounded-lg" />
+              </Form.Item>
+            </div>
+          </div>
+
+          {/* Seccion 3: Elementos Traza */}
+          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2.5 flex items-center gap-2 m-0">
+              <ExperimentOutlined className="text-geoterra-blue" /> Elementos Traza (mg/L)
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <Form.Item name="fe" label={<span className="font-semibold text-gray-700">Fe</span>} style={{ marginBottom: 0 }}>
+                <InputNumber style={{ width: '100%' }} min={0} step={0.001} className="rounded-lg" />
+              </Form.Item>
+              <Form.Item name="b" label={<span className="font-semibold text-gray-700">B</span>} style={{ marginBottom: 0 }}>
+                <InputNumber style={{ width: '100%' }} min={0} step={0.001} className="rounded-lg" />
+              </Form.Item>
+              <Form.Item name="li" label={<span className="font-semibold text-gray-700">Li</span>} style={{ marginBottom: 0 }}>
+                <InputNumber style={{ width: '100%' }} min={0} step={0.001} className="rounded-lg" />
+              </Form.Item>
+              <Form.Item name="f" label={<span className="font-semibold text-gray-700">F</span>} style={{ marginBottom: 0 }}>
+                <InputNumber style={{ width: '100%' }} min={0} step={0.001} className="rounded-lg" />
+              </Form.Item>
+            </div>
+          </div>
+
+          {/* Seccion 4: Notas de Laboratorio */}
+          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2.5 flex items-center gap-2 m-0">
+              <InfoCircleOutlined className="text-geoterra-blue" /> Notas de Laboratorio
+            </h3>
+            <Form.Item name="description" style={{ marginBottom: 0 }}>
+              <Input.TextArea rows={3} placeholder="Notas del análisis geoquímico, método utilizado..." className="rounded-lg" />
             </Form.Item>
-            <Form.Item name="conductivity" label="Conductividad (μS/cm)">
-              <InputNumber style={{ width: '100%' }} min={0} step={1} placeholder="1250" />
-            </Form.Item>
           </div>
-
-          <Divider style={{ margin: '12px 0' }} />
-          <h4 className="font-semibold text-sm my-2 text-gray-700">🧪 Iones Mayores (mg/L)</h4>
-          <div className="grid grid-cols-4 gap-2">
-            <Form.Item name="cl" label="Cl"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
-            <Form.Item name="ca" label="Ca"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
-            <Form.Item name="hco3" label="HCO3"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
-            <Form.Item name="so4" label="SO4"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
-            <Form.Item name="na" label="Na"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
-            <Form.Item name="k" label="K"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
-            <Form.Item name="mg" label="Mg"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
-            <Form.Item name="si" label="Si"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
-          </div>
-
-          <Divider style={{ margin: '12px 0' }} />
-          <h4 className="font-semibold text-sm my-2 text-gray-700">⚗️ Elementos Traza (mg/L)</h4>
-          <div className="grid grid-cols-4 gap-2">
-            <Form.Item name="fe" label="Fe"><InputNumber style={{ width: '100%' }} min={0} step={0.001} /></Form.Item>
-            <Form.Item name="b" label="B"><InputNumber style={{ width: '100%' }} min={0} step={0.001} /></Form.Item>
-            <Form.Item name="li" label="Li"><InputNumber style={{ width: '100%' }} min={0} step={0.001} /></Form.Item>
-            <Form.Item name="f" label="F"><InputNumber style={{ width: '100%' }} min={0} step={0.001} /></Form.Item>
-          </div>
-
-          <Form.Item name="description" label="Notas de Laboratorio">
-            <Input.TextArea rows={2} placeholder="Notas del análisis geoquímico, método utilizado..." />
-          </Form.Item>
         </Form>
       </Modal>
     </div>
