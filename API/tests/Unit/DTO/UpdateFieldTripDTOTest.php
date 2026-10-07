@@ -32,6 +32,23 @@ class UpdateFieldTripDTOTest extends TestCase
     $this->assertArrayNotHasKey('field_trip_finish_date', $updateArray);
   }
 
+  public function testHasFieldAndOnlyProvidedFieldsInToArray(): void
+  {
+    $data = [
+      'province_snit_code' => 5,
+    ];
+
+    $dto = UpdateFieldTripDTO::fromArray($data);
+
+    $this->assertTrue($dto->hasField('province_snit_code'));
+    $this->assertFalse($dto->hasField('canton_snit_code'));
+    $this->assertFalse($dto->hasField('district_snit_code'));
+    $this->assertFalse($dto->hasField('participants'));
+
+    $updateArray = $dto->toArray();
+    $this->assertSame(['province_snit_code' => 5], $updateArray);
+  }
+
   public function testValidateThrowsOnLongName(): void
   {
     $this->expectException(ApiException::class);
