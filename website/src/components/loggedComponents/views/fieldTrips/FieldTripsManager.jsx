@@ -8,6 +8,7 @@ import {
   Drawer,
   Form,
   Input,
+  InputNumber,
   DatePicker,
   Select,
   Switch,
@@ -26,6 +27,7 @@ import {
   message,
   List,
   Empty,
+  Alert,
 } from 'antd';
 import {
   CompassOutlined,
@@ -46,6 +48,9 @@ import {
   FireOutlined,
   SearchOutlined,
   UserOutlined,
+  ThunderboltOutlined,
+  AimOutlined,
+  ExperimentOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import {
@@ -66,10 +71,14 @@ import {
   maintenanceAllUsers,
   geomanifestationsAdminIndex,
   geomanifestationsIndex,
+  geomanifestationsAdminStore,
+  geomanifestationsAdminUpdate,
+  insituTestsStore,
 } from '../../../../config/apiConf';
 import { useSession } from '../../../../hooks/useSession';
 import { usePermissions } from '../../../../hooks/usePermissions';
 import CommentsPanel from '../../../common/CommentsPanel';
+import MapCoordinatePicker from '../../../common/MapCoordinatePicker';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -122,7 +131,26 @@ const FieldTripsManager = () => {
   const [linkingManifestation, setLinkingManifestation] = useState(false);
 
   const canManage = hasPermission(PERMISSIONS.MANAGE_FIELD_TRIPS);
+  const canFastPoint =
+    hasPermission(PERMISSIONS.MANAGE_GEOMANIFESTATIONS) ||
+    hasPermission(PERMISSIONS.MANAGE_INSITU_TESTS);
   const currentUserId = user?.user_id || user?.id;
+
+  // Fast Point (Punto Rápido en Campo) state
+  const [fastPointModalVisible, setFastPointModalVisible] = useState(false);
+  const [fastPointSubmitting, setFastPointSubmitting] = useState(false);
+  const [fastPointForm] = Form.useForm();
+  const [gettingGps, setGettingGps] = useState(false);
+  const [gpsAccuracy, setGpsAccuracy] = useState(null);
+  const [fastPointCoords, setFastPointCoords] = useState(null);
+  const [showMapPicker, setShowMapPicker] = useState(false);
+  const [fastPointSelectedTrip, setFastPointSelectedTrip] = useState(null);
+
+  // Lab Revision: Rename Manifestation state
+  const [renameModalVisible, setRenameModalVisible] = useState(false);
+  const [renamingManifestation, setRenamingManifestation] = useState(null);
+  const [renameSubmitting, setRenameSubmitting] = useState(false);
+  const [renameForm] = Form.useForm();
 
   // Load Provinces
   const loadProvinces = async () => {
@@ -228,6 +256,253 @@ const FieldTripsManager = () => {
       }
     } catch (err) {
       console.error('❌ Error loading districts:', err);
+    }
+  };
+
+  // ============================================
+  // FAST POINT (PUNTO RÁPIDO EN CAMPO) LOGIC
+  // ============================================
+
+  // Helper to generate a generic point name based on the trip
+  const generateGenericPointName = (trip) => {
+    const tripObj = trip || fastPointSelectedTrip;
+    const existingCount = Array.isArray(tripObj?.geomanifestations)
+      ? tripObj.geomanifestations.length
+      : 0;
+    const pointNum = existingCount + 1;
+    const tripName = tripObj?.field_trip_name
+      ? tripObj.field_trip_name.trim().slice(0, 25)
+      : 'Gira';
+    const timeStr = dayjs().format('HH:mm');
+    return `Punto #${pointNum} - ${tripName} (${timeStr})`;
+  };
+
+  // Fast Point: Capture GPS location
+  const handleGetGpsLocation = () => {
+    if (!navigator.geolocation) {
+      message.error('La geolocalización no está soportada por tu dispositivo');
+      return;
+    }
+    setGettingGps(true);
+    setGpsAccuracy(null);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = parseFloat(pos.coords.latitude.toFixed(6));
+        const lng = parseFloat(pos.coords.longitude.toFixed(6));
+        const acc = Math.round(pos.coords.accuracy);
+        fastPointForm.setFieldsValue({ latitude: lat, longitude: lng });
+        setFastPointCoords({ lat, lng });
+        setGpsAccuracy(`±${acc}m`);
+        setGettingGps(false);
+        message.success(`Ubicación GPS capturada: ${lat}, ${lng} (precisión: ±${acc}m)`);
+      },
+      (err) => {
+        setGettingGps(false);
+        let msg = 'No se pudo obtener señal GPS automática';
+        if (err.code === err.PERMISSION_DENIED) {
+          msg = 'Permiso denegado para acceder al GPS';
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          msg = 'Señal GPS no disponible temporalmente';
+        } else if (err.code === err.TIMEOUT) {
+          msg = 'Tiempo agotado al consultar GPS';
+        }
+        message.warning(`${msg}. Puedes usar el mapa interactivo si lo requieres.`);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
+
+  // Open Fast Point Modal
+  const handleOpenFastPoint = async (tripRecord = null) => {
+    fastPointForm.resetFields();
+    setFastPointCoords(null);
+    setGpsAccuracy(null);
+    setShowMapPicker(false);
+
+    // If tripRecord provided, use it; otherwise pick selectedTrip if open, active trip, or first
+    const activeTrips = trips.filter((t) => t.field_trip_is_active);
+    const tripToSelect =
+      tripRecord ||
+      (selectedTrip ? selectedTrip : null) ||
+      (activeTrips.length > 0 ? activeTrips[0] : (trips[0] || null));
+    const tripId = tripToSelect ? (tripToSelect.field_trip_id || tripToSelect.id) : undefined;
+
+    setFastPointSelectedTrip(tripToSelect);
+
+    const autoName = generateGenericPointName(tripToSelect);
+
+    const initialValues = {
+      field_trip_id: tripId,
+      geomanifestation_name: autoName,
+      temperature: null,
+      ph: null,
+      conductivity: null,
+      latitude: undefined,
+      longitude: undefined,
+    };
+
+    fastPointForm.setFieldsValue(initialValues);
+    setFastPointModalVisible(true);
+
+    // Automatically trigger GPS satellite capture immediately upon opening
+    handleGetGpsLocation();
+  };
+
+  // Fast Point: Trip selection changed
+  const handleFastPointTripChange = (tripId) => {
+    const trip =
+      trips.find((t) => (t.field_trip_id || t.id) === tripId) ||
+      myTrips.find((t) => (t.field_trip_id || t.id) === tripId);
+    setFastPointSelectedTrip(trip || null);
+
+    if (trip) {
+      const currentName = fastPointForm.getFieldValue('geomanifestation_name');
+      // If name is empty or starts with "Punto #", update to reflect new trip
+      if (!currentName || currentName.startsWith('Punto #')) {
+        fastPointForm.setFieldsValue({
+          geomanifestation_name: generateGenericPointName(trip),
+        });
+      }
+    }
+  };
+
+  // Fast Point: Submit Geomanifestation + Insitu Test
+  const handleFastPointSubmit = async (values) => {
+    try {
+      setFastPointSubmitting(true);
+
+      const tripId = values.field_trip_id;
+      const gmName = values.geomanifestation_name?.trim();
+      const lat = Number(values.latitude ?? fastPointCoords?.lat);
+      const lng = Number(values.longitude ?? fastPointCoords?.lng);
+
+      if (!gmName) {
+        message.error('Por favor ingresa un nombre para la geomanifestación');
+        return;
+      }
+      if (isNaN(lat) || isNaN(lng)) {
+        message.error('Por favor captura la ubicación GPS o indícala en el mapa');
+        return;
+      }
+
+      // Inherit territory silently from selected field trip
+      const trip =
+        trips.find((t) => (t.field_trip_id || t.id) === tripId) ||
+        myTrips.find((t) => (t.field_trip_id || t.id) === tripId) ||
+        fastPointSelectedTrip;
+
+      const pCode = trip?.province_snit_code ?? trip?.location?.province_snit_code ?? null;
+      const cCode = trip?.canton_snit_code ?? trip?.location?.canton_snit_code ?? null;
+      const dCode = trip?.district_snit_code ?? trip?.location?.district_snit_code ?? null;
+
+      // 1. Create Geomanifestation linked to the field trip
+      const gmPayload = {
+        geomanifestation_name: gmName,
+        latitude: lat,
+        longitude: lng,
+        province_snit_code: pCode ? Number(pCode) : null,
+        canton_snit_code: cCode ? Number(cCode) : null,
+        district_snit_code: dCode ? Number(dCode) : null,
+        field_trip_id: tripId || null,
+        description: values.description ? values.description.trim() : null,
+        visibility: false,
+      };
+
+      const resGm = await geomanifestationsAdminStore(gmPayload);
+      if (!resGm.ok) {
+        message.error(resGm.error || 'Error al registrar la geomanifestación');
+        return;
+      }
+
+      const createdGm = resGm.data;
+      const gmId = createdGm.geomanifestation_id || createdGm.id;
+
+      // 2. Register Insitu Test if measurements were provided
+      const hasTemp = values.temperature !== undefined && values.temperature !== null && values.temperature !== '';
+      const hasPh = values.ph !== undefined && values.ph !== null && values.ph !== '';
+      const hasCond = values.conductivity !== undefined && values.conductivity !== null && values.conductivity !== '';
+      const hasNotes = Boolean(values.test_description && values.test_description.trim());
+
+      let insituCreated = false;
+      if (hasTemp || hasPh || hasCond || hasNotes) {
+        const testPayload = {
+          geomanifestation_id: gmId,
+          temperature: hasTemp ? Number(values.temperature) : 0,
+          ph: hasPh ? Number(values.ph) : 0,
+          conductivity: hasCond ? Number(values.conductivity) : 0,
+          description: hasNotes ? values.test_description.trim() : 'Medición inicial de campo (Fast Point)',
+        };
+
+        const resTest = await insituTestsStore(testPayload);
+        if (resTest.ok) {
+          insituCreated = true;
+        } else {
+          message.warning('Geomanifestación creada, pero ocurrió un error al guardar la prueba in-situ: ' + (resTest.error || ''));
+        }
+      }
+
+      message.success(
+        insituCreated
+          ? '¡Punto rápido y prueba in-situ registrados exitosamente en la gira!'
+          : '¡Geomanifestación registrada exitosamente en la gira!'
+      );
+
+      setFastPointModalVisible(false);
+      fastPointForm.resetFields();
+      setFastPointCoords(null);
+
+      // Refresh trips and details
+      loadTrips();
+      loadManifestations();
+      if (selectedTrip && (selectedTrip.field_trip_id || selectedTrip.id) === tripId) {
+        loadTripDetail(tripId);
+      }
+    } catch (err) {
+      console.error('Error in Fast Point submit:', err);
+      message.error(err.message || 'Error de conexión al guardar el punto rápido');
+    } finally {
+      setFastPointSubmitting(false);
+    }
+  };
+
+  // Lab Revision: Open Rename Geomanifestation Modal
+  const handleOpenRename = (manifestation) => {
+    setRenamingManifestation(manifestation);
+    renameForm.setFieldsValue({
+      geomanifestation_name: manifestation.geomanifestation_name || manifestation.name || '',
+      description: manifestation.description || '',
+    });
+    setRenameModalVisible(true);
+  };
+
+  // Lab Revision: Submit Renamed Geomanifestation
+  const handleRenameSubmit = async (values) => {
+    if (!renamingManifestation) return;
+    try {
+      setRenameSubmitting(true);
+      const mId = renamingManifestation.geomanifestation_id || renamingManifestation.id;
+      const res = await geomanifestationsAdminUpdate(mId, {
+        geomanifestation_name: values.geomanifestation_name?.trim(),
+        description: values.description ? values.description.trim() : null,
+      });
+
+      if (res.ok) {
+        message.success('Geomanifestación actualizada y renombrada exitosamente');
+        setRenameModalVisible(false);
+        renameForm.resetFields();
+        setRenamingManifestation(null);
+        if (selectedTrip) {
+          loadTripDetail(selectedTrip.field_trip_id || selectedTrip.id);
+        }
+        loadManifestations();
+      } else {
+        message.error(res.error || 'Error al renombrar la geomanifestación');
+      }
+    } catch (err) {
+      console.error('Error in renaming manifestation:', err);
+      message.error(err.message || 'Error al renombrar');
+    } finally {
+      setRenameSubmitting(false);
     }
   };
 
@@ -767,6 +1042,17 @@ const FieldTripsManager = () => {
       align: 'right',
       render: (_, record) => (
         <Space size="small">
+          {canFastPoint && (
+            <Tooltip title="Punto Rápido (Crear manifestación y medición in-situ en esta gira)">
+              <Button
+                type="text"
+                size="small"
+                icon={<ThunderboltOutlined style={{ color: '#13c2c2', fontSize: 16 }} />}
+                onClick={() => handleOpenFastPoint(record)}
+              />
+            </Tooltip>
+          )}
+
           <Tooltip title="Ver Detalle y Bitácora">
             <Button
               type="default"
@@ -833,6 +1119,21 @@ const FieldTripsManager = () => {
           </div>
 
           <Space wrap>
+            {canFastPoint && (
+              <Button
+                type="primary"
+                icon={<ThunderboltOutlined />}
+                onClick={() => handleOpenFastPoint()}
+                style={{
+                  background: 'linear-gradient(135deg, #13c2c2 0%, #08979c 100%)',
+                  borderColor: '#13c2c2',
+                  fontWeight: 600,
+                  boxShadow: '0 2px 6px rgba(19, 194, 194, 0.35)',
+                }}
+              >
+                Punto Rápido
+              </Button>
+            )}
             {canManage && (
               <Button
                 type="primary"
@@ -988,122 +1289,525 @@ const FieldTripsManager = () => {
       >
         <Spin spinning={loadingEditModal} tip="Cargando datos de la gira...">
           <Form form={form} layout="vertical" onFinish={handleSubmit}>
-          <Form.Item
-            name="field_trip_name"
-            label="Nombre de la Gira"
-            rules={[
-              { required: true, message: 'El nombre es requerido' },
-              { max: 110, message: 'Máximo 110 caracteres' },
-            ]}
-          >
-            <Input placeholder="Ej: Gira de Monitoreo Volcán Miravalles 2026" maxLength={110} showCount />
-          </Form.Item>
+            <Form.Item
+              name="field_trip_name"
+              label="Nombre de la Gira"
+              rules={[
+                { required: true, message: 'El nombre es requerido' },
+                { max: 110, message: 'Máximo 110 caracteres' },
+              ]}
+            >
+              <Input placeholder="Ej: Gira de Monitoreo Volcán Miravalles 2026" maxLength={110} showCount />
+            </Form.Item>
 
-          <Row gutter={16}>
-            <Col xs={24} sm={8}>
-              <Form.Item
-                name="field_trip_scheduled_date"
-                label="Fecha Programada"
-                rules={[{ required: true, message: 'Fecha programada requerida' }]}
-              >
-                <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" placeholder="Seleccionar" />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={8}>
-              <Form.Item name="field_trip_start_date" label="Fecha Inicio Real">
-                <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" placeholder="Opcional" />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={8}>
-              <Form.Item name="field_trip_finish_date" label="Fecha Fin Real">
-                <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" placeholder="Opcional" />
-              </Form.Item>
-            </Col>
-          </Row>
+            <Row gutter={16}>
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  name="field_trip_scheduled_date"
+                  label="Fecha Programada"
+                  rules={[{ required: true, message: 'Fecha programada requerida' }]}
+                >
+                  <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" placeholder="Seleccionar" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={8}>
+                <Form.Item name="field_trip_start_date" label="Fecha Inicio Real">
+                  <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" placeholder="Opcional" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={8}>
+                <Form.Item name="field_trip_finish_date" label="Fecha Fin Real">
+                  <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" placeholder="Opcional" />
+                </Form.Item>
+              </Col>
+            </Row>
 
-          <Divider orientation="left" style={{ margin: '12px 0' }}>
-            <span style={{ fontSize: 13, color: '#8c8c8c' }}>Ubicación Geográfica</span>
-          </Divider>
+            <Divider orientation="left" style={{ margin: '12px 0' }}>
+              <span style={{ fontSize: 13, color: '#8c8c8c' }}>Ubicación Geográfica</span>
+            </Divider>
 
-          <Row gutter={16}>
-            <Col xs={24} sm={8}>
-              <Form.Item name="province_snit_code" label="Provincia">
-                <Select placeholder="Selecciona provincia" onChange={handleProvinceChange} allowClear>
-                  {provinces.map((prov) => (
-                    <Select.Option key={prov.province_snit_code || prov.province_id} value={prov.province_snit_code}>
-                      {prov.province_name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={8}>
-              <Form.Item name="canton_snit_code" label="Cantón">
-                <Select placeholder="Selecciona cantón" onChange={handleCantonChange} allowClear disabled={cantons.length === 0}>
-                  {cantons.map((c) => (
-                    <Select.Option key={c.canton_snit_code || c.canton_id} value={c.canton_snit_code}>
-                      {c.canton_name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={8}>
-              <Form.Item name="district_snit_code" label="Distrito">
-                <Select placeholder="Selecciona distrito" allowClear disabled={districts.length === 0}>
-                  {districts.map((d) => (
-                    <Select.Option key={d.district_snit_code || d.district_id} value={d.district_snit_code}>
-                      {d.district_name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
+            <Row gutter={16}>
+              <Col xs={24} sm={8}>
+                <Form.Item name="province_snit_code" label="Provincia">
+                  <Select placeholder="Selecciona provincia" onChange={handleProvinceChange} allowClear>
+                    {provinces.map((prov) => (
+                      <Select.Option key={prov.province_snit_code || prov.province_id} value={prov.province_snit_code}>
+                        {prov.province_name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={8}>
+                <Form.Item name="canton_snit_code" label="Cantón">
+                  <Select placeholder="Selecciona cantón" onChange={handleCantonChange} allowClear disabled={cantons.length === 0}>
+                    {cantons.map((c) => (
+                      <Select.Option key={c.canton_snit_code || c.canton_id} value={c.canton_snit_code}>
+                        {c.canton_name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={8}>
+                <Form.Item name="district_snit_code" label="Distrito">
+                  <Select placeholder="Selecciona distrito" allowClear disabled={districts.length === 0}>
+                    {districts.map((d) => (
+                      <Select.Option key={d.district_snit_code || d.district_id} value={d.district_snit_code}>
+                        {d.district_name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
 
-          <Divider orientation="left" style={{ margin: '12px 0' }}>
-            <span style={{ fontSize: 13, color: '#8c8c8c' }}>Participantes y Manifestaciones</span>
-          </Divider>
+            <Divider orientation="left" style={{ margin: '12px 0' }}>
+              <span style={{ fontSize: 13, color: '#8c8c8c' }}>Participantes y Manifestaciones</span>
+            </Divider>
 
-          <Form.Item
-            name="participants"
-            label="Participantes (Investigadores / Personal Asignado)"
-            help="Selecciona los miembros del equipo que participarán en esta gira"
-          >
-            <Select
-              mode="multiple"
-              placeholder="Buscar y seleccionar participantes..."
-              allowClear
-              optionFilterProp="label"
-              options={allUsers.map((u) => ({
-                value: u.user_id || u.id,
-                label: `${[u.first_name, u.last_name].filter(Boolean).join(' ') || u.email} (${u.role || 'Usuario'})`,
-              }))}
-            />
-          </Form.Item>
+            <Form.Item
+              name="participants"
+              label="Participantes (Investigadores / Personal Asignado)"
+              help="Selecciona los miembros del equipo que participarán en esta gira"
+            >
+              <Select
+                mode="multiple"
+                placeholder="Buscar y seleccionar participantes..."
+                allowClear
+                optionFilterProp="label"
+                options={allUsers.map((u) => ({
+                  value: u.user_id || u.id,
+                  label: `${[u.first_name, u.last_name].filter(Boolean).join(' ') || u.email} (${u.role || 'Usuario'})`,
+                }))}
+              />
+            </Form.Item>
 
-          <Form.Item
-            name="geomanifestations"
-            label="Geomanifestaciones Vinculadas"
-            help="Sitios termales o manifestaciones que se estudiarán en esta gira"
-          >
-            <Select
-              mode="multiple"
-              placeholder="Buscar y seleccionar geomanifestaciones..."
-              allowClear
-              optionFilterProp="label"
-              options={allManifestations.map((m) => ({
-                value: m.geomanifestation_id || m.id,
-                label: `${m.geomanifestation_name || m.name} ${m.location?.canton ? `— ${m.location.canton}` : ''}`,
-              }))}
-            />
-          </Form.Item>
+            <Form.Item
+              name="geomanifestations"
+              label="Geomanifestaciones Vinculadas"
+              help="Sitios termales o manifestaciones que se estudiarán en esta gira"
+            >
+              <Select
+                mode="multiple"
+                placeholder="Buscar y seleccionar geomanifestaciones..."
+                allowClear
+                optionFilterProp="label"
+                options={allManifestations.map((m) => ({
+                  value: m.geomanifestation_id || m.id,
+                  label: `${m.geomanifestation_name || m.name} ${m.location?.canton ? `— ${m.location.canton}` : ''}`,
+                }))}
+              />
+            </Form.Item>
 
-          <Form.Item name="field_trip_is_active" valuePropName="checked" label="Estado de la Gira">
-            <Switch checkedChildren="Activa" unCheckedChildren="Inactiva / Cerrada" />
-          </Form.Item>
-        </Form>
+            <Form.Item name="field_trip_is_active" valuePropName="checked" label="Estado de la Gira">
+              <Switch checkedChildren="Activa" unCheckedChildren="Inactiva / Cerrada" />
+            </Form.Item>
+          </Form>
         </Spin>
+      </Modal>
+
+      {/* Modal: Fast Point (Punto Rápido en Campo) */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #13c2c2 0%, #08979c 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#fff',
+                fontSize: 20,
+                boxShadow: '0 2px 6px rgba(19, 194, 194, 0.35)',
+              }}
+            >
+              <ThunderboltOutlined />
+            </div>
+            <div>
+              <div style={{ fontWeight: 600, fontSize: 16 }}>Punto Rápido en Campo (Fast Point)</div>
+              <div style={{ fontSize: 12, color: '#8c8c8c', fontWeight: 400 }}>
+                Crea una geomanifestación y su medición in-situ en un solo paso
+              </div>
+            </div>
+          </div>
+        }
+        open={fastPointModalVisible}
+        onCancel={() => {
+          setFastPointModalVisible(false);
+          fastPointForm.resetFields();
+          setFastPointCoords(null);
+          setShowMapPicker(false);
+        }}
+        footer={null}
+        width={680}
+        destroyOnClose
+      >
+        <Form
+          form={fastPointForm}
+          layout="vertical"
+          onFinish={handleFastPointSubmit}
+          style={{ marginTop: 14 }}
+        >
+          {/* Coordinates stored in form (hidden by default) */}
+          <Form.Item name="latitude" hidden>
+            <Input />
+          </Form.Item>
+          <Form.Item name="longitude" hidden>
+            <Input />
+          </Form.Item>
+
+          {/* 1. Gira de Campo Asociada */}
+          <Card
+            size="small"
+            style={{
+              borderRadius: 8,
+              background: '#f0f5ff',
+              border: '1px solid #adc6ff',
+              marginBottom: 14,
+            }}
+          >
+            <Form.Item
+              name="field_trip_id"
+              label={
+                <span style={{ fontWeight: 600, color: '#1d39c4' }}>
+                  <CompassOutlined style={{ marginRight: 6 }} />
+                  Gira de Campo
+                </span>
+              }
+              rules={[{ required: true, message: 'Selecciona la gira a la que pertenece este punto' }]}
+              style={{ marginBottom: 0 }}
+            >
+              <Select
+                placeholder="Selecciona la gira de campo..."
+                onChange={handleFastPointTripChange}
+                showSearch
+                optionFilterProp="label"
+                options={trips.map((t) => {
+                  const tId = t.field_trip_id || t.id;
+                  const isActive = Boolean(t.field_trip_is_active);
+                  const loc = [t.province_name || t.province, t.canton_name || t.canton]
+                    .filter(Boolean)
+                    .join(', ');
+                  return {
+                    value: tId,
+                    label: `${t.field_trip_name} ${loc ? `(${loc})` : ''} - [${isActive ? 'Activa' : 'Inactiva'}]`,
+                  };
+                })}
+              />
+            </Form.Item>
+          </Card>
+
+          {/* 2. Ubicación GPS (1 solo toque) */}
+          <div style={{ marginBottom: 14 }}>
+            <div
+              style={{
+                marginBottom: 6,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <span style={{ fontWeight: 600, color: '#08979c', fontSize: 13 }}>
+                <AimOutlined style={{ marginRight: 6 }} />
+                Ubicación Satelital (GPS)
+              </span>
+              {gpsAccuracy && (
+                <Tag color="cyan" style={{ margin: 0 }}>
+                  Precisión: {gpsAccuracy}
+                </Tag>
+              )}
+            </div>
+
+            {fastPointCoords ? (
+              <div
+                style={{
+                  background: '#f6ffed',
+                  border: '1px solid #b7eb8f',
+                  borderRadius: 8,
+                  padding: '10px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      color: '#389e0d',
+                      fontWeight: 600,
+                      fontSize: 13,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                    }}
+                  >
+                    <CheckCircleOutlined /> Coordenadas GPS fijadas
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: 'monospace',
+                      fontSize: 13,
+                      color: '#262626',
+                      marginTop: 2,
+                    }}
+                  >
+                    Lat: <strong>{fastPointCoords.lat}</strong> | Lng: <strong>{fastPointCoords.lng}</strong>
+                  </div>
+                </div>
+                <Button
+                  size="small"
+                  icon={<ReloadOutlined />}
+                  onClick={handleGetGpsLocation}
+                  loading={gettingGps}
+                  style={{ borderColor: '#b7eb8f' }}
+                >
+                  Recapturar
+                </Button>
+              </div>
+            ) : (
+              <Button
+                type="primary"
+                size="large"
+                block
+                icon={<AimOutlined style={{ fontSize: 18 }} />}
+                onClick={handleGetGpsLocation}
+                loading={gettingGps}
+                style={{
+                  height: 48,
+                  fontSize: 15,
+                  fontWeight: 700,
+                  background: 'linear-gradient(135deg, #13c2c2 0%, #08979c 100%)',
+                  borderColor: '#13c2c2',
+                  borderRadius: 8,
+                }}
+              >
+                {gettingGps ? 'Obteniendo señal satelital GPS...' : '📍 Capturar Ubicación GPS Actual'}
+              </Button>
+            )}
+
+            {/* Toggle for Map and Manual Coordinates ONLY if user needs fallback */}
+            <div style={{ textAlign: 'right', marginTop: 6 }}>
+              <Button
+                type="link"
+                size="small"
+                onClick={() => setShowMapPicker((prev) => !prev)}
+                style={{ color: '#08979c', padding: 0, fontSize: 12 }}
+              >
+                {showMapPicker
+                  ? '▲ Ocultar mapa interactivo'
+                  : '▼ ¿Sin señal GPS? Ajustar en mapa o ingresar lat/long manual'}
+              </Button>
+            </div>
+
+            {/* Interactive Map and Manual Lat/Lng inputs (shown ONLY on demand) */}
+            {showMapPicker && (
+              <Card
+                size="small"
+                style={{
+                  marginTop: 8,
+                  borderRadius: 8,
+                  border: '1px dashed #13c2c2',
+                  background: '#fafafa',
+                }}
+              >
+                <div style={{ marginBottom: 12 }}>
+                  <MapCoordinatePicker
+                    latLng={{
+                      lat: fastPointCoords?.lat || fastPointForm.getFieldValue('latitude') || 9.93333,
+                      lng: fastPointCoords?.lng || fastPointForm.getFieldValue('longitude') || -84.08333,
+                    }}
+                    onCoordinatesChange={(coords) => {
+                      if (coords && coords.lat && coords.lng) {
+                        const newLat = parseFloat(coords.lat.toFixed(6));
+                        const newLng = parseFloat(coords.lng.toFixed(6));
+                        fastPointForm.setFieldsValue({ latitude: newLat, longitude: newLng });
+                        setFastPointCoords({ lat: newLat, lng: newLng });
+                      }
+                    }}
+                    mapHeight="220px"
+                  />
+                </div>
+                <Row gutter={12}>
+                  <Col xs={24} sm={12}>
+                    <Form.Item
+                      label={<span style={{ fontSize: 12, fontWeight: 600 }}>Latitud Manual</span>}
+                      style={{ marginBottom: 4 }}
+                    >
+                      <InputNumber
+                        style={{ width: '100%' }}
+                        step={0.000001}
+                        value={fastPointCoords?.lat}
+                        onChange={(val) => {
+                          fastPointForm.setFieldsValue({ latitude: val });
+                          setFastPointCoords((prev) => ({ ...(prev || {}), lat: val }));
+                        }}
+                        placeholder="Ej: 10.724812"
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} sm={12}>
+                    <Form.Item
+                      label={<span style={{ fontSize: 12, fontWeight: 600 }}>Longitud Manual</span>}
+                      style={{ marginBottom: 4 }}
+                    >
+                      <InputNumber
+                        style={{ width: '100%' }}
+                        step={0.000001}
+                        value={fastPointCoords?.lng}
+                        onChange={(val) => {
+                          fastPointForm.setFieldsValue({ longitude: val });
+                          setFastPointCoords((prev) => ({ ...(prev || {}), lng: val }));
+                        }}
+                        placeholder="Ej: -85.023411"
+                      />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Card>
+            )}
+          </div>
+
+          {/* 3. Nombre del Punto (Pre-generado automáticamente) */}
+          <Form.Item
+            name="geomanifestation_name"
+            label={
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                  alignItems: 'center',
+                }}
+              >
+                <span style={{ fontWeight: 600 }}>Nombre del Punto</span>
+                <Tag color="blue" style={{ fontSize: 11, fontWeight: 'normal', margin: 0 }}>
+                  Generado automáticamente
+                </Tag>
+              </div>
+            }
+            extra={
+              <span style={{ fontSize: 11, color: '#8c8c8c' }}>
+                ⚡ No necesitas escribirlo ahora bajo el sol. Eso se cambia luego con calma en el laboratorio.
+              </span>
+            }
+            rules={[
+              { required: true, message: 'Ingresa un nombre para la geomanifestación' },
+              { max: 255, message: 'Máximo 255 caracteres' },
+            ]}
+            style={{ marginBottom: 14 }}
+          >
+            <Input placeholder="Ej: Punto #1 - Gira (10:15)" />
+          </Form.Item>
+
+          {/* 4. Mediciones In-Situ */}
+          <Card
+            size="small"
+            style={{
+              background: '#fffbe6',
+              border: '1px solid #ffe58f',
+              borderRadius: 8,
+              marginBottom: 16,
+            }}
+          >
+            <div style={{ fontWeight: 600, color: '#d46b08', fontSize: 13, marginBottom: 10 }}>
+              <ExperimentOutlined style={{ marginRight: 6 }} />
+              Parámetros Físico-Químicos In-Situ
+            </div>
+            <Row gutter={12}>
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  name="temperature"
+                  label="Temperatura"
+                  style={{ marginBottom: 8 }}
+                >
+                  <InputNumber
+                    style={{ width: '100%' }}
+                    step={0.1}
+                    min={0}
+                    max={200}
+                    addonAfter="°C"
+                    placeholder="Ej: 91.5"
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  name="ph"
+                  label="pH"
+                  style={{ marginBottom: 8 }}
+                >
+                  <InputNumber
+                    style={{ width: '100%' }}
+                    step={0.1}
+                    min={0}
+                    max={14}
+                    addonAfter="pH"
+                    placeholder="Ej: 3.2"
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  name="conductivity"
+                  label="Conductividad"
+                  style={{ marginBottom: 8 }}
+                >
+                  <InputNumber
+                    style={{ width: '100%' }}
+                    min={0}
+                    step={1}
+                    addonAfter="µS/cm"
+                    placeholder="Ej: 2150"
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Form.Item
+              name="test_description"
+              label={<span style={{ fontSize: 12 }}>Notas breves (opcional)</span>}
+              style={{ marginBottom: 0 }}
+            >
+              <Input placeholder="Ej: Fumarola activa, olor a azufre, agua turbia" />
+            </Form.Item>
+          </Card>
+
+          {/* Submit Actions */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+            <Button
+              onClick={() => {
+                setFastPointModalVisible(false);
+                fastPointForm.resetFields();
+                setFastPointCoords(null);
+                setShowMapPicker(false);
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={fastPointSubmitting}
+              icon={<ThunderboltOutlined />}
+              style={{
+                minWidth: 190,
+                height: 40,
+                fontWeight: 700,
+                fontSize: 14,
+                background: 'linear-gradient(135deg, #fa8c16 0%, #d46b08 100%)',
+                borderColor: '#fa8c16',
+                boxShadow: '0 2px 8px rgba(250, 140, 22, 0.35)',
+              }}
+            >
+              Guardar Punto Rápido
+            </Button>
+          </div>
+        </Form>
       </Modal>
 
       {/* Drawer: Detailed Trip View + Participants + Manifestations + Comments */}
@@ -1269,19 +1973,19 @@ const FieldTripsManager = () => {
                             actions={
                               canManage
                                 ? [
-                                    <Popconfirm
-                                      title="¿Remover participante de la gira?"
-                                      key="del"
-                                      onConfirm={() => handleRemoveParticipant(pId)}
-                                      okText="Sí"
-                                      cancelText="No"
-                                      okButtonProps={{ danger: true }}
-                                    >
-                                      <Button type="text" danger size="small" icon={<UserDeleteOutlined />}>
-                                        Remover
-                                      </Button>
-                                    </Popconfirm>,
-                                  ]
+                                  <Popconfirm
+                                    title="¿Remover participante de la gira?"
+                                    key="del"
+                                    onConfirm={() => handleRemoveParticipant(pId)}
+                                    okText="Sí"
+                                    cancelText="No"
+                                    okButtonProps={{ danger: true }}
+                                  >
+                                    <Button type="text" danger size="small" icon={<UserDeleteOutlined />}>
+                                      Remover
+                                    </Button>
+                                  </Popconfirm>,
+                                ]
                                 : []
                             }
                           >
@@ -1311,6 +2015,22 @@ const FieldTripsManager = () => {
                 label: `Geomanifestaciones (${Array.isArray(selectedTrip.geomanifestations) ? selectedTrip.geomanifestations.length : 0})`,
                 children: (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    {canFastPoint && (
+                      <Button
+                        type="primary"
+                        icon={<ThunderboltOutlined />}
+                        onClick={() => handleOpenFastPoint(selectedTrip)}
+                        style={{
+                          background: 'linear-gradient(135deg, #13c2c2 0%, #08979c 100%)',
+                          borderColor: '#13c2c2',
+                          alignSelf: 'flex-start',
+                          boxShadow: '0 2px 6px rgba(19, 194, 194, 0.35)',
+                        }}
+                      >
+                        + Punto Rápido en esta Gira
+                      </Button>
+                    )}
+
                     {canManage && (
                       <Card size="small" style={{ borderRadius: 8, background: '#fff7e6', border: '1px solid #ffd591' }}>
                         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -1355,24 +2075,34 @@ const FieldTripsManager = () => {
                         const mName = m.geomanifestation_name || m.name || mId;
                         return (
                           <List.Item
-                            actions={
-                              canManage
-                                ? [
-                                    <Popconfirm
-                                      title="¿Desvincular manifestación de la gira?"
-                                      key="del"
-                                      onConfirm={() => handleUnlinkManifestation(mId)}
-                                      okText="Sí"
-                                      cancelText="No"
-                                      okButtonProps={{ danger: true }}
-                                    >
-                                      <Button type="text" danger size="small" icon={<DisconnectOutlined />}>
-                                        Desvincular
-                                      </Button>
-                                    </Popconfirm>,
-                                  ]
-                                : []
-                            }
+                            actions={[
+                              canFastPoint ? (
+                                <Button
+                                  type="text"
+                                  size="small"
+                                  icon={<EditOutlined />}
+                                  onClick={() => handleOpenRename(m)}
+                                  key="rename"
+                                  style={{ color: '#1890ff' }}
+                                >
+                                  Renombrar
+                                </Button>
+                              ) : null,
+                              canManage ? (
+                                <Popconfirm
+                                  title="¿Desvincular manifestación de la gira?"
+                                  key="del"
+                                  onConfirm={() => handleUnlinkManifestation(mId)}
+                                  okText="Sí"
+                                  cancelText="No"
+                                  okButtonProps={{ danger: true }}
+                                >
+                                  <Button type="text" danger size="small" icon={<DisconnectOutlined />}>
+                                    Desvincular
+                                  </Button>
+                                </Popconfirm>
+                              ) : null,
+                            ].filter(Boolean)}
                           >
                             <List.Item.Meta
                               avatar={
@@ -1412,6 +2142,56 @@ const FieldTripsManager = () => {
           />
         ) : null}
       </Drawer>
+
+      {/* Modal: Lab Revision - Rename Geomanifestation */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <EditOutlined style={{ color: '#1890ff' }} />
+            <span>Revisión de Laboratorio: Renombrar Geomanifestación</span>
+          </div>
+        }
+        open={renameModalVisible}
+        onCancel={() => {
+          setRenameModalVisible(false);
+          renameForm.resetFields();
+          setRenamingManifestation(null);
+        }}
+        onOk={() => renameForm.submit()}
+        confirmLoading={renameSubmitting}
+        okText="Guardar Nombre Formal"
+        cancelText="Cancelar"
+        destroyOnClose
+      >
+        <div style={{ marginBottom: 16, color: '#595959', fontSize: 13 }}>
+          Asigna el nombre formal y completa los detalles de laboratorio para el punto registrado en campo.
+        </div>
+        <Form
+          form={renameForm}
+          layout="vertical"
+          onFinish={handleRenameSubmit}
+        >
+          <Form.Item
+            name="geomanifestation_name"
+            label="Nombre Formal de la Geomanifestación"
+            rules={[
+              { required: true, message: 'Ingresa el nombre formal' },
+              { max: 255, message: 'Máximo 255 caracteres' },
+            ]}
+          >
+            <Input placeholder="Ej: Fumarola Las Hornillas Sector B" autoFocus />
+          </Form.Item>
+          <Form.Item
+            name="description"
+            label="Descripción y Notas de Laboratorio (opcional)"
+          >
+            <Input.TextArea
+              rows={3}
+              placeholder="Detalles geológicos, contexto del muestreo o notas adicionales..."
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };
