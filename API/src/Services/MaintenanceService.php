@@ -94,7 +94,8 @@ final class MaintenanceService
     try {
       Request::requireRole([
         AllowedUserRoles::ADMIN,
-        AllowedUserRoles::MAINTENANCE
+        AllowedUserRoles::MAINTENANCE,
+        AllowedUserRoles::INVESTIGATOR,
       ]);
 
       $users = $this->userRepository->getAllUsers();
@@ -106,6 +107,8 @@ final class MaintenanceService
           'count' => count($users),
         ],
       ];
+    } catch (ApiException $e) {
+      throw $e;
     } catch (Throwable $e) {
       throw new ApiException(ErrorType::internal($e->getMessage()), 500);
     }
