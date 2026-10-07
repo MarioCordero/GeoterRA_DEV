@@ -106,6 +106,7 @@ const FieldTripsManager = () => {
   // Create / Edit Modal state
   const [modalVisible, setModalVisible] = useState(false);
   const [editingTrip, setEditingTrip] = useState(null);
+  const [loadingEditModal, setLoadingEditModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm();
 
@@ -233,6 +234,7 @@ const FieldTripsManager = () => {
   // Open Create Modal
   const handleOpenCreate = () => {
     setEditingTrip(null);
+    setLoadingEditModal(false);
     form.resetFields();
     setCantons([]);
     setDistricts([]);
@@ -247,6 +249,8 @@ const FieldTripsManager = () => {
   // Open Edit Modal
   const handleOpenEdit = async (record) => {
     setEditingTrip(record);
+    setModalVisible(true);
+    setLoadingEditModal(true);
     form.resetFields();
 
     // Load full details first to populate participants and manifestations
@@ -261,22 +265,35 @@ const FieldTripsManager = () => {
       console.error('Error fetching detail for edit:', err);
     }
 
+    const provCode = detail.province_snit_code ?? detail.location?.province_snit_code ?? record.province_snit_code;
+    const cantCode = detail.canton_snit_code ?? detail.location?.canton_snit_code ?? record.canton_snit_code;
+    const distCode = detail.district_snit_code ?? detail.location?.district_snit_code ?? record.district_snit_code;
+
     // Load cantons and districts for location
-    if (detail.province_snit_code) {
+    if (provCode) {
       try {
-        const resCantons = await cantonsIndex(detail.province_snit_code);
-        if (resCantons.ok) setCantons(resCantons.data || []);
+        const resCantons = await cantonsIndex(provCode);
+        if (resCantons.ok && Array.isArray(resCantons.data)) {
+          setCantons(resCantons.data);
+        }
       } catch (e) {
-        console.error(e);
+        console.error('Error loading cantons for edit:', e);
       }
+    } else {
+      setCantons([]);
     }
-    if (detail.canton_snit_code) {
+
+    if (cantCode) {
       try {
-        const resDistricts = await districtsIndex(detail.canton_snit_code);
-        if (resDistricts.ok) setDistricts(resDistricts.data || []);
+        const resDistricts = await districtsIndex(cantCode);
+        if (resDistricts.ok && Array.isArray(resDistricts.data)) {
+          setDistricts(resDistricts.data);
+        }
       } catch (e) {
-        console.error(e);
+        console.error('Error loading districts for edit:', e);
       }
+    } else {
+      setDistricts([]);
     }
 
     const participantIds = Array.isArray(detail.participants)
@@ -287,57 +304,162 @@ const FieldTripsManager = () => {
       ? detail.geomanifestations.map((m) => m.geomanifestation_id || m.id || m)
       : [];
 
+    const parseDate = (d) => {
+      if (!d) return null;
+      const str = typeof d === 'string' ? d.split(' ')[0] : d;
+      const parsed = dayjs(str);
+      return parsed.isValid() ? parsed : null;
+    };
+
+    const scheduledDate = parseDate(detail.field_trip_scheduled_date);
+    const startDate = parseDate(detail.field_trip_start_date);
+    const finishDate = parseDate(detail.field_trip_finish_date);
+    const isActive = detail.field_trip_is_active !== undefined ? Boolean(detail.field_trip_is_active) : true;
+
+    // Snapshot of original values for partial update comparison
+    const initialValues = {
+      field_trip_name: detail.field_trip_name ? detail.field_trip_name.trim() : '',
+      field_trip_scheduled_date: scheduledDate ? scheduledDate.format('YYYY-MM-DD') : null,
+      field_trip_start_date: startDate ? startDate.format('YYYY-MM-DD') : null,
+      field_trip_finish_date: finishDate ? finishDate.format('YYYY-MM-DD') : null,
+      field_trip_is_active: isActive,
+      province_snit_code: provCode ? Number(provCode) : null,
+      canton_snit_code: cantCode ? Number(cantCode) : null,
+      district_snit_code: distCode ? Number(distCode) : null,
+      participants: participantIds,
+      geomanifestations: manifestationIds,
+    };
+
+    setEditingTrip({
+      ...detail,
+      field_trip_id: tripId,
+      _initialValues: initialValues,
+    });
+
     form.setFieldsValue({
-      field_trip_name: detail.field_trip_name,
-      field_trip_scheduled_date: detail.field_trip_scheduled_date ? dayjs(detail.field_trip_scheduled_date) : null,
-      field_trip_start_date: detail.field_trip_start_date ? dayjs(detail.field_trip_start_date) : null,
-      field_trip_finish_date: detail.field_trip_finish_date ? dayjs(detail.field_trip_finish_date) : null,
-      field_trip_is_active: Boolean(detail.field_trip_is_active),
-      province_snit_code: detail.province_snit_code || undefined,
-      canton_snit_code: detail.canton_snit_code || undefined,
-      district_snit_code: detail.district_snit_code || undefined,
+      field_trip_name: detail.field_trip_name || '',
+      field_trip_scheduled_date: scheduledDate,
+      field_trip_start_date: startDate,
+      field_trip_finish_date: finishDate,
+      field_trip_is_active: isActive,
+      province_snit_code: provCode || undefined,
+      canton_snit_code: cantCode || undefined,
+      district_snit_code: distCode || undefined,
       participants: participantIds,
       geomanifestations: manifestationIds,
     });
 
-    setModalVisible(true);
+    setLoadingEditModal(false);
   };
 
   // Submit Create / Edit
   const handleSubmit = async (values) => {
     try {
       setSubmitting(true);
-      const payload = {
-        field_trip_name: values.field_trip_name?.trim(),
-        field_trip_scheduled_date: values.field_trip_scheduled_date ? values.field_trip_scheduled_date.format('YYYY-MM-DD') : null,
-        field_trip_start_date: values.field_trip_start_date ? values.field_trip_start_date.format('YYYY-MM-DD') : null,
-        field_trip_finish_date: values.field_trip_finish_date ? values.field_trip_finish_date.format('YYYY-MM-DD') : null,
-        field_trip_is_active: Boolean(values.field_trip_is_active),
-        province_snit_code: values.province_snit_code || null,
-        canton_snit_code: values.canton_snit_code || null,
-        district_snit_code: values.district_snit_code || null,
-        participants: values.participants || [],
-        geomanifestations: values.geomanifestations || [],
-      };
 
-      let res;
       if (editingTrip) {
         const id = editingTrip.field_trip_id || editingTrip.id;
-        res = await fieldTripsUpdate(id, payload);
-      } else {
-        res = await fieldTripsStore(payload);
-      }
+        const initial = editingTrip._initialValues || {};
+        const payload = {};
 
-      if (res.ok) {
-        message.success(`Gira de campo ${editingTrip ? 'actualizada' : 'creada'} exitosamente`);
-        setModalVisible(false);
-        form.resetFields();
-        loadTrips();
-        if (selectedTrip && (selectedTrip.field_trip_id || selectedTrip.id) === (editingTrip?.field_trip_id || editingTrip?.id)) {
-          loadTripDetail(selectedTrip.field_trip_id || selectedTrip.id);
+        // Only send fields that actually changed
+        const newName = values.field_trip_name ? values.field_trip_name.trim() : '';
+        if (newName !== (initial.field_trip_name || '')) {
+          payload.field_trip_name = newName;
+        }
+
+        const newSched = values.field_trip_scheduled_date ? values.field_trip_scheduled_date.format('YYYY-MM-DD') : null;
+        if (newSched !== (initial.field_trip_scheduled_date || null)) {
+          payload.field_trip_scheduled_date = newSched;
+        }
+
+        const newStart = values.field_trip_start_date ? values.field_trip_start_date.format('YYYY-MM-DD') : null;
+        if (newStart !== (initial.field_trip_start_date || null)) {
+          payload.field_trip_start_date = newStart;
+        }
+
+        const newFinish = values.field_trip_finish_date ? values.field_trip_finish_date.format('YYYY-MM-DD') : null;
+        if (newFinish !== (initial.field_trip_finish_date || null)) {
+          payload.field_trip_finish_date = newFinish;
+        }
+
+        const newActive = Boolean(values.field_trip_is_active);
+        if (newActive !== Boolean(initial.field_trip_is_active)) {
+          payload.field_trip_is_active = newActive;
+        }
+
+        const newProv = values.province_snit_code ? Number(values.province_snit_code) : null;
+        const newCant = values.canton_snit_code ? Number(values.canton_snit_code) : null;
+        const newDist = values.district_snit_code ? Number(values.district_snit_code) : null;
+
+        if (newProv !== (initial.province_snit_code ?? null)) {
+          payload.province_snit_code = newProv;
+        }
+        if (newCant !== (initial.canton_snit_code ?? null)) {
+          payload.canton_snit_code = newCant;
+        }
+        if (newDist !== (initial.district_snit_code ?? null)) {
+          payload.district_snit_code = newDist;
+        }
+
+        const newParticipants = Array.isArray(values.participants) ? values.participants : [];
+        const oldParticipants = Array.isArray(initial.participants) ? initial.participants : [];
+        const sortedNewP = [...newParticipants].sort();
+        const sortedOldP = [...oldParticipants].sort();
+        if (JSON.stringify(sortedNewP) !== JSON.stringify(sortedOldP)) {
+          payload.participants = newParticipants;
+        }
+
+        const newGms = Array.isArray(values.geomanifestations) ? values.geomanifestations : [];
+        const oldGms = Array.isArray(initial.geomanifestations) ? initial.geomanifestations : [];
+        const sortedNewGms = [...newGms].sort();
+        const sortedOldGms = [...oldGms].sort();
+        if (JSON.stringify(sortedNewGms) !== JSON.stringify(sortedOldGms)) {
+          payload.geomanifestations = newGms;
+        }
+
+        if (Object.keys(payload).length === 0) {
+          message.info('No se detectaron cambios en la gira de campo');
+          setModalVisible(false);
+          return;
+        }
+
+        const res = await fieldTripsUpdate(id, payload);
+        if (res.ok) {
+          message.success('Gira de campo actualizada exitosamente');
+          setModalVisible(false);
+          form.resetFields();
+          loadTrips();
+          if (selectedTrip && (selectedTrip.field_trip_id || selectedTrip.id) === id) {
+            loadTripDetail(id);
+          }
+        } else {
+          message.error(res.error || 'Error al actualizar la gira de campo');
         }
       } else {
-        message.error(res.error || 'Error al guardar la gira de campo');
+        // Create mode
+        const payload = {
+          field_trip_name: values.field_trip_name?.trim(),
+          field_trip_scheduled_date: values.field_trip_scheduled_date ? values.field_trip_scheduled_date.format('YYYY-MM-DD') : null,
+          field_trip_start_date: values.field_trip_start_date ? values.field_trip_start_date.format('YYYY-MM-DD') : null,
+          field_trip_finish_date: values.field_trip_finish_date ? values.field_trip_finish_date.format('YYYY-MM-DD') : null,
+          field_trip_is_active: Boolean(values.field_trip_is_active),
+          province_snit_code: values.province_snit_code || null,
+          canton_snit_code: values.canton_snit_code || null,
+          district_snit_code: values.district_snit_code || null,
+          participants: values.participants || [],
+          geomanifestations: values.geomanifestations || [],
+        };
+
+        const res = await fieldTripsStore(payload);
+        if (res.ok) {
+          message.success('Gira de campo creada exitosamente');
+          setModalVisible(false);
+          form.resetFields();
+          loadTrips();
+        } else {
+          message.error(res.error || 'Error al crear la gira de campo');
+        }
       }
     } catch (err) {
       message.error(err.message || 'Error de conexión');
@@ -825,15 +947,20 @@ const FieldTripsManager = () => {
           </div>
         }
         open={modalVisible}
-        onOk={() => form.submit()}
-        onCancel={() => setModalVisible(false)}
+        onOk={() => !loadingEditModal && form.submit()}
+        onCancel={() => {
+          setModalVisible(false);
+          setLoadingEditModal(false);
+        }}
         confirmLoading={submitting}
+        okButtonProps={{ disabled: loadingEditModal }}
         okText={editingTrip ? 'Guardar Cambios' : 'Crear Gira'}
         cancelText="Cancelar"
         width={720}
         centered
       >
-        <Form form={form} layout="vertical" onFinish={handleSubmit}>
+        <Spin spinning={loadingEditModal} tip="Cargando datos de la gira...">
+          <Form form={form} layout="vertical" onFinish={handleSubmit}>
           <Form.Item
             name="field_trip_name"
             label="Nombre de la Gira"
@@ -949,6 +1076,7 @@ const FieldTripsManager = () => {
             <Switch checkedChildren="Activa" unCheckedChildren="Inactiva / Cerrada" />
           </Form.Item>
         </Form>
+        </Spin>
       </Modal>
 
       {/* Drawer: Detailed Trip View + Participants + Manifestations + Comments */}
