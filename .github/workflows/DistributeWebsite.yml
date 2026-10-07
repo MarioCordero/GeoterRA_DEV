@@ -1,11 +1,6 @@
 name: WEBSITE - Build y Distribución de Website a Develop y Main
 
 on:
-  push:
-    branches:
-      - web
-    paths:
-      - 'website/**'
   workflow_dispatch:
 
 permissions:
