@@ -145,5 +145,5 @@ Thumbs.db
 *.rej
 notes.txt
 GeoterRA_local.session.sql
-bash/\[LOCAL]update_local_db_mario.sh
 database/local_migrations/*
+bash/LOCAL.update_local_db_mario.sh
