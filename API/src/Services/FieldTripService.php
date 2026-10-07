@@ -202,11 +202,18 @@ final class FieldTripService
     }
 
     $dto->validate();
-    $this->validateLocationReferences(
-      $dto->provinceSnitCode ?? $existing['province_snit_code'],
-      $dto->cantonSnitCode ?? $existing['canton_snit_code'],
-      $dto->districtSnitCode ?? $existing['district_snit_code']
-    );
+
+    $targetProvince = $dto->hasField('province_snit_code')
+      ? $dto->provinceSnitCode
+      : (isset($existing['province_snit_code']) ? (int)$existing['province_snit_code'] : null);
+    $targetCanton = $dto->hasField('canton_snit_code')
+      ? $dto->cantonSnitCode
+      : (isset($existing['canton_snit_code']) ? (int)$existing['canton_snit_code'] : null);
+    $targetDistrict = $dto->hasField('district_snit_code')
+      ? $dto->districtSnitCode
+      : (isset($existing['district_snit_code']) ? (int)$existing['district_snit_code'] : null);
+
+    $this->validateLocationReferences($targetProvince, $targetCanton, $targetDistrict);
 
     try {
       $this->pdo->beginTransaction();
@@ -441,6 +448,9 @@ final class FieldTripService
       'field_trip_start_date' => $row['field_trip_start_date'] ?? null,
       'field_trip_finish_date' => $row['field_trip_finish_date'] ?? null,
       'field_trip_is_active' => (bool)$row['field_trip_is_active'],
+      'province_snit_code' => isset($row['province_snit_code']) ? (int)$row['province_snit_code'] : null,
+      'canton_snit_code' => isset($row['canton_snit_code']) ? (int)$row['canton_snit_code'] : null,
+      'district_snit_code' => isset($row['district_snit_code']) ? (int)$row['district_snit_code'] : null,
       'location' => [
         'province' => $row['province_name'] ?? null,
         'province_snit_code' => isset($row['province_snit_code']) ? (int)$row['province_snit_code'] : null,
