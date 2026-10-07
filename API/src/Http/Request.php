@@ -36,28 +36,64 @@ final class Request
     }
 
     $headers = self::getHeaders();
-    self::$apiKey = $headers['-x-api-key']
-      ?? $_SERVER['HTTP_X_API_KEY'] ?? null;
+    $lowerHeaders = array_change_key_case($headers, CASE_LOWER);
 
-    // Searchs for api-keys.php in the following paths:
+    $apiKey = $lowerHeaders['x-api-key']
+      ?? $_SERVER['HTTP_X_API_KEY']
+      ?? $_SERVER['REDIRECT_HTTP_X_API_KEY']
+      ?? $_SERVER['X_API_KEY']
+      ?? $lowerHeaders['x_api_key']
+      ?? null;
+
+    self::$apiKey = is_string($apiKey) ? trim($apiKey) : null;
+
+    // Search for api-keys.php in candidate paths
     $productionKeysPath = dirname(__DIR__, 4) . '/api-keys.php';
     $localKeysPath = dirname(__DIR__, 2) . '/config/api-keys.php';
 
-    // If the file exists in the production directory, use it. Otherwise, use the local one.
-    $apiKeysPath = (
-      EnvironmentDetector::isProduction() && file_exists($productionKeysPath)
-    ) ? $productionKeysPath : $localKeysPath;
+    $candidatePaths = [];
+    if (EnvironmentDetector::isProduction()) {
+      $candidatePaths[] = $productionKeysPath;
+      if (getenv('HOME')) {
+        $candidatePaths[] = rtrim(getenv('HOME'), '/') . '/api-keys.php';
+      }
+      $candidatePaths[] = dirname(__DIR__, 3) . '/api-keys.php';
+      $candidatePaths[] = $localKeysPath;
+    } else {
+      $candidatePaths[] = $localKeysPath;
+      $candidatePaths[] = $productionKeysPath;
+      $candidatePaths[] = dirname(__DIR__, 3) . '/api-keys.php';
+      if (getenv('HOME')) {
+        $candidatePaths[] = rtrim(getenv('HOME'), '/') . '/api-keys.php';
+      }
+    }
 
-    if (!file_exists($apiKeysPath)) {
+    if (!empty($_SERVER['DOCUMENT_ROOT'])) {
+      $candidatePaths[] = rtrim(dirname($_SERVER['DOCUMENT_ROOT'], 2), '/') . '/api-keys.php';
+      $candidatePaths[] = rtrim(dirname($_SERVER['DOCUMENT_ROOT'], 3), '/') . '/api-keys.php';
+      $candidatePaths[] = rtrim(dirname($_SERVER['DOCUMENT_ROOT'], 4), '/') . '/api-keys.php';
+    }
+
+    $candidatePaths = array_values(array_unique(array_filter($candidatePaths)));
+
+    $apiKeysPath = null;
+    foreach ($candidatePaths as $candidate) {
+      if (file_exists($candidate)) {
+        $apiKeysPath = $candidate;
+        break;
+      }
+    }
+
+    if ($apiKeysPath === null) {
       throw new RuntimeException(
-        'API keys configuration file not found at: ' . $apiKeysPath
+        'API keys configuration file not found. Looked in: ' . implode(', ', $candidatePaths)
       );
     }
 
     $apiKeys = require $apiKeysPath;
-    $allowedClients = $apiKeys;
+    $allowedClients = is_array($apiKeys) ? $apiKeys : [];
 
-    if (self::$apiKey && isset($allowedClients[self::$apiKey])) {
+    if (self::$apiKey !== null && isset($allowedClients[self::$apiKey])) {
       self::$platform = $allowedClients[self::$apiKey];
     } else {
       self::$platform = 'unknown';
@@ -257,11 +293,42 @@ final class Request
    */
   public static function getHeaders(): array
   {
+    $headers = [];
     if (function_exists('getallheaders')) {
-      $headers = getallheaders();
-      return is_array($headers) ? $headers : [];
+      $all = getallheaders();
+      if (is_array($all)) {
+        $headers = $all;
+      }
+    } elseif (function_exists('apache_request_headers')) {
+      $all = apache_request_headers();
+      if (is_array($all)) {
+        $headers = $all;
+      }
     }
-    return [];
+
+    // Fallback: extract headers from $_SERVER (HTTP_* and REDIRECT_HTTP_*)
+    foreach ($_SERVER as $key => $value) {
+      if (is_string($value)) {
+        if (str_starts_with($key, 'HTTP_')) {
+          $headerName = str_replace('_', '-', strtolower(substr($key, 5)));
+          if (!isset($headers[$headerName])) {
+            $headers[$headerName] = $value;
+          }
+        } elseif (str_starts_with($key, 'REDIRECT_HTTP_')) {
+          $headerName = str_replace('_', '-', strtolower(substr($key, 14)));
+          if (!isset($headers[$headerName])) {
+            $headers[$headerName] = $value;
+          }
+        } elseif (in_array($key, ['CONTENT_TYPE', 'CONTENT_LENGTH', 'X_API_KEY'], true)) {
+          $headerName = str_replace('_', '-', strtolower($key));
+          if (!isset($headers[$headerName])) {
+            $headers[$headerName] = $value;
+          }
+        }
+      }
+    }
+
+    return $headers;
   }
 
   /**
