@@ -1,50 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Tag, Spin } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import {
+  CompassOutlined,
+  EnvironmentOutlined,
+  ThunderboltOutlined,
+  CheckCircleOutlined
+} from '@ant-design/icons';
 import { useSession } from '../../../../hooks/useSession';
 import UserInfo from './userInfo';
-import {
-  FileTextOutlined,
-  PlusCircleOutlined,
-  CheckCircleOutlined,
-  IdcardOutlined
-} from '@ant-design/icons';
 import '../../../../colorModule.css';
 import '../../../../fontsModule.css';
 
-/**
- * UserWelcome Component
- * Shown to regular users (non-admin)
- * Upgraded with GeoterRA executive styling
- */
-const UserWelcome = () => {
-  const navigate = useNavigate();
-  const { isLogged, loading, user: sessionUser } = useSession();
-  const [user, setUser] = useState({ name: '', requestedPoints: 0 });
-
-  useEffect(() => {
-    if (!loading && isLogged && sessionUser) {
-      setUser({
-        name: sessionUser.name || sessionUser.first_name || sessionUser.email || 'Usuario',
-        requestedPoints: sessionUser.requestedPoints || 0,
-      });
-    } else if (!loading && !isLogged) {
-      navigate('/');
-    }
-  }, [loading, isLogged, sessionUser, navigate]);
+const FieldInvestigatorDashboard = () => {
+  const { user: sessionUser, loading } = useSession();
 
   if (loading) {
     return (
       <div className="w-full min-h-96 flex items-center justify-center">
-        <Spin size="large" tip="Verificando sesión..." />
-      </div>
-    );
-  }
-
-  if (!isLogged) {
-    return (
-      <div className="w-full min-h-96 flex items-center justify-center text-gray-500 poppins">
-        Acceso no autorizado
+        <Spin size="large" tip="Cargando panel de campo..." />
       </div>
     );
   }
@@ -56,75 +29,75 @@ const UserWelcome = () => {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-bold uppercase tracking-wider text-geoterra-orange poppins">
-              PORTAL INSTITUCIONAL • GEOTERRA
+              OPERACIONES DE CAMPO • GEOTERRA
             </span>
-            <Tag color="orange" className="m-0 text-[11px] font-semibold">
-              Usuario General
+            <Tag color="cyan" className="m-0 text-[11px] font-semibold">
+              Investigador de Campo
             </Tag>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-geoterra-blue m-0 poppins">
-            ¡Bienvenido, {user?.name}!
+            ¡Bienvenido, {sessionUser?.first_name || sessionUser?.name || 'Investigador de Campo'}!
           </h1>
           <p className="text-sm text-gray-500 mt-1 mb-0 max-w-2xl">
-            Portal de gestión de solicitudes de análisis hidrogeoquímico y seguimiento a estudios de geomanifestaciones.
+            Gestión expedita para toma de mediciones bajo condiciones de alta temperatura y registro rápido en terreno.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <Tag color="success" className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-            <CheckCircleOutlined /> Cuenta Activa
+            <CheckCircleOutlined /> Modo Terreno Habilitado
           </Tag>
         </div>
       </div>
 
-      {/* User Info Component */}
+      {/* User Info Cards */}
       <UserInfo />
 
       {/* Quick Navigation Cards */}
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
         <div className="border-b border-gray-100 pb-3">
           <span className="text-xs font-bold uppercase tracking-wider text-geoterra-orange poppins block">
-            ACCIONES Y SERVICIOS
+            OPERACIONES EN TERRENO
           </span>
           <h3 className="text-lg font-bold text-geoterra-blue m-0 poppins">
-            ¿Qué deseas realizar hoy?
+            Herramientas de Expedición y Levantamiento
           </h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
           <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-[#12467E] transition-all group">
+            <div className="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-700 flex items-center justify-center text-lg mb-3">
+              <CompassOutlined />
+            </div>
+            <h4 className="font-bold text-gray-800 text-base m-0 mb-1 group-hover:text-[#12467E] transition-colors">
+              Giras Asignadas
+            </h4>
+            <p className="text-xs text-gray-500 m-0">
+              Consulta las giras vigentes, bitácoras y miembros del equipo de expedición.
+            </p>
+          </div>
+
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-[#12467E] transition-all group">
+            <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center text-lg mb-3">
+              <ThunderboltOutlined />
+            </div>
+            <h4 className="font-bold text-gray-800 text-base m-0 mb-1 group-hover:text-[#12467E] transition-colors">
+              Puntos Rápidos
+            </h4>
+            <p className="text-xs text-gray-500 m-0">
+              Captura inmediata de coordenadas GPS, fotos y temperatura en fumarolas o manantiales.
+            </p>
+          </div>
+
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-[#12467E] transition-all group">
             <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#12467E] flex items-center justify-center text-lg mb-3">
-              <FileTextOutlined />
+              <EnvironmentOutlined />
             </div>
             <h4 className="font-bold text-gray-800 text-base m-0 mb-1 group-hover:text-[#12467E] transition-colors">
-              Mis Solicitudes
+              Borradores en Estudio
             </h4>
             <p className="text-xs text-gray-500 m-0">
-              Consulta el estado de revisión, dictámenes y avances de tus solicitudes enviadas.
-            </p>
-          </div>
-
-          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-[#12467E] transition-all group">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-lg mb-3">
-              <PlusCircleOutlined />
-            </div>
-            <h4 className="font-bold text-gray-800 text-base m-0 mb-1 group-hover:text-[#12467E] transition-colors">
-              Nueva Solicitud de Análisis
-            </h4>
-            <p className="text-xs text-gray-500 m-0">
-              Registra un punto de interés termal o geomanifestación para su estudio técnico.
-            </p>
-          </div>
-
-          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-[#12467E] transition-all group">
-            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center text-lg mb-3">
-              <IdcardOutlined />
-            </div>
-            <h4 className="font-bold text-gray-800 text-base m-0 mb-1 group-hover:text-[#12467E] transition-colors">
-              Mi Perfil y Credenciales
-            </h4>
-            <p className="text-xs text-gray-500 m-0">
-              Actualiza tus datos de contacto institucional o cambia tu contraseña de acceso.
+              Sitios pendientes de revisión de laboratorio antes de la publicación oficial en el mapa.
             </p>
           </div>
         </div>
@@ -133,4 +106,4 @@ const UserWelcome = () => {
   );
 };
 
-export default UserWelcome;
+export default FieldInvestigatorDashboard;

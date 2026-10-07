@@ -1,14 +1,24 @@
-import "../../../../colorModule.css";
-import '../../../../fontsModule.css';
 import React, { useState, useEffect } from 'react';
 import { useSession } from '../../../../hooks/useSession';
-import { Card, Row, Col, Statistic, Tag, Spin } from 'antd';
+import { Tag, Spin } from 'antd';
 import { maintenanceDashboardInfo } from '../../../../config/apiConf';
-import { HddOutlined, TeamOutlined, DatabaseOutlined, FileTextOutlined } from '@ant-design/icons';
+import {
+  HddOutlined,
+  TeamOutlined,
+  DatabaseOutlined,
+  FileTextOutlined,
+  SafetyCertificateOutlined,
+  CheckCircleOutlined,
+  CloudServerOutlined,
+  CodeOutlined
+} from '@ant-design/icons';
+import '../../../../colorModule.css';
+import '../../../../fontsModule.css';
+import UserInfo from './userInfo';
 
 const MaintenanceDashboard = () => {
   const { user: sessionUser, loading: sessionLoading } = useSession();
-  
+
   // State Management
   const [dashboardData, setDashboardData] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
@@ -17,9 +27,7 @@ const MaintenanceDashboard = () => {
   const fetchDashboardStats = async () => {
     setStatsLoading(true);
     try {
-      // API CALL
       const result = await maintenanceDashboardInfo();
-
       if (result.ok && result.data) {
         setDashboardData(result.data);
       } else {
@@ -32,211 +40,185 @@ const MaintenanceDashboard = () => {
     }
   };
 
-  // Initial data fetch
   useEffect(() => {
     if (sessionUser) {
       fetchDashboardStats();
     }
   }, [sessionUser]);
 
-  // Helper function to get status color
-  const getStatusColor = (status) => {
-    return status === 'Online' ? 'green' : 'red';
-  };
-
-  // Helper function to get load color
-  const getLoadColor = (load) => {
-    switch(load) {
-      case 'Low':
-        return '#52c41a';
-      case 'Moderate':
-        return '#faad14';
-      case 'High':
-        return '#ff4d4f';
-      default:
-        return '#1890ff';
-    }
-  };
-
   if (sessionLoading) {
     return (
       <div className="w-full min-h-screen flex items-center justify-center">
-        <Spin size="large" tip="Cargando..." />
+        <Spin size="large" tip="Cargando panel de soporte..." />
       </div>
     );
   }
 
   return (
-    <div className="w-full min-h-screen p-4 md:p-6">
-      {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg p-8 mb-6">
-        <h1 className="text-4xl font-bold mb-2">
-          ¡Bienvenido, {sessionUser?.first_name || sessionUser?.email}!
-        </h1>
-        <p className="text-green-100">Panel de Mantenimiento e Infraestructura - GeoterRA</p>
-      </div>
-
-      {/* User Info Cards */}
-      <Row gutter={16} className="mb-8">
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <p className="text-gray-600 text-sm">Rol</p>
-            <Tag color="green">🔧 Mantenimiento</Tag>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <p className="text-gray-600 text-sm">Email</p>
-            <p className="font-semibold text-sm">{sessionUser?.email}</p>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <p className="text-gray-600 text-sm">Estado</p>
-            <Tag color={sessionUser?.is_active ? 'green' : 'red'}>
-              {sessionUser?.is_active ? '✅ Activo' : '❌ Inactivo'}
+    <div className="w-full p-4 md:p-8 space-y-6 poppins">
+      {/* Header Card */}
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-geoterra-orange poppins">
+              PANEL PRINCIPAL • INFRAESTRUCTURA Y SOPORTE
+            </span>
+            <Tag color="orange" className="m-0 text-[11px] font-semibold">
+              Mantenimiento
             </Tag>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <p className="text-gray-600 text-sm">Acceso a Datos</p>
-            <Tag color="blue">🔍 Solo Lectura</Tag>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Role Description */}
-      <Card className="mb-8 bg-blue-50 border-l-4 border-blue-500">
-        <h3 className="text-xl font-bold mb-3">📋 Descripción del Rol: Administrador de Mantenimiento</h3>
-        <p className="text-gray-700 mb-4">
-          Como Administrador de Mantenimiento, eres responsable de monitorear y mantener la integridad del sistema GeoterRA. 
-          Tu rol te permite supervisar el estado de la infraestructura, gestionar usuarios y acceder a información crítica del sistema 
-          con permisos de solo lectura para garantizar seguridad.
-        </p>
-        <h4 className="font-semibold text-gray-800 mb-2">🎯 Responsabilidades Principales:</h4>
-        <ul style={{ margin: '0', paddingLeft: '20px', color: '#333' }}>
-          <li>Monitorear el estado y rendimiento del servidor en tiempo real</li>
-          <li>Supervisar usuarios activos en el sistema</li>
-          <li>Revisar solicitudes pendientes y su estado de procesamiento</li>
-          <li>Acceder a registros del sistema para auditoría y diagnóstico</li>
-          <li>Gestionar información de usuarios registrados (solo lectura)</li>
-          <li>Visualizar la estructura completa de la base de datos</li>
-        </ul>
-      </Card>
-
-      {/* System Statistics */}
-      <h2 className="text-2xl font-bold mb-4">📈 Estado del Sistema</h2>
-      <Row gutter={16} className="mb-8">
-        <Col xs={24} sm={12} md={6}>
-          <Card loading={statsLoading}>
-            <Statistic
-              title="Estado del Servidor"
-              value={dashboardData?.serverStatus || 'N/A'}
-              icon={<HddOutlined />}
-              valueStyle={{ color: dashboardData?.serverStatus === 'Online' ? '#52c41a' : '#ff4d4f' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card loading={statsLoading}>
-            <Statistic
-              title="Usuarios Activos"
-              value={dashboardData?.activeUsers || 0}
-              icon={<TeamOutlined />}
-              valueStyle={{ color: '#1890ff' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card loading={statsLoading}>
-            <Statistic
-              title="Solicitudes Pendientes"
-              value={dashboardData?.pendingRequests || 0}
-              icon={<FileTextOutlined />}
-              valueStyle={{ color: '#faad14' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card loading={statsLoading}>
-            <Statistic
-              title="Carga del Sistema"
-              value={dashboardData?.systemLoad || 'N/A'}
-              icon={<DatabaseOutlined />}
-              valueStyle={{ color: getLoadColor(dashboardData?.systemLoad) }}
-            />
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Capabilities */}
-      <Card className="mb-8 bg-green-100 border-l-4 border-green-500">
-        <h3 className="text-lg font-bold mb-4">🎯 ¿Qué puedes hacer aquí?</h3>
-        <Row gutter={16}>
-          <Col xs={24} sm={12} md={6}>
-            <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-blue-600 mb-2">📊 Registros del Sistema</h4>
-              <p className="text-sm text-gray-600">Accede a los últimos 500 registros de eventos, errores y acciones realizadas en el sistema.</p>
-            </div>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-blue-600 mb-2">👥 Gestionar Usuarios</h4>
-              <p className="text-sm text-gray-600">Visualiza la lista completa de usuarios registrados, información de contacto y estado de actividad.</p>
-            </div>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-blue-600 mb-2">🗄️ Base de Datos</h4>
-              <p className="text-sm text-gray-600">Accede a todas las tablas, estructura y datos almacenados (hasta 1000 registros por tabla).</p>
-            </div>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <div className="p-4 bg-white rounded border border-gray-200">
-              <h4 className="font-semibold text-blue-600 mb-2">📈 Monitor de Salud</h4>
-              <p className="text-sm text-gray-600">Monitorea estadísticas en tiempo real: servidor, usuarios activos y carga del sistema.</p>
-            </div>
-          </Col>
-        </Row>
-      </Card>
-
-      {/* Access and Restrictions Info */}
-      <Card className="mb-8">
-        <h3 className="text-lg font-bold mb-4">🔐 Permisos de Acceso y Restricciones</h3>
-        <Row gutter={16}>
-          <Col xs={24} sm={12}>
-            <h4 className="font-semibold mb-3 text-green-600">✅ Permitido (Lectura):</h4>
-            <ul style={{ margin: '0', paddingLeft: '20px', lineHeight: '1.8' }}>
-              <li>Ver todos los datos del sistema sin restricción</li>
-              <li>Monitorear estado del servidor en tiempo real</li>
-              <li>Ver estadísticas y métricas del sistema</li>
-              <li>Acceder a registros del sistema (logs)</li>
-              <li>Gestionar usuarios (crear, editar información básica)</li>
-              <li>Visualizar toda la estructura de la base de datos</li>
-              <li>Consultar datos de todas las tablas (hasta 1000 registros)</li>
-            </ul>
-          </Col>
-          <Col xs={24} sm={12}>
-            <h4 className="font-semibold mb-3 text-red-600">❌ No Permitido (Escritura/Eliminación):</h4>
-            <ul style={{ margin: '0', paddingLeft: '20px', lineHeight: '1.8' }}>
-              <li>Modificar registros existentes directamente</li>
-              <li>Eliminar registros de la base de datos</li>
-              <li>Crear nuevos registros manualmente</li>
-              <li>Cambiar configuración crítica del sistema</li>
-              <li>Borrar registros de auditoría (logs)</li>
-              <li>Modificar roles y permisos de otros usuarios</li>
-              <li>Cambiar configuración de la base de datos</li>
-            </ul>
-          </Col>
-        </Row>
-        <div style={{ marginTop: '20px', padding: '12px', backgroundColor: '#e6f7ff', borderRadius: '4px', borderLeft: '4px solid #1890ff' }}>
-          <p style={{ margin: '0', fontSize: '14px', color: '#0050b3' }}>
-            <strong>💡 Nota:</strong> El rol de Mantenimiento es de solo lectura. Esto garantiza que se mantiene la integridad de los datos críticos. 
-            Para cambios en los datos, contacta con un administrador de base de datos.
+          </div>
+          <h1 className="text-2xl md:text-3xl font-bold text-geoterra-blue m-0 poppins">
+            ¡Bienvenido, {sessionUser?.first_name || sessionUser?.name || 'Mantenimiento'}!
+          </h1>
+          <p className="text-sm text-gray-500 mt-1 mb-0 max-w-2xl">
+            Supervisión técnica de salud del servidor, auditoría de base de datos e integridad operativa de GeoterRA.
           </p>
         </div>
-      </Card>
+
+        <div className="flex items-center gap-2">
+          <Tag color="cyan" className="px-3 py-1 rounded-full text-xs font-semibold">
+            Solo Lectura Segura
+          </Tag>
+        </div>
+      </div>
+
+      {/* User Info Component */}
+      <UserInfo />
+
+      {/* KPI Stats Overview */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Estado del Servidor
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
+              <CloudServerOutlined />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-gray-800 poppins">
+              {statsLoading ? '...' : (dashboardData?.serverStatus || 'Online')}
+            </span>
+            <span className="text-xs text-gray-500 font-medium">Core API</span>
+          </div>
+          <div className="mt-2 text-xs text-emerald-700 font-medium flex items-center gap-1">
+            <CheckCircleOutlined /> Daemon activo y respondiendo
+          </div>
+        </div>
+
+        <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Usuarios Activos
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#12467E] flex items-center justify-center text-lg">
+              <TeamOutlined />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-gray-800 poppins">
+              {statsLoading ? '...' : (dashboardData?.activeUsers || 0)}
+            </span>
+            <span className="text-xs text-gray-500 font-medium">Cuentas</span>
+          </div>
+          <div className="mt-2 text-xs text-blue-700 font-medium flex items-center gap-1">
+            En base de datos institucional
+          </div>
+        </div>
+
+        <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Solicitudes Pendientes
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
+              <FileTextOutlined />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-amber-600 poppins">
+              {statsLoading ? '...' : (dashboardData?.pendingRequests || 0)}
+            </span>
+            <span className="text-xs text-gray-500 font-medium">En espera</span>
+          </div>
+          <div className="mt-2 text-xs text-amber-700 font-medium flex items-center gap-1">
+            Flujo de solicitudes de análisis
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-slate-900 to-[#12467E] p-5 rounded-2xl border border-gray-800 text-white shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-blue-200 uppercase tracking-wider">
+              Carga del Sistema
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-white/10 text-emerald-400 flex items-center justify-center text-lg">
+              <DatabaseOutlined />
+            </div>
+          </div>
+          <div className="mt-2">
+            <span className="text-2xl font-bold poppins text-white">
+              {dashboardData?.systemLoad || 'Baja'}
+            </span>
+            <p className="text-xs text-blue-200 m-0 mt-0.5 font-normal">
+              Latencia reducida y memoria disponible
+            </p>
+          </div>
+          <div className="mt-3 text-[11px] text-emerald-300 font-medium flex items-center gap-1">
+            <CheckCircleOutlined /> MySQL Pool Conectado
+          </div>
+        </div>
+      </div>
+
+      {/* Module Navigation Grid */}
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+        <div className="border-b border-gray-100 pb-3">
+          <span className="text-xs font-bold uppercase tracking-wider text-geoterra-orange poppins block">
+            HERRAMIENTAS DE SOPORTE
+          </span>
+          <h3 className="text-lg font-bold text-geoterra-blue m-0 poppins">
+            Módulos de Soporte e Infraestructura
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-[#12467E] transition-all group">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#12467E] flex items-center justify-center text-lg mb-3">
+              <DatabaseOutlined />
+            </div>
+            <h4 className="font-bold text-gray-800 text-base m-0 mb-1 group-hover:text-[#12467E] transition-colors">
+              Explorador de Tablas
+            </h4>
+            <p className="text-xs text-gray-500 m-0">
+              Visualización y consulta estructurada de todas las entidades de la base de datos (solo lectura).
+            </p>
+          </div>
+
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-[#12467E] transition-all group">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-lg mb-3">
+              <CodeOutlined />
+            </div>
+            <h4 className="font-bold text-gray-800 text-base m-0 mb-1 group-hover:text-[#12467E] transition-colors">
+              Logs del Sistema
+            </h4>
+            <p className="text-xs text-gray-500 m-0">
+              Monitoreo en vivo de eventos del servidor, excepciones, llamadas HTTP y estado del daemon.
+            </p>
+          </div>
+
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-[#12467E] transition-all group">
+            <div className="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-700 flex items-center justify-center text-lg mb-3">
+              <TeamOutlined />
+            </div>
+            <h4 className="font-bold text-gray-800 text-base m-0 mb-1 group-hover:text-[#12467E] transition-colors">
+              Soporte a Usuarios
+            </h4>
+            <p className="text-xs text-gray-500 m-0">
+              Gestión de cuentas institucionales, activación y resolución de incidencias de acceso.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

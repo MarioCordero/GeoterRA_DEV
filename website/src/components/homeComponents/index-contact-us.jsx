@@ -144,7 +144,7 @@ function IndexContactUs() {
           <div className="text-center">
             <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-md">
               <h3 className="font-semibold text-geoterra-blue mb-2">Email</h3>
-              <p className="text-sm text-gray-700">contacto@geoterra.com</p>
+              <p className="text-sm text-gray-700">geoterra.inii.ucr@gmail.com</p>
             </div>
           </div>
           <div className="text-center">

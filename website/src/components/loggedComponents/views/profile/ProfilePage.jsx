@@ -1,10 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import { userMeUpdate, userMeDelete } from '../../../../config/apiConf';
+import React, { useState } from 'react';
+import {
+  userMeUpdate,
+  userMeDelete,
+  userUpdatePassword
+} from '../../../../config/apiConf';
 import { useSession } from '../../../../hooks/useSession';
 import ConfirmationModal from '../../../common/ConfirmationModal';
 import SuccessModal from '../../../common/SuccessModal';
-import { Form, Input, Button, Card, Spin, Row, Col, message } from 'antd';
-import { LockOutlined, MailOutlined, UserOutlined, PhoneOutlined, SaveOutlined, ExclamationCircleOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import ErrorModal from '../../../common/ErrorModal';
+import {
+  Form,
+  Input,
+  Button,
+  Card,
+  Spin,
+  Row,
+  Col,
+  Tag,
+  message,
+  Divider
+} from 'antd';
+import {
+  LockOutlined,
+  MailOutlined,
+  UserOutlined,
+  PhoneOutlined,
+  SaveOutlined,
+  ExclamationCircleOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  SafetyCertificateOutlined,
+  CalendarOutlined,
+  IdcardOutlined,
+  KeyOutlined,
+  CheckCircleOutlined
+} from '@ant-design/icons';
+import '../../../../colorModule.css';
+import '../../../../fontsModule.css';
 
 const ProfilePage = () => {
   const { user, refresh: refreshSession } = useSession();
@@ -15,11 +47,21 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // Modals state
   const [modalVisible, setModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [profileUpdateSuccessVisible, setProfileUpdateSuccessVisible] = useState(false);
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
   const [pendingData, setPendingData] = useState(null);
+
+  const showError = (msg) => {
+    setErrorMessage(msg);
+    setErrorModalVisible(true);
+  };
 
   // Handle profile update submission
   const handleProfileUpdate = async (values) => {
@@ -34,20 +76,21 @@ const ProfilePage = () => {
 
     try {
       const payload = {
-        firstName: pendingData.firstName,
-        lastName: pendingData.lastName,
+        first_name: pendingData.firstName,
+        last_name: pendingData.lastName,
         email: pendingData.email,
-        phoneNumber: pendingData.phone,
+        phone_number: pendingData.phone ? pendingData.phone.replace(/\D/g, '') : null,
       };
+
       const result = await userMeUpdate(payload);
-      if (!result.ok) throw new Error(result.error || 'Error updating profile');
+      if (!result.ok) throw new Error(result.error || 'Error al actualizar el perfil');
 
       setLoading(false);
       setPendingData(null);
       setProfileUpdateSuccessVisible(true);
     } catch (error) {
-      message.error(`Error: ${error.message}`);
       setLoading(false);
+      showError(error.message || 'Error al actualizar la información del perfil');
     }
   };
 
@@ -60,32 +103,27 @@ const ProfilePage = () => {
   // Handle password change submission
   const handlePasswordChange = async (values) => {
     if (values.newPassword !== values.confirmPassword) {
-      message.error('Las contraseñas no coinciden');
+      showError('Las contraseñas no coinciden');
       return;
     }
     setPasswordLoading(true);
 
     try {
       const payload = {
-        currentPassword: values.currentPassword,
-        password: values.newPassword,
-        firstName: user.first_name || user.firstName,
-        lastName: user.last_name || user.lastName,
-        email: user.email,
-        phoneNumber: user.phone_number || user.phoneNumber,
+        current_password: values.currentPassword,
+        new_password: values.newPassword,
       };
 
-      const response = await userMeUpdate(payload);
+      const response = await userUpdatePassword(payload);
       if (!response.ok) {
-        throw new Error(response.error || 'Password change failed');
+        throw new Error(response.error || 'Error al cambiar la contraseña');
       }
 
       setSuccessModalVisible(true);
-      console.log('✅ [handlePasswordChange] Password changed successfully - Success modal is now visible');
       passwordForm.resetFields();
     } catch (error) {
       console.error('❌ [handlePasswordChange] Error:', error);
-      message.error(`Error: ${error.message}`);
+      showError(error.message || 'Error al cambiar la contraseña');
     } finally {
       setPasswordLoading(false);
     }
@@ -107,16 +145,16 @@ const ProfilePage = () => {
       const result = await userMeDelete();
 
       if (!result.ok) {
-        throw new Error(result.error || 'Account deletion failed');
+        throw new Error(result.error || 'Error al eliminar la cuenta');
       }
 
-      message.success('✅ Cuenta eliminada correctamente');
+      message.success('Cuenta eliminada correctamente');
       setTimeout(() => {
         window.location.href = '/';
       }, 1500);
     } catch (error) {
       console.error('Account deletion error:', error);
-      message.error(`Error: ${error.message}`);
+      showError(error.message || 'Error al eliminar la cuenta');
     } finally {
       setDeleteLoading(false);
     }
@@ -124,113 +162,179 @@ const ProfilePage = () => {
 
   if (!user) {
     return (
-      <div className="p-6 text-center">
-        <Spin size="large" />
+      <div className="w-full min-h-screen flex items-center justify-center">
+        <Spin size="large" tip="Cargando perfil..." />
       </div>
     );
   }
 
+  const roleLabels = {
+    admin: 'Administrador Global',
+    maintenance: 'Mantenimiento e Infraestructura',
+    investigator: 'Investigador Principal',
+    field_investigator: 'Investigador de Campo',
+    user: 'Usuario General',
+  };
+
+  const roleColors = {
+    admin: 'magenta',
+    maintenance: 'orange',
+    investigator: 'blue',
+    field_investigator: 'cyan',
+    user: 'default',
+  };
+
+  const initials = `${(user.first_name || user.firstName || 'G')[0] || ''}${(user.last_name || user.lastName || 'T')[0] || ''}`.toUpperCase();
+
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <div className="mb-8">
-        <h1 className="mb-2">Perfil de Usuario</h1>
-        <p className="text-gray-500 m-0">Gestiona tu información personal y seguridad</p>
+    <div className="w-full p-4 md:p-8 space-y-6 poppins max-w-5xl mx-auto">
+      {/* Header Card */}
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-geoterra-orange poppins">
+              MI CUENTA • CONFIGURACIÓN Y SEGURIDAD
+            </span>
+            <Tag color={roleColors[user.role] || 'blue'} className="m-0 text-[11px] font-semibold">
+              {roleLabels[user.role] || user.role}
+            </Tag>
+          </div>
+          <h1 className="text-2xl md:text-3xl font-bold text-geoterra-blue m-0 poppins">
+            Perfil de Usuario
+          </h1>
+          <p className="text-sm text-gray-500 mt-1 mb-0 max-w-2xl">
+            Gestiona tu información de contacto personal, credenciales de acceso y credenciales institucionales.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Tag color="success" className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+            <CheckCircleOutlined /> Cuenta Activa
+          </Tag>
+        </div>
       </div>
 
-      {/* Profile Information Card */}
-      <Card
-        title={
-          <div className="flex items-center justify-between">
-            <span>Información Personal</span>
-            {!isEditing && (
-              <Button
-                type="primary"
-                icon={<EditOutlined />}
-                onClick={() => setIsEditing(true)}
-              >
-                Editar
-              </Button>
+      {/* User Hero Overview Card */}
+      <div className="bg-gradient-to-r from-[#12467E] to-[#1c5d9e] p-6 rounded-2xl shadow-sm text-white flex flex-col sm:flex-row items-center sm:items-start gap-6">
+        <div className="w-20 h-20 rounded-2xl bg-white/10 border-2 border-white/20 flex items-center justify-center text-3xl font-extrabold text-amber-300 shadow-inner shrink-0">
+          {initials}
+        </div>
+
+        <div className="flex-1 text-center sm:text-left space-y-1">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+            <h2 className="text-2xl font-bold text-white m-0 poppins">
+              {user.first_name || user.firstName} {user.last_name || user.lastName}
+            </h2>
+            <span className="bg-white/20 text-blue-100 text-xs px-2.5 py-0.5 rounded-full font-medium">
+              {roleLabels[user.role] || user.role}
+            </span>
+          </div>
+
+          <p className="text-blue-100 text-sm m-0 flex items-center justify-center sm:justify-start gap-1">
+            <MailOutlined className="text-blue-300" />
+            <span>{user.email}</span>
+          </p>
+
+          <div className="pt-2 flex flex-wrap items-center justify-center sm:justify-start gap-4 text-xs text-blue-200">
+            {user.phone_number || user.phoneNumber ? (
+              <span className="flex items-center gap-1">
+                <PhoneOutlined /> {user.phone_number || user.phoneNumber}
+              </span>
+            ) : null}
+            {user.created_at && (
+              <span className="flex items-center gap-1">
+                <CalendarOutlined /> Miembro desde{' '}
+                {new Date(user.created_at).toLocaleDateString('es-ES', {
+                  month: 'short',
+                  year: 'numeric',
+                })}
+              </span>
             )}
           </div>
-        }
-        className="mb-6"
-      >
+        </div>
+      </div>
+
+      {/* Profile Details & Form */}
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+        <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+          <div className="flex items-center gap-2">
+            <IdcardOutlined className="text-xl text-[#12467E]" />
+            <h3 className="text-lg font-bold text-gray-800 m-0 poppins">
+              Información Personal
+            </h3>
+          </div>
+
+          {!isEditing && (
+            <Button
+              type="primary"
+              icon={<EditOutlined />}
+              onClick={() => setIsEditing(true)}
+              style={{ backgroundColor: '#12467E', borderColor: '#12467E' }}
+              className="poppins-bold shadow-sm"
+            >
+              Editar Datos
+            </Button>
+          )}
+        </div>
+
         <Spin spinning={loading}>
           {!isEditing ? (
             // View Mode
-            <div>
-              <Row gutter={[16, 16]}>
-                <Col xs={24} sm={12}>
-                  <div className="py-3">
-                    <p className="text-gray-400 m-0 text-xs">Nombre</p>
-                    <p className="m-0 text-base font-medium">{user.first_name || '-'}</p>
-                  </div>
-                </Col>
-                <Col xs={24} sm={12}>
-                  <div className="py-3">
-                    <p className="text-gray-400 m-0 text-xs">Apellido</p>
-                    <p className="m-0 text-base font-medium">{user.last_name || '-'}</p>
-                  </div>
-                </Col>
-              </Row>
-              <Row gutter={[16, 16]}>
-                <Col xs={24} sm={12}>
-                  <div className="py-3">
-                    <p className="text-gray-400 m-0 text-xs">Email</p>
-                    <p className="m-0 text-base font-medium">{user.email || '-'}</p>
-                  </div>
-                </Col>
-              </Row>
-              <Row gutter={[16, 16]}>
-                <Col xs={24} sm={12}>
-                  <div className="py-3">
-                    <p className="text-gray-400 m-0 text-xs">Número de Teléfono</p>
-                    <p className="m-0 text-base font-medium">{user.phone_number || '-'}</p>
-                  </div>
-                </Col>
-                <Col xs={24} sm={12}>
-                  <div className="py-3">
-                    <p className="text-gray-400 m-0 text-xs">Rol</p>
-                    <p className="m-0 text-base font-medium capitalize">
-                      {user.role || '-'}
-                    </p>
-                  </div>
-                </Col>
-              </Row>
-              {user.created_at && (
-                <Row gutter={[16, 16]}>
-                  <Col xs={24}>
-                    <div className="py-3">
-                      <p className="text-gray-400 m-0 text-xs">Miembro desde</p>
-                      <p className="m-0 text-base font-medium">
-                        {new Date(user.created_at).toLocaleDateString('es-ES', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        })}
-                      </p>
-                    </div>
-                  </Col>
-                </Row>
-              )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-1">
+                  Nombre de Pila
+                </span>
+                <span className="text-base font-bold text-gray-800 poppins">
+                  {user.first_name || user.firstName || '-'}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-1">
+                  Apellidos
+                </span>
+                <span className="text-base font-bold text-gray-800 poppins">
+                  {user.last_name || user.lastName || '-'}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-1">
+                  Correo Electrónico
+                </span>
+                <span className="text-base font-bold text-gray-800 poppins">
+                  {user.email || '-'}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-1">
+                  Número Telefónico
+                </span>
+                <span className="text-base font-bold text-gray-800 poppins">
+                  {user.phone_number || user.phoneNumber || 'No especificado'}
+                </span>
+              </div>
             </div>
           ) : (
-            // Edit Mode
+            // Edit Mode Form
             <Form
               form={form}
               layout="vertical"
               onFinish={handleProfileUpdate}
               initialValues={{
-                firstName: user.first_name || '',
-                lastName: user.last_name || '',
+                firstName: user.first_name || user.firstName || '',
+                lastName: user.last_name || user.lastName || '',
                 email: user.email || '',
-                phone: user.phone_number || '',
+                phone: user.phone_number || user.phoneNumber || '',
               }}
+              className="space-y-4"
             >
               <Row gutter={16}>
                 <Col xs={24} sm={12}>
                   <Form.Item
-                    label="Nombre"
+                    label={<span className="font-semibold text-gray-700">Nombre</span>}
                     name="firstName"
                     rules={[
                       { required: true, message: 'Ingresa tu nombre' },
@@ -238,15 +342,16 @@ const ProfilePage = () => {
                     ]}
                   >
                     <Input
-                      prefix={<UserOutlined />}
+                      prefix={<UserOutlined className="text-gray-400" />}
                       placeholder="Tu nombre"
                       disabled={loading}
+                      className="rounded-lg py-2"
                     />
                   </Form.Item>
                 </Col>
                 <Col xs={24} sm={12}>
                   <Form.Item
-                    label="Apellido"
+                    label={<span className="font-semibold text-gray-700">Apellidos</span>}
                     name="lastName"
                     rules={[
                       { required: true, message: 'Ingresa tu apellido' },
@@ -254,49 +359,59 @@ const ProfilePage = () => {
                     ]}
                   >
                     <Input
-                      prefix={<UserOutlined />}
+                      prefix={<UserOutlined className="text-gray-400" />}
                       placeholder="Tu apellido"
                       disabled={loading}
+                      className="rounded-lg py-2"
                     />
                   </Form.Item>
                 </Col>
               </Row>
 
-              <Form.Item
-                label="Email"
-                name="email"
-                rules={[
-                  { required: true, message: 'Ingresa tu email' },
-                  { type: 'email', message: 'Email inválido' },
-                ]}
-              >
-                <Input
-                  prefix={<MailOutlined />}
-                  placeholder="tu@email.com"
-                  disabled={loading}
-                />
-              </Form.Item>
+              <Row gutter={16}>
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    label={<span className="font-semibold text-gray-700">Correo Electrónico</span>}
+                    name="email"
+                    rules={[
+                      { required: true, message: 'Ingresa tu email' },
+                      { type: 'email', message: 'Email inválido' },
+                    ]}
+                  >
+                    <Input
+                      prefix={<MailOutlined className="text-gray-400" />}
+                      placeholder="tu@email.com"
+                      disabled={loading}
+                      className="rounded-lg py-2"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    label={<span className="font-semibold text-gray-700">Teléfono</span>}
+                    name="phone"
+                    rules={[
+                      { min: 7, message: 'El teléfono debe tener al menos 7 dígitos' },
+                    ]}
+                  >
+                    <Input
+                      prefix={<PhoneOutlined className="text-gray-400" />}
+                      placeholder="8888-8888"
+                      disabled={loading}
+                      className="rounded-lg py-2"
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
 
-              <Form.Item
-                label="Número de Teléfono"
-                name="phone"
-                rules={[
-                  { min: 7, message: 'El teléfono debe tener al menos 7 dígitos' },
-                ]}
-              >
-                <Input
-                  prefix={<PhoneOutlined />}
-                  placeholder="+1 (555) 000-0000"
-                  disabled={loading}
-                />
-              </Form.Item>
-
-              <div className="flex gap-3 mt-6">
+              <div className="flex gap-3 pt-2">
                 <Button
                   type="primary"
                   htmlType="submit"
                   icon={<SaveOutlined />}
                   loading={loading}
+                  style={{ backgroundColor: '#12467E', borderColor: '#12467E' }}
+                  className="poppins-bold shadow-sm"
                 >
                   Guardar Cambios
                 </Button>
@@ -306,6 +421,7 @@ const ProfilePage = () => {
                     form.resetFields();
                   }}
                   disabled={loading}
+                  className="border-gray-300"
                 >
                   Cancelar
                 </Button>
@@ -313,40 +429,74 @@ const ProfilePage = () => {
             </Form>
           )}
         </Spin>
-      </Card>
+      </div>
 
-      {/* Password Change Card */}
-      <Card title="Cambiar Contraseña" className="mb-6">
-        <Spin spinning={passwordLoading}>
-          {!isChangingPassword ? (
+      {/* Security & Password Card */}
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+        <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+          <div className="flex items-center gap-2">
+            <KeyOutlined className="text-xl text-[#12467E]" />
+            <div>
+              <h3 className="text-lg font-bold text-gray-800 m-0 poppins">
+                Seguridad de la Cuenta
+              </h3>
+              <p className="text-xs text-gray-500 m-0">
+                Actualiza tu contraseña periódicamente para proteger tu acceso.
+              </p>
+            </div>
+          </div>
+
+          {!isChangingPassword && (
             <Button
               onClick={() => setIsChangingPassword(true)}
               disabled={passwordLoading}
+              className="border-gray-300 poppins font-medium"
             >
               Cambiar Contraseña
             </Button>
+          )}
+        </div>
+
+        <Spin spinning={passwordLoading}>
+          {!isChangingPassword ? (
+            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#12467E] flex items-center justify-center text-lg">
+                  <SafetyCertificateOutlined />
+                </div>
+                <div>
+                  <span className="text-sm font-bold text-gray-800 block">
+                    Contraseña activa y segura
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    Última actualización de credenciales protegida con hashing bcrypt.
+                  </span>
+                </div>
+              </div>
+              <Tag color="blue" className="rounded-md font-medium">Protegido</Tag>
+            </div>
           ) : (
             <Form
               form={passwordForm}
               layout="vertical"
               onFinish={handlePasswordChange}
+              className="space-y-4 max-w-xl"
             >
               <Form.Item
-                label="Contraseña Actual"
+                label={<span className="font-semibold text-gray-700">Contraseña Actual</span>}
                 name="currentPassword"
-                rules={[
-                  { required: true, message: 'Ingresa tu contraseña actual' },
-                ]}
+                rules={[{ required: true, message: 'Ingresa tu contraseña actual' }]}
               >
                 <Input.Password
-                  prefix={<LockOutlined />}
+                  prefix={<LockOutlined className="text-gray-400" />}
                   placeholder="Tu contraseña actual"
                   disabled={passwordLoading}
+                  className="rounded-lg py-2"
                 />
               </Form.Item>
 
               <Form.Item
-                label="Nueva Contraseña"
+                label={<span className="font-semibold text-gray-700">Nueva Contraseña</span>}
                 name="newPassword"
                 rules={[
                   { required: true, message: 'Ingresa una nueva contraseña' },
@@ -358,31 +508,33 @@ const ProfilePage = () => {
                 ]}
               >
                 <Input.Password
-                  prefix={<LockOutlined />}
-                  placeholder="Nueva contraseña"
+                  prefix={<LockOutlined className="text-gray-400" />}
+                  placeholder="Mínimo 8 caracteres, mayúsculas y números"
                   disabled={passwordLoading}
+                  className="rounded-lg py-2"
                 />
               </Form.Item>
 
               <Form.Item
-                label="Confirmar Contraseña"
+                label={<span className="font-semibold text-gray-700">Confirmar Nueva Contraseña</span>}
                 name="confirmPassword"
-                rules={[
-                  { required: true, message: 'Confirma tu nueva contraseña' },
-                ]}
+                rules={[{ required: true, message: 'Confirma tu nueva contraseña' }]}
               >
                 <Input.Password
-                  prefix={<LockOutlined />}
-                  placeholder="Confirma tu contraseña"
+                  prefix={<LockOutlined className="text-gray-400" />}
+                  placeholder="Repite la nueva contraseña"
                   disabled={passwordLoading}
+                  className="rounded-lg py-2"
                 />
               </Form.Item>
 
-              <div className="flex gap-3 mt-6">
+              <div className="flex gap-3 pt-2">
                 <Button
                   type="primary"
                   htmlType="submit"
                   loading={passwordLoading}
+                  style={{ backgroundColor: '#12467E', borderColor: '#12467E' }}
+                  className="poppins-bold shadow-sm"
                 >
                   Actualizar Contraseña
                 </Button>
@@ -392,6 +544,7 @@ const ProfilePage = () => {
                     passwordForm.resetFields();
                   }}
                   disabled={passwordLoading}
+                  className="border-gray-300"
                 >
                   Cancelar
                 </Button>
@@ -399,50 +552,50 @@ const ProfilePage = () => {
             </Form>
           )}
         </Spin>
-      </Card>
+      </div>
 
-      {/* Delete Account Card - Danger Zone */}
-      <Card
-        title={
-          <div className="flex items-center gap-2 text-red-500">
-            <ExclamationCircleOutlined />
-            <span>Zona de Peligro</span>
-          </div>
-        }
-        className="mb-6 border-red-500"
-      >
-        <div className="py-3">
-          <h4 className="m-0 mb-2 text-red-500">Eliminar Cuenta</h4>
-          <p className="text-gray-500 m-0 mb-4">
-            Una vez que elimines tu cuenta, no hay forma de recuperarla. Por favor, asegúrate de que deseas hacer esto.
-          </p>
+      {/* Danger Zone Card */}
+      <div className="bg-white p-6 rounded-2xl border border-rose-200 shadow-sm space-y-4">
+        <div className="flex items-center gap-2 text-rose-600">
+          <ExclamationCircleOutlined className="text-xl" />
+          <h3 className="text-lg font-bold text-rose-600 m-0 poppins">
+            Zona de Peligro
+          </h3>
+        </div>
+        <p className="text-sm text-gray-600 m-0">
+          Una vez que elimines tu cuenta, no hay forma de recuperarla. Toda tu información de perfil,
+          solicitudes e historial serán eliminados permanentemente del sistema.
+        </p>
+
+        <div className="pt-2">
           <Spin spinning={deleteLoading}>
             <Button
               danger
               icon={<DeleteOutlined />}
               onClick={() => setDeleteModalVisible(true)}
               disabled={deleteLoading}
+              className="poppins-semibold rounded-lg"
             >
-              Eliminar mi Cuenta
+              Eliminar Permanentemente mi Cuenta
             </Button>
           </Spin>
         </div>
-      </Card>
+      </div>
 
-      {/* Profile Update Confirmation Modal */}
+      {/* Modals */}
       <ConfirmationModal
         open={modalVisible}
         title="Confirmar cambios"
         message="¿Estás seguro de que deseas actualizar tu información personal?"
         items={[
-          ...(pendingData?.firstName !== user.first_name ? [{
+          ...(pendingData?.firstName !== (user.first_name || user.firstName) ? [{
             label: 'Nombre',
-            old: user.first_name,
+            old: user.first_name || user.firstName,
             new: pendingData?.firstName,
           }] : []),
-          ...(pendingData?.lastName !== user.last_name ? [{
+          ...(pendingData?.lastName !== (user.last_name || user.lastName) ? [{
             label: 'Apellido',
-            old: user.last_name,
+            old: user.last_name || user.lastName,
             new: pendingData?.lastName,
           }] : []),
           ...(pendingData?.email !== user.email ? [{
@@ -450,9 +603,9 @@ const ProfilePage = () => {
             old: user.email,
             new: pendingData?.email,
           }] : []),
-          ...(pendingData?.phone !== (user.phone_number || '') ? [{
+          ...(pendingData?.phone !== (user.phone_number || user.phoneNumber || '') ? [{
             label: 'Teléfono',
-            old: user.phone_number || '(No especificado)',
+            old: user.phone_number || user.phoneNumber || '(No especificado)',
             new: pendingData?.phone || '(No especificado)',
           }] : []),
         ]}
@@ -463,7 +616,6 @@ const ProfilePage = () => {
         loading={loading}
       />
 
-      {/* Delete Account Confirmation Modal */}
       <ConfirmationModal
         open={deleteModalVisible}
         title="Eliminar Cuenta Permanentemente"
@@ -483,7 +635,6 @@ const ProfilePage = () => {
         loading={deleteLoading}
       />
 
-      {/* Password Change Success Modal */}
       <SuccessModal
         open={successModalVisible}
         title="¡Éxito!"
@@ -494,7 +645,6 @@ const ProfilePage = () => {
         onConfirm={handlePasswordChangeSuccess}
       />
 
-      {/* Profile Update Success Modal */}
       <SuccessModal
         open={profileUpdateSuccessVisible}
         title="¡Éxito!"
@@ -503,6 +653,12 @@ const ProfilePage = () => {
         status="success"
         confirmText="Continuar"
         onConfirm={handleProfileUpdateSuccess}
+      />
+
+      <ErrorModal
+        open={errorModalVisible}
+        errorMessage={errorMessage}
+        onClose={() => setErrorModalVisible(false)}
       />
     </div>
   );
