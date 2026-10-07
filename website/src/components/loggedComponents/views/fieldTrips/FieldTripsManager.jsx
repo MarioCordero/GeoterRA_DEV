@@ -233,6 +233,9 @@ const FieldTripsManager = () => {
 
   // Open Create Modal
   const handleOpenCreate = () => {
+    if (allUsers.length === 0) {
+      loadUsers();
+    }
     setEditingTrip(null);
     setLoadingEditModal(false);
     form.resetFields();
@@ -248,6 +251,9 @@ const FieldTripsManager = () => {
 
   // Open Edit Modal
   const handleOpenEdit = async (record) => {
+    if (allUsers.length === 0) {
+      loadUsers();
+    }
     setEditingTrip(record);
     setModalVisible(true);
     setLoadingEditModal(true);
@@ -263,6 +269,27 @@ const FieldTripsManager = () => {
       }
     } catch (err) {
       console.error('Error fetching detail for edit:', err);
+    }
+
+    // Merge detail participants into allUsers so labels resolve immediately
+    if (Array.isArray(detail.participants) && detail.participants.length > 0) {
+      setAllUsers((prevUsers) => {
+        const existingIds = new Set(prevUsers.map((u) => u.user_id || u.id));
+        const toAdd = detail.participants.filter(
+          (p) => typeof p === 'object' && p !== null && !existingIds.has(p.user_id || p.id)
+        );
+        return toAdd.length > 0 ? [...prevUsers, ...toAdd] : prevUsers;
+      });
+    }
+
+    if (Array.isArray(detail.geomanifestations) && detail.geomanifestations.length > 0) {
+      setAllManifestations((prev) => {
+        const existingIds = new Set(prev.map((m) => m.geomanifestation_id || m.id));
+        const toAdd = detail.geomanifestations.filter(
+          (m) => typeof m === 'object' && m !== null && !existingIds.has(m.geomanifestation_id || m.id)
+        );
+        return toAdd.length > 0 ? [...prev, ...toAdd] : prev;
+      });
     }
 
     const provCode = detail.province_snit_code ?? detail.location?.province_snit_code ?? record.province_snit_code;
