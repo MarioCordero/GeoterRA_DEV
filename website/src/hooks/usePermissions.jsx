@@ -133,8 +133,8 @@ const ROLE_PERMISSIONS = {
 
   // ──────────────────────────────────────────────────────────
   // field_investigator: solicitudes + geomanifestaciones +
-  //   pruebas de campo + georeportes + giras de campo.
-  //   SIN acceso a Pruebas de Laboratorio.
+  //   pruebas de campo + georeportes + consulta de giras.
+  //   SIN acceso a Pruebas de Laboratorio ni gestión/creación de giras.
   // ──────────────────────────────────────────────────────────
   field_investigator: [
     // Solicitudes
@@ -148,7 +148,6 @@ const ROLE_PERMISSIONS = {
     PERMISSIONS.MANAGE_GEOMANIFESTATIONS,
     PERMISSIONS.MANAGE_INSITU_TESTS,
     PERMISSIONS.MANAGE_GEOREPORTS,
-    PERMISSIONS.MANAGE_FIELD_TRIPS,
     PERMISSIONS.VIEW_FIELD_TRIPS,
   ],
 
