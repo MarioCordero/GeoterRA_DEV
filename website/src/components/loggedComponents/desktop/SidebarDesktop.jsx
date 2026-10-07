@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   LogoutOutlined,
   MenuOutlined,
@@ -26,6 +26,19 @@ const SidebarDesktop = ({ selectedKey, setSelectedKey, collapsed, setCollapsed }
   // Get menu items from centralized configuration
   const permissionsObj = createPermissionsObject(hasPermission, PERMISSIONS);
   const menuItems = getMenuItems(permissionsObj);
+
+  // Maintain open submenus state (e.g. Solicitudes, Otros)
+  const [openKeys, setOpenKeys] = useState(() => {
+    const parent = menuItems.find(item => item.children?.some(c => c.key === selectedKey));
+    return parent ? [parent.key] : [];
+  });
+
+  useEffect(() => {
+    const parent = menuItems.find(item => item.children?.some(c => c.key === selectedKey));
+    if (parent && !openKeys.includes(parent.key)) {
+      setOpenKeys(prev => [...prev, parent.key]);
+    }
+  }, [selectedKey]);
 
   const handleLogout = async () => {
     try {
@@ -62,6 +75,30 @@ const SidebarDesktop = ({ selectedKey, setSelectedKey, collapsed, setCollapsed }
 
   const handleMenuClick = (e) => {
     setSelectedKey(e.key);
+  };
+
+  // Format menu items recursively for Ant Design Menu
+  const formatDesktopMenuItems = (items) => {
+    return items.map(({ shortLabel, children, ...rest }) => {
+      const isSelected = selectedKey === rest.key;
+      const hasActiveChild = children?.some(c => c.key === selectedKey);
+
+      const formatted = {
+        ...rest,
+        style: {
+          margin: '4px 0',
+          fontSize: '15px',
+          fontWeight: isSelected || hasActiveChild ? 'bold' : 'normal',
+          color: isSelected ? '#1890ff' : '#333',
+        },
+      };
+
+      if (children && children.length > 0) {
+        formatted.children = formatDesktopMenuItems(children);
+      }
+
+      return formatted;
+    });
   };
 
   const LogoutModal = () => (
@@ -145,6 +182,8 @@ const SidebarDesktop = ({ selectedKey, setSelectedKey, collapsed, setCollapsed }
           theme="light"
           mode="inline"
           selectedKeys={[selectedKey]}
+          openKeys={collapsed ? [] : openKeys}
+          onOpenChange={(keys) => setOpenKeys(keys)}
           onClick={handleMenuClick}
           style={{ 
             marginTop: '1rem',
@@ -152,15 +191,7 @@ const SidebarDesktop = ({ selectedKey, setSelectedKey, collapsed, setCollapsed }
             background: 'transparent',
             flex: 1,
           }}
-          items={menuItems.map(({ shortLabel, ...rest }) => ({
-            ...rest,
-            style: {
-              margin: '8px 0',
-              fontSize: '16px',
-              fontWeight: selectedKey === rest.key ? 'bold' : 'normal',
-              color: selectedKey === rest.key ? '#1890ff' : '#333',
-            }
-          }))}
+          items={formatDesktopMenuItems(menuItems)}
           inlineCollapsed={collapsed}
         />
 

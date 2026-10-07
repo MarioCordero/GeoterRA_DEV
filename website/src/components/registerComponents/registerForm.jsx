@@ -1,19 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Form, Input } from "antd";
-import PhoneInput from "../common/PhoneInput";
 import "../../colorModule.css";
 import "../../fontsModule.css";
+import { Form, Input } from "antd";
+import ErrorModal from "../common/ErrorModal";
+import PhoneInput from "../common/PhoneInput";
+import { useNavigate } from "react-router-dom";
+import SuccessModal from "../common/SuccessModal";
+import React, { useState, useEffect } from "react";
 import { userRegister } from "../../config/apiConf";
+import NotImplementedModal from "../common/NotImplementedModal";
 
 export default function Register() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showNotImplementedModal, setShowNotImplementedModal] = useState(false);
 
   // Freeze/unfreeze scroll when modal opens/closes
   useEffect(() => {
-    if (showSuccessModal) {
+    if (showSuccessModal || showErrorModal || showNotImplementedModal) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -22,7 +28,7 @@ export default function Register() {
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [showSuccessModal]);
+  }, [showSuccessModal, showErrorModal, showNotImplementedModal]);
 
   const handleFinish = async (values) => {
     // Trim and clean names before sending
@@ -34,8 +40,8 @@ export default function Register() {
     const phoneDigits = (values.phone_num || "").replace(/\D/g, "");
 
     const payload = {
-      name: cleanFirstName,
-      lastname: cleanLastName,
+      first_name: cleanFirstName,
+      last_name: cleanLastName,
       email: cleanEmail,
       phone_number: phoneDigits || null,
       password: values.password,
@@ -47,16 +53,19 @@ export default function Register() {
       if (result.ok && result.data) {
         setShowSuccessModal(true);
       } else if (result.error) {
-        alert(result.error);
+        setErrorMessage(result.error);
+        setShowErrorModal(true);
       } else {
-        alert("Error en el registro");
+        setErrorMessage("Error en el registro");
+        setShowErrorModal(true);
       }
     } catch (err) {
       console.error('Registration error:', err);
-      alert("Error de conexión");
+      setErrorMessage("Error de conexión");
+      setShowErrorModal(true);
     }
   };
-  
+
   const handleModalClose = () => {
     setShowSuccessModal(false);
     navigate("/login");
@@ -203,11 +212,17 @@ export default function Register() {
             {/* Terms and Privacy - Mobile only */}
             <div className="md:hidden text-xs text-gray-600 leading-relaxed pt-2">
               Al registrarse, acepta nuestros{" "}
-              <span className="text-geoterra-blue cursor-pointer hover:underline">
+              <span 
+                onClick={() => setShowNotImplementedModal(true)}
+                className="text-geoterra-blue cursor-pointer hover:underline"
+              >
                 términos de servicio
               </span>{" "}
               y{" "}
-              <span className="text-geoterra-blue cursor-pointer hover:underline">
+              <span 
+                onClick={() => setShowNotImplementedModal(true)}
+                className="text-geoterra-blue cursor-pointer hover:underline"
+              >
                 política de privacidad
               </span>
               .
@@ -217,7 +232,7 @@ export default function Register() {
             <div className="pt-4 sm:pt-6 md:pt-8">
               <button
                 type="submit"
-                className="w-full sm:w-4/5 md:w-3/4 lg:w-2/3 xl:w-1/2 mx-auto block poppins-bold bg-geoterra-orange hover:bg-orange-600 text-white py-3 sm:py-4 px-6 sm:px-8 rounded-md font-bold transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm sm:text-base md:text-lg"
+                className="cursor-pointer w-full sm:w-4/5 md:w-3/4 lg:w-2/3 xl:w-1/2 mx-auto block poppins-bold bg-geoterra-orange hover:bg-orange-600 text-white py-3 sm:py-4 px-6 sm:px-8 rounded-md font-bold transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm sm:text-base md:text-lg"
               >
                 Registrarse
               </button>
@@ -226,11 +241,17 @@ export default function Register() {
             {/* Terms and Privacy - Desktop */}
             <div className="hidden md:block text-sm text-gray-600 text-center leading-relaxed pt-4">
               Al registrarse, acepta nuestros{" "}
-              <span className="text-geoterra-blue cursor-pointer hover:underline">
+              <span 
+                onClick={() => setShowNotImplementedModal(true)}
+                className="text-geoterra-blue cursor-pointer hover:underline"
+              >
                 términos de servicio
               </span>{" "}
               y{" "}
-              <span className="text-geoterra-blue cursor-pointer hover:underline">
+              <span 
+                onClick={() => setShowNotImplementedModal(true)}
+                className="text-geoterra-blue cursor-pointer hover:underline"
+              >
                 política de privacidad
               </span>
               .
@@ -253,42 +274,27 @@ export default function Register() {
         </div>
       </main>
 
-      {/* Success Modal - Full Screen */}
-      {showSuccessModal && (
-        <div className="fixed inset-0 bg-white/30 bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-1000">
-          <div className="bg-white rounded-lg p-8 sm:p-12 max-w-lg w-full mx-6 shadow-2xl">
-            <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
-                <svg
-                  className="h-8 w-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 13l4 4L19 7"
-                  ></path>
-                </svg>
-              </div>
-              <h3 className="text-2xl sm:text-3xl poppins-bold text-geoterra-blue mb-4">
-                ¡Registro Exitoso!
-              </h3>
-              <p className="text-base sm:text-lg text-gray-600 poppins mb-8 leading-relaxed">
-                Gracias por registrarse, ahora inicie sesión
-              </p>
-              <button
-                onClick={handleModalClose}
-                className="px-8 py-4 bg-geoterra-orange hover:bg-orange-600 text-white poppins-bold rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg text-base sm:text-lg"
-              >
-                Ir a Iniciar Sesión
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Success Modal */}
+      <SuccessModal
+        open={showSuccessModal}
+        title="¡Registro Exitoso!"
+        message="Gracias por registrarse, ahora inicie sesión"
+        confirmText="Ir a Iniciar Sesión"
+        onConfirm={handleModalClose}
+      />
+
+      {/* Error Modal */}
+      <ErrorModal
+        visible={showErrorModal}
+        errorMessage={errorMessage}
+        onClose={() => setShowErrorModal(false)}
+      />
+
+      {/* NotImplemented Modal */}
+      <NotImplementedModal
+        isOpen={showNotImplementedModal}
+        onClose={() => setShowNotImplementedModal(false)}
+      />
     </div>
   );
 }
