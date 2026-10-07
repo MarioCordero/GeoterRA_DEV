@@ -55,7 +55,6 @@ final class FieldTripService
   {
     Request::requireRole([
       AllowedUserRoles::ADMIN,
-      AllowedUserRoles::FIELD_INVESTIGATOR,
       AllowedUserRoles::INVESTIGATOR,
     ]);
 
@@ -192,7 +191,6 @@ final class FieldTripService
   {
     Request::requireRole([
       AllowedUserRoles::ADMIN,
-      AllowedUserRoles::FIELD_INVESTIGATOR,
       AllowedUserRoles::INVESTIGATOR,
     ]);
 
@@ -263,7 +261,6 @@ final class FieldTripService
   {
     Request::requireRole([
       AllowedUserRoles::ADMIN,
-      AllowedUserRoles::FIELD_INVESTIGATOR,
       AllowedUserRoles::INVESTIGATOR,
     ]);
 
@@ -288,7 +285,6 @@ final class FieldTripService
   {
     Request::requireRole([
       AllowedUserRoles::ADMIN,
-      AllowedUserRoles::FIELD_INVESTIGATOR,
       AllowedUserRoles::INVESTIGATOR,
     ]);
 
@@ -318,7 +314,6 @@ final class FieldTripService
   {
     Request::requireRole([
       AllowedUserRoles::ADMIN,
-      AllowedUserRoles::FIELD_INVESTIGATOR,
       AllowedUserRoles::INVESTIGATOR,
     ]);
 
@@ -343,7 +338,6 @@ final class FieldTripService
   {
     Request::requireRole([
       AllowedUserRoles::ADMIN,
-      AllowedUserRoles::FIELD_INVESTIGATOR,
       AllowedUserRoles::INVESTIGATOR,
     ]);
 
@@ -373,7 +367,6 @@ final class FieldTripService
   {
     Request::requireRole([
       AllowedUserRoles::ADMIN,
-      AllowedUserRoles::FIELD_INVESTIGATOR,
       AllowedUserRoles::INVESTIGATOR,
     ]);
 
@@ -398,7 +391,6 @@ final class FieldTripService
   {
     Request::requireRole([
       AllowedUserRoles::ADMIN,
-      AllowedUserRoles::FIELD_INVESTIGATOR,
       AllowedUserRoles::INVESTIGATOR,
     ]);
 
