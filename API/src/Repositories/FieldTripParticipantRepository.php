@@ -81,12 +81,15 @@ final class FieldTripParticipantRepository extends Repository
     $sqlDelete = "DELETE FROM field_trip_participants WHERE field_trip_id = :ft_id";
     $this->execute($sqlDelete, [':ft_id' => $fieldTripId]);
 
-    if (!empty($userIds)) {
+    $uniqueUserIds = array_values(array_unique(array_filter($userIds, 'is_string')));
+
+    if (!empty($uniqueUserIds)) {
       $insertSql = "INSERT INTO field_trip_participants (field_trip_id, user_id, created_at) VALUES ";
       $parts = [];
-      $params = [':ft_id' => $fieldTripId];
-      foreach (array_values($userIds) as $i => $uid) {
-        $parts[] = "(:ft_id, :uid_$i, NOW())";
+      $params = [];
+      foreach ($uniqueUserIds as $i => $uid) {
+        $parts[] = "(:ft_id_$i, :uid_$i, NOW())";
+        $params[":ft_id_$i"] = $fieldTripId;
         $params[":uid_$i"] = $uid;
       }
       $insertSql .= implode(', ', $parts);
