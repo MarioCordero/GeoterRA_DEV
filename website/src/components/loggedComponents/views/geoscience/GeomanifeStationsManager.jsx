@@ -5,6 +5,7 @@ import {
   Tag,
   Button,
   Modal,
+  Drawer,
   Form,
   Input,
   InputNumber,
@@ -20,15 +21,24 @@ import {
   Progress,
   Tooltip,
   Divider,
+  Row,
+  Col,
+  Statistic,
+  Empty,
+  Alert,
+  Radio,
+  Checkbox,
 } from 'antd';
 import {
   EnvironmentOutlined, PlusOutlined, ReloadOutlined, EyeOutlined, EyeInvisibleOutlined,
   CheckCircleOutlined, EditOutlined, DeleteOutlined, InfoCircleOutlined, SearchOutlined,
   RocketOutlined, ExperimentOutlined, BarChartOutlined, FileSearchOutlined, BulbOutlined,
-  CompassOutlined,
+  CompassOutlined, StarOutlined, StarFilled,
 } from '@ant-design/icons';
 import MapCoordinatePicker from '../../../common/MapCoordinatePicker';
 import CommentsPanel from '../../../common/CommentsPanel';
+import { renderDateWithProse } from '../../../../utils/dateFormatter';
+import { usePermissions } from '../../../../hooks/usePermissions';
 import {
   geomanifestationsIndex,
   geomanifestationsAdminIndex,
@@ -43,11 +53,16 @@ import {
   insituTestsStore,
   insituTestsUpdate,
   insituTestsIndex,
+  insituTestsDelete,
   inlabTestsStore,
   inlabTestsUpdate,
   inlabTestsIndex,
+  inlabTestsDelete,
+  georeportsCurrent,
   georeportsAdminStore,
   georeportsAdminUpdate,
+  georeportsAdminDelete,
+  georeportsAdminPromote,
   georeportsAdminIndex,
   fieldTripsIndex,
 } from '../../../../config/apiConf';
@@ -64,6 +79,12 @@ const extractList = (resData) => {
 };
 
 const GeomanifeStationsManager = () => {
+  const { hasPermission, PERMISSIONS } = usePermissions();
+
+  const canManageInsitu = hasPermission(PERMISSIONS.MANAGE_INSITU_TESTS) || hasPermission(PERMISSIONS.MANAGE_GEOMANIFESTATIONS);
+  const canManageInlab = hasPermission(PERMISSIONS.MANAGE_INLAB_TESTS) || hasPermission(PERMISSIONS.MANAGE_GEOMANIFESTATIONS);
+  const canManageGeoreports = hasPermission(PERMISSIONS.MANAGE_GEOREPORTS) || hasPermission(PERMISSIONS.MANAGE_GEOMANIFESTATIONS);
+
   const [manifestations, setManifestations] = useState([]);
   const [acceptedRequestsManifestations, setAcceptedRequestsManifestations] = useState([]);
   const [fieldTripsList, setFieldTripsList] = useState([]);
@@ -83,24 +104,36 @@ const GeomanifeStationsManager = () => {
   const [districts, setDistricts] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 
-  // Detail Modal
-  const [detailModalVisible, setDetailModalVisible] = useState(false);
-  const [detailData, setDetailData] = useState(null);
-  const [loadingDetail, setLoadingDetail] = useState(false);
+  // Dedicated Studies & Tests Drawer State
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [selectedGeo, setSelectedGeo] = useState(null);
+  const [drawerTab, setDrawerTab] = useState('georeports'); // default to hierarchical georeports tab
+  const [georeportsList, setGeoreportsList] = useState([]);
+  const [currentReport, setCurrentReport] = useState(null);
+  const [insituTests, setInsituTests] = useState([]);
+  const [inlabTests, setInlabTests] = useState([]);
+  const [loadingStudies, setLoadingStudies] = useState(false);
+  const [promotingId, setPromotingId] = useState(null);
 
-  // Quick Study Modals
+  // Hierarchical Georeport Modal (combines in-situ, in-lab & georeport)
+  const [georeportModalVisible, setGeoreportModalVisible] = useState(false);
+  const [editingGeoreport, setEditingGeoreport] = useState(null);
+  const [submittingGeoreport, setSubmittingGeoreport] = useState(false);
+  const [insituMode, setInsituMode] = useState('new'); // 'new' | 'select'
+  const [inlabMode, setInlabMode] = useState('new');   // 'new' | 'select'
+  const [georeportForm] = Form.useForm();
+
+  // In-Situ edit modal states
   const [quickInsituModalVisible, setQuickInsituModalVisible] = useState(false);
-  const [quickInlabModalVisible, setQuickInlabModalVisible] = useState(false);
-  const [quickGeoreportModalVisible, setQuickGeoreportModalVisible] = useState(false);
-  const [quickTarget, setQuickTarget] = useState(null);
-  const [submittingQuick, setSubmittingQuick] = useState(false);
-
-  const [insituOptions, setInsituOptions] = useState([]);
-  const [inlabOptions, setInlabOptions] = useState([]);
-
+  const [editingInsituTest, setEditingInsituTest] = useState(null);
+  const [submittingInsitu, setSubmittingInsitu] = useState(false);
   const [quickInsituForm] = Form.useForm();
+
+  // In-Lab edit modal states
+  const [quickInlabModalVisible, setQuickInlabModalVisible] = useState(false);
+  const [editingInlabTest, setEditingInlabTest] = useState(null);
+  const [submittingInlab, setSubmittingInlab] = useState(false);
   const [quickInlabForm] = Form.useForm();
-  const [quickGeoreportForm] = Form.useForm();
 
   // Normalize backend record
   const normalizeItem = (item, provincesList = provinces) => {
@@ -142,6 +175,7 @@ const GeomanifeStationsManager = () => {
       isVisible,
       visibility: isVisible ? 1 : 0,
       hasRequestId: Boolean(item.request_id && String(item.request_id).trim() !== ''),
+      hasGeoreport: Boolean(item.current_georeport || (item.current_georeport_id && String(item.current_georeport_id).trim() !== '')),
     };
   };
 
@@ -193,6 +227,16 @@ const GeomanifeStationsManager = () => {
 
         setManifestations(publicList);
         setAcceptedRequestsManifestations(draftList);
+
+        // Update selectedGeo if drawer is open
+        if (selectedGeo) {
+          const freshGeo = normalizedList.find(
+            item => (item.geomanifestation_id || item.id) === (selectedGeo.geomanifestation_id || selectedGeo.id)
+          );
+          if (freshGeo) {
+            setSelectedGeo(prev => ({ ...prev, ...freshGeo }));
+          }
+        }
       } else {
         setManifestations([]);
         setAcceptedRequestsManifestations([]);
@@ -204,7 +248,7 @@ const GeomanifeStationsManager = () => {
     }
   };
 
-  // Load cantons on province select
+  // Load canton & district on province select
   const handleProvinceChange = async (provCode) => {
     form.setFieldsValue({ canton_snit_code: undefined, district_snit_code: undefined });
     setCantons([]);
@@ -220,7 +264,6 @@ const GeomanifeStationsManager = () => {
     }
   };
 
-  // Load districts on canton select
   const handleCantonChange = async (cantonCode) => {
     form.setFieldsValue({ district_snit_code: undefined });
     setDistricts([]);
@@ -244,6 +287,361 @@ const GeomanifeStationsManager = () => {
     init();
   }, []);
 
+  // --- DRAWER & HIERARCHICAL STUDIES MANAGEMENT HANDLERS ---
+  const handleOpenGeoDrawer = (record, tab = 'georeports') => {
+    setSelectedGeo(record);
+    setDrawerTab(tab);
+    setDrawerVisible(true);
+    const id = record.geomanifestation_id || record.id;
+    loadStudiesForGeo(id, record);
+  };
+
+  const loadStudiesForGeo = async (geoId, currentRecord = selectedGeo) => {
+    if (!geoId) return;
+    try {
+      setLoadingStudies(true);
+      const [resDetail, resReports, resCurrent, resInsitu, resInlab] = await Promise.allSettled([
+        geomanifestationsAdminShow(geoId),
+        georeportsAdminIndex({ geomanifestation_id: geoId }),
+        georeportsCurrent({ geomanifestation_id: geoId }),
+        insituTestsIndex({ geomanifestation_id: geoId }),
+        inlabTestsIndex({ geomanifestation_id: geoId }),
+      ]);
+
+      if (resDetail.status === 'fulfilled' && resDetail.value.ok && resDetail.value.data) {
+        const fullDetail = resDetail.value.data.data || resDetail.value.data;
+        setSelectedGeo(prev => ({ ...(prev || currentRecord), ...fullDetail }));
+      }
+
+      if (resReports.status === 'fulfilled' && resReports.value.ok && resReports.value.data) {
+        setGeoreportsList(extractList(resReports.value.data));
+      } else {
+        setGeoreportsList([]);
+      }
+
+      if (resCurrent.status === 'fulfilled' && resCurrent.value.ok && resCurrent.value.data) {
+        const curData = resCurrent.value.data.data || resCurrent.value.data;
+        setCurrentReport(curData?.georeport_id || curData?.id ? curData : null);
+      } else {
+        setCurrentReport(null);
+      }
+
+      if (resInsitu.status === 'fulfilled' && resInsitu.value.ok && resInsitu.value.data) {
+        setInsituTests(extractList(resInsitu.value.data));
+      } else {
+        setInsituTests([]);
+      }
+
+      if (resInlab.status === 'fulfilled' && resInlab.value.ok && resInlab.value.data) {
+        setInlabTests(extractList(resInlab.value.data));
+      } else {
+        setInlabTests([]);
+      }
+    } catch (err) {
+      console.error('Error loading studies for geo:', err);
+    } finally {
+      setLoadingStudies(false);
+    }
+  };
+
+  // --- HIERARCHICAL GEOREPORT CREATION & EDITING ---
+  const handleOpenCreateGeoreportModal = (targetRecord = selectedGeo) => {
+    const target = targetRecord || selectedGeo;
+    setSelectedGeo(target);
+    setEditingGeoreport(null);
+    setInsituMode('new');
+    setInlabMode('new');
+    georeportForm.resetFields();
+    georeportForm.setFieldsValue({
+      insitu_mode: 'new',
+      inlab_mode: 'new',
+      set_as_current: true,
+    });
+    setGeoreportModalVisible(true);
+  };
+
+  const handleOpenEditGeoreport = (report) => {
+    setEditingGeoreport(report);
+    const isCurrent = currentReport && (currentReport.georeport_id || currentReport.id) === (report.georeport_id || report.id);
+    setInsituMode('select');
+    setInlabMode('select');
+    georeportForm.resetFields();
+    georeportForm.setFieldsValue({
+      insitu_mode: 'select',
+      insitu_test_id: report.insitu_test_id,
+      inlab_mode: 'select',
+      inlab_test_id: report.inlab_test_id,
+      details: report.details,
+      set_as_current: isCurrent,
+    });
+    setGeoreportModalVisible(true);
+  };
+
+  const handleSaveGeoreport = async (values) => {
+    const targetGeo = selectedGeo;
+    if (!targetGeo) return;
+    const geoId = targetGeo.geomanifestation_id || targetGeo.id;
+
+    try {
+      setSubmittingGeoreport(true);
+
+      // 1. Resolve In-Situ Test ID
+      let finalInsituId = values.insitu_test_id;
+      if (values.insitu_mode === 'new') {
+        const insituPayload = {
+          geomanifestation_id: geoId,
+          temperature: values.insitu_temperature !== undefined && values.insitu_temperature !== null ? parseFloat(values.insitu_temperature) : null,
+          conductivity: values.insitu_conductivity !== undefined && values.insitu_conductivity !== null ? parseFloat(values.insitu_conductivity) : null,
+          ph: values.insitu_ph !== undefined && values.insitu_ph !== null ? parseFloat(values.insitu_ph) : null,
+          description: values.insitu_description || null,
+        };
+
+        const resInsitu = await insituTestsStore(insituPayload);
+        if (!resInsitu.ok) {
+          throw new Error(resInsitu.error || 'Error al registrar la prueba in-situ');
+        }
+        finalInsituId = resInsitu.data?.insitu_test_id || resInsitu.data?.id;
+      }
+
+      if (!finalInsituId) {
+        message.error('Debes registrar o seleccionar una prueba in-situ para el georeporte');
+        return;
+      }
+
+      // 2. Resolve In-Lab Test ID
+      let finalInlabId = values.inlab_test_id;
+      if (values.inlab_mode === 'new') {
+        const fields = ['cl', 'ca', 'hco3', 'so4', 'fe', 'si', 'b', 'li', 'f', 'na', 'k', 'mg'];
+        const inlabPayload = {
+          geomanifestation_id: geoId,
+          ph: values.inlab_ph !== undefined && values.inlab_ph !== null ? parseFloat(values.inlab_ph) : null,
+          conductivity: values.inlab_conductivity !== undefined && values.inlab_conductivity !== null ? parseFloat(values.inlab_conductivity) : null,
+          description: values.inlab_description || null,
+        };
+
+        fields.forEach(f => {
+          const valKey = `inlab_${f}`;
+          inlabPayload[f] = values[valKey] !== undefined && values[valKey] !== null ? parseFloat(values[valKey]) : null;
+        });
+
+        const resInlab = await inlabTestsStore(inlabPayload);
+        if (!resInlab.ok) {
+          throw new Error(resInlab.error || 'Error al registrar la prueba de laboratorio');
+        }
+        finalInlabId = resInlab.data?.inlab_test_id || resInlab.data?.id;
+      }
+
+      if (!finalInlabId) {
+        message.error('Debes registrar o seleccionar una prueba de laboratorio para el georeporte');
+        return;
+      }
+
+      // 3. Save Georeport associating both tests to this geomanifestation
+      const georeportPayload = {
+        geomanifestation_id: geoId,
+        insitu_test_id: finalInsituId,
+        inlab_test_id: finalInlabId,
+        details: values.details || null,
+        set_as_current: Boolean(values.set_as_current),
+      };
+
+      let resReport;
+      if (editingGeoreport) {
+        const reportId = editingGeoreport.georeport_id || editingGeoreport.id;
+        delete georeportPayload.geomanifestation_id;
+        resReport = await georeportsAdminUpdate(reportId, georeportPayload);
+      } else {
+        resReport = await georeportsAdminStore(georeportPayload);
+      }
+
+      if (!resReport.ok) {
+        throw new Error(resReport.error || 'Error al guardar el georeporte');
+      }
+
+      message.success(`📋 Georeporte con sus pruebas ${editingGeoreport ? 'actualizado' : 'registrado'} exitosamente`);
+      setGeoreportModalVisible(false);
+      setEditingGeoreport(null);
+      georeportForm.resetFields();
+      loadStudiesForGeo(geoId, targetGeo);
+      loadManifestations();
+    } catch (err) {
+      console.error(err);
+      message.error(err.message || 'Error al procesar el georeporte');
+    } finally {
+      setSubmittingGeoreport(false);
+    }
+  };
+
+  const handlePromoteGeoreport = async (report) => {
+    const id = report.georeport_id || report.id;
+    try {
+      setPromotingId(id);
+      const res = await georeportsAdminPromote(id);
+      if (res.ok) {
+        message.success('⭐ Georeporte establecido como vigente oficial para el mapa');
+        loadStudiesForGeo(selectedGeo?.geomanifestation_id || selectedGeo?.id);
+        loadManifestations();
+      } else {
+        message.error(res.error || 'Error al promover georeporte');
+      }
+    } catch (err) {
+      message.error(err.message || 'Error de conexión');
+    } finally {
+      setPromotingId(null);
+    }
+  };
+
+  const handleDeleteGeoreport = async (report) => {
+    const id = report.georeport_id || report.id;
+    try {
+      const res = await georeportsAdminDelete(id);
+      if (res.ok) {
+        message.success('Georeporte eliminado correctamente');
+        loadStudiesForGeo(selectedGeo?.geomanifestation_id || selectedGeo?.id);
+        loadManifestations();
+      } else {
+        message.error(res.error || 'Error al eliminar el georeporte');
+      }
+    } catch (err) {
+      message.error(err.message || 'Error de conexión');
+    }
+  };
+
+  // --- INDIVIDUAL TEST EDIT/DELETE HANDLERS ---
+  const handleOpenEditInsitu = (testRecord) => {
+    setEditingInsituTest(testRecord);
+    quickInsituForm.resetFields();
+    quickInsituForm.setFieldsValue({
+      temperature: testRecord.temperature,
+      conductivity: testRecord.conductivity,
+      ph: testRecord.ph,
+      description: testRecord.description,
+    });
+    setQuickInsituModalVisible(true);
+  };
+
+  const handleSaveQuickInsitu = async (values) => {
+    const targetGeo = selectedGeo;
+    if (!targetGeo || !editingInsituTest) return;
+    const testId = editingInsituTest.insitu_test_id || editingInsituTest.id;
+
+    try {
+      setSubmittingInsitu(true);
+      const payload = {
+        temperature: values.temperature !== undefined && values.temperature !== null ? parseFloat(values.temperature) : null,
+        conductivity: values.conductivity !== undefined && values.conductivity !== null ? parseFloat(values.conductivity) : null,
+        ph: values.ph !== undefined && values.ph !== null ? parseFloat(values.ph) : null,
+        description: values.description || null,
+      };
+
+      const res = await insituTestsUpdate(testId, payload);
+      if (res.ok) {
+        message.success('🌿 Prueba In-Situ actualizada exitosamente');
+        setQuickInsituModalVisible(false);
+        setEditingInsituTest(null);
+        quickInsituForm.resetFields();
+        loadStudiesForGeo(targetGeo.geomanifestation_id || targetGeo.id);
+        loadManifestations();
+      } else {
+        message.error(res.error || 'Error al actualizar prueba in-situ');
+      }
+    } catch (err) {
+      message.error(err.message || 'Error de conexión');
+    } finally {
+      setSubmittingInsitu(false);
+    }
+  };
+
+  const handleDeleteInsitu = async (testRecord) => {
+    const testId = testRecord.insitu_test_id || testRecord.id;
+    try {
+      const res = await insituTestsDelete(testId);
+      if (res.ok) {
+        message.success('Prueba In-Situ eliminada correctamente');
+        loadStudiesForGeo(selectedGeo?.geomanifestation_id || selectedGeo?.id);
+        loadManifestations();
+      } else {
+        message.error(res.error || 'Error al eliminar');
+      }
+    } catch (err) {
+      message.error(err.message || 'Error de conexión');
+    }
+  };
+
+  const handleOpenEditInlab = (testRecord) => {
+    setEditingInlabTest(testRecord);
+    quickInlabForm.resetFields();
+    quickInlabForm.setFieldsValue({
+      ph: testRecord.ph,
+      conductivity: testRecord.conductivity,
+      cl: testRecord.cl,
+      ca: testRecord.ca,
+      hco3: testRecord.hco3,
+      so4: testRecord.so4,
+      fe: testRecord.fe,
+      si: testRecord.si,
+      b: testRecord.b,
+      li: testRecord.li,
+      f: testRecord.f,
+      na: testRecord.na,
+      k: testRecord.k,
+      mg: testRecord.mg,
+      description: testRecord.description,
+    });
+    setQuickInlabModalVisible(true);
+  };
+
+  const handleSaveQuickInlab = async (values) => {
+    const targetGeo = selectedGeo;
+    if (!targetGeo || !editingInlabTest) return;
+    const testId = editingInlabTest.inlab_test_id || editingInlabTest.id;
+
+    try {
+      setSubmittingInlab(true);
+      const fields = ['ph', 'conductivity', 'cl', 'ca', 'hco3', 'so4', 'fe', 'si', 'b', 'li', 'f', 'na', 'k', 'mg'];
+      const payload = {
+        description: values.description || null,
+      };
+
+      fields.forEach(f => {
+        payload[f] = values[f] !== undefined && values[f] !== null ? parseFloat(values[f]) : null;
+      });
+
+      const res = await inlabTestsUpdate(testId, payload);
+      if (res.ok) {
+        message.success('🧪 Prueba de Laboratorio actualizada exitosamente');
+        setQuickInlabModalVisible(false);
+        setEditingInlabTest(null);
+        quickInlabForm.resetFields();
+        loadStudiesForGeo(targetGeo.geomanifestation_id || targetGeo.id);
+        loadManifestations();
+      } else {
+        message.error(res.error || 'Error al actualizar prueba de laboratorio');
+      }
+    } catch (err) {
+      message.error(err.message || 'Error de conexión');
+    } finally {
+      setSubmittingInlab(false);
+    }
+  };
+
+  const handleDeleteInlab = async (testRecord) => {
+    const testId = testRecord.inlab_test_id || testRecord.id;
+    try {
+      const res = await inlabTestsDelete(testId);
+      if (res.ok) {
+        message.success('Prueba de Laboratorio eliminada correctamente');
+        loadStudiesForGeo(selectedGeo?.geomanifestation_id || selectedGeo?.id);
+        loadManifestations();
+      } else {
+        message.error(res.error || 'Error al eliminar (puede estar vinculada a un georeporte)');
+      }
+    } catch (err) {
+      message.error(err.message || 'Error de conexión');
+    }
+  };
+
+  // --- CRUD GEOMANIFESTATION MODAL ---
   const handleModalClose = () => {
     setModalVisible(false);
     setEditingItem(null);
@@ -290,13 +688,12 @@ const GeomanifeStationsManager = () => {
     setModalVisible(true);
   };
 
-  // Toggle Visibility: Public <-> Draft
   const handleSendToDraft = async (record) => {
     const id = record.geomanifestation_id || record.id;
     try {
       const res = await geomanifestationsAdminSetVisibility(id, { visibility: false });
       if (res.ok) {
-        message.success(`" ${record.name}" movida a Borradores`);
+        message.success(`"${record.name}" movida a Borradores`);
         loadManifestations();
       } else {
         message.error(res.error || 'Error al mover a borrador');
@@ -327,30 +724,15 @@ const GeomanifeStationsManager = () => {
       const res = await geomanifestationsAdminDelete(id);
       if (res.ok) {
         message.success('Geomanifestación eliminada permanentemente');
+        if (selectedGeo && (selectedGeo.geomanifestation_id || selectedGeo.id) === id) {
+          setDrawerVisible(false);
+        }
         loadManifestations();
       } else {
         message.error(res.error || 'Error al eliminar');
       }
     } catch (err) {
       message.error(err.message || 'Error de conexión');
-    }
-  };
-
-  const handleShowDetail = async (record) => {
-    const id = record.geomanifestation_id || record.id;
-    setDetailModalVisible(true);
-    setLoadingDetail(true);
-    try {
-      const res = await geomanifestationsAdminShow(id);
-      if (res.ok && res.data) {
-        setDetailData(res.data.data || res.data);
-      } else {
-        setDetailData(record);
-      }
-    } catch {
-      setDetailData(record);
-    } finally {
-      setLoadingDetail(false);
     }
   };
 
@@ -403,209 +785,6 @@ const GeomanifeStationsManager = () => {
     }
   };
 
-  // --- QUICK STUDY MODALS HANDLERS ---
-  const handleOpenQuickInsitu = (record) => {
-    setQuickTarget(record);
-    quickInsituForm.resetFields();
-    if (record.insitu_test) {
-      quickInsituForm.setFieldsValue({
-        temperature: record.insitu_test.temperature,
-        conductivity: record.insitu_test.conductivity,
-        ph: record.insitu_test.ph,
-        description: record.insitu_test.description,
-      });
-    } else if (record.temperature !== undefined && record.temperature !== null) {
-      quickInsituForm.setFieldsValue({
-        temperature: record.temperature,
-      });
-    }
-    setQuickInsituModalVisible(true);
-  };
-
-  const handleSaveQuickInsitu = async (values) => {
-    if (!quickTarget) return;
-    try {
-      setSubmittingQuick(true);
-      const geoId = quickTarget.geomanifestation_id || quickTarget.id;
-      const payload = {
-        geomanifestation_id: geoId,
-        temperature: values.temperature !== undefined && values.temperature !== null ? parseFloat(values.temperature) : null,
-        conductivity: values.conductivity !== undefined && values.conductivity !== null ? parseFloat(values.conductivity) : null,
-        ph: values.ph !== undefined && values.ph !== null ? parseFloat(values.ph) : null,
-        description: values.description || null,
-      };
-
-      let res;
-      if (quickTarget.insitu_test?.insitu_test_id) {
-        delete payload.geomanifestation_id;
-        res = await insituTestsUpdate(quickTarget.insitu_test.insitu_test_id, payload);
-      } else {
-        res = await insituTestsStore(payload);
-      }
-
-      if (res.ok) {
-        message.success('🧪 Prueba In-Situ guardada exitosamente');
-        setQuickInsituModalVisible(false);
-        loadManifestations();
-      } else {
-        message.error(res.error || 'Error al guardar prueba in-situ');
-      }
-    } catch (err) {
-      message.error(err.message || 'Error de conexión');
-    } finally {
-      setSubmittingQuick(false);
-    }
-  };
-
-  const handleOpenQuickInlab = (record) => {
-    setQuickTarget(record);
-    quickInlabForm.resetFields();
-    if (record.inlab_test) {
-      quickInlabForm.setFieldsValue({
-        ph: record.inlab_test.ph,
-        conductivity: record.inlab_test.conductivity,
-        cl: record.inlab_test.cl,
-        ca: record.inlab_test.ca,
-        hco3: record.inlab_test.hco3,
-        so4: record.inlab_test.so4,
-        fe: record.inlab_test.fe,
-        si: record.inlab_test.si,
-        b: record.inlab_test.b,
-        li: record.inlab_test.li,
-        f: record.inlab_test.f,
-        na: record.inlab_test.na,
-        k: record.inlab_test.k,
-        mg: record.inlab_test.mg,
-        description: record.inlab_test.description,
-      });
-    }
-    setQuickInlabModalVisible(true);
-  };
-
-  const handleSaveQuickInlab = async (values) => {
-    if (!quickTarget) return;
-    try {
-      setSubmittingQuick(true);
-      const geoId = quickTarget.geomanifestation_id || quickTarget.id;
-      const fields = ['ph', 'conductivity', 'cl', 'ca', 'hco3', 'so4', 'fe', 'si', 'b', 'li', 'f', 'na', 'k', 'mg'];
-      const payload = {
-        geomanifestation_id: geoId,
-        description: values.description || null,
-      };
-
-      fields.forEach(f => {
-        payload[f] = values[f] !== undefined && values[f] !== null ? parseFloat(values[f]) : null;
-      });
-
-      let res;
-      if (quickTarget.inlab_test?.inlab_test_id) {
-        delete payload.geomanifestation_id;
-        res = await inlabTestsUpdate(quickTarget.inlab_test.inlab_test_id, payload);
-      } else {
-        res = await inlabTestsStore(payload);
-      }
-
-      if (res.ok) {
-        message.success('⚗️ Prueba de Laboratorio guardada exitosamente');
-        setQuickInlabModalVisible(false);
-        loadManifestations();
-      } else {
-        message.error(res.error || 'Error al guardar prueba de laboratorio');
-      }
-    } catch (err) {
-      message.error(err.message || 'Error de conexión');
-    } finally {
-      setSubmittingQuick(false);
-    }
-  };
-
-  const handleOpenQuickGeoreport = async (record) => {
-    setQuickTarget(record);
-    quickGeoreportForm.resetFields();
-    const geoId = record.geomanifestation_id || record.id;
-
-    try {
-      // Load available insitu & inlab test options for this geomanifestation
-      const resInsitu = await insituTestsIndex({ geomanifestation_id: geoId });
-      if (resInsitu.ok && Array.isArray(resInsitu.data)) {
-        setInsituOptions(resInsitu.data);
-      } else {
-        setInsituOptions([]);
-      }
-
-      const resInlab = await inlabTestsIndex({ geomanifestation_id: geoId });
-      if (resInlab.ok && Array.isArray(resInlab.data)) {
-        setInlabOptions(resInlab.data);
-      } else {
-        setInlabOptions([]);
-      }
-
-      const currentInsituId = record.insitu_test?.insitu_test_id;
-      const currentInlabId = record.inlab_test?.inlab_test_id;
-      const currentReport = record.current_georeport;
-
-      quickGeoreportForm.setFieldsValue({
-        insitu_test_id: currentReport?.insitu_test_id || currentInsituId,
-        inlab_test_id: currentReport?.inlab_test_id || currentInlabId,
-        details: currentReport?.details || `Georeporte consolidado para ${record.name}`,
-      });
-
-      setQuickGeoreportModalVisible(true);
-    } catch (err) {
-      console.error(err);
-      message.error('Error al cargar opciones de pruebas');
-    }
-  };
-
-  const handleSaveQuickGeoreport = async (values) => {
-    if (!quickTarget) return;
-    try {
-      setSubmittingQuick(true);
-      const geoId = quickTarget.geomanifestation_id || quickTarget.id;
-      const payload = {
-        geomanifestation_id: geoId,
-        insitu_test_id: values.insitu_test_id,
-        inlab_test_id: values.inlab_test_id,
-        details: values.details || null,
-        set_as_current: true,
-      };
-
-      let res;
-      if (quickTarget.current_georeport?.georeport_id) {
-        delete payload.geomanifestation_id;
-        res = await georeportsAdminUpdate(quickTarget.current_georeport.georeport_id, payload);
-      } else {
-        res = await georeportsAdminStore(payload);
-      }
-
-      if (res.ok) {
-        message.success('📋 Georeporte creado y consolidado correctamente');
-        setQuickGeoreportModalVisible(false);
-        loadManifestations();
-      } else {
-        message.error(res.error || 'Error al guardar georeporte');
-      }
-    } catch (err) {
-      message.error(err.message || 'Error de conexión');
-    } finally {
-      setSubmittingQuick(false);
-    }
-  };
-
-  // Calculate completeness status for draft items
-  const getDraftCompletionStatus = (record) => {
-    const hasInsitu = Boolean(record.insitu_test || (record.temperature !== undefined && record.temperature !== null));
-    const hasInlab = Boolean(record.inlab_test || record.cl !== undefined);
-    const hasGeoreport = Boolean(record.current_georeport || record.current_georeport_id);
-
-    let count = 0;
-    if (hasInsitu) count++;
-    if (hasInlab) count++;
-    if (hasGeoreport) count++;
-
-    return { hasInsitu, hasInlab, hasGeoreport, count, isReady: count >= 1 };
-  };
-
   // Filter helper for lists
   const filterList = (list) => {
     return list.filter(item => {
@@ -620,7 +799,7 @@ const GeomanifeStationsManager = () => {
   const filteredPublicList = filterList(manifestations);
   const filteredDraftList = filterList(acceptedRequestsManifestations);
 
-  // Columns for Tab 1 (Geomanifestaciones Públicas)
+  // --- COLUMNS FOR TAB 1 (PÚBLICAS) ---
   const columnsPublic = [
     {
       title: 'Nombre / ID',
@@ -628,7 +807,7 @@ const GeomanifeStationsManager = () => {
       key: 'name',
       render: (text, record) => (
         <div>
-          <span className="font-semibold text-gray-800 block">
+          <span className="font-semibold text-blue-600 hover:text-blue-800 block cursor-pointer">
             {text || record.geomanifestation_name || `Punto ${record.geomanifestation_id || record.id}`}
           </span>
           <Text type="secondary" style={{ fontSize: '11px' }} className="font-mono">
@@ -669,6 +848,19 @@ const GeomanifeStationsManager = () => {
       },
     },
     {
+      title: 'Georeporte Oficial',
+      key: 'georeport_status',
+      render: (_, record) => {
+        return record.hasGeoreport ? (
+          <Tag color="cyan" icon={<CheckCircleOutlined />}>
+            Georeporte Vigente
+          </Tag>
+        ) : (
+          <Tag color="default">Sin Georeporte</Tag>
+        );
+      },
+    },
+    {
       title: 'Estado Visibilidad',
       key: 'visibility',
       render: () => <Tag icon={<EyeOutlined />} color="success">Pública en Mapa</Tag>,
@@ -678,34 +870,72 @@ const GeomanifeStationsManager = () => {
       key: 'actions',
       render: (_, record) => (
         <Space size="small">
-          <Button icon={<InfoCircleOutlined />} size="small" onClick={() => handleShowDetail(record)} title="Ver Detalles" />
-          <Button icon={<EditOutlined />} size="small" type="primary" onClick={() => handleOpenEdit(record)} title="Editar Punto" />
-          
+          <Button
+            type="primary"
+            ghost
+            icon={<FileSearchOutlined />}
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleOpenGeoDrawer(record, 'georeports');
+            }}
+          >
+            Georeportes & Pruebas
+          </Button>
+
+          <Button
+            icon={<EditOutlined />}
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleOpenEdit(record);
+            }}
+            title="Editar Punto"
+          />
+
           <Popconfirm
             title="¿Mover a borradores?"
             description="La geomanifestación dejará de ser visible públicamente en el mapa."
-            onConfirm={() => handleSendToDraft(record)}
+            onConfirm={(e) => {
+              e?.stopPropagation();
+              handleSendToDraft(record);
+            }}
             okText="Sí, enviar a borrador"
             cancelText="Cancelar"
           >
             <Button
               size="small"
               icon={<EyeInvisibleOutlined />}
+              onClick={(e) => e.stopPropagation()}
               style={{ backgroundColor: '#fa8c16', color: '#fff', borderColor: '#fa8c16' }}
             >
-              Enviar a Borrador
+              A Borrador
             </Button>
           </Popconfirm>
 
-          <Popconfirm title="¿Eliminar geomanifestación?" onConfirm={() => handleDelete(record)} okText="Sí" cancelText="No">
-            <Button icon={<DeleteOutlined />} size="small" danger title="Eliminar" />
+          <Popconfirm
+            title="¿Eliminar geomanifestación?"
+            onConfirm={(e) => {
+              e?.stopPropagation();
+              handleDelete(record);
+            }}
+            okText="Sí"
+            cancelText="No"
+          >
+            <Button
+              icon={<DeleteOutlined />}
+              size="small"
+              danger
+              title="Eliminar"
+              onClick={(e) => e.stopPropagation()}
+            />
           </Popconfirm>
         </Space>
       ),
     },
   ];
 
-  // Columns for Tab 2 (Solicitudes Aceptadas / Borradores)
+  // --- COLUMNS FOR TAB 2 (BORRADORES) ---
   const columnsDrafts = [
     {
       title: 'Geomanifestación en Borrador',
@@ -713,7 +943,7 @@ const GeomanifeStationsManager = () => {
       key: 'name',
       render: (text, record) => (
         <div>
-          <span className="font-semibold text-gray-800 block">
+          <span className="font-semibold text-blue-600 hover:text-blue-800 block cursor-pointer">
             {text || record.geomanifestation_name || `Geomanifestación-${record.geomanifestation_id || record.id}`}
           </span>
           <Text type="secondary" style={{ fontSize: '11px' }} className="block font-mono">
@@ -737,103 +967,55 @@ const GeomanifeStationsManager = () => {
       ),
     },
     {
-      title: '1. Prueba In-Situ',
-      key: 'insitu_step',
+      title: 'Jerarquía: Georeporte (In-Situ + Lab)',
+      key: 'hierarchy_step',
       render: (_, record) => {
-        const hasInsitu = Boolean(record.insitu_test || (record.temperature !== undefined && record.temperature !== null));
+        const hasReport = record.hasGeoreport;
         const temp = record.insitu_test?.temperature ?? record.temperature;
 
         return (
           <Space direction="vertical" size={2}>
-            {hasInsitu ? (
-              <Tag color="green" icon={<CheckCircleOutlined />}>
-                In-Situ: {temp !== undefined && temp !== null ? `${temp}°C` : 'Registrada'}
-              </Tag>
+            {hasReport ? (
+              <div>
+                <Tag color="green" icon={<CheckCircleOutlined />}>
+                  Georeporte Vigente Configurado
+                </Tag>
+                {temp !== undefined && temp !== null && (
+                  <span className="text-xs text-gray-500 block">In-Situ: {temp}°C</span>
+                )}
+              </div>
             ) : (
-              <Tag color="orange">Falta In-Situ</Tag>
+              <Tag color="orange">Falta Georeporte con Pruebas</Tag>
             )}
             <Button
               size="small"
-              type={hasInsitu ? 'default' : 'primary'}
-              ghost={!hasInsitu}
-              icon={<BulbOutlined />}
-              onClick={() => handleOpenQuickInsitu(record)}
+              type={hasReport ? 'default' : 'primary'}
+              ghost={!hasReport}
+              icon={hasReport ? <FileSearchOutlined /> : <PlusOutlined />}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (hasReport) {
+                  handleOpenGeoDrawer(record, 'georeports');
+                } else {
+                  handleOpenCreateGeoreportModal(record);
+                }
+              }}
               style={{ fontSize: '11px' }}
             >
-              {hasInsitu ? 'Editar In-Situ' : '+ Agregar In-Situ'}
+              {hasReport ? 'Gestionar Georeporte' : '+ Crear Georeporte (In-Situ + Lab)'}
             </Button>
           </Space>
         );
       },
     },
     {
-      title: '2. Prueba Laboratorio',
-      key: 'inlab_step',
+      title: 'Listo para Publicar',
+      key: 'ready_status',
       render: (_, record) => {
-        const hasInlab = Boolean(record.inlab_test || record.cl !== undefined);
-
-        return (
-          <Space direction="vertical" size={2}>
-            {hasInlab ? (
-              <Tag color="purple" icon={<CheckCircleOutlined />}>
-                Lab Registrado
-              </Tag>
-            ) : (
-              <Tag color="orange">Falta Lab</Tag>
-            )}
-            <Button
-              size="small"
-              type={hasInlab ? 'default' : 'primary'}
-              ghost={!hasInlab}
-              icon={<BarChartOutlined />}
-              onClick={() => handleOpenQuickInlab(record)}
-              style={{ fontSize: '11px' }}
-            >
-              {hasInlab ? 'Editar Lab' : '+ Agregar Lab'}
-            </Button>
-          </Space>
-        );
-      },
-    },
-    {
-      title: '3. Georeporte',
-      key: 'georeport_step',
-      render: (_, record) => {
-        const hasGeoreport = Boolean(record.current_georeport || record.current_georeport_id);
-
-        return (
-          <Space direction="vertical" size={2}>
-            {hasGeoreport ? (
-              <Tag color="blue" icon={<CheckCircleOutlined />}>
-                Georeporte Vigente
-              </Tag>
-            ) : (
-              <Tag color="orange">Falta Georeporte</Tag>
-            )}
-            <Button
-              size="small"
-              type={hasGeoreport ? 'default' : 'primary'}
-              ghost={!hasGeoreport}
-              icon={<FileSearchOutlined />}
-              onClick={() => handleOpenQuickGeoreport(record)}
-              style={{ fontSize: '11px' }}
-            >
-              {hasGeoreport ? 'Editar Reporte' : '+ Crear Reporte'}
-            </Button>
-          </Space>
-        );
-      },
-    },
-    {
-      title: 'Progreso de Estudios',
-      key: 'progress',
-      render: (_, record) => {
-        const { count } = getDraftCompletionStatus(record);
-        const percent = Math.round((count / 3) * 100);
-        return (
-          <div style={{ width: 110 }}>
-            <Progress percent={percent} size="small" status={count === 3 ? 'success' : 'active'} format={() => `${count}/3 estudios`} />
-          </div>
+        return record.hasGeoreport ? (
+          <Tag color="success">Listo para Mapa</Tag>
+        ) : (
+          <Tag color="warning">Requiere Georeporte</Tag>
         );
       },
     },
@@ -845,8 +1027,12 @@ const GeomanifeStationsManager = () => {
           <Space direction="vertical" size={4}>
             <Popconfirm
               title="¿Publicar en el mapa geotérmico?"
-              description="La geomanifestación pasará a ser visible públicamente para todos los usuarios."
-              onConfirm={() => handlePublishToMap(record)}
+              description="La geomanifestación y su georeporte pasarán a ser visibles públicamente para todos."
+              onConfirm={(e) => {
+                e?.stopPropagation();
+                handlePublishToMap(record);
+              }}
+              disabled={!record.hasGeoreport}
               okText="Sí, publicar"
               cancelText="Cancelar"
             >
@@ -854,17 +1040,52 @@ const GeomanifeStationsManager = () => {
                 type="primary"
                 size="small"
                 icon={<RocketOutlined />}
-                style={{ backgroundColor: '#52c41a', borderColor: '#52c41a', fontWeight: 'bold' }}
+                disabled={!record.hasGeoreport}
+                onClick={(e) => e.stopPropagation()}
+                style={{ backgroundColor: record.hasGeoreport ? '#52c41a' : undefined, borderColor: record.hasGeoreport ? '#52c41a' : undefined, fontWeight: 'bold' }}
               >
                 Publicar en Mapa
               </Button>
             </Popconfirm>
 
             <Space size="small">
-              <Button icon={<InfoCircleOutlined />} size="small" onClick={() => handleShowDetail(record)} title="Ver Detalles" />
-              <Button icon={<EditOutlined />} size="small" onClick={() => handleOpenEdit(record)} title="Editar Punto" />
-              <Popconfirm title="¿Eliminar borrador?" onConfirm={() => handleDelete(record)} okText="Sí" cancelText="No">
-                <Button icon={<DeleteOutlined />} size="small" danger title="Eliminar" />
+              <Button
+                type="primary"
+                ghost
+                size="small"
+                icon={<FileSearchOutlined />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenGeoDrawer(record, 'georeports');
+                }}
+              >
+                Georeportes
+              </Button>
+              <Button
+                icon={<EditOutlined />}
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenEdit(record);
+                }}
+                title="Editar Punto"
+              />
+              <Popconfirm
+                title="¿Eliminar borrador?"
+                onConfirm={(e) => {
+                  e?.stopPropagation();
+                  handleDelete(record);
+                }}
+                okText="Sí"
+                cancelText="No"
+              >
+                <Button
+                  icon={<DeleteOutlined />}
+                  size="small"
+                  danger
+                  title="Eliminar"
+                  onClick={(e) => e.stopPropagation()}
+                />
               </Popconfirm>
             </Space>
           </Space>
@@ -884,13 +1105,21 @@ const GeomanifeStationsManager = () => {
       ),
       children: (
         <div>
+          <Alert
+            message="💡 Jerarquía Geocientífica"
+            description="Toca o haz clic sobre cualquier geomanifestación para gestionar sus Georeportes. Cada georeporte asocia una prueba de campo (in-situ) y una prueba de laboratorio (geoquímica)."
+            type="info"
+            showIcon
+            style={{ marginBottom: 16, borderRadius: 8 }}
+          />
+
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
             <Input
               placeholder="Buscar por nombre, ID o descripción..."
               prefix={<SearchOutlined style={{ color: '#aaa' }} />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
-              style={{ width: 320 }}
+              style={{ width: 340 }}
               allowClear
             />
 
@@ -908,6 +1137,10 @@ const GeomanifeStationsManager = () => {
             dataSource={filteredPublicList}
             columns={columnsPublic}
             rowKey={(item) => item.geomanifestation_id || item.id}
+            onRow={(record) => ({
+              onClick: () => handleOpenGeoDrawer(record, 'georeports'),
+              style: { cursor: 'pointer' },
+            })}
             pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100'] }}
             locale={{ emptyText: 'No hay geomanifestaciones públicas publicadas en el mapa' }}
           />
@@ -925,9 +1158,9 @@ const GeomanifeStationsManager = () => {
       children: (
         <div>
           <div style={{ marginBottom: 16, background: '#e6f7ff', padding: '12px 16px', borderRadius: 8, border: '1px solid #91d5ff' }}>
-            <Text strong style={{ color: '#0050b3' }}>💡 Flujo de Preparación para Publicación en Mapa:</Text>
+            <Text strong style={{ color: '#0050b3' }}>💡 Flujo de Preparación Jerárquico para el Mapa:</Text>
             <Paragraph style={{ margin: 0, fontSize: '12px', color: '#002766' }}>
-              Completa los 3 estudios clave de la geomanifestación (<strong>In-Situ</strong>, <strong>Laboratorio</strong> y <strong>Georeporte</strong>) usando los botones directos de cada fila. Cuando esté lista, haz clic en <strong>"Publicar en Mapa"</strong> para moverla al mapa geotérmico público.
+              Para publicar una geomanifestación en el mapa, debe asociarse a un <strong>Georeporte</strong> que integre tanto la <strong>Prueba In-Situ</strong> como la <strong>Prueba de Laboratorio</strong>.
             </Paragraph>
           </div>
 
@@ -937,7 +1170,7 @@ const GeomanifeStationsManager = () => {
               prefix={<SearchOutlined style={{ color: '#aaa' }} />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
-              style={{ width: 320 }}
+              style={{ width: 340 }}
               allowClear
             />
 
@@ -955,6 +1188,10 @@ const GeomanifeStationsManager = () => {
             dataSource={filteredDraftList}
             columns={columnsDrafts}
             rowKey={(item) => item.geomanifestation_id || item.id}
+            onRow={(record) => ({
+              onClick: () => handleOpenGeoDrawer(record, 'georeports'),
+              style: { cursor: 'pointer' },
+            })}
             pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100'] }}
             locale={{ emptyText: 'No hay solicitudes aceptadas o borradores pendientes de estudio' }}
           />
@@ -999,7 +1236,781 @@ const GeomanifeStationsManager = () => {
         )}
       </Card>
 
-      {/* Manual Point / Edit Modal */}
+      {/* ========================================================================= */}
+      {/* COMPREHENSIVE HIERARCHICAL DRAWER: GEOMANIFESTATION -> GEOREPORTS -> TESTS*/}
+      {/* ========================================================================= */}
+      <Drawer
+        open={drawerVisible}
+        onClose={() => setDrawerVisible(false)}
+        width={Math.min(980, typeof window !== 'undefined' ? window.innerWidth * 0.95 : 980)}
+        title={
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <EnvironmentOutlined style={{ fontSize: 26, color: '#1890ff', marginTop: 2 }} />
+              <div>
+                <Title level={4} style={{ margin: 0, lineHeight: 1.2 }}>
+                  {selectedGeo?.name || selectedGeo?.geomanifestation_name || 'Geomanifestación'}
+                </Title>
+                <Space size="small" wrap style={{ marginTop: 4 }}>
+                  <span className="font-mono text-xs text-gray-500">ID: {selectedGeo?.geomanifestation_id || selectedGeo?.id}</span>
+                  {selectedGeo?.isVisible ? (
+                    <Tag color="success" icon={<EyeOutlined />}>Pública en Mapa</Tag>
+                  ) : (
+                    <Tag color="warning" icon={<EyeInvisibleOutlined />}>Borrador / Estudio</Tag>
+                  )}
+                  {selectedGeo?.locationText && <Tag color="blue">{selectedGeo.locationText}</Tag>}
+                  {selectedGeo?.latitude && selectedGeo?.longitude && (
+                    <Tag className="font-mono text-xs">
+                      GPS: {parseFloat(selectedGeo.latitude).toFixed(4)}°, {parseFloat(selectedGeo.longitude).toFixed(4)}°
+                    </Tag>
+                  )}
+                </Space>
+              </div>
+            </div>
+
+            {!selectedGeo?.isVisible && (
+              <Popconfirm
+                title="¿Publicar en el mapa geotérmico?"
+                description="La geomanifestación y su georeporte serán visibles públicamente."
+                onConfirm={() => handlePublishToMap(selectedGeo)}
+                disabled={!selectedGeo?.hasGeoreport}
+                okText="Sí, publicar"
+                cancelText="Cancelar"
+              >
+                <Button
+                  type="primary"
+                  icon={<RocketOutlined />}
+                  size="small"
+                  disabled={!selectedGeo?.hasGeoreport}
+                  style={{ backgroundColor: selectedGeo?.hasGeoreport ? '#52c41a' : undefined, borderColor: selectedGeo?.hasGeoreport ? '#52c41a' : undefined }}
+                >
+                  Publicar en Mapa
+                </Button>
+              </Popconfirm>
+            )}
+          </div>
+        }
+      >
+        {selectedGeo && (
+          <div>
+            {/* Top Quick Stats Row */}
+            <Row gutter={12} style={{ marginBottom: 20 }}>
+              <Col span={8}>
+                <Card size="small" style={{ background: '#fff7e6', border: '1px solid #ffd591', borderRadius: 8 }}>
+                  <Statistic
+                    title="Georeportes Registrados"
+                    value={georeportsList.length}
+                    prefix={<FileSearchOutlined style={{ color: '#fa8c16' }} />}
+                    valueStyle={{ color: '#d46b08', fontWeight: 'bold' }}
+                  />
+                </Card>
+              </Col>
+              <Col span={8}>
+                <Card size="small" style={{ background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 8 }}>
+                  <Statistic
+                    title="Pruebas de Campo (In-Situ)"
+                    value={insituTests.length}
+                    prefix={<BulbOutlined style={{ color: '#52c41a' }} />}
+                    valueStyle={{ color: '#389e0d', fontWeight: 'bold' }}
+                  />
+                </Card>
+              </Col>
+              <Col span={8}>
+                <Card size="small" style={{ background: '#f9f0ff', border: '1px solid #d3adf7', borderRadius: 8 }}>
+                  <Statistic
+                    title="Pruebas de Lab (Geoquímica)"
+                    value={inlabTests.length}
+                    prefix={<BarChartOutlined style={{ color: '#722ed1' }} />}
+                    valueStyle={{ color: '#531dab', fontWeight: 'bold' }}
+                  />
+                </Card>
+              </Col>
+            </Row>
+
+            {/* Inner Drawer Tabs - Hierarchical workflow */}
+            <Tabs
+              activeKey={drawerTab}
+              onChange={setDrawerTab}
+              type="card"
+              items={[
+                {
+                  key: 'georeports',
+                  label: (
+                    <span>
+                      <FileSearchOutlined />
+                      Georeportes ({georeportsList.length})
+                    </span>
+                  ),
+                  children: (
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
+                        <div>
+                          <Text strong style={{ fontSize: '15px' }}>📋 Georeportes de la Geomanifestación</Text>
+                          <Paragraph type="secondary" style={{ margin: 0, fontSize: '12px' }}>
+                            Un georeporte consolida la prueba in-situ (campo) y la prueba de laboratorio (geoquímica).
+                          </Paragraph>
+                        </div>
+
+                        <Space>
+                          <Button
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            disabled={!canManageGeoreports}
+                            onClick={() => handleOpenCreateGeoreportModal(selectedGeo)}
+                            style={{ backgroundColor: '#fa8c16', borderColor: '#fa8c16' }}
+                          >
+                            + Crear Georeporte (In-Situ + Lab)
+                          </Button>
+                          <Button
+                            icon={<ReloadOutlined />}
+                            onClick={() => loadStudiesForGeo(selectedGeo.geomanifestation_id || selectedGeo.id)}
+                            loading={loadingStudies}
+                          />
+                        </Space>
+                      </div>
+
+                      {loadingStudies ? (
+                        <div style={{ textAlign: 'center', padding: '30px 0' }}><Spin tip="Cargando georeportes..." /></div>
+                      ) : georeportsList.length === 0 ? (
+                        <Empty
+                          description="Esta geomanifestación aún no tiene georeportes registrados."
+                          style={{ margin: '30px 0' }}
+                        >
+                          <Button
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            disabled={!canManageGeoreports}
+                            onClick={() => handleOpenCreateGeoreportModal(selectedGeo)}
+                            style={{ backgroundColor: '#fa8c16', borderColor: '#fa8c16' }}
+                          >
+                            Crear Primer Georeporte
+                          </Button>
+                        </Empty>
+                      ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                          {georeportsList.map((report) => {
+                            const repId = report.georeport_id || report.id;
+                            const isCurrent = currentReport && (currentReport.georeport_id || currentReport.id) === repId;
+                            const linkedInsitu = insituTests.find(t => (t.insitu_test_id || t.id) === report.insitu_test_id);
+                            const linkedInlab = inlabTests.find(t => (t.inlab_test_id || t.id) === report.inlab_test_id);
+
+                            return (
+                              <Card
+                                key={repId}
+                                size="small"
+                                style={{
+                                  borderRadius: 10,
+                                  border: isCurrent ? '2px solid #fa8c16' : '1px solid #e8e8e8',
+                                  boxShadow: isCurrent ? '0 2px 8px rgba(250, 140, 22, 0.15)' : 'none',
+                                }}
+                              >
+                                {/* Report Card Header */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f0f0f0', paddingBottom: 8, marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <FileSearchOutlined style={{ color: '#fa8c16', fontSize: 18 }} />
+                                    <Text strong style={{ fontSize: 14 }}>Georeporte #{repId}</Text>
+                                    {isCurrent ? (
+                                      <Tag color="gold" icon={<StarFilled />} style={{ fontWeight: 'bold' }}>
+                                        ⭐ Vigente Oficial en Mapa
+                                      </Tag>
+                                    ) : (
+                                      <Tag color="default">Histórico</Tag>
+                                    )}
+                                  </div>
+
+                                  <Space size="small">
+                                    <span className="text-xs text-gray-500">
+                                      {renderDateWithProse(report.created_at, { showIcon: true })}
+                                    </span>
+                                    {report.created_by_first_name && (
+                                      <span className="text-xs text-gray-400">
+                                        | Por: {report.created_by_first_name} {report.created_by_last_name || ''}
+                                      </span>
+                                    )}
+                                  </Space>
+                                </div>
+
+                                {/* Hierarchical Nested Components: In-Situ Test & In-Lab Test */}
+                                <Row gutter={12}>
+                                  {/* 1. Prueba In-Situ */}
+                                  <Col span={12}>
+                                    <Card
+                                      size="small"
+                                      title={
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                          <span style={{ color: '#237804', fontSize: '13px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                            <BulbOutlined /> 1. Prueba In-Situ (Campo)
+                                          </span>
+                                          {linkedInsitu && canManageInsitu && (
+                                            <Button
+                                              type="link"
+                                              size="small"
+                                              icon={<EditOutlined />}
+                                              onClick={() => handleOpenEditInsitu(linkedInsitu)}
+                                            >
+                                              Editar
+                                            </Button>
+                                          )}
+                                        </div>
+                                      }
+                                      style={{ background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 8 }}
+                                    >
+                                      {linkedInsitu ? (
+                                        <div className="space-y-1 text-xs">
+                                          <div>
+                                            <span className="text-gray-500">ID:</span> <span className="font-mono">{linkedInsitu.insitu_test_id || linkedInsitu.id}</span>
+                                          </div>
+                                          <div>
+                                            <span className="text-gray-500">Temperatura:</span>{' '}
+                                            <Tag color={linkedInsitu.temperature > 50 ? 'red' : linkedInsitu.temperature > 30 ? 'orange' : 'blue'}>
+                                              {linkedInsitu.temperature}°C
+                                            </Tag>
+                                            <span className="text-gray-500 ml-2">pH:</span> <Tag color="cyan">{linkedInsitu.ph ?? 'N/A'}</Tag>
+                                          </div>
+                                          <div>
+                                            <span className="text-gray-500">Conductividad:</span> {linkedInsitu.conductivity ? `${linkedInsitu.conductivity} μS/cm` : 'N/A'}
+                                          </div>
+                                          {linkedInsitu.description && (
+                                            <div className="text-gray-600 italic">"{linkedInsitu.description}"</div>
+                                          )}
+                                        </div>
+                                      ) : (
+                                        <div className="text-xs text-gray-500 font-mono">
+                                          ID Prueba: {report.insitu_test_id}
+                                        </div>
+                                      )}
+                                    </Card>
+                                  </Col>
+
+                                  {/* 2. Prueba de Laboratorio */}
+                                  <Col span={12}>
+                                    <Card
+                                      size="small"
+                                      title={
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                          <span style={{ color: '#531dab', fontSize: '13px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                            <BarChartOutlined /> 2. Prueba Laboratorio (Geoquímica)
+                                          </span>
+                                          {linkedInlab && canManageInlab && (
+                                            <Button
+                                              type="link"
+                                              size="small"
+                                              icon={<EditOutlined />}
+                                              onClick={() => handleOpenEditInlab(linkedInlab)}
+                                            >
+                                              Editar
+                                            </Button>
+                                          )}
+                                        </div>
+                                      }
+                                      style={{ background: '#f9f0ff', border: '1px solid #d3adf7', borderRadius: 8 }}
+                                    >
+                                      {linkedInlab ? (
+                                        <div className="space-y-1 text-xs">
+                                          <div>
+                                            <span className="text-gray-500">ID:</span> <span className="font-mono">{linkedInlab.inlab_test_id || linkedInlab.id}</span>
+                                          </div>
+                                          <div>
+                                            <span className="text-gray-500">pH Lab:</span> <Tag color="purple">{linkedInlab.ph ?? 'N/A'}</Tag>
+                                            <span className="text-gray-500 ml-2">Cond:</span> {linkedInlab.conductivity ? `${linkedInlab.conductivity} μS/cm` : 'N/A'}
+                                          </div>
+                                          <div className="text-gray-600">
+                                            <span className="font-semibold">Iones:</span> Cl: {linkedInlab.cl ?? '-'} | Ca: {linkedInlab.ca ?? '-'} | SO4: {linkedInlab.so4 ?? '-'} | HCO3: {linkedInlab.hco3 ?? '-'}
+                                          </div>
+                                          <div className="text-gray-600">
+                                            <span className="font-semibold">Trazas:</span> Fe: {linkedInlab.fe ?? '-'} | Si: {linkedInlab.si ?? '-'} | B: {linkedInlab.b ?? '-'}
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <div className="text-xs text-gray-500 font-mono">
+                                          ID Lab: {report.inlab_test_id}
+                                        </div>
+                                      )}
+                                    </Card>
+                                  </Col>
+                                </Row>
+
+                                {/* Report Diagnosis / Details */}
+                                <div style={{ marginTop: 12, padding: '8px 12px', background: '#fafafa', borderRadius: 6, border: '1px solid #f0f0f0' }}>
+                                  <Text strong style={{ fontSize: '12px', display: 'block', marginBottom: 2 }}>
+                                    📝 Conclusiones / Diagnóstico del Georeporte:
+                                  </Text>
+                                  <Paragraph style={{ margin: 0, fontSize: '13px', color: '#262626' }}>
+                                    {report.details || 'Sin observaciones adicionales registradas.'}
+                                  </Paragraph>
+                                </div>
+
+                                {/* Report Actions */}
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 12 }}>
+                                  {!isCurrent && (
+                                    <Popconfirm
+                                      title="¿Promover este georeporte a vigente?"
+                                      description="Se convertirá en el reporte oficial para el mapa geotérmico público."
+                                      onConfirm={() => handlePromoteGeoreport(report)}
+                                      okText="Sí, promover"
+                                      cancelText="Cancelar"
+                                    >
+                                      <Button
+                                        size="small"
+                                        icon={<StarOutlined />}
+                                        loading={promotingId === repId}
+                                        style={{ color: '#fa8c16', borderColor: '#ffd591' }}
+                                      >
+                                        Hacer Vigente
+                                      </Button>
+                                    </Popconfirm>
+                                  )}
+
+                                  <Button
+                                    size="small"
+                                    icon={<EditOutlined />}
+                                    onClick={() => handleOpenEditGeoreport(report)}
+                                  >
+                                    Editar Georeporte
+                                  </Button>
+
+                                  <Popconfirm
+                                    title="¿Eliminar este georeporte?"
+                                    description="Se desvinculará de la geomanifestación."
+                                    onConfirm={() => handleDeleteGeoreport(report)}
+                                    okText="Sí"
+                                    cancelText="No"
+                                  >
+                                    <Button size="small" icon={<DeleteOutlined />} danger>
+                                      Eliminar
+                                    </Button>
+                                  </Popconfirm>
+                                </div>
+                              </Card>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  ),
+                },
+                {
+                  key: 'insitu',
+                  label: (
+                    <span>
+                      <BulbOutlined />
+                      Pruebas In-Situ ({insituTests.length})
+                    </span>
+                  ),
+                  children: (
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                        <Text strong style={{ fontSize: '15px' }}>🌿 Historial de Mediciones In-Situ</Text>
+                        <Button
+                          type="primary"
+                          icon={<PlusOutlined />}
+                          disabled={!canManageInsitu}
+                          onClick={() => handleOpenCreateGeoreportModal(selectedGeo)}
+                          style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+                        >
+                          + Crear Georeporte con In-Situ
+                        </Button>
+                      </div>
+
+                      <Table
+                        dataSource={insituTests}
+                        rowKey={(r) => r.insitu_test_id || r.id}
+                        pagination={false}
+                        columns={[
+                          {
+                            title: 'ID Prueba',
+                            dataIndex: 'insitu_test_id',
+                            key: 'id',
+                            render: (val, r) => <span className="font-mono text-xs">{val || r.id}</span>,
+                          },
+                          {
+                            title: 'Temperatura',
+                            dataIndex: 'temperature',
+                            key: 'temp',
+                            render: (val) => val !== null && val !== undefined ? (
+                              <Tag color={val > 50 ? 'red' : val > 30 ? 'orange' : 'blue'}>{val}°C</Tag>
+                            ) : 'N/A',
+                          },
+                          {
+                            title: 'Conductividad',
+                            dataIndex: 'conductivity',
+                            key: 'cond',
+                            render: (val) => val !== null && val !== undefined ? `${val} μS/cm` : 'N/A',
+                          },
+                          {
+                            title: 'pH Campo',
+                            dataIndex: 'ph',
+                            key: 'ph',
+                            render: (val) => val !== null && val !== undefined ? <Tag color="cyan">{val}</Tag> : 'N/A',
+                          },
+                          {
+                            title: 'Notas',
+                            dataIndex: 'description',
+                            key: 'desc',
+                            ellipsis: true,
+                            render: (val) => val || 'Sin notas',
+                          },
+                          {
+                            title: 'Fecha',
+                            dataIndex: 'created_at',
+                            key: 'date',
+                            render: (val) => renderDateWithProse(val, { showIcon: false }),
+                          },
+                          {
+                            title: 'Acciones',
+                            key: 'acts',
+                            render: (_, record) => (
+                              <Space size="small">
+                                <Button
+                                  icon={<EditOutlined />}
+                                  size="small"
+                                  type="primary"
+                                  ghost
+                                  disabled={!canManageInsitu}
+                                  onClick={() => handleOpenEditInsitu(record)}
+                                />
+                                <Popconfirm
+                                  title="¿Eliminar prueba in-situ?"
+                                  onConfirm={() => handleDeleteInsitu(record)}
+                                  okText="Sí"
+                                  cancelText="No"
+                                >
+                                  <Button icon={<DeleteOutlined />} size="small" danger disabled={!canManageInsitu} />
+                                </Popconfirm>
+                              </Space>
+                            ),
+                          },
+                        ]}
+                      />
+                    </div>
+                  ),
+                },
+                {
+                  key: 'inlab',
+                  label: (
+                    <span>
+                      <BarChartOutlined />
+                      Pruebas de Laboratorio ({inlabTests.length})
+                    </span>
+                  ),
+                  children: (
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                        <Text strong style={{ fontSize: '15px' }}>🧪 Historial de Análisis Geoquímicos</Text>
+                        <Button
+                          type="primary"
+                          icon={<PlusOutlined />}
+                          disabled={!canManageInlab}
+                          onClick={() => handleOpenCreateGeoreportModal(selectedGeo)}
+                          style={{ backgroundColor: '#722ed1', borderColor: '#722ed1' }}
+                        >
+                          + Crear Georeporte con Lab
+                        </Button>
+                      </div>
+
+                      <Table
+                        dataSource={inlabTests}
+                        rowKey={(r) => r.inlab_test_id || r.id}
+                        pagination={false}
+                        columns={[
+                          {
+                            title: 'ID Prueba',
+                            dataIndex: 'inlab_test_id',
+                            key: 'id',
+                            render: (val, r) => <span className="font-mono text-xs">{val || r.id}</span>,
+                          },
+                          {
+                            title: 'pH Lab',
+                            dataIndex: 'ph',
+                            key: 'ph',
+                            render: (val) => val !== null && val !== undefined ? <Tag color="purple">{val}</Tag> : 'N/A',
+                          },
+                          {
+                            title: 'Cond. (μS/cm)',
+                            dataIndex: 'conductivity',
+                            key: 'cond',
+                            render: (val) => val ?? 'N/A',
+                          },
+                          {
+                            title: 'Iones Principales (mg/L)',
+                            key: 'ions',
+                            render: (_, r) => (
+                              <div className="text-xs">
+                                Cl: {r.cl ?? '-'} | Ca: {r.ca ?? '-'} | SO4: {r.so4 ?? '-'} | HCO3: {r.hco3 ?? '-'}
+                              </div>
+                            ),
+                          },
+                          {
+                            title: 'Fecha',
+                            dataIndex: 'created_at',
+                            key: 'date',
+                            render: (val) => renderDateWithProse(val, { showIcon: false }),
+                          },
+                          {
+                            title: 'Acciones',
+                            key: 'acts',
+                            render: (_, record) => (
+                              <Space size="small">
+                                <Button
+                                  icon={<EditOutlined />}
+                                  size="small"
+                                  type="primary"
+                                  ghost
+                                  disabled={!canManageInlab}
+                                  onClick={() => handleOpenEditInlab(record)}
+                                />
+                                <Popconfirm
+                                  title="¿Eliminar prueba de laboratorio?"
+                                  description="Fallará si está vinculada a un georeporte."
+                                  onConfirm={() => handleDeleteInlab(record)}
+                                  okText="Sí"
+                                  cancelText="No"
+                                >
+                                  <Button icon={<DeleteOutlined />} size="small" danger disabled={!canManageInlab} />
+                                </Popconfirm>
+                              </Space>
+                            ),
+                          },
+                        ]}
+                      />
+                    </div>
+                  ),
+                },
+                {
+                  key: 'info',
+                  label: (
+                    <span>
+                      <InfoCircleOutlined />
+                      Detalles y Bitácora
+                    </span>
+                  ),
+                  children: (
+                    <div>
+                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4">
+                        <Title level={5} style={{ marginTop: 0 }}>Información Geográfica y Origen</Title>
+                        <p><strong>Descripción:</strong> {selectedGeo.description || 'Sin descripción'}</p>
+                        <p><strong>Ubicación SNIT:</strong> {selectedGeo.locationText || 'Costa Rica'}</p>
+                        <p><strong>Coordenadas:</strong> Lat {selectedGeo.latitude}, Lng {selectedGeo.longitude}</p>
+                        {selectedGeo.field_trip_id && (
+                          <p>
+                            <strong>Gira de Campo:</strong>{' '}
+                            <Tag color="orange" icon={<CompassOutlined />}>
+                              {selectedGeo.field_trip_id}
+                            </Tag>
+                          </p>
+                        )}
+                        {selectedGeo.request_id && (
+                          <p><strong>Origen Solicitud:</strong> <span className="font-mono text-blue-600">{selectedGeo.request_id}</span></p>
+                        )}
+                      </div>
+
+                      <CommentsPanel
+                        entityType="geomanifestation"
+                        entityId={selectedGeo.geomanifestation_id || selectedGeo.id}
+                        title="Bitácora y Comentarios de la Geomanifestación"
+                        compact
+                      />
+                    </div>
+                  ),
+                },
+              ]}
+            />
+          </div>
+        )}
+      </Drawer>
+
+      {/* ========================================================================= */}
+      {/* MODAL: HIERARCHICAL GEOREPORT (IN-SITU + IN-LAB + GEOREPORT)               */}
+      {/* ========================================================================= */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <FileSearchOutlined style={{ color: '#fa8c16' }} />
+            <span>
+              {editingGeoreport ? 'Editar Georeporte' : 'Nuevo Georeporte'} — {selectedGeo?.name}
+            </span>
+          </div>
+        }
+        open={georeportModalVisible}
+        onOk={() => georeportForm.submit()}
+        onCancel={() => {
+          setGeoreportModalVisible(false);
+          setEditingGeoreport(null);
+        }}
+        confirmLoading={submittingGeoreport}
+        okText={editingGeoreport ? 'Guardar Cambios' : 'Crear y Consolidar Georeporte'}
+        cancelText="Cancelar"
+        width={850}
+        styles={{
+          body: {
+            maxHeight: 'calc(100vh - 160px)',
+            overflowY: 'auto',
+            paddingRight: 8
+          }
+        }}
+      >
+        <Form
+          form={georeportForm}
+          layout="vertical"
+          onFinish={handleSaveGeoreport}
+        >
+          <div style={{ marginBottom: 16 }}>
+            <Text type="secondary">
+              Cada georeporte asocia una medición de campo (In-Situ) y un análisis geoquímico (Laboratorio) a esta geomanifestación.
+            </Text>
+          </div>
+
+          {/* 1. SECCIÓN: PRUEBA IN-SITU */}
+          <Card
+            size="small"
+            style={{ marginBottom: 16, background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 8 }}
+            title={<span style={{ color: '#237804', fontWeight: 'bold' }}>🌿 1. Prueba de Campo (In-Situ)</span>}
+          >
+            <Form.Item name="insitu_mode" style={{ marginBottom: 12 }}>
+              <Radio.Group onChange={(e) => setInsituMode(e.target.value)} value={insituMode}>
+                <Radio value="new">Registrar nueva prueba in-situ</Radio>
+                <Radio value="select" disabled={insituTests.length === 0}>
+                  Seleccionar prueba in-situ existente ({insituTests.length} disponibles)
+                </Radio>
+              </Radio.Group>
+            </Form.Item>
+
+            {insituMode === 'new' ? (
+              <div className="bg-white p-3 rounded border border-green-200">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <Form.Item
+                    name="insitu_temperature"
+                    label="Temperatura (°C)"
+                    rules={[{ required: insituMode === 'new', message: 'Requerido' }]}
+                  >
+                    <InputNumber style={{ width: '100%' }} placeholder="Ej: 55.4" step={0.1} min={0} max={200} />
+                  </Form.Item>
+                  <Form.Item name="insitu_conductivity" label="Conductividad (μS/cm)">
+                    <InputNumber style={{ width: '100%' }} placeholder="Ej: 1200" min={0} step={1} />
+                  </Form.Item>
+                  <Form.Item name="insitu_ph" label="pH Campo">
+                    <InputNumber style={{ width: '100%' }} placeholder="Ej: 6.8" min={0} max={14} step={0.01} />
+                  </Form.Item>
+                </div>
+                <Form.Item name="insitu_description" label="Notas de Campo">
+                  <Input placeholder="Condiciones del ojo termal, caudal, clima..." />
+                </Form.Item>
+              </div>
+            ) : (
+              <Form.Item
+                name="insitu_test_id"
+                label="Seleccionar Prueba In-Situ"
+                rules={[{ required: insituMode === 'select', message: 'Selecciona una prueba' }]}
+              >
+                <Select placeholder="Selecciona la prueba in-situ para asociar" allowClear>
+                  {insituTests.map((t) => (
+                    <Select.Option key={t.insitu_test_id || t.id} value={t.insitu_test_id || t.id}>
+                      #{t.insitu_test_id || t.id} — Temp: {t.temperature}°C, Cond: {t.conductivity || 'N/A'}, pH: {t.ph || 'N/A'} ({renderDateWithProse(t.created_at)})
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            )}
+          </Card>
+
+          {/* 2. SECCIÓN: PRUEBA DE LABORATORIO */}
+          <Card
+            size="small"
+            style={{ marginBottom: 16, background: '#f9f0ff', border: '1px solid #d3adf7', borderRadius: 8 }}
+            title={<span style={{ color: '#531dab', fontWeight: 'bold' }}>🧪 2. Prueba de Laboratorio (Geoquímica)</span>}
+          >
+            <Form.Item name="inlab_mode" style={{ marginBottom: 12 }}>
+              <Radio.Group onChange={(e) => setInlabMode(e.target.value)} value={inlabMode}>
+                <Radio value="new">Registrar nuevo análisis de laboratorio</Radio>
+                <Radio value="select" disabled={inlabTests.length === 0}>
+                  Seleccionar prueba de lab existente ({inlabTests.length} disponibles)
+                </Radio>
+              </Radio.Group>
+            </Form.Item>
+
+            {inlabMode === 'new' ? (
+              <div className="bg-white p-3 rounded border border-purple-200">
+                <div className="grid grid-cols-2 gap-3 mb-2">
+                  <Form.Item name="inlab_ph" label="pH Laboratorio">
+                    <InputNumber style={{ width: '100%' }} placeholder="7.2" step={0.01} min={0} max={14} />
+                  </Form.Item>
+                  <Form.Item name="inlab_conductivity" label="Conductividad (μS/cm)">
+                    <InputNumber style={{ width: '100%' }} placeholder="1250" step={1} min={0} />
+                  </Form.Item>
+                </div>
+
+                <div className="text-xs font-semibold text-gray-600 mb-2">Iones Mayores (mg/L):</div>
+                <div className="grid grid-cols-4 gap-2 mb-2">
+                  <Form.Item name="inlab_cl" label="Cl"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
+                  <Form.Item name="inlab_ca" label="Ca"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
+                  <Form.Item name="inlab_hco3" label="HCO3"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
+                  <Form.Item name="inlab_so4" label="SO4"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
+                  <Form.Item name="inlab_na" label="Na"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
+                  <Form.Item name="inlab_k" label="K"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
+                  <Form.Item name="inlab_mg" label="Mg"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
+                  <Form.Item name="inlab_si" label="Si"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
+                </div>
+
+                <div className="text-xs font-semibold text-gray-600 mb-2">Elementos Traza (mg/L):</div>
+                <div className="grid grid-cols-4 gap-2 mb-2">
+                  <Form.Item name="inlab_fe" label="Fe"><InputNumber style={{ width: '100%' }} min={0} step={0.001} /></Form.Item>
+                  <Form.Item name="inlab_b" label="B"><InputNumber style={{ width: '100%' }} min={0} step={0.001} /></Form.Item>
+                  <Form.Item name="inlab_li" label="Li"><InputNumber style={{ width: '100%' }} min={0} step={0.001} /></Form.Item>
+                  <Form.Item name="inlab_f" label="F"><InputNumber style={{ width: '100%' }} min={0} step={0.001} /></Form.Item>
+                </div>
+
+                <Form.Item name="inlab_description" label="Notas de Laboratorio" style={{ marginBottom: 0 }}>
+                  <Input placeholder="Método analítico, laboratorio responsable..." />
+                </Form.Item>
+              </div>
+            ) : (
+              <Form.Item
+                name="inlab_test_id"
+                label="Seleccionar Prueba de Laboratorio"
+                rules={[{ required: inlabMode === 'select', message: 'Selecciona una prueba' }]}
+              >
+                <Select placeholder="Selecciona la prueba de laboratorio para asociar" allowClear>
+                  {inlabTests.map((t) => (
+                    <Select.Option key={t.inlab_test_id || t.id} value={t.inlab_test_id || t.id}>
+                      #{t.inlab_test_id || t.id} — pH: {t.ph || 'N/A'}, Cond: {t.conductivity || 'N/A'}, Cl: {t.cl ?? '-'} ({renderDateWithProse(t.created_at)})
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            )}
+          </Card>
+
+          {/* 3. SECCIÓN: DETALLES DEL GEOREPORTE */}
+          <Card
+            size="small"
+            style={{ background: '#fffbe6', border: '1px solid #ffe58f', borderRadius: 8 }}
+            title={<span style={{ color: '#d46b08', fontWeight: 'bold' }}>📋 3. Conclusión y Diagnóstico del Georeporte</span>}
+          >
+            <Form.Item
+              name="details"
+              label="Conclusiones de la Evaluación Geotérmica"
+              rules={[{ max: 500, message: 'Máximo 500 caracteres' }]}
+            >
+              <Input.TextArea
+                rows={3}
+                placeholder="Diagnóstico geotérmico del recurso, estimación de temperatura profunda, clasificación hidrogeoquímica..."
+                maxLength={500}
+                showCount
+              />
+            </Form.Item>
+
+            <Form.Item name="set_as_current" valuePropName="checked" style={{ marginBottom: 0 }}>
+              <Checkbox>
+                <strong style={{ color: '#d46b08' }}>⭐ Establecer como Georeporte Vigente oficial</strong> (publicado en el mapa de GeoterRA)
+              </Checkbox>
+            </Form.Item>
+          </Card>
+        </Form>
+      </Modal>
+
+      {/* ========================================================================= */}
+      {/* MODAL: EDIT POINT COORDINATES & SNIT METADATA                             */}
+      {/* ========================================================================= */}
       <Modal
         title={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1121,113 +2132,82 @@ const GeomanifeStationsManager = () => {
         </Form>
       </Modal>
 
-      {/* Detail Modal */}
-      <Modal
-        title="Detalle de la Geomanifestación"
-        open={detailModalVisible}
-        onCancel={() => setDetailModalVisible(false)}
-        footer={[<Button key="close" onClick={() => setDetailModalVisible(false)}>Cerrar</Button>]}
-        width={750}
-      >
-        {loadingDetail ? (
-          <Spin style={{ display: 'block', margin: '20px auto' }} />
-        ) : detailData ? (
-          <div>
-            <Title level={4}>{detailData.geomanifestation_name || detailData.name}</Title>
-            <p><strong>ID:</strong> <span className="font-mono">{detailData.geomanifestation_id || detailData.id}</span></p>
-            <p><strong>Descripción:</strong> {detailData.description || 'Sin descripción'}</p>
-            <p><strong>Visibilidad:</strong> {detailData.visibility || detailData.isVisible ? <Tag color="green">Pública</Tag> : <Tag color="gray">Oculta / Borrador</Tag>}</p>
-            {detailData.field_trip_id && (
-              <p>
-                <strong>Gira de Campo:</strong>{' '}
-                <Tag color="orange" icon={<CompassOutlined />}>
-                  <span className="font-mono">{detailData.field_trip_id}</span>
-                </Tag>
-              </p>
-            )}
-            {detailData.request_id && <p><strong>Origen Solicitud ID:</strong> <span className="font-mono text-blue-600">{detailData.request_id}</span></p>}
-            <p><strong>Ubicación:</strong> {detailData.locationText || [detailData.location?.province, detailData.location?.canton, detailData.location?.district].filter(Boolean).join(', ') || 'Costa Rica'}</p>
-            <p><strong>Coordenadas GPS:</strong> Lat {detailData.location?.latitude ?? detailData.latitude}, Lng {detailData.location?.longitude ?? detailData.longitude}</p>
-
-            {detailData.insitu_test && (
-              <div style={{ marginTop: 16, background: '#fafafa', padding: 12, borderRadius: 6 }}>
-                <Text strong>Prueba In-Situ:</Text>
-                <div>Temp: {detailData.insitu_test.temperature}°C | pH: {detailData.insitu_test.ph} | Cond: {detailData.insitu_test.conductivity}</div>
-              </div>
-            )}
-
-            {detailData.inlab_test && (
-              <div style={{ marginTop: 16, background: '#fafafa', padding: 12, borderRadius: 6 }}>
-                <Text strong>Prueba de Laboratorio (Geoquímica):</Text>
-                <div>pH: {detailData.inlab_test.ph} | Cond: {detailData.inlab_test.conductivity}</div>
-                <div>Cl: {detailData.inlab_test.cl} | Ca: {detailData.inlab_test.ca} | HCO3: {detailData.inlab_test.hco3} | SO4: {detailData.inlab_test.so4}</div>
-              </div>
-            )}
-
-            <Divider style={{ margin: '20px 0 12px' }} />
-            <CommentsPanel
-              entityType="geomanifestation"
-              entityId={detailData.geomanifestation_id || detailData.id}
-              title="Bitácora y Comentarios de la Geomanifestación"
-              compact
-            />
-          </div>
-        ) : null}
-      </Modal>
-
-      {/* QUICK MODAL 1: IN-SITU TEST */}
+      {/* ========================================================================= */}
+      {/* MODAL: EDIT SPECIFIC IN-SITU TEST                                         */}
+      {/* ========================================================================= */}
       <Modal
         title={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <BulbOutlined style={{ color: '#52c41a' }} />
-            <span>Prueba In-Situ — {quickTarget?.name}</span>
+            <span>Editar Prueba In-Situ</span>
           </div>
         }
         open={quickInsituModalVisible}
         onOk={() => quickInsituForm.submit()}
-        onCancel={() => setQuickInsituModalVisible(false)}
-        confirmLoading={submittingQuick}
-        okText="Guardar In-Situ"
+        onCancel={() => {
+          setQuickInsituModalVisible(false);
+          setEditingInsituTest(null);
+        }}
+        confirmLoading={submittingInsitu}
+        okText="Guardar Cambios"
         cancelText="Cancelar"
       >
         <Form form={quickInsituForm} layout="vertical" onFinish={handleSaveQuickInsitu}>
-          <Form.Item name="temperature" label="Temperatura (°C)" rules={[{ required: true, message: 'Requerido' }]}>
+          <Form.Item
+            name="temperature"
+            label="Temperatura (°C)"
+            rules={[{ required: true, message: 'La temperatura es requerida' }]}
+          >
             <InputNumber style={{ width: '100%' }} placeholder="Ej: 55.4" step={0.1} min={0} max={200} />
           </Form.Item>
-          <Form.Item name="conductivity" label="Conductividad (μS/cm)">
-            <InputNumber style={{ width: '100%' }} placeholder="Ej: 1200" min={0} />
+
+          <Form.Item name="conductivity" label="Conductividad Eléctrica (μS/cm)">
+            <InputNumber style={{ width: '100%' }} placeholder="Ej: 1200" min={0} step={1} />
           </Form.Item>
+
           <Form.Item name="ph" label="pH Campo">
             <InputNumber style={{ width: '100%' }} placeholder="Ej: 6.5" min={0} max={14} step={0.01} />
           </Form.Item>
-          <Form.Item name="description" label="Notas / Descripción Campo">
-            <Input.TextArea rows={2} placeholder="Condiciones de medición..." />
+
+          <Form.Item name="description" label="Notas / Descripción de Campo">
+            <Input.TextArea rows={3} placeholder="Condiciones de medición, clima, color del agua..." />
           </Form.Item>
         </Form>
       </Modal>
 
-      {/* QUICK MODAL 2: IN-LAB TEST */}
+      {/* ========================================================================= */}
+      {/* MODAL: EDIT SPECIFIC IN-LAB TEST                                          */}
+      {/* ========================================================================= */}
       <Modal
         title={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <BarChartOutlined style={{ color: '#722ed1' }} />
-            <span>Prueba de Laboratorio (Geoquímica) — {quickTarget?.name}</span>
+            <span>Editar Análisis de Laboratorio</span>
           </div>
         }
         open={quickInlabModalVisible}
         onOk={() => quickInlabForm.submit()}
-        onCancel={() => setQuickInlabModalVisible(false)}
-        confirmLoading={submittingQuick}
-        okText="Guardar Análisis Lab"
+        onCancel={() => {
+          setQuickInlabModalVisible(false);
+          setEditingInlabTest(null);
+        }}
+        confirmLoading={submittingInlab}
+        okText="Guardar Cambios"
         cancelText="Cancelar"
-        width={700}
+        width={750}
       >
         <Form form={quickInlabForm} layout="vertical" onFinish={handleSaveQuickInlab}>
           <div className="grid grid-cols-2 gap-4">
-            <Form.Item name="ph" label="pH Laboratorio"><InputNumber style={{ width: '100%' }} min={0} max={14} step={0.01} /></Form.Item>
-            <Form.Item name="conductivity" label="Conductividad (μS/cm)"><InputNumber style={{ width: '100%' }} min={0} /></Form.Item>
+            <Form.Item name="ph" label="pH Laboratorio">
+              <InputNumber style={{ width: '100%' }} min={0} max={14} step={0.01} placeholder="7.2" />
+            </Form.Item>
+            <Form.Item name="conductivity" label="Conductividad (μS/cm)">
+              <InputNumber style={{ width: '100%' }} min={0} step={1} placeholder="1250" />
+            </Form.Item>
           </div>
-          <h4 className="font-semibold text-sm my-2 text-gray-700">Iones Mayores (mg/L)</h4>
+
+          <Divider style={{ margin: '12px 0' }} />
+          <h4 className="font-semibold text-sm my-2 text-gray-700">🧪 Iones Mayores (mg/L)</h4>
           <div className="grid grid-cols-4 gap-2">
             <Form.Item name="cl" label="Cl"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
             <Form.Item name="ca" label="Ca"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
@@ -1238,57 +2218,18 @@ const GeomanifeStationsManager = () => {
             <Form.Item name="mg" label="Mg"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
             <Form.Item name="si" label="Si"><InputNumber style={{ width: '100%' }} min={0} step={0.01} /></Form.Item>
           </div>
-          <h4 className="font-semibold text-sm my-2 text-gray-700">Elementos Traza (mg/L)</h4>
+
+          <Divider style={{ margin: '12px 0' }} />
+          <h4 className="font-semibold text-sm my-2 text-gray-700">⚗️ Elementos Traza (mg/L)</h4>
           <div className="grid grid-cols-4 gap-2">
             <Form.Item name="fe" label="Fe"><InputNumber style={{ width: '100%' }} min={0} step={0.001} /></Form.Item>
             <Form.Item name="b" label="B"><InputNumber style={{ width: '100%' }} min={0} step={0.001} /></Form.Item>
             <Form.Item name="li" label="Li"><InputNumber style={{ width: '100%' }} min={0} step={0.001} /></Form.Item>
             <Form.Item name="f" label="F"><InputNumber style={{ width: '100%' }} min={0} step={0.001} /></Form.Item>
           </div>
+
           <Form.Item name="description" label="Notas de Laboratorio">
-            <Input.TextArea rows={2} placeholder="Notas del análisis geoquímico..." />
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      {/* QUICK MODAL 3: GEOREPORT */}
-      <Modal
-        title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <FileSearchOutlined style={{ color: '#fa8c16' }} />
-            <span>Crear / Consolidar Georeporte — {quickTarget?.name}</span>
-          </div>
-        }
-        open={quickGeoreportModalVisible}
-        onOk={() => quickGeoreportForm.submit()}
-        onCancel={() => setQuickGeoreportModalVisible(false)}
-        confirmLoading={submittingQuick}
-        okText="Guardar Georeporte"
-        cancelText="Cancelar"
-      >
-        <Form form={quickGeoreportForm} layout="vertical" onFinish={handleSaveQuickGeoreport}>
-          <Form.Item name="insitu_test_id" label="Vincular Prueba In-Situ">
-            <Select placeholder="Selecciona la prueba in-situ para consolidar" allowClear>
-              {insituOptions.map(t => (
-                <Select.Option key={t.insitu_test_id || t.id} value={t.insitu_test_id || t.id}>
-                  {t.insitu_test_id || t.id} — Temp: {t.temperature}°C, pH: {t.ph}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="inlab_test_id" label="Vincular Prueba de Laboratorio">
-            <Select placeholder="Selecciona la prueba de laboratorio para consolidar" allowClear>
-              {inlabOptions.map(t => (
-                <Select.Option key={t.inlab_test_id || t.id} value={t.inlab_test_id || t.id}>
-                  {t.inlab_test_id || t.id} — pH: {t.ph}, Cond: {t.conductivity}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="details" label="Detalles / Conclusión del Reporte" rules={[{ max: 500 }]}>
-            <Input.TextArea rows={3} placeholder="Reporte de evaluación geotérmica..." maxLength={500} showCount />
+            <Input.TextArea rows={2} placeholder="Notas del análisis geoquímico, método utilizado..." />
           </Form.Item>
         </Form>
       </Modal>

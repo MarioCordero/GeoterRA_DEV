@@ -7,11 +7,9 @@ import {
   DatabaseOutlined,
   HistoryOutlined,
   EnvironmentOutlined,
-  BulbOutlined,
-  BarChartOutlined,
-  FileSearchOutlined,
   GlobalOutlined,
   CompassOutlined,
+  AppstoreOutlined,
 } from '@ant-design/icons';
 
 /**
@@ -24,7 +22,7 @@ import {
 export const getMenuItems = (permissions) => {
   const menuItems = [];
 
-  // Dashboard - always visible
+  // 1. Dashboard - always visible
   menuItems.push({
     key: '1',
     icon: <DashboardOutlined style={{ fontSize: '18px' }} />,
@@ -32,35 +30,43 @@ export const getMenuItems = (permissions) => {
     shortLabel: 'Inicio',
   });
 
-  // Mis Solicitudes - user, investigator, field_investigator
+  // 2. Solicitudes - Unificado en 1 solo ítem "Solicitudes"
+  const solicitudesChildren = [];
   if (permissions.hasRequests) {
-    menuItems.push({
+    solicitudesChildren.push({
       key: '2',
-      icon: <FileTextOutlined style={{ fontSize: '18px' }} />,
+      icon: <FileTextOutlined style={{ fontSize: '16px' }} />,
       label: 'Mis Solicitudes',
-      shortLabel: 'Solicitudes',
+      shortLabel: 'Mis Sol.',
     });
   }
-
-  // Gestionar Solicitudes - admin, investigator, field_investigator
   if (permissions.hasReviewRequests) {
-    menuItems.push({
+    solicitudesChildren.push({
       key: '3',
-      icon: <ExperimentOutlined style={{ fontSize: '18px' }} />,
+      icon: <ExperimentOutlined style={{ fontSize: '16px' }} />,
       label: 'Gestionar Solicitudes',
       shortLabel: 'Gestionar',
     });
   }
 
-  // Perfil - always visible
-  menuItems.push({
-    key: '4',
-    icon: <UserOutlined style={{ fontSize: '18px' }} />,
-    label: 'Perfil',
-    shortLabel: 'Perfil',
-  });
+  if (solicitudesChildren.length === 1) {
+    menuItems.push({
+      key: solicitudesChildren[0].key,
+      icon: solicitudesChildren[0].icon,
+      label: 'Solicitudes',
+      shortLabel: 'Solicitudes',
+    });
+  } else if (solicitudesChildren.length > 1) {
+    menuItems.push({
+      key: 'sub-solicitudes',
+      icon: <FileTextOutlined style={{ fontSize: '18px' }} />,
+      label: 'Solicitudes',
+      shortLabel: 'Solicitudes',
+      children: solicitudesChildren,
+    });
+  }
 
-  // ─── Sección admin / investigación: gestión geociencia ───────────────────
+  // 3. Geociencia
   if (permissions.hasFieldTrips) {
     menuItems.push({
       key: '13',
@@ -79,67 +85,64 @@ export const getMenuItems = (permissions) => {
     });
   }
 
-  if (permissions.hasManageInsituTests) {
-    menuItems.push({
-      key: '9',
-      icon: <BulbOutlined style={{ fontSize: '18px' }} />,
-      label: 'Pruebas de Campo',
-      shortLabel: 'Campo',
-    });
-  }
+  // 4. Otros - Agrupa Perfil, Territorio, Gestionar Usuarios y herramientas del sistema
+  const otrosChildren = [];
 
-  if (permissions.hasManageInlabTests) {
-    menuItems.push({
-      key: '10',
-      icon: <BarChartOutlined style={{ fontSize: '18px' }} />,
-      label: 'Pruebas de Laboratorio',
-      shortLabel: 'Laboratorio',
-    });
-  }
+  // Perfil - siempre visible
+  otrosChildren.push({
+    key: '4',
+    icon: <UserOutlined style={{ fontSize: '16px' }} />,
+    label: 'Perfil',
+    shortLabel: 'Perfil',
+  });
 
-  if (permissions.hasManageGeoreports) {
-    menuItems.push({
-      key: '11',
-      icon: <FileSearchOutlined style={{ fontSize: '18px' }} />,
-      label: 'Georeportes',
-      shortLabel: 'Reportes',
-    });
-  }
-
+  // Territorio
   if (permissions.hasManageTerritory) {
-    menuItems.push({
+    otrosChildren.push({
       key: '12',
-      icon: <GlobalOutlined style={{ fontSize: '18px' }} />,
+      icon: <GlobalOutlined style={{ fontSize: '16px' }} />,
       label: 'Territorio',
       shortLabel: 'Territorio',
     });
   }
 
-  // ─── Sección mantenimiento ─────────────────────────────────────────────
+  // Gestionar Usuarios
   if (permissions.hasManageUsers) {
-    menuItems.push({
+    otrosChildren.push({
       key: '5',
-      icon: <TeamOutlined style={{ fontSize: '18px' }} />,
+      icon: <TeamOutlined style={{ fontSize: '16px' }} />,
       label: 'Gestionar Usuarios',
       shortLabel: 'Usuarios',
     });
   }
 
+  // Base de datos - mantenimiento
   if (permissions.hasViewInfrastructure) {
-    menuItems.push({
+    otrosChildren.push({
       key: '6',
-      icon: <DatabaseOutlined style={{ fontSize: '18px' }} />,
+      icon: <DatabaseOutlined style={{ fontSize: '16px' }} />,
       label: 'Base de datos',
       shortLabel: 'BD',
     });
   }
 
+  // Logs - mantenimiento
   if (permissions.hasSystemLogs) {
-    menuItems.push({
+    otrosChildren.push({
       key: '7',
-      icon: <HistoryOutlined style={{ fontSize: '18px' }} />,
-      label: 'Logs',
+      icon: <HistoryOutlined style={{ fontSize: '16px' }} />,
+      label: 'Logs del Sistema',
       shortLabel: 'Logs',
+    });
+  }
+
+  if (otrosChildren.length > 0) {
+    menuItems.push({
+      key: 'sub-otros',
+      icon: <AppstoreOutlined style={{ fontSize: '18px' }} />,
+      label: 'Otros',
+      shortLabel: 'Otros',
+      children: otrosChildren,
     });
   }
 

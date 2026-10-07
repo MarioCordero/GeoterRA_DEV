@@ -88,25 +88,13 @@ const DashboardContentController = ({ selectedKey }) => {
       return <GeomanifeStationsManager />;
 
     case '9':
-      // Pruebas de Campo (In-Situ) - admin only
-      if (!hasPermission(PERMISSIONS.MANAGE_INSITU_TESTS)) {
-        return <div style={{ padding: '24px', color: 'red' }}>Acceso denegado</div>;
-      }
-      return <InsituTestsManager />;
-
     case '10':
-      // Pruebas de Laboratorio (In-Lab) - admin only
-      if (!hasPermission(PERMISSIONS.MANAGE_INLAB_TESTS)) {
-        return <div style={{ padding: '24px', color: 'red' }}>Acceso denegado</div>;
-      }
-      return <InlabTestsManager />;
-
     case '11':
-      // Georeportes - admin only
-      if (!hasPermission(PERMISSIONS.MANAGE_GEOREPORTS)) {
+      // Redirigir pruebas y georeportes a Geomanifestaciones (ahora se gestionan jerárquicamente dentro de cada punto)
+      if (!hasPermission(PERMISSIONS.MANAGE_GEOMANIFESTATIONS)) {
         return <div style={{ padding: '24px', color: 'red' }}>Acceso denegado</div>;
       }
-      return <GeoreportsManager />;
+      return <GeomanifeStationsManager />;
 
     case '12':
       // Territorio - admin only
