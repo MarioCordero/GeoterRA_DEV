@@ -101,4 +101,28 @@ jobs:
       - name: Actualizar servidor de producción (SERVER.pull.sh)
         run: |
           echo "🚀 Notificando al servidor de producción para ejecutar git pull..."
-          curl -k https://163.178.171.105/cgi-bin/SERVER.pull.sh
+          OUTPUT=$(curl -k -sS --max-time 120 https://163.178.171.105/cgi-bin/SERVER.pull.sh)
+          echo "$OUTPUT"
+
+          if ! echo "$OUTPUT" | grep -q "Actualización completada con éxito"; then
+            echo "::error::SERVER.pull.sh no terminó correctamente en el servidor."
+            exit 1
+          fi
+
+      # ------------------------------------------------------------------------
+      # 4. Verificar que el servidor generó /config.js con la API key (runtime config)
+      #    La clave vive en /home/proyecto/.env y SERVER.pull.sh la inyecta tras
+      #    cada pull. Si no está, todo el sitio respondería 403 (Invalid API Key).
+      # ------------------------------------------------------------------------
+      - name: Verificar config.js en producción
+        run: |
+          CONFIG=$(curl -k -sS --max-time 30 "https://geoterra.inii.ucr.ac.cr/config.js?t=$(date +%s)")
+
+          if echo "$CONFIG" | grep -q 'API_KEY: "[^"]\+"'; then
+            echo "✅ config.js en producción contiene API_KEY (el valor no se imprime)."
+          else
+            echo "::error::config.js en producción NO contiene API_KEY."
+            echo "Revisa que /var/www/cgi-bin/SERVER.pull.sh sea la versión nueva y que"
+            echo "/home/proyecto/.env tenga VITE_API_KEY y sea legible por el usuario del CGI."
+            exit 1
+          fi
