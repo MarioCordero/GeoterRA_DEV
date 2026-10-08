@@ -8,7 +8,9 @@ const API_CONFIG = {
 
   defaultHeaders: {
     'Content-Type': 'application/json',
-    'x-api-key': import.meta.env.VITE_API_KEY,
+    // Production: injected at runtime via /config.js (from the server's .env).
+    // Local dev: falls back to VITE_API_KEY from src/config/.env.
+    'x-api-key': window.__APP_CONFIG__?.API_KEY || import.meta.env.VITE_API_KEY,
   },
 
   endpoints: {
