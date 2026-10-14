@@ -72,6 +72,7 @@ final class FieldTripRepository extends Repository
     $sql = "SELECT ft.*,
                    u.first_name AS creator_first_name,
                    u.last_name AS creator_last_name,
+                   u.email AS creator_email,
                    p.province_name,
                    c.canton_name,
                    d.district_name
@@ -115,6 +116,7 @@ final class FieldTripRepository extends Repository
     $sql = "SELECT DISTINCT ft.*,
                    u.first_name AS creator_first_name,
                    u.last_name AS creator_last_name,
+                   u.email AS creator_email,
                    p.province_name,
                    c.canton_name,
                    d.district_name
