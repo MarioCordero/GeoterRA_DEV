@@ -291,16 +291,22 @@ final class FieldTripRepository extends Repository
    * @param string $fieldTripId
    * @return array[]
    */
-  public function getManifestations(string $fieldTripId): array
-  {
-    $sql = "SELECT g.geomanifestation_id, g.province_snit_code, g.canton_snit_code, g.district_snit_code,
+	public function getManifestations(string $fieldTripId): array
+	{
+		$sql = "SELECT g.geomanifestation_id, g.province_snit_code, g.canton_snit_code, g.district_snit_code,
                    g.current_georeport_id, r.request_id, r.request_name, g.geomanifestation_name,
                    g.latitude, g.longitude, g.description, g.visibility, g.field_trip_id,
-                   g.created_at, g.created_by
+                   g.created_at, g.created_by,
+                   ft.field_trip_name,
+                   p.province_name, c.canton_name, d.district_name
             FROM geomanifestations g
             LEFT JOIN requests r ON g.request_id = r.request_id
+            LEFT JOIN field_trips ft ON g.field_trip_id = ft.field_trip_id
+            LEFT JOIN provinces p ON g.province_snit_code = p.province_snit_code
+            LEFT JOIN cantons c ON g.canton_snit_code = c.canton_snit_code
+            LEFT JOIN districts d ON g.district_snit_code = d.district_snit_code
             WHERE g.field_trip_id = :ft_id
             ORDER BY g.geomanifestation_name ASC";
-    return $this->execute($sql, [':ft_id' => $fieldTripId])->fetchAll(PDO::FETCH_ASSOC);
-  }
+		return $this->execute($sql, [':ft_id' => $fieldTripId])->fetchAll(PDO::FETCH_ASSOC);
+	}
 }
