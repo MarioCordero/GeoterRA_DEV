@@ -462,9 +462,51 @@ final class FieldTripService
 
     if ($includeRelations) {
       $formatted['participants'] = $this->participantRepository->getParticipants($row['field_trip_id']);
-      $formatted['geomanifestations'] = $this->repository->getManifestations($row['field_trip_id']);
+			$rawManifestations = $this->repository->getManifestations($row['field_trip_id']);
+
+			$formatted['geomanifestations'] = array_map(
+				fn($manifestationRow) => $this->formatManifestation($manifestationRow),
+				$rawManifestations
+			);
     }
 
     return $formatted;
   }
+
+
+	/**
+	 * Formats a view row into the API response structure.
+	 *
+	 * @param array<string,mixed> $row
+	 * @return array<string, mixed>
+	 */
+	private function formatManifestation(array $row): array {
+		$response = [
+			'geomanifestation_id' => $row['geomanifestation_id'],
+			'geomanifestation_name' => $row['geomanifestation_name'],
+			'description' => $row['description'],
+			'field_trip_id' => $row['field_trip_id'] ?? null,
+			'field_trip_name' => $row['field_trip_name'] ?? null,
+			'created_at' => $row['created_at'],
+			'location' => [
+				'province' => $row['province_name'],
+				'province_snit_code' => $row['province_snit_code'],
+				'canton' => $row['canton_name'],
+				'canton_snit_code' => $row['canton_snit_code'],
+				'district' => $row['district_name'],
+				'district_snit_code' => $row['district_snit_code'],
+				'latitude' => (float)$row['latitude'],
+				'longitude' => (float)$row['longitude'],
+			]
+		];
+
+		$response['visibility'] = isset($row['visibility']) && $row['visibility'];
+
+		$response['request'] = (isset($row['request_id'])) ? [
+			'request_id' => $row['request_id'],
+			'request_name' => $row['request_name'],
+		] : null;
+
+		return $response;
+	}
 }
