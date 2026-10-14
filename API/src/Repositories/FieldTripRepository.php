@@ -20,7 +20,17 @@ final class FieldTripRepository extends Repository
    */
   public function findById(string $id): ?array
   {
-    $sql = "SELECT ft.*,
+    $sql = "SELECT ft.field_trip_id, 
+                   ft.field_trip_name, 
+                   ft.field_trip_scheduled_date, 
+                   ft.field_trip_start_date, 
+                   ft.field_trip_finish_date, 
+                   ft.field_trip_is_active, 
+                   ft.province_snit_code, 
+                   ft.canton_snit_code, 
+                   ft.district_snit_code, 
+                   ft.field_trip_creator_id, 
+                   ft.created_at,
                    u.first_name AS creator_first_name,
                    u.last_name AS creator_last_name,
                    u.email AS creator_email,
@@ -69,7 +79,17 @@ final class FieldTripRepository extends Repository
     $limitInt = $limit;
     $offsetInt = (int)$offset;
 
-    $sql = "SELECT ft.*,
+    $sql = "SELECT ft.field_trip_id, 
+                   ft.field_trip_name, 
+                   ft.field_trip_scheduled_date, 
+                   ft.field_trip_start_date, 
+                   ft.field_trip_finish_date, 
+                   ft.field_trip_is_active, 
+                   ft.province_snit_code, 
+                   ft.canton_snit_code, 
+                   ft.district_snit_code, 
+                   ft.field_trip_creator_id, 
+                   ft.created_at,
                    u.first_name AS creator_first_name,
                    u.last_name AS creator_last_name,
                    u.email AS creator_email,
@@ -113,7 +133,17 @@ final class FieldTripRepository extends Repository
     $limitInt = $limit;
     $offsetInt = (int)$offset;
 
-    $sql = "SELECT DISTINCT ft.*,
+    $sql = "SELECT ft.field_trip_id, 
+                   ft.field_trip_name, 
+                   ft.field_trip_scheduled_date, 
+                   ft.field_trip_start_date, 
+                   ft.field_trip_finish_date, 
+                   ft.field_trip_is_active, 
+                   ft.province_snit_code, 
+                   ft.canton_snit_code, 
+                   ft.district_snit_code, 
+                   ft.field_trip_creator_id, 
+                   ft.created_at,
                    u.first_name AS creator_first_name,
                    u.last_name AS creator_last_name,
                    u.email AS creator_email,
