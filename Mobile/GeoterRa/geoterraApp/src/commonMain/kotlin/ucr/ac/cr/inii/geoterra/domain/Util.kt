@@ -34,7 +34,7 @@ class Util {
 		 * @param decimalPlaces The maximum number of decimal positions to keep after the separator.
 		 * @return The string representation of the double truncated to [decimalPlaces] decimal places.
 		 */
-		fun truncateDecimal(value: Double, decimalPlaces: Int): String {
+		fun truncateDecimal(value: Double?, decimalPlaces: Int): String {
 			return truncateDecimal(value.toString(), decimalPlaces)
 		}
 	}

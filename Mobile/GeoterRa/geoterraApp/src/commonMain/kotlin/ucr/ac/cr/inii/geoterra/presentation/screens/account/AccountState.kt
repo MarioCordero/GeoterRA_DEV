@@ -7,5 +7,6 @@ data class AccountState(
 	val isLoading: Boolean = false,
 	val user: UserResponse? = null,
 	val isDarkMode: Boolean = false,
+	val isFieldTripMode: Boolean = false,
 	val snackBarMessage: SnackbarMessage? = null
 )

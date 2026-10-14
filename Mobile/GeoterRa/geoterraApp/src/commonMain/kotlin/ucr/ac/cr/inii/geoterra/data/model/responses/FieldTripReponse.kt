@@ -1,0 +1,18 @@
+package ucr.ac.cr.inii.geoterra.data.model.responses
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class FieldTripResponse(
+	val field_trip_id: String,
+	val field_trip_name: String,
+	val field_trip_scheduled_date: String,
+	val field_trip_start_date: String? = null,
+	val field_trip_finish_date: String? = null,
+	val field_trip_is_active: Boolean,
+	val geomanifestations: List<GeomanifestationResponse>,
+	val participants: List<UserResponse>,
+	val location: LocationResponse,
+	val creator: UserResponse,
+	val created_at: String
+)

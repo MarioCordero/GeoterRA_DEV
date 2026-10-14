@@ -48,6 +48,7 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.DangerActionItem
 import ucr.ac.cr.inii.geoterra.presentation.components.account.InfoTile
 import ucr.ac.cr.inii.geoterra.presentation.components.account.ProfileHeaderCard
 import ucr.ac.cr.inii.geoterra.presentation.components.common.ConfirmDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.FieldTripToggle
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SectionHeader
 import ucr.ac.cr.inii.geoterra.presentation.components.common.ThemeToggle
 
@@ -60,6 +61,7 @@ fun AccountContent(
 	onEditClick: () -> Unit,
 	onChangePasswordClick: () -> Unit,
 	onThemeToggle: (Boolean) -> Unit,
+	onFieldTripToggle: (Boolean) -> Unit
 ) {
 	var showLogoutDialog by remember { mutableStateOf(false) }
 	var showDeleteDialog by remember { mutableStateOf(false) }
@@ -104,12 +106,14 @@ fun AccountContent(
 								else -> null
 							}
 
-							Text(
-								userRole ?: state.user.role,
-								style = MaterialTheme.typography.titleLarge,
-								fontWeight = FontWeight.Bold,
-								color = MaterialTheme.colorScheme.primary
-							)
+							(userRole ?: state.user.role)?.let {
+								Text(
+									it,
+									style = MaterialTheme.typography.titleLarge,
+									fontWeight = FontWeight.Bold,
+									color = MaterialTheme.colorScheme.primary
+								)
+							}
 						}
 					}
 				}
@@ -138,6 +142,15 @@ fun AccountContent(
 							onThemeToggle(isDark)
 						}
 					)
+
+					if (state.user.role != "user") {
+						FieldTripToggle(
+							isFieldTripActive = state.isFieldTripMode,
+							onToggle = { enabled ->
+								onFieldTripToggle(enabled)
+							}
+						)
+					}
 
 					ActionMenuItem(
 						Icons.Default.Edit,

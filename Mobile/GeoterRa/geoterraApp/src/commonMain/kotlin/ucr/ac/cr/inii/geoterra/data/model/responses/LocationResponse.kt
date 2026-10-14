@@ -10,7 +10,6 @@ data class LocationResponse(
 	val canton_snit_code: Int,
 	val district: String,
 	val district_snit_code: Int,
-	val latitude: Double,
-	val longitude: Double
-) : JavaSerializable {
-}
+	val latitude: Double? = null,
+	val longitude: Double? = null
+)

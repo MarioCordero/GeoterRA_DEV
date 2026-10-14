@@ -20,6 +20,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,17 +36,29 @@ import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
+import com.russhwolf.settings.Settings
+import org.koin.compose.koinInject
 import ucr.ac.cr.inii.geoterra.presentation.navigation.AccountTab
+import ucr.ac.cr.inii.geoterra.presentation.navigation.FieldTripTab
 import ucr.ac.cr.inii.geoterra.presentation.navigation.HomeTab
 import ucr.ac.cr.inii.geoterra.presentation.navigation.MapTab
 import ucr.ac.cr.inii.geoterra.presentation.navigation.RequestTab
+import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountViewModel
 
 class MainScreen : Screen {
   @Composable
   override fun Content() {
-    TabNavigator(HomeTab) { tabNavigator ->
-      val tabs = listOf(HomeTab, MapTab, RequestTab, AccountTab)
+		val accountViewModel: AccountViewModel = koinInject()
+		val accountState by accountViewModel.state.collectAsState()
 
+		val isFieldTripMode = accountState.isFieldTripMode
+
+		val actionTab = if (isFieldTripMode) FieldTripTab else RequestTab
+		val tabs = remember(isFieldTripMode) {
+			listOf(HomeTab, MapTab, actionTab, AccountTab)
+		}
+
+    TabNavigator(HomeTab) { tabNavigator ->
       Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {

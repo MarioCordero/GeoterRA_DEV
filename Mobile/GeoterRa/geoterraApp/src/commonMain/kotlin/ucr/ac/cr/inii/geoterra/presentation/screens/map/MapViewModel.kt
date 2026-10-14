@@ -119,7 +119,7 @@ class MapViewModel(
 				tempMax = tempMax
 			)
 
-			manifestationsRepository.getManifestations(filters)
+			manifestationsRepository.getPublicGeomanifestations(filters)
 				.onSuccess { result ->
 					_state.update {
 						it.copy(

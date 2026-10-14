@@ -55,7 +55,7 @@ fun ProfileHeaderCard(user: UserResponse) {
         )
 
 				Text(
-          "Miembro desde: ${user.created_at.take(10)}",
+          "Miembro desde: ${user.created_at?.take(10)}",
           style = MaterialTheme.typography.bodySmall,
           color = MaterialTheme.colorScheme.outline
         )

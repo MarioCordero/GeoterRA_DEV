@@ -18,7 +18,8 @@ class AccountViewModel(
 	private val authService: AuthService,
 	private val settings: Settings
 ) : BaseScreenModel<AccountState>(AccountState(
-	isDarkMode = settings.getBoolean("is_dark_mode", false)
+	isDarkMode = settings.getBoolean("is_dark_mode", false),
+	isFieldTripMode = settings.getBoolean("is_field_trip_mode", false)
 )) {
 
 	init {
@@ -96,6 +97,11 @@ class AccountViewModel(
 	fun toggleTheme(isDark: Boolean) {
 		settings.putBoolean("is_dark_mode", isDark)
 		_state.update { it.copy(isDarkMode = isDark) }
+	}
+
+	fun toggleFieldTripMode(enabled: Boolean) {
+		settings.putBoolean("is_field_trip_mode", enabled)
+		_state.update { it.copy(isFieldTripMode = enabled) }
 	}
 
 	fun logout() {

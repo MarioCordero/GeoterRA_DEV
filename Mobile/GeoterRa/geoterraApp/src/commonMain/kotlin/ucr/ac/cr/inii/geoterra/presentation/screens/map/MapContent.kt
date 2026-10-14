@@ -66,8 +66,10 @@ fun MapContent(
 				cameraState.animateTo(
 					CameraPosition(
 						target = Position(
-							latitude = manifestation.location.latitude,
+							latitude = manifestation.location.latitude
+								?: state.userLocation?.latitude ?: 9.934739,
 							longitude = manifestation.location.longitude
+								?: state.userLocation?.longitude ?: -84.087502
 						),
 						zoom = targetZoom
 					)

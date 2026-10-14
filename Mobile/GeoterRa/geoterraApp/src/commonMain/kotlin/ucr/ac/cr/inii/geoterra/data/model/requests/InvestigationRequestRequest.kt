@@ -26,6 +26,8 @@ data class InvestigationRequestRequest(
 		 * Maps a remote AnalysisRequest to a DTO.
 		 */
 		fun fromRemote(remote: InvestigationRequestResponse): InvestigationRequestRequest {
+			// Map the remote AnalysisRequest to the DTO
+			// latitude and longitude should be always present.
 			return InvestigationRequestRequest(
 				province_snit_code = remote.location.province_snit_code,
 				canton_snit_code = remote.location.canton_snit_code,
@@ -38,8 +40,8 @@ data class InvestigationRequestRequest(
 				bubbles = remote.bubbles,
 				details = remote.details,
 				exact_address = remote.exact_address,
-				latitude = remote.location.latitude,
-				longitude = remote.location.longitude,
+				latitude = remote.location.latitude ?: 0.0,
+				longitude = remote.location.longitude ?: 0.0,
 				relation_with_owner = remote.relation_with_owner
 			)
 		}

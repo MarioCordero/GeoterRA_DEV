@@ -92,6 +92,9 @@ class AccountScreen : Screen {
 				},
 				onThemeToggle = { isDark ->
 					viewModel.toggleTheme(isDark)
+				},
+				onFieldTripToggle = { enabled ->
+					viewModel.toggleFieldTripMode(enabled)
 				}
 			)
 		}
