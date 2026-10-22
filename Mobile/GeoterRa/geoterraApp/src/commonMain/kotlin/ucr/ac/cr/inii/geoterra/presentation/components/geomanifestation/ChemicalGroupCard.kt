@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.components.manifestation
+package ucr.ac.cr.inii.geoterra.presentation.components.geomanifestation
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column

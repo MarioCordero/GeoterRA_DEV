@@ -30,6 +30,7 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.account.password.change.Pass
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.password.recovery.PasswordRecoveryViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.field.trip.details.FieldTripDetailsViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.fieldtrip.FieldTripViewModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.fieldtrip.form.FieldTripFormViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.sign.`in`.SignInViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation.GeomanifestationViewModel
@@ -80,9 +81,19 @@ val appModule = module {
 		)
 	}
 
+	factory {
+		params -> FieldTripFormViewModel(
+			fieldTripRepository = get(),
+			provincesRepository = get(),
+			cantonsRepository = get(),
+			districtsRepository = get(),
+			fieldTripToEdit = params.getOrNull<FieldTripResponse>()
+		)
+	}
+
 	factory { params ->
 		FieldTripDetailsViewModel(
-			fieldTrip = params.get<FieldTripResponse>(),
+			fieldTripId = params.get<String>(),
 			fieldTripRepository = get()
 		)
 	}

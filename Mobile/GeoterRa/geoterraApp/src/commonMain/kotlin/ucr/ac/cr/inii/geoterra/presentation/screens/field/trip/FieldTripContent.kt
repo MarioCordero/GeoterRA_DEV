@@ -40,7 +40,8 @@ fun FieldTripContent(
 						Text(
 							text = tab.title,
 							style = MaterialTheme.typography.titleSmall,
-							color = if (state.currentTab == tab) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+							color = if (state.currentTab == tab)
+								MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
 						)
 					}
 				)
@@ -66,10 +67,12 @@ fun FieldTripContent(
 					Text(
 						text = when (state.currentTab) {
 							FieldTripTab.GENERAL -> "No hay giras de campo registradas."
-							FieldTripTab.ASSIGNED -> if (!state.isLoggedIn) "Inicia sesión para ver tus giras asignadas." else "No tienes giras de campo asignadas."
+							FieldTripTab.ASSIGNED -> if (!state.isLoggedIn)
+								"Inicia sesión para ver tus giras asignadas."
+								else "No tienes giras de campo asignadas."
 						},
 						style = MaterialTheme.typography.bodyMedium,
-						color = MaterialTheme.colorScheme.onSurfaceVariant
+						color = MaterialTheme.colorScheme.onSurface
 					)
 				}
 			} else {

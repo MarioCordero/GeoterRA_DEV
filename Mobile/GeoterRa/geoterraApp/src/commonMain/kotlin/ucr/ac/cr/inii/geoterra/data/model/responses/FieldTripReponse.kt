@@ -10,8 +10,8 @@ data class FieldTripResponse(
 	val field_trip_start_date: String? = null,
 	val field_trip_finish_date: String? = null,
 	val field_trip_is_active: Boolean,
-	val geomanifestations: List<GeomanifestationResponse>,
-	val participants: List<UserResponse>,
+	val geomanifestations: List<GeomanifestationResponse> = emptyList(),
+	val participants: List<UserResponse> = emptyList(),
 	val location: LocationResponse,
 	val creator: UserResponse,
 	val created_at: String

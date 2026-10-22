@@ -1,6 +1,5 @@
 package ucr.ac.cr.inii.geoterra.presentation.components.fieldtrip
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -15,6 +14,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ucr.ac.cr.inii.geoterra.data.model.responses.FieldTripResponse
+import ucr.ac.cr.inii.geoterra.presentation.components.common.ActionButton
+import ucr.ac.cr.inii.geoterra.presentation.components.common.InfoChip
 
 @Composable
 fun FieldTripCardItem(
@@ -25,98 +26,98 @@ fun FieldTripCardItem(
 	Card(
 		modifier = modifier
 			.fillMaxWidth()
-			.clickable(onClick = onView),
-		shape = RoundedCornerShape(16.dp),
-		colors = CardDefaults.cardColors(
-			containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-		),
-		elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+			.padding(horizontal = 4.dp),
+		shape = RoundedCornerShape(24.dp),
+		elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+		colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
 	) {
 		Column(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(16.dp),
-			verticalArrangement = Arrangement.spacedBy(10.dp)
+				.padding(20.dp),
+			verticalArrangement = Arrangement.spacedBy(16.dp)
 		) {
 			Row(
 				modifier = Modifier.fillMaxWidth(),
 				horizontalArrangement = Arrangement.SpaceBetween,
-				verticalAlignment = Alignment.CenterVertically
+				verticalAlignment = Alignment.Top
 			) {
-				Text(
-					text = fieldTrip.field_trip_name,
-					style = MaterialTheme.typography.titleMedium,
-					fontWeight = FontWeight.Bold,
-					color = MaterialTheme.colorScheme.onSurface,
-					modifier = Modifier.weight(1f),
-					maxLines = 1,
-					overflow = TextOverflow.Ellipsis
-				)
+				Column(
+					modifier = Modifier
+						.weight(1f)
+						.padding(end = 12.dp),
+					verticalArrangement = Arrangement.spacedBy(4.dp)
+				) {
+					Text(
+						text = fieldTrip.field_trip_name,
+						style = MaterialTheme.typography.titleLarge.copy(
+							fontWeight = FontWeight.ExtraBold,
+						),
+						color = MaterialTheme.colorScheme.onSurface,
+						maxLines = 2,
+						overflow = TextOverflow.Ellipsis
+					)
+				}
+
 				Surface(
 					shape = RoundedCornerShape(8.dp),
-					color = if (fieldTrip.field_trip_is_active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer
+					color = if (fieldTrip.field_trip_is_active)
+						MaterialTheme.colorScheme.primaryContainer
+					else
+						MaterialTheme.colorScheme.errorContainer
 				) {
 					Text(
 						text = if (fieldTrip.field_trip_is_active) "Activa" else "Inactiva",
-						style = MaterialTheme.typography.labelSmall,
-						color = if (fieldTrip.field_trip_is_active) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onErrorContainer,
-						modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+						style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+						color = if (fieldTrip.field_trip_is_active)
+							MaterialTheme.colorScheme.onPrimaryContainer
+						else
+							MaterialTheme.colorScheme.onErrorContainer,
+						modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
 					)
 				}
 			}
 
-			Row(
-				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(6.dp)
+			Column(
+				modifier = Modifier.fillMaxWidth(),
+				verticalArrangement = Arrangement.spacedBy(8.dp)
 			) {
-				Icon(
-					imageVector = Icons.Default.CalendarToday,
-					contentDescription = null,
-					tint = MaterialTheme.colorScheme.primary,
-					modifier = Modifier.size(16.dp)
+				InfoChip(
+					icon = Icons.Default.CalendarToday,
+					label = "Fecha programada",
+					value = fieldTrip.field_trip_scheduled_date.take(10),
+					modifier = Modifier.fillMaxWidth(),
+					iconColor = MaterialTheme.colorScheme.primary
 				)
-				Text(
-					text = "Fecha programada: ${fieldTrip.field_trip_scheduled_date}",
-					style = MaterialTheme.typography.bodyMedium,
-					color = MaterialTheme.colorScheme.onSurfaceVariant
+
+				InfoChip(
+					icon = Icons.Default.LocationOn,
+					label = "Ubicación",
+					value = "${fieldTrip.location.province}, ${fieldTrip.location.canton}",
+					modifier = Modifier.fillMaxWidth(),
+					iconColor = MaterialTheme.colorScheme.secondary
+				)
+
+				InfoChip(
+					icon = Icons.Default.Person,
+					label = "Organizador",
+					value = "${fieldTrip.creator.first_name} ${fieldTrip.creator.last_name}",
+					modifier = Modifier.fillMaxWidth(),
+					iconColor = MaterialTheme.colorScheme.tertiary,
+					maxLines = 1
 				)
 			}
 
 			Row(
-				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(6.dp)
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.End,
+				verticalAlignment = Alignment.CenterVertically
 			) {
-				Icon(
-					imageVector = Icons.Default.LocationOn,
-					contentDescription = null,
-					tint = MaterialTheme.colorScheme.secondary,
-					modifier = Modifier.size(16.dp)
-				)
-				Text(
-					text = "${fieldTrip.location.province}, ${fieldTrip.location.canton}",
-					style = MaterialTheme.typography.bodyMedium,
-					color = MaterialTheme.colorScheme.onSurfaceVariant,
-					maxLines = 1,
-					overflow = TextOverflow.Ellipsis
-				)
-			}
-
-			Row(
-				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(6.dp)
-			) {
-				Icon(
-					imageVector = Icons.Default.Person,
-					contentDescription = null,
-					tint = MaterialTheme.colorScheme.tertiary,
-					modifier = Modifier.size(16.dp)
-				)
-				Text(
-					text = "Organizador: ${fieldTrip.creator.first_name} ${fieldTrip.creator.last_name}",
-					style = MaterialTheme.typography.bodySmall,
-					color = MaterialTheme.colorScheme.onSurfaceVariant,
-					maxLines = 1,
-					overflow = TextOverflow.Ellipsis
+				ActionButton(
+					text = "Ver Detalles",
+					onClick = onView,
+					modifier = Modifier.fillMaxWidth(),
+					isCompact = true
 				)
 			}
 		}

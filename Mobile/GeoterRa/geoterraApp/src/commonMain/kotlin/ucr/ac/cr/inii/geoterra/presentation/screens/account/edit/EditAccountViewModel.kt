@@ -20,7 +20,7 @@ class EditAccountViewModel(
 				payload = UserUpdateRequest(
 					first_name = userProfile.first_name,
 					last_name = userProfile.last_name,
-					email = userProfile.email,
+					email = userProfile.email ?: "",
 					phone_number = userProfile.phone_number
 				)
 			)

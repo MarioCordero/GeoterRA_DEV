@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -59,7 +60,7 @@ fun FieldTripToggle(
 					Text(
 						text = if (isFieldTripActive) "Modo offline activo (Datos en memoria)" else "Modo normal de solicitudes",
 						style = MaterialTheme.typography.bodySmall,
-						color = MaterialTheme.colorScheme.onSurfaceVariant
+						color = Gray
 					)
 				}
 			}

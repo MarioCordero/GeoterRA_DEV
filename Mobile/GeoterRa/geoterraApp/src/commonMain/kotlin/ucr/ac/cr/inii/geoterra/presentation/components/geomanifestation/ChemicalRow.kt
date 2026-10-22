@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.components.manifestation
+package ucr.ac.cr.inii.geoterra.presentation.components.geomanifestation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

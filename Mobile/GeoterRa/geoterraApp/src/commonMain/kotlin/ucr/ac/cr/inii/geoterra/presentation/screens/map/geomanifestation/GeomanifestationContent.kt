@@ -28,14 +28,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.common.DataBox
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SectionHeader
-import ucr.ac.cr.inii.geoterra.presentation.components.manifestation.ChemicalGroupCard
+import ucr.ac.cr.inii.geoterra.presentation.components.geomanifestation.ChemicalGroupCard
 
 @Composable
 fun GeomanifestationContent(

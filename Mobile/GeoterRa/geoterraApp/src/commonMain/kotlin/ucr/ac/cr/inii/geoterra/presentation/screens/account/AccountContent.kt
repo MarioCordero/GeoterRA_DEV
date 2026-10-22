@@ -126,7 +126,7 @@ fun AccountContent(
 				) {
 					SectionHeader(title = "Información de Contacto")
 
-					InfoTile(Icons.Default.Email, "Correo electrónico", state.user.email)
+					InfoTile(Icons.Default.Email, "Correo electrónico", state.user.email ?: "No especificado")
 					InfoTile(Icons.Default.Phone, "Teléfono", state.user.phone_number ?: "No especificado")
 				}
 
