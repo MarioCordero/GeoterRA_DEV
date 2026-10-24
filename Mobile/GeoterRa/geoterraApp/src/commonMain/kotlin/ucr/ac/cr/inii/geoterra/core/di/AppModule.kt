@@ -42,7 +42,7 @@ import kotlin.coroutines.EmptyCoroutineContext.get
 
 val appModule = module {
 	// Tabs ViewModels (ScreenModels)
-	single { AuthService(get(), get()) }
+	single { AuthService(get(), get(), get()) }
 	single { HomeViewModel() }
 	single { MapViewModel(get(), get(), get(), get(), get(), get()) }
 	single { AccountViewModel(get(), get(), get()) }

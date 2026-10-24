@@ -16,13 +16,26 @@ import androidx.compose.ui.unit.dp
 import ucr.ac.cr.inii.geoterra.data.model.responses.FieldTripResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.common.ActionButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.InfoChip
+import ucr.ac.cr.inii.geoterra.presentation.components.common.OutlinedActionButton
 
 @Composable
 fun FieldTripCardItem(
 	fieldTrip: FieldTripResponse,
+	currentUserId: String?,
+	currentUserRole: String?,
 	onView: () -> Unit,
+	onEdit: () -> Unit,
+	onDelete: () -> Unit,
 	modifier: Modifier = Modifier
 ) {
+	val isAdmin = currentUserRole == "admin"
+	val isInvestigator = currentUserRole == "investigator"
+	val isCreator = currentUserId != null && fieldTrip.creator.user_id == currentUserId
+	val isParticipant = currentUserId != null && fieldTrip.participants.any { it.user_id == currentUserId }
+
+	val showEdit = isAdmin || (isInvestigator && (isCreator || isParticipant))
+	val showDelete = isAdmin || (isInvestigator && isCreator)
+
 	Card(
 		modifier = modifier
 			.fillMaxWidth()
@@ -110,15 +123,33 @@ fun FieldTripCardItem(
 
 			Row(
 				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.End,
+				horizontalArrangement = Arrangement.spacedBy(10.dp),
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				ActionButton(
-					text = "Ver Detalles",
+					text = "Detalles",
 					onClick = onView,
-					modifier = Modifier.fillMaxWidth(),
+					modifier = Modifier.weight(1f),
 					isCompact = true
 				)
+
+				if (showEdit) {
+					OutlinedActionButton(
+						text = "Editar",
+						onClick = onEdit,
+						modifier = Modifier.weight(1f),
+						isCompact = true
+					)
+				}
+
+				if (showDelete) {
+					OutlinedActionButton(
+						text = "Eliminar",
+						onClick = onDelete,
+						modifier = Modifier.weight(1f),
+						isCompact = true
+					)
+				}
 			}
 		}
 	}

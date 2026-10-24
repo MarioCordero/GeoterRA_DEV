@@ -27,6 +27,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import ucr.ac.cr.inii.geoterra.presentation.components.common.ConfirmDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 import ucr.ac.cr.inii.geoterra.presentation.screens.fieldtrip.details.FieldTripDetailsScreen
@@ -56,6 +57,17 @@ class FieldTripScreen : Screen {
 				)
 				viewModel.clearSnackBarMessage()
 			}
+		}
+
+		state.fieldTripToDelete?.let { fieldTrip ->
+			ConfirmDialog(
+				title = "Eliminar gira de campo",
+				message = "¿Estás seguro de que deseas eliminar esta gira de campo? Esta acción no se puede deshacer.",
+				confirmText = "Eliminar",
+				onConfirm = { viewModel.deleteFieldTrip(fieldTrip.field_trip_id) },
+				onDismiss = { viewModel.setFieldTripToDelete(null) },
+				isDanger = true
+			)
 		}
 
 		Scaffold(
@@ -136,6 +148,14 @@ class FieldTripScreen : Screen {
 					navigator.push(
 						FieldTripDetailsScreen(fieldTrip.field_trip_id)
 					)
+				},
+				onEdit = { fieldTrip ->
+					navigator.push(
+						FieldTripFormScreen(fieldTripToEdit = fieldTrip)
+					)
+				},
+				onDelete = { fieldTrip ->
+					viewModel.setFieldTripToDelete(fieldTrip)
 				}
 			)
 		}

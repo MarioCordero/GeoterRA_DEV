@@ -11,8 +11,11 @@ enum class FieldTripTab(val title: String) {
 data class FieldTripState(
 	val isLoading: Boolean = false,
 	val isLoggedIn: Boolean = false,
+	val currentUserId: String? = null,
+	val currentUserRole: String? = null,
 	val currentTab: FieldTripTab = FieldTripTab.GENERAL,
 	val generalFieldTrips: List<FieldTripResponse> = emptyList(),
 	val myFieldTrips: List<FieldTripResponse> = emptyList(),
-	val snackBarMessage: SnackbarMessage? = null
+	val snackBarMessage: SnackbarMessage? = null,
+	val fieldTripToDelete: FieldTripResponse? = null
 )

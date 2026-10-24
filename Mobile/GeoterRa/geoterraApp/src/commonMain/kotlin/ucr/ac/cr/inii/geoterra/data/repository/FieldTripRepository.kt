@@ -5,10 +5,13 @@ import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import kotlinx.serialization.json.JsonElement
 import ucr.ac.cr.inii.geoterra.core.network.ApiError
 import ucr.ac.cr.inii.geoterra.core.network.ApiException
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
@@ -117,6 +120,70 @@ class FieldTripRepository(private val client: HttpClient)
 
 				Result.success(envelope.data ?: emptyList())
 
+			} else {
+				handleErrorResponse(response)
+			}
+		} catch (e: Exception) {
+			Result.failure(
+				ApiException(
+					ApiError(
+						code = ApiError.INTERNAL_ERROR,
+						message = "Error de red: verifica tu conexión a internet."
+					)
+				)
+			)
+		}
+	}
+
+	override suspend fun updateFieldTrip(
+		id: String,
+		request: FieldTripRequest
+	): Result<FieldTripResponse> {
+		return try {
+			val response = client.put("field-trips/$id") {
+				contentType(ContentType.Application.Json)
+				setBody(request)
+			}
+
+			if (response.status.isSuccess()) {
+				val envelope = response.body<ApiResponseModel<FieldTripResponse, MetaResponse>>()
+
+				if (envelope.errors.isNotEmpty()) {
+					return Result.failure(ApiException(envelope.errors.first()))
+				}
+
+				Result.success(envelope.data ?: throw Exception("Empty response body received."))
+
+			} else {
+				handleErrorResponse(response)
+			}
+		} catch (e: Exception) {
+			Result.failure(
+				ApiException(
+					ApiError(
+						code = ApiError.INTERNAL_ERROR,
+						message = "Error de red: verifica tu conexión a internet."
+					)
+				)
+			)
+		}
+	}
+
+	override suspend fun deleteFieldTrip(id: String): Result<Unit> {
+		return try {
+			val response = client.delete("field-trips/$id")
+			if (response.status.isSuccess()) {
+				if (response.status == HttpStatusCode.NoContent) {
+					return Result.success(Unit)
+				}
+
+				val envelope = response.body<ApiResponseModel<JsonElement, MetaResponse>>()
+
+				if (envelope.errors.isNotEmpty()) {
+					return Result.failure(ApiException(envelope.errors.first()))
+				}
+
+				Result.success(Unit)
 			} else {
 				handleErrorResponse(response)
 			}

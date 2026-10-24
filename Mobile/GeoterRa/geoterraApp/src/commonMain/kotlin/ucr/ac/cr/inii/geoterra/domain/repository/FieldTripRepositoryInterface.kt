@@ -11,6 +11,9 @@ interface FieldTripRepositoryInterface {
 
 	suspend fun getMyFieldTrips(): Result<List<FieldTripResponse>>
 
+	suspend fun updateFieldTrip(id: String, request: FieldTripRequest): Result<FieldTripResponse>
+	suspend fun deleteFieldTrip(id: String): Result<Unit>
+
 	suspend fun addGeomanifestationToFieldTrip(id: String, geomanifestationId: String): Result<FieldTripResponse>
 
 	suspend fun removeGeomanifestationFromFieldTrip(id: String, geomanifestationId: String): Result<FieldTripResponse>

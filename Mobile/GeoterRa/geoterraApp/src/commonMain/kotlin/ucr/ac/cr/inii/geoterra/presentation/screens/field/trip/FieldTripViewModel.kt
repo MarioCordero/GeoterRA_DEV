@@ -1,12 +1,12 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.fieldtrip
 
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.core.network.ApiException
 import ucr.ac.cr.inii.geoterra.core.network.isAuthError
 import ucr.ac.cr.inii.geoterra.core.network.isInvalidAccess
+import ucr.ac.cr.inii.geoterra.data.model.responses.FieldTripResponse
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
 import ucr.ac.cr.inii.geoterra.domain.repository.FieldTripRepositoryInterface
@@ -26,15 +26,34 @@ class FieldTripViewModel(
 			authService.events.collect { event ->
 				when (event) {
 					is AuthEvent.Unauthorized -> {
-						_state.update { it.copy(isLoggedIn = false, myFieldTrips = emptyList()) }
+						_state.update {
+							it.copy(
+								isLoggedIn = false,
+								myFieldTrips = emptyList(),
+								currentUserId = null,
+								currentUserRole = null
+							)
+						}
 					}
-					is AuthEvent.Authorized -> {
-						_state.update { it.copy(isLoggedIn = true) }
+					is AuthEvent.Authorized, is AuthEvent.LoginSuccess -> {
+						_state.update {
+							it.copy(
+								isLoggedIn = true,
+								currentUserId = authService.userId,
+								currentUserRole = authService.userRole
+							)
+						}
 						fetchMyFieldTrips()
 					}
 					else -> {}
 				}
 			}
+		}
+		_state.update {
+			it.copy(
+				currentUserId = authService.userId,
+				currentUserRole = authService.userRole
+			)
 		}
 		fetchAllData()
 	}
@@ -91,6 +110,41 @@ class FieldTripViewModel(
 								)
 							)
 						}
+					}
+				}
+		}
+	}
+
+	fun setFieldTripToDelete(fieldTrip: FieldTripResponse?) {
+		_state.update { it.copy(fieldTripToDelete = fieldTrip) }
+	}
+
+	fun deleteFieldTrip(fieldTripId: String) {
+		screenModelScope.launch {
+			_state.update { it.copy(isLoading = true, fieldTripToDelete = null) }
+			fieldTripRepository.deleteFieldTrip(fieldTripId)
+				.onSuccess {
+					_state.update {
+						it.copy(
+							isLoading = false,
+							snackBarMessage = SnackbarMessage(
+								text = "Gira de campo eliminada correctamente",
+								type = SnackbarType.SUCCESS
+							),
+							generalFieldTrips = it.generalFieldTrips.filter { trip -> trip.field_trip_id != fieldTripId },
+							myFieldTrips = it.myFieldTrips.filter { trip -> trip.field_trip_id != fieldTripId }
+						)
+					}
+				}
+				.onFailure { exception ->
+					_state.update {
+						it.copy(
+							isLoading = false,
+							snackBarMessage = SnackbarMessage(
+								text = exception.message ?: "Error al eliminar la gira de campo",
+								type = SnackbarType.ERROR
+							)
+						)
 					}
 				}
 		}

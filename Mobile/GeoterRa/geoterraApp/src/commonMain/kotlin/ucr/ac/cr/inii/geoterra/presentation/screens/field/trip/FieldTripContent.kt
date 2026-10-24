@@ -18,7 +18,9 @@ fun FieldTripContent(
 	modifier: Modifier = Modifier,
 	state: FieldTripState,
 	onTabSelected: (FieldTripTab) -> Unit,
-	onViewDetails: (FieldTripResponse) -> Unit
+	onViewDetails: (FieldTripResponse) -> Unit,
+	onEdit: (FieldTripResponse) -> Unit,
+	onDelete: (FieldTripResponse) -> Unit
 ) {
 	val currentList = when (state.currentTab) {
 		FieldTripTab.GENERAL -> state.generalFieldTrips
@@ -69,7 +71,7 @@ fun FieldTripContent(
 							FieldTripTab.GENERAL -> "No hay giras de campo registradas."
 							FieldTripTab.ASSIGNED -> if (!state.isLoggedIn)
 								"Inicia sesión para ver tus giras asignadas."
-								else "No tienes giras de campo asignadas."
+							else "No tienes giras de campo asignadas."
 						},
 						style = MaterialTheme.typography.bodyMedium,
 						color = MaterialTheme.colorScheme.onSurface
@@ -84,7 +86,11 @@ fun FieldTripContent(
 					items(currentList, key = { it.field_trip_id }) { fieldTrip ->
 						FieldTripCardItem(
 							fieldTrip = fieldTrip,
-							onView = { onViewDetails(fieldTrip) }
+							currentUserId = state.currentUserId,
+							currentUserRole = state.currentUserRole,
+							onView = { onViewDetails(fieldTrip) },
+							onEdit = { onEdit(fieldTrip) },
+							onDelete = { onDelete(fieldTrip) }
 						)
 					}
 				}
