@@ -48,38 +48,59 @@ final class FieldTripRepository extends Repository
     return $row ?: null;
   }
 
-  /**
-   * Returns paginated list of field trips with optional active status filter.
-   *
-   * @param int $page
-   * @param int $limit
-   * @param bool|null $isActive
-   * @return array{data: array[], total: int}
-   */
-  public function getAllPaginated(
-    int $page = 1,
-    int $limit = 20,
-    ?bool $isActive = null
-  ): array {
-    $offset = ($page - 1) * $limit;
-    $conditions = [];
-    $params = [];
+	/**
+	 * Returns a paginated list of field trips with optional active status and SNIT filters.
+	 *
+	 * @param int $page
+	 * @param int $limit
+	 * @param bool|null $isActive
+	 * @param int|null $provinceSnitCode
+	 * @param int|null $cantonSnitCode
+	 * @param int|null $districtSnitCode
+	 * @return array{data: array[], total: int}
+	 */
+	public function getAllPaginated(
+		int $page = 1,
+		int $limit = 20,
+		?bool $isActive = null,
+		?int $provinceSnitCode = null,
+		?int $cantonSnitCode = null,
+		?int $districtSnitCode = null
+	): array {
+		$offset = ($page - 1) * $limit;
+		$conditions = [];
+		$params = [];
 
-    if ($isActive !== null) {
-      $conditions[] = "ft.field_trip_is_active = :is_active";
-      $params[':is_active'] = $isActive ? 1 : 0;
-    }
+		if ($isActive !== null) {
+			$conditions[] = "ft.field_trip_is_active = :is_active";
+			$params[':is_active'] = $isActive ? 1 : 0;
+		}
 
-    $whereClause = empty($conditions) ? "" : "WHERE " . implode(" AND ", $conditions);
+		if ($provinceSnitCode !== null) {
+			$conditions[] = "ft.province_snit_code = :province_snit_code";
+			$params[':province_snit_code'] = $provinceSnitCode;
+		}
 
-    $countSql = "SELECT COUNT(*) FROM field_trips ft $whereClause";
-    $countStmt = $this->execute($countSql, $params);
-    $total = (int)$countStmt->fetchColumn();
+		if ($cantonSnitCode !== null) {
+			$conditions[] = "ft.canton_snit_code = :canton_snit_code";
+			$params[':canton_snit_code'] = $cantonSnitCode;
+		}
 
-    $limitInt = $limit;
-    $offsetInt = (int)$offset;
+		if ($districtSnitCode !== null) {
+			$conditions[] = "ft.district_snit_code = :district_snit_code";
+			$params[':district_snit_code'] = $districtSnitCode;
+		}
 
-    $sql = "SELECT ft.field_trip_id, 
+		$whereClause = empty($conditions) ? "" : "WHERE " . implode(" AND ", $conditions);
+
+		$countSql = "SELECT COUNT(*) FROM field_trips ft $whereClause";
+		$countStmt = $this->execute($countSql, $params);
+		$total = (int)$countStmt->fetchColumn();
+
+		$limitInt = $limit;
+		$offsetInt = (int)$offset;
+
+		$sql = "SELECT ft.field_trip_id, 
                    ft.field_trip_name, 
                    ft.field_trip_scheduled_date, 
                    ft.field_trip_start_date, 
@@ -105,35 +126,64 @@ final class FieldTripRepository extends Repository
             ORDER BY ft.field_trip_scheduled_date DESC
             LIMIT {$limitInt} OFFSET {$offsetInt}";
 
-    $stmt = $this->execute($sql, $params);
-    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$stmt = $this->execute($sql, $params);
+		$data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    return ['data' => $data, 'total' => $total];
-  }
+		return ['data' => $data, 'total' => $total];
+	}
 
-  /**
-   * Returns paginated field trips assigned to or created by a specific user.
-   *
-   * @param string $userId
-   * @param int $page
-   * @param int $limit
-   * @return array{data: array[], total: int}
-   */
-  public function getByParticipant(string $userId, int $page = 1, int $limit = 20): array
-  {
-    $offset = ($page - 1) * $limit;
+	/**
+	 * Returns paginated field trips assigned to or created by a specific user with optional SNIT filters.
+	 *
+	 * @param string $userId
+	 * @param int $page
+	 * @param int $limit
+	 * @param int|null $provinceSnitCode
+	 * @param int|null $cantonSnitCode
+	 * @param int|null $districtSnitCode
+	 * @return array{data: array[], total: int}
+	 */
+	public function getByParticipant(
+		string $userId,
+		int $page = 1,
+		int $limit = 20,
+		?int $provinceSnitCode = null,
+		?int $cantonSnitCode = null,
+		?int $districtSnitCode = null
+	): array {
+		$offset = ($page - 1) * $limit;
 
-    $countSql = "SELECT COUNT(DISTINCT ft.field_trip_id)
+		$conditions = ["(ftp.user_id = :user_id OR ft.field_trip_creator_id = :creator_id)"];
+		$params = [':user_id' => $userId, ':creator_id' => $userId];
+
+		if ($provinceSnitCode !== null) {
+			$conditions[] = "ft.province_snit_code = :province_snit_code";
+			$params[':province_snit_code'] = $provinceSnitCode;
+		}
+
+		if ($cantonSnitCode !== null) {
+			$conditions[] = "ft.canton_snit_code = :canton_snit_code";
+			$params[':canton_snit_code'] = $cantonSnitCode;
+		}
+
+		if ($districtSnitCode !== null) {
+			$conditions[] = "ft.district_snit_code = :district_snit_code";
+			$params[':district_snit_code'] = $districtSnitCode;
+		}
+
+		$whereClause = "WHERE " . implode(" AND ", $conditions);
+
+		$countSql = "SELECT COUNT(DISTINCT ft.field_trip_id)
                  FROM field_trips ft
                  LEFT JOIN field_trip_participants ftp ON ft.field_trip_id = ftp.field_trip_id
-                 WHERE ftp.user_id = :user_id OR ft.field_trip_creator_id = :creator_id";
-    $countStmt = $this->execute($countSql, [':user_id' => $userId, ':creator_id' => $userId]);
-    $total = (int)$countStmt->fetchColumn();
+                 $whereClause";
+		$countStmt = $this->execute($countSql, $params);
+		$total = (int)$countStmt->fetchColumn();
 
-    $limitInt = $limit;
-    $offsetInt = (int)$offset;
+		$limitInt = $limit;
+		$offsetInt = (int)$offset;
 
-    $sql = "SELECT ft.field_trip_id, 
+		$sql = "SELECT ft.field_trip_id, 
                    ft.field_trip_name, 
                    ft.field_trip_scheduled_date, 
                    ft.field_trip_start_date, 
@@ -156,15 +206,16 @@ final class FieldTripRepository extends Repository
             LEFT JOIN cantons c ON ft.canton_snit_code = c.canton_snit_code
             LEFT JOIN districts d ON ft.district_snit_code = d.district_snit_code
             LEFT JOIN field_trip_participants ftp ON ft.field_trip_id = ftp.field_trip_id
-            WHERE ftp.user_id = :user_id OR ft.field_trip_creator_id = :creator_id
+            $whereClause
+            GROUP BY ft.field_trip_id
             ORDER BY ft.field_trip_scheduled_date DESC
             LIMIT {$limitInt} OFFSET {$offsetInt}";
 
-    $stmt = $this->execute($sql, [':user_id' => $userId, ':creator_id' => $userId]);
-    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$stmt = $this->execute($sql, $params);
+		$data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    return ['data' => $data, 'total' => $total];
-  }
+		return ['data' => $data, 'total' => $total];
+	}
 
   /**
    * Creates a new field trip.
