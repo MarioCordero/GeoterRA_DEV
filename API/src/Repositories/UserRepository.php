@@ -276,4 +276,74 @@ final class UserRepository
     );
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
+
+  /**
+   * Returns paginated users with optional filters (role, email, phone, non-user roles).
+   *
+   * @param int $page
+   * @param int $limit
+   * @param string|null $role
+   * @param string|null $email
+   * @param string|null $phone
+   * @param bool $excludeStandardUser If true, filters out users with role 'user'
+   * @return array{data: array[], total: int}
+   */
+  public function getFilteredPaginated(
+    int $page = 1,
+    int $limit = 20,
+    ?string $role = null,
+    ?string $email = null,
+    ?string $phone = null,
+    bool $excludeStandardUser = false
+  ): array {
+    $offset = ($page - 1) * $limit;
+
+    $conditions = ["deleted_at IS NULL", "is_deleted = 0"];
+    $params = [];
+
+    if ($role !== null && $role !== '') {
+      $conditions[] = "role = :role";
+      $params[':role'] = $role;
+    }
+
+    if ($email !== null && $email !== '') {
+      $conditions[] = "email LIKE :email";
+      $params[':email'] = '%' . $email . '%';
+    }
+
+    if ($phone !== null && $phone !== '') {
+      $conditions[] = "phone_number LIKE :phone";
+      $params[':phone'] = '%' . $phone . '%';
+    }
+
+    if ($excludeStandardUser) {
+      $conditions[] = "role != 'user'";
+    }
+
+    $whereClause = "WHERE " . implode(" AND ", $conditions);
+
+    $countSql = "SELECT COUNT(*) FROM users $whereClause";
+    $countStmt = $this->db->prepare($countSql);
+    $countStmt->execute($params);
+    $total = (int)$countStmt->fetchColumn();
+
+    $sql = "SELECT user_id, first_name, last_name, email, phone_number, role, is_verified, created_at, deleted_at
+            FROM users 
+            $whereClause 
+            ORDER BY created_at DESC 
+            LIMIT :limit OFFSET :offset";
+
+    $stmt = $this->db->prepare($sql);
+
+    foreach ($params as $key => $val) {
+      $stmt->bindValue($key, $val);
+    }
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
+    $stmt->execute();
+    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    return ['data' => $data, 'total' => $total];
+  }
 }

@@ -71,6 +71,53 @@ final class UserService
   }
 
   /**
+   * Returns a paginated and filtered list of users.
+   *
+   * @param int $page
+   * @param int $limit
+   * @param string|null $role
+   * @param string|null $email
+   * @param string|null $phone
+   * @param bool $excludeStandardUser
+   * @return array
+   * @throws ApiException
+   */
+  public function getFilteredUsers(
+    int $page = 1,
+    int $limit = 20,
+    ?string $role = null,
+    ?string $email = null,
+    ?string $phone = null,
+    bool $excludeStandardUser = false
+  ): array {
+    Request::requireRole([
+      AllowedUserRoles::ADMIN,
+      AllowedUserRoles::MAINTENANCE,
+      AllowedUserRoles::INVESTIGATOR,
+      AllowedUserRoles::FIELD_INVESTIGATOR
+    ]);
+
+    $result = $this->repository->getFilteredPaginated(
+      $page,
+      $limit,
+      $role,
+      $email,
+      $phone,
+      $excludeStandardUser
+    );
+
+    return [
+      'data' => $result['data'],
+      'pagination' => [
+        'current_page' => $page,
+        'per_page' => $limit,
+        'total' => $result['total'],
+        'last_page' => (int)ceil($result['total'] / $limit),
+      ]
+    ];
+  }
+
+  /**
    * Restores a soft‑deleted user account.
    *
    * @param string $email The email of the account to restore.

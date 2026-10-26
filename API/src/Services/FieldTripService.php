@@ -59,7 +59,7 @@ final class FieldTripService
     ]);
 
     $dto->validate();
-    $this->validateLocationReferences(
+    $this->validateSnitHierarchy(
       $dto->provinceSnitCode,
       $dto->cantonSnitCode,
       $dto->districtSnitCode
@@ -189,7 +189,7 @@ final class FieldTripService
    */
   public function update(string $id, UpdateFieldTripDTO $dto): array
   {
-    Request::requireRole([
+    $session = Request::requireRole([
       AllowedUserRoles::ADMIN,
       AllowedUserRoles::INVESTIGATOR,
     ]);
@@ -197,6 +197,19 @@ final class FieldTripService
     $existing = $this->repository->findById($id);
     if (!$existing) {
       throw new ApiException(ErrorType::notFound('Field trip'), 404);
+    }
+
+    $userId = $session['user_id'];
+    $userRole = $session['role'];
+    $isMember = false;
+    foreach ($existing['participants'] as $participant) {
+      if ($participant['user_id'] === $userId) {
+        $isMember = true;
+      }
+    }
+
+    if ($userRole !== AllowedUserRoles::ADMIN || !$isMember) {
+      throw new ApiException(ErrorType::forbidden(), 403);
     }
 
     $dto->validate();
@@ -211,7 +224,7 @@ final class FieldTripService
       ? $dto->districtSnitCode
       : (isset($existing['district_snit_code']) ? (int)$existing['district_snit_code'] : null);
 
-    $this->validateLocationReferences($targetProvince, $targetCanton, $targetDistrict);
+    $this->validateSnitHierarchy($targetProvince, $targetCanton, $targetDistrict);
 
     try {
       $this->pdo->beginTransaction();
@@ -259,7 +272,7 @@ final class FieldTripService
    */
   public function toggleActive(string $id, bool $isActive): array
   {
-    Request::requireRole([
+    $session = Request::requireRole([
       AllowedUserRoles::ADMIN,
       AllowedUserRoles::INVESTIGATOR,
     ]);
@@ -267,6 +280,19 @@ final class FieldTripService
     $existing = $this->repository->findById($id);
     if (!$existing) {
       throw new ApiException(ErrorType::notFound('Field trip'), 404);
+    }
+
+    $userId = $session['user_id'];
+    $userRole = $session['role'];
+    $isMember = false;
+    foreach ($existing['participants'] as $participant) {
+      if ($participant['user_id'] === $userId) {
+        $isMember = true;
+      }
+    }
+
+    if ($userRole !== AllowedUserRoles::ADMIN || !$isMember) {
+      throw new ApiException(ErrorType::forbidden(), 403);
     }
 
     $updated = $this->repository->toggleActive($id, $isActive);
@@ -283,14 +309,26 @@ final class FieldTripService
    */
   public function addParticipant(string $fieldTripId, string $userId): array
   {
-    Request::requireRole([
+    $session = Request::requireRole([
       AllowedUserRoles::ADMIN,
       AllowedUserRoles::INVESTIGATOR,
     ]);
 
-    $fieldTrip = $this->repository->findById($fieldTripId);
-    if (!$fieldTrip) {
+    $existing = $this->repository->findById($fieldTripId);
+    if (!$existing) {
       throw new ApiException(ErrorType::notFound('Field trip'), 404);
+    }
+
+    $userRole = $session['role'];
+    $isMember = false;
+    foreach ($existing['participants'] as $participant) {
+      if ($participant['user_id'] === $session['user_id']) {
+        $isMember = true;
+      }
+    }
+
+    if ($userRole !== AllowedUserRoles::ADMIN || !$isMember) {
+      throw new ApiException(ErrorType::forbidden(), 403);
     }
 
     $user = $this->userRepository->findById($userId);
@@ -312,14 +350,26 @@ final class FieldTripService
    */
   public function removeParticipant(string $fieldTripId, string $userId): array
   {
-    Request::requireRole([
+    $session = Request::requireRole([
       AllowedUserRoles::ADMIN,
       AllowedUserRoles::INVESTIGATOR,
     ]);
 
-    $fieldTrip = $this->repository->findById($fieldTripId);
-    if (!$fieldTrip) {
+    $existing = $this->repository->findById($fieldTripId);
+    if (!$existing) {
       throw new ApiException(ErrorType::notFound('Field trip'), 404);
+    }
+
+    $userRole = $session['role'];
+    $isMember = false;
+    foreach ($existing['participants'] as $participant) {
+      if ($participant['user_id'] === $session['user_id']) {
+        $isMember = true;
+      }
+    }
+
+    if ($userRole !== AllowedUserRoles::ADMIN || !$isMember) {
+      throw new ApiException(ErrorType::forbidden(), 403);
     }
 
     $this->participantRepository->removeParticipant($fieldTripId, $userId);
@@ -336,14 +386,26 @@ final class FieldTripService
    */
   public function linkManifestation(string $fieldTripId, string $geomanifestationId): array
   {
-    Request::requireRole([
+    $session = Request::requireRole([
       AllowedUserRoles::ADMIN,
       AllowedUserRoles::INVESTIGATOR,
     ]);
 
-    $fieldTrip = $this->repository->findById($fieldTripId);
-    if (!$fieldTrip) {
+    $existing = $this->repository->findById($fieldTripId);
+    if (!$existing) {
       throw new ApiException(ErrorType::notFound('Field trip'), 404);
+    }
+
+    $userRole = $session['role'];
+    $isMember = false;
+    foreach ($existing['participants'] as $participant) {
+      if ($participant['user_id'] === $session['user_id']) {
+        $isMember = true;
+      }
+    }
+
+    if ($userRole !== AllowedUserRoles::ADMIN || !$isMember) {
+      throw new ApiException(ErrorType::forbidden(), 403);
     }
 
     $gm = $this->manifestationRepository->findById($geomanifestationId);
@@ -365,14 +427,31 @@ final class FieldTripService
    */
   public function unlinkManifestation(string $fieldTripId, string $geomanifestationId): array
   {
-    Request::requireRole([
+    $session = Request::requireRole([
       AllowedUserRoles::ADMIN,
       AllowedUserRoles::INVESTIGATOR,
     ]);
 
-    $fieldTrip = $this->repository->findById($fieldTripId);
-    if (!$fieldTrip) {
+    $existing = $this->repository->findById($fieldTripId);
+    if (!$existing) {
       throw new ApiException(ErrorType::notFound('Field trip'), 404);
+    }
+
+    $userRole = $session['role'];
+    $isMember = false;
+    foreach ($existing['participants'] as $participant) {
+      if ($participant['user_id'] === $session['user_id']) {
+        $isMember = true;
+      }
+    }
+
+    if ($userRole !== AllowedUserRoles::ADMIN || !$isMember) {
+      throw new ApiException(ErrorType::forbidden(), 403);
+    }
+
+    $gm = $this->manifestationRepository->findById($geomanifestationId);
+    if (!$gm) {
+      throw new ApiException(ErrorType::notFound('Geothermal manifestation'), 404);
     }
 
     $this->repository->unlinkManifestation($geomanifestationId);
@@ -389,19 +468,28 @@ final class FieldTripService
    */
   public function delete(string $id): void
   {
-    Request::requireRole([
+    $session = Request::requireRole([
       AllowedUserRoles::ADMIN,
-      AllowedUserRoles::INVESTIGATOR,
+      AllowedUserRoles::INVESTIGATOR
     ]);
 
-    $fieldTrip = $this->repository->findById($id);
-    if (!$fieldTrip) {
+    $existing = $this->repository->findById($id);
+    if (!$existing) {
       throw new ApiException(ErrorType::notFound('Field trip'), 404);
     }
 
-    $auth = $this->authService->requireAuth();
-    if ($auth['role'] !== AllowedUserRoles::ADMIN && $fieldTrip['field_trip_creator_id'] !== $auth['user_id']) {
-      throw new ApiException(ErrorType::forbidden('You can only delete field trips you created'), 403);
+
+    $userId = $session['user_id'];
+    $userRole = $session['role'];
+    $isMember = false;
+    foreach ($existing['participants'] as $participant) {
+      if ($participant['user_id'] === $userId) {
+        $isMember = true;
+      }
+    }
+
+    if ($userRole !== AllowedUserRoles::ADMIN || !$isMember) {
+      throw new ApiException(ErrorType::forbidden(), 403);
     }
 
     if (!$this->repository->delete($id)) {
@@ -425,6 +513,63 @@ final class FieldTripService
     }
     if ($districtSnitCode !== null && !$this->districtRepository->existsBySnitCode($districtSnitCode)) {
       throw new ApiException(ErrorType::invalidField('district_snit_code'), 422);
+    }
+  }
+
+
+  /**
+   * Validates SNIT hierarchical consistency.
+   *
+   * @param int|null $provinceSnitCode
+   * @param int|null $cantonSnitCode
+   * @param int|null $districtSnitCode
+   * @throws ApiException
+   */
+  private function validateSnitHierarchy(
+    ?int $provinceSnitCode,
+    ?int $cantonSnitCode,
+    ?int $districtSnitCode
+  ): void {
+    if ($districtSnitCode !== null && ($cantonSnitCode === null || $provinceSnitCode === null)) {
+      throw new ApiException(
+        ErrorType::invalidField(
+          'District filter requires Canton and Province SNIT codes'
+        ),
+        422
+      );
+    }
+
+    if ($cantonSnitCode !== null && $provinceSnitCode === null) {
+      throw new ApiException(
+        ErrorType::invalidField('Canton filter requires Province SNIT code'),
+        422
+      );
+    }
+
+    $this->validateLocationReferences(
+      $provinceSnitCode, $cantonSnitCode, $districtSnitCode
+    );
+
+    if ($cantonSnitCode !== null && $provinceSnitCode !== null && !str_starts_with(
+        (string)$cantonSnitCode, (string)$provinceSnitCode
+      )) {
+      throw new ApiException(
+        ErrorType::invalidField(
+          'canton_snit_code does not belong to the given province'
+        ),
+        422
+      );
+    }
+
+    if ($districtSnitCode !== null && $cantonSnitCode !== null && !str_starts_with(
+        (string)$districtSnitCode, (string)$cantonSnitCode
+      )) {
+      throw new ApiException(
+        ErrorType::invalidField(
+          'district_snit_code does not belong to the given canton'
+        ),
+        422
+      );
     }
   }
 
