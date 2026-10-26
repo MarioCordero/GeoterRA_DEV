@@ -20,7 +20,7 @@ final class MaintenanceController
   private MaintenanceService $service;
   public function __construct(private PDO $pdo)
   {
-    $this->service = new MaintenanceService($pdo);
+    $this->service = new MaintenanceService($this->pdo);
   }
 
   // GET /maintenance/system/logs
@@ -52,26 +52,6 @@ final class MaintenanceController
     } catch (Throwable $e) {
       Logger::error(
         '❌ [MaintenanceController::getDashboardInfo] Error: ' . $e->getMessage()
-      );
-      Response::error(ErrorType::internal($e->getMessage()), 500);
-    }
-  }
-
-  // GET /maintenance/users
-  public function showAllUsers(): void
-  {
-    try {
-      $result = $this->service->getAllUsers();
-      Response::success(
-        $result['data'],
-        $result['meta'],
-        200
-      );
-    } catch (ApiException $e) {
-      Response::error($e->getError(), $e->getCode());
-    } catch (Throwable $e) {
-      Logger::error(
-        '❌ [MaintenanceController::showAllUsers] Error: ' . $e->getMessage()
       );
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
