@@ -19,7 +19,7 @@ return [
   // 2. Users (Gestión de usuarios)
   // ==========================================
   // 2.1 Crea una nueva cuenta de usuario [No requerida]
-  ['method' => 'POST', 'path' => '/users/register', 'controller' => 'UserController', 'action' => 'register'],
+  ['method' => 'POST', 'path' => '/users', 'controller' => 'UserController', 'action' => 'register'],
   // 2.2 Retorna datos del usuario autenticado [Requerida]
   ['method' => 'GET', 'path' => '/users/me', 'controller' => 'UserController', 'action' => 'show'],
   // 2.3 Actualiza el perfil del usuario autenticado [Requerida]
