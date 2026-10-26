@@ -25,58 +25,64 @@ final class FieldTripController
     $this->service = new FieldTripService($pdo);
   }
 
-  /**
-   * GET /field-trips
-   * Returns paginated list of field trips.
-   */
-  public function index(): void
-  {
-    try {
-      $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-      $limit = isset($_GET['limit']) ? min(100, max(1, (int)$_GET['limit'])) : 20;
-      $isActive = isset($_GET['is_active']) ? (bool)$_GET['is_active'] : null;
+	/**
+	 * GET /field-trips
+	 * Returns paginated list of field trips with optional filters.
+	 */
+	public function index(): void
+	{
+		try {
+			$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+			$limit = isset($_GET['limit']) ? min(100, max(1, (int)$_GET['limit'])) : 20;
+			$isActive = isset($_GET['is_active']) ? (bool)$_GET['is_active'] : null;
+			$provinceSnitCode = isset($_GET['province_snit_code']) ? (int)$_GET['province_snit_code'] : null;
+			$cantonSnitCode = isset($_GET['canton_snit_code']) ? (int)$_GET['canton_snit_code'] : null;
+			$districtSnitCode = isset($_GET['district_snit_code']) ? (int)$_GET['district_snit_code'] : null;
 
-      $result = $this->service->getAll($page, $limit, $isActive);
-      Response::success(
-        $result['data'],
-        [
-          'total' => $result['total'],
-          'page' => $result['page'],
-          'limit' => $result['limit'],
-        ]
-      );
-    } catch (ApiException $e) {
-      Response::error($e->getError(), $e->getHttpStatus());
-    } catch (Throwable $e) {
-      Response::error(ErrorType::internal($e->getMessage()), 500);
-    }
-  }
+			$result = $this->service->getAll($page, $limit, $isActive, $provinceSnitCode, $cantonSnitCode, $districtSnitCode);
+			Response::success(
+				$result['data'],
+				[
+					'total' => $result['total'],
+					'page' => $result['page'],
+					'limit' => $result['limit'],
+				]
+			);
+		} catch (ApiException $e) {
+			Response::error($e->getError(), $e->getHttpStatus());
+		} catch (Throwable $e) {
+			Response::error(ErrorType::internal($e->getMessage()), 500);
+		}
+	}
 
-  /**
-   * GET /field-trips/my
-   * Returns paginated list of field trips assigned to or created by current user.
-   */
-  public function myFieldTrips(): void
-  {
-    try {
-      $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-      $limit = isset($_GET['limit']) ? min(100, max(1, (int)$_GET['limit'])) : 20;
+	/**
+	 * GET /field-trips/my
+	 * Returns paginated list of field trips assigned to or created by current user with optional filters.
+	 */
+	public function myFieldTrips(): void
+	{
+		try {
+			$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+			$limit = isset($_GET['limit']) ? min(100, max(1, (int)$_GET['limit'])) : 20;
+			$provinceSnitCode = isset($_GET['province_snit_code']) ? (int)$_GET['province_snit_code'] : null;
+			$cantonSnitCode = isset($_GET['canton_snit_code']) ? (int)$_GET['canton_snit_code'] : null;
+			$districtSnitCode = isset($_GET['district_snit_code']) ? (int)$_GET['district_snit_code'] : null;
 
-      $result = $this->service->getMyFieldTrips($page, $limit);
-      Response::success(
-        $result['data'],
-        [
-          'total' => $result['total'],
-          'page' => $result['page'],
-          'limit' => $result['limit'],
-        ]
-      );
-    } catch (ApiException $e) {
-      Response::error($e->getError(), $e->getHttpStatus());
-    } catch (Throwable $e) {
-      Response::error(ErrorType::internal($e->getMessage()), 500);
-    }
-  }
+			$result = $this->service->getMyFieldTrips($page, $limit, $provinceSnitCode, $cantonSnitCode, $districtSnitCode);
+			Response::success(
+				$result['data'],
+				[
+					'total' => $result['total'],
+					'page' => $result['page'],
+					'limit' => $result['limit'],
+				]
+			);
+		} catch (ApiException $e) {
+			Response::error($e->getError(), $e->getHttpStatus());
+		} catch (Throwable $e) {
+			Response::error(ErrorType::internal($e->getMessage()), 500);
+		}
+	}
 
   /**
    * GET /field-trips/{id}
