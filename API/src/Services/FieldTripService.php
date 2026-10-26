@@ -124,60 +124,81 @@ final class FieldTripService
     return $this->formatFieldTrip($fieldTrip, true);
   }
 
-  /**
-   * Returns a paginated list of all field trips.
-   *
-   * @param int $page
-   * @param int $limit
-   * @param bool|null $isActive
-   * @return array{data: array[], total: int, page: int, limit: int}
-   */
-  public function getAll(int $page = 1, int $limit = 20, ?bool $isActive = null): array
-  {
-    Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::FIELD_INVESTIGATOR,
-      AllowedUserRoles::INVESTIGATOR,
-      AllowedUserRoles::MAINTENANCE,
-    ]);
+	/**
+	 * Returns a paginated list of all field trips.
+	 *
+	 * @param int $page
+	 * @param int $limit
+	 * @param bool|null $isActive
+	 * @param int|null $provinceSnitCode
+	 * @param int|null $cantonSnitCode
+	 * @param int|null $districtSnitCode
+	 * @return array{data: array[], total: int, page: int, limit: int}
+	 */
+	public function getAll(
+		int $page = 1,
+		int $limit = 20,
+		?bool $isActive = null,
+		?int $provinceSnitCode = null,
+		?int $cantonSnitCode = null,
+		?int $districtSnitCode = null
+	): array {
+		Request::requireRole([
+			AllowedUserRoles::ADMIN,
+			AllowedUserRoles::FIELD_INVESTIGATOR,
+			AllowedUserRoles::INVESTIGATOR,
+			AllowedUserRoles::MAINTENANCE,
+		]);
 
-    $result = $this->repository->getAllPaginated($page, $limit, $isActive);
-    $data = array_map(fn($row) => $this->formatFieldTrip($row, false), $result['data']);
+		$this->validateSnitHierarchy($provinceSnitCode, $cantonSnitCode, $districtSnitCode);
 
-    return [
-      'data' => $data,
-      'total' => $result['total'],
-      'page' => $page,
-      'limit' => $limit,
-    ];
-  }
+		$result = $this->repository->getAllPaginated($page, $limit, $isActive, $provinceSnitCode, $cantonSnitCode, $districtSnitCode);
+		$data = array_map(fn($row) => $this->formatFieldTrip($row, true), $result['data']);
 
-  /**
-   * Returns paginated field trips assigned to or created by the authenticated user.
-   *
-   * @param int $page
-   * @param int $limit
-   * @return array{data: array[], total: int, page: int, limit: int}
-   */
-  public function getMyFieldTrips(int $page = 1, int $limit = 20): array
-  {
-    $auth = Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::FIELD_INVESTIGATOR,
-      AllowedUserRoles::INVESTIGATOR,
-      AllowedUserRoles::MAINTENANCE,
-    ]);
+		return [
+			'data' => $data,
+			'total' => $result['total'],
+			'page' => $page,
+			'limit' => $limit,
+		];
+	}
 
-    $result = $this->repository->getByParticipant($auth['user_id'], $page, $limit);
-    $data = array_map(fn($row) => $this->formatFieldTrip($row, false), $result['data']);
+	/**
+	 * Returns paginated field trips assigned to or created by the authenticated user.
+	 *
+	 * @param int $page
+	 * @param int $limit
+	 * @param int|null $provinceSnitCode
+	 * @param int|null $cantonSnitCode
+	 * @param int|null $districtSnitCode
+	 * @return array{data: array[], total: int, page: int, limit: int}
+	 */
+	public function getMyFieldTrips(
+		int $page = 1,
+		int $limit = 20,
+		?int $provinceSnitCode = null,
+		?int $cantonSnitCode = null,
+		?int $districtSnitCode = null
+	): array {
+		$auth = Request::requireRole([
+			AllowedUserRoles::ADMIN,
+			AllowedUserRoles::FIELD_INVESTIGATOR,
+			AllowedUserRoles::INVESTIGATOR,
+			AllowedUserRoles::MAINTENANCE,
+		]);
 
-    return [
-      'data' => $data,
-      'total' => $result['total'],
-      'page' => $page,
-      'limit' => $limit,
-    ];
-  }
+		$this->validateSnitHierarchy($provinceSnitCode, $cantonSnitCode, $districtSnitCode);
+
+		$result = $this->repository->getByParticipant($auth['user_id'], $page, $limit, $provinceSnitCode, $cantonSnitCode, $districtSnitCode);
+		$data = array_map(fn($row) => $this->formatFieldTrip($row, true), $result['data']);
+
+		return [
+			'data' => $data,
+			'total' => $result['total'],
+			'page' => $page,
+			'limit' => $limit,
+		];
+	}
 
   /**
    * Updates an existing field trip.
@@ -189,28 +210,7 @@ final class FieldTripService
    */
   public function update(string $id, UpdateFieldTripDTO $dto): array
   {
-    $session = Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::INVESTIGATOR,
-    ]);
-
-    $existing = $this->repository->findById($id);
-    if (!$existing) {
-      throw new ApiException(ErrorType::notFound('Field trip'), 404);
-    }
-
-    $userId = $session['user_id'];
-    $userRole = $session['role'];
-    $isMember = false;
-    foreach ($existing['participants'] as $participant) {
-      if ($participant['user_id'] === $userId) {
-        $isMember = true;
-      }
-    }
-
-    if ($userRole !== AllowedUserRoles::ADMIN || !$isMember) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
+		$this->validateFieldTripAccess($id);
 
     $dto->validate();
 
@@ -272,28 +272,7 @@ final class FieldTripService
    */
   public function toggleActive(string $id, bool $isActive): array
   {
-    $session = Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::INVESTIGATOR,
-    ]);
-
-    $existing = $this->repository->findById($id);
-    if (!$existing) {
-      throw new ApiException(ErrorType::notFound('Field trip'), 404);
-    }
-
-    $userId = $session['user_id'];
-    $userRole = $session['role'];
-    $isMember = false;
-    foreach ($existing['participants'] as $participant) {
-      if ($participant['user_id'] === $userId) {
-        $isMember = true;
-      }
-    }
-
-    if ($userRole !== AllowedUserRoles::ADMIN || !$isMember) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
+    $this->validateFieldTripAccess($id);
 
     $updated = $this->repository->toggleActive($id, $isActive);
     return $this->formatFieldTrip($updated, true);
@@ -309,35 +288,18 @@ final class FieldTripService
    */
   public function addParticipant(string $fieldTripId, string $userId): array
   {
-    $session = Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::INVESTIGATOR,
-    ]);
+		$this->validateFieldTripAccess($fieldTripId);
 
-    $existing = $this->repository->findById($fieldTripId);
-    if (!$existing) {
-      throw new ApiException(ErrorType::notFound('Field trip'), 404);
-    }
-
-    $userRole = $session['role'];
-    $isMember = false;
-    foreach ($existing['participants'] as $participant) {
-      if ($participant['user_id'] === $session['user_id']) {
-        $isMember = true;
-      }
-    }
-
-    if ($userRole !== AllowedUserRoles::ADMIN || !$isMember) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
-
-    $user = $this->userRepository->findById($userId);
+		$user = $this->userRepository->findById($userId);
     if (!$user) {
       throw new ApiException(ErrorType::notFound('User'), 404);
     }
 
     $this->participantRepository->addParticipant($fieldTripId, $userId);
-    return $this->participantRepository->getParticipants($fieldTripId);
+
+		$fresh = $this->repository->findById($fieldTripId);
+
+		return $this->formatFieldTrip($fresh, true);
   }
 
   /**
@@ -350,31 +312,13 @@ final class FieldTripService
    */
   public function removeParticipant(string $fieldTripId, string $userId): array
   {
-    $session = Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::INVESTIGATOR,
-    ]);
+		$this->validateFieldTripAccess($fieldTripId);
 
-    $existing = $this->repository->findById($fieldTripId);
-    if (!$existing) {
-      throw new ApiException(ErrorType::notFound('Field trip'), 404);
-    }
+		$this->participantRepository->removeParticipant($fieldTripId, $userId);
 
-    $userRole = $session['role'];
-    $isMember = false;
-    foreach ($existing['participants'] as $participant) {
-      if ($participant['user_id'] === $session['user_id']) {
-        $isMember = true;
-      }
-    }
-
-    if ($userRole !== AllowedUserRoles::ADMIN || !$isMember) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
-
-    $this->participantRepository->removeParticipant($fieldTripId, $userId);
-    return $this->participantRepository->getParticipants($fieldTripId);
-  }
+		$fresh = $this->repository->findById($fieldTripId);
+		return $this->formatFieldTrip($fresh, true);
+	}
 
   /**
    * Links a geomanifestation to a field trip.
@@ -386,36 +330,18 @@ final class FieldTripService
    */
   public function linkManifestation(string $fieldTripId, string $geomanifestationId): array
   {
-    $session = Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::INVESTIGATOR,
-    ]);
+		$this->validateFieldTripAccess($fieldTripId, true);
 
-    $existing = $this->repository->findById($fieldTripId);
-    if (!$existing) {
-      throw new ApiException(ErrorType::notFound('Field trip'), 404);
-    }
-
-    $userRole = $session['role'];
-    $isMember = false;
-    foreach ($existing['participants'] as $participant) {
-      if ($participant['user_id'] === $session['user_id']) {
-        $isMember = true;
-      }
-    }
-
-    if ($userRole !== AllowedUserRoles::ADMIN || !$isMember) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
-
-    $gm = $this->manifestationRepository->findById($geomanifestationId);
+		$gm = $this->manifestationRepository->findById($geomanifestationId);
     if (!$gm) {
       throw new ApiException(ErrorType::notFound('Geothermal manifestation'), 404);
     }
 
     $this->repository->linkManifestation($fieldTripId, $geomanifestationId);
-    return $this->repository->getManifestations($fieldTripId);
-  }
+
+		$fresh = $this->repository->findById($fieldTripId);
+		return $this->formatFieldTrip($fresh, true);
+	}
 
   /**
    * Unlinks a geomanifestation from a field trip.
@@ -427,35 +353,17 @@ final class FieldTripService
    */
   public function unlinkManifestation(string $fieldTripId, string $geomanifestationId): array
   {
-    $session = Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::INVESTIGATOR,
-    ]);
+		$this->validateFieldTripAccess($fieldTripId, true);
 
-    $existing = $this->repository->findById($fieldTripId);
-    if (!$existing) {
-      throw new ApiException(ErrorType::notFound('Field trip'), 404);
-    }
-
-    $userRole = $session['role'];
-    $isMember = false;
-    foreach ($existing['participants'] as $participant) {
-      if ($participant['user_id'] === $session['user_id']) {
-        $isMember = true;
-      }
-    }
-
-    if ($userRole !== AllowedUserRoles::ADMIN || !$isMember) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
-
-    $gm = $this->manifestationRepository->findById($geomanifestationId);
+		$gm = $this->manifestationRepository->findById($geomanifestationId);
     if (!$gm) {
       throw new ApiException(ErrorType::notFound('Geothermal manifestation'), 404);
     }
 
     $this->repository->unlinkManifestation($geomanifestationId);
-    return $this->repository->getManifestations($fieldTripId);
+
+		$fresh = $this->repository->findById($fieldTripId);
+		return $this->formatFieldTrip($fresh, true);
   }
 
   /**
@@ -468,30 +376,7 @@ final class FieldTripService
    */
   public function delete(string $id): void
   {
-    $session = Request::requireRole([
-      AllowedUserRoles::ADMIN,
-      AllowedUserRoles::INVESTIGATOR
-    ]);
-
-    $existing = $this->repository->findById($id);
-    if (!$existing) {
-      throw new ApiException(ErrorType::notFound('Field trip'), 404);
-    }
-
-
-    $userId = $session['user_id'];
-    $userRole = $session['role'];
-    $isMember = false;
-    foreach ($existing['participants'] as $participant) {
-      if ($participant['user_id'] === $userId) {
-        $isMember = true;
-      }
-    }
-
-    if ($userRole !== AllowedUserRoles::ADMIN || !$isMember) {
-      throw new ApiException(ErrorType::forbidden(), 403);
-    }
-
+		$this->validateFieldTripAccess($id);
     if (!$this->repository->delete($id)) {
       throw new ApiException(ErrorType::internal('Failed to delete field trip'), 500);
     }
@@ -574,7 +459,7 @@ final class FieldTripService
   }
 
   /**
-   * Formats a raw database row into API response structure.
+   * Formats a raw database row into an API response structure.
    */
   private function formatFieldTrip(array $row, bool $includeRelations = false): array
   {
@@ -653,5 +538,46 @@ final class FieldTripService
 		] : null;
 
 		return $response;
+	}
+
+	/**
+	 * @param string $fieldTripId
+	 * @return void
+	 */
+	private function validateFieldTripAccess(
+		string $fieldTripId,
+		bool $include_fieldInvestigator = false
+	): void
+	{
+		$session = [];
+		if (!$include_fieldInvestigator) {
+			$session = Request::requireRole([
+				AllowedUserRoles::ADMIN,
+				AllowedUserRoles::INVESTIGATOR
+			]);
+		} else {
+			$session = Request::requireRole([
+				AllowedUserRoles::ADMIN,
+				AllowedUserRoles::INVESTIGATOR,
+				AllowedUserRoles::FIELD_INVESTIGATOR,
+			]);
+		}
+
+		$existing = $this->repository->findById($fieldTripId);
+		if (!$existing) {
+			throw new ApiException(ErrorType::notFound('Field trip'), 404);
+		}
+
+		$userRole = $session['role'];
+		$isMember = false;
+		foreach ($existing['participants'] as $participant) {
+			if ($participant['user_id'] === $session['user_id']) {
+				$isMember = true;
+			}
+		}
+
+		if ($userRole !== AllowedUserRoles::ADMIN || !$isMember) {
+			throw new ApiException(ErrorType::forbidden(), 403);
+		}
 	}
 }
