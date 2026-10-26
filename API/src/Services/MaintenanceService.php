@@ -84,37 +84,6 @@ final class MaintenanceService
   }
 
   /**
-   * Get all users in the system
-   * 
-   * @return array List of all users
-   * @throws ApiException
-   */
-  public function getAllUsers(): array
-  {
-    try {
-      Request::requireRole([
-        AllowedUserRoles::ADMIN,
-        AllowedUserRoles::MAINTENANCE,
-        AllowedUserRoles::INVESTIGATOR,
-      ]);
-
-      $users = $this->userRepository->getAllUsers();
-
-      return [
-        'data' => $users,
-        'meta' => [
-          'total' => count($users),
-          'count' => count($users),
-        ],
-      ];
-    } catch (ApiException $e) {
-      throw $e;
-    } catch (Throwable $e) {
-      throw new ApiException(ErrorType::internal($e->getMessage()), 500);
-    }
-  }
-
-  /**
    * Get all database tables with their structure and data
    * 
    * @return array All tables with columns and data
