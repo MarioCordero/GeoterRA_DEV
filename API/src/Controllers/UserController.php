@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Controllers;
 
+use Core\Logger;
 use DTO\PermissionsDTO;
 use DTO\UpdatePasswordDTO;
 use DTO\UpdateUserDTO;
@@ -39,6 +40,47 @@ final class UserController
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getCode());
     } catch (Throwable $e) {
+      Response::error(ErrorType::internal($e->getMessage()), 500);
+    }
+  }
+
+
+  /**
+   * GET /admin/users
+   * Returns paginated and filtered list of users.
+   */
+  public function index(): void
+  {
+    try {
+      $page = (int)($_GET['page'] ?? 1);
+      $limit = (int)($_GET['limit'] ?? 20);
+
+      $role = isset($_GET['role']) ? trim($_GET['role']) : null;
+      $email = isset($_GET['email']) ? trim($_GET['email']) : null;
+      $phone = isset($_GET['phone_number']) ? trim($_GET['phone_number']) : null;
+
+      $excludeStandardUser = isset($_GET['exclude_user'])
+        ? filter_var($_GET['exclude_user'], FILTER_VALIDATE_BOOLEAN)
+        : false;
+
+      $result = $this->userService->getFilteredUsers(
+        $page,
+        $limit,
+        $role,
+        $email,
+        $phone,
+        $excludeStandardUser
+      );
+
+      Response::success(
+        $result['data'],
+        ['pagination' => $result['pagination']],
+        200
+      );
+
+    } catch (ApiException $e) {
+      Response::error($e->getError(), $e->getHttpStatus());
+    } catch (\Throwable $e) {
       Response::error(ErrorType::internal($e->getMessage()), 500);
     }
   }
