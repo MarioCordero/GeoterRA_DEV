@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace DTO;
 
+use DateTimeImmutable;
 use Http\ApiException;
 use Http\ErrorType;
 
@@ -13,10 +14,8 @@ final class UpdateFieldTripDTO
 {
   /**
    * @param string|null $fieldTripName
-   * @param string|null $fieldTripScheduledDate
    * @param string|null $fieldTripStartDate
    * @param string|null $fieldTripFinishDate
-   * @param bool|null $fieldTripIsActive
    * @param int|null $provinceSnitCode
    * @param int|null $cantonSnitCode
    * @param int|null $districtSnitCode
@@ -26,10 +25,8 @@ final class UpdateFieldTripDTO
    */
   public function __construct(
     public ?string $fieldTripName = null,
-    public ?string $fieldTripScheduledDate = null,
     public ?string $fieldTripStartDate = null,
     public ?string $fieldTripFinishDate = null,
-    public ?bool $fieldTripIsActive = null,
     public ?int $provinceSnitCode = null,
     public ?int $cantonSnitCode = null,
     public ?int $districtSnitCode = null,
@@ -59,14 +56,18 @@ final class UpdateFieldTripDTO
     $fieldsProvided = array_fill_keys(array_keys($data), true);
 
     return new self(
-      fieldTripName: array_key_exists('field_trip_name', $data) && $data['field_trip_name'] !== null ? trim((string)$data['field_trip_name']) : null,
-      fieldTripScheduledDate: array_key_exists('field_trip_scheduled_date', $data) && $data['field_trip_scheduled_date'] !== null ? trim((string)$data['field_trip_scheduled_date']) : null,
-      fieldTripStartDate: array_key_exists('field_trip_start_date', $data) && $data['field_trip_start_date'] !== null ? trim((string)$data['field_trip_start_date']) : null,
-      fieldTripFinishDate: array_key_exists('field_trip_finish_date', $data) && $data['field_trip_finish_date'] !== null ? trim((string)$data['field_trip_finish_date']) : null,
-      fieldTripIsActive: array_key_exists('field_trip_is_active', $data) && $data['field_trip_is_active'] !== null ? (bool)$data['field_trip_is_active'] : null,
-      provinceSnitCode: array_key_exists('province_snit_code', $data) && $data['province_snit_code'] !== null ? (int)$data['province_snit_code'] : null,
-      cantonSnitCode: array_key_exists('canton_snit_code', $data) && $data['canton_snit_code'] !== null ? (int)$data['canton_snit_code'] : null,
-      districtSnitCode: array_key_exists('district_snit_code', $data) && $data['district_snit_code'] !== null ? (int)$data['district_snit_code'] : null,
+      fieldTripName: array_key_exists('field_trip_name', $data)
+      && $data['field_trip_name'] !== null ? trim((string)$data['field_trip_name']) : null,
+      fieldTripStartDate: array_key_exists('field_trip_start_date', $data)
+      && $data['field_trip_start_date'] !== null ? trim((string)$data['field_trip_start_date']) : null,
+      fieldTripFinishDate: array_key_exists('field_trip_finish_date', $data)
+      && $data['field_trip_finish_date'] !== null ? trim((string)$data['field_trip_finish_date']) : null,
+      provinceSnitCode: array_key_exists('province_snit_code', $data)
+      && $data['province_snit_code'] !== null ? (int)$data['province_snit_code'] : null,
+      cantonSnitCode: array_key_exists('canton_snit_code', $data)
+      && $data['canton_snit_code'] !== null ? (int)$data['canton_snit_code'] : null,
+      districtSnitCode: array_key_exists('district_snit_code', $data)
+      && $data['district_snit_code'] !== null ? (int)$data['district_snit_code'] : null,
       participants: $participants,
       geomanifestations: $manifestations,
       fieldsProvided: $fieldsProvided
@@ -93,57 +94,28 @@ final class UpdateFieldTripDTO
   {
     $update = [];
 
+    $mapping = [
+      'field_trip_name' => $this->fieldTripName,
+      'field_trip_start_date' => $this->fieldTripStartDate,
+      'field_trip_finish_date' => $this->fieldTripFinishDate,
+      'province_snit_code' => $this->provinceSnitCode,
+      'canton_snit_code' => $this->cantonSnitCode,
+      'district_snit_code' => $this->districtSnitCode,
+    ];
+
     if (!empty($this->fieldsProvided)) {
-      if (isset($this->fieldsProvided['field_trip_name'])) {
-        $update['field_trip_name'] = $this->fieldTripName;
-      }
-      if (isset($this->fieldsProvided['field_trip_scheduled_date'])) {
-        $update['field_trip_scheduled_date'] = $this->fieldTripScheduledDate;
-      }
-      if (isset($this->fieldsProvided['field_trip_start_date'])) {
-        $update['field_trip_start_date'] = $this->fieldTripStartDate;
-      }
-      if (isset($this->fieldsProvided['field_trip_finish_date'])) {
-        $update['field_trip_finish_date'] = $this->fieldTripFinishDate;
-      }
-      if (isset($this->fieldsProvided['field_trip_is_active'])) {
-        $update['field_trip_is_active'] = $this->fieldTripIsActive ? 1 : 0;
-      }
-      if (isset($this->fieldsProvided['province_snit_code'])) {
-        $update['province_snit_code'] = $this->provinceSnitCode;
-      }
-      if (isset($this->fieldsProvided['canton_snit_code'])) {
-        $update['canton_snit_code'] = $this->cantonSnitCode;
-      }
-      if (isset($this->fieldsProvided['district_snit_code'])) {
-        $update['district_snit_code'] = $this->districtSnitCode;
+      foreach ($mapping as $field => $value) {
+        if (isset($this->fieldsProvided[$field])) {
+          $update[$field] = $value;
+        }
       }
       return $update;
     }
 
-    if ($this->fieldTripName !== null) {
-      $update['field_trip_name'] = $this->fieldTripName;
-    }
-    if ($this->fieldTripScheduledDate !== null) {
-      $update['field_trip_scheduled_date'] = $this->fieldTripScheduledDate;
-    }
-    if ($this->fieldTripStartDate !== null) {
-      $update['field_trip_start_date'] = $this->fieldTripStartDate;
-    }
-    if ($this->fieldTripFinishDate !== null) {
-      $update['field_trip_finish_date'] = $this->fieldTripFinishDate;
-    }
-    if ($this->fieldTripIsActive !== null) {
-      $update['field_trip_is_active'] = $this->fieldTripIsActive ? 1 : 0;
-    }
-    if ($this->provinceSnitCode !== null) {
-      $update['province_snit_code'] = $this->provinceSnitCode;
-    }
-    if ($this->cantonSnitCode !== null) {
-      $update['canton_snit_code'] = $this->cantonSnitCode;
-    }
-    if ($this->districtSnitCode !== null) {
-      $update['district_snit_code'] = $this->districtSnitCode;
+    foreach ($mapping as $field => $value) {
+      if ($value !== null) {
+        $update[$field] = $value;
+      }
     }
 
     return $update;
@@ -157,7 +129,39 @@ final class UpdateFieldTripDTO
   public function validate(): void
   {
     if ($this->fieldTripName !== null && strlen($this->fieldTripName) > 110) {
-      throw new ApiException(ErrorType::invalidField('field_trip_name (max 110 characters)'), 422);
+      throw new ApiException(
+        ErrorType::invalidField('field_trip_name (max 110 characters)'),
+        422
+      );
     }
+
+    $start = null;
+    $finish = null;
+
+    if ($this->fieldTripStartDate !== null) {
+      $start = DateTimeImmutable::createFromFormat(
+        'Y-m-d H:i:s', $this->fieldTripStartDate
+      ) ?: DateTimeImmutable::createFromFormat(
+        'Y-m-d', $this->fieldTripStartDate
+      );
+    }
+
+    if ($this->fieldTripFinishDate !== null) {
+      $finish = DateTimeImmutable::createFromFormat(
+        'Y-m-d H:i:s', $this->fieldTripFinishDate
+      ) ?: DateTimeImmutable::createFromFormat(
+        'Y-m-d', $this->fieldTripFinishDate
+      );
+    }
+
+    if ($start && $finish && $start > $finish) {
+      throw new ApiException(
+        ErrorType::invalidField(
+          'field_trip_start_date must be less than or equal to field_trip_finish_date'
+        ),
+        422
+      );
+    }
+
   }
 }
