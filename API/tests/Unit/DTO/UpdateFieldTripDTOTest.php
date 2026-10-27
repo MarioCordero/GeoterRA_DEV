@@ -14,7 +14,6 @@ class UpdateFieldTripDTOTest extends TestCase
     $data = [
       'field_trip_name' => 'Updated Gira Name',
       'field_trip_start_date' => '2026-10-15 09:00:00',
-      'field_trip_is_active' => false,
       'participants' => ['01HXYZ12345678901234567890'],
     ];
 
@@ -22,13 +21,14 @@ class UpdateFieldTripDTOTest extends TestCase
 
     $this->assertSame('Updated Gira Name', $dto->fieldTripName);
     $this->assertSame('2026-10-15 09:00:00', $dto->fieldTripStartDate);
-    $this->assertFalse($dto->fieldTripIsActive);
     $this->assertNull($dto->fieldTripFinishDate);
     $this->assertSame(['01HXYZ12345678901234567890'], $dto->participants);
 
     $updateArray = $dto->toArray();
     $this->assertSame('Updated Gira Name', $updateArray['field_trip_name']);
-    $this->assertSame(0, $updateArray['field_trip_is_active']);
+    $this->assertSame('2026-10-15 09:00:00', $updateArray['field_trip_start_date']);
+    $this->assertArrayNotHasKey('field_trip_is_active', $updateArray);
+    $this->assertArrayNotHasKey('field_trip_scheduled_date', $updateArray);
     $this->assertArrayNotHasKey('field_trip_finish_date', $updateArray);
   }
 

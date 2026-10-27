@@ -198,18 +198,15 @@ return [
   ['method' => 'POST', 'path' => 'admin/field-trips', 'controller' => 'FieldTripController', 'action' => 'store'],
   // 12.5 Actualiza una gira de campo existente [Admin / Investigator]
   ['method' => 'PUT', 'path' => 'admin/field-trips/{id}', 'controller' => 'FieldTripController', 'action' => 'update'],
-  // 12.6 Cambia el estado activo/inactivo de una gira [Admin / Investigator]
-  ['method' => 'PATCH', 'path' => 'admin/field-trips/{id}/active', 'controller'
-  => 'FieldTripController', 'action' => 'toggleActive'],
-  // 12.7 Agrega un participante a una gira [Admin / Investigator]
+  // 12.6 Agrega un participante a una gira [Admin / Investigator]
   ['method' => 'POST', 'path' => 'admin/field-trips/{id}/participants', 'controller' => 'FieldTripController', 'action' => 'addParticipant'],
-  // 12.8 Remueve un participante de una gira [Admin / Investigator]
+  // 12.7 Remueve un participante de una gira [Admin / Investigator]
   ['method' => 'DELETE', 'path' => 'admim/field-trips/{id}/participants/{userId}', 'controller' => 'FieldTripController', 'action' => 'removeParticipant'],
-  // 12.9 Asocia una manifestación a una gira [Admin / Investigator]
+  // 12.8 Asocia una manifestación a una gira [Admin / Investigator]
   ['method' => 'POST', 'path' => 'admin/field-trips/{id}/geomanifestations', 'controller' => 'FieldTripController', 'action' => 'linkManifestation'],
-  // 12.10 Desvincula una manifestación de una gira [Admin / Investigator]
+  // 12.9 Desvincula una manifestación de una gira [Admin / Investigator]
   ['method' => 'DELETE', 'path' => 'admin/field-trips/{id}/geomanifestations/{gmId}', 'controller' => 'FieldTripController', 'action' => 'unlinkManifestation'],
-  // 12.11 Elimina una gira de campo (creador o admin) [Admin / Investigator]
+  // 12.10 Elimina una gira de campo (creador o admin) [Admin / Investigator]
   ['method' => 'DELETE', 'path' => 'admin/field-trips/{id}', 'controller' => 'FieldTripController', 'action' => 'delete'],
 
   // ==========================================
