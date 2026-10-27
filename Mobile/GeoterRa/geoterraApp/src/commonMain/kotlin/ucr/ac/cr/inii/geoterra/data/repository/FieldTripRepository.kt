@@ -25,7 +25,7 @@ class FieldTripRepository(private val client: HttpClient)
 	: FieldTripRepositoryInterface {
 	override suspend fun createFieldTrip(request: FieldTripRequest): Result<FieldTripResponse> {
 		return try {
-			val response = client.post("field-trips") {
+			val response = client.post("admin/field-trips") {
 				contentType(ContentType.Application.Json)
 				setBody(request)
 			}
@@ -56,7 +56,7 @@ class FieldTripRepository(private val client: HttpClient)
 
 	override suspend fun getFieldTrips(): Result<List<FieldTripResponse>> {
 		return try {
-			val response = client.get("field-trips")
+			val response = client.get("admin/field-trips")
 			if (response.status.isSuccess()) {
 				val envelope = response.body<ApiResponseModel<List<FieldTripResponse>, MetaResponse>>()
 
@@ -83,7 +83,7 @@ class FieldTripRepository(private val client: HttpClient)
 
 	override suspend fun getFieldTripById(id: String): Result<FieldTripResponse> {
 		return try {
-			val response = client.get("field-trips/$id")
+			val response = client.get("admin/field-trips/$id")
 			if (response.status.isSuccess()) {
 				val envelope = response.body<ApiResponseModel<FieldTripResponse, MetaResponse>>()
 
@@ -110,7 +110,7 @@ class FieldTripRepository(private val client: HttpClient)
 
 	override suspend fun getMyFieldTrips(): Result<List<FieldTripResponse>> {
 		return try {
-			val response = client.get("field-trips/my")
+			val response = client.get("admin/field-trips/my")
 			if (response.status.isSuccess()) {
 				val envelope = response.body<ApiResponseModel<List<FieldTripResponse>, MetaResponse>>()
 
@@ -140,7 +140,7 @@ class FieldTripRepository(private val client: HttpClient)
 		request: FieldTripRequest
 	): Result<FieldTripResponse> {
 		return try {
-			val response = client.put("field-trips/$id") {
+			val response = client.put("admin/field-trips/$id") {
 				contentType(ContentType.Application.Json)
 				setBody(request)
 			}
@@ -171,7 +171,7 @@ class FieldTripRepository(private val client: HttpClient)
 
 	override suspend fun deleteFieldTrip(id: String): Result<Unit> {
 		return try {
-			val response = client.delete("field-trips/$id")
+			val response = client.delete("admin/field-trips/$id")
 			if (response.status.isSuccess()) {
 				if (response.status == HttpStatusCode.NoContent) {
 					return Result.success(Unit)
@@ -204,7 +204,7 @@ class FieldTripRepository(private val client: HttpClient)
 		geomanifestationId: String
 	): Result<FieldTripResponse> {
 		return try {
-			val response = client.post("field-trips/$id/geomanifestations") {
+			val response = client.post("admin/field-trips/$id/geomanifestations") {
 				contentType(ContentType.Application.Json)
 				setBody("geomanifestation_id" to geomanifestationId)
 			}
@@ -237,7 +237,7 @@ class FieldTripRepository(private val client: HttpClient)
 		geomanifestationId: String
 	): Result<FieldTripResponse> {
 		return try {
-			val response = client.delete("field-trips/$id/geomanifestations")
+			val response = client.delete("admin/field-trips/$id/geomanifestations")
 			if (response.status.isSuccess()) {
 				val envelope = response.body<ApiResponseModel<FieldTripResponse, MetaResponse>>()
 

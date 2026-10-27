@@ -6,6 +6,7 @@ import ucr.ac.cr.inii.geoterra.data.model.responses.UserResponse
 
 interface UserRepositoryInterface {
   suspend fun getMe(): Result<UserResponse>
+	suspend fun getUsers(excludeUser: Boolean = true): Result<List<UserResponse>>
   suspend fun updateMe(request: UserUpdateRequest): Result<String>
 
 	suspend fun updatePassword(request: UpdatePasswordRequest): Result<String>

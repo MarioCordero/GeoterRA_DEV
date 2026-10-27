@@ -1,10 +1,6 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.fieldtrip.form
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,6 +16,9 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import org.koin.core.parameter.parametersOf
 import ucr.ac.cr.inii.geoterra.data.model.responses.FieldTripResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.common.*
+import ucr.ac.cr.inii.geoterra.presentation.screens.field.trip.form.FieldTripFormContent
+import ucr.ac.cr.inii.geoterra.presentation.screens.field.trip.form.FieldTripFormEvent
+import ucr.ac.cr.inii.geoterra.presentation.screens.field.trip.form.FieldTripFormViewModel
 
 data class FieldTripFormScreen(
 	val fieldTripToEdit: FieldTripResponse? = null

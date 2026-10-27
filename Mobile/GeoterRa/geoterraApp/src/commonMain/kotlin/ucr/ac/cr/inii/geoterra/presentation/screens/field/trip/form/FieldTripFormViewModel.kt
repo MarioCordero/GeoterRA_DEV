@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.fieldtrip.form
+package ucr.ac.cr.inii.geoterra.presentation.screens.field.trip.form
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
@@ -9,6 +9,7 @@ import ucr.ac.cr.inii.geoterra.domain.repository.CantonRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.DistrictRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.FieldTripRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.ProvinceRepositoryInterface
+import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
@@ -18,6 +19,7 @@ class FieldTripFormViewModel(
 	private val provincesRepository: ProvinceRepositoryInterface,
 	private val cantonsRepository: CantonRepositoryInterface,
 	private val districtsRepository: DistrictRepositoryInterface,
+	private val userRepository: UserRepositoryInterface,
 	private val fieldTripToEdit: FieldTripResponse? = null
 ) : BaseScreenModel<FieldTripFormState>(FieldTripFormState()) {
 	private val fieldTripId: String? = fieldTripToEdit?.field_trip_id
@@ -26,6 +28,7 @@ class FieldTripFormViewModel(
 		loadProvinces()
 		loadCantons()
 		loadDistricts()
+		loadUsers()
 		fieldTripToEdit?.let {
 			_state.update { state ->
 				state.copy(request = FieldTripRequest.fromRemote(it))
@@ -54,6 +57,14 @@ class FieldTripFormViewModel(
 			districtsRepository.getDistricts()
 				.onSuccess { districts -> _state.update { it.copy(availableDistricts = districts) } }
 				.onFailure { _state.update { it.copy(snackBarMessage = SnackbarMessage("Error al cargar distritos", SnackbarType.ERROR)) } }
+		}
+	}
+
+	private fun loadUsers() {
+		screenModelScope.launch {
+			userRepository.getUsers(excludeUser = true)
+				.onSuccess { users -> _state.update { it.copy(availableUsers = users) } }
+				.onFailure { _state.update { it.copy(snackBarMessage = SnackbarMessage("Error al cargar usuarios", SnackbarType.ERROR)) } }
 		}
 	}
 
@@ -105,6 +116,18 @@ class FieldTripFormViewModel(
 					)
 				}
 			}
+			is FieldTripFormEvent.ParticipantAdded -> {
+				if (!state.value.request.participants.contains(event.userId)) {
+					_state.update {
+						it.copy(request = it.request.copy(participants = it.request.participants + event.userId))
+					}
+				}
+			}
+			is FieldTripFormEvent.ParticipantRemoved -> {
+				_state.update {
+					it.copy(request = it.request.copy(participants = it.request.participants - event.userId))
+				}
+			}
 			is FieldTripFormEvent.Submit -> submitForm()
 			is FieldTripFormEvent.ShowSnackBar -> _state.update { it.copy(snackBarMessage = event.message) }
 			is FieldTripFormEvent.ClearSnackBar -> _state.update { it.copy(snackBarMessage = null) }
@@ -117,7 +140,11 @@ class FieldTripFormViewModel(
 
 		screenModelScope.launch {
 			val currentRequest = _state.value.request
-			val result = fieldTripRepository.createFieldTrip(currentRequest)
+			val result = if (fieldTripId != null) {
+				fieldTripRepository.updateFieldTrip(fieldTripId, currentRequest)
+			} else {
+				fieldTripRepository.createFieldTrip(currentRequest)
+			}
 
 			if (result.isSuccess) {
 				val successMsg = if (fieldTripId != null) "Gira actualizada correctamente." else "Gira creada correctamente."

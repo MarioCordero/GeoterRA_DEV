@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import kotlinx.serialization.json.JsonElement
@@ -25,6 +26,29 @@ class UserRepository(private val client: HttpClient) : UserRepositoryInterface {
 		val envelope = response.body<ApiResponseModel<UserResponse, MetaResponse>>()
 		if (envelope.data != null) Result.success(envelope.data)
 		else handleErrorResponse(response)
+	} catch (e: Exception) {
+		Result.failure(
+			ApiException(
+				ApiError(
+					code = ApiError.INTERNAL_ERROR,
+					message = "Error de red: verifica tu conexión a internet."
+				)
+			)
+		)
+	}
+
+	override suspend fun getUsers(excludeUser: Boolean): Result<List<UserResponse>> = try {
+		val response = client.get("admin/users") {
+			if (excludeUser) {
+				parameter("exclude_user", "true")
+			}
+		}
+		val envelope = response.body<ApiResponseModel<List<UserResponse>, MetaResponse>>()
+		if (envelope.data != null) {
+			Result.success(envelope.data)
+		} else {
+			handleErrorResponse(response)
+		}
 	} catch (e: Exception) {
 		Result.failure(
 			ApiException(

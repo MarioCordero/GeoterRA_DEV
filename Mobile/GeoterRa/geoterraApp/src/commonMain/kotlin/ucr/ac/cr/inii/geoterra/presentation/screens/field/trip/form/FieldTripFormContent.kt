@@ -1,4 +1,4 @@
-package ucr.ac.cr.inii.geoterra.presentation.screens.fieldtrip.form
+package ucr.ac.cr.inii.geoterra.presentation.screens.field.trip.form
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -86,7 +86,7 @@ fun FieldTripFormContent(
 
 			DatePickerField(
 				title = "Seleccione la fecha de inicio de la gira",
-				value = state.request.field_trip_start_date,
+				value = state.request.field_trip_start_date ?: "",
 				onDateSelected = { onEvent(FieldTripFormEvent.StartDateChanged(it)) },
 				label = "Fecha de inicio",
 				icon = Icons.Default.PlayArrow
@@ -94,7 +94,7 @@ fun FieldTripFormContent(
 
 			DatePickerField(
 				title = "Seleccione la fecha de finalización de la gira",
-				value = state.request.field_trip_finish_date,
+				value = state.request.field_trip_finish_date ?: "",
 				onDateSelected = { onEvent(FieldTripFormEvent.FinishDateChanged(it)) },
 				label = "Fecha de finalización",
 				icon = Icons.Default.Flag
@@ -143,6 +143,42 @@ fun FieldTripFormContent(
 				isError = state.fieldErrors["district"] != null,
 				errorMessage = state.fieldErrors["district"]
 			)
+		}
+
+		FormSection(title = "Participantes (Personal)", icon = Icons.Default.Group) {
+			SearchableDropdown(
+				label = "Agregar investigador o personal",
+				items = state.availableUsers.filter { !state.request.participants.contains(it.user_id) },
+				selectedItem = null,
+				itemToString = { "${it.first_name} ${it.last_name} (${it.email ?: it.role})" },
+				onItemSelected = { user ->
+					user?.let { onEvent(FieldTripFormEvent.ParticipantAdded(it.user_id)) }
+				},
+				modifier = Modifier.fillMaxWidth(),
+				enabled = state.availableUsers.isNotEmpty()
+			)
+
+			if (state.request.participants.isNotEmpty()) {
+				Spacer(Modifier.height(8.dp))
+				Text("Participantes seleccionados:", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+
+				state.request.participants.forEach { participantId ->
+					val user = state.availableUsers.find { it.user_id == participantId }
+					Row(
+						modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+						verticalAlignment = Alignment.CenterVertically,
+						horizontalArrangement = Arrangement.SpaceBetween
+					) {
+						Text(
+							text = user?.let { "${it.first_name} ${it.last_name}" } ?: participantId,
+							style = MaterialTheme.typography.bodyMedium
+						)
+						IconButton(onClick = { onEvent(FieldTripFormEvent.ParticipantRemoved(participantId)) }) {
+							Icon(Icons.Default.Close, contentDescription = "Remover participante", tint = MaterialTheme.colorScheme.error)
+						}
+					}
+				}
+			}
 		}
 
 		Spacer(Modifier.height(8.dp))
