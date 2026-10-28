@@ -41,17 +41,9 @@ final class GeoreportRepository extends Repository
 			$params[':georeport_name'] = '%' . trim($georeportName) . '%';
 		}
 
-		$sql .= " ORDER BY g.created_at DESC LIMIT :limit OFFSET :offset";
-
-		$stmt = $this->pdo->prepare($sql);
-		foreach ($params as $key => $val) {
-			$stmt->bindValue($key, $val, PDO::PARAM_STR);
-		}
-		$stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-		$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-		$stmt->execute();
-
-		return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $sql .= " ORDER BY g.created_at DESC LIMIT " . (int)$limit . " OFFSET " .
+      (int)$offset;
+    return $this->execute($sql, $params)->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	/**

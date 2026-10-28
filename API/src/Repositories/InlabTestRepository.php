@@ -60,17 +60,10 @@ final class InlabTestRepository extends Repository
 			$params[':inlab_test_name'] = '%' . trim($inlabTestName) . '%';
 		}
 
-		$sql .= " ORDER BY t.created_at DESC LIMIT :limit OFFSET :offset";
+    $sql .= " ORDER BY t.created_at DESC LIMIT " . (int)$limit . " OFFSET " . (int)$offset;
+    $stmt = $this->execute($sql, $params);
 
-		$stmt = $this->pdo->prepare($sql);
-		foreach ($params as $key => $val) {
-			$stmt->bindValue($key, $val, PDO::PARAM_STR);
-		}
-		$stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-		$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-		$stmt->execute();
-
-		return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	/**

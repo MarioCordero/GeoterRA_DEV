@@ -52,7 +52,7 @@ final class GeomanifestationViewRepository extends Repository
               ist.description AS insitu_description,
               ist.created_at AS insitu_created_at,
               ilt.inlab_test_id AS inlab_test_id,
-              ilt.inlab_test_name AS lab_test_name,
+              ilt.inlab_test_name AS inlab_test_name,
               ilt.ph AS lab_ph,
               ilt.conductivity AS lab_conductivity,
               ilt.cl AS cl,
