@@ -39,7 +39,7 @@ final class GeomanifestationViewRepository extends Repository
               d.district_name AS district_name,
               d.district_snit_code AS district_snit_code,
               gr.georeport_id AS georeport_id,
-              gr.georeport_name AS report_name,
+              gr.georeport_name AS georeport_name,
               gr.details AS report_details,
               gr.created_at AS report_created_at,
               report_creator.first_name AS report_creator_first_name,
