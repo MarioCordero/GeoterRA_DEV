@@ -4,6 +4,12 @@ import cafe.adriel.voyager.core.lifecycle.JavaSerializable
 import kotlinx.serialization.Serializable
 
 @Serializable
+data class PaginatedInvestigationRequestsRemote(
+	val data: List<InvestigationRequestResponse>,
+	val pagination: PaginationResponse
+)
+
+@Serializable
 data class InvestigationRequestResponse(
   val request_id: String,
   val request_name: String,

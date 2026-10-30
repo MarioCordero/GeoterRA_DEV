@@ -12,15 +12,19 @@ import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
 import ucr.ac.cr.inii.geoterra.data.model.requests.InvestigationRequestRequest
 import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.MetaResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.PaginatedInvestigationRequestsRemote
 import ucr.ac.cr.inii.geoterra.domain.repository.InvestigationRequestsRepositoryInterface
 
 class InvestigationRequestsRepository(
 	private val client: HttpClient
 ) : InvestigationRequestsRepositoryInterface {
 
-	override suspend fun getMyRequests(): Result<List<InvestigationRequestResponse>> {
+	override suspend fun getMyRequests(page: Int?, limit: Int?): Result<PaginatedInvestigationRequestsRemote> {
 		return try {
-			val response = client.get("analysis-requests")
+			val response = client.get("analysis-requests") {
+				page?.let { parameter("page", it) }
+				limit?.let { parameter("limit", it) }
+			}
 
 			if (response.status.isSuccess()) {
 				val envelope = response.body<ApiResponseModel<List<InvestigationRequestResponse>, MetaResponse>>()
@@ -29,8 +33,11 @@ class InvestigationRequestsRepository(
 					return Result.failure(ApiException(envelope.errors.first()))
 				}
 
-				Result.success(envelope.data ?: emptyList())
+				val dataList = envelope.data ?: emptyList()
+				val pagination = envelope.meta?.pagination
+					?: throw Exception("No se encontró metadata de paginación en el campo 'meta'.")
 
+				Result.success(PaginatedInvestigationRequestsRemote(data = dataList, pagination = pagination))
 			} else {
 				handleErrorResponse(response)
 			}
@@ -59,7 +66,7 @@ class InvestigationRequestsRepository(
 			} else {
 				handleErrorResponse(response)
 			}
-			} catch (e: Exception) {
+		} catch (e: Exception) {
 			Result.failure(
 				ApiException(
 					ApiError(

@@ -3,6 +3,12 @@ package ucr.ac.cr.inii.geoterra.data.model.responses
 import kotlinx.serialization.Serializable
 
 @Serializable
+data class PaginatedFieldTripsRemote(
+	val data: List<FieldTripResponse>,
+	val pagination: PaginationResponse
+)
+
+@Serializable
 data class FieldTripResponse(
 	val field_trip_id: String,
 	val field_trip_name: String,

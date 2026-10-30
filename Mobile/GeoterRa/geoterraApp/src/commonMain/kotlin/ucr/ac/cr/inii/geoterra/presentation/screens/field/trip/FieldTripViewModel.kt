@@ -72,7 +72,7 @@ class FieldTripViewModel(
 			_state.update { it.copy(isLoading = true, snackBarMessage = null) }
 			fieldTripRepository.getFieldTrips()
 				.onSuccess { data ->
-					_state.update { it.copy(isLoading = false, generalFieldTrips = data) }
+					_state.update { it.copy(isLoading = false, generalFieldTrips = data.data) }
 				}
 				.onFailure { exception ->
 					val apiException = exception as? ApiException
@@ -97,7 +97,7 @@ class FieldTripViewModel(
 		screenModelScope.launch {
 			fieldTripRepository.getMyFieldTrips()
 				.onSuccess { data ->
-					_state.update { it.copy(myFieldTrips = data) }
+					_state.update { it.copy(myFieldTrips = data.data) }
 				}
 				.onFailure { exception ->
 					val apiException = exception as? ApiException

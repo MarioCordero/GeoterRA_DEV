@@ -36,11 +36,15 @@ class InSituTestRepository(private val client: HttpClient) : InSituTestRepositor
 			}
 
 			if (response.status.isSuccess()) {
-				// Asumiendo que ApiResponseModel mapea el ['data'] de tu Controller global
 				val envelope = response.body<ApiResponseModel<List<InSituTestResponse>, MetaResponse>>()
 
+				if (envelope.errors.isNotEmpty()) {
+					return Result.failure(ApiException(envelope.errors.first()))
+				}
+
 				val dataList = envelope.data ?: emptyList()
-				val pagination = envelope.meta?.pagination ?: throw Exception("Pagination data missing.")
+				val pagination = envelope.meta?.pagination
+					?: throw Exception("No se encontró metadata de paginación en el campo 'meta'.")
 
 				Result.success(PaginatedInSituTestsRemote(data = dataList, pagination = pagination))
 			} else {
@@ -48,7 +52,12 @@ class InSituTestRepository(private val client: HttpClient) : InSituTestRepositor
 			}
 		} catch (e: Exception) {
 			Result.failure(
-				ApiException(ApiError(code = ApiError.INTERNAL_ERROR, message = "Error de red: verifica tu conexión a internet."))
+				ApiException(
+					ApiError(
+						code = ApiError.INTERNAL_ERROR,
+						message = "Error de red: verifica tu conexión a internet."
+					)
+				)
 			)
 		}
 	}
@@ -69,7 +78,12 @@ class InSituTestRepository(private val client: HttpClient) : InSituTestRepositor
 			}
 		} catch (e: Exception) {
 			Result.failure(
-				ApiException(ApiError(code = ApiError.INTERNAL_ERROR, message = "Error de red: verifica tu conexión a internet."))
+				ApiException(
+					ApiError(
+						code = ApiError.INTERNAL_ERROR,
+						message = "Error de red: verifica tu conexión a internet."
+					)
+				)
 			)
 		}
 	}
@@ -94,13 +108,19 @@ class InSituTestRepository(private val client: HttpClient) : InSituTestRepositor
 			}
 		} catch (e: Exception) {
 			Result.failure(
-				ApiException(ApiError(code = ApiError.INTERNAL_ERROR, message = "Error de red: verifica tu conexión a internet."))
+				ApiException(
+					ApiError(
+						code = ApiError.INTERNAL_ERROR,
+						message = "Error de red: verifica tu conexión a internet."
+					)
+				)
 			)
 		}
 	}
 
 	override suspend fun updateInsituTest(
-		id: String, request: InSituTestRequest
+		id: String,
+		request: InSituTestRequest
 	): Result<InSituTestResponse> {
 		return try {
 			val response = client.put("admin/insitu-tests/$id") {
@@ -151,7 +171,12 @@ class InSituTestRepository(private val client: HttpClient) : InSituTestRepositor
 			}
 		} catch (e: Exception) {
 			Result.failure(
-				ApiException(ApiError(code = ApiError.INTERNAL_ERROR, message = "Error de red: verifica tu conexión a internet."))
+				ApiException(
+					ApiError(
+						code = ApiError.INTERNAL_ERROR,
+						message = "Error de red: verifica tu conexión a internet."
+					)
+				)
 			)
 		}
 	}

@@ -52,7 +52,7 @@ class InvestigationRequestsViewModel(
 			_state.update { it.copy(isLoading = true, snackBarMessage = null) }
 			requestRepository.getMyRequests()
 				.onSuccess { data ->
-					_state.update { it.copy(isLoading = false, requests = data) }
+					_state.update { it.copy(isLoading = false, requests = data.data) }
 				}
 				.onFailure { exception ->
 					val apiException = exception as? ApiException

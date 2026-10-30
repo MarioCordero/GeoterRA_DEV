@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
@@ -19,10 +20,11 @@ import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
 import ucr.ac.cr.inii.geoterra.data.model.requests.FieldTripRequest
 import ucr.ac.cr.inii.geoterra.data.model.responses.FieldTripResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.MetaResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.PaginatedFieldTripsRemote
 import ucr.ac.cr.inii.geoterra.domain.repository.FieldTripRepositoryInterface
 
-class FieldTripRepository(private val client: HttpClient)
-	: FieldTripRepositoryInterface {
+class FieldTripRepository(private val client: HttpClient) : FieldTripRepositoryInterface {
+
 	override suspend fun createFieldTrip(request: FieldTripRequest): Result<FieldTripResponse> {
 		return try {
 			val response = client.post("admin/field-trips") {
@@ -38,7 +40,6 @@ class FieldTripRepository(private val client: HttpClient)
 				}
 
 				Result.success(envelope.data ?: throw Exception("Empty response body received."))
-
 			} else {
 				handleErrorResponse(response)
 			}
@@ -54,9 +55,13 @@ class FieldTripRepository(private val client: HttpClient)
 		}
 	}
 
-	override suspend fun getFieldTrips(): Result<List<FieldTripResponse>> {
+	override suspend fun getFieldTrips(page: Int?, limit: Int?): Result<PaginatedFieldTripsRemote> {
 		return try {
-			val response = client.get("admin/field-trips")
+			val response = client.get("admin/field-trips") {
+				page?.let { parameter("page", it) }
+				limit?.let { parameter("limit", it) }
+			}
+
 			if (response.status.isSuccess()) {
 				val envelope = response.body<ApiResponseModel<List<FieldTripResponse>, MetaResponse>>()
 
@@ -64,8 +69,11 @@ class FieldTripRepository(private val client: HttpClient)
 					return Result.failure(ApiException(envelope.errors.first()))
 				}
 
-				Result.success(envelope.data ?: emptyList())
+				val dataList = envelope.data ?: emptyList()
+				val pagination = envelope.meta?.pagination
+					?: throw Exception("No se encontró metadata de paginación en el campo 'meta'.")
 
+				Result.success(PaginatedFieldTripsRemote(data = dataList, pagination = pagination))
 			} else {
 				handleErrorResponse(response)
 			}
@@ -92,7 +100,6 @@ class FieldTripRepository(private val client: HttpClient)
 				}
 
 				Result.success(envelope.data ?: throw Exception("Field trip not found."))
-
 			} else {
 				handleErrorResponse(response)
 			}
@@ -108,9 +115,13 @@ class FieldTripRepository(private val client: HttpClient)
 		}
 	}
 
-	override suspend fun getMyFieldTrips(): Result<List<FieldTripResponse>> {
+	override suspend fun getMyFieldTrips(page: Int?, limit: Int?): Result<PaginatedFieldTripsRemote> {
 		return try {
-			val response = client.get("admin/field-trips/my")
+			val response = client.get("admin/field-trips/my") {
+				page?.let { parameter("page", it) }
+				limit?.let { parameter("limit", it) }
+			}
+
 			if (response.status.isSuccess()) {
 				val envelope = response.body<ApiResponseModel<List<FieldTripResponse>, MetaResponse>>()
 
@@ -118,8 +129,11 @@ class FieldTripRepository(private val client: HttpClient)
 					return Result.failure(ApiException(envelope.errors.first()))
 				}
 
-				Result.success(envelope.data ?: emptyList())
+				val dataList = envelope.data ?: emptyList()
+				val pagination = envelope.meta?.pagination
+					?: throw Exception("No se encontró metadata de paginación en el campo 'meta'.")
 
+				Result.success(PaginatedFieldTripsRemote(data = dataList, pagination = pagination))
 			} else {
 				handleErrorResponse(response)
 			}
@@ -153,7 +167,6 @@ class FieldTripRepository(private val client: HttpClient)
 				}
 
 				Result.success(envelope.data ?: throw Exception("Empty response body received."))
-
 			} else {
 				handleErrorResponse(response)
 			}
@@ -216,7 +229,6 @@ class FieldTripRepository(private val client: HttpClient)
 				}
 
 				Result.success(envelope.data ?: throw Exception("Empty response body received."))
-
 			} else {
 				handleErrorResponse(response)
 			}
@@ -246,7 +258,6 @@ class FieldTripRepository(private val client: HttpClient)
 				}
 
 				Result.success(envelope.data ?: throw Exception("Empty response body received."))
-
 			} else {
 				handleErrorResponse(response)
 			}
