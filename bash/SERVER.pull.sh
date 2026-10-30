@@ -2,14 +2,23 @@
 echo "Content-Type: text/plain; charset=utf-8"
 echo ""
 
+# Redirigir todos los errores (stderr) a la salida (stdout) para verlos en el curl
+exec 2>&1
+
 # Script de despliegue GeoterRA - Servidor reforesta01
 set -e
+
+# Establecer HOME para que Git use las credenciales y SSH de /home/proyecto
+export HOME="/home/proyecto"
 
 REPO_DIR="/home/proyecto/GeoterRA_DEV"
 
 echo "🚀 Iniciando actualización en $(date)"
 
 cd "$REPO_DIR"
+
+# Permitir que el usuario del CGI (www-data) opere en el repositorio de 'proyecto'
+git config --global --add safe.directory "$REPO_DIR" 2>/dev/null || true
 
 echo "📦 Trayendo cambios de Git (main)..."
 # Descartar cambios locales y forzar sincronización limpia con origin/main
