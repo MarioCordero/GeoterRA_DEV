@@ -145,12 +145,27 @@ export DB_USER="root"
 export DB_PASS="$DB_ROOT_PASS"
 export GEOTERRA_TEST_DB_READY=1
 
+# Si no se pasó ninguna opción de cobertura ni --no-coverage, agregamos --no-coverage
+# por defecto para evitar error "No code coverage driver available" (por phpunit.xml)
+has_coverage_flag=0
+for arg in "$@"; do
+  if [[ "$arg" == --coverage* || "$arg" == "--no-coverage" ]]; then
+    has_coverage_flag=1
+    break
+  fi
+done
+
+test_args=("$@")
+if (( ! has_coverage_flag )); then
+  test_args+=("--no-coverage")
+fi
+
 cd "$API_DIR"
 set +e
 if [[ "$RUNNER" == "paratest" ]]; then
-  vendor/bin/paratest -p "$PROCS" "$@"
+  vendor/bin/paratest -p "$PROCS" "${test_args[@]}"
 else
-  vendor/bin/phpunit "$@"
+  vendor/bin/phpunit "${test_args[@]}"
 fi
 rc=$?
 set -e
