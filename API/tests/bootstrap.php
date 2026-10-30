@@ -75,32 +75,12 @@ function initializeTestDatabase(): PDO
     echo "[*] Configuración de DB - Host: {$host}:{$port} | User: {$user}\n";
   }
 
-  // Names of the databases
-  $prodDbName = 'GeoterRA';
+  // Name of the test database
   $testToken = getenv('TEST_TOKEN') ?: ($_SERVER['TEST_TOKEN'] ?? ($_ENV['TEST_TOKEN'] ?? ''));
   $testDbName = 'GeoterRA_test' . ($testToken !== '' ? '_' . $testToken : '');
 
-  // Connect to production database (to read schema)
-  if (!empty($socket)) {
-    $prodDsn = "mysql:unix_socket={$socket};dbname={$prodDbName};charset=utf8mb4";
-  } else {
-    $prodDsn = "mysql:host={$host};port={$port};dbname={$prodDbName};charset=utf8mb4";
-  }
-
   try {
-    $prodPdo = new PDO(
-      $prodDsn, $user, $password, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-      ]
-    );
-    echo "[✓] Connected to production database: {$prodDbName}\n";
-  } catch (PDOException $e) {
-    echo "[✗] Failed to connect to production database: " . $e->getMessage() . "\n";
-    exit(1);
-  }
-
-  try {
+    // Connect to the server database without selecting a specific database
     if (!empty($socket)) {
       $serverDsn = "mysql:unix_socket={$socket};charset=utf8mb4";
     } else {
@@ -113,15 +93,11 @@ function initializeTestDatabase(): PDO
       ]
     );
 
-    $stmt = $serverPdo->query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{$testDbName}'");
-    $dbExists = (bool)$stmt->fetchColumn();
+    // Clean up and recreate the test database
+    $serverPdo->exec("DROP DATABASE IF EXISTS `{$testDbName}`");
+    $serverPdo->exec("CREATE DATABASE `{$testDbName}`");
 
-    $forceRecreate = !empty(getenv('FORCE_RECREATE_TEST_DB'));
-    if (!$dbExists || $forceRecreate) {
-      $serverPdo->exec("DROP DATABASE IF EXISTS `{$testDbName}`");
-      $serverPdo->exec("CREATE DATABASE `{$testDbName}`");
-    }
-
+    // Connect to the freshly created test database
     if (!empty($socket)) {
       $testDsn = "mysql:unix_socket={$socket};dbname={$testDbName};charset=utf8mb4";
     } else {
@@ -139,11 +115,11 @@ function initializeTestDatabase(): PDO
     }
 
     $testPdo = new PDO($testDsn, $user, $password, $pdoOptions);
-    echo "[✓] Connected to test database: {$testDbName}\n";
+    echo "[✓] Connected to fresh test database: {$testDbName}\n";
 
-    if (!$dbExists || $forceRecreate) {
-      loadTestSchema($testPdo);
-    }
+    // Execute migrations to initialize the test database
+    loadTestSchema($testPdo);
+
   } catch (PDOException $e) {
     echo "[✗] Failed to connect/recreate test database: " . $e->getMessage() . "\n";
     exit(1);
@@ -153,32 +129,52 @@ function initializeTestDatabase(): PDO
 }
 
 /**
- * Load database schema and initial data from the master GeoterRA.sql dump
- * Includes both DDL and initial DML as the standard for the project
+ * Load database schema and initial data from the migrations directory
  */
 function loadTestSchema(?PDO $testPdo = null): void
 {
+  if ($testPdo === null) {
+    return;
+  }
+
   try {
-    $schemaPath = dirname(__DIR__, 2) . '/database/GeoterRA_schema.sql';
-    if (!file_exists($schemaPath)) {
-      $schemaPath = dirname(__DIR__, 2) . '/database/GeoterRA.sql';
-    }
-    if (!file_exists($schemaPath)) {
-      echo "[!] Warning: Schema file not found at {$schemaPath}\n";
+    $schemaPath = dirname(__DIR__, 2) . '/database/migrations/';
+    // Try to load migrations from the project root
+    if (!is_dir($schemaPath)) {
+      echo "[!] Warning: Migrations directory not found at {$schemaPath}\n";
       return;
     }
 
-    echo "\n[*] Loading test database schema from fixtures...\n";
+    echo "\n[*] Loading test database schema from migrations...\n";
+    // Load all SQL files in the migrations directory
+    $migrationFiles = glob($schemaPath . '*.sql');
+    if ($migrationFiles === false || empty($migrationFiles)) {
+      echo "[!] Warning: No migration SQL files found in {$schemaPath}\n";
+      return;
+    }
+    // Sort files by name to ensure proper execution order
+    sort($migrationFiles);
+    // Disable emulation of prepared statements for better performance
+    $testPdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, 1);
 
-    if ($testPdo !== null) {
-      $sql = file_get_contents($schemaPath);
+    // Execute each SQL file in order
+    foreach ($migrationFiles as $file) {
+      $filename = basename($file);
+      echo "    -> Executing {$filename}...\n";
+
+      $sql = file_get_contents($file);
+      // Remove the prefix from the table names (if any)
       $sql = preg_replace('/\`[gG]eoter[rR][aA]\`\./', '', $sql);
+      // Remove the delimiter (if any)
       $sql = preg_replace('/DELIMITER \$\$.*?DELIMITER ;/s', '', $sql);
-      $testPdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, 1);
-      $testPdo->exec($sql);
-      echo "[✓] Schema successfully loaded\n";
-      return;
+      // Remove comments
+      if (trim($sql) !== '') {
+        $testPdo->exec($sql);
+      }
     }
+
+    echo "[✓] All migrations successfully loaded\n";
+
   } catch (Exception $e) {
     echo "[!] Schema load notice: " . $e->getMessage() . "\n";
   }

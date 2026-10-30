@@ -182,7 +182,8 @@ class InvestigationRequestServiceTest extends TestCase
 		$result = $this->service->create($dto);
 
 		$this->assertNotEmpty($result['request_id']);
-		$this->assertStringStartsWith('SOLI-', $result['request_name']);
+		$this->assertStringStartsWith((string)$geo['district_snit_code'],
+      $result['request_name']);
 		$this->assertEquals($geo['province_snit_code'], $result['location']['province_snit_code']);
 		$this->assertEquals('Pendiente', $result['current_state']['value']);
 
