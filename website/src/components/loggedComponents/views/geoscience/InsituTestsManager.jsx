@@ -102,6 +102,7 @@ const InsituTestsManager = () => {
   const handleOpenEdit = (record) => {
     setEditingTest(record);
     form.setFieldsValue({
+      insitu_test_name: record.insitu_test_name || '',
       temperature: record.temperature,
       conductivity: record.conductivity,
       ph: record.ph,
@@ -130,6 +131,7 @@ const InsituTestsManager = () => {
       setSubmitting(true);
       const payload = {
         geomanifestation_id: selectedGeoId,
+        insitu_test_name: values.insitu_test_name ? values.insitu_test_name.trim() : '',
         temperature: values.temperature !== undefined && values.temperature !== null ? parseFloat(values.temperature) : null,
         conductivity: values.conductivity !== undefined && values.conductivity !== null ? parseFloat(values.conductivity) : null,
         ph: values.ph !== undefined && values.ph !== null ? parseFloat(values.ph) : null,
@@ -161,6 +163,12 @@ const InsituTestsManager = () => {
   };
 
   const columns = [
+    {
+      title: 'Nombre',
+      dataIndex: 'insitu_test_name',
+      key: 'insitu_test_name',
+      render: (val) => <span className="font-semibold text-slate-800">{val || 'Sin nombre'}</span>,
+    },
     {
       title: 'ID Prueba',
       dataIndex: 'insitu_test_id',
@@ -294,6 +302,17 @@ const InsituTestsManager = () => {
         cancelText="Cancelar"
       >
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
+          <Form.Item
+            name="insitu_test_name"
+            label="Nombre de la Prueba In-Situ"
+            rules={[
+              { required: true, message: 'El nombre de la prueba es obligatorio' },
+              { max: 55, message: 'Máximo 55 caracteres' },
+            ]}
+          >
+            <Input placeholder="Ej: Medición Manantial Termal A" maxLength={55} />
+          </Form.Item>
+
           <Form.Item
             name="temperature"
             label="Temperatura (°C)"

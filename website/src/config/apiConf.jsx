@@ -29,7 +29,7 @@ const API_CONFIG = {
     // 2. Users (Gestión de usuarios)
     // ==========================================
     users: {
-      register: '/users/register',                    // 2.1 POST  - Crea cuenta [No requerida]
+      register: '/users',                             // 2.1 POST  - Crea cuenta [No requerida]
       me: '/users/me',                                // 2.2 GET   - Datos usuario [Requerida]
                                                       // 2.3 PUT   - Actualiza perfil [Requerida]
                                                       // 2.5 DELETE - Soft-delete cuenta [Requerida]
@@ -37,6 +37,11 @@ const API_CONFIG = {
       restore: '/users/restore',                      // 2.6 POST  - Restaura cuenta eliminada [No requerida]
       meSession: '/users/me/session',                 // 2.7 GET   - Datos de sesión [Requerida]
       adminUpdateRole: (id) => `/admin/users/${id}/role`, // 2.8 PUT - Actualiza rol [Admin]
+      adminIndex: (params) => {
+        if (!params) return '/admin/users';
+        const query = new URLSearchParams(params).toString();
+        return query ? `/admin/users?${query}` : '/admin/users';
+      },                                              // 2.9 GET   - Listar usuarios paginados y filtrados [Admin]
     },
 
     // ==========================================
@@ -155,7 +160,11 @@ const API_CONFIG = {
     // ==========================================
     maintenance: {
       dashboardInfo: '/maintenance/dashboard',                // 11.1 GET - Dashboard info [Admin/Maintenance]
-      allUsers: '/maintenance/users',                         // 11.2 GET - Lista usuarios [Admin/Maintenance]
+      allUsers: (params) => {
+        if (!params) return '/admin/users';
+        const query = new URLSearchParams(params).toString();
+        return query ? `/admin/users?${query}` : '/admin/users';
+      },                                                      // 11.2 GET - Lista usuarios migrado a admin/users [Admin]
       systemLogs: '/maintenance/system/logs',                 // 11.3 GET - Logs del sistema [Admin/Maintenance]
       allTables: '/maintenance/database/tables',              // 11.4 GET - Tablas BD [Admin/Maintenance]
     },
@@ -165,30 +174,33 @@ const API_CONFIG = {
     // ==========================================
     fieldTrips: {
       index: (params) => {
-        if (!params) return '/field-trips';
+        if (!params) return '/admin/field-trips';
         const query = new URLSearchParams(params).toString();
-        return query ? `/field-trips?${query}` : '/field-trips';
+        return query ? `/admin/field-trips?${query}` : '/admin/field-trips';
       },                                                      // 12.1 GET    - Listar giras [Admin/Investigator/Maintenance]
-      my: '/field-trips/my',                                  // 12.2 GET    - Giras asignadas al usuario [Auth]
-      show: (id) => `/field-trips/${id}`,                     // 12.3 GET    - Detalle gira [Auth]
-      store: '/field-trips',                                  // 12.4 POST   - Crear gira [Admin/Investigator]
-      update: (id) => `/field-trips/${id}`,                   // 12.5 PUT    - Actualizar gira [Admin/Investigator]
-      toggleActive: (id) => `/field-trips/${id}/active`,      // 12.6 PATCH  - Cambiar estado activo [Admin/Investigator]
-      addParticipant: (id) => `/field-trips/${id}/participants`, // 12.7 POST - Agregar participante [Admin/Investigator]
-      removeParticipant: (id, userId) => `/field-trips/${id}/participants/${userId}`, // 12.8 DELETE - Remover participante [Admin/Investigator]
-      linkManifestation: (id) => `/field-trips/${id}/geomanifestations`, // 12.9 POST - Vincular manifestación [Admin/Investigator]
-      unlinkManifestation: (id, gmId) => `/field-trips/${id}/geomanifestations/${gmId}`, // 12.10 DELETE - Desvincular manifestación [Admin/Investigator]
-      delete: (id) => `/field-trips/${id}`,                   // 12.11 DELETE - Eliminar gira [Admin/Investigator]
+      my: (params) => {
+        if (!params) return '/admin/field-trips/my';
+        const query = new URLSearchParams(params).toString();
+        return query ? `/admin/field-trips/my?${query}` : '/admin/field-trips/my';
+      },                                                      // 12.2 GET    - Giras asignadas al usuario [Auth]
+      show: (id) => `/admin/field-trips/${id}`,               // 12.3 GET    - Detalle gira [Auth]
+      store: '/admin/field-trips',                            // 12.4 POST   - Crear gira [Admin/Investigator]
+      update: (id) => `/admin/field-trips/${id}`,             // 12.5 PUT    - Actualizar gira [Admin/Investigator]
+      addParticipant: (id) => `/admin/field-trips/${id}/participants`, // 12.6 POST - Agregar participante [Admin/Investigator]
+      removeParticipant: (id, userId) => `/admin/field-trips/${id}/participants/${userId}`, // 12.7 DELETE - Remover participante [Admin/Investigator]
+      linkManifestation: (id) => `/admin/field-trips/${id}/geomanifestations`, // 12.8 POST - Vincular manifestación [Admin/Investigator]
+      unlinkManifestation: (id, gmId) => `/admin/field-trips/${id}/geomanifestations/${gmId}`, // 12.9 DELETE - Desvincular manifestación [Admin/Investigator]
+      delete: (id) => `/admin/field-trips/${id}`,             // 12.10 DELETE - Eliminar gira [Admin/Investigator]
     },
 
     // ==========================================
     // 13. Comments (Comentarios)
     // ==========================================
     comments: {
-      index: (entityType, entityId) => `/comments/${entityType}/${entityId}`, // 13.1 GET - Listar comentarios [Auth]
-      store: (entityType, entityId) => `/comments/${entityType}/${entityId}`, // 13.2 POST - Crear comentario [Auth]
-      update: (id) => `/comments/${id}`,                     // 13.3 PUT - Actualizar comentario [Auth]
-      delete: (id) => `/comments/${id}`,                     // 13.4 DELETE - Eliminar comentario [Auth]
+      index: (entityType, entityId) => `/admin/comments/${entityType}/${entityId}`, // 13.1 GET - Listar comentarios [Auth]
+      store: (entityType, entityId) => `/admin/comments/${entityType}/${entityId}`, // 13.2 POST - Crear comentario [Auth]
+      update: (id) => `/admin/comments/${id}`,               // 13.3 PUT - Actualizar comentario [Auth]
+      delete: (id) => `/admin/comments/${id}`,               // 13.4 DELETE - Eliminar comentario [Auth]
     },
   }
 };
@@ -228,6 +240,7 @@ export const users = {
   restore: () => buildApiUrl(API_CONFIG.endpoints.users.restore),
   meSession: () => buildApiUrl(API_CONFIG.endpoints.users.meSession),
   adminUpdateRole: (id) => buildApiUrl(API_CONFIG.endpoints.users.adminUpdateRole(id)),
+  adminIndex: (params) => buildApiUrl(API_CONFIG.endpoints.users.adminIndex(params)),
 };
 
 // ============================================
@@ -336,7 +349,7 @@ export const georeports = {
 // ============================================
 export const maintenance = {
   dashboardInfo: () => buildApiUrl(API_CONFIG.endpoints.maintenance.dashboardInfo),
-  allUsers: () => buildApiUrl(API_CONFIG.endpoints.maintenance.allUsers),
+  allUsers: (params) => buildApiUrl(API_CONFIG.endpoints.maintenance.allUsers(params)),
   systemLogs: () => buildApiUrl(API_CONFIG.endpoints.maintenance.systemLogs),
   allTables: () => buildApiUrl(API_CONFIG.endpoints.maintenance.allTables),
 };
@@ -346,11 +359,11 @@ export const maintenance = {
 // ============================================
 export const fieldTrips = {
   index: (params) => buildApiUrl(API_CONFIG.endpoints.fieldTrips.index(params)),
-  my: () => buildApiUrl(API_CONFIG.endpoints.fieldTrips.my),
+  my: (params) => buildApiUrl(API_CONFIG.endpoints.fieldTrips.my(params)),
   show: (id) => buildApiUrl(API_CONFIG.endpoints.fieldTrips.show(id)),
   store: () => buildApiUrl(API_CONFIG.endpoints.fieldTrips.store),
   update: (id) => buildApiUrl(API_CONFIG.endpoints.fieldTrips.update(id)),
-  toggleActive: (id) => buildApiUrl(API_CONFIG.endpoints.fieldTrips.toggleActive(id)),
+  toggleActive: (id) => buildApiUrl(API_CONFIG.endpoints.fieldTrips.toggleActive ? API_CONFIG.endpoints.fieldTrips.toggleActive(id) : `/admin/field-trips/${id}`),
   addParticipant: (id) => buildApiUrl(API_CONFIG.endpoints.fieldTrips.addParticipant(id)),
   removeParticipant: (id, userId) => buildApiUrl(API_CONFIG.endpoints.fieldTrips.removeParticipant(id, userId)),
   linkManifestation: (id) => buildApiUrl(API_CONFIG.endpoints.fieldTrips.linkManifestation(id)),
@@ -610,6 +623,10 @@ export const userAdminUpdateRole = async (id, payload) => {
   return callApi(users.adminUpdateRole(id), 'PUT', payload);
 };
 
+export const userAdminIndex = async (params) => {
+  return callApi(users.adminIndex(params), 'GET');
+};
+
 // ============================================
 // 3. ANALYSIS REQUEST API FUNCTIONS
 // ============================================
@@ -857,8 +874,8 @@ export const maintenanceDashboardInfo = async () => {
   return callApi(maintenance.dashboardInfo(), 'GET');
 };
 
-export const maintenanceAllUsers = async () => {
-  return callApi(maintenance.allUsers(), 'GET');
+export const maintenanceAllUsers = async (params = { limit: 1000 }) => {
+  return callApi(maintenance.allUsers(params), 'GET');
 };
 
 export const maintenanceSystemLogs = async () => {
@@ -876,8 +893,8 @@ export const fieldTripsIndex = async (params) => {
   return callApi(fieldTrips.index(params), 'GET');
 };
 
-export const fieldTripsMy = async () => {
-  return callApi(fieldTrips.my(), 'GET');
+export const fieldTripsMy = async (params) => {
+  return callApi(fieldTrips.my(params), 'GET');
 };
 
 export const fieldTripsShow = async (id) => {
