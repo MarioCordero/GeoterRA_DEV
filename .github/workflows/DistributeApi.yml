@@ -43,7 +43,7 @@ jobs:
 
       - name: Ejecutar Pruebas Unitarias (Docker efímero + Migraciones)
         working-directory: ./API
-        run: bash tests/run-tests.sh
+        run: bash tests/run-tests.sh --no-coverage
 
   # ----------------------------------------------------------------------------
   # FASE 2: DISTRIBUCIÓN PARALELA A RAMAS DE DESTINO
