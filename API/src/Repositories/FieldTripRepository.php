@@ -164,12 +164,12 @@ final class FieldTripRepository extends Repository
 
     $whereClause = "WHERE " . implode(" AND ", $conditions);
 
-    $countSql = "SELECT COUNT(DISTINCT ft.field_trip_id)
-                 FROM field_trips ft
-                 LEFT JOIN field_trip_participants ftp ON ft.field_trip_id = ftp.field_trip_id
-                 $whereClause";
-    $countStmt =$this->execute($countSql,$params);
-    $total = (int)$countStmt->fetchColumn();
+    $total = $this->countByParticipant(
+      $userId,
+      $provinceSnitCode,
+      $cantonSnitCode,
+      $districtSnitCode
+    );
 
     $limitInt =$limit;
     $offsetInt = (int)$offset;
@@ -204,6 +204,46 @@ final class FieldTripRepository extends Repository
     $data =$stmt->fetchAll(PDO::FETCH_ASSOC);
 
     return ['data' => $data, 'total' =>$total];
+  }
+
+  /**
+   * Counts field trips assigned to or created by a specific user with optional SNIT filters.
+   *
+   * @param string $userId
+   * @param int|null $provinceSnitCode
+   * @param int|null $cantonSnitCode
+   * @param int|null $districtSnitCode
+   * @return int
+   */
+  public function countByParticipant(
+    string $userId,
+    ?int $provinceSnitCode = null,
+    ?int $cantonSnitCode = null,
+    ?int $districtSnitCode = null
+  ): int {
+    $conditions = ["(ftp.user_id = :user_id OR ft.field_trip_creator_id = :creator_id)"];
+    $params = [':user_id' => $userId, ':creator_id' =>$userId];
+
+    if ($provinceSnitCode !== null) {$conditions[] = "ft.province_snit_code = :province_snit_code";
+      $params[':province_snit_code'] =$provinceSnitCode;
+    }
+
+    if ($cantonSnitCode !== null) {$conditions[] = "ft.canton_snit_code = :canton_snit_code";
+      $params[':canton_snit_code'] =$cantonSnitCode;
+    }
+
+    if ($districtSnitCode !== null) {$conditions[] = "ft.district_snit_code = :district_snit_code";
+      $params[':district_snit_code'] =$districtSnitCode;
+    }
+
+    $whereClause = "WHERE " . implode(" AND ", $conditions);
+
+    $countSql = "SELECT COUNT(DISTINCT ft.field_trip_id)
+                 FROM field_trips ft
+                 LEFT JOIN field_trip_participants ftp ON ft.field_trip_id = ftp.field_trip_id
+                 $whereClause";
+    $countStmt =$this->execute($countSql,$params);
+    return (int)$countStmt->fetchColumn();
   }
 
   /**
