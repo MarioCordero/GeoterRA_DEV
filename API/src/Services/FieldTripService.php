@@ -191,10 +191,19 @@ final class FieldTripService
     $this->validateSnitHierarchy($provinceSnitCode, $cantonSnitCode, $districtSnitCode);
 
     $result = $this->repository->getByParticipant($auth['user_id'], $page, $limit, $provinceSnitCode, $cantonSnitCode, $districtSnitCode);
-    $data = array_map(fn($row) => $this->formatFieldTrip($row, true), $result['data']);
+    $rows = $result['data'] ?? $result;
+    $total = isset($result['total'])
+      ? (int)$result['total']
+      : $this->repository->countByParticipant(
+        $auth['user_id'],
+        $provinceSnitCode,
+        $cantonSnitCode,
+        $districtSnitCode
+      );
+    $data = array_map(fn($row) => $this->formatFieldTrip($row, true), $rows);
 
     return $this->buildPaginationResponse(
-      $data, $result['total'], $page, $limit
+      $data, $total, $page, $limit
     );
   }
 
