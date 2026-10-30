@@ -32,7 +32,7 @@ fun InSituTestDetails(
 	Card(
 		modifier = modifier.fillMaxWidth(),
 		colors = CardDefaults.cardColors(
-			containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+			containerColor = MaterialTheme.colorScheme.surface
 		),
 		onClick = {
 			if (!isForPdf) {

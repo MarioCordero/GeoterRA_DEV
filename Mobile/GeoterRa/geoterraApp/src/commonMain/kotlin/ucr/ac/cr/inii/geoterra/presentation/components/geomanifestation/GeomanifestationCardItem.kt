@@ -37,56 +37,43 @@ fun GeomanifestationCardItem(
 				.padding(20.dp),
 			verticalArrangement = Arrangement.spacedBy(16.dp)
 		) {
-			Row(
-				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.SpaceBetween,
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				Column(
-					modifier = Modifier
-						.weight(1f)
-						.padding(end = 12.dp),
-					verticalArrangement = Arrangement.spacedBy(4.dp)
-				) {
-					Text(
-						text = manifestation.geomanifestation_name,
-						style = MaterialTheme.typography.titleLarge.copy(
-							fontWeight = FontWeight.ExtraBold,
-						),
-						color = MaterialTheme.colorScheme.onSurface,
-						maxLines = 2,
-						overflow = TextOverflow.Ellipsis
-					)
-				}
+//			Row(
+//				modifier = Modifier.fillMaxWidth(),
+//				horizontalArrangement = Arrangement.SpaceBetween,
+//				verticalAlignment = Alignment.CenterVertically
+//			) {
+//				Column(
+//					modifier = Modifier
+//						.weight(1f)
+//						.padding(end = 12.dp),
+//					verticalArrangement = Arrangement.spacedBy(4.dp)
+//				) {
+//
+//				}
+//			}
 
-				Surface(
-					shape = RoundedCornerShape(8.dp),
-					color = MaterialTheme.colorScheme.secondaryContainer
-				) {
-					Row(
-						modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-						verticalAlignment = Alignment.CenterVertically,
-						horizontalArrangement = Arrangement.spacedBy(4.dp)
-					) {
-						Icon(
-							imageVector = Icons.Default.Place,
-							contentDescription = null,
-							modifier = Modifier.size(14.dp),
-							tint = MaterialTheme.colorScheme.onSecondaryContainer
-						)
-						Text(
-							text = "Manifestación",
-							style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-							color = MaterialTheme.colorScheme.onSecondaryContainer
-						)
-					}
-				}
-			}
+			Text(
+				text = manifestation.geomanifestation_name,
+				style = MaterialTheme.typography.titleLarge.copy(
+					fontWeight = FontWeight.ExtraBold,
+				),
+				color = MaterialTheme.colorScheme.onSurface,
+				maxLines = 2,
+				overflow = TextOverflow.Ellipsis
+			)
 
 			Column(
 				modifier = Modifier.fillMaxWidth(),
 				verticalArrangement = Arrangement.spacedBy(8.dp)
 			) {
+				InfoChip(
+					icon = Icons.Default.LocationOn,
+					label = "Ubicación Geográfica",
+					value = "${manifestation.location.province}, ${manifestation.location.canton}, ${manifestation.location.district}",
+					modifier = Modifier.fillMaxWidth(),
+					iconColor = MaterialTheme.colorScheme.primary
+				)
+
 				InfoChip(
 					icon = Icons.Default.Description,
 					label = "Descripción",
@@ -94,14 +81,6 @@ fun GeomanifestationCardItem(
 					modifier = Modifier.fillMaxWidth(),
 					iconColor = MaterialTheme.colorScheme.secondary,
 					maxLines = 2
-				)
-
-				InfoChip(
-					icon = Icons.Default.LocationOn,
-					label = "Ubicación",
-					value = "${manifestation.location.province}, ${manifestation.location.canton}, ${manifestation.location.district}",
-					modifier = Modifier.fillMaxWidth(),
-					iconColor = MaterialTheme.colorScheme.primary
 				)
 			}
 
