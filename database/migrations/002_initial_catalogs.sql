@@ -24,7 +24,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- 1. PROVINCIAS
 -- ==============================================================================
 
-INSERT INTO `provinces` (`province_id`, `province_snit_code`, `province_name`, `created_by`, `created_at`) VALUES
+INSERT IGNORE INTO `provinces` (`province_id`, `province_snit_code`, `province_name`, `created_by`, `created_at`) VALUES
 ('01KS0XQNTDN884Y92RN30CABFR', 1, 'San José', '06F43H2S28KNWX71TSF7MWWTA4', '2026-05-19 20:09:47'),
 ('01KS0XQNTENRA7S6ZYRSRVFWSE', 2, 'Alajuela', '06F43H2S28KNWX71TSF7MWWTA4', '2026-05-19 20:09:47'),
 ('01KS0XQNTGKZ0M23PVEA2MRX5B', 3, 'Cartago', '06F43H2S28KNWX71TSF7MWWTA4', '2026-05-19 20:09:47'),
@@ -38,7 +38,7 @@ INSERT INTO `provinces` (`province_id`, `province_snit_code`, `province_name`, `
 -- 2. CANTONES
 -- ==============================================================================
 
-INSERT INTO `cantons` (`canton_id`, `province_snit_code`, `canton_snit_code`, `canton_name`, `created_at`, `created_by`) VALUES
+INSERT IGNORE INTO `cantons` (`canton_id`, `province_snit_code`, `canton_snit_code`, `canton_name`, `created_at`, `created_by`) VALUES
 -- Provincia 1: San José (20 cantones)
 ('01KS0XQNTNRT61XB5V319X97TZ', 1, 101, 'San José', '2026-05-19 20:09:47', '06F43H2S28KNWX71TSF7MWWTA4'),
 ('01KS0XQNTP3R0CXBH9QECFWAT4', 1, 102, 'Escazú', '2026-05-19 20:09:47', '06F43H2S28KNWX71TSF7MWWTA4'),
@@ -137,7 +137,7 @@ INSERT INTO `cantons` (`canton_id`, `province_snit_code`, `canton_snit_code`, `c
 -- 3. DISTRITOS
 -- ==============================================================================
 
-INSERT INTO `districts` (`district_id`, `canton_snit_code`, `district_snit_code`, `district_name`, `created_at`, `created_by`) VALUES
+INSERT IGNORE INTO `districts` (`district_id`, `canton_snit_code`, `district_snit_code`, `district_name`, `created_at`, `created_by`) VALUES
 -- ── San José > San José (101) ────────────────────────────────────────────────
 ('01KS0XQNW1SJ7AD1F042FFGN1B', 101, 10101, 'Carmen', '2026-05-19 14:09:47', '06F43H2S28KNWX71TSF7MWWTA4'),
 ('01KS0XQNW1SJ7AD1F042FFGN1C', 101, 10102, 'Merced', '2026-05-19 14:09:47', '06F43H2S28KNWX71TSF7MWWTA4'),
