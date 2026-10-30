@@ -51,6 +51,7 @@ final class FieldTripController
       Response::success(
         $result['data'], ['pagination' => $result['pagination']]
       );
+
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());
     } catch (Throwable $e) {
