@@ -230,4 +230,10 @@ final class InlabTestRepository extends Repository
 		$sql = "UPDATE inlab_tests SET visibility = 1 WHERE inlab_test_id = :id AND geomanifestation_id = :gm_id";
 		$this->execute($sql, [':id' => $id, ':gm_id' => $geomanifestationId]);
 	}
+
+  public function countByName(string $inlabTestName) {
+    $sql = "SELECT COUNT(*) FROM inlab_tests WHERE inlab_test_name LIKE :inlab_test_name";
+    $stmt = $this->execute($sql, [':inlab_test_name' => '%' . trim($inlabTestName) . '%']);
+    return (int)$stmt->fetchColumn();
+  }
 }

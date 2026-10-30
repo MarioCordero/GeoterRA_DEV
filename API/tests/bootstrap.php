@@ -53,133 +53,65 @@ spl_autoload_register(
 );
 
 /**
- * Initialize test database - copies schema from production
+ * Connects to the throw-away Docker test database.
+ *
+ * The schema is NOT built here: tests/run-tests.sh starts a disposable MariaDB
+ * container and applies every file in database/migrations/ with the real
+ * `mariadb` client (triggers included, aborting on the first SQL error), so the
+ * tests run against exactly what the migrations produce. The container is
+ * destroyed when the run ends.
+ *
+ * With ParaTest each worker gets its own database (GeoterRA_test_<TEST_TOKEN>)
+ * because the tests wipe every table between cases.
  */
-function initializeTestDatabase(): PDO
+function connectToTestDatabase(): PDO
 {
-  $configIniPath = BASE_DIR . '/config/config.ini';
-  $iniConfig = file_exists($configIniPath) ? (parse_ini_file($configIniPath, true)['database'] ?? []) : [];
+  $fail = static function (string $message): never {
+    fwrite(STDERR, "[✗] {$message}\n");
+    exit(1);
+  };
 
-  // Read environment variables (GitHub Actions) or fallback to config.ini / defaults (Local)
-  $host = getenv('DB_HOST') ?: ($iniConfig['host'] ?? '127.0.0.1');
-  if ($host === 'localhost') $host = '127.0.0.1';
-  $port = (int)(getenv('DB_PORT') ?: ($iniConfig['port'] ?? 3306));
-  $user = getenv('DB_USER') ?: ($iniConfig['user'] ?? 'root');
-  $password = getenv('DB_PASS') !== false ? (string)getenv('DB_PASS') : ($iniConfig['pass'] ?? '');
-
-  $socket = getenv('DB_SOCKET') ?: ($iniConfig['unix_socket'] ?? null);
-
-  if (!empty($socket)) {
-    echo "[*] Configuración de DB - Socket: {$socket} | User: {$user}\n";
-  } else {
-    echo "[*] Configuración de DB - Host: {$host}:{$port} | User: {$user}\n";
+  if (getenv('GEOTERRA_TEST_DB_READY') !== '1') {
+    $fail(
+      "La base de datos de pruebas no está preparada.\n"
+      . "    Los tests corren sobre un contenedor Docker efímero creado desde database/migrations/.\n"
+      . "    Ejecuta:  composer test   (o:  bash tests/run-tests.sh)"
+    );
   }
 
-  // Name of the test database
+  $host = getenv('DB_HOST') ?: '127.0.0.1';
+  $port = (int)(getenv('DB_PORT') ?: 3306);
+  $user = getenv('DB_USER') ?: 'root';
+  $password = (string)getenv('DB_PASS');
+
+  // Fixed name on purpose (no override): resetDatabase() deletes every row.
   $testToken = getenv('TEST_TOKEN') ?: ($_SERVER['TEST_TOKEN'] ?? ($_ENV['TEST_TOKEN'] ?? ''));
   $testDbName = 'GeoterRA_test' . ($testToken !== '' ? '_' . $testToken : '');
 
   try {
-    // Connect to the server database without selecting a specific database
-    if (!empty($socket)) {
-      $serverDsn = "mysql:unix_socket={$socket};charset=utf8mb4";
-    } else {
-      $serverDsn = "mysql:host={$host};port={$port};charset=utf8mb4";
-    }
-
-    $serverPdo = new PDO(
-      $serverDsn, $user, $password, [
+    $pdo = new PDO(
+      "mysql:host={$host};port={$port};dbname={$testDbName};charset=utf8mb4",
+      $user,
+      $password,
+      [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => true,
       ]
     );
-
-    // Clean up and recreate the test database
-    $serverPdo->exec("DROP DATABASE IF EXISTS `{$testDbName}`");
-    $serverPdo->exec("CREATE DATABASE `{$testDbName}`");
-
-    // Connect to the freshly created test database
-    if (!empty($socket)) {
-      $testDsn = "mysql:unix_socket={$socket};dbname={$testDbName};charset=utf8mb4";
-    } else {
-      $testDsn = "mysql:host={$host};port={$port};dbname={$testDbName};charset=utf8mb4";
-    }
-
-    $pdoOptions = [
-      PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-      PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ];
-    if (defined('Pdo\\Mysql::ATTR_MULTI_STATEMENTS')) {
-      $pdoOptions[\Pdo\Mysql::ATTR_MULTI_STATEMENTS] = true;
-    } elseif (defined('PDO::MYSQL_ATTR_MULTI_STATEMENTS')) {
-      $pdoOptions[\PDO::MYSQL_ATTR_MULTI_STATEMENTS] = true;
-    }
-
-    $testPdo = new PDO($testDsn, $user, $password, $pdoOptions);
-    echo "[✓] Connected to fresh test database: {$testDbName}\n";
-
-    // Execute migrations to initialize the test database
-    loadTestSchema($testPdo);
-
   } catch (PDOException $e) {
-    echo "[✗] Failed to connect/recreate test database: " . $e->getMessage() . "\n";
-    exit(1);
+    $fail("No se pudo conectar a {$testDbName} en {$host}:{$port}: " . $e->getMessage());
   }
 
-  return $testPdo;
-}
-
-/**
- * Load database schema and initial data from the migrations directory
- */
-function loadTestSchema(?PDO $testPdo = null): void
-{
-  if ($testPdo === null) {
-    return;
+  $tables = (int)$pdo->query(
+    'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE()'
+  )->fetchColumn();
+  if ($tables === 0) {
+    $fail("{$testDbName} está vacía: las migraciones no se aplicaron.");
   }
 
-  try {
-    $schemaPath = dirname(__DIR__, 2) . '/database/migrations/';
-    // Try to load migrations from the project root
-    if (!is_dir($schemaPath)) {
-      echo "[!] Warning: Migrations directory not found at {$schemaPath}\n";
-      return;
-    }
-
-    echo "\n[*] Loading test database schema from migrations...\n";
-    // Load all SQL files in the migrations directory
-    $migrationFiles = glob($schemaPath . '*.sql');
-    if ($migrationFiles === false || empty($migrationFiles)) {
-      echo "[!] Warning: No migration SQL files found in {$schemaPath}\n";
-      return;
-    }
-    // Sort files by name to ensure proper execution order
-    sort($migrationFiles);
-    // Disable emulation of prepared statements for better performance
-    $testPdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, 1);
-
-    // Execute each SQL file in order
-    foreach ($migrationFiles as $file) {
-      $filename = basename($file);
-      echo "    -> Executing {$filename}...\n";
-
-      $sql = file_get_contents($file);
-      // Remove the prefix from the table names (if any)
-      $sql = preg_replace('/\`[gG]eoter[rR][aA]\`\./', '', $sql);
-      // Remove the delimiter (if any)
-      $sql = preg_replace('/DELIMITER \$\$.*?DELIMITER ;/s', '', $sql);
-      // Remove comments
-      if (trim($sql) !== '') {
-        $testPdo->exec($sql);
-      }
-    }
-
-    echo "[✓] All migrations successfully loaded\n";
-
-  } catch (Exception $e) {
-    echo "[!] Schema load notice: " . $e->getMessage() . "\n";
-  }
+  return $pdo;
 }
 
 // Store database connection in global state for tests
-$_SERVER['TEST_DATABASE'] = initializeTestDatabase();
-?>
+$_SERVER['TEST_DATABASE'] = connectToTestDatabase();

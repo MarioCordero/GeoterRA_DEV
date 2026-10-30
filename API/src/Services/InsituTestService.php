@@ -13,12 +13,14 @@ use PDO;
 use Repositories\GeomanifestationRepository;
 use Repositories\InsituTestRepository;
 use Repositories\UserRepository;
+use Services\Utils\PaginationBuilder;
 
 /**
  * Business logic for in-situ tests (insitu_tests table).
  */
 final class InsituTestService
 {
+  use PaginationBuilder;
   private InsituTestRepository $repository;
   private GeomanifestationRepository $geomanifestationRepository;
   private UserRepository $userRepository;
@@ -200,16 +202,11 @@ final class InsituTestService
 
 		$tests = $this->repository->getByManifestation($geomanifestationId, $insituTestName, $limit, $offset);
 		$total = $this->repository->countByManifestation($geomanifestationId, $insituTestName);
+    $data = array_map([$this, 'formatTest'], $tests);
 
-		return [
-			'data' => array_map([$this, 'formatTest'], $tests),
-			'pagination' => [
-				'current_page' => $page,
-				'per_page' => $limit,
-				'total' => $total,
-				'total_pages' => (int)ceil($total / $limit)
-			]
-		];
+		return $this->buildPaginationResponse(
+      $data, $total, $page, $limit
+    );
 	}
 
 	/**
@@ -237,14 +234,12 @@ final class InsituTestService
 		$offset = ($page - 1) * $limit;
 
 		$tests = $this->repository->searchByName($insituTestName, $limit, $offset);
+    $data = array_map([$this, 'formatTest'], $tests);
+    $total = $this->repository->countByName($insituTestName);
 
-		return [
-			'data' => array_map([$this, 'formatTest'], $tests),
-			'pagination' => [
-				'current_page' => $page,
-				'per_page' => $limit,
-			]
-		];
+		return $this->buildPaginationResponse(
+      $data, $total, $page, $limit
+    );
 	}
 
   /**

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Services;
 
+use Services\Utils\PaginationBuilder;
 use DTO\AllowedUserRoles;
 use DTO\RegisterGeomanifestationDTO;
 use DTO\UpdateGeomanifestationDTO;
@@ -25,6 +26,7 @@ use Repositories\UserRepository;
  */
 final class GeomanifestationService
 {
+  use PaginationBuilder;
   private GeomanifestationRepository $repository;
   private GeomanifestationViewRepository $viewRepository;
   private GeoreportRepository $georeportRepository;
@@ -595,32 +597,6 @@ final class GeomanifestationService
         422
       );
     }
-  }
-
-  /**
-   * Builds paginated response structure.
-   *
-   * @param array $data
-   * @param int $total
-   * @param int $page
-   * @param int $limit
-   * @return array{data: array, pagination: array}
-   */
-  private function buildPaginationResponse(
-    array $data,
-    int $total,
-    int $page,
-    int $limit
-  ): array {
-    return [
-      'data' => $data,
-      'pagination' => [
-        'current_page' => $page,
-        'per_page' => $limit,
-        'total' => $total,
-        'last_page' => (int)ceil($total / $limit),
-      ],
-    ];
   }
 
   /**
