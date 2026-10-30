@@ -84,16 +84,14 @@ class FieldTripServiceTest extends TestCase
       'INSERT INTO field_trips (
         field_trip_id,
         field_trip_name,
-        field_trip_scheduled_date,
         field_trip_start_date,
         field_trip_finish_date,
         field_trip_creator_id,
         created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, NOW())'
+      ) VALUES (?, ?, ?, ?, ?, NOW())'
     )->execute([
       $id,
       $overrides['field_trip_name'] ?? ('Field Trip ' . substr($id, -6)),
-      $overrides['field_trip_scheduled_date'] ?? '2026-01-01 08:00:00',
       $overrides['field_trip_start_date'] ?? '2026-01-01 08:00:00',
       $overrides['field_trip_finish_date'] ?? '2026-01-01 12:00:00',
       $creatorId,
