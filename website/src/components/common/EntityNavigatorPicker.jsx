@@ -267,7 +267,7 @@ const EntityNavigatorPicker = ({
             const tripName = trip?.field_trip_name || record.field_trip_name;
 
             return tripId ? (
-              <Tooltip title={`Gira: ${tripName || tripId} ${trip?.field_trip_scheduled_date ? `(${trip.field_trip_scheduled_date})` : ''}`}>
+              <Tooltip title={`Gira: ${tripName || tripId} ${trip?.field_trip_start_date ? `(${trip.field_trip_start_date})` : (trip?.field_trip_scheduled_date ? `(${trip.field_trip_scheduled_date})` : '')}`}>
                 <Tag
                   color="orange"
                   icon={<CompassOutlined />}
@@ -480,7 +480,7 @@ const EntityNavigatorPicker = ({
                           label: 'Filtrar por Gira Específica',
                           options: fieldTrips.map((t) => ({
                             value: t.field_trip_id || t.id,
-                            label: `🧭 ${t.field_trip_name} (${t.field_trip_scheduled_date || 'Sin fecha'})`,
+                            label: `🧭 ${t.field_trip_name} (${t.field_trip_start_date || t.field_trip_scheduled_date || 'Sin fecha'})`,
                           })),
                         },
                       ]
@@ -672,7 +672,7 @@ const EntityNavigatorPicker = ({
                         label: 'Filtrar por Gira Específica',
                         options: fieldTrips.map((t) => ({
                           value: t.field_trip_id || t.id,
-                          label: `🧭 ${t.field_trip_name} (${t.field_trip_scheduled_date || 'Sin fecha'})`,
+                          label: `🧭 ${t.field_trip_name} (${t.field_trip_start_date || t.field_trip_scheduled_date || 'Sin fecha'})`,
                         })),
                       },
                     ]

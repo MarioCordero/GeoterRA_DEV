@@ -156,6 +156,7 @@ const GeoreportsManager = () => {
     setEditingReport(record);
     const isCurrent = currentReport && (currentReport.georeport_id || currentReport.id) === (record.georeport_id || record.id);
     form.setFieldsValue({
+      georeport_name: record.georeport_name || '',
       insitu_test_id: record.insitu_test_id,
       inlab_test_id: record.inlab_test_id,
       details: record.details,
@@ -202,6 +203,7 @@ const GeoreportsManager = () => {
       setSubmitting(true);
       const payload = {
         geomanifestation_id: selectedGeoId,
+        georeport_name: values.georeport_name ? values.georeport_name.trim() : '',
         insitu_test_id: values.insitu_test_id,
         inlab_test_id: values.inlab_test_id,
         details: values.details || null,
@@ -264,6 +266,12 @@ const GeoreportsManager = () => {
           </Popconfirm>
         );
       },
+    },
+    {
+      title: 'Nombre',
+      dataIndex: 'georeport_name',
+      key: 'georeport_name',
+      render: (val) => <span className="font-semibold text-slate-800">{val || 'Sin nombre'}</span>,
     },
     {
       title: 'ID Georeporte',
@@ -438,6 +446,17 @@ const GeoreportsManager = () => {
         width={650}
       >
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
+          <Form.Item
+            name="georeport_name"
+            label="Nombre del Georeporte"
+            rules={[
+              { required: true, message: 'El nombre del georeporte es obligatorio' },
+              { max: 55, message: 'Máximo 55 caracteres' },
+            ]}
+          >
+            <Input placeholder="Ej: Reporte Hidrogeológico 2026-A" maxLength={55} />
+          </Form.Item>
+
           <Form.Item
             name="insitu_test_id"
             label="Prueba In-Situ"

@@ -362,6 +362,7 @@ const GeomanifeStationsManager = () => {
     const isCurrent = currentReport && (currentReport.georeport_id || currentReport.id) === (report.georeport_id || report.id);
     georeportForm.resetFields();
     georeportForm.setFieldsValue({
+      georeport_name: report.georeport_name || '',
       insitu_test_id: report.insitu_test_id,
       inlab_test_id: report.inlab_test_id,
       details: report.details,
@@ -390,6 +391,7 @@ const GeomanifeStationsManager = () => {
 
       const georeportPayload = {
         geomanifestation_id: geoId,
+        georeport_name: values.georeport_name ? values.georeport_name.trim() : `GeoReporte - ${targetGeo.geomanifestation_name || ''}`.trim(),
         insitu_test_id: values.insitu_test_id,
         inlab_test_id: values.inlab_test_id,
         details: values.details || null,
@@ -469,6 +471,7 @@ const GeomanifeStationsManager = () => {
     setEditingInsituTest(testRecord);
     quickInsituForm.resetFields();
     quickInsituForm.setFieldsValue({
+      insitu_test_name: testRecord.insitu_test_name || '',
       temperature: testRecord.temperature,
       conductivity: testRecord.conductivity,
       ph: testRecord.ph,
@@ -485,6 +488,7 @@ const GeomanifeStationsManager = () => {
       setSubmittingInsitu(true);
       const payload = {
         geomanifestation_id: targetGeo.geomanifestation_id || targetGeo.id,
+        insitu_test_name: values.insitu_test_name ? values.insitu_test_name.trim() : `Prueba In-Situ - ${targetGeo.geomanifestation_name || ''}`.trim(),
         temperature: values.temperature !== undefined && values.temperature !== null ? parseFloat(values.temperature) : null,
         conductivity: values.conductivity !== undefined && values.conductivity !== null ? parseFloat(values.conductivity) : null,
         ph: values.ph !== undefined && values.ph !== null ? parseFloat(values.ph) : null,
@@ -543,6 +547,7 @@ const GeomanifeStationsManager = () => {
     setEditingInlabTest(testRecord);
     quickInlabForm.resetFields();
     quickInlabForm.setFieldsValue({
+      inlab_test_name: testRecord.inlab_test_name || '',
       ph: testRecord.ph,
       conductivity: testRecord.conductivity,
       cl: testRecord.cl,
@@ -571,6 +576,7 @@ const GeomanifeStationsManager = () => {
       const fields = ['ph', 'conductivity', 'cl', 'ca', 'hco3', 'so4', 'fe', 'si', 'b', 'li', 'f', 'na', 'k', 'mg'];
       const payload = {
         geomanifestation_id: targetGeo.geomanifestation_id || targetGeo.id,
+        inlab_test_name: values.inlab_test_name ? values.inlab_test_name.trim() : `Prueba Lab - ${targetGeo.geomanifestation_name || ''}`.trim(),
         description: values.description || null,
       };
 
@@ -1147,7 +1153,7 @@ const GeomanifeStationsManager = () => {
                   {fieldTripsList.map((trip) => {
                     const tripId = trip.field_trip_id || trip.id;
                     const tripName = trip.field_trip_name || trip.name || `Gira #${tripId}`;
-                    const dateStr = trip.field_trip_scheduled_date || trip.scheduled_date;
+                    const dateStr = trip.field_trip_start_date || trip.start_date || trip.field_trip_scheduled_date;
                     const count = acceptedRequestsManifestations.filter(d => String(d.field_trip_id) === String(tripId)).length;
                     return (
                       <Select.Option key={tripId} value={tripId}>
@@ -1985,6 +1991,17 @@ const GeomanifeStationsManager = () => {
             Selecciona una medición de campo (In-Situ) y un análisis de laboratorio (Geoquímica) ya registrados para consolidar este georeporte.
           </p>
 
+          <Form.Item
+            name="georeport_name"
+            label={<span className="font-semibold text-gray-700">Nombre del Georeporte</span>}
+            rules={[
+              { required: true, message: 'El nombre del georeporte es obligatorio' },
+              { max: 55, message: 'Máximo 55 caracteres' },
+            ]}
+          >
+            <Input placeholder="Ej: GeoReporte Oficial 2026" maxLength={55} className="rounded-lg py-1.5" />
+          </Form.Item>
+
           {(insituTests.length === 0 || inlabTests.length === 0) && (
             <Alert
               type="warning"
@@ -2225,7 +2242,7 @@ const GeomanifeStationsManager = () => {
               <Select placeholder="Selecciona una gira de campo" allowClear showSearch optionFilterProp="label" className="rounded-lg">
                 {fieldTripsList.map((trip) => (
                   <Select.Option key={trip.field_trip_id || trip.id} value={trip.field_trip_id || trip.id}>
-                    {trip.field_trip_name} {trip.field_trip_scheduled_date ? `(${trip.field_trip_scheduled_date})` : ''}
+                    {trip.field_trip_name} {(trip.field_trip_start_date || trip.field_trip_finish_date) ? `(${trip.field_trip_start_date || ''}${trip.field_trip_finish_date ? ` / ${trip.field_trip_finish_date}` : ''})` : ''}
                   </Select.Option>
                 ))}
               </Select>
@@ -2285,6 +2302,17 @@ const GeomanifeStationsManager = () => {
               <BulbOutlined className="text-geoterra-blue" /> Parámetros In-Situ de Campo
             </h3>
             <Form form={quickInsituForm} layout="vertical" onFinish={handleSaveQuickInsitu} className="poppins">
+              <Form.Item
+                name="insitu_test_name"
+                label={<span className="font-semibold text-gray-700">Nombre de la Prueba In-Situ</span>}
+                rules={[
+                  { required: true, message: 'El nombre de la prueba es requerido' },
+                  { max: 55, message: 'Máximo 55 caracteres' },
+                ]}
+              >
+                <Input placeholder="Ej: Medición de Temperatura y pH 1" maxLength={55} className="rounded-lg py-1" />
+              </Form.Item>
+
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <Form.Item
                   name="temperature"
@@ -2359,6 +2387,21 @@ const GeomanifeStationsManager = () => {
         }}
       >
         <Form form={quickInlabForm} layout="vertical" onFinish={handleSaveQuickInlab} className="poppins space-y-4 py-2">
+          {/* Seccion 0: Nombre de la prueba */}
+          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <Form.Item
+              name="inlab_test_name"
+              label={<span className="font-semibold text-gray-700">Nombre de la Prueba de Laboratorio</span>}
+              rules={[
+                { required: true, message: 'El nombre de la prueba es requerido' },
+                { max: 55, message: 'Máximo 55 caracteres' },
+              ]}
+              style={{ marginBottom: 0 }}
+            >
+              <Input placeholder="Ej: Análisis Geoquímico Muestra A" maxLength={55} className="rounded-lg py-1" />
+            </Form.Item>
+          </div>
+
           {/* Seccion 1: Parametros Fisico-Quimicos */}
           <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
             <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2.5 flex items-center gap-2 m-0">
