@@ -13,12 +13,14 @@ use PDO;
 use Repositories\GeomanifestationRepository;
 use Repositories\InlabTestRepository;
 use Repositories\UserRepository;
+use Services\Utils\PaginationBuilder;
 
 /**
  * Business logic for in-lab tests (inlab_tests table).
  */
 final class InlabTestService
 {
+  use PaginationBuilder;
 	private InlabTestRepository $repository;
 	private GeomanifestationRepository $geomanifestationRepository;
 	private NotificationService $notificationService;
@@ -232,16 +234,11 @@ final class InlabTestService
 
 		$tests = $this->repository->getByManifestation($geomanifestationId, $inlabTestName, $limit, $offset);
 		$total = $this->repository->countByManifestation($geomanifestationId, $inlabTestName);
+    $data = array_map([$this, 'formatTest'], $tests);
 
-		return [
-			'data' => array_map([$this, 'formatTest'], $tests),
-			'pagination' => [
-				'current_page' => $page,
-				'per_page' => $limit,
-				'total' => $total,
-				'total_pages' => (int)ceil($total / $limit)
-			]
-		];
+    return $this->buildPaginationResponse(
+      $data, $total, $page, $limit
+    );
 	}
 
 	/**
@@ -269,14 +266,12 @@ final class InlabTestService
 		$offset = ($page - 1) * $limit;
 
 		$tests = $this->repository->searchByName($inlabTestName, $limit, $offset);
+    $total = $this->repository->countByName($inlabTestName);
+    $data = array_map([$this, 'formatTest'], $tests);
 
-		return [
-			'data' => array_map([$this, 'formatTest'], $tests),
-			'pagination' => [
-				'current_page' => $page,
-				'per_page' => $limit,
-			]
-		];
+		return $this->buildPaginationResponse(
+      $data, $total, $page, $limit
+    );
 	}
 
 	/**

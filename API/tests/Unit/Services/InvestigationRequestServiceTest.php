@@ -450,37 +450,43 @@ class InvestigationRequestServiceTest extends TestCase
 
 	// ------------------------------ getAllByUser ------------------------------ //
 
-	public function testGetAllByUser(): void
-	{
-		$user = $this->authenticateUser(['role' => AllowedUserRoles::USER]);
-		$ownRequest1 = $this->createTestRequest(['user_id' => $user['user_id']]);
-		$ownRequest2 = $this->createTestRequest(['user_id' => $user['user_id']]);
-		$this->createTestRequest();
+  public function testGetAllByUser(): void
+  {
+    $user = $this->authenticateUser(['role' => AllowedUserRoles::USER]);
+    $ownRequest1 = $this->createTestRequest(['user_id' => $user['user_id']]);
+    $ownRequest2 = $this->createTestRequest(['user_id' => $user['user_id']]);
+    $this->createTestRequest();
 
-		$result = $this->service->getAllByUser();
+    $result = $this->service->getAllByUser();
 
-		$this->assertCount(2, $result);
-		$ids = array_column($result, 'request_id');
-		$this->assertContains($ownRequest1['request_id'], $ids);
-		$this->assertContains($ownRequest2['request_id'], $ids);
-	}
+    $this->assertCount(2, $result['data']);
+    $ids = array_column($result['data'], 'request_id');
+    $this->assertContains($ownRequest1['request_id'], $ids);
+    $this->assertContains($ownRequest2['request_id'], $ids);
+
+    $this->assertArrayHasKey('pagination', $result);
+    $this->assertEquals(2, $result['pagination']['total']);
+  }
 
 	// --------------------------------- getAll --------------------------------- //
 
-	public function testGetAll(): void
-	{
-		$this->authenticateUser(['role' => AllowedUserRoles::ADMIN]);
-		$request1 = $this->createTestRequest();
-		$request2 = $this->createTestRequest();
+  public function testGetAll(): void
+  {
+    $this->authenticateUser(['role' => AllowedUserRoles::ADMIN]);
+    $request1 = $this->createTestRequest();
+    $request2 = $this->createTestRequest();
 
-		$result = $this->service->adminGetAll();
+    $result = $this->service->adminGetAll();
 
-		$this->assertCount(2, $result);
-		$ids = array_column($result, 'request_id');
-		$this->assertContains($request1['request_id'], $ids);
-		$this->assertContains($request2['request_id'], $ids);
-		$this->assertArrayHasKey('user_first_name', $result[0]);
-	}
+    $this->assertCount(2, $result['data']);
+    $ids = array_column($result['data'], 'request_id');
+    $this->assertContains($request1['request_id'], $ids);
+    $this->assertContains($request2['request_id'], $ids);
+    $this->assertArrayHasKey('user_first_name', $result['data'][0]);
+
+    $this->assertArrayHasKey('pagination', $result);
+    $this->assertEquals(2, $result['pagination']['total']);
+  }
 
 	public function testGetAllThrowsForbiddenForUnauthorizedRole(): void
 	{

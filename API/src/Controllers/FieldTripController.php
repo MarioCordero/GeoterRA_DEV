@@ -49,12 +49,7 @@ final class FieldTripController
       );
 
       Response::success(
-        $result['data'],
-        [
-          'total' => $result['total'],
-          'page' => $result['page'],
-          'limit' => $result['limit'],
-        ]
+        $result['data'], ['pagination' => $result['pagination']]
       );
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());

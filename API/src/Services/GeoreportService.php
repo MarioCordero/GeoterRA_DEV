@@ -15,12 +15,14 @@ use Repositories\GeoreportRepository;
 use Repositories\InlabTestRepository;
 use Repositories\InsituTestRepository;
 use Repositories\UserRepository;
+use Services\Utils\PaginationBuilder;
 
 /**
  * Business logic for geothermal reports (georeports table).
  */
 final class GeoreportService
 {
+  use PaginationBuilder;
 	private GeoreportRepository $repository;
 	private GeomanifestationRepository $geomanifestationRepository;
 	private InsituTestRepository $insituTestRepository;
@@ -241,7 +243,7 @@ final class GeoreportService
 			'geomanifestation_id' => $row['geomanifestation_id'],
 			'insitu_test_id' => $row['insitu_test_id'],
 			'inlab_test_id' => $row['inlab_test_id'],
-			'georeport_name' => $row['georeport_name'] ?? null,
+			'georeport_name' => $row['georeport_name'],
 			'details' => $row['details'],
 			'visibility' => (bool)($row['visibility'] ?? 0),
 			'created_at' => $row['created_at'],
@@ -333,16 +335,11 @@ final class GeoreportService
 
 		$georeports = $this->repository->getByManifestation($geomanifestationId, $georeportName, $limit, $offset);
 		$total = $this->repository->countByManifestation($geomanifestationId, $georeportName);
+    $data = array_map([$this, 'formatReport'], $georeports);
 
-		return [
-			'data' => array_map([$this, 'formatReport'], $georeports),
-			'pagination' => [
-				'current_page' => $page,
-				'per_page' => $limit,
-				'total' => $total,
-				'total_pages' => (int)ceil($total / $limit)
-			]
-		];
+    return $this->buildPaginationResponse(
+      $data, $total, $page, $limit
+    );
 	}
 
 	/**
@@ -370,14 +367,12 @@ final class GeoreportService
 		$offset = ($page - 1) * $limit;
 
 		$georeports = $this->repository->searchByName($georeportName, $limit, $offset);
+    $total = $this->repository->countByName($georeportName);
+    $data = array_map([$this, 'formatReport'], $georeports);
 
-		return [
-			'data' => array_map([$this, 'formatReport'], $georeports),
-			'pagination' => [
-				'current_page' => $page,
-				'per_page' => $limit,
-			]
-		];
+    return $this->buildPaginationResponse(
+      $data, $total, $page, $limit
+    );
 	}
 
 	/**
