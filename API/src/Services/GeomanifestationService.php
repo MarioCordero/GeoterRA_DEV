@@ -162,7 +162,8 @@ final class GeomanifestationService
    * @param bool $isAdmin If true, excludes insitu/inlab test data
    * @return array<string, mixed>
    */
-  private function formatManifestationView(array $row, bool $isAdmin = false
+  private function formatManifestationView(
+		array $row, bool $isAdmin = false
   ): array {
     $response = [
       'geomanifestation_id' => $row['geomanifestation_id'],
@@ -183,11 +184,13 @@ final class GeomanifestationService
       ],
       'current_georeport' => $row['georeport_id'] ? [
         'georeport_id' => $row['georeport_id'],
+				'georeport_name' => $row['georeport_name'],
         'details' => $row['report_details'],
         'created_at' => $row['report_created_at'],
       ] : null,
       'insitu_test' => $row['insitu_test_id'] ? [
         'insitu_test_id' => $row['insitu_test_id'],
+				'insitu_test_name' => $row['insitu_test_name'],
         'temperature' => isset($row['temperature'])
           ? (float)$row['temperature'] : null,
         'conductivity' => isset($row['insitu_conductivity'])
@@ -198,6 +201,7 @@ final class GeomanifestationService
       ] : null,
     'inlab_test' => $row['inlab_test_id'] ? [
       'inlab_test_id' => $row['inlab_test_id'],
+			'inlab_test_name' => $row['inlab_test_name'],
       'ph' => isset($row['lab_ph']) ? (float)$row['lab_ph'] : null,
       'conductivity' => isset($row['lab_conductivity'])
         ? (float)$row['lab_conductivity'] : null,

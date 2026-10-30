@@ -19,6 +19,7 @@ final class UpdateInsituTestDTO
    * @param string|null $description New description
    */
   public function __construct(
+		public ?string $insituTestName = null,
     public ?float $temperature = null,
     public ?float $conductivity = null,
     public ?float $ph = null,
@@ -34,6 +35,9 @@ final class UpdateInsituTestDTO
   public static function fromArray(array $data): self
   {
     return new self(
+			insituTestName : isset($data['insitu_test_name']) ? trim(
+				(string)$data['insitu_test_name']
+			) : null,
       temperature : isset($data['temperature']) ? (float)$data['temperature'] : null,
       conductivity : isset($data['conductivity']) ? (float)$data['conductivity'] : null,
       ph : isset($data['ph']) ? (float)$data['ph'] : null,
@@ -50,6 +54,9 @@ final class UpdateInsituTestDTO
   public function toArray(): array
   {
     $update = [];
+		if ($this->insituTestName !== null) {
+			$update['insitu_test_name'] = $this->insituTestName;
+		}
     if ($this->temperature !== null) {
       $update['temperature'] = $this->temperature;
     }
@@ -72,6 +79,11 @@ final class UpdateInsituTestDTO
    */
   public function validate(): void
   {
+		if ($this->insituTestName !== null && (trim($this->insituTestName) === '' || mb_strlen($this->insituTestName) > 55)) {
+			throw new ApiException(
+				ErrorType::invalidField('insitu_test_name (max 55 characters)'), 422
+			);
+		}
     if ($this->temperature !== null
         && ($this->temperature < 0 || $this->temperature > 200)) {
       throw new ApiException(

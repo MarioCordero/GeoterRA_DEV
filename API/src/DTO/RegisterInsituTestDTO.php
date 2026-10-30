@@ -21,6 +21,7 @@ final class RegisterInsituTestDTO
    */
   public function __construct(
     public string $geomanifestationId,
+    public string $insituTestName,
     public ?float $temperature = null,
     public ?float $conductivity = null,
     public ?float $ph = null,
@@ -36,14 +37,18 @@ final class RegisterInsituTestDTO
    */
   public static function fromArray(array $data): self
   {
-    if (empty($data['geomanifestation_id'])) {
-      throw new ApiException(
-        ErrorType::missingField('geomanifestation_id'), 422
-      );
-    }
+		$required = ['geomanifestation_id', 'insitu_test_name'];
+		foreach ($required as $field) {
+			if (empty($data[$field])) {
+				throw new ApiException(
+					ErrorType::missingField($field), 422
+				);
+			}
+		}
 
     return new self(
       geomanifestationId : trim((string)$data['geomanifestation_id']),
+			insituTestName : trim((string)$data['insitu_test_name']),
       temperature : isset($data['temperature']) ? (float)$data['temperature']
         : 0,
       conductivity : isset($data['conductivity']) ? (float)$data['conductivity'] : 0,
@@ -64,6 +69,11 @@ final class RegisterInsituTestDTO
         ErrorType::invalidField('geomanifestation_id'), 422
       );
     }
+		if (trim($this->insituTestName) === '' || mb_strlen($this->insituTestName) > 55) {
+			throw new ApiException(
+				ErrorType::invalidField('insitu_test_name (required, max 55 characters)'), 422
+			);
+		}
     if ($this->temperature !== null && ($this->temperature < 0 || $this->temperature > 200)) {
       throw new ApiException(
         ErrorType::invalidField('temperature (must be between 0 and 200)'), 422

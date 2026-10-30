@@ -31,56 +31,120 @@ final class InsituTestRepository extends Repository
     return $row ?: null;
   }
 
-  /**
-   * Returns all in-situ tests for a given geomanifestation, including creator user info.
-   *
-   * @param string $geomanifestationId
-   * @return array[]
-   */
-  public function getByManifestation(string $geomanifestationId): array
-  {
-    $sql = "SELECT t.*,
-                       u.first_name AS created_by_first_name,
-                       u.last_name AS created_by_last_name
-                FROM insitu_tests t
-                LEFT JOIN users u ON t.created_by = u.user_id
-                WHERE t.geomanifestation_id = :gm_id
-                ORDER BY t.created_at DESC";
-    return $this->execute($sql, [':gm_id' => $geomanifestationId])->fetchAll(
-      PDO::FETCH_ASSOC
-    );
-  }
+	/**
+	 * Returns all in-situ tests for a given geomanifestation, with optional name filtering and pagination.
+	 *
+	 * @param string $geomanifestationId
+	 * @param string|null $insituTestName
+	 * @param int $limit
+	 * @param int $offset
+	 * @return array[]
+	 */
+	public function getByManifestation(
+		string $geomanifestationId,
+		?string $insituTestName = null,
+		int $limit = 10,
+		int $offset = 0
+	): array {
+		$sql = "SELECT t.*,
+                 u.first_name AS created_by_first_name,
+                 u.last_name AS created_by_last_name
+          FROM insitu_tests t
+          LEFT JOIN users u ON t.created_by = u.user_id
+          WHERE t.geomanifestation_id = :gm_id";
 
-  /**
-   * Creates a new in-situ test.
-   *
-   * @param RegisterInsituTestDTO $dto
-   * @param string $createdBy User ULID
-   * @return array The result row.
-   */
-  public function create(RegisterInsituTestDTO $dto, string $createdBy): array
-  {
-    $id = $this->generateUlid();
-    $sql = "INSERT INTO insitu_tests (
-                    insitu_test_id, geomanifestation_id, temperature, conductivity,
-                    ph, description, created_by, created_at
-                ) VALUES (
-                    :id, :gm_id, :temp, :cond, :ph, :desc, :created_by, NOW()
-                )";
-    $this->execute(
-      $sql, [
-        ':id' => $id,
-        ':gm_id' => $dto->geomanifestationId,
-        ':temp' => $dto->temperature,
-        ':cond' => $dto->conductivity,
-        ':ph' => $dto->ph,
-        ':desc' => $dto->description,
-        ':created_by' => $createdBy
-      ]
-    );
+		$params = [':gm_id' => $geomanifestationId];
 
-    return $this->findById($id);
-  }
+		if ($insituTestName !== null && trim($insituTestName) !== '') {
+			$sql .= " AND t.insitu_test_name LIKE :insitu_test_name";
+			$params[':insitu_test_name'] = '%' . trim($insituTestName) . '%';
+		}
+
+    $sql .= " ORDER BY t.created_at DESC LIMIT " . (int)$limit . " OFFSET " . (int)$offset;
+    $stmt = $this->execute($sql, $params);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	/**
+	 * Counts in-situ tests for a given geomanifestation with optional name filtering.
+	 *
+	 * @param string $geomanifestationId
+	 * @param string|null $insituTestName
+	 * @return int
+	 */
+	public function countByManifestation(string $geomanifestationId, ?string $insituTestName = null): int
+	{
+		$sql = "SELECT COUNT(*) FROM insitu_tests t WHERE t.geomanifestation_id = :gm_id";
+		$params = [':gm_id' => $geomanifestationId];
+
+		if ($insituTestName !== null && trim($insituTestName) !== '') {
+			$sql .= " AND t.insitu_test_name LIKE :insitu_test_name";
+			$params[':insitu_test_name'] = '%' . trim($insituTestName) . '%';
+		}
+
+		$stmt = $this->execute($sql, $params);
+		return (int)$stmt->fetchColumn();
+	}
+
+	/**
+	 * Searches in-situ tests globally by name with pagination.
+	 *
+	 * @param string $insituTestName
+	 * @param int $limit
+	 * @param int $offset
+	 * @return array[]
+	 */
+	public function searchByName(string $insituTestName, int $limit = 10, int $offset = 0): array
+	{
+		$sql = "SELECT t.*,
+                 u.first_name AS created_by_first_name,
+                 u.last_name AS created_by_last_name
+          FROM insitu_tests t
+          LEFT JOIN users u ON t.created_by = u.user_id
+          WHERE t.insitu_test_name LIKE :insitu_test_name
+          ORDER BY t.created_at DESC LIMIT :limit OFFSET :offset";
+
+		$stmt = $this->pdo->prepare($sql);
+		$stmt->bindValue(':insitu_test_name', '%' . trim($insituTestName) . '%', PDO::PARAM_STR);
+		$stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+		$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+		$stmt->execute();
+
+		return $stmt->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	/**
+	 * Creates a new in-situ test.
+	 *
+	 * @param RegisterInsituTestDTO $dto
+	 * @param string $createdBy User ULID
+	 * @return array The result row.
+	 */
+	public function create(RegisterInsituTestDTO $dto, string $createdBy): array
+	{
+		$id = $this->generateUlid();
+		$sql = "INSERT INTO insitu_tests (
+                  insitu_test_id, geomanifestation_id, insitu_test_name, temperature, conductivity,
+                  ph, description, created_by, created_at
+              ) VALUES (
+                  :id, :gm_id, :name, :temp, :cond, :ph, :desc, :created_by, NOW()
+              )";
+		$this->execute(
+			$sql, [
+				':id' => $id,
+				':gm_id' => $dto->geomanifestationId,
+				':name' => $dto->insituTestName,
+				':temp' => $dto->temperature,
+				':cond' => $dto->conductivity,
+				':ph' => $dto->ph,
+				':desc' => $dto->description,
+				':created_by' => $createdBy
+			]
+		);
+
+		return $this->findById($id);
+	}
 
   /**
    * Updates an existing in-situ test using only provided fields.
