@@ -28,7 +28,7 @@ final class InvestigationRequestRepository
 	{
 		$requestId = UlidGenerator::generate();
 		$timePart = substr($requestId, 0, 10);
-		$generatedName = 'SOLI-' . $dto->districtSnitCode . '-' . $timePart;
+		$generatedName = $dto->districtSnitCode . '-' . $timePart;
 
 		$sql = "INSERT INTO requests (
                       request_id, province_snit_code, canton_snit_code, district_snit_code,
