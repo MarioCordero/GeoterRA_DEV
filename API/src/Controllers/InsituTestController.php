@@ -25,30 +25,33 @@ final class InsituTestController
     $this->service = new InsituTestService($pdo);
   }
 
-  /**
-   * GET /admin/insitu-tests
-   * Returns all in‑situ tests for a given geomanifestation.
-   * Query parameter: geomanifestation_id (required)
-   */
-  public function index(): void
-  {
-    try {
-      $geomanifestationId = $_GET['geomanifestation_id'] ?? '';
+	/**
+	 * GET /admin/insitu-tests
+	 * Returns all in‑situ tests for a given geomanifestation with optional name filtering and pagination.
+	 * Query parameters: geomanifestation_id (required), insitu_test_name (optional), page (optional), limit (optional)
+	 */
+	public function index(): void
+	{
+		try {
+			$geomanifestationId = $_GET['geomanifestation_id'] ?? '';
+			$insituTestName = $_GET['insitu_test_name'] ?? null;
+			$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+			$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
 
-      if (empty($geomanifestationId)) {
-        throw new ApiException(
-          ErrorType::missingField('geomanifestation_id'), 422
-        );
-      }
+			if (empty($geomanifestationId)) {
+				throw new ApiException(
+					ErrorType::missingField('geomanifestation_id'), 422
+				);
+			}
 
-      $tests = $this->service->getByManifestation($geomanifestationId);
-      Response::success($tests);
-    } catch (ApiException $e) {
-      Response::error($e->getError(), $e->getHttpStatus());
-    } catch (Throwable $e) {
-      Response::error(ErrorType::internal($e->getMessage()), 500);
-    }
-  }
+			$result = $this->service->getByManifestation($geomanifestationId, $insituTestName, $page, $limit);
+			Response::success($result);
+		} catch (ApiException $e) {
+			Response::error($e->getError(), $e->getHttpStatus());
+		} catch (Throwable $e) {
+			Response::error(ErrorType::internal($e->getMessage()), 500);
+		}
+	}
 
   /**
    * GET /admin/insitu-tests/{id}

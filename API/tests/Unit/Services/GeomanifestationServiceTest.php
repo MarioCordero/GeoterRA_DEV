@@ -134,12 +134,13 @@ class GeomanifestationServiceTest extends TestCase
 
     $this->pdo->prepare(
       'INSERT INTO insitu_tests (
-                insitu_test_id, geomanifestation_id, temperature, conductivity,
+                insitu_test_id, geomanifestation_id, insitu_test_name, temperature, conductivity,
                 ph, description, created_by, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())'
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())'
     )->execute([
       $insituTestId,
       $geomanifestationId,
+      'Test In-Situ',
       $temperature,
       300.0,
       7.0,
@@ -149,17 +150,18 @@ class GeomanifestationServiceTest extends TestCase
 
     $this->pdo->prepare(
       'INSERT INTO inlab_tests (
-                inlab_test_id, geomanifestation_id,
+                inlab_test_id, geomanifestation_id, inlab_test_name,
                 ph, conductivity, cl, ca, hco3, so4, fe, si, b, li, f, na, k, mg,
                 description, created_by, created_at
             ) VALUES (
-                ?, ?,
+                ?, ?, ?,
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                 ?, ?, NOW()
             )'
     )->execute([
       $inlabTestId,
       $geomanifestationId,
+      'Test In-Lab',
       7.0,
       300.0,
       10.0,
@@ -180,14 +182,15 @@ class GeomanifestationServiceTest extends TestCase
 
     $this->pdo->prepare(
       'INSERT INTO georeports (
-                georeport_id, geomanifestation_id, insitu_test_id, inlab_test_id,
+                georeport_id, geomanifestation_id, insitu_test_id, inlab_test_id, georeport_name,
                 created_by, created_at
-            ) VALUES (?, ?, ?, ?, ?, NOW())'
+            ) VALUES (?, ?, ?, ?, ?, ?, NOW())'
     )->execute([
       $georeportId,
       $geomanifestationId,
       $insituTestId,
       $inlabTestId,
+      'Test Georeport',
       $userId,
     ]);
 

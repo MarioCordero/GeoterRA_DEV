@@ -124,73 +124,128 @@ final class InsituTestService
     return $this->formatTest($test);
   }
 
-  /**
-   * Formats a raw database row into the API response structure.
-   * - Removes created_by (ULID)
-   * - Includes created_by_first_name and created_by_last_name
-   * - Rounds numeric values
-   *
-   * @param array<string,mixed> $row
-   * @return array<string,mixed>
-   */
-  private function formatTest(array $row): array
-  {
-    // Build response without created_by
-    $result = [
-      'insitu_test_id' => $row['insitu_test_id'],
-      'geomanifestation_id' => $row['geomanifestation_id'],
-      'temperature' => isset($row['temperature']) ? round(
-        (float)$row['temperature'], 2
-      ) : null,
-      'conductivity' => isset($row['conductivity']) ? round(
-        (float)$row['conductivity'], 2
-      ) : null,
-      'ph' => isset($row['ph']) ? round((float)$row['ph'], 2) : null,
-      'description' => $row['description'],
-      'visibility' => (bool)($row['visibility'] ?? 0),
-      'created_at' => $row['created_at'],
-      'created_by_first_name' => $row['created_by_first_name'] ?? null,
-      'created_by_last_name' => $row['created_by_last_name'] ?? null,
-    ];
+	/**
+	 * Formats a raw database row into the API response structure.
+	 * - Removes created_by (ULID)
+	 * - Includes created_by_first_name and created_by_last_name
+	 * - Includes insitu_test_name
+	 * - Rounds numeric values
+	 *
+	 * @param array<string,mixed> $row
+	 * @return array<string,mixed>
+	 */
+	private function formatTest(array $row): array
+	{
+		// Build response without created_by
+		$result = [
+			'insitu_test_id' => $row['insitu_test_id'],
+			'geomanifestation_id' => $row['geomanifestation_id'],
+			'insitu_test_name' => $row['insitu_test_name'] ?? null,
+			'temperature' => isset($row['temperature']) ? round(
+				(float)$row['temperature'], 2
+			) : null,
+			'conductivity' => isset($row['conductivity']) ? round(
+				(float)$row['conductivity'], 2
+			) : null,
+			'ph' => isset($row['ph']) ? round((float)$row['ph'], 2) : null,
+			'description' => $row['description'],
+			'visibility' => (bool)($row['visibility'] ?? 0),
+			'created_at' => $row['created_at'],
+			'created_by_first_name' => $row['created_by_first_name'] ?? null,
+			'created_by_last_name' => $row['created_by_last_name'] ?? null,
+		];
 
-    return $result;
-  }
+		return $result;
+	}
 
-  /**
-   * Returns all in-situ tests for a given geomanifestation.
-   * Checks manifestation visibility: if hidden, only allowed roles can access.
-   *
-   * @param string $geomanifestationId
-   * @return array[]
-   * @throws ApiException
-   */
-  public function getByManifestation(string $geomanifestationId): array
-  {
-    // Check if manifestation exists
-    $manifestation = $this->geomanifestationRepository->findById(
-      $geomanifestationId
-    );
-    if (!$manifestation) {
-      throw new ApiException(
-        ErrorType::notFound('Geothermal manifestation'), 404
-      );
-    }
+	/**
+	 * Returns all in-situ tests for a given geomanifestation with optional name filtering and pagination.
+	 *
+	 * @param string $geomanifestationId
+	 * @param string|null $insituTestName
+	 * @param int $page
+	 * @param int $limit
+	 * @return array
+	 * @throws ApiException
+	 */
+	public function getByManifestation(
+		string $geomanifestationId,
+		?string $insituTestName = null,
+		int $page = 1,
+		int $limit = 10
+	): array {
 
-    // If manifestation is hidden, only admin/field investigator/investigator/maintenance can see its tests
-    if (!$manifestation['visibility']) {
-      Request::requireRole(
-        [
-          AllowedUserRoles::ADMIN,
-          AllowedUserRoles::FIELD_INVESTIGATOR,
-          AllowedUserRoles::INVESTIGATOR,
-          AllowedUserRoles::MAINTENANCE
-        ]
-      );
-    }
+		Request::requireRole(
+			[
+				AllowedUserRoles::ADMIN,
+				AllowedUserRoles::FIELD_INVESTIGATOR,
+				AllowedUserRoles::INVESTIGATOR,
+				AllowedUserRoles::MAINTENANCE
+			]
+		);
 
-    $tests = $this->repository->getByManifestation($geomanifestationId);
-    return array_map([$this, 'formatTest'], $tests);
-  }
+		// Check if manifestation exists
+		$manifestation = $this->geomanifestationRepository->findById(
+			$geomanifestationId
+		);
+		if (!$manifestation) {
+			throw new ApiException(
+				ErrorType::notFound('Geothermal manifestation'), 404
+			);
+		}
+
+		$page = max(1, $page);
+		$limit = max(1, min(100, $limit));
+		$offset = ($page - 1) * $limit;
+
+		$tests = $this->repository->getByManifestation($geomanifestationId, $insituTestName, $limit, $offset);
+		$total = $this->repository->countByManifestation($geomanifestationId, $insituTestName);
+
+		return [
+			'data' => array_map([$this, 'formatTest'], $tests),
+			'pagination' => [
+				'current_page' => $page,
+				'per_page' => $limit,
+				'total' => $total,
+				'total_pages' => (int)ceil($total / $limit)
+			]
+		];
+	}
+
+	/**
+	 * Searches in-situ tests globally by name with pagination.
+	 *
+	 * @param string $insituTestName
+	 * @param int $page
+	 * @param int $limit
+	 * @return array
+	 * @throws ApiException
+	 */
+	public function searchByName(string $insituTestName, int $page = 1, int $limit = 10): array
+	{
+		Request::requireRole(
+			[
+				AllowedUserRoles::ADMIN,
+				AllowedUserRoles::FIELD_INVESTIGATOR,
+				AllowedUserRoles::INVESTIGATOR,
+				AllowedUserRoles::MAINTENANCE
+			]
+		);
+
+		$page = max(1, $page);
+		$limit = max(1, min(100, $limit));
+		$offset = ($page - 1) * $limit;
+
+		$tests = $this->repository->searchByName($insituTestName, $limit, $offset);
+
+		return [
+			'data' => array_map([$this, 'formatTest'], $tests),
+			'pagination' => [
+				'current_page' => $page,
+				'per_page' => $limit,
+			]
+		];
+	}
 
   /**
    * Updates an existing in-situ test (admin/investigator only).
