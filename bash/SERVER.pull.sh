@@ -16,8 +16,7 @@ echo "📦 Trayendo cambios de Git (main)..."
 # localmente para que el pull no genere conflictos.
 git checkout -- website/dist/config.js 2>/dev/null || true
 git checkout main
-git fetch origin main
-git reset --hard origin/main
+git pull origin main
 
 # 🔑 Generar config de runtime a partir de /home/proyecto/.env (fuera del repo)
 ENV_FILE="/home/proyecto/.env"
