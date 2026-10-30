@@ -3,6 +3,7 @@ package ucr.ac.cr.inii.geoterra.core.di
 import com.russhwolf.settings.Settings
 import org.koin.dsl.module
 import ucr.ac.cr.inii.geoterra.data.model.responses.FieldTripResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.UserResponse
 import ucr.ac.cr.inii.geoterra.data.repository.AuthRepository
@@ -10,6 +11,7 @@ import ucr.ac.cr.inii.geoterra.data.repository.CantonRepository
 import ucr.ac.cr.inii.geoterra.data.repository.DistrictRepository
 import ucr.ac.cr.inii.geoterra.data.repository.FieldTripRepository
 import ucr.ac.cr.inii.geoterra.data.repository.GeomanifestationsRepository
+import ucr.ac.cr.inii.geoterra.data.repository.InSituTestRepository
 import ucr.ac.cr.inii.geoterra.data.repository.InvestigationRequestsRepository
 import ucr.ac.cr.inii.geoterra.data.repository.ProvinceRepository
 import ucr.ac.cr.inii.geoterra.data.repository.UserRepository
@@ -21,6 +23,7 @@ import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
 import ucr.ac.cr.inii.geoterra.domain.repository.FieldTripRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.GeomanifestationsRepositoryInterface
+import ucr.ac.cr.inii.geoterra.domain.repository.InSituTestRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.ProvinceRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.InvestigationRequestsRepositoryInterface
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountViewModel
@@ -31,6 +34,8 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.account.password.recovery.Pa
 import ucr.ac.cr.inii.geoterra.presentation.screens.field.trip.details.FieldTripDetailsViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.fieldtrip.FieldTripViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.field.trip.form.FieldTripFormViewModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.field.geomanifestation.details.GeomanifestationDetailsViewModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.geomanifestation.form.GeomanifestationFormViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.sign.`in`.SignInViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation.GeomanifestationViewModel
@@ -84,6 +89,7 @@ val appModule = module {
 		params -> FieldTripFormViewModel(
 			fieldTripRepository = get(),
 		  userRepository = get(),
+			geomanifestationsRepository = get(),
 			provincesRepository = get(),
 			cantonsRepository = get(),
 			districtsRepository = get(),
@@ -95,6 +101,25 @@ val appModule = module {
 		FieldTripDetailsViewModel(
 			fieldTripId = params.get<String>(),
 			fieldTripRepository = get()
+		)
+	}
+
+	factory { params ->
+		GeomanifestationFormViewModel(
+			geomanifestationsRepository = get(),
+			provincesRepository = get(),
+			cantonsRepository = get(),
+			districtsRepository = get(),
+			geomanifestationToEdit = params.getOrNull<GeomanifestationResponse>(),
+			fieldTripId = params.get<String>()
+		)
+	}
+
+	factory { params ->
+		GeomanifestationDetailsViewModel(
+			geomanifestationId = params.get<String>(),
+			geomanifestationsRepository = get(),
+			inSituTestRepository = get()
 		)
 	}
 
@@ -111,6 +136,7 @@ val appModule = module {
 	single<InvestigationRequestsRepositoryInterface> { InvestigationRequestsRepository(get()) }
 	single<GeomanifestationsRepositoryInterface> { GeomanifestationsRepository(get()) }
 	single<FieldTripRepositoryInterface> { FieldTripRepository(get()) }
+	single<InSituTestRepositoryInterface> { InSituTestRepository(get()) }
 
 	// Provide concrete implementations if needed by other components directly
 	single { AuthRepository(get(), get()) }
@@ -121,4 +147,5 @@ val appModule = module {
 	single { DistrictRepository(get()) }
 	single { InvestigationRequestsRepository(get()) }
 	single { FieldTripRepository(get()) }
+	single { InSituTestRepository(get()) }
 }

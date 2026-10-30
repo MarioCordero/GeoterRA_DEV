@@ -31,7 +31,9 @@ fun FieldTripCardItem(
 	val isAdmin = currentUserRole == "admin"
 	val isInvestigator = currentUserRole == "investigator"
 	val isCreator = currentUserId != null && fieldTrip.creator.user_id == currentUserId
-	val isParticipant = currentUserId != null && fieldTrip.participants.any { it.user_id == currentUserId }
+	val isParticipant = currentUserId != null
+			&& fieldTrip.participants.any { it.user_id == currentUserId }
+	val chipSpacing = 8.dp
 
 	val showEdit = isAdmin || (isInvestigator && (isCreator || isParticipant))
 	val showDelete = isAdmin || (isInvestigator && isCreator)
@@ -91,24 +93,39 @@ fun FieldTripCardItem(
 				}
 			}
 
+			Row(
+				modifier = Modifier
+					.fillMaxWidth()
+					.height(IntrinsicSize.Max),
+				horizontalArrangement = Arrangement.spacedBy(chipSpacing)
+			) {
+				InfoChip(
+					icon = Icons.Default.CalendarToday,
+					label = "Inicio",
+					value = fieldTrip.field_trip_start_date.take(10),
+					modifier = Modifier.weight(1f),
+					iconColor = MaterialTheme.colorScheme.secondary
+				)
+
+				InfoChip(
+					icon = Icons.Default.CalendarToday,
+					label = "Finalización",
+					value = fieldTrip.field_trip_finish_date.take(10),
+					modifier = Modifier.weight(1f),
+					iconColor = MaterialTheme.colorScheme.secondary
+				)
+			}
+
 			Column(
 				modifier = Modifier.fillMaxWidth(),
 				verticalArrangement = Arrangement.spacedBy(8.dp)
 			) {
 				InfoChip(
-					icon = Icons.Default.CalendarToday,
-					label = "Fecha programada",
-					value = fieldTrip.field_trip_scheduled_date.take(10),
-					modifier = Modifier.fillMaxWidth(),
-					iconColor = MaterialTheme.colorScheme.primary
-				)
-
-				InfoChip(
 					icon = Icons.Default.LocationOn,
 					label = "Ubicación",
-					value = "${fieldTrip.location.province}, ${fieldTrip.location.canton}",
+					value = "${fieldTrip.location.province}, ${fieldTrip.location.canton}, ${fieldTrip.location.district}",
 					modifier = Modifier.fillMaxWidth(),
-					iconColor = MaterialTheme.colorScheme.secondary
+					iconColor = MaterialTheme.colorScheme.primary
 				)
 
 				InfoChip(
@@ -117,7 +134,7 @@ fun FieldTripCardItem(
 					value = "${fieldTrip.creator.first_name} ${fieldTrip.creator.last_name}",
 					modifier = Modifier.fillMaxWidth(),
 					iconColor = MaterialTheme.colorScheme.tertiary,
-					maxLines = 1
+					maxLines = 2
 				)
 			}
 

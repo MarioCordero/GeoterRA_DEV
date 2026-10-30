@@ -1,10 +1,14 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.fieldtrip.details
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
@@ -17,15 +21,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.common.InfoChip
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SectionHeader
+import ucr.ac.cr.inii.geoterra.presentation.components.geomanifestation.GeomanifestationCardItem
 import ucr.ac.cr.inii.geoterra.presentation.screens.field.trip.details.FieldTripDetailsState
 
 @Composable
 fun FieldTripDetailsContent(
 	modifier: Modifier = Modifier,
 	isForPdf: Boolean = false,
-	state: FieldTripDetailsState
+	state: FieldTripDetailsState,
+	onGeomanifestationClick: ((String) -> Unit)? = null
 ) {
 	val scrollState = if (!isForPdf) rememberScrollState() else null
 	val verticalSpacing = 16.dp
@@ -61,14 +68,6 @@ fun FieldTripDetailsContent(
 			Spacer(modifier = Modifier.height(verticalSpacing))
 
 			SectionHeader(title = "Estado y Fechas")
-			InfoChip(
-				Icons.Default.CalendarToday,
-				"Fecha Programada",
-				fieldTrip.field_trip_scheduled_date.take(10),
-				Modifier.fillMaxWidth(),
-				MaterialTheme.colorScheme.primary
-			)
-
 			Spacer(modifier = Modifier.height(chipSpacing))
 
 			Row(
@@ -150,13 +149,9 @@ fun FieldTripDetailsContent(
 			} else {
 				Column(verticalArrangement = Arrangement.spacedBy(chipSpacing)) {
 					fieldTrip.geomanifestations.forEach { manifestation ->
-						InfoChip(
-							Icons.Default.Place,
-							manifestation.geomanifestation_name,
-							manifestation.description ?: "Sin descripción",
-							Modifier.fillMaxWidth(),
-							MaterialTheme.colorScheme.secondary,
-							maxLines = 10
+						GeomanifestationCardItem(
+							manifestation = manifestation,
+							onDetailsClick = { onGeomanifestationClick?.invoke(manifestation.geomanifestation_id) }
 						)
 					}
 				}

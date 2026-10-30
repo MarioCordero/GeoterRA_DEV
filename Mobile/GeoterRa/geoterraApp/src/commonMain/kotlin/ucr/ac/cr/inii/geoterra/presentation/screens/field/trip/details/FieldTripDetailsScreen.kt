@@ -6,13 +6,12 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Menu
@@ -39,6 +38,8 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 import ucr.ac.cr.inii.geoterra.presentation.screens.field.trip.details.FieldTripDetailsViewModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.field.geomanifestation.details.GeomanifestationDetailsScreen
+import ucr.ac.cr.inii.geoterra.presentation.screens.geomanifestation.form.GeomanifestationFormScreen
 
 class FieldTripDetailsScreen(
 	private val fieldTripId: String
@@ -123,9 +124,20 @@ class FieldTripDetailsScreen(
 							ExtendedFloatingActionButton(
 								onClick = {
 									isFabExpanded = false
+									navigator.push(GeomanifestationFormScreen(fieldTripId = fieldTripId))
+								},
+								icon = { Icon(Icons.Default.Add, contentDescription = "Añadir Geomanifestación") },
+								text = { Text("Añadir Manifestación") },
+								containerColor = MaterialTheme.colorScheme.primaryContainer,
+								contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+							)
+
+							ExtendedFloatingActionButton(
+								onClick = {
+									isFabExpanded = false
 									scope.launch {
 										try {
-//											viewModel.setPdfGenerating(true)
+											viewModel.setPdfGenerating(true)
 //											val fieldTripName = state.fieldTrip?.field_trip_name ?: "Gira"
 //											val fileName = "Reporte_Gira_$fieldTripName"
 //											val resultPath = PDFUtil.generateRequestPdf(state, fileName)
@@ -188,7 +200,10 @@ class FieldTripDetailsScreen(
 					.padding(top = paddingValues.calculateTopPadding())
 					.padding(horizontal = 20.dp),
 				state = state,
-				isForPdf = false
+				isForPdf = false,
+				onGeomanifestationClick = { manifestationId ->
+					navigator.push(GeomanifestationDetailsScreen(manifestationId = manifestationId))
+				}
 			)
 		}
 	}

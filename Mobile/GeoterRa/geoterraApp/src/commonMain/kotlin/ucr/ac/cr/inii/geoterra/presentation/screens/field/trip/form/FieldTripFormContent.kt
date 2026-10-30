@@ -9,7 +9,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ucr.ac.cr.inii.geoterra.presentation.components.common.ActionButton
@@ -50,43 +49,12 @@ fun FieldTripFormContent(
 				isError = state.fieldErrors["name"] != null,
 				errorMessage = state.fieldErrors["name"]
 			)
-
-			Row(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(vertical = 4.dp),
-				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.SpaceBetween
-			) {
-				Column(modifier = Modifier.weight(1f)) {
-					Text("Estado de la gira", fontWeight = FontWeight.SemiBold)
-					Text(
-						text = if (state.request.field_trip_is_active) "Gira Activa" else "Gira Inactiva",
-						style = MaterialTheme.typography.bodySmall,
-						color = if (state.request.field_trip_is_active) MaterialTheme.colorScheme.primary else Color.Gray
-					)
-				}
-				Switch(
-					checked = state.request.field_trip_is_active,
-					onCheckedChange = { onEvent(FieldTripFormEvent.ActiveStatusChanged(it)) }
-				)
-			}
 		}
 
 		FormSection(title = "Fechas de la Gira", icon = Icons.Default.DateRange) {
 			DatePickerField(
-				title = "Seleccione la fecha programada de la gira",
-				value = state.request.field_trip_scheduled_date,
-				onDateSelected = { onEvent(FieldTripFormEvent.ScheduledDateChanged(it)) },
-				label = "Fecha programada",
-				icon = Icons.Default.Event,
-				isError = state.fieldErrors["scheduled_date"] != null,
-				errorMessage = state.fieldErrors["scheduled_date"]
-			)
-
-			DatePickerField(
 				title = "Seleccione la fecha de inicio de la gira",
-				value = state.request.field_trip_start_date ?: "",
+				value = state.request.field_trip_start_date,
 				onDateSelected = { onEvent(FieldTripFormEvent.StartDateChanged(it)) },
 				label = "Fecha de inicio",
 				icon = Icons.Default.PlayArrow
@@ -94,7 +62,7 @@ fun FieldTripFormContent(
 
 			DatePickerField(
 				title = "Seleccione la fecha de finalización de la gira",
-				value = state.request.field_trip_finish_date ?: "",
+				value = state.request.field_trip_finish_date,
 				onDateSelected = { onEvent(FieldTripFormEvent.FinishDateChanged(it)) },
 				label = "Fecha de finalización",
 				icon = Icons.Default.Flag
@@ -143,6 +111,51 @@ fun FieldTripFormContent(
 				isError = state.fieldErrors["district"] != null,
 				errorMessage = state.fieldErrors["district"]
 			)
+		}
+
+		FormSection(title = "Geomanifestaciones Coincidentes", icon = Icons.Default.Place) {
+			if (state.request.province_snit_code == 0) {
+				Text(
+					text = "Seleccione una ubicación para buscar manifestaciones registradas en la zona.",
+					style = MaterialTheme.typography.bodySmall,
+					color = MaterialTheme.colorScheme.outline
+				)
+			} else if (state.matchingGeomanifestations.isEmpty()) {
+				Text(
+					text = "No se encontraron manifestaciones geotérmicas asociadas a los códigos SNIT seleccionados.",
+					style = MaterialTheme.typography.bodyMedium,
+					color = MaterialTheme.colorScheme.onSurfaceVariant
+				)
+			} else {
+				Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+					state.matchingGeomanifestations.forEach { manifestation ->
+						val isSelected = state.request.geomanifestations.contains(manifestation.geomanifestation_id)
+						Row(
+							modifier = Modifier.fillMaxWidth(),
+							verticalAlignment = Alignment.CenterVertically
+						) {
+							Checkbox(
+								checked = isSelected,
+								onCheckedChange = {
+									onEvent(FieldTripFormEvent.GeomanifestationToggled(manifestation.geomanifestation_id))
+								}
+							)
+							Column(modifier = Modifier.weight(1f)) {
+								Text(
+									text = manifestation.geomanifestation_name,
+									style = MaterialTheme.typography.bodyMedium,
+									fontWeight = FontWeight.SemiBold
+								)
+								Text(
+									text = manifestation.description ?: "Sin descripción",
+									style = MaterialTheme.typography.bodySmall,
+									color = MaterialTheme.colorScheme.onSurfaceVariant
+								)
+							}
+						}
+					}
+				}
+			}
 		}
 
 		FormSection(title = "Participantes (Personal)", icon = Icons.Default.Group) {

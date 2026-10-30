@@ -5,9 +5,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.requests.FieldTripRequest
 import ucr.ac.cr.inii.geoterra.data.model.responses.FieldTripResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationFilters
 import ucr.ac.cr.inii.geoterra.domain.repository.CantonRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.DistrictRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.FieldTripRepositoryInterface
+import ucr.ac.cr.inii.geoterra.domain.repository.GeomanifestationsRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.ProvinceRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
@@ -16,6 +18,7 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
 
 class FieldTripFormViewModel(
 	private val fieldTripRepository: FieldTripRepositoryInterface,
+	private val geomanifestationsRepository: GeomanifestationsRepositoryInterface,
 	private val provincesRepository: ProvinceRepositoryInterface,
 	private val cantonsRepository: CantonRepositoryInterface,
 	private val districtsRepository: DistrictRepositoryInterface,
@@ -33,6 +36,7 @@ class FieldTripFormViewModel(
 			_state.update { state ->
 				state.copy(request = FieldTripRequest.fromRemote(it))
 			}
+			fetchMatchingGeomanifestations()
 		}
 	}
 
@@ -68,22 +72,49 @@ class FieldTripFormViewModel(
 		}
 	}
 
+	private fun fetchMatchingGeomanifestations() {
+		val req = _state.value.request
+		if (req.province_snit_code == 0) {
+			_state.update { it.copy(matchingGeomanifestations = emptyList()) }
+			return
+		}
+
+		screenModelScope.launch {
+			val filters = GeomanifestationFilters(
+				provinceSnitCode = if (req.province_snit_code != 0) req.province_snit_code else null,
+				cantonSnitCode = if (req.canton_snit_code != 0) req.canton_snit_code else null,
+				districtSnitCode = if (req.district_snit_code != 0) req.district_snit_code else null
+			)
+
+			geomanifestationsRepository.getGeomanifestations(filters)
+				.onSuccess { paginatedResult ->
+					val matches = paginatedResult.data
+					_state.update { state ->
+						val updatedSelected = state.request.geomanifestations.filter { selectedId ->
+							matches.any { it.geomanifestation_id == selectedId }
+						}
+						state.copy(
+							matchingGeomanifestations = matches,
+							request = state.request.copy(geomanifestations = updatedSelected)
+						)
+					}
+				}
+				.onFailure {
+					_state.update { state -> state.copy(matchingGeomanifestations = emptyList()) }
+				}
+		}
+	}
+
 	fun onEvent(event: FieldTripFormEvent) {
 		when (event) {
 			is FieldTripFormEvent.NameChanged -> {
 				_state.update { it.copy(request = it.request.copy(field_trip_name = event.value), fieldErrors = it.fieldErrors - "name") }
 			}
-			is FieldTripFormEvent.ScheduledDateChanged -> {
-				_state.update { it.copy(request = it.request.copy(field_trip_scheduled_date = event.value), fieldErrors = it.fieldErrors - "scheduled_date") }
-			}
 			is FieldTripFormEvent.StartDateChanged -> {
-				_state.update { it.copy(request = it.request.copy(field_trip_start_date = event.value.ifBlank { null })) }
+				_state.update { it.copy(request = it.request.copy(field_trip_start_date = event.value)) }
 			}
 			is FieldTripFormEvent.FinishDateChanged -> {
-				_state.update { it.copy(request = it.request.copy(field_trip_finish_date = event.value.ifBlank { null })) }
-			}
-			is FieldTripFormEvent.ActiveStatusChanged -> {
-				_state.update { it.copy(request = it.request.copy(field_trip_is_active = event.value)) }
+				_state.update { it.copy(request = it.request.copy(field_trip_finish_date = event.value)) }
 			}
 			is FieldTripFormEvent.ProvinceChanged -> {
 				_state.update {
@@ -96,6 +127,7 @@ class FieldTripFormViewModel(
 						fieldErrors = it.fieldErrors - "province"
 					)
 				}
+				fetchMatchingGeomanifestations()
 			}
 			is FieldTripFormEvent.CantonChanged -> {
 				_state.update {
@@ -107,6 +139,7 @@ class FieldTripFormViewModel(
 						fieldErrors = it.fieldErrors - "canton"
 					)
 				}
+				fetchMatchingGeomanifestations()
 			}
 			is FieldTripFormEvent.DistrictChanged -> {
 				_state.update {
@@ -115,6 +148,7 @@ class FieldTripFormViewModel(
 						fieldErrors = it.fieldErrors - "district"
 					)
 				}
+				fetchMatchingGeomanifestations()
 			}
 			is FieldTripFormEvent.ParticipantAdded -> {
 				if (!state.value.request.participants.contains(event.userId)) {
@@ -127,6 +161,15 @@ class FieldTripFormViewModel(
 				_state.update {
 					it.copy(request = it.request.copy(participants = it.request.participants - event.userId))
 				}
+			}
+			is FieldTripFormEvent.GeomanifestationToggled -> {
+				val currentList = state.value.request.geomanifestations
+				val updatedList = if (currentList.contains(event.manifestationId)) {
+					currentList - event.manifestationId
+				} else {
+					currentList + event.manifestationId
+				}
+				_state.update { it.copy(request = it.request.copy(geomanifestations = updatedList)) }
 			}
 			is FieldTripFormEvent.Submit -> submitForm()
 			is FieldTripFormEvent.ShowSnackBar -> _state.update { it.copy(snackBarMessage = event.message) }
@@ -173,8 +216,11 @@ class FieldTripFormViewModel(
 		if (req.field_trip_name.isBlank()) {
 			errors["name"] = "El nombre de la gira es obligatorio."
 		}
-		if (req.field_trip_scheduled_date.isBlank()) {
-			errors["scheduled_date"] = "La fecha programada es obligatoria."
+		if (req.field_trip_start_date.isBlank()) {
+			errors["start_date"] = "La fecha de inicio es obligatoria."
+		}
+		if (req.field_trip_finish_date.isBlank()) {
+			errors["finish_date"] = "La fecha de finalización es obligatoria."
 		}
 		if (req.province_snit_code == 0) {
 			errors["province"] = "Seleccione una provincia."

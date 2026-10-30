@@ -6,9 +6,8 @@ import kotlinx.serialization.Serializable
 data class FieldTripResponse(
 	val field_trip_id: String,
 	val field_trip_name: String,
-	val field_trip_scheduled_date: String,
-	val field_trip_start_date: String? = null,
-	val field_trip_finish_date: String? = null,
+	val field_trip_start_date: String,
+	val field_trip_finish_date: String,
 	val field_trip_is_active: Boolean,
 	val geomanifestations: List<GeomanifestationResponse> = emptyList(),
 	val participants: List<UserResponse> = emptyList(),
