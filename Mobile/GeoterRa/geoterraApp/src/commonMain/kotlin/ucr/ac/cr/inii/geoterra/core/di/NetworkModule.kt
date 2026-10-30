@@ -17,6 +17,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.Json.Default.encodeToString
+import kotlinx.serialization.json.Json.Default.parseToJsonElement
 import kotlinx.serialization.json.JsonElement
 import org.koin.dsl.module
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
@@ -57,8 +59,16 @@ val networkModule = module {
 			install(Logging) {
 				logger = object : Logger {
 					override fun log(message: String) {
-						println("KtorClient: $message")
-					}
+						val formattedMessage = try {
+							encodeToString(
+								JsonElement.serializer(),
+								parseToJsonElement(message)
+							)
+						} catch (e: Exception) {
+							message
+						}
+
+						println("KtorClient: $formattedMessage")					}
 				}
 
 				level = LogLevel.ALL
