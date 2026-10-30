@@ -228,9 +228,11 @@ final class ErrorType implements JsonSerializable
 	/**
 	 * Forbidden access to a resource.
 	 */
-	public static function forbidden(): self
+	public static function forbidden(?string $message = null): self
 	{
-		return new self('FORBIDDEN_ACCESS', 'El acceso a este recurso está estrictamente prohibido');	
+		return new self('FORBIDDEN_ACCESS',
+      $message ?: 'El acceso a este recurso está estrictamente prohibido'
+    );
 	}
 
 	/**

@@ -20,8 +20,8 @@ cd "${API_DIR}"
 composer install --no-interaction
 
 echo ""
-echo -e "${BLUE}Step 2: Running All Tests${NC}"
-vendor/bin/phpunit
+echo -e "${BLUE}Step 2: Running All Tests (ephemeral Docker database)${NC}"
+bash tests/run-tests.sh
 
 echo ""
 echo -e "${GREEN}✓ All tests passed!${NC}"
@@ -30,7 +30,7 @@ echo ""
 read -p "Generate code coverage report? (y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    vendor/bin/phpunit --coverage-html coverage/ --coverage-text
+    TEST_RUNNER=phpunit bash tests/run-tests.sh --coverage-html coverage/ --coverage-text
     echo -e "${GREEN}✓ Coverage report generated in coverage/index.html${NC}"
 fi
 

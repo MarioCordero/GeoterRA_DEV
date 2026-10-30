@@ -48,8 +48,12 @@ final class InlabTestController
 				$geomanifestationId, $inlabTestName,
 				$page, $limit
 			);
-			Response::success($result);
-		} catch (ApiException $e) {
+
+      Response::success(
+        $result['data'], ['pagination' => $result['pagination']]
+      );
+
+    } catch (ApiException $e) {
 			Response::error($e->getError(), $e->getHttpStatus());
 		} catch (Throwable $e) {
 			Response::error(ErrorType::internal($e->getMessage()), 500);

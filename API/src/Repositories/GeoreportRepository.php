@@ -257,4 +257,10 @@ final class GeoreportRepository extends Repository
 		$sql = "UPDATE georeports SET visibility = 1 WHERE georeport_id = :id AND geomanifestation_id = :gm_id";
 		$this->execute($sql, [':id' => $id, ':gm_id' => $geomanifestationId]);
 	}
+
+  public function countByName(string $georeportName) {
+    $sql = "SELECT COUNT(*) FROM georeports WHERE georeport_name LIKE :georeport_name";
+    $stmt = $this->execute($sql, [':georeport_name' => '%' . trim($georeportName) . '%']);
+    return (int)$stmt->fetchColumn();
+  }
 }
