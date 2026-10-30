@@ -102,6 +102,7 @@ const InlabTestsManager = () => {
   const handleOpenEdit = (record) => {
     setEditingTest(record);
     form.setFieldsValue({
+      inlab_test_name: record.inlab_test_name || '',
       ph: record.ph,
       conductivity: record.conductivity,
       cl: record.cl,
@@ -142,6 +143,7 @@ const InlabTestsManager = () => {
       const fields = ['ph', 'conductivity', 'cl', 'ca', 'hco3', 'so4', 'fe', 'si', 'b', 'li', 'f', 'na', 'k', 'mg'];
       const payload = {
         geomanifestation_id: selectedGeoId,
+        inlab_test_name: values.inlab_test_name ? values.inlab_test_name.trim() : '',
         description: values.description || null,
       };
 
@@ -174,6 +176,12 @@ const InlabTestsManager = () => {
   };
 
   const columns = [
+    {
+      title: 'Nombre',
+      dataIndex: 'inlab_test_name',
+      key: 'inlab_test_name',
+      render: (val) => <span className="font-semibold text-slate-800">{val || 'Sin nombre'}</span>,
+    },
     {
       title: 'ID Prueba',
       dataIndex: 'inlab_test_id',
@@ -303,6 +311,17 @@ const InlabTestsManager = () => {
         width={750}
       >
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
+          <Form.Item
+            name="inlab_test_name"
+            label="Nombre de la Prueba de Laboratorio"
+            rules={[
+              { required: true, message: 'El nombre de la prueba es obligatorio' },
+              { max: 55, message: 'Máximo 55 caracteres' },
+            ]}
+          >
+            <Input placeholder="Ej: Análisis Químico Muestra #1" maxLength={55} />
+          </Form.Item>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Form.Item name="ph" label="pH Laboratorio" rules={[{ type: 'number', min: 0, max: 14 }]}>
               <InputNumber style={{ width: '100%' }} placeholder="7.2" step={0.01} />

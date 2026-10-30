@@ -59,7 +59,6 @@ import {
   fieldTripsShow,
   fieldTripsStore,
   fieldTripsUpdate,
-  fieldTripsToggleActive,
   fieldTripsAddParticipant,
   fieldTripsRemoveParticipant,
   fieldTripsLinkManifestation,
@@ -427,6 +426,7 @@ const FieldTripsManager = () => {
       if (hasTemp || hasPh || hasCond || hasNotes) {
         const testPayload = {
           geomanifestation_id: gmId,
+          insitu_test_name: `Prueba In-Situ - ${values.geomanifestation_name || 'Gira'}`,
           temperature: hasTemp ? Number(values.temperature) : 0,
           ph: hasPh ? Number(values.ph) : 0,
           conductivity: hasCond ? Number(values.conductivity) : 0,
@@ -517,8 +517,8 @@ const FieldTripsManager = () => {
     setCantons([]);
     setDistricts([]);
     form.setFieldsValue({
-      field_trip_is_active: true,
-      field_trip_scheduled_date: dayjs(),
+      field_trip_start_date: dayjs(),
+      field_trip_finish_date: dayjs().add(1, 'day'),
       participants: currentUserId ? [currentUserId] : [],
     });
     setModalVisible(true);
@@ -613,7 +613,6 @@ const FieldTripsManager = () => {
       return parsed.isValid() ? parsed : null;
     };
 
-    const scheduledDate = parseDate(detail.field_trip_scheduled_date);
     const startDate = parseDate(detail.field_trip_start_date);
     const finishDate = parseDate(detail.field_trip_finish_date);
     const isActive = detail.field_trip_is_active !== undefined ? Boolean(detail.field_trip_is_active) : true;
@@ -621,10 +620,8 @@ const FieldTripsManager = () => {
     // Snapshot of original values for partial update comparison
     const initialValues = {
       field_trip_name: detail.field_trip_name ? detail.field_trip_name.trim() : '',
-      field_trip_scheduled_date: scheduledDate ? scheduledDate.format('YYYY-MM-DD') : null,
       field_trip_start_date: startDate ? startDate.format('YYYY-MM-DD') : null,
       field_trip_finish_date: finishDate ? finishDate.format('YYYY-MM-DD') : null,
-      field_trip_is_active: isActive,
       province_snit_code: provCode ? Number(provCode) : null,
       canton_snit_code: cantCode ? Number(cantCode) : null,
       district_snit_code: distCode ? Number(distCode) : null,
@@ -640,10 +637,8 @@ const FieldTripsManager = () => {
 
     form.setFieldsValue({
       field_trip_name: detail.field_trip_name || '',
-      field_trip_scheduled_date: scheduledDate,
       field_trip_start_date: startDate,
       field_trip_finish_date: finishDate,
-      field_trip_is_active: isActive,
       province_snit_code: provCode || undefined,
       canton_snit_code: cantCode || undefined,
       district_snit_code: distCode || undefined,
@@ -670,11 +665,6 @@ const FieldTripsManager = () => {
           payload.field_trip_name = newName;
         }
 
-        const newSched = values.field_trip_scheduled_date ? values.field_trip_scheduled_date.format('YYYY-MM-DD') : null;
-        if (newSched !== (initial.field_trip_scheduled_date || null)) {
-          payload.field_trip_scheduled_date = newSched;
-        }
-
         const newStart = values.field_trip_start_date ? values.field_trip_start_date.format('YYYY-MM-DD') : null;
         if (newStart !== (initial.field_trip_start_date || null)) {
           payload.field_trip_start_date = newStart;
@@ -683,11 +673,6 @@ const FieldTripsManager = () => {
         const newFinish = values.field_trip_finish_date ? values.field_trip_finish_date.format('YYYY-MM-DD') : null;
         if (newFinish !== (initial.field_trip_finish_date || null)) {
           payload.field_trip_finish_date = newFinish;
-        }
-
-        const newActive = Boolean(values.field_trip_is_active);
-        if (newActive !== Boolean(initial.field_trip_is_active)) {
-          payload.field_trip_is_active = newActive;
         }
 
         const newProv = values.province_snit_code ? Number(values.province_snit_code) : null;
@@ -742,13 +727,11 @@ const FieldTripsManager = () => {
         // Create mode
         const payload = {
           field_trip_name: values.field_trip_name?.trim(),
-          field_trip_scheduled_date: values.field_trip_scheduled_date ? values.field_trip_scheduled_date.format('YYYY-MM-DD') : null,
           field_trip_start_date: values.field_trip_start_date ? values.field_trip_start_date.format('YYYY-MM-DD') : null,
           field_trip_finish_date: values.field_trip_finish_date ? values.field_trip_finish_date.format('YYYY-MM-DD') : null,
-          field_trip_is_active: Boolean(values.field_trip_is_active),
-          province_snit_code: values.province_snit_code || null,
-          canton_snit_code: values.canton_snit_code || null,
-          district_snit_code: values.district_snit_code || null,
+          province_snit_code: values.province_snit_code ? Number(values.province_snit_code) : null,
+          canton_snit_code: values.canton_snit_code ? Number(values.canton_snit_code) : null,
+          district_snit_code: values.district_snit_code ? Number(values.district_snit_code) : null,
           participants: values.participants || [],
           geomanifestations: values.geomanifestations || [],
         };
@@ -770,24 +753,6 @@ const FieldTripsManager = () => {
     }
   };
 
-  // Toggle Active status
-  const handleToggleActive = async (record, checked) => {
-    const id = record.field_trip_id || record.id;
-    try {
-      const res = await fieldTripsToggleActive(id, checked);
-      if (res.ok) {
-        message.success(`Gira marcada como ${checked ? 'activa' : 'inactiva'}`);
-        loadTrips();
-        if (selectedTrip && (selectedTrip.field_trip_id || selectedTrip.id) === id) {
-          setSelectedTrip((prev) => ({ ...prev, field_trip_is_active: checked ? 1 : 0 }));
-        }
-      } else {
-        message.error(res.error || 'Error al cambiar estado');
-      }
-    } catch (err) {
-      message.error(err.message || 'Error de conexión');
-    }
-  };
 
   // Delete Trip
   const handleDeleteTrip = async (record) => {
@@ -948,23 +913,10 @@ const FieldTripsManager = () => {
       key: 'status',
       width: 100,
       align: 'center',
-      render: (val, record) => (
-        canManage ? (
-          <div onClick={(e) => e.stopPropagation()}>
-            <Tooltip title={`Clic para ${val ? 'desactivar' : 'activar'}`}>
-              <Switch
-                size="small"
-                checked={Boolean(val)}
-                onChange={(checked) => handleToggleActive(record, checked)}
-                style={{ backgroundColor: val ? '#52c41a' : '#bfbfbf' }}
-              />
-            </Tooltip>
-          </div>
-        ) : (
-          <Tag color={val ? 'green' : 'default'}>
-            {val ? 'Activa' : 'Inactiva'}
-          </Tag>
-        )
+      render: (val) => (
+        <Tag color={val ? 'green' : 'default'}>
+          {val ? 'Activa' : 'Inactiva'}
+        </Tag>
       ),
     },
     {
@@ -983,15 +935,18 @@ const FieldTripsManager = () => {
       ),
     },
     {
-      title: 'Fecha Programada',
-      dataIndex: 'field_trip_scheduled_date',
-      key: 'field_trip_scheduled_date',
-      render: (val) => (
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <CalendarOutlined style={{ color: '#fa8c16' }} />
-          {val ? dayjs(val).format('YYYY-MM-DD') : 'N/A'}
-        </span>
-      ),
+      title: 'Fechas (Inicio / Fin)',
+      key: 'dates',
+      render: (_, record) => {
+        const start = record.field_trip_start_date ? dayjs(record.field_trip_start_date).format('YYYY-MM-DD') : null;
+        const finish = record.field_trip_finish_date ? dayjs(record.field_trip_finish_date).format('YYYY-MM-DD') : null;
+        return (
+          <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <CalendarOutlined style={{ color: '#fa8c16' }} />
+            {start && finish ? `${start} al ${finish}` : (start || finish || 'N/A')}
+          </span>
+        );
+      },
     },
     {
       title: 'Ubicación',
@@ -1360,23 +1315,22 @@ const FieldTripsManager = () => {
               </Form.Item>
 
               <Row gutter={16}>
-                <Col xs={24} sm={8}>
+                <Col xs={24} sm={12}>
                   <Form.Item
-                    name="field_trip_scheduled_date"
-                    label="Fecha Programada"
-                    rules={[{ required: true, message: 'Fecha programada requerida' }]}
+                    name="field_trip_start_date"
+                    label="Fecha de Inicio"
+                    rules={[{ required: true, message: 'Fecha de inicio requerida' }]}
                   >
-                    <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" placeholder="Seleccionar" size="middle" />
+                    <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" placeholder="Seleccionar inicio" size="middle" />
                   </Form.Item>
                 </Col>
-                <Col xs={24} sm={8}>
-                  <Form.Item name="field_trip_start_date" label="Fecha Inicio Real">
-                    <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" placeholder="Opcional" size="middle" />
-                  </Form.Item>
-                </Col>
-                <Col xs={24} sm={8}>
-                  <Form.Item name="field_trip_finish_date" label="Fecha Fin Real">
-                    <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" placeholder="Opcional" size="middle" />
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    name="field_trip_finish_date"
+                    label="Fecha de Finalización"
+                    rules={[{ required: true, message: 'Fecha de finalización requerida' }]}
+                  >
+                    <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" placeholder="Seleccionar fin" size="middle" />
                   </Form.Item>
                 </Col>
               </Row>
@@ -1390,7 +1344,11 @@ const FieldTripsManager = () => {
 
               <Row gutter={16}>
                 <Col xs={24} sm={8}>
-                  <Form.Item name="province_snit_code" label="Provincia">
+                  <Form.Item
+                    name="province_snit_code"
+                    label="Provincia"
+                    rules={[{ required: true, message: 'Provincia requerida' }]}
+                  >
                     <Select placeholder="Selecciona provincia" onChange={handleProvinceChange} allowClear size="middle">
                       {provinces.map((prov) => (
                         <Select.Option key={prov.province_snit_code || prov.province_id} value={prov.province_snit_code}>
@@ -1401,7 +1359,11 @@ const FieldTripsManager = () => {
                   </Form.Item>
                 </Col>
                 <Col xs={24} sm={8}>
-                  <Form.Item name="canton_snit_code" label="Cantón">
+                  <Form.Item
+                    name="canton_snit_code"
+                    label="Cantón"
+                    rules={[{ required: true, message: 'Cantón requerido' }]}
+                  >
                     <Select placeholder="Selecciona cantón" onChange={handleCantonChange} allowClear disabled={cantons.length === 0} size="middle">
                       {cantons.map((c) => (
                         <Select.Option key={c.canton_snit_code || c.canton_id} value={c.canton_snit_code}>
@@ -1412,7 +1374,11 @@ const FieldTripsManager = () => {
                   </Form.Item>
                 </Col>
                 <Col xs={24} sm={8}>
-                  <Form.Item name="district_snit_code" label="Distrito">
+                  <Form.Item
+                    name="district_snit_code"
+                    label="Distrito"
+                    rules={[{ required: true, message: 'Distrito requerido' }]}
+                  >
                     <Select placeholder="Selecciona distrito" allowClear disabled={districts.length === 0} size="middle">
                       {districts.map((d) => (
                         <Select.Option key={d.district_snit_code || d.district_id} value={d.district_snit_code}>
@@ -1467,9 +1433,7 @@ const FieldTripsManager = () => {
                 />
               </Form.Item>
 
-              <Form.Item name="field_trip_is_active" valuePropName="checked" label="Estado de la Gira" style={{ marginBottom: 0 }}>
-                <Switch checkedChildren="Activa" unCheckedChildren="Inactiva / Cerrada" />
-              </Form.Item>
+
             </div>
           </Form>
         </Spin>
@@ -1871,32 +1835,35 @@ const FieldTripsManager = () => {
                     <Card size="small" style={{ borderRadius: 8, backgroundColor: '#fafbfc' }}>
                       <Row gutter={[16, 12]}>
                         <Col span={12}>
-                          <Text type="secondary">Fecha Programada:</Text>
+                          <Text type="secondary">Fecha de Inicio:</Text>
                           <div>
                             <CalendarOutlined style={{ color: '#fa8c16', marginRight: 6 }} />
                             <Text strong>
-                              {selectedTrip.field_trip_scheduled_date
-                                ? dayjs(selectedTrip.field_trip_scheduled_date).format('YYYY-MM-DD')
-                                : 'N/A'}
+                              {selectedTrip.field_trip_start_date
+                                ? dayjs(selectedTrip.field_trip_start_date).format('YYYY-MM-DD')
+                                : 'No registrada'}
                             </Text>
                           </div>
                         </Col>
                         <Col span={12}>
+                          <Text type="secondary">Fecha de Finalización:</Text>
+                          <div>
+                            <CalendarOutlined style={{ color: '#fa8c16', marginRight: 6 }} />
+                            <Text strong>
+                              {selectedTrip.field_trip_finish_date
+                                ? dayjs(selectedTrip.field_trip_finish_date).format('YYYY-MM-DD')
+                                : 'No registrada'}
+                            </Text>
+                          </div>
+                        </Col>
+                        <Col span={24}>
                           <Text type="secondary">Estado Operativo:</Text>
                           <div>
                             <Badge
                               status={selectedTrip.field_trip_is_active ? 'success' : 'default'}
-                              text={selectedTrip.field_trip_is_active ? 'En Curso / Programada' : 'Finalizada / Inactiva'}
+                              text={selectedTrip.field_trip_is_active ? 'En Curso (Activa)' : 'Finalizada / Inactiva'}
                             />
                           </div>
-                        </Col>
-                        <Col span={12}>
-                          <Text type="secondary">Fecha de Inicio Real:</Text>
-                          <div>{selectedTrip.field_trip_start_date || 'No registrada'}</div>
-                        </Col>
-                        <Col span={12}>
-                          <Text type="secondary">Fecha de Finalización:</Text>
-                          <div>{selectedTrip.field_trip_finish_date || 'No registrada'}</div>
                         </Col>
                         <Col span={24}>
                           <Text type="secondary">Ubicación Territorial:</Text>
