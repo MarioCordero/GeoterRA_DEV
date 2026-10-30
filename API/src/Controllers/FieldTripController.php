@@ -75,11 +75,7 @@ final class FieldTripController
       $result = $this->service->getMyFieldTrips($page, $limit, $provinceSnitCode, $cantonSnitCode, $districtSnitCode);
       Response::success(
         $result['data'],
-        [
-          'total' => $result['total'],
-          'page' => $result['page'],
-          'limit' => $result['limit'],
-        ]
+        ['pagination' => $result['pagination']]
       );
     } catch (ApiException $e) {
       Response::error($e->getError(), $e->getHttpStatus());

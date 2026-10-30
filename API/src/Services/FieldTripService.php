@@ -137,7 +137,7 @@ final class FieldTripService
    * @param int|null $provinceSnitCode
    * @param int|null $cantonSnitCode
    * @param int|null $districtSnitCode
-   * @return array{data: array[], total: int, page: int, limit: int}
+   * @return array{data: array[], pagination: array{current_page: int, per_page: int, total: int, last_page: int}}
    */
   public function getAll(
     int $page = 1,
@@ -172,7 +172,7 @@ final class FieldTripService
    * @param int|null $provinceSnitCode
    * @param int|null $cantonSnitCode
    * @param int|null $districtSnitCode
-   * @return array{data: array[], total: int, page: int, limit: int}
+   * @return array{data: array[], pagination: array{current_page: int, per_page: int, total: int, last_page: int}}
    */
   public function getMyFieldTrips(
     int $page = 1,
