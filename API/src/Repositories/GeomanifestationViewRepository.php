@@ -16,9 +16,9 @@ final class GeomanifestationViewRepository extends Repository
 	 *
 	 * @return string
 	 */
-	private function getBaseSql(): string
-	{
-		return "SELECT 
+  private function getBaseSql(): string
+  {
+    return "SELECT 
               gm.geomanifestation_id AS geomanifestation_id,
               gm.geomanifestation_name AS geomanifestation_name,
               r.request_id AS request_id,
@@ -45,12 +45,16 @@ final class GeomanifestationViewRepository extends Repository
               report_creator.first_name AS report_creator_first_name,
               report_creator.last_name AS report_creator_last_name,
               ist.insitu_test_id AS insitu_test_id,
+              ist.geomanifestation_id AS insitu_geomanifestation_id,
               ist.insitu_test_name AS insitu_test_name,
               ist.temperature AS temperature,
               ist.conductivity AS insitu_conductivity,
               ist.ph AS insitu_ph,
               ist.description AS insitu_description,
+              ist.visibility AS insitu_visibility,
               ist.created_at AS insitu_created_at,
+              ist_creator.first_name AS insitu_creator_first_name,
+              ist_creator.last_name AS insitu_creator_last_name,
               ilt.inlab_test_id AS inlab_test_id,
               ilt.inlab_test_name AS inlab_test_name,
               ilt.ph AS lab_ph,
@@ -77,10 +81,11 @@ final class GeomanifestationViewRepository extends Repository
             LEFT JOIN georeports gr ON gm.current_georeport_id = gr.georeport_id 
             LEFT JOIN users report_creator ON gr.created_by = report_creator.user_id 
             LEFT JOIN insitu_tests ist ON gr.insitu_test_id = ist.insitu_test_id
+            LEFT JOIN users ist_creator ON ist.created_by = ist_creator.user_id
             LEFT JOIN requests r ON r.request_id = gm.request_id
             LEFT JOIN inlab_tests ilt ON gr.inlab_test_id = ilt.inlab_test_id
             LEFT JOIN field_trips ft ON gm.field_trip_id = ft.field_trip_id";
-	}
+  }
 
 	/**
 	 * Finds a single manifestation view by ID.
