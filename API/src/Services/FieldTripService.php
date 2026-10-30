@@ -19,12 +19,14 @@ use Repositories\FieldTripRepository;
 use Repositories\GeomanifestationRepository;
 use Repositories\ProvinceRepository;
 use Repositories\UserRepository;
+use Services\Utils\PaginationBuilder;
 
 /**
  * Business logic for field trips (giras de campo).
  */
 final class FieldTripService
 {
+  use PaginationBuilder;
   private FieldTripRepository $repository;
   private FieldTripParticipantRepository $participantRepository;
   private GeomanifestationRepository $manifestationRepository;
@@ -157,12 +159,9 @@ final class FieldTripService
     $result = $this->repository->getAllPaginated($page, $limit, $isActive, $provinceSnitCode, $cantonSnitCode, $districtSnitCode);
     $data = array_map(fn($row) => $this->formatFieldTrip($row, true), $result['data']);
 
-    return [
-      'data' => $data,
-      'total' => $result['total'],
-      'page' => $page,
-      'limit' => $limit,
-    ];
+    return $this->buildPaginationResponse(
+      $data, $result['total'], $page, $limit
+    );
   }
 
   /**
@@ -194,12 +193,9 @@ final class FieldTripService
     $result = $this->repository->getByParticipant($auth['user_id'], $page, $limit, $provinceSnitCode, $cantonSnitCode, $districtSnitCode);
     $data = array_map(fn($row) => $this->formatFieldTrip($row, true), $result['data']);
 
-    return [
-      'data' => $data,
-      'total' => $result['total'],
-      'page' => $page,
-      'limit' => $limit,
-    ];
+    return $this->buildPaginationResponse(
+      $data, $result['total'], $page, $limit
+    );
   }
 
   /**
@@ -603,8 +599,14 @@ final class FieldTripService
       new DateTimeImmutable($existing['field_trip_finish_date']) : null;
 
     if ($requireBeforeFinish) {
-      if ($finishDate !== null && $now > $finishDate) {
-        throw new ApiException(ErrorType::forbidden(), 403);
+      if ($userRole !== AllowedUserRoles::ADMIN
+        && $finishDate !== null && $now > $finishDate) {
+        throw new ApiException(
+          ErrorType::forbidden(
+            'This field trip has already finished and cannot be modified.'
+          ),
+          403
+        );
       }
     } else if ($startDate === null || $finishDate === null
       || $now < $startDate || $now > $finishDate) {

@@ -12,10 +12,16 @@ use Http\Request;
 use PDO;
 use Repositories\InvestigationRequestRepository;
 use Repositories\UserRepository;
+use Services\Utils\PaginationBuilder;
 use Throwable;
 
+/**
+ * Service handling business logic for investigation requests.
+ */
 final class InvestigationRequestService
 {
+  use PaginationBuilder;
+
   private InvestigationRequestRepository $repository;
   private UserRepository $userRepository;
   private NotificationService $notificationService;
@@ -27,13 +33,57 @@ final class InvestigationRequestService
     $this->notificationService = new NotificationService(new SmtpEmailService());
   }
 
-  public function getAllByUser(): array
-  {
+  /**
+   * Retrieves a paginated and filtered list of requests belonging to the current user.
+   *
+   * @param int $page Current pagination page.
+   * @param int $limit Maximum number of results per page.
+   * @param int|null $provinceSnitCode Optional filter by province SNIT.
+   * @param int|null $cantonSnitCode Optional filter by canton SNIT.
+   * @param int|null $districtSnitCode Optional filter by district SNIT.
+   * @return array Standardized pagination response structure.
+   */
+  public function getAllByUser(
+    int $page = 1,
+    int $limit = 20,
+    ?int $provinceSnitCode = null,
+    ?int $cantonSnitCode = null,
+    ?int $districtSnitCode = null
+  ): array {
     $user = Request::getUser();
-    $rows = $this->repository->findAllByUser($user['user_id']);
-    return array_map([$this, 'formatRequest'], $rows);
+
+    $safeLimit = $limit > 0 ? $limit : 20;
+    $safePage = $page > 0 ? $page : 1;
+    $offset = ($safePage - 1) * $safeLimit;
+
+    $rows = $this->repository->findAllByUserPaginated(
+      $user['user_id'],
+      $safeLimit,
+      $offset,
+      $provinceSnitCode,
+      $cantonSnitCode,
+      $districtSnitCode
+    );
+
+    $total = $this->repository->countAllByUser(
+      $user['user_id'],
+      $provinceSnitCode,
+      $cantonSnitCode,
+      $districtSnitCode
+    );
+
+    $formattedData = array_map([$this, 'formatRequest'], $rows);
+
+    return $this->buildPaginationResponse($formattedData, $total, $safePage, $safeLimit);
   }
 
+  /**
+   * Retrieves a specific request by ID, verifying user ownership.
+   *
+   * @param string $id Unique request identifier.
+   * @return array Formatted request payload.
+   * @throws ApiException If request is not found or unauthorized.
+   */
   public function getById(string $id): array
   {
     $user = Request::getUser();
@@ -44,6 +94,13 @@ final class InvestigationRequestService
     return $this->formatRequest($row);
   }
 
+  /**
+   * Creates a new investigation request and emits a notification.
+   *
+   * @param RegisterInvestigationRequestDTO $dto Validated transfer object.
+   * @return array Formatted created request.
+   * @throws ApiException In case of unexpected server failures.
+   */
   public function create(RegisterInvestigationRequestDTO $dto): array
   {
     $user = Request::getUser();
@@ -75,7 +132,9 @@ final class InvestigationRequestService
 
       return $this->formatRequest($result);
     } catch (Throwable $e) {
-      $this->pdo->rollBack();
+      if ($this->pdo->inTransaction()) {
+        $this->pdo->rollBack();
+      }
       throw new ApiException(
         ErrorType::internal('Failed to create request: ' . $e->getMessage()),
         500
@@ -83,6 +142,14 @@ final class InvestigationRequestService
     }
   }
 
+  /**
+   * Updates an existing request owned by the user, if it remains in 'Pendiente' state.
+   *
+   * @param string $id Unique request identifier.
+   * @param UpdateInvestigationRequestDTO $dto Validated update transfer object.
+   * @return array Formatted updated request.
+   * @throws ApiException If request is invalid, missing, or locked.
+   */
   public function update(string $id, UpdateInvestigationRequestDTO $dto): array
   {
     $user = Request::getUser();
@@ -126,6 +193,13 @@ final class InvestigationRequestService
     return $this->formatRequest($result);
   }
 
+  /**
+   * Deletes an investigation request owned by the user.
+   *
+   * @param string $id Unique request identifier.
+   * @return void
+   * @throws ApiException
+   */
   public function delete(string $id): void
   {
     $user = Request::getUser();
@@ -136,6 +210,14 @@ final class InvestigationRequestService
     }
     $this->repository->delete($id, $user['user_id']);
   }
+
+  /**
+   * Returns state tracking records for a specific request owned by the user.
+   *
+   * @param string $id Unique request identifier.
+   * @return array List of history states.
+   * @throws ApiException
+   */
   public function getStates(string $id): array
   {
     $user = Request::getUser();
@@ -148,8 +230,17 @@ final class InvestigationRequestService
     return $this->repository->getStatesByRequestId($id);
   }
 
-  public function adminAddState(string $id, string $stateValue, string $description
-  ): void {
+  /**
+   * Allows an admin to attach a new state tracking update to any request.
+   *
+   * @param string $id Unique request identifier.
+   * @param string $stateValue The new label (e.g. Aprobado).
+   * @param string $description The audit note.
+   * @return void
+   * @throws ApiException
+   */
+  public function adminAddState(string $id, string $stateValue, string $description): void
+  {
     $user = Request::requireRole(
       [
         AllowedUserRoles::ADMIN,
@@ -180,6 +271,13 @@ final class InvestigationRequestService
     }
   }
 
+  /**
+   * Retrieves administrative state tracking records for any given request.
+   *
+   * @param string $id Unique request identifier.
+   * @return array List of history states.
+   * @throws ApiException
+   */
   public function adminGetStates(string $id): array
   {
     Request::requireRole(
@@ -201,8 +299,29 @@ final class InvestigationRequestService
     return $this->repository->getStatesByRequestId($id);
   }
 
-  public function adminGetAll(): array
-  {
+  /**
+   * Retrieves a globally paginated and filtered list of requests with administrative scope.
+   *
+   * @param int $page Current pagination page.
+   * @param int $limit Maximum number of results per page.
+   * @param int|null $provinceSnitCode Filter by province SNIT.
+   * @param int|null $cantonSnitCode Filter by canton SNIT.
+   * @param int|null $districtSnitCode Filter by district SNIT.
+   * @param string|null $requestName Filter by request name.
+   * @param string|null $userName Filter by user's first or last name.
+   * @param string|null $userEmail Filter by user's email.
+   * @return array Standardized pagination response structure.
+   */
+  public function adminGetAll(
+    int $page = 1,
+    int $limit = 20,
+    ?int $provinceSnitCode = null,
+    ?int $cantonSnitCode = null,
+    ?int $districtSnitCode = null,
+    ?string $requestName = null,
+    ?string $userName = null,
+    ?string $userEmail = null
+  ): array {
     Request::requireRole(
       [
         AllowedUserRoles::ADMIN,
@@ -212,11 +331,42 @@ final class InvestigationRequestService
       ]
     );
 
-    $rows = $this->repository->getAll();
-    return array_map([$this, 'formatRequest'], $rows);
+    $safeLimit = $limit > 0 ? $limit : 20;
+    $safePage = $page > 0 ? $page : 1;
+    $offset = ($safePage - 1) * $safeLimit;
+
+    $rows = $this->repository->getAllPaginated(
+      $safeLimit,
+      $offset,
+      $provinceSnitCode,
+      $cantonSnitCode,
+      $districtSnitCode,
+      $requestName,
+      $userName,
+      $userEmail
+    );
+
+    $total = $this->repository->countAll(
+      $provinceSnitCode,
+      $cantonSnitCode,
+      $districtSnitCode,
+      $requestName,
+      $userName,
+      $userEmail
+    );
+
+    $formattedData = array_map([$this, 'formatRequest'], $rows);
+
+    return $this->buildPaginationResponse($formattedData, $total, $safePage, $safeLimit);
   }
 
-
+  /**
+   * Returns any analysis request by ID, ignoring standard ownership checks.
+   *
+   * @param string $id Unique request identifier.
+   * @return array Formatted request payload.
+   * @throws ApiException
+   */
   public function adminGetById(string $id): array
   {
     Request::requireRole(
@@ -235,6 +385,12 @@ final class InvestigationRequestService
     return $this->formatRequest($row);
   }
 
+  /**
+   * Helper method to map raw database rows to strict API JSON contracts.
+   *
+   * @param array $row Raw dataset from PDO.
+   * @return array API mapped array.
+   */
   private function formatRequest(array $row): array
   {
     $currentState = null;
@@ -259,16 +415,16 @@ final class InvestigationRequestService
       'exact_address' => $row['exact_address'],
       'relation_with_owner' => $row['relation_with_owner'],
       'created_at' => $row['created_at'],
-			'location' => [
-				'province' => $row['province_name'],
-				'province_snit_code' => $row['province_snit_code'],
-				'canton' => $row['canton_name'],
-				'canton_snit_code' => $row['canton_snit_code'],
-				'district' => $row['district_name'],
-				'district_snit_code' => $row['district_snit_code'],
-				'latitude' => round((float)$row['latitude'], 7),
-				'longitude' => round((float)$row['longitude'], 7),
-			],
+      'location' => [
+        'province' => $row['province_name'],
+        'province_snit_code' => $row['province_snit_code'],
+        'canton' => $row['canton_name'],
+        'canton_snit_code' => $row['canton_snit_code'],
+        'district' => $row['district_name'],
+        'district_snit_code' => $row['district_snit_code'],
+        'latitude' => round((float)$row['latitude'], 7),
+        'longitude' => round((float)$row['longitude'], 7),
+      ],
       'current_state' => $currentState,
     ];
 
