@@ -1,3 +1,10 @@
+export const getActiveApiKey = () => {
+  if (typeof window !== 'undefined' && window.__APP_CONFIG__?.API_KEY) {
+    return window.__APP_CONFIG__.API_KEY;
+  }
+  return import.meta.env.VITE_API_KEY || '';
+};
+
 const API_CONFIG = {
   environment: import.meta.env.MODE === 'production' ? 'production' : 'local',
 
@@ -8,9 +15,6 @@ const API_CONFIG = {
 
   defaultHeaders: {
     'Content-Type': 'application/json',
-    // Production: injected at runtime via /config.js (from the server's .env).
-    // Local dev: falls back to VITE_API_KEY from src/config/.env.
-    'x-api-key': window.__APP_CONFIG__?.API_KEY || import.meta.env.VITE_API_KEY,
   },
 
   endpoints: {
@@ -436,8 +440,10 @@ const _isAuthEndpoint = (endpoint) => {
  */
 const _rawCallApi = async (endpoint, method = 'GET', payload = null, customHeaders = {}) => {
   try {
+    const activeApiKey = getActiveApiKey();
     const headers = {
       ...API_CONFIG.defaultHeaders,
+      ...(activeApiKey ? { 'x-api-key': activeApiKey } : {}),
       ...customHeaders,
     };
 
