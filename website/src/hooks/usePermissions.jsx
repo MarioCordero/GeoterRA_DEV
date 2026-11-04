@@ -1,3 +1,4 @@
+import React, { useCallback } from 'react';
 import { useSession } from './useSession';
 
 // ============================================================
@@ -171,40 +172,40 @@ export const usePermissions = () => {
    * @param {string} permission - The permission to check
    * @returns {boolean} True if user has permission, false otherwise
    */
-  const hasPermission = (permission) => {
+  const hasPermission = useCallback((permission) => {
     if (!user || !user.role) {
       return false;
     }
     
     const userPermissions = ROLE_PERMISSIONS[user.role] || [];
     return userPermissions.includes(permission);
-  };
+  }, [user?.role]);
   
   /**
    * Check if the user has any of the specified permissions
    * @param {Array<string>} permissions - List of permissions to check
    * @returns {boolean} True if user has at least one of the permissions
    */
-  const hasAnyPermission = (permissions) => {
+  const hasAnyPermission = useCallback((permissions) => {
     if (!Array.isArray(permissions)) {
       return false;
     }
     
     return permissions.some(permission => hasPermission(permission));
-  };
+  }, [hasPermission]);
   
   /**
    * Check if the user has all of the specified permissions
    * @param {Array<string>} permissions - List of permissions to check
    * @returns {boolean} True if user has all of the permissions
    */
-  const hasAllPermissions = (permissions) => {
+  const hasAllPermissions = useCallback((permissions) => {
     if (!Array.isArray(permissions)) {
       return false;
     }
     
     return permissions.every(permission => hasPermission(permission));
-  };
+  }, [hasPermission]);
   
   return {
     // Permission checking functions
