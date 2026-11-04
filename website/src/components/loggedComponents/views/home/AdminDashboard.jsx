@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSession } from '../../../../hooks/useSession';
-import { analysisRequest } from '../../../../config/apiConf';
+import { analysisRequestAdminIndex } from '../../../../config/apiConf';
 import { usePermissions } from '../../../../hooks/usePermissions';
 import { Spin, Card, Tag, Button } from 'antd';
 import {
@@ -26,23 +26,21 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState({ total: 0, pending: 0, analyzed: 0, rejected: 0 });
   const [statsLoading, setStatsLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      if (!hasPermission(PERMISSIONS.REVIEW_REQUESTS)) return;
+  const canReviewRequests = hasPermission(PERMISSIONS.REVIEW_REQUESTS);
 
+  useEffect(() => {
+    if (!canReviewRequests) return;
+
+    let isMounted = true;
+    const fetchStats = async () => {
       try {
         setStatsLoading(true);
-        const res = await fetch(analysisRequest.adminIndex(), {
-          method: 'GET',
-          credentials: 'include',
-          headers: { 'Accept': 'application/json' },
-        });
+        const res = await analysisRequestAdminIndex();
 
-        if (!res.ok) return;
+        if (!isMounted || !res.ok) return;
 
-        const result = await res.json();
-        if (result.data && Array.isArray(result.data)) {
-          const data = result.data;
+        const data = res.data;
+        if (data && Array.isArray(data)) {
           setStats({
             total: data.length,
             pending: data.filter(r => r.state === 'Pendiente' || r.state === 'Registrada').length,
@@ -53,12 +51,18 @@ const AdminDashboard = () => {
       } catch (err) {
         console.warn('Stats fetch warning:', err);
       } finally {
-        setStatsLoading(false);
+        if (isMounted) {
+          setStatsLoading(false);
+        }
       }
     };
 
     fetchStats();
-  }, [hasPermission, PERMISSIONS]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [canReviewRequests]);
 
   if (loading) {
     return (
