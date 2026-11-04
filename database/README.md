@@ -30,7 +30,7 @@ Guía para la inicialización, gestión y ejecución de migraciones de la base d
 | **Usuario** | `mario` | `DB_USER` | Usuario con privilegios completos |
 | **Contraseña Usuario**| `2003` | `DB_PASS` | Contraseña configurada en `API/config/config.ini` |
 | **Contraseña Root** | `2003` | `DB_ROOT_PASS` | Acceso administrativo interno |
-| **Puerto Host** | `3306` | `DB_PORT` | Mapeo al puerto `3306` del contenedor |
+| **Puerto Host** | `3307` | `DB_PORT` | Mapeo al puerto `3306` del contenedor (estándar para Docker) |
 | **Volumen** | `geoterra_mariadb_data` | `VOLUME_NAME` | Persistencia de datos en `/var/lib/mysql` |
 | **Charset / Collate** | `utf8mb4` / `utf8mb4_general_ci` | - | Codificación estándar del proyecto |
 
@@ -109,34 +109,15 @@ Cada migración aplicada se registra en la tabla interna `schema_migrations`:
 
 ---
 
-## ⚠️ Resolución de Conflictos Comunes
-
-### Puerto 3306 Ocupado
-Si cuenta con un servicio local de MariaDB/MySQL en ejecución en su equipo (`sudo systemctl status mariadb`), Docker no podrá vincular el puerto `3306`. En este caso, tiene dos opciones:
-
-1. **Opción A (Recomendada): Usar otro puerto para Docker**:
-   ```bash
-   DB_PORT=3307 ./bash/DOCKER.migrate.sh
-   ```
-   *(Recuerde ajustar `port = 3307` en `API/config/config.ini` si utiliza este puerto).*
-
-2. **Opción B: Detener la instancia nativa del host**:
-   ```bash
-   sudo systemctl stop mariadb
-   ./bash/DOCKER.migrate.sh
-   ```
-
----
-
 ## 🔌 Conexión desde el Backend PHP (API)
 
-Para conectar la API local al contenedor Docker, asegúrese de que [`API/config/config.ini`](../API/config/config.ini) contenga los parámetros correspondientes:
+Para conectar la API local al contenedor Docker, asegúrese de que [`API/config/config.ini`](../API/config/config.ini) contenga los parámetros correspondientes (estándar en puerto `3307`):
 
 ```ini
 [database]
 host = 127.0.0.1
-port = 3306
+port = 3307
 name = GeoterRA
-user = <Su usuario>
-pass = <Su contraseña>
+user = mario
+pass = 2003
 ```
