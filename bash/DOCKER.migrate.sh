@@ -24,7 +24,7 @@
 #      ./bash/DOCKER.migrate.sh --restart
 #
 # Variables de entorno opcionales:
-#   DB_PORT=3306          (Puerto en el host, cambiar a 3307 si el 3306 está ocupado)
+#   DB_PORT=3307          (Puerto en el host, por defecto 3307)
 #   DB_NAME=GeoterRA
 #   DB_USER=mario
 #   DB_PASS=2003
@@ -45,7 +45,7 @@ CONTAINER_NAME="${CONTAINER_NAME:-geoterra-mariadb}"
 VOLUME_NAME="${VOLUME_NAME:-geoterra_mariadb_data}"
 IMAGE="${GEOTERRA_DB_IMAGE:-mariadb:11.8}"
 
-DB_HOST_PORT="${DB_PORT:-3306}"
+DB_HOST_PORT="${DB_PORT:-3307}"
 DB_NAME="${DB_NAME:-GeoterRA}"
 DB_USER="${DB_USER:-mario}"
 DB_PASS="${DB_PASS:-2003}"
