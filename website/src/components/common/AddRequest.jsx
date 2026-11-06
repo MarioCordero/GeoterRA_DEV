@@ -1,23 +1,39 @@
 import dayjs from "dayjs";
 import "leaflet/dist/leaflet.css";
 import PhoneInput from './PhoneInput';
-import { 
-  analysisRequestStore, 
-  provincesIndex, 
-  cantonsIndex, 
-  districtsIndex 
+import {
+  analysisRequestStore,
+  provincesIndex,
+  cantonsIndex,
+  districtsIndex
 } from '../../config/apiConf';
 import { useSession } from '../../hooks/useSession';
 import MapCoordinatePicker from './MapCoordinatePicker';
 import React, { useState, useEffect, useRef } from "react";
-import { 
-  Modal, Button, Form, Input, Radio, Upload, message, Spin, Select, Card, Switch 
+import {
+  Modal, Button, Form, Input, Radio, Upload, message, Spin, Select, Card, Switch, Slider, Checkbox, Tag
 } from "antd";
-import { 
-  EnvironmentFilled, ExperimentOutlined, UserOutlined, PlusCircleOutlined 
+import {
+  EnvironmentFilled, ExperimentOutlined, UserOutlined, PlusCircleOutlined
 } from "@ant-design/icons";
 
 const FORM_CACHE_KEY = "addPointFormCache";
+
+const TEMPERATURE_LEVELS = [
+  { value: 'Natural', label: 'Natural', emoji: '🍃', color: '#64748b', desc: 'Temperatura ambiente / fresca' },
+  { value: 'Templado', label: 'Templado', emoji: '🌤️', color: '#0284c7', desc: 'Ligeramente tibia al tacto' },
+  { value: 'Caliente', label: 'Caliente', emoji: '🥵', color: '#f59e0b', desc: 'Calor apreciable sin vapor denso' },
+  { value: 'Muy Caliente', label: 'Muy Caliente', emoji: '🌶️', color: '#ea580c', desc: 'Emanación de calor intenso y vapor' },
+  { value: 'Hirviendo', label: 'Hirviendo', emoji: '🔥', color: '#dc2626', desc: 'Burbujeo / ebullición visible' },
+];
+
+const TEMPERATURE_MARKS = {
+  0: <span className="font-semibold text-xs text-slate-600">🍃 Natural</span>,
+  1: <span className="font-semibold text-xs text-sky-700">🌤️ Templado</span>,
+  2: <span className="font-semibold text-xs text-amber-700">🥵 Caliente</span>,
+  3: <span className="font-semibold text-xs text-orange-700">🌶️ Muy Caliente</span>,
+  4: <span className="font-semibold text-xs text-red-600">🔥 Hirviendo</span>,
+};
 
 const AddRequest = ({
   onRequestAdded,
@@ -42,11 +58,33 @@ const AddRequest = ({
   const [loadingCantons, setLoadingCantons] = useState(false);
   const [loadingDistricts, setLoadingDistricts] = useState(false);
 
+  // Temperature sensation slider state
+  const [tempSliderIndex, setTempSliderIndex] = useState(0);
+  const [isUnspecifiedTemp, setIsUnspecifiedTemp] = useState(false);
+
+  const currentTempLevel = isUnspecifiedTemp
+    ? { value: 'Sin Especificar', label: 'Sin Especificar', emoji: '🤷', color: '#8c8c8c', desc: 'No se definió una percepción térmica' }
+    : (TEMPERATURE_LEVELS[tempSliderIndex] || TEMPERATURE_LEVELS[0]);
+
+  const handleSliderChange = (val) => {
+    setTempSliderIndex(val);
+    form.setFieldsValue({ temperatureSensation: TEMPERATURE_LEVELS[val].value });
+  };
+
+  const handleToggleUnspecified = (checked) => {
+    setIsUnspecifiedTemp(checked);
+    if (checked) {
+      form.setFieldsValue({ temperatureSensation: 'Sin Especificar' });
+    } else {
+      form.setFieldsValue({ temperatureSensation: TEMPERATURE_LEVELS[tempSliderIndex].value });
+    }
+  };
+
   // Load provinces when modal opens
   useEffect(() => {
     if (visible) {
       loadProvinces();
-      
+
       const cached = localStorage.getItem(FORM_CACHE_KEY);
       if (cached) {
         try {
@@ -57,6 +95,15 @@ const AddRequest = ({
           }
           if (parsed.hasOwnerInfo) {
             setHasOwnerInfo(parsed.hasOwnerInfo);
+          }
+          if (parsed.temperatureSensation) {
+            if (parsed.temperatureSensation === "Sin Especificar") {
+              setIsUnspecifiedTemp(true);
+            } else {
+              setIsUnspecifiedTemp(false);
+              const idx = TEMPERATURE_LEVELS.findIndex(l => l.value === parsed.temperatureSensation);
+              if (idx !== -1) setTempSliderIndex(idx);
+            }
           }
 
           // Restore cantons and districts if cached
@@ -76,6 +123,8 @@ const AddRequest = ({
       setCantons([]);
       setDistricts([]);
       setHasOwnerInfo("0");
+      setTempSliderIndex(0);
+      setIsUnspecifiedTemp(false);
     }
   }, [visible]);
 
@@ -159,7 +208,7 @@ const AddRequest = ({
         details: values.details?.trim() || null,
         latitude: latLng.lat ? Number(latLng.lat) : null,
         longitude: latLng.lng ? Number(latLng.lng) : null,
-        
+
         // Owner info is completely optional (null if not provided or unknown)
         owner_name: hasOwnerInfo === "1" && values.ownerName?.trim() ? values.ownerName.trim() : null,
         owner_phone_number: hasOwnerInfo === "1" && values.contactNumber ? values.contactNumber.replace(/\D/g, '') : null,
@@ -174,6 +223,8 @@ const AddRequest = ({
         localStorage.removeItem(FORM_CACHE_KEY);
         setLatLng({});
         setHasOwnerInfo("0");
+        setTempSliderIndex(0);
+        setIsUnspecifiedTemp(false);
 
         if (onRequestAdded) {
           onRequestAdded();
@@ -203,6 +254,8 @@ const AddRequest = ({
   const handleCancel = () => {
     setLatLng({});
     setHasOwnerInfo("0");
+    setTempSliderIndex(0);
+    setIsUnspecifiedTemp(false);
     setVisible(false);
   };
 
@@ -252,11 +305,11 @@ const AddRequest = ({
 
   return (
     <>
-      <Button 
-        type="primary" 
-        size="large"
+      <Button
+        type="primary"
+        size="medium"
         icon={<PlusCircleOutlined />}
-        onClick={() => setVisible(true)} 
+        onClick={() => setVisible(true)}
         disabled={!userEmail}
       >
         Agregar Solicitud
@@ -295,9 +348,9 @@ const AddRequest = ({
       >
         {renderStatusMessage()}
 
-        <Form 
-          layout="vertical" 
-          form={form} 
+        <Form
+          layout="vertical"
+          form={form}
           className="poppins space-y-8"
           initialValues={{
             temperatureSensation: "Natural",
@@ -310,7 +363,7 @@ const AddRequest = ({
             <h3 className="text-lg font-bold text-geoterra-blue border-b border-gray-100 pb-3 flex items-center gap-2">
               <EnvironmentFilled /> Ubicación de la Manifestación
             </h3>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <Form.Item
                 label="Provincia"
@@ -382,10 +435,10 @@ const AddRequest = ({
               <ExperimentOutlined /> Características de la Manifestación
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Form.Item 
-                label="Uso Actual del Terreno" 
-                name="currentUsage" 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Form.Item
+                label="Uso Actual del Terreno"
+                name="currentUsage"
                 rules={[{ required: true, message: "Seleccione el uso actual" }]}
               >
                 <Select
@@ -402,30 +455,84 @@ const AddRequest = ({
                 />
               </Form.Item>
 
-              <Form.Item 
-                label="Sensación Térmica" 
-                name="temperatureSensation" 
-                rules={[{ required: true, message: "Seleccione la sensación térmica" }]}
-              >
-                <Select
-                  size="large"
-                  placeholder="Sensación térmica percibida"
-                  options={[
-                    { value: 'Hirviendo', label: '🔥 Hirviendo' },
-                    { value: 'Muy Caliente', label: '🌶️ Muy Caliente' },
-                    { value: 'Caliente', label: '🥵 Caliente' },
-                    { value: 'Templado', label: '🌤️ Templado' },
-                    { value: 'Natural', label: '🍃 Natural' },
-                    { value: 'Sin Especificar', label: '🤷 Sin Especificar' }
-                  ]}
-                />
-              </Form.Item>
-
               <Form.Item label="Burbujeo Activo" name="bubbles">
                 <Radio.Group size="large" className="pt-2">
                   <Radio value="1">Sí (Activo)</Radio>
                   <Radio value="0">No</Radio>
                 </Radio.Group>
+              </Form.Item>
+            </div>
+
+            {/* Sensación Térmica: Deslizador con gradiente térmico o casilla Sin Especificar */}
+            <div className="bg-gray-50/80 p-4.5 rounded-xl border border-gray-200 space-y-3">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-gray-200/60 pb-2.5">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-gray-800 text-sm poppins flex items-center gap-1.5">
+                      <span>{currentTempLevel.emoji}</span> Sensación Térmica Percibida:
+                    </span>
+                    <Tag
+                      className="rounded-full px-2.5 py-0.5 text-xs font-bold border"
+                      style={{
+                        backgroundColor: `${currentTempLevel.color}15`,
+                        color: currentTempLevel.color,
+                        borderColor: `${currentTempLevel.color}40`,
+                      }}
+                    >
+                      {currentTempLevel.label}
+                    </Tag>
+                  </div>
+                  <p className="text-xs text-gray-500 m-0 mt-0.5 poppins">
+                    {currentTempLevel.desc}
+                  </p>
+                </div>
+
+                <Checkbox
+                  checked={isUnspecifiedTemp}
+                  onChange={(e) => handleToggleUnspecified(e.target.checked)}
+                  className="poppins text-xs text-gray-600 font-medium select-none"
+                >
+                  Sin especificar
+                </Checkbox>
+              </div>
+
+              {!isUnspecifiedTemp ? (
+                <div className="pt-2 pb-5 px-3">
+                  <Slider
+                    min={0}
+                    max={4}
+                    step={1}
+                    value={tempSliderIndex}
+                    onChange={handleSliderChange}
+                    marks={TEMPERATURE_MARKS}
+                    railStyle={{
+                      background: 'linear-gradient(to right, #94a3b8 0%, #38bdf8 25%, #f59e0b 50%, #ea580c 75%, #dc2626 100%)',
+                      height: 8,
+                      borderRadius: 4,
+                    }}
+                    trackStyle={{ background: 'transparent' }}
+                    handleStyle={{
+                      borderColor: currentTempLevel.color,
+                      backgroundColor: '#ffffff',
+                      width: 20,
+                      height: 20,
+                      marginTop: -6,
+                      boxShadow: `0 2px 6px ${currentTempLevel.color}66`,
+                    }}
+                    tooltip={{
+                      formatter: (val) => `${TEMPERATURE_LEVELS[val]?.emoji} ${TEMPERATURE_LEVELS[val]?.label}`,
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="py-3 px-4 bg-white rounded-lg border border-dashed border-gray-300 text-center text-xs text-gray-500 poppins flex items-center justify-center gap-2">
+                  <span>🤷</span> No se especificará una sensación térmica en este registro.
+                </div>
+              )}
+
+              {/* Input oculto vinculado al formulario para validación y persistencia */}
+              <Form.Item name="temperatureSensation" hidden>
+                <Input />
               </Form.Item>
             </div>
 
@@ -440,11 +547,11 @@ const AddRequest = ({
               <h3 className="text-lg font-bold text-geoterra-blue flex items-center gap-2 m-0">
                 <UserOutlined /> Información del Propietario <span className="text-xs text-gray-400 font-normal">(Opcional)</span>
               </h3>
-              
+
               <div className="flex items-center gap-3">
                 <span className="text-sm font-semibold text-gray-600">¿Conoce al propietario?</span>
-                <Radio.Group 
-                  value={hasOwnerInfo} 
+                <Radio.Group
+                  value={hasOwnerInfo}
                   onChange={(e) => setHasOwnerInfo(e.target.value)}
                   buttonStyle="solid"
                 >
