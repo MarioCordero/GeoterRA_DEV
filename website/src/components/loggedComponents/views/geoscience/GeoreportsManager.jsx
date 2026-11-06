@@ -13,6 +13,7 @@ import {
 } from '@ant-design/icons';
 import EntityNavigatorPicker from '../../../common/EntityNavigatorPicker';
 import { renderDateWithProse } from '../../../../utils/dateFormatter';
+import { useSession } from '../../../../hooks/useSession';
 import {
   georeportsCurrent,
   georeportsAdminIndex,
@@ -38,6 +39,8 @@ const extractList = (resData) => {
 };
 
 const GeoreportsManager = () => {
+  const { user } = useSession();
+  const isMaintenance = user?.role === 'maintenance';
   const [manifestations, setManifestations] = useState([]);
   const [selectedGeoId, setSelectedGeoId] = useState(null);
   const [reports, setReports] = useState([]);
@@ -273,21 +276,25 @@ const GeoreportsManager = () => {
       key: 'georeport_name',
       render: (val) => <span className="font-semibold text-slate-800">{val || 'Sin nombre'}</span>,
     },
-    {
+    ...(isMaintenance ? [{
       title: 'ID Georeporte',
       dataIndex: 'georeport_id',
       key: 'georeport_id',
       render: (val, record) => <span className="font-mono text-xs font-semibold text-gray-700">{val || record.id}</span>,
-    },
+    }] : []),
     {
       title: 'Prueba In-Situ',
       dataIndex: 'insitu_test_id',
       key: 'insitu_test_id',
       render: (val) => (
-        <span className="font-mono text-xs flex items-center gap-1 text-cyan-700">
-          <BulbOutlined style={{ color: '#13c2c2' }} />
-          {val || 'Ninguna'}
-        </span>
+        isMaintenance ? (
+          <span className="font-mono text-xs flex items-center gap-1 text-cyan-700">
+            <BulbOutlined style={{ color: '#13c2c2' }} />
+            {val || 'Ninguna'}
+          </span>
+        ) : (
+          val ? <Tag color="cyan">Vinculada</Tag> : <Tag color="default">Ninguna</Tag>
+        )
       ),
     },
     {
@@ -295,10 +302,14 @@ const GeoreportsManager = () => {
       dataIndex: 'inlab_test_id',
       key: 'inlab_test_id',
       render: (val) => (
-        <span className="font-mono text-xs flex items-center gap-1 text-purple-700">
-          <ExperimentOutlined style={{ color: '#722ed1' }} />
-          {val || 'Ninguna'}
-        </span>
+        isMaintenance ? (
+          <span className="font-mono text-xs flex items-center gap-1 text-purple-700">
+            <ExperimentOutlined style={{ color: '#722ed1' }} />
+            {val || 'Ninguna'}
+          </span>
+        ) : (
+          val ? <Tag color="purple">Vinculada</Tag> : <Tag color="default">Ninguna</Tag>
+        )
       ),
     },
     {
@@ -410,9 +421,11 @@ const GeoreportsManager = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
               <StarFilled style={{ color: '#fa8c16', fontSize: 18 }} />
               <Text strong style={{ color: '#d46b08' }}>Reporte Vigente Actual:</Text>
-              <span className="font-mono text-xs bg-amber-100 px-2 py-0.5 rounded border border-amber-300">
-                {currentReport.georeport_id || currentReport.id}
-              </span>
+              {isMaintenance && (
+                <span className="font-mono text-xs bg-amber-100 px-2 py-0.5 rounded border border-amber-300">
+                  {currentReport.georeport_id || currentReport.id}
+                </span>
+              )}
               <span style={{ margin: '0 8px', color: '#ccc' }}>|</span>
               <Text type="secondary">{currentReport.details || 'Sin detalles'}</Text>
             </div>

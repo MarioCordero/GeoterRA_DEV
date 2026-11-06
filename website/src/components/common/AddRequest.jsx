@@ -11,7 +11,7 @@ import { useSession } from '../../hooks/useSession';
 import MapCoordinatePicker from './MapCoordinatePicker';
 import React, { useState, useEffect, useRef } from "react";
 import {
-  Modal, Button, Form, Input, Radio, Upload, message, Spin, Select, Card, Switch, Slider, Checkbox, Tag
+  Modal, Button, Form, Input, Radio, Upload, message, Spin, Select, Card, Switch, Slider, Checkbox, Tag, ConfigProvider
 } from "antd";
 import {
   EnvironmentFilled, ExperimentOutlined, UserOutlined, PlusCircleOutlined
@@ -498,31 +498,38 @@ const AddRequest = ({
 
               {!isUnspecifiedTemp ? (
                 <div className="pt-2 pb-5 px-3">
-                  <Slider
-                    min={0}
-                    max={4}
-                    step={1}
-                    value={tempSliderIndex}
-                    onChange={handleSliderChange}
-                    marks={TEMPERATURE_MARKS}
-                    railStyle={{
-                      background: 'linear-gradient(to right, #94a3b8 0%, #38bdf8 25%, #f59e0b 50%, #ea580c 75%, #dc2626 100%)',
-                      height: 8,
-                      borderRadius: 4,
+                  <ConfigProvider
+                    theme={{
+                      components: {
+                        Slider: {
+                          colorPrimary: currentTempLevel.color,
+                          colorPrimaryBorder: currentTempLevel.color,
+                          colorPrimaryBorderHover: currentTempLevel.color,
+                          handleColor: currentTempLevel.color,
+                          handleActiveColor: currentTempLevel.color,
+                          dotActiveBorderColor: currentTempLevel.color,
+                        },
+                      },
                     }}
-                    trackStyle={{ background: 'transparent' }}
-                    handleStyle={{
-                      borderColor: currentTempLevel.color,
-                      backgroundColor: '#ffffff',
-                      width: 20,
-                      height: 20,
-                      marginTop: -6,
-                      boxShadow: `0 2px 6px ${currentTempLevel.color}66`,
-                    }}
-                    tooltip={{
-                      formatter: (val) => `${TEMPERATURE_LEVELS[val]?.emoji} ${TEMPERATURE_LEVELS[val]?.label}`,
-                    }}
-                  />
+                  >
+                    <Slider
+                      min={0}
+                      max={4}
+                      step={1}
+                      value={tempSliderIndex}
+                      onChange={handleSliderChange}
+                      marks={TEMPERATURE_MARKS}
+                      railStyle={{
+                        background: 'linear-gradient(to right, #94a3b8 0%, #38bdf8 25%, #f59e0b 50%, #ea580c 75%, #dc2626 100%)',
+                        height: 8,
+                        borderRadius: 4,
+                      }}
+                      trackStyle={{ background: 'transparent' }}
+                      tooltip={{
+                        formatter: (val) => `${TEMPERATURE_LEVELS[val]?.emoji} ${TEMPERATURE_LEVELS[val]?.label}`,
+                      }}
+                    />
+                  </ConfigProvider>
                 </div>
               ) : (
                 <div className="py-3 px-4 bg-white rounded-lg border border-dashed border-gray-300 text-center text-xs text-gray-500 poppins flex items-center justify-center gap-2">

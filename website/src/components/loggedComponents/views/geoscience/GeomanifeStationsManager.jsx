@@ -79,7 +79,7 @@ const extractList = (resData) => {
 };
 
 const GeomanifeStationsManager = () => {
-  const { hasPermission, PERMISSIONS } = usePermissions();
+  const { hasPermission, PERMISSIONS, isMaintenance } = usePermissions();
 
   const canManageInsitu = hasPermission(PERMISSIONS.MANAGE_INSITU_TESTS) || hasPermission(PERMISSIONS.MANAGE_GEOMANIFESTATIONS);
   const canManageInlab = hasPermission(PERMISSIONS.MANAGE_INLAB_TESTS) || hasPermission(PERMISSIONS.MANAGE_GEOMANIFESTATIONS);
@@ -803,17 +803,19 @@ const GeomanifeStationsManager = () => {
   // --- COLUMNS FOR TAB 1 (PÚBLICAS) ---
   const columnsPublic = [
     {
-      title: 'Nombre / ID',
+      title: isMaintenance ? 'Nombre / ID' : 'Nombre',
       dataIndex: 'name',
       key: 'name',
       render: (text, record) => (
         <div>
           <span className="font-semibold text-blue-600 hover:text-blue-800 block cursor-pointer">
-            {text || record.geomanifestation_name || `Punto ${record.geomanifestation_id || record.id}`}
+            {text || record.geomanifestation_name || (isMaintenance ? `Punto ${record.geomanifestation_id || record.id}` : 'Punto Geotermal')}
           </span>
-          <Text type="secondary" style={{ fontSize: '11px' }} className="font-mono">
-            ID: {record.geomanifestation_id || record.id}
-          </Text>
+          {isMaintenance && (
+            <Text type="secondary" style={{ fontSize: '11px' }} className="font-mono">
+              ID: {record.geomanifestation_id || record.id}
+            </Text>
+          )}
         </div>
       ),
     },
@@ -937,14 +939,16 @@ const GeomanifeStationsManager = () => {
         return (
           <div>
             <span className="font-semibold text-blue-600 hover:text-blue-800 block cursor-pointer">
-              {text || record.geomanifestation_name || `Geomanifestación-${record.geomanifestation_id || record.id}`}
+              {text || record.geomanifestation_name || (isMaintenance ? `Geomanifestación-${record.geomanifestation_id || record.id}` : 'Geomanifestación')}
             </span>
             <Text type="secondary" style={{ fontSize: '11px' }} className="block font-mono">
-              {record.hasRequestId ? `Originada de Solicitud: ${record.request_id}` : `ID Borrador: ${record.geomanifestation_id || record.id}`}
+              {record.hasRequestId
+                ? (isMaintenance ? `Originada de Solicitud: ${record.request_id}` : 'Originada de Solicitud de Análisis')
+                : (isMaintenance ? `ID Borrador: ${record.geomanifestation_id || record.id}` : 'Borrador geocientífico')}
             </Text>
             {linkedTrip && (
               <Tag color="orange" icon={<CompassOutlined />} style={{ fontSize: '11px', marginTop: 3 }}>
-                {linkedTrip.field_trip_name || `Gira #${record.field_trip_id}`}
+                {linkedTrip.field_trip_name || (isMaintenance ? `Gira #${record.field_trip_id}` : 'Gira de campo')}
               </Tag>
             )}
           </div>
@@ -1353,7 +1357,9 @@ const GeomanifeStationsManager = () => {
                   {selectedGeo?.name || selectedGeo?.geomanifestation_name || 'Geomanifestación'}
                 </span>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="font-mono text-xs text-gray-400">ID: #{selectedGeo?.geomanifestation_id || selectedGeo?.id}</span>
+                  {isMaintenance && (
+                    <span className="font-mono text-xs text-gray-400">ID: #{selectedGeo?.geomanifestation_id || selectedGeo?.id}</span>
+                  )}
                   {selectedGeo?.isVisible ? (
                     <Tag color="success" icon={<EyeOutlined />} className="rounded-full text-[11px] m-0">Pública en Mapa</Tag>
                   ) : (
@@ -1505,7 +1511,7 @@ const GeomanifeStationsManager = () => {
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f0f0f0', paddingBottom: 8, marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                     <FileSearchOutlined style={{ color: '#fa8c16', fontSize: 18 }} />
-                                    <Text strong style={{ fontSize: 14 }}>Georeporte #{repId}</Text>
+                                    <Text strong style={{ fontSize: 14 }}>{isMaintenance ? `Georeporte #${repId}` : 'Georeporte Oficial'}</Text>
                                     {isCurrent ? (
                                       <Tag color="gold" icon={<StarFilled />} style={{ fontWeight: 'bold' }}>
                                         Vigente Oficial en Mapa
@@ -1554,9 +1560,11 @@ const GeomanifeStationsManager = () => {
                                     >
                                       {linkedInsitu ? (
                                         <div className="space-y-1 text-xs">
-                                          <div>
-                                            <span className="text-gray-500">ID:</span> <span className="font-mono">{linkedInsitu.insitu_test_id || linkedInsitu.id}</span>
-                                          </div>
+                                          {isMaintenance && (
+                                            <div>
+                                              <span className="text-gray-500">ID:</span> <span className="font-mono">{linkedInsitu.insitu_test_id || linkedInsitu.id}</span>
+                                            </div>
+                                          )}
                                           <div>
                                             <span className="text-gray-500">Temperatura:</span>{' '}
                                             <Tag color={linkedInsitu.temperature > 50 ? 'red' : linkedInsitu.temperature > 30 ? 'orange' : 'blue'}>
@@ -1573,7 +1581,7 @@ const GeomanifeStationsManager = () => {
                                         </div>
                                       ) : (
                                         <div className="text-xs text-gray-500 font-mono">
-                                          ID Prueba: {report.insitu_test_id}
+                                          {isMaintenance ? `ID Prueba: ${report.insitu_test_id}` : 'Prueba de campo vinculada'}
                                         </div>
                                       )}
                                     </Card>
@@ -1604,9 +1612,11 @@ const GeomanifeStationsManager = () => {
                                     >
                                       {linkedInlab ? (
                                         <div className="space-y-1 text-xs">
-                                          <div>
-                                            <span className="text-gray-500">ID:</span> <span className="font-mono">{linkedInlab.inlab_test_id || linkedInlab.id}</span>
-                                          </div>
+                                          {isMaintenance && (
+                                            <div>
+                                              <span className="text-gray-500">ID:</span> <span className="font-mono">{linkedInlab.inlab_test_id || linkedInlab.id}</span>
+                                            </div>
+                                          )}
                                           <div>
                                             <span className="text-gray-500">pH Lab:</span> <Tag color="purple">{linkedInlab.ph ?? 'N/A'}</Tag>
                                             <span className="text-gray-500 ml-2">Cond:</span> {linkedInlab.conductivity ? `${linkedInlab.conductivity} μS/cm` : 'N/A'}
@@ -1620,7 +1630,7 @@ const GeomanifeStationsManager = () => {
                                         </div>
                                       ) : (
                                         <div className="text-xs text-gray-500 font-mono">
-                                          ID Lab: {report.inlab_test_id}
+                                          {isMaintenance ? `ID Lab: ${report.inlab_test_id}` : 'Prueba de laboratorio vinculada'}
                                         </div>
                                       )}
                                     </Card>
@@ -1714,12 +1724,12 @@ const GeomanifeStationsManager = () => {
                         rowKey={(r) => r.insitu_test_id || r.id}
                         pagination={false}
                         columns={[
-                          {
+                          ...(isMaintenance ? [{
                             title: 'ID Prueba',
                             dataIndex: 'insitu_test_id',
                             key: 'id',
                             render: (val, r) => <span className="font-mono text-xs">{val || r.id}</span>,
-                          },
+                          }] : []),
                           {
                             title: 'Temperatura',
                             dataIndex: 'temperature',
@@ -1815,12 +1825,12 @@ const GeomanifeStationsManager = () => {
                         rowKey={(r) => r.inlab_test_id || r.id}
                         pagination={false}
                         columns={[
-                          {
+                          ...(isMaintenance ? [{
                             title: 'ID Prueba',
                             dataIndex: 'inlab_test_id',
                             key: 'id',
                             render: (val, r) => <span className="font-mono text-xs">{val || r.id}</span>,
-                          },
+                          }] : []),
                           {
                             title: 'pH Lab',
                             dataIndex: 'ph',
@@ -1923,12 +1933,12 @@ const GeomanifeStationsManager = () => {
                         <p>
                           <strong>Gira de Campo:</strong>{' '}
                           <Tag color="orange" icon={<CompassOutlined />}>
-                            {selectedGeo.field_trip_id}
+                            {isMaintenance ? selectedGeo.field_trip_id : 'Gira Asociada'}
                           </Tag>
                         </p>
                       )}
                       {selectedGeo.request_id && (
-                        <p><strong>Origen Solicitud:</strong> <span className="font-mono text-blue-600">{selectedGeo.request_id}</span></p>
+                        <p><strong>Origen Solicitud:</strong> <span className="font-mono text-blue-600">{isMaintenance ? selectedGeo.request_id : 'Solicitud de Análisis'}</span></p>
                       )}
                     </div>
                   ),
@@ -2045,7 +2055,7 @@ const GeomanifeStationsManager = () => {
               >
                 {insituTests.map((t) => (
                   <Select.Option key={t.insitu_test_id || t.id} value={t.insitu_test_id || t.id}>
-                    #{t.insitu_test_id || t.id} — Temp: {t.temperature}°C | Cond: {t.conductivity ?? 'N/A'} μS/cm | pH: {t.ph ?? 'N/A'} ({renderDateWithProse(t.created_at, { showIcon: false })})
+                    {isMaintenance ? `#${t.insitu_test_id || t.id} — ` : ''}Temp: {t.temperature}°C | Cond: {t.conductivity ?? 'N/A'} μS/cm | pH: {t.ph ?? 'N/A'} ({renderDateWithProse(t.created_at, { showIcon: false })})
                   </Select.Option>
                 ))}
               </Select>
@@ -2071,7 +2081,7 @@ const GeomanifeStationsManager = () => {
               >
                 {inlabTests.map((t) => (
                   <Select.Option key={t.inlab_test_id || t.id} value={t.inlab_test_id || t.id}>
-                    #{t.inlab_test_id || t.id} — pH: {t.ph ?? 'N/A'} | Cond: {t.conductivity ?? 'N/A'} μS/cm | Cl: {t.cl ?? '-'} | Ca: {t.ca ?? '-'} | SO4: {t.so4 ?? '-'} ({renderDateWithProse(t.created_at, { showIcon: false })})
+                    {isMaintenance ? `#${t.inlab_test_id || t.id} — ` : ''}pH: {t.ph ?? 'N/A'} | Cond: {t.conductivity ?? 'N/A'} μS/cm | Cl: {t.cl ?? '-'} | Ca: {t.ca ?? '-'} | SO4: {t.so4 ?? '-'} ({renderDateWithProse(t.created_at, { showIcon: false })})
                   </Select.Option>
                 ))}
               </Select>

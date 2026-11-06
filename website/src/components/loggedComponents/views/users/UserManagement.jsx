@@ -33,7 +33,7 @@ import {
 import { renderDateWithProse } from '../../../../utils/dateFormatter';
 
 const UserManagement = () => {
-  const { hasPermission, PERMISSIONS } = usePermissions();
+  const { hasPermission, PERMISSIONS, isMaintenance } = usePermissions();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -198,7 +198,7 @@ const UserManagement = () => {
             <span className="font-semibold text-gray-900 block text-sm">
               {record.first_name} {record.last_name}
             </span>
-            <span className="text-xs text-gray-400 font-mono">ID: #{record.user_id || record.id}</span>
+            {isMaintenance && <span className="text-xs text-gray-400 font-mono">ID: #{record.user_id || record.id}</span>}
           </div>
         </div>
       ),

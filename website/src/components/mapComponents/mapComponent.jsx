@@ -212,6 +212,8 @@ function FullscreenControl({ fullscreen, handleFullscreen }) {
 }
 
 export default function MapComponent() {
+  const { user } = useSession();
+  const isMaintenance = user?.role === 'maintenance';
   const navigate = useNavigate();
   const [allPoints, setAllPoints] = useState([]);
   const [fullscreen, setFullscreen] = useState(false);
@@ -547,7 +549,7 @@ export default function MapComponent() {
                 <Popup maxWidth={400} minWidth={320}>
                   <div className="w-full max-w-[380px] min-w-0 overflow-x-hidden m-2 p-2 poppins">
                     <h4 className="mb-2 text-[16px] text-geoterra-blue border-b-2 border-blue-500 pb-1 font-bold">
-                      {point.name || point.id}
+                      {point.name || (isMaintenance ? `Punto #${point.id}` : 'Punto Geotermal')}
                     </h4>
 
                     <div className="mb-2">
