@@ -16,6 +16,7 @@ import {
   InfoCircleOutlined,
 } from '@ant-design/icons';
 import { fieldTripsIndex } from '../../config/apiConf';
+import { useSession } from '../../hooks/useSession';
 
 const { Text, Title } = Typography;
 
@@ -37,7 +38,7 @@ export const ENTITY_SCHEMAS = {
     icon: <EnvironmentOutlined style={{ color: '#1890ff' }} />,
     color: 'blue',
     idField: (item) => item.geomanifestation_id || item.id,
-    titleField: (item) => item.geomanifestation_name || item.name || `Punto ${item.geomanifestation_id || item.id}`,
+    titleField: (item) => item.geomanifestation_name || item.name || 'Punto Geotermal',
     subtitleField: (item) => {
       const parts = [item.location?.province || item.province, item.location?.canton || item.canton].filter(Boolean);
       return parts.length > 0 ? parts.join(', ') : 'Costa Rica';
@@ -60,8 +61,8 @@ export const ENTITY_SCHEMAS = {
     icon: <FileSearchOutlined style={{ color: '#fa8c16' }} />,
     color: 'orange',
     idField: (item) => item.georeport_id || item.id,
-    titleField: (item) => item.details || `Reporte ${item.georeport_id || item.id}`,
-    subtitleField: (item) => `GM: ${item.geomanifestation_id || item.geomanifestation_name || 'N/A'}`,
+    titleField: (item) => item.details || 'Georeporte Oficial',
+    subtitleField: (item) => item.geomanifestation_name ? `GM: ${item.geomanifestation_name}` : 'Geomanifestación asociada',
     searchMatcher: (item, term) => {
       const id = String(item.georeport_id || item.id || '').toLowerCase();
       const geoId = String(item.geomanifestation_id || '').toLowerCase();
@@ -78,7 +79,7 @@ export const ENTITY_SCHEMAS = {
     icon: <InboxOutlined style={{ color: '#52c41a' }} />,
     color: 'green',
     idField: (item) => item.request_id || item.id_soli || item.id,
-    titleField: (item) => item.request_name || item.name || `SOLI-${item.request_id || item.id}`,
+    titleField: (item) => item.request_name || item.name || 'Solicitud de Análisis',
     subtitleField: (item) => item.owner_name || item.owner_email || item.email || 'Solicitante sin nombre',
     searchMatcher: (item, term) => {
       const id = String(item.request_id || item.id_soli || item.id || '').toLowerCase();
@@ -95,7 +96,7 @@ export const ENTITY_SCHEMAS = {
     icon: <BulbOutlined style={{ color: '#13c2c2' }} />,
     color: 'cyan',
     idField: (item) => item.insitu_test_id || item.id,
-    titleField: (item) => `Prueba In-Situ ${item.insitu_test_id || item.id}`,
+    titleField: (item) => item.temperature ? `Medición In-Situ (${item.temperature}°C)` : 'Prueba In-Situ',
     subtitleField: (item) => `Temp: ${item.temperature ?? 'N/A'}°C | pH: ${item.ph ?? 'N/A'} | Cond: ${item.conductivity ?? 'N/A'}`,
     searchMatcher: (item, term) => {
       const id = String(item.insitu_test_id || item.id || '').toLowerCase();
@@ -111,7 +112,7 @@ export const ENTITY_SCHEMAS = {
     icon: <ExperimentOutlined style={{ color: '#722ed1' }} />,
     color: 'purple',
     idField: (item) => item.inlab_test_id || item.id,
-    titleField: (item) => `Prueba Lab ${item.inlab_test_id || item.id}`,
+    titleField: (item) => item.ph ? `Análisis de Lab (pH ${item.ph})` : 'Prueba de Laboratorio',
     subtitleField: (item) => `pH: ${item.ph ?? 'N/A'} | Cond: ${item.conductivity ?? 'N/A'} | Cl: ${item.cl ?? 'N/A'}`,
     searchMatcher: (item, term) => {
       const id = String(item.inlab_test_id || item.id || '').toLowerCase();
@@ -140,6 +141,8 @@ const EntityNavigatorPicker = ({
   disabled = false,
   customColumns = null,
 }) => {
+  const { user } = useSession();
+  const isMaintenance = user?.role === 'maintenance';
   const [currentType, setCurrentType] = useState(entityType);
   const [modalVisible, setModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -247,7 +250,11 @@ const EntityNavigatorPicker = ({
                 <span>{title}</span>
               </div>
               <div className="text-xs text-gray-500 font-mono mt-0.5">
-                ID: <span className="text-gray-700">{id}</span> {subtitle ? `— ${subtitle}` : ''}
+                {isMaintenance ? (
+                  <>ID: <span className="text-gray-700">{id}</span> {subtitle ? `— ${subtitle}` : ''}</>
+                ) : (
+                  subtitle ? <span className="text-gray-600 font-sans">{subtitle}</span> : null
+                )}
               </div>
             </div>
           );
@@ -322,12 +329,12 @@ const EntityNavigatorPicker = ({
           render: (_, record) => (
             <Space size={4}>
               {record.insitu_test_id ? (
-                <Tag color="cyan">In-Situ: {String(record.insitu_test_id).slice(0, 8)}...</Tag>
+                <Tag color="cyan">In-Situ: {isMaintenance ? `${String(record.insitu_test_id).slice(0, 8)}...` : 'Vinculada'}</Tag>
               ) : (
                 <Tag color="default">Sin In-Situ</Tag>
               )}
               {record.inlab_test_id ? (
-                <Tag color="purple">Lab: {String(record.inlab_test_id).slice(0, 8)}...</Tag>
+                <Tag color="purple">Lab: {isMaintenance ? `${String(record.inlab_test_id).slice(0, 8)}...` : 'Vinculada'}</Tag>
               ) : (
                 <Tag color="default">Sin Lab</Tag>
               )}
@@ -360,13 +367,17 @@ const EntityNavigatorPicker = ({
         }
       );
     } else if (currentType === 'insitu_tests' || currentType === 'inlab_tests') {
+      if (isMaintenance) {
+        baseColumns.push(
+          {
+            title: 'Geomanifestación ID',
+            dataIndex: 'geomanifestation_id',
+            key: 'geo_id',
+            render: (val) => <span className="font-mono text-xs text-blue-600">{val ? String(val).slice(0, 10) + '...' : 'N/A'}</span>,
+          }
+        );
+      }
       baseColumns.push(
-        {
-          title: 'Geomanifestación ID',
-          dataIndex: 'geomanifestation_id',
-          key: 'geo_id',
-          render: (val) => <span className="font-mono text-xs text-blue-600">{val ? String(val).slice(0, 10) + '...' : 'N/A'}</span>,
-        },
         {
           title: 'Fecha Registro',
           dataIndex: 'created_at',
@@ -428,7 +439,7 @@ const EntityNavigatorPicker = ({
                 </Tag>
               )}
               <Tag color={selectedItem ? activeSchema.color : 'default'} style={{ margin: 0 }}>
-                {selectedItem ? `ID: ${activeSelectedId}` : `${items.length} disponibles`}
+                {selectedItem ? (isMaintenance ? `ID: ${activeSelectedId}` : 'Seleccionado') : `${items.length} disponibles`}
               </Tag>
             </Space>
           </Button>
@@ -558,14 +569,16 @@ const EntityNavigatorPicker = ({
                 <Text type="secondary" style={{ fontSize: '12px' }}>
                   📍 {activeSchema.subtitleField(selectedItem)}
                 </Text>
-                <Text type="secondary" style={{ fontSize: '11px' }} className="font-mono bg-white px-2 py-0.5 rounded border border-gray-200">
-                  ID: {activeSelectedId}
-                </Text>
+                {isMaintenance && (
+                  <Text type="secondary" style={{ fontSize: '11px' }} className="font-mono bg-white px-2 py-0.5 rounded border border-gray-200">
+                    ID: {activeSelectedId}
+                  </Text>
+                )}
 
                 {selectedItem.field_trip_id && (
-                  <Tooltip title={`ID de Gira: ${selectedItem.field_trip_id}`}>
+                  <Tooltip title={isMaintenance ? `ID de Gira: ${selectedItem.field_trip_id}` : 'Gira de campo asociada'}>
                     <Tag color="orange" icon={<CompassOutlined />} style={{ borderRadius: 10, fontWeight: 500 }}>
-                      Gira: {fieldTripsMap[selectedItem.field_trip_id]?.field_trip_name || selectedItem.field_trip_name || String(selectedItem.field_trip_id).slice(0, 8)}
+                      Gira: {fieldTripsMap[selectedItem.field_trip_id]?.field_trip_name || selectedItem.field_trip_name || (isMaintenance ? String(selectedItem.field_trip_id).slice(0, 8) : 'Asociada')}
                     </Tag>
                   </Tooltip>
                 )}

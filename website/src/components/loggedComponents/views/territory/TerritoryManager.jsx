@@ -34,6 +34,7 @@ import {
 } from '@ant-design/icons';
 import '../../../../colorModule.css';
 import '../../../../fontsModule.css';
+import { useSession } from '../../../../hooks/useSession';
 import {
   provincesIndex,
   provincesAdminStore,
@@ -52,6 +53,8 @@ import {
 const { Title, Text, Paragraph } = Typography;
 
 const TerritoryManager = () => {
+  const { user } = useSession();
+  const isMaintenance = user?.role === 'maintenance';
   const [activeTab, setActiveTab] = useState('1');
 
   // Search queries per tab
@@ -401,7 +404,7 @@ const TerritoryManager = () => {
         </div>
       ),
     },
-    {
+    ...(isMaintenance ? [{
       title: 'ID Sistema (ULID)',
       dataIndex: 'province_id',
       key: 'province_id',
@@ -410,7 +413,7 @@ const TerritoryManager = () => {
           {val || r.id}
         </span>
       ),
-    },
+    }] : []),
     {
       title: 'Fecha Registro',
       dataIndex: 'created_at',
@@ -489,7 +492,7 @@ const TerritoryManager = () => {
         );
       },
     },
-    {
+    ...(isMaintenance ? [{
       title: 'ID Sistema (ULID)',
       dataIndex: 'canton_id',
       key: 'canton_id',
@@ -498,7 +501,7 @@ const TerritoryManager = () => {
           {val || r.id}
         </span>
       ),
-    },
+    }] : []),
     {
       title: 'Acciones',
       key: 'actions',
@@ -564,7 +567,7 @@ const TerritoryManager = () => {
         </Tag>
       ),
     },
-    {
+    ...(isMaintenance ? [{
       title: 'ID Sistema (ULID)',
       dataIndex: 'district_id',
       key: 'district_id',
@@ -573,7 +576,7 @@ const TerritoryManager = () => {
           {val || r.id}
         </span>
       ),
-    },
+    }] : []),
     {
       title: 'Acciones',
       key: 'actions',

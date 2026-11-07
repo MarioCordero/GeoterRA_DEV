@@ -3,6 +3,7 @@ import { Card, Typography, Tag, Button, Modal, Form, InputNumber, Input, Table, 
 import { BulbOutlined, PlusOutlined, ReloadOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import EntityNavigatorPicker from '../../../common/EntityNavigatorPicker';
 import { renderDateWithProse } from '../../../../utils/dateFormatter';
+import { useSession } from '../../../../hooks/useSession';
 import {
   insituTestsIndex,
   insituTestsStore,
@@ -24,6 +25,8 @@ const extractList = (resData) => {
 };
 
 const InsituTestsManager = () => {
+  const { user } = useSession();
+  const isMaintenance = user?.role === 'maintenance';
   const [manifestations, setManifestations] = useState([]);
   const [selectedGeoId, setSelectedGeoId] = useState(null);
   const [tests, setTests] = useState([]);
@@ -169,12 +172,12 @@ const InsituTestsManager = () => {
       key: 'insitu_test_name',
       render: (val) => <span className="font-semibold text-slate-800">{val || 'Sin nombre'}</span>,
     },
-    {
+    ...(isMaintenance ? [{
       title: 'ID Prueba',
       dataIndex: 'insitu_test_id',
       key: 'insitu_test_id',
       render: (val, record) => <span className="font-mono text-xs">{val || record.id}</span>,
-    },
+    }] : []),
     {
       title: 'Temperatura (°C)',
       dataIndex: 'temperature',

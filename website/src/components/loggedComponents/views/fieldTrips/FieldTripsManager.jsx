@@ -92,7 +92,7 @@ const extractList = (resData) => {
 
 const FieldTripsManager = () => {
   const { user } = useSession();
-  const { hasPermission, PERMISSIONS } = usePermissions();
+  const { hasPermission, PERMISSIONS, isMaintenance } = usePermissions();
 
   // Tab: 'all' vs 'my'
   const [activeTab, setActiveTab] = useState('all');
@@ -928,9 +928,11 @@ const FieldTripsManager = () => {
           <span className="font-semibold text-blue-600 hover:text-blue-800 block cursor-pointer">
             {val}
           </span>
-          <div style={{ fontSize: 11, color: '#8c8c8c' }} className="font-mono">
-            {record.field_trip_id || record.id}
-          </div>
+          {isMaintenance && (
+            <div style={{ fontSize: 11, color: '#8c8c8c' }} className="font-mono">
+              {record.field_trip_id || record.id}
+            </div>
+          )}
         </div>
       ),
     },
@@ -1803,9 +1805,11 @@ const FieldTripsManager = () => {
                 <span className="poppins-bold text-base text-geoterra-blue block">
                   {selectedTrip?.field_trip_name || 'Detalle de la Gira'}
                 </span>
-                <span className="text-xs text-gray-400 font-mono">
-                  #{selectedTrip?.field_trip_id || selectedTrip?.id}
-                </span>
+                {isMaintenance && (
+                  <span className="text-xs text-gray-400 font-mono">
+                    #{selectedTrip?.field_trip_id || selectedTrip?.id}
+                  </span>
+                )}
               </div>
             </div>
             {selectedTrip && (
@@ -2097,9 +2101,9 @@ const FieldTripsManager = () => {
                               title={<Text strong>{mName}</Text>}
                               description={
                                 <div>
-                                  <span className="font-mono text-xs text-gray-500">{mId}</span>
+                                  {isMaintenance && <span className="font-mono text-xs text-gray-500 mr-2">{mId}</span>}
                                   {m.location && (
-                                    <span style={{ marginLeft: 8, color: '#8c8c8c' }}>
+                                    <span style={{ color: '#8c8c8c' }}>
                                       {[m.location.province, m.location.canton, m.location.district].filter(Boolean).join(', ')}
                                     </span>
                                   )}
