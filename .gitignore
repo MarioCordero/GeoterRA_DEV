@@ -39,9 +39,7 @@ gradle-app.setting
 **/.kotlin/compose-cache/
 
 # Archivos de compilación Android
-*.apk
 *.ap_
-*.aab
 *.dex
 *.class
 
