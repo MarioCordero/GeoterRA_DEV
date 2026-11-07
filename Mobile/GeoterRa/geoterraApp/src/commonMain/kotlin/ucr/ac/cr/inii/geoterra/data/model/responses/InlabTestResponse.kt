@@ -1,5 +1,6 @@
 package ucr.ac.cr.inii.geoterra.data.model.responses
 
+import cafe.adriel.voyager.core.lifecycle.JavaSerializable
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -21,4 +22,4 @@ data class InlabTestResponse(
 	val mg: Double?,
 	val description: String?,
 	val created_at: String
-)
+) : JavaSerializable {}

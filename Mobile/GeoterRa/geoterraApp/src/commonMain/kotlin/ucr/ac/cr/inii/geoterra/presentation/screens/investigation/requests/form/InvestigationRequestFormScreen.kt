@@ -7,10 +7,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -27,78 +27,76 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import org.koin.core.parameter.parametersOf
 import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
+import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.common.StatusDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 
 data class InvestigationRequestFormScreen(
-  val requestToEdit: InvestigationRequestResponse? = null
+	val requestToEdit: InvestigationRequestResponse? = null
 ) : Screen {
 
-  override val key: ScreenKey = uniqueScreenKey
+	override val key: ScreenKey = uniqueScreenKey
 
-  @Composable
-  override fun Content() {
-    val navigator = LocalNavigator.currentOrThrow
-    val viewModel = getScreenModel<InvestigationRequestFormViewModel>(
-      parameters = { parametersOf(requestToEdit) }
-    )
+	@Composable
+	override fun Content() {
+		val navigator = LocalNavigator.currentOrThrow
+		val viewModel = getScreenModel<InvestigationRequestFormViewModel>(
+			parameters = { parametersOf(requestToEdit) }
+		)
 
-    val state by viewModel.state.collectAsState()
+		val state by viewModel.state.collectAsState()
+		val snackbarHostState = remember { TypedSnackbarHostState() }
 
-    val snackBarHost = remember { SnackbarHostState() }
+		LoadingDialog(
+			isVisible = state.isLoading,
+		)
 
-    LoadingDialog(
-      isVisible = state.isLoading,
-    )
+		LaunchedEffect(state.snackBarMessage) {
+			state.snackBarMessage?.let { snackbarMsg ->
+				snackbarHostState.showSnackbar(
+					message = snackbarMsg.text,
+					type = snackbarMsg.type
+				)
 
-    if (state.isSuccess) {
-      val successMessage = state.snackBarMessage ?: "Operación completada correctamente."
-      StatusDialog(
-        isSuccess = true,
-        message = successMessage,
-        onDismiss = {
-          viewModel.clearSuccess()
-          navigator.pop()
-        }
-      )
-    }
+				viewModel.onEvent(AnalysisFormEvent.ClearSnackBar)
 
-    state.error?.let { errorMessage ->
-      StatusDialog(
-        isSuccess = false,
-        message = errorMessage,
-        onDismiss = { viewModel.clearError() }
-      )
-    }
+				if (state.isSuccess) {
+					viewModel.clearSuccess()
+					navigator.pop()
+				}
+			}
+		}
 
-    Scaffold(
-      snackbarHost = { SnackbarHost(snackBarHost) },
-      modifier = Modifier.fillMaxSize(),
-      containerColor = MaterialTheme.colorScheme.background,
-      topBar = {
-        Row(
-          modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 10.dp),
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.Start
-        ) {
-          Text(
-            text = if (requestToEdit != null) "Editar Solicitud" else "Nueva Solicitud",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.weight(1f)
-          )
-          AdaptiveBackButton(onBack = { navigator.pop() })
-        }
-      }
-    ) { paddingValues ->
-      InvestigationRequestFormContent(
-        modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
-        state = state,
-        onEvent = viewModel::onEvent,
-      )
-    }
-  }
+		Scaffold(
+			snackbarHost = { CustomSnackbarHost(snackbarHostState) },
+			modifier = Modifier.fillMaxSize(),
+			containerColor = MaterialTheme.colorScheme.background,
+			topBar = {
+				Row(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(horizontal = 20.dp, vertical = 10.dp),
+					verticalAlignment = Alignment.CenterVertically,
+					horizontalArrangement = Arrangement.Start
+				) {
+					Text(
+						text = if (requestToEdit != null) "Editar Solicitud" else "Nueva Solicitud",
+						style = MaterialTheme.typography.headlineMedium,
+						fontWeight = FontWeight.Bold,
+						color = MaterialTheme.colorScheme.secondary,
+						modifier = Modifier.weight(1f)
+					)
+					AdaptiveBackButton(onBack = { navigator.pop() })
+				}
+			}
+		) { paddingValues ->
+			InvestigationRequestFormContent(
+				modifier = Modifier
+					.padding(top = paddingValues.calculateTopPadding())
+					.padding(horizontal = 20.dp),
+				state = state,
+				onEvent = viewModel::onEvent,
+			)
+		}
+	}
 }

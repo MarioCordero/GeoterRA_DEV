@@ -59,15 +59,15 @@ fun Throwable.isInvalidAccess(): Boolean =
 	asApiException()?.error?.isInvalidAccess() ?: false
 
 @Serializable
-data class ApiResponseModel<T>(
+data class ApiResponseModel<T, M>(
 	val data: T? = null,
-	val meta: Map<String, JsonElement>? = null,
+	val meta: M? = null,
 	val errors: List<ApiError> = emptyList()
 )
 
 suspend fun <T> handleErrorResponse(response: HttpResponse): Result<T> {
 	return try {
-		val errorEnvelope = response.body<ApiResponseModel<Unit>>()
+		val errorEnvelope = response.body<ApiResponseModel<Unit, Unit>>()
 		val firstError = errorEnvelope.errors.firstOrNull()
 
 		val errorCode = firstError?.code ?: ApiError.INTERNAL_ERROR

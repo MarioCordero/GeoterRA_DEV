@@ -4,35 +4,77 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import kotlinx.serialization.json.JsonElement
+import ucr.ac.cr.inii.geoterra.core.network.ApiError
 import ucr.ac.cr.inii.geoterra.core.network.ApiException
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.handleErrorResponse
-import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestRequest
+import ucr.ac.cr.inii.geoterra.data.model.requests.InvestigationRequestRequest
 import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.MetaResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.PaginatedInvestigationRequestsRemote
 import ucr.ac.cr.inii.geoterra.domain.repository.InvestigationRequestsRepositoryInterface
 
 class InvestigationRequestsRepository(
 	private val client: HttpClient
 ) : InvestigationRequestsRepositoryInterface {
 
-	override suspend fun getMyRequests(): Result<List<InvestigationRequestResponse>> {
+	override suspend fun getMyRequests(page: Int?, limit: Int?): Result<PaginatedInvestigationRequestsRemote> {
 		return try {
-			val response = client.get("analysis-requests")
+			val response = client.get("analysis-requests") {
+				page?.let { parameter("page", it) }
+				limit?.let { parameter("limit", it) }
+			}
 
 			if (response.status.isSuccess()) {
-				val envelope = response.body<ApiResponseModel<List<InvestigationRequestResponse>>>()
+				val envelope = response.body<ApiResponseModel<List<InvestigationRequestResponse>, MetaResponse>>()
 
 				if (envelope.errors.isNotEmpty()) {
 					return Result.failure(ApiException(envelope.errors.first()))
 				}
 
-				Result.success(envelope.data ?: emptyList())
+				val dataList = envelope.data ?: emptyList()
+				val pagination = envelope.meta?.pagination
+					?: throw Exception("No se encontró metadata de paginación en el campo 'meta'.")
 
+				Result.success(PaginatedInvestigationRequestsRemote(data = dataList, pagination = pagination))
 			} else {
 				handleErrorResponse(response)
 			}
 		} catch (e: Exception) {
-			Result.failure(Exception("Error de conexión: ${e.message}"))
+			Result.failure(
+				ApiException(
+					ApiError(
+						code = ApiError.INTERNAL_ERROR,
+						message = "Error de red: verifica tu conexión a internet."
+					)
+				)
+			)
+		}
+	}
+
+	override suspend fun getRequestStatuses(id: String): Result<List<InvestigationRequestResponse.StateResponse>> {
+		return try {
+			val response = client.get("analysis-requests/$id/states")
+			if (response.status.isSuccess()) {
+				val envelope =
+					response.body<ApiResponseModel<List<InvestigationRequestResponse.StateResponse>, MetaResponse>>()
+				if (envelope.errors.isNotEmpty()) {
+					return Result.failure(ApiException(envelope.errors.first()))
+				}
+				Result.success(envelope.data ?: emptyList())
+			} else {
+				handleErrorResponse(response)
+			}
+		} catch (e: Exception) {
+			Result.failure(
+				ApiException(
+					ApiError(
+						code = ApiError.INTERNAL_ERROR,
+						message = "Error de red: verifica tu conexión a internet."
+					)
+				)
+			)
 		}
 	}
 
@@ -42,10 +84,26 @@ class InvestigationRequestsRepository(
 				contentType(ContentType.Application.Json)
 				setBody(form)
 			}
-			if (response.status.isSuccess()) Result.success(Unit)
-			else handleErrorResponse(response)
+			if (response.status.isSuccess()){
+				val envelope = response.body<ApiResponseModel<JsonElement, MetaResponse>>()
+
+				if (envelope.errors.isNotEmpty()) {
+					return Result.failure(ApiException(envelope.errors.first()))
+				}
+
+				Result.success(Unit)
+			} else  {
+				handleErrorResponse(response)
+			}
 		} catch (e: Exception) {
-			Result.failure(e)
+			Result.failure(
+				ApiException(
+					ApiError(
+						code = ApiError.INTERNAL_ERROR,
+						message = "Error de red: verifica tu conexión a internet."
+					)
+				)
+			)
 		}
 	}
 
@@ -55,20 +113,55 @@ class InvestigationRequestsRepository(
 				contentType(ContentType.Application.Json)
 				setBody(form)
 			}
-			if (response.status.isSuccess()) Result.success(Unit)
-			else handleErrorResponse(response)
+			if (response.status.isSuccess()) {
+				val envelope = response.body<ApiResponseModel<JsonElement, MetaResponse>>()
+
+				if (envelope.errors.isNotEmpty()) {
+					return Result.failure(ApiException(envelope.errors.first()))
+				}
+				Result.success(Unit)
+			} else {
+				handleErrorResponse(response)
+			}
 		} catch (e: Exception) {
-			Result.failure(Exception("Error de red: verifica tu conexión."))
+			Result.failure(
+				ApiException(
+					ApiError(
+						code = ApiError.INTERNAL_ERROR,
+						message = "Error de red: verifica tu conexión a internet."
+					)
+				)
+			)
 		}
 	}
 
 	override suspend fun deleteRequest(id: String): Result<Unit> {
 		return try {
 			val response = client.delete("analysis-requests/$id")
-			if (response.status.isSuccess()) Result.success(Unit)
-			else handleErrorResponse(response)
+			if (response.status.isSuccess()) {
+				if (response.status == HttpStatusCode.NoContent) {
+					return Result.success(Unit)
+				}
+
+				val envelope = response.body<ApiResponseModel<JsonElement, MetaResponse>>()
+
+				if (envelope.errors.isNotEmpty()) {
+					return Result.failure(ApiException(envelope.errors.first()))
+				}
+
+				Result.success(Unit)
+			} else {
+				handleErrorResponse(response)
+			}
 		} catch (e: Exception) {
-			Result.failure(Exception("Error de red: verifica tu conexión."))
+			Result.failure(
+				ApiException(
+					ApiError(
+						code = ApiError.INTERNAL_ERROR,
+						message = "Error de red: verifica tu conexión a internet."
+					)
+				)
+			)
 		}
 	}
 }

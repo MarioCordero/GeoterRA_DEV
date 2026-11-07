@@ -12,7 +12,7 @@ import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.request.RequestCardItem
 
 @Composable
-fun RequestsContent(
+fun InvestigationRequestsContent(
   modifier: Modifier,
   state: InvestigationRequestsState,
   onView: (InvestigationRequestResponse) -> Unit,
@@ -29,18 +29,10 @@ fun RequestsContent(
       }
     }
 
-    state.snackBarMessage?.let {
-      Text(
-        text = it,
-        color = MaterialTheme.colorScheme.error,
-        modifier = Modifier.padding(16.dp)
-      )
-    }
-
     LazyColumn(
-      contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp),
-      modifier = Modifier.weight(1f).fillMaxWidth()
+      modifier = Modifier.weight(1f).fillMaxWidth(),
+			contentPadding = PaddingValues(bottom = 16.dp)
     ) {
       items(state.requests, key = { it.request_id }) { request ->
         RequestCardItem(
@@ -50,7 +42,6 @@ fun RequestsContent(
           onDelete = { onDelete(request) }
         )
       }
-    }
-
+		}
   }
 }

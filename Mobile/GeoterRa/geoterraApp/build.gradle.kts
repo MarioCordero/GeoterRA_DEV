@@ -125,6 +125,16 @@ kotlin {
     }
 }
 
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
+val apiUrl = localProperties.getProperty("API_URL") ?: ""
+val androidApiKey = localProperties.getProperty("ANDROID_API_KEY") ?: ""
+val iosApiKey = localProperties.getProperty("IOS_API_KEY") ?: ""
+
 android {
     namespace = "ucr.ac.cr.inii.geoterra"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -133,8 +143,8 @@ android {
         applicationId = "ucr.ac.cr.inii.geoterra"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = providers.gradleProperty("app.version.code").get().toInt()
+        versionName = providers.gradleProperty("app.version.name").get()
     }
 
     packaging {
@@ -143,9 +153,22 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            val keystoreFile = localProperties.getProperty("RELEASE_KEYSTORE_FILE")
+            if (keystoreFile != null && file(keystoreFile).exists()) {
+                storeFile = file(keystoreFile)
+                storePassword = localProperties.getProperty("RELEASE_KEYSTORE_PASSWORD")
+                keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS")
+                keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
@@ -165,17 +188,6 @@ configurations.all {
         force("androidx.activity:activity-compose:1.9.3")
     }
 }
-
-val localProperties = Properties()
-val localPropertiesFile = rootProject.file("local.properties")
-if (localPropertiesFile.exists()) {
-    localProperties.load(localPropertiesFile.inputStream())
-}
-
-val apiUrl = localProperties.getProperty("API_URL") ?: ""
-val androidApiKey = localProperties.getProperty("ANDROID_API_KEY") ?: ""
-val iosApiKey = localProperties.getProperty("IOS_API_KEY") ?: ""
-
 
 buildkonfig {
     packageName = "ucr.ac.cr.inii.geoterra"
