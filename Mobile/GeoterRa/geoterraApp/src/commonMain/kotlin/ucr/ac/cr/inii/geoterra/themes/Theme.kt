@@ -60,7 +60,6 @@ fun GeoterraTheme(
   
   MaterialTheme(
     colorScheme = colors,
-    // Aquí puedes agregar también configuraciones de Typography y Shapes
     content = content
   )
 }

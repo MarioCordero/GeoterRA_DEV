@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import ucr.ac.cr.inii.geoterra.domain.Util
 
 @Composable
 fun UserLocationInfoPanel(
@@ -68,8 +69,8 @@ fun UserLocationInfoPanel(
           color = MaterialTheme.colorScheme.onPrimaryContainer
         )
         Text(
-          text = "Lat: ${latitude.toString().take(10)}," +
-            " Long: ${longitude.toString().take(10)}",
+          text = "Lat: ${Util.truncateDecimal(latitude, 6)}," +
+            " Long: ${Util.truncateDecimal(longitude, 6)}",
           style = MaterialTheme.typography.bodyMedium,
           color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.95f)
         )

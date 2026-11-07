@@ -34,7 +34,11 @@ fun CustomTextField(
     label = { Text(label) },
     leadingIcon = icon?.let { { Icon(it, contentDescription = null) } },
     isError = isError,
-    supportingText = { if (isError && errorMessage != null) Text(errorMessage) },
+    supportingText = if (isError && errorMessage != null) {
+      { Text(errorMessage) }
+    } else {
+      null
+    },
     modifier = modifier.fillMaxWidth(),
     shape = RoundedCornerShape(12.dp),
     keyboardOptions = KeyboardOptions(keyboardType = keyboardType),

@@ -25,51 +25,58 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun InfoChip(
-  icon: ImageVector,
-  label: String,
-  value: String,
-  modifier: Modifier = Modifier,
-  iconColor: Color = MaterialTheme.colorScheme.primary
+	icon: ImageVector,
+	label: String,
+	value: String,
+	modifier: Modifier = Modifier,
+	iconColor: Color = MaterialTheme.colorScheme.primary,
+	maxLines: Int = 2,
+	labelMaxLines: Int = 1
 ) {
-  Row(
-    modifier = modifier
-      .background(
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-        RoundedCornerShape(16.dp)
-      )
-      .padding(12.dp),
-    verticalAlignment = Alignment.CenterVertically
-  ) {
-    Box(
-      modifier = Modifier
-        .size(36.dp)
-        .background(MaterialTheme.colorScheme.surface, CircleShape),
-      contentAlignment = Alignment.Center
-    ) {
-      Icon(
-        imageVector = icon,
-        contentDescription = null,
-        modifier = Modifier.size(20.dp),
-        tint = iconColor
-      )
-    }
-    Spacer(modifier = Modifier.width(12.dp))
-    Column {
-      Text(
-        text = label.uppercase(),
-        style = MaterialTheme.typography.labelSmall.copy(
-          fontWeight = FontWeight.Bold,
-          letterSpacing = 1.sp
-        ),
-        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
-      )
-      Text(
-        text = value,
-        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-        color = MaterialTheme.colorScheme.onSurface,
-        maxLines = 4,
-        overflow = TextOverflow.Ellipsis
-      )
-    }
-  }
+	Row(
+		modifier = modifier
+			.background(
+				MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+				RoundedCornerShape(16.dp)
+			)
+			.padding(12.dp),
+		verticalAlignment = Alignment.CenterVertically
+	) {
+		Box(
+			modifier = Modifier
+				.size(36.dp)
+				.background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
+			contentAlignment = Alignment.Center
+		) {
+			Icon(
+				imageVector = icon,
+				contentDescription = null,
+				modifier = Modifier.size(20.dp),
+				tint = iconColor
+			)
+		}
+
+		Spacer(modifier = Modifier.width(12.dp))
+
+		Column(
+			modifier = Modifier.weight(1f)
+		) {
+			Text(
+				text = label,
+				fontWeight = FontWeight.Bold,
+				color = MaterialTheme.colorScheme.onSurface,
+				fontSize = 14.sp,
+				maxLines = labelMaxLines,
+				overflow = TextOverflow.Ellipsis
+			)
+			Text(
+				text = value,
+				color = MaterialTheme.colorScheme.onSurface,
+				fontWeight = FontWeight.Normal,
+				fontSize = 14.sp,
+				maxLines = maxLines,
+				overflow = TextOverflow.Ellipsis
+			)
+		}
+	}
 }

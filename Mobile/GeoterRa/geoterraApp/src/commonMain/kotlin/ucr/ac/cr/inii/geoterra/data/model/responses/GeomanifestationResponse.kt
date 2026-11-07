@@ -1,6 +1,12 @@
 package ucr.ac.cr.inii.geoterra.data.model.responses
 
+import cafe.adriel.voyager.core.lifecycle.JavaSerializable
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
+import kotlinx.serialization.json.putJsonObject
 
 /**
  * Data class representing the available filters for querying geothermal manifestations.
@@ -13,8 +19,7 @@ data class GeomanifestationFilters(
 	val cantonSnitCode: Int? = null,
 	val districtSnitCode: Int? = null,
 	val tempMin: Double? = null,
-	val tempMax: Double? = null,
-	val showAll: Boolean? = null
+	val tempMax: Double? = null
 )
 
 /**
@@ -28,49 +33,50 @@ data class PaginatedManifestationsRemote(
 @Serializable
 data class GeomanifestationResponse(
 	val geomanifestation_id: String,
-	val name: String,
+	val geomanifestation_name: String,
 	val description: String?,
 	val created_at: String,
 	val location: LocationResponse,
 	val current_georeport: GeoreportResponse? = null,
-	val insitu_test: InsituTestResponse? = null,
-	val inlab_test: InlabTestResponse? = null
-) {
+	val insitu_test: InSituTestResponse? = null,
+	val inlab_test: InlabTestResponse? = null,
+) : JavaSerializable {
 
 }
 
 fun List<GeomanifestationResponse>.toGeoJsonString(): String {
-	val featuresJson = joinToString(",") { manifestation ->
-		val temperature = manifestation.insitu_test?.temperature
-		"""
-        {
-          "type": "Feature",
-          "geometry": {
-            "type": "Point",
-            "coordinates": [${manifestation.location.longitude}, ${manifestation.location.latitude}]
-          },
-          "properties": {
-            "id": "${manifestation.geomanifestation_id}",
-            "name": "${manifestation.name}",
-            "description": "${manifestation.description}",
-            "temp": $temperature,
-						"latitude": ${manifestation.location.latitude},
-			    	"longitude": ${manifestation.location.longitude},
-					  "province": "${manifestation.location.province}",
-						"province_snit_code": ${manifestation.location.province_snit_code},
-						"canton": "${manifestation.location.canton}",
-						"canton_snit_code": ${manifestation.location.canton_snit_code},
-					  "district": "${manifestation.location.district}",
-						"district_snit_code": ${manifestation.location.district_snit_code}
-          }
-        }
-        """.trimIndent()
-	}
+	val featureCollection = buildJsonObject {
+		put("type", "FeatureCollection")
+		putJsonArray("features") {
+			this@toGeoJsonString.forEach { manifestation ->
+				add(buildJsonObject {
+					put("type", "Feature")
 
-	return """
-    {
-      "type": "FeatureCollection",
-      "features": [$featuresJson]
-    }
-    """.trimIndent()
+					putJsonObject("geometry") {
+						put("type", "Point")
+						putJsonArray("coordinates") {
+							add(manifestation.location.longitude)
+							add(manifestation.location.latitude)
+						}
+					}
+
+					putJsonObject("properties") {
+						put("id", manifestation.geomanifestation_id)
+						put("name", manifestation.geomanifestation_name)
+						put("description", manifestation.description)
+						put("temp", manifestation.insitu_test?.temperature)
+						put("latitude", manifestation.location.latitude)
+						put("longitude", manifestation.location.longitude)
+						put("province", manifestation.location.province)
+						put("province_snit_code", manifestation.location.province_snit_code)
+						put("canton", manifestation.location.canton)
+						put("canton_snit_code", manifestation.location.canton_snit_code)
+						put("district", manifestation.location.district)
+						put("district_snit_code", manifestation.location.district_snit_code)
+					}
+				})
+			}
+		}
+	}
+	return featureCollection.toString()
 }

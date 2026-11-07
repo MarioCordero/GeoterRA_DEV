@@ -11,4 +11,8 @@ interface AuthRepositoryInterface {
   suspend fun refreshAccessToken(): Result<Unit>
   
   suspend fun isUserLoggedIn(): Boolean
+
+	suspend fun requestPasswordReset(email: String): Result<Unit>
+
+	suspend fun resetPassword(token: String, password: String): Result<Unit>
 }

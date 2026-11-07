@@ -1,0 +1,132 @@
+package ucr.ac.cr.inii.geoterra.presentation.screens.sign
+
+import cafe.adriel.voyager.core.model.screenModelScope
+import kotlinx.coroutines.launch
+import ucr.ac.cr.inii.geoterra.data.model.requests.RegisterRequest
+import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
+import ucr.ac.cr.inii.geoterra.domain.validation.PasswordValidator
+import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
+
+class SignUpViewModel(
+	private val authService: AuthService
+) : BaseScreenModel<SignUpState>(SignUpState()) {
+
+	fun onNameChanged(v: String) =
+		updateState { it.copy(name = v, fieldErrors = it.fieldErrors - "name") }
+
+	fun onLastnameChanged(v: String) =
+		updateState { it.copy(lastname = v, fieldErrors = it.fieldErrors - "lastname") }
+
+	fun onEmailChanged(v: String) =
+		updateState { it.copy(email = v, fieldErrors = it.fieldErrors - "email") }
+
+	fun onPhoneChanged(v: String) =
+		updateState { it.copy(phoneNumber = v, fieldErrors = it.fieldErrors - "phone") }
+
+	fun onPasswordChanged(v: String) = updateState { state ->
+		val errorMessage = PasswordValidator.getMissingRequirementsMessage(v)
+
+		val newFieldErrors = if (errorMessage != null) {
+			state.fieldErrors + ("password" to errorMessage)
+		} else {
+			state.fieldErrors - "password"
+		}
+
+		state.copy(
+			password = v,
+			fieldErrors = newFieldErrors
+		)
+	}
+
+	fun onConfirmPasswordChanged(v: String) = updateState { it.copy(confirmPassword = v) }
+	fun togglePasswordVisibility() =
+		updateState { it.copy(isPasswordVisible = !it.isPasswordVisible) }
+
+	fun onSnackbarDismissed() = updateState { it.copy(snackBarMessage = null, isSuccess = false) }
+
+	fun register() {
+		updateState {
+			it.copy(
+				name = it.name.trim(),
+				lastname = it.lastname.trim(),
+				email = it.email.trim(),
+				phoneNumber = it.phoneNumber.trim(),
+				password = it.password.trim(),
+				confirmPassword = it.confirmPassword.trim(),
+				fieldErrors = emptyMap(),
+				snackBarMessage = null
+			)
+		}
+
+		if (!validateFields()) return
+
+		updateState { it.copy(isLoading = true, snackBarMessage = null) }
+
+		screenModelScope.launch {
+			val s = state.value
+			val request = RegisterRequest(
+				first_name = s.name,
+				last_name = s.lastname,
+				email = s.email,
+				phone_number = s.phoneNumber.ifBlank { null },
+				password = s.password
+			)
+
+			authService.register(request)
+				.onSuccess {
+					updateState {
+						it.copy(
+							isLoading = false,
+							isSuccess = true,
+							snackBarMessage = SnackbarMessage(
+								text = "Cuenta creada con éxito. Ya puedes iniciar sesión.",
+								type = SnackbarType.SUCCESS
+							)
+						)
+					}
+				}
+				.onFailure { error ->
+					updateState {
+						it.copy(
+							isLoading = false,
+							snackBarMessage = SnackbarMessage(
+								text = error.message ?: "Ocurrió un error inesperado al crear la cuenta.",
+								type = SnackbarType.ERROR
+							)
+						)
+					}
+				}
+		}
+	}
+
+	private fun validateFields(): Boolean {
+		val errors = mutableMapOf<String, String>()
+		val s = state.value
+
+		if (s.name.isBlank()) errors["name"] = "Proporcione su(s) nombre(s)."
+		if (s.lastname.isBlank()) errors["lastname"] = "Proporcione los apellidos."
+
+		val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[a-z]+$".toRegex()
+		if (s.email.isBlank()) errors["email"] = "Proporcione un correo electrónico."
+		else if (!s.email.matches(emailRegex)) errors["email"] =
+			"El formato del correo electrónico no es válido."
+
+		if (s.phoneNumber.isNotBlank()) {
+			val phoneRegex = "^[0-9]{8}$|^[0-9]{4}[- ]?[0-9]{4}$".toRegex()
+			if (!s.phoneNumber.trim().matches(phoneRegex)) errors["phone"] =
+				"Debe ser un número de teléfono válido."
+		}
+
+		val passwordError = PasswordValidator.getMissingRequirementsMessage(s.password)
+		if (passwordError != null) {
+			errors["password"] = passwordError
+		} else if (s.password != s.confirmPassword) {
+			errors["password"] = "Las contraseñas no coinciden."
+		}
+
+		updateState { it.copy(fieldErrors = errors) }
+		return errors.isEmpty()
+	}
+}

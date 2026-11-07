@@ -1,0 +1,82 @@
+package ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation
+
+import cafe.adriel.voyager.core.model.screenModelScope
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
+import ucr.ac.cr.inii.geoterra.domain.pdf.PDFUtil
+import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
+
+class GeomanifestationViewModel(
+	private val initialManifestation: GeomanifestationResponse
+) :
+	BaseScreenModel<GeomanifestationState>(GeomanifestationState(manifestation = initialManifestation)) {
+
+	fun downloadReport() {
+		screenModelScope.launch {
+			_state.update { it.copy(isLoading = true, isPdfGenerating = true) }
+			try {
+				val fileName = "Reporte_Geoquímico_${initialManifestation.geomanifestation_name}"
+
+				// Call the generator and capture the path
+				val resultPath = PDFUtil.generateManifestationReportPdf(initialManifestation, fileName)
+
+				if (resultPath != null) {
+					_state.update { it.copy(lastGeneratedPdfPath = resultPath, isPdfGenerating = false) }
+
+				} else {
+					_state.update {
+						it.copy(
+							snackBarMessage = SnackbarMessage(
+								text = "No se pudo generar la ruta del archivo PDF.",
+								type = SnackbarType.ERROR
+							),
+							isPdfGenerating = false,
+							lastGeneratedPdfPath = null
+						)
+					}
+				}
+			} catch (e: Exception) {
+				_state.update {
+					it.copy(
+						snackBarMessage = SnackbarMessage(
+							text = "Error al generar el PDF: ${e.message ?: "Ocurrió un error inesperado."}",
+							type = SnackbarType.ERROR
+						),
+						isPdfGenerating = false,
+						lastGeneratedPdfPath = null
+					)
+				}
+			}
+		}
+	}
+
+	/**
+	 * Resets PDF states after closing the success dialog.
+	 */
+	fun clearPdfStatus() {
+		_state.update { it.copy(lastGeneratedPdfPath = null, isPdfGenerating = false) }
+	}
+
+	/**
+	 * Resets the snackbar state after dismissing it.
+	 */
+	fun onSnackbarDismissed() {
+		_state.update { it.copy(snackBarMessage = null) }
+	}
+
+	fun setGeneratedPdfPath(path: String?) {
+		_state.update { it.copy(lastGeneratedPdfPath = path) }
+	}
+
+	fun getPdfPath(): String? {
+		return _state.value.lastGeneratedPdfPath
+	}
+
+	fun updateSnackBarMessage(message: String, type: SnackbarType = SnackbarType.INFO) {
+		_state.update { it.copy(snackBarMessage = SnackbarMessage(message, type)) }
+	}
+
+}
