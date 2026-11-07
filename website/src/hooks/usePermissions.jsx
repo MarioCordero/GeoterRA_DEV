@@ -218,6 +218,7 @@ export const usePermissions = () => {
     
     // Current user role
     userRole: user?.role || null,
+    isMaintenance: user?.role === 'maintenance',
   };
 };
 

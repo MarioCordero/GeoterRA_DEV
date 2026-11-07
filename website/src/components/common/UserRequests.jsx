@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useSession } from '../../hooks/useSession';
 import AddRequest from './AddRequest';
 import RequestDetails from './RequestDetails';
 import {
@@ -29,6 +30,9 @@ import { renderDateWithProse } from '../../utils/dateFormatter';
  * Features: view details, delete request with confirmation, interactive KPI cards, search, filters, responsive table/card layout.
  */
 const UserRequests = () => {
+  const { user } = useSession();
+  const isMaintenance = user?.role === 'maintenance';
+
   // ─── View state ───
   const [isMobile, setIsMobile] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -217,10 +221,10 @@ const UserRequests = () => {
               onClick={() => handleViewDetails(request)}
               className="poppins-bold text-base text-geoterra-blue block hover:underline cursor-pointer"
             >
-              {loc ? `${loc.province}, ${loc.canton}` : request.request_name || `Solicitud #${id}`}
+              {loc ? `${loc.province}, ${loc.canton}` : request.request_name || (isMaintenance ? `Solicitud #${id}` : 'Solicitud de Análisis')}
             </span>
             <span className="text-xs text-gray-400 font-mono">
-              #{id} • {renderDateWithProse(request.created_at, { showIcon: false })}
+              {isMaintenance && `#{id} • `}{renderDateWithProse(request.created_at, { showIcon: false })}
             </span>
           </div>
           {renderStateBadge(request.state)}
@@ -276,7 +280,7 @@ const UserRequests = () => {
               <EnvironmentOutlined className="text-xs text-geoterra-blue" />
               {text}
             </div>
-            <span className="font-mono text-xs text-gray-400">ID: #{id}</span>
+            {isMaintenance && <span className="font-mono text-xs text-gray-400">ID: #{id}</span>}
           </div>
         );
       },

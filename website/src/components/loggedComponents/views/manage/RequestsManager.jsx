@@ -86,6 +86,7 @@ const RequestsManager = () => {
   const [stateFilter, setStateFilter] = useState('ALL');
 
   const { user } = useSession();
+  const isMaintenance = user?.role === 'maintenance';
 
   // Check if screen is mobile size
   useEffect(() => {
@@ -583,7 +584,7 @@ const RequestsManager = () => {
   // Ant Design Table columns
   const tableColumns = [
     {
-      title: 'Solicitud / Código',
+      title: isMaintenance ? 'Solicitud / Código' : 'Solicitud',
       key: 'solicitud',
       sorter: (a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0),
       render: (_, record) => (
@@ -596,9 +597,11 @@ const RequestsManager = () => {
             {record.name}
           </div>
           <div className="flex items-center gap-2 text-xs text-gray-500">
-            <Tag className="m-0 font-mono text-[11px] bg-gray-100 border-gray-200">
-              #{record.id_soli}
-            </Tag>
+            {isMaintenance && (
+              <Tag className="m-0 font-mono text-[11px] bg-gray-100 border-gray-200">
+                #{record.id_soli}
+              </Tag>
+            )}
             <span>{renderDateWithProse(record.created_at, { showIcon: false })}</span>
           </div>
         </div>
@@ -762,7 +765,7 @@ const RequestsManager = () => {
               {request.name}
             </span>
             <span className="text-xs text-gray-400">
-              #{request.id_soli} • {renderDateWithProse(request.created_at, { showIcon: false })}
+              {isMaintenance && `#{request.id_soli} • `}{renderDateWithProse(request.created_at, { showIcon: false })}
             </span>
           </div>
           {renderStateBadge(request.state)}
@@ -1185,10 +1188,12 @@ const RequestsManager = () => {
           <div className="py-2 space-y-4 poppins">
             {/* Header Status Bar */}
             <div className="bg-blue-50/60 p-4 rounded-xl border border-blue-100 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <span className="text-xs text-gray-500 uppercase font-semibold">Código</span>
-                <p className="text-lg font-bold text-geoterra-blue m-0 font-mono">#{selectedRequest.id_soli}</p>
-              </div>
+              {isMaintenance && (
+                <div>
+                  <span className="text-xs text-gray-500 uppercase font-semibold">Código</span>
+                  <p className="text-lg font-bold text-geoterra-blue m-0 font-mono">#{selectedRequest.id_soli}</p>
+                </div>
+              )}
               <div>
                 <span className="text-xs text-gray-500 uppercase font-semibold">Fecha de Creación</span>
                 <p className="text-sm font-semibold text-gray-800 m-0">

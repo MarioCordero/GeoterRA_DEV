@@ -12,6 +12,7 @@ import {
 import PiperDiagram from './PiperDiagram';
 import LindalDiagram from './LindalDiagram';
 import { geomanifestationsShow } from '../../config/apiConf';
+import { useSession } from '../../hooks/useSession';
 
 /**
  * Utility function to transform API response into normalized component data structure.
@@ -62,7 +63,7 @@ const transformManifestationData = (apiData, fallbackRegionName = 'Región desco
   const locationText = [province, canton, district].filter(Boolean).join(', ') || fallbackRegionName;
 
   const id = apiData.geomanifestation_id || apiData.id;
-  const name = apiData.geomanifestation_name || apiData.name || `Punto ${id}`;
+  const name = apiData.geomanifestation_name || apiData.name || 'Punto Geotermal';
 
   const hasInsituTest = Boolean(apiData.insitu_test || toFloat(temp) > 0 || toFloat(fieldPH) > 0 || toFloat(fieldCond) > 0);
   const ionsSum = toFloat(cl) + toFloat(hco3) + toFloat(so4) + toFloat(ca) + toFloat(mg) + toFloat(na) + toFloat(k);
@@ -156,6 +157,8 @@ const fetchPointData = async (pointId) => {
 };
 
 export default function PointDetails() {
+  const { user } = useSession();
+  const isMaintenance = user?.role === 'maintenance';
   const { pointId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -280,7 +283,9 @@ export default function PointDetails() {
               </h1>
             </div>
             <p className="text-gray-500 text-sm m-0">
-              📍 {pointData.region} • ID: <span className="font-mono text-gray-700 font-semibold">{pointData.id}</span>
+              📍 {pointData.region}{isMaintenance && (
+                <> • ID: <span className="font-mono text-gray-700 font-semibold">{pointData.id}</span></>
+              )}
             </p>
             {pointData.description && (
               <p className="text-gray-600 text-sm mt-2 italic bg-gray-50 p-2.5 rounded-md border border-gray-100">
