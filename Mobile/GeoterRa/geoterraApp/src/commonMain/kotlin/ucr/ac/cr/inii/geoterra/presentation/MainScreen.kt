@@ -38,6 +38,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.russhwolf.settings.Settings
 import org.koin.compose.koinInject
+import ucr.ac.cr.inii.geoterra.presentation.components.common.BottomNavBar
 import ucr.ac.cr.inii.geoterra.presentation.navigation.AccountTab
 import ucr.ac.cr.inii.geoterra.presentation.navigation.FieldTripTab
 import ucr.ac.cr.inii.geoterra.presentation.navigation.HomeTab
@@ -62,7 +63,7 @@ class MainScreen : Screen {
       Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
-          ModernBottomNavigationBar(
+          BottomNavBar(
             items = tabs,
             tabNavigator = tabNavigator
           )
@@ -70,51 +71,6 @@ class MainScreen : Screen {
       ) { padding ->
         Box(Modifier.padding(padding)) {
           CurrentTab()
-        }
-      }
-    }
-  }
-}
-
-@Composable
-fun ModernBottomNavigationBar(
-  items: List<Tab>,
-  tabNavigator: TabNavigator
-) {
-  Surface(
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(start = 16.dp, end = 16.dp, bottom = 24.dp),
-    shape = RoundedCornerShape(32.dp),
-    color = MaterialTheme.colorScheme.surface,
-    shadowElevation = 8.dp
-  ) {
-    Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 8.dp),
-      horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-      items.forEach { tab ->
-        val isSelected = tabNavigator.current.key == tab.key
-
-        Column(
-          horizontalAlignment = Alignment.CenterHorizontally,
-          modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
-            .clickable { tabNavigator.current = tab }
-            .padding(8.dp)
-        ) {
-          Icon(
-            painter = tab.options.icon!!,
-            contentDescription = tab.options.title,
-            tint = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline
-          )
-          Text(
-            text = tab.options.title,
-            style = MaterialTheme.typography.labelSmall,
-            color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline
-          )
         }
       }
     }
