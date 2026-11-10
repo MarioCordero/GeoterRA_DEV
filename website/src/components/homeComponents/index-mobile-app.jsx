@@ -78,17 +78,12 @@ function IndexMobileApp() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-geoterra-orange poppins block mb-2">
-            INVESTIGACIÓN EN TERRENO
-          </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#12467E] poppins-bold m-0 leading-tight">
-            GeoterRA Móvil para Trabajo de Campo
+            GeoterRA Móvil
           </h2>
           <div className="w-20 sm:w-24 border-b-4 border-geoterra-orange mx-auto my-4"></div>
           <p className="text-gray-600 text-sm sm:text-base leading-relaxed poppins m-0">
-            Lleve el catálogo geotérmico a sus expediciones. Registre puntos termales, capture coordenadas
-            GPS satelitales de alta precisión y tome fotografías georreferenciadas directamente desde su
-            dispositivo, incluso en zonas remotas sin conexión a internet.
+            Realice solicitudes de manifestaciones, capture coordenadas GPS satelitales de alta precisión, todo directamente desde su dispositivo, incluso en zonas remotas sin conexión a internet.
           </p>
         </div>
 
@@ -98,10 +93,6 @@ function IndexMobileApp() {
           <div className="lg:col-span-7 bg-slate-50 border border-gray-200 rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-sm">
             <div>
               <div className="flex items-center justify-between gap-4 flex-wrap mb-6">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border border-blue-200 poppins">
-                  <SafetyCertificateOutlined />
-                  Instalador Oficial Verificado
-                </span>
                 <span className="text-xs text-gray-500 font-medium poppins">
                   Android 8.0 o superior
                 </span>
@@ -122,7 +113,7 @@ function IndexMobileApp() {
               </div>
 
               {/* Version & Technical Details */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6 bg-white p-4 rounded-xl border border-gray-200 text-xs poppins">
+              <div className="text-center grid grid-cols-2 sm:grid-cols-2 gap-3 mb-6 bg-white p-4 rounded-xl border border-gray-200 text-xs poppins">
                 <div>
                   <span className="text-gray-400 block font-medium uppercase text-[10px]">Archivo</span>
                   <span className="font-semibold text-gray-800 font-mono">{versionInfo.fileName}</span>
@@ -132,10 +123,6 @@ function IndexMobileApp() {
                   <span className="font-semibold text-gray-800 font-mono">
                     {versionInfo.fileSizeMB ? `${versionInfo.fileSizeMB} MB` : '74.6 MB'}
                   </span>
-                </div>
-                <div className="col-span-2 sm:col-span-1">
-                  <span className="text-gray-400 block font-medium uppercase text-[10px]">Compatibilidad</span>
-                  <span className="font-semibold text-gray-800">ARM64 / x86_64</span>
                 </div>
               </div>
             </div>
@@ -153,7 +140,7 @@ function IndexMobileApp() {
 
               <div className="flex items-center justify-center gap-2 mt-3 text-xs text-gray-500 poppins">
                 <CheckCircleOutlined className="text-[#12467E]" />
-                <span>Instalación directa sin intermediarios • Seguro y libre de publicidad</span>
+                <span>Instalación directa</span>
               </div>
             </div>
           </div>
@@ -178,9 +165,6 @@ function IndexMobileApp() {
                   <span className="text-base sm:text-lg font-bold text-gray-900 group-hover:text-[#12467E] transition block poppins-bold">
                     Google Play
                   </span>
-                  <span className="text-xs text-gray-500 poppins block">
-                    Publicación en trámite oficial
-                  </span>
                 </div>
               </div>
 
@@ -204,9 +188,6 @@ function IndexMobileApp() {
                   </span>
                   <span className="text-base sm:text-lg font-bold text-gray-900 group-hover:text-[#12467E] transition block poppins-bold">
                     App Store
-                  </span>
-                  <span className="text-xs text-gray-500 poppins block">
-                    Versión nativa para iOS
                   </span>
                 </div>
               </div>
