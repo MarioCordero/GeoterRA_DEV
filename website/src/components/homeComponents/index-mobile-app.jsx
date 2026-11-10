@@ -15,6 +15,8 @@ import NotImplementedModal from '../common/NotImplementedModal';
 import { getApkDownloadUrl, getAppVersionInfo } from '../../config/apiConf';
 import '../../fontsModule.css';
 
+const PRODUCTION_APK_URL = 'https://163.178.171.105/api/app/download-apk';
+
 function IndexMobileApp() {
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
@@ -132,7 +134,7 @@ function IndexMobileApp() {
               <div className="bg-white p-4 sm:p-5 rounded-xl border border-gray-200 mb-6 flex flex-col sm:flex-row items-center gap-5">
                 <div className="bg-white p-2.5 rounded-xl border border-gray-200 shrink-0 shadow-xs flex items-center justify-center">
                   <QRCode
-                    value={versionInfo.downloadUrl}
+                    value={PRODUCTION_APK_URL}
                     size={118}
                     bordered={false}
                     color="#12467E"
