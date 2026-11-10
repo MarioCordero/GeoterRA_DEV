@@ -715,7 +715,7 @@ const TerritoryManager = () => {
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
               Nivel 2 • Cantones
             </span>
-            <div className="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-700 flex items-center justify-center text-lg">
+            <div className="w-10 h-10 rounded-xl bg-orange-50 text-geoterra-orange flex items-center justify-center text-lg">
               <ApartmentOutlined />
             </div>
           </div>
@@ -725,7 +725,7 @@ const TerritoryManager = () => {
             </span>
             <span className="text-xs text-gray-500 font-medium">Activos</span>
           </div>
-          <div className="mt-2 text-xs text-cyan-700 font-medium flex items-center gap-1">
+          <div className="mt-2 text-xs text-slate-600 font-medium flex items-center gap-1">
             <FilterOutlined /> Filtrables por provincia
           </div>
         </div>
@@ -741,7 +741,7 @@ const TerritoryManager = () => {
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
               Nivel 3 • Distritos
             </span>
-            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center text-lg">
+            <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center text-lg">
               <EnvironmentOutlined />
             </div>
           </div>
@@ -751,18 +751,18 @@ const TerritoryManager = () => {
             </span>
             <span className="text-xs text-gray-500 font-medium">Unidades</span>
           </div>
-          <div className="mt-2 text-xs text-purple-700 font-medium flex items-center gap-1">
+          <div className="mt-2 text-xs text-slate-600 font-medium flex items-center gap-1">
             <GlobalOutlined /> Cobertura geotérmica
           </div>
         </div>
 
         {/* KPI 4: Cartografía SNIT */}
-        <div className="bg-gradient-to-br from-slate-900 to-[#12467E] p-5 rounded-2xl border border-gray-800 text-white shadow-sm flex flex-col justify-between">
+        <div className="bg-[#12467E] p-5 rounded-2xl border border-blue-900 text-white shadow-sm flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-blue-200 uppercase tracking-wider">
               Estándar Cartográfico
             </span>
-            <div className="w-10 h-10 rounded-xl bg-white/10 text-amber-400 flex items-center justify-center text-lg">
+            <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center text-lg">
               <SafetyCertificateOutlined />
             </div>
           </div>
@@ -772,7 +772,7 @@ const TerritoryManager = () => {
               Proyección cartográfica oficial del IGN / SNIT
             </p>
           </div>
-          <div className="mt-3 text-[11px] text-emerald-300 font-medium flex items-center gap-1">
+          <div className="mt-3 text-[11px] text-blue-100 font-medium flex items-center gap-1">
             <CheckCircleOutlined /> Coordenadas WGS84 compatibles
           </div>
         </div>

@@ -1,9 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AndroidOutlined } from '@ant-design/icons';
 import Fondo from "../../assets/images/index-background.png";
 import GeoterRA_ISO from "../../assets/images/GeoterRA-ISO-Black.svg";
 import '../../fontsModule.css';
 
 function IndexWelcome() {
+  const navigate = useNavigate();
   const bgImage = {
     backgroundImage: `url(${Fondo})`,
     backgroundRepeat: "no-repeat",
@@ -66,12 +69,31 @@ function IndexWelcome() {
           </div>
 
           {/* Buttons Section */}
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center lg:justify-start max-w-md mx-auto lg:mx-0">
-            <button className="bg-geoterra-orange hover:bg-orange-600 cursor-pointer text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-lg transition-all duration-300 transform hover:scale-105 poppins-bold text-sm sm:text-base">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 justify-center lg:justify-start max-w-xl mx-auto lg:mx-0 flex-wrap">
+            <button
+              onClick={() => navigate('/map')}
+              className="bg-geoterra-orange hover:bg-orange-600 cursor-pointer text-white font-semibold py-3 sm:py-3.5 px-6 sm:px-8 rounded-lg transition-all duration-300 transform hover:scale-105 poppins-bold text-sm sm:text-base shadow-sm"
+            >
               Ver mapa
             </button>
-            <button className="bg-transparent hover:bg-white hover:text-black cursor-pointer text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-lg border-2 border-white transition-all duration-300 transform hover:scale-105 poppins-bold text-sm sm:text-base">
+            <button
+              onClick={() => {
+                const el = document.getElementById('how-works');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="bg-transparent hover:bg-white hover:text-black cursor-pointer text-white font-semibold py-3 sm:py-3.5 px-6 sm:px-8 rounded-lg border-2 border-white transition-all duration-300 transform hover:scale-105 poppins-bold text-sm sm:text-base"
+            >
               Cómo funciona
+            </button>
+            <button
+              onClick={() => {
+                const el = document.getElementById('mobile-app');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="bg-[#12467E] hover:bg-[#084F9D] cursor-pointer text-white font-semibold py-3 sm:py-3.5 px-6 sm:px-7 rounded-lg transition-all duration-300 transform hover:scale-105 poppins-bold text-sm sm:text-base flex items-center justify-center gap-2 shadow-sm"
+            >
+              <AndroidOutlined className="text-base" />
+              <span>App Móvil</span>
             </button>
           </div>
 

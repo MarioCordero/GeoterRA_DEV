@@ -6,7 +6,7 @@ import {
 import {
   EditOutlined, DeleteOutlined,
   EnvironmentOutlined, SaveOutlined, UserOutlined,
-  ExperimentOutlined, EnvironmentFilled
+  ExperimentOutlined, EnvironmentFilled, CalendarOutlined
 } from '@ant-design/icons';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -373,8 +373,8 @@ const RequestDetails = ({
                         <div>
                           <p className="font-semibold text-sm m-0 text-gray-800">{st.value}</p>
                           {st.description && <p className="text-xs text-gray-600 m-0 mt-0.5">{st.description}</p>}
-                          <p className="text-xs text-gray-400 m-0 mt-1">
-                            📅 {st.created_at ? new Date(st.created_at).toLocaleString('es-ES') : ''}
+                          <p className="text-xs text-gray-400 m-0 mt-1 flex items-center gap-1">
+                            <CalendarOutlined /> {st.created_at ? new Date(st.created_at).toLocaleString('es-ES') : ''}
                           </p>
                         </div>
                       ),
@@ -513,12 +513,12 @@ const RequestDetails = ({
                   </Form.Item>
                   <Form.Item name="sensTermica" label="Sensación Térmica">
                     <Select size="large" options={[
-                      { value: 'Hirviendo', label: '🔥 Hirviendo' },
-                      { value: 'Muy Caliente', label: '🌶️ Muy Caliente' },
-                      { value: 'Caliente', label: '🥵 Caliente' },
-                      { value: 'Templado', label: '🌤️ Templado' },
-                      { value: 'Natural', label: '🍃 Natural' },
-                      { value: 'Sin Especificar', label: '🤷 Sin Especificar' }
+                      { value: 'Hirviendo', label: 'Hirviendo' },
+                      { value: 'Muy Caliente', label: 'Muy Caliente' },
+                      { value: 'Caliente', label: 'Caliente' },
+                      { value: 'Templado', label: 'Templado' },
+                      { value: 'Natural', label: 'Natural' },
+                      { value: 'Sin Especificar', label: 'Sin Especificar' }
                     ]} />
                   </Form.Item>
                   <Form.Item name="burbujeo" label="Burbujeo Activo">

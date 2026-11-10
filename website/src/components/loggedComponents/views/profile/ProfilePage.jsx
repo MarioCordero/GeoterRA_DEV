@@ -215,8 +215,8 @@ const ProfilePage = () => {
       </div>
 
       {/* User Hero Overview Card */}
-      <div className="bg-gradient-to-r from-[#12467E] to-[#1c5d9e] p-6 rounded-2xl shadow-sm text-white flex flex-col sm:flex-row items-center sm:items-start gap-6">
-        <div className="w-20 h-20 rounded-2xl bg-white/10 border-2 border-white/20 flex items-center justify-center text-3xl font-extrabold text-amber-300 shadow-inner shrink-0">
+      <div className="bg-[#12467E] p-6 rounded-2xl shadow-sm text-white flex flex-col sm:flex-row items-center sm:items-start gap-6 border border-blue-900">
+        <div className="w-20 h-20 rounded-2xl bg-white/10 border-2 border-white/20 flex items-center justify-center text-3xl font-extrabold text-geoterra-orange shadow-inner shrink-0">
           {initials}
         </div>
 
@@ -619,7 +619,7 @@ const ProfilePage = () => {
       <ConfirmationModal
         open={deleteModalVisible}
         title="Eliminar Cuenta Permanentemente"
-        message="⚠️ Esta acción es irreversible y permanente."
+        message="Esta acción es irreversible y permanente."
         icon="danger"
         danger={true}
         items={[

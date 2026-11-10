@@ -1068,7 +1068,8 @@ const FieldTripsManager = () => {
               type="primary"
               icon={<ThunderboltOutlined />}
               onClick={() => handleOpenFastPoint()}
-              className="bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white font-semibold border-0 shadow-sm poppins"
+              style={{ backgroundColor: '#F39C29', borderColor: '#F39C29' }}
+              className="text-white font-semibold shadow-sm poppins hover:opacity-90"
             >
               Punto Rápido
             </Button>
@@ -2011,11 +2012,11 @@ const FieldTripsManager = () => {
                         icon={<ThunderboltOutlined />}
                         onClick={() => handleOpenFastPoint(selectedTrip)}
                         style={{
-                          background: 'linear-gradient(135deg, #13c2c2 0%, #08979c 100%)',
-                          borderColor: '#13c2c2',
+                          backgroundColor: '#F39C29',
+                          borderColor: '#F39C29',
                           alignSelf: 'flex-start',
-                          boxShadow: '0 2px 6px rgba(19, 194, 194, 0.35)',
                         }}
+                        className="hover:opacity-90 font-semibold"
                       >
                         + Punto Rápido en esta Gira
                       </Button>

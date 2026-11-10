@@ -20,19 +20,19 @@ import {
 const FORM_CACHE_KEY = "addPointFormCache";
 
 const TEMPERATURE_LEVELS = [
-  { value: 'Natural', label: 'Natural', emoji: '🍃', color: '#64748b', desc: 'Temperatura ambiente / fresca' },
-  { value: 'Templado', label: 'Templado', emoji: '🌤️', color: '#0284c7', desc: 'Ligeramente tibia al tacto' },
-  { value: 'Caliente', label: 'Caliente', emoji: '🥵', color: '#f59e0b', desc: 'Calor apreciable sin vapor denso' },
-  { value: 'Muy Caliente', label: 'Muy Caliente', emoji: '🌶️', color: '#ea580c', desc: 'Emanación de calor intenso y vapor' },
-  { value: 'Hirviendo', label: 'Hirviendo', emoji: '🔥', color: '#dc2626', desc: 'Burbujeo / ebullición visible' },
+  { value: 'Natural', label: 'Natural', color: '#64748b', desc: 'Temperatura ambiente / fresca' },
+  { value: 'Templado', label: 'Templado', color: '#12467E', desc: 'Ligeramente tibia al tacto' },
+  { value: 'Caliente', label: 'Caliente', color: '#ea580c', desc: 'Calor apreciable sin vapor denso' },
+  { value: 'Muy Caliente', label: 'Muy Caliente', color: '#c2410c', desc: 'Emanación de calor intenso y vapor' },
+  { value: 'Hirviendo', label: 'Hirviendo', color: '#9a3412', desc: 'Burbujeo / ebullición visible' },
 ];
 
 const TEMPERATURE_MARKS = {
-  0: <span className="font-semibold text-xs text-slate-600">🍃 Natural</span>,
-  1: <span className="font-semibold text-xs text-sky-700">🌤️ Templado</span>,
-  2: <span className="font-semibold text-xs text-amber-700">🥵 Caliente</span>,
-  3: <span className="font-semibold text-xs text-orange-700">🌶️ Muy Caliente</span>,
-  4: <span className="font-semibold text-xs text-red-600">🔥 Hirviendo</span>,
+  0: <span className="font-medium text-xs text-gray-600">Natural</span>,
+  1: <span className="font-medium text-xs text-[#12467E]">Templado</span>,
+  2: <span className="font-medium text-xs text-orange-600">Caliente</span>,
+  3: <span className="font-medium text-xs text-orange-700">Muy Caliente</span>,
+  4: <span className="font-medium text-xs text-orange-900">Hirviendo</span>,
 };
 
 const AddRequest = ({
@@ -63,7 +63,7 @@ const AddRequest = ({
   const [isUnspecifiedTemp, setIsUnspecifiedTemp] = useState(false);
 
   const currentTempLevel = isUnspecifiedTemp
-    ? { value: 'Sin Especificar', label: 'Sin Especificar', emoji: '🤷', color: '#8c8c8c', desc: 'No se definió una percepción térmica' }
+    ? { value: 'Sin Especificar', label: 'Sin Especificar', color: '#64748b', desc: 'No se definió una percepción térmica' }
     : (TEMPERATURE_LEVELS[tempSliderIndex] || TEMPERATURE_LEVELS[0]);
 
   const handleSliderChange = (val) => {
@@ -468,15 +468,15 @@ const AddRequest = ({
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-gray-200/60 pb-2.5">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-gray-800 text-sm poppins flex items-center gap-1.5">
-                      <span>{currentTempLevel.emoji}</span> Sensación Térmica Percibida:
+                    <span className="font-bold text-gray-800 text-sm poppins">
+                      Sensación Térmica Percibida:
                     </span>
                     <Tag
                       className="rounded-full px-2.5 py-0.5 text-xs font-bold border"
                       style={{
-                        backgroundColor: `${currentTempLevel.color}15`,
+                        backgroundColor: '#f8fafc',
                         color: currentTempLevel.color,
-                        borderColor: `${currentTempLevel.color}40`,
+                        borderColor: '#e2e8f0',
                       }}
                     >
                       {currentTempLevel.label}
@@ -520,20 +520,20 @@ const AddRequest = ({
                       onChange={handleSliderChange}
                       marks={TEMPERATURE_MARKS}
                       railStyle={{
-                        background: 'linear-gradient(to right, #94a3b8 0%, #38bdf8 25%, #f59e0b 50%, #ea580c 75%, #dc2626 100%)',
-                        height: 8,
-                        borderRadius: 4,
+                        backgroundColor: '#e2e8f0',
+                        height: 6,
+                        borderRadius: 3,
                       }}
-                      trackStyle={{ background: 'transparent' }}
+                      trackStyle={{ backgroundColor: currentTempLevel.color, height: 6, borderRadius: 3 }}
                       tooltip={{
-                        formatter: (val) => `${TEMPERATURE_LEVELS[val]?.emoji} ${TEMPERATURE_LEVELS[val]?.label}`,
+                        formatter: (val) => TEMPERATURE_LEVELS[val]?.label,
                       }}
                     />
                   </ConfigProvider>
                 </div>
               ) : (
-                <div className="py-3 px-4 bg-white rounded-lg border border-dashed border-gray-300 text-center text-xs text-gray-500 poppins flex items-center justify-center gap-2">
-                  <span>🤷</span> No se especificará una sensación térmica en este registro.
+                <div className="py-3 px-4 bg-white rounded-lg border border-dashed border-gray-300 text-center text-xs text-gray-500 poppins flex items-center justify-center">
+                  No se especificará una sensación térmica en este registro.
                 </div>
               )}
 

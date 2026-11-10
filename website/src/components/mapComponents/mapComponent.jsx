@@ -99,12 +99,12 @@ function CenterOnUser() {
       onAdd: function (map) {
         const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom custom-location-control');
         container.className += ' bg-white w-10 h-10 cursor-pointer flex items-center justify-center rounded-lg shadow-md hover:bg-gray-50 border border-gray-200 transition-all';
-        container.innerHTML = '<span style="font-size: 16px;">📍</span>';
+        container.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>';
         container.title = 'Ir a mi ubicación';
 
         container.onclick = function () {
           if (navigator.geolocation) {
-            container.innerHTML = '<span style="font-size: 16px;">⏳</span>';
+            container.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="10"></circle></svg>';
             container.style.pointerEvents = 'none';
 
             navigator.geolocation.getCurrentPosition(
@@ -119,7 +119,7 @@ function CenterOnUser() {
 
                 const customIcon = L.divIcon({
                   className: 'custom-location-marker',
-                  html: '<div style="background-color: #ff4444; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
+                  html: '<div style="background-color: #12467E; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
                   iconSize: [20, 20],
                   iconAnchor: [10, 10]
                 });
@@ -129,15 +129,15 @@ function CenterOnUser() {
                   isLocationMarker: true
                 })
                   .addTo(map)
-                  .bindPopup("📍 Tu ubicación actual")
+                  .bindPopup("Ubicación actual")
                   .openPopup();
 
-                container.innerHTML = '<span style="font-size: 16px;">📍</span>';
+                container.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>';
                 container.style.pointerEvents = 'auto';
               },
               (error) => {
                 console.error("Geolocation error:", error);
-                container.innerHTML = '<span style="font-size: 16px;">📍</span>';
+                container.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>';
                 container.style.pointerEvents = 'auto';
               },
               {
@@ -178,7 +178,9 @@ function FullscreenControl({ fullscreen, handleFullscreen }) {
       onAdd: function (map) {
         const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom custom-fullscreen-control');
         container.className += ' bg-white w-10 h-10 cursor-pointer flex items-center justify-center mt-2 rounded-lg shadow-md hover:bg-gray-50 border border-gray-200 transition-all';
-        container.innerHTML = `<span style="font-size: 16px;">${fullscreen ? '🔲' : '⛶'}</span>`;
+        container.innerHTML = fullscreen
+          ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path></svg>'
+          : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6m0 6v6h-6M9 21H3v-6M3 9V3h6"></path></svg>';
         container.title = fullscreen ? 'Salir de pantalla completa' : 'Pantalla completa';
 
         container.onclick = function () {
@@ -194,7 +196,9 @@ function FullscreenControl({ fullscreen, handleFullscreen }) {
     const updateButton = () => {
       const button = control.getContainer();
       if (button) {
-        button.innerHTML = `<span style="font-size: 16px;">${fullscreen ? '🔲' : '⛶'}</span>`;
+        button.innerHTML = fullscreen
+          ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path></svg>'
+          : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6m0 6v6h-6M9 21H3v-6M3 9V3h6"></path></svg>';
         button.title = fullscreen ? 'Salir de pantalla completa' : 'Pantalla completa';
       }
     };
@@ -553,8 +557,9 @@ export default function MapComponent() {
                     </h4>
 
                     <div className="mb-2">
-                      <div className="text-[12px] text-gray-600 mb-1 font-semibold">
-                        📍 {point.locationName}
+                      <div className="text-[12px] text-gray-600 mb-1 font-semibold flex items-center gap-1">
+                        <FaMapMarkerAlt className="text-geoterra-blue text-xs shrink-0" />
+                        <span>{point.locationName}</span>
                       </div>
                       <div className="text-[11px] text-gray-400 font-mono">
                         {lat.toFixed(6)}°, {lng.toFixed(6)}°
@@ -617,7 +622,7 @@ export default function MapComponent() {
             <div className="absolute top-3 left-3 z-[1000] w-[320px] max-w-[calc(100vw-32px)] h-[calc(100%-24px)] bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-200 flex flex-col transition-all duration-300 overflow-hidden poppins">
 
               {/* Header */}
-              <div className="bg-gradient-to-r from-geoterra-blue to-blue-700 text-white p-3.5 flex items-center justify-between shadow-sm">
+              <div className="bg-[#12467E] text-white p-3.5 flex items-center justify-between shadow-sm">
                 <div className="flex items-center gap-2 font-bold text-sm">
                   <FaSlidersH className="text-blue-300" />
                   <span>Capas y Filtros</span>

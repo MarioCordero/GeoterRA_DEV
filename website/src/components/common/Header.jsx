@@ -17,6 +17,7 @@ export default function AppHeader() {
   const navItems = [
     { key: 'about', path: '/#about-us', label: 'Acerca de nosotros', sectionId: 'about-us' },
     { key: 'how', path: '/#how-works', label: 'Cómo funciona', sectionId: 'how-works' },
+    { key: 'mobile', path: '/#mobile-app', label: 'App Móvil', sectionId: 'mobile-app' },
     { key: 'contact', path: '/#contact-us', label: 'Contacto', sectionId: 'contact-us' },
     { key: 'map', path: '/map', label: 'Mapa', sectionId: null },
     isLogged

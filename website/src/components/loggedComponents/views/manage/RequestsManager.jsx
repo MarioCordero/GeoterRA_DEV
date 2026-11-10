@@ -192,7 +192,7 @@ const RequestsManager = () => {
         throw new Error(result.error || 'Error creando manifestación registrada');
       }
 
-      message.success('📍 Punto geotérmico creado como borrador en Geomanifestaciones', 2);
+      message.success('Punto geotérmico creado como borrador en Geomanifestaciones', 2);
 
       // Step 2: Update analysis request state to "Analizada"
       const updatePayload = {
@@ -646,13 +646,13 @@ const RequestsManager = () => {
           )}
           <div className="flex flex-wrap gap-1">
             {record.temperature_sensation && (
-              <Tag color="volcano" className="text-[11px] m-0 rounded">
-                🌡️ {record.temperature_sensation}
+              <Tag color="orange" className="text-[11px] m-0 rounded">
+                {record.temperature_sensation}
               </Tag>
             )}
             {record.bubbles ? (
               <Tag color="blue" className="text-[11px] m-0 rounded">
-                🫧 Burbujeo
+                Burbujeo activo
               </Tag>
             ) : null}
             {record.current_usage && (
@@ -792,9 +792,9 @@ const RequestsManager = () => {
 
         <div className="flex flex-wrap gap-1">
           {request.temperature_sensation && (
-            <Tag color="volcano" className="text-xs">🌡️ {request.temperature_sensation}</Tag>
+            <Tag color="orange" className="text-xs">{request.temperature_sensation}</Tag>
           )}
-          {request.bubbles ? <Tag color="blue" className="text-xs">🫧 Burbujeo</Tag> : null}
+          {request.bubbles ? <Tag color="blue" className="text-xs">Burbujeo activo</Tag> : null}
           {request.current_usage && (
             <Tag className="text-xs bg-gray-50 text-gray-600">{request.current_usage}</Tag>
           )}
@@ -951,21 +951,21 @@ const RequestsManager = () => {
           <div
             onClick={() => setStateFilter('Pendiente')}
             className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'Pendiente'
-              ? 'border-amber-400 shadow-md ring-2 ring-amber-100'
+              ? 'border-orange-400 shadow-sm ring-2 ring-orange-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
               }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">Pendientes</span>
-              <div className="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-base">
+              <span className="text-xs font-semibold text-orange-700 uppercase tracking-wider">Pendientes</span>
+              <div className="w-9 h-9 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center text-base">
                 <ClockCircleOutlined />
               </div>
             </div>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold poppins text-amber-900">{stats.pending}</span>
-              <span className="text-xs text-amber-600">por revisar</span>
+              <span className="text-2xl font-bold poppins text-gray-900">{stats.pending}</span>
+              <span className="text-xs text-orange-600">por revisar</span>
             </div>
-            <div className="mt-2 text-xs text-amber-700 flex items-center gap-1 font-medium">
+            <div className="mt-2 text-xs text-gray-500 flex items-center gap-1 font-medium">
               <span>Requieren atención de campo</span>
             </div>
           </div>
@@ -974,21 +974,21 @@ const RequestsManager = () => {
           <div
             onClick={() => setStateFilter('Revisión')}
             className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'Revisión'
-              ? 'border-blue-400 shadow-md ring-2 ring-blue-100'
+              ? 'border-blue-400 shadow-sm ring-2 ring-blue-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
               }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider">En Revisión</span>
-              <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-base">
+              <span className="text-xs font-semibold text-blue-800 uppercase tracking-wider">En Revisión</span>
+              <div className="w-9 h-9 rounded-lg bg-blue-50 text-geoterra-blue flex items-center justify-center text-base">
                 <SyncOutlined />
               </div>
             </div>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold poppins text-blue-900">{stats.inReview}</span>
+              <span className="text-2xl font-bold poppins text-gray-900">{stats.inReview}</span>
               <span className="text-xs text-blue-600">en análisis</span>
             </div>
-            <div className="mt-2 text-xs text-blue-700 flex items-center gap-1 font-medium">
+            <div className="mt-2 text-xs text-gray-500 flex items-center gap-1 font-medium">
               <span>Evaluación técnica activa</span>
             </div>
           </div>
@@ -997,21 +997,21 @@ const RequestsManager = () => {
           <div
             onClick={() => setStateFilter('Procesada')}
             className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'Procesada'
-              ? 'border-emerald-400 shadow-md ring-2 ring-emerald-100'
+              ? 'border-geoterra-blue shadow-sm ring-2 ring-blue-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
               }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Aceptadas / Procesadas</span>
-              <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-base">
+              <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">Aceptadas / Procesadas</span>
+              <div className="w-9 h-9 rounded-lg bg-gray-100 text-gray-700 flex items-center justify-center text-base">
                 <CheckCircleOutlined />
               </div>
             </div>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold poppins text-emerald-900">{stats.processed}</span>
-              <span className="text-xs text-emerald-600">incorporadas</span>
+              <span className="text-2xl font-bold poppins text-gray-900">{stats.processed}</span>
+              <span className="text-xs text-gray-500">incorporadas</span>
             </div>
-            <div className="mt-2 text-xs text-emerald-700 flex items-center gap-1 font-medium">
+            <div className="mt-2 text-xs text-gray-500 flex items-center gap-1 font-medium">
               <span>Convertidas a Geomanifestación</span>
             </div>
           </div>
@@ -1020,7 +1020,7 @@ const RequestsManager = () => {
         {/* ========================================================================= */}
         {/* WORKFLOW BANNER HELPER                                                    */}
         {/* ========================================================================= */}
-        <div className="bg-gradient-to-r from-blue-50/70 via-white to-amber-50/50 p-4 rounded-xl border border-blue-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div className="bg-white p-4 rounded-xl border border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-blue-100 text-geoterra-blue flex items-center justify-center text-lg flex-shrink-0">
               <CompassOutlined />
@@ -1063,9 +1063,9 @@ const RequestsManager = () => {
                 className="w-full sm:w-48"
               >
                 <Select.Option value="ALL">Todos los Estados</Select.Option>
-                <Select.Option value="Pendiente">🟡 Solo Pendientes</Select.Option>
-                <Select.Option value="Revisión">🔵 En Revisión</Select.Option>
-                <Select.Option value="Procesada">🟢 Aceptadas / Procesadas</Select.Option>
+                <Select.Option value="Pendiente">Solo Pendientes</Select.Option>
+                <Select.Option value="Revisión">En Revisión</Select.Option>
+                <Select.Option value="Procesada">Aceptadas / Procesadas</Select.Option>
               </Select>
 
               {(searchText || stateFilter !== 'ALL') && (
@@ -1260,7 +1260,7 @@ const RequestsManager = () => {
                 </div>
                 <div>
                   <span className="text-xs text-gray-400 font-semibold uppercase">Burbujeo</span>
-                  <p className="text-gray-800 m-0">{selectedRequest.bubbles ? '🫧 Sí detectado' : '❌ No presente'}</p>
+                  <p className="text-gray-800 m-0">{selectedRequest.bubbles ? 'Sí detectado' : 'No presente'}</p>
                 </div>
                 <div>
                   <span className="text-xs text-gray-400 font-semibold uppercase">Uso Actual</span>
@@ -1528,16 +1528,16 @@ const RequestsManager = () => {
               >
                 <Select placeholder="Selecciona el estado" className="rounded-lg">
                   <Select.Option value="Pendiente">
-                    <Tag color="orange">🟡 Pendiente</Tag>
+                    <Tag color="orange">Pendiente</Tag>
                   </Select.Option>
                   <Select.Option value="Revisión">
-                    <Tag color="blue">🔵 En Revisión</Tag>
+                    <Tag color="blue">En Revisión</Tag>
                   </Select.Option>
                   <Select.Option value="Procesada">
-                    <Tag color="green">🟢 Procesada / Aceptada</Tag>
+                    <Tag color="default">Procesada / Aceptada</Tag>
                   </Select.Option>
                   <Select.Option value="Rechazada">
-                    <Tag color="red">🔴 Rechazada</Tag>
+                    <Tag color="red">Rechazada</Tag>
                   </Select.Option>
                 </Select>
               </Form.Item>
@@ -1590,7 +1590,7 @@ const RequestsManager = () => {
         <div className="py-2 space-y-4 poppins text-sm text-gray-700">
           <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
             <h4 className="font-bold text-geoterra-blue m-0 flex items-center gap-2 text-base">
-              🔄 Flujo de Trabajo Recomendado
+              <SyncOutlined /> Flujo de Trabajo Recomendado
             </h4>
             <div className="space-y-3 pt-2 text-xs">
               <div className="flex items-start gap-3">
@@ -1633,7 +1633,7 @@ const RequestsManager = () => {
 
           <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-2 text-xs">
             <h4 className="font-bold text-geoterra-blue m-0 flex items-center gap-2 text-sm">
-              💡 Consejos de Buenas Prácticas
+              <BulbOutlined /> Consejos de Buenas Prácticas
             </h4>
             <ul className="list-disc pl-5 space-y-1 text-gray-600 m-0">
               <li>Usa los filtros superiores para ubicar rápidamente solicitudes pendientes o de un cantón específico.</li>

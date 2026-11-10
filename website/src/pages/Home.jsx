@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import WelcomeSection from '../components/homeComponents/index-welcome';
 import AboutUsSection from '../components/homeComponents/index-about-us';
 import HowWorksSection from '../components/homeComponents/index-how-works';
+import MobileAppSection from '../components/homeComponents/index-mobile-app';
 import ContactUsSection from '../components/homeComponents/index-contact-us';
 import AppHeader from '../components/common/Header';
 import Footer from '../components/common/Footer';
@@ -59,6 +60,9 @@ const Home = () => {
         </section>
         <section id="how-works">
           <HowWorksSection />
+        </section>
+        <section id="mobile-app">
+          <MobileAppSection />
         </section>
         <section id="contact-us">
           <ContactUsSection />
