@@ -48,13 +48,16 @@ if (function_exists('validateSessionToken')) {
   validateSessionToken($db);
 }
 
-if (!Request::isValidClient()) {
-  Http\Response::error(Http\ErrorType::unauthorized('Invalid API Key'), 403);
-}
-
 // Request parsing
 $path = Request::getPath();
 $method = Request::getMethod();
+
+// Exempt public app installer download and version endpoints from API key requirement
+$isPublicAppEndpoint = in_array($path, ['/app/download-apk', '/app/download', '/app/version'], true);
+
+if (!$isPublicAppEndpoint && !Request::isValidClient()) {
+  Http\Response::error(Http\ErrorType::unauthorized('Invalid API Key'), 403);
+}
 
 // Load routes
 $routes = $safeRequire($configPath . 'routes.php');

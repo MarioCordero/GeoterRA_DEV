@@ -35,6 +35,61 @@ final class Response
   }
 
   /**
+   * Streams a binary file download with appropriate HTTP headers and terminates execution.
+   *
+   * @param string $filePath Full filesystem path to the file.
+   * @param string $fileName Suggested download file name.
+   * @param string $mimeType Content-Type (defaults to application/octet-stream).
+   * @return void Terminates execution via exit.
+   */
+  public static function download(
+    string $filePath,
+    string $fileName = '',
+    string $mimeType = 'application/octet-stream'
+  ): void
+  {
+    if (!file_exists($filePath) || !is_readable($filePath)) {
+      self::error(ErrorType::notFound('Archivo'), 404);
+      return;
+    }
+
+    $fileName = $fileName ?: basename($filePath);
+    $fileSize = filesize($filePath);
+
+    if (ob_get_level()) {
+      ob_end_clean();
+    }
+
+    http_response_code(200);
+    header('Content-Description: File Transfer');
+    header('Content-Type: ' . $mimeType);
+    header('Content-Disposition: attachment; filename="' . str_replace('"', '', $fileName) . '"');
+    header('Content-Transfer-Encoding: binary');
+    header('Expires: 0');
+    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+    header('Pragma: public');
+    if ($fileSize !== false) {
+      header('Content-Length: ' . (string) $fileSize);
+    }
+
+    flush();
+
+    // Stream file chunk by chunk (safe for large files without hitting memory limits)
+    $handle = fopen($filePath, 'rb');
+    if ($handle !== false) {
+      while (!feof($handle)) {
+        echo fread($handle, 1024 * 64);
+        flush();
+      }
+      fclose($handle);
+    } else {
+      readfile($filePath);
+    }
+
+    exit;
+  }
+
+  /**
    * Sends a formatted error JSON response and terminates execution.
    * 
    * Handles multiple input formats: a single ErrorType instance, an array of ErrorTypes/strings,
