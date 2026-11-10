@@ -43,7 +43,8 @@ jobs:
             SRC_BRANCH="Mobile"
           fi
 
-          git checkout develop || git checkout -b develop origin/develop
+          git fetch origin develop
+          git checkout -B develop origin/develop
           
           rm -rf Mobile/
           git checkout "origin/$SRC_BRANCH" -- Mobile/
@@ -51,6 +52,7 @@ jobs:
 
           if ! git diff --cached --quiet; then
             git commit -m "📱 CI: Sincronización automática de Mobile/ desde rama $SRC_BRANCH [skip ci]"
+            git pull --rebase origin develop
             git push origin develop
             echo "✅ Mobile/ sincronizado en develop exitosamente."
           else
@@ -70,7 +72,8 @@ jobs:
             SRC_BRANCH="Mobile"
           fi
 
-          git checkout web || git checkout -b web origin/web
+          git fetch origin web
+          git checkout -B web origin/web
           
           rm -rf Mobile/
           git checkout "origin/$SRC_BRANCH" -- Mobile/
@@ -78,6 +81,7 @@ jobs:
 
           if ! git diff --cached --quiet; then
             git commit -m "📱 CI: Sincronización automática de Mobile/ desde rama $SRC_BRANCH [skip ci]"
+            git pull --rebase origin web
             git push origin web
             echo "✅ Mobile/ sincronizado en web exitosamente."
           else
@@ -97,7 +101,8 @@ jobs:
             SRC_BRANCH="Mobile"
           fi
 
-          git checkout main || git checkout -b main origin/main
+          git fetch origin main
+          git checkout -B main origin/main
           
           rm -rf Mobile/
           git checkout "origin/$SRC_BRANCH" -- Mobile/
@@ -105,6 +110,7 @@ jobs:
 
           if ! git diff --cached --quiet; then
             git commit -m "📱 CI: Sincronización automática de Mobile/ desde rama $SRC_BRANCH [skip ci]"
+            git pull --rebase origin main
             git push origin main
             echo "✅ Mobile/ sincronizado en main exitosamente."
           else
