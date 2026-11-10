@@ -12,9 +12,9 @@ class SimpleRouter
 {
     private array $routes;
     private array $controllers = [];
-    private $db;
+    private ?PDO $db = null;
 
-    public function __construct(array $routes, PDO $db)
+    public function __construct(array $routes, ?PDO $db = null)
     {
         $this->routes = $routes;
         $this->db = $db;
