@@ -14,15 +14,15 @@ const LindalDiagram = ({ temperature }) => {
   ];
 
   // Find applicable uses for the given temperature
-  const applicableUses = lindalRanges.filter(range =>
+  const applicableUses = lindalRanges.filter(range => 
     temperature >= range.min && temperature <= range.max
   );
 
   // Get the primary use (highest temperature range that applies)
-  const primaryUse = applicableUses.length > 0
-    ? applicableUses.reduce((max, current) =>
-      current.min > max.min ? current : max
-    )
+  const primaryUse = applicableUses.length > 0 
+    ? applicableUses.reduce((max, current) => 
+        current.min > max.min ? current : max
+      )
     : null;
 
   if (!temperature || temperature < 20) {
@@ -65,7 +65,7 @@ const LindalDiagram = ({ temperature }) => {
       {/* Primary use */}
       {primaryUse && (
         <div style={{ marginBottom: "3px" }}>
-          <div style={{
+          <div style={{ 
             color: primaryUse.color,
             fontWeight: "bold",
             fontSize: "9px",

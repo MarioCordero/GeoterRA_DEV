@@ -240,10 +240,11 @@ const UserManagement = () => {
       key: 'is_deleted',
       render: (isDeleted) => (
         <span
-          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${!isDeleted
+          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+            !isDeleted
               ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
               : 'bg-rose-50 text-rose-700 border border-rose-200'
-            }`}
+          }`}
         >
           {!isDeleted ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
           {!isDeleted ? 'Activo' : 'Inactivo'}
@@ -327,10 +328,11 @@ const UserManagement = () => {
             setRoleFilter('ALL');
             setStatusFilter('ALL');
           }}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'ALL' && statusFilter === 'ALL'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
+            roleFilter === 'ALL' && statusFilter === 'ALL'
               ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-            }`}
+          }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Usuarios</span>
@@ -348,10 +350,11 @@ const UserManagement = () => {
         {/* Administracion */}
         <div
           onClick={() => setRoleFilter('ADMINS')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'ADMINS'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
+            roleFilter === 'ADMINS'
               ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-            }`}
+          }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider">
@@ -371,10 +374,11 @@ const UserManagement = () => {
         {/* Investigadores */}
         <div
           onClick={() => setRoleFilter('INVESTIGATORS')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'INVESTIGATORS'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
+            roleFilter === 'INVESTIGATORS'
               ? 'border-amber-400 shadow-md ring-2 ring-amber-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-            }`}
+          }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">
@@ -394,10 +398,11 @@ const UserManagement = () => {
         {/* Usuarios Generales */}
         <div
           onClick={() => setRoleFilter('user')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'user'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
+            roleFilter === 'user'
               ? 'border-slate-500 shadow-md ring-2 ring-slate-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-            }`}
+          }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider">

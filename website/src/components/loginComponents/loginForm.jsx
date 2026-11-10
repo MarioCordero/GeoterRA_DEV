@@ -217,7 +217,7 @@ function Login() {
   return (
     <div className="min-h-screen flex bg-gray-100 relative">
       {/* Background layers */}
-      <div
+      <div 
         className="absolute inset-0 z-0"
         style={{
           ...bgImage,
@@ -236,7 +236,7 @@ function Login() {
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-geoterra-orange mb-4 sm:mb-6 poppins-bold">
                 Iniciar Sesión
               </h1>
-
+              
               {/* Error Message */}
               {errorMsg && (
                 <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-3 py-2 sm:px-4 sm:py-3 rounded relative">
@@ -319,8 +319,8 @@ function Login() {
                     disabled={loading}
                     className="mr-2 hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   />
-                  <label
-                    htmlFor="remember"
+                  <label 
+                    htmlFor="remember" 
                     className="text-gray-700 select-none hover:cursor-pointer poppins"
                   >
                     Recordar contraseña
