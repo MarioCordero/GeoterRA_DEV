@@ -15,7 +15,7 @@ import NotImplementedModal from '../common/NotImplementedModal';
 import { getApkDownloadUrl, getAppVersionInfo } from '../../config/apiConf';
 import '../../fontsModule.css';
 
-const PRODUCTION_APK_URL = 'https://163.178.171.105/api/app/download-apk';
+const PRODUCTION_APK_URL = 'https://geoterra.inii.ucr.ac.cr/api/app/download-apk';
 
 function IndexMobileApp() {
   const [modalConfig, setModalConfig] = useState({
@@ -92,7 +92,7 @@ function IndexMobileApp() {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Main APK Download Card (Left 7 cols) */}
           <div className="lg:col-span-7 bg-slate-50 border border-gray-200 rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-sm">
             <div>
@@ -176,7 +176,7 @@ function IndexMobileApp() {
           </div>
 
           {/* Store Links & Mock Buttons (Right 5 cols) */}
-          <div className="lg:col-span-5 flex flex-col justify-between gap-4">
+          <div className="lg:col-span-5 flex flex-col justify-start gap-4">
             {/* Google Play Store Mock Card */}
             <div
               onClick={handleOpenPlayStoreModal}
