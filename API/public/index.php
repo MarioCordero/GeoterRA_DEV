@@ -41,13 +41,6 @@ $safeRequire($configPath . 'init.php');
 // Error handling
 GlobalErrorHandler::register();
 
-$db = $safeRequire($configPath . 'database.php');
-
-$safeRequire($configPath . 'session.php');
-if (function_exists('validateSessionToken')) {
-  validateSessionToken($db);
-}
-
 // Request parsing
 $path = Request::getPath();
 $method = Request::getMethod();
@@ -65,6 +58,24 @@ $routes = $safeRequire($configPath . 'routes.php');
 if (!$routes) {
   Response::error(ErrorType::internal('Routes configuration missing'), 500);
   exit;
+}
+
+// Public app installer endpoints are file-based and do not require a database connection
+if ($isPublicAppEndpoint) {
+  $router = new SimpleRouter($routes, null);
+  $response = $router->dispatch($method, $path);
+  if ($response === null) {
+    Response::error(ErrorType::notFound('Route'), 404);
+  }
+  exit;
+}
+
+// Database and session initialization for database-backed endpoints
+$db = $safeRequire($configPath . 'database.php');
+
+$safeRequire($configPath . 'session.php');
+if (function_exists('validateSessionToken')) {
+  validateSessionToken($db);
 }
 
 // Route dispatching
