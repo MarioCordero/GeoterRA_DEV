@@ -1,12 +1,6 @@
 name: MOBILE - Distribución de Mobile a Develop, Main y Web
 
 on:
-  push:
-    branches:
-      - mobile
-      - Mobile
-    paths:
-      - 'Mobile/**'
   workflow_dispatch:
 
 permissions:
