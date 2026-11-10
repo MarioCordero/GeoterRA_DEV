@@ -1,5 +1,8 @@
 package ucr.ac.cr.inii.geoterra.data.model.requests
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class GeomanifestationRequest(
 	val geomanifestation_name: String,
 	val description: String,
