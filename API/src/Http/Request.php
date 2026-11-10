@@ -273,6 +273,12 @@ final class Request
     if ($pos === 0) {
       $path = substr($path, strlen($basePath));
     }
+
+    // Strip optional /public prefix if present
+    if (stripos($path, '/public') === 0) {
+      $path = substr($path, 7);
+    }
+
     return $path ?: '/';
   }
 
