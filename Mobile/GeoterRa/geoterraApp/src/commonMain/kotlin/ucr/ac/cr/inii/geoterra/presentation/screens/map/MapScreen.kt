@@ -28,12 +28,13 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
+import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 import ucr.ac.cr.inii.geoterra.presentation.components.map.FilterBottomModal
-import ucr.ac.cr.inii.geoterra.presentation.screens.manifestation.ManifestationDetailScreen
+import ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation.GeomanifestationScreen
 
 class MapScreen : Screen {
   override val key: ScreenKey = uniqueScreenKey
-
 
   @OptIn(ExperimentalMaterial3Api::class)
   @Composable
@@ -42,15 +43,25 @@ class MapScreen : Screen {
     val state by viewModel.state.collectAsState()
     val navigator = LocalNavigator.currentOrThrow
 
-    val snackBarHost = remember { SnackbarHostState() }
+    val snackBarHost = remember { TypedSnackbarHostState() }
     
     LaunchedEffect(Unit) {
       viewModel.requestLocationIfNeeded()
       viewModel.loadMapMarkers()
     }
 
+		LaunchedEffect(state.snackBarMessage) {
+			state.snackBarMessage?.let { message ->
+				snackBarHost.showSnackbar(
+					message = message.text,
+					type = message.type
+				)
+				viewModel.clearSnackBar()
+			}
+		}
+
     Scaffold(
-      snackbarHost = { SnackbarHost(snackBarHost) },
+      snackbarHost = { CustomSnackbarHost(snackBarHost) },
       floatingActionButton = {
         Column(
           horizontalAlignment = Alignment.End,
@@ -84,7 +95,7 @@ class MapScreen : Screen {
         onUserMarkerClick = viewModel::onUserMarkerSelected,
         onDismissPanel = { viewModel.onManifestationMarkerSelected("") },
         onDetailsClick = { manifestation ->
-          navigator.push(ManifestationDetailScreen(manifestation))
+          navigator.push(GeomanifestationScreen(manifestation))
         }
       )
 

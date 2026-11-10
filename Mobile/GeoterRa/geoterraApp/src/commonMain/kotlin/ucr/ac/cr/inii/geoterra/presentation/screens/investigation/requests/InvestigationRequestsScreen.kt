@@ -19,167 +19,101 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import kotlinx.coroutines.launch
-import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 import ucr.ac.cr.inii.geoterra.domain.pdf.PDFUtil
-import ucr.ac.cr.inii.geoterra.presentation.components.request.RequestBottomModalContent
 import ucr.ac.cr.inii.geoterra.presentation.components.common.ConfirmDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
-import ucr.ac.cr.inii.geoterra.presentation.components.common.StatusDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
+import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.details.InvestigationRequestDetailsScreen
 import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.form.InvestigationRequestFormScreen
 
-class RequestsScreen : Screen {
-  override val key: ScreenKey = uniqueScreenKey
+class InvestigationRequestsScreen : Screen {
+	override val key: ScreenKey = uniqueScreenKey
 
-  @OptIn(ExperimentalMaterial3Api::class)
-  @Composable
-  override fun Content() {
-    val viewModel = getScreenModel<InvestigationRequestsViewModel>()
-    val state by viewModel.state.collectAsState()
-    val navigator = LocalNavigator.currentOrThrow
+	@OptIn(ExperimentalMaterial3Api::class)
+	@Composable
+	override fun Content() {
+		val viewModel = getScreenModel<InvestigationRequestsViewModel>()
+		val state by viewModel.state.collectAsState()
+		val navigator = LocalNavigator.currentOrThrow
 
-    val snackbarHostState = remember { SnackbarHostState() }
-    var selectedRequest by remember { mutableStateOf<InvestigationRequestResponse?>(null) }
-    val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
+		val snackbarHostState = remember { TypedSnackbarHostState() }
 
-    LaunchedEffect(Unit) {
-      viewModel.fetchSubmittedRequests()
-    }
+		LaunchedEffect(Unit) {
+			viewModel.fetchSubmittedRequests()
+		}
 
-    LaunchedEffect(state.snackBarMessage) {
-      state.snackBarMessage?.let {
-        snackbarHostState.showSnackbar(it)
-        viewModel.dismissSnackBar()
-      }
-    }
+		LaunchedEffect(state.snackBarMessage) {
+			state.snackBarMessage?.let { snackbarMsg ->
+				snackbarHostState.showSnackbar(
+					message = snackbarMsg.text,
+					type = snackbarMsg.type
+				)
+				viewModel.clearSnackBarMessage()
+			}
+		}
 
-    // --- UI FEEDBACK DIALOGS ---
+		state.requestToDelete?.let { request ->
+			ConfirmDialog(
+				title = "Eliminar solicitud",
+				message = "¿Estás seguro de que deseas eliminar esta solicitud? Esta acción no se puede deshacer.",
+				confirmText = "Eliminar",
+				onConfirm = { viewModel.deleteRequest(request.request_id) },
+				onDismiss = { viewModel.setRequestToDelete(null) },
+				isDanger = true
+			)
+		}
 
-    // Loading Dialog
-    if (state.isPdfGenerating) {
-      LoadingDialog(
-        isVisible = state.isPdfGenerating,
-        message = "Renderizando documento, por favor espere..."
-      )
-    }
-
-    state.requestToDelete?.let { request ->
-      ConfirmDialog(
-        title = "Eliminar solicitud",
-        message = "¿Estás seguro de que deseas eliminar esta solicitud? Esta acción no se puede deshacer.",
-        confirmText = "Eliminar",
-        onConfirm = { viewModel.deleteRequest(request.request_id) },
-        onDismiss = { viewModel.setRequestToDelete(null) },
-        isDanger = true
-      )
-    }
-
-    // 2. SuccessActionDialog para éxito
-    if (state.showSuccessDialog) {
-      SuccessActionDialog(
-        title = "¡Borrado exitoso!",
-        message = "La solicitud ha sido eliminada correctamente de tu lista.",
-        onConfirm = { viewModel.clearSuccessDialog() },
-        onDismiss = { viewModel.clearSuccessDialog() }
-      )
-    }
-
-    // Success Dialog
-    if (state.lastGeneratedPdfPath != null) {
-      SuccessActionDialog(
-        message = "El reporte PDF se ha generado correctamente.",
-        confirmText = "Abrir PDF",
-        dismissText = "Ahora no",
-        onConfirm = {
-          state.lastGeneratedPdfPath?.let { path ->
-            PDFUtil.openPdf(path, "ucr.ac.cr.inii.geoterra.provider")
-          }
-          viewModel.clearPdfStatus()
-        },
-        onDismiss = { viewModel.clearPdfStatus() }
-      )
-    }
-
-    // Error Dialog
-    if (state.pdfError != null) {
-      StatusDialog(
-        isSuccess = false,
-        message = state.pdfError!!,
-        onDismiss = { viewModel.clearPdfError() }
-      )
-    }
-
-    selectedRequest?.let { request ->
-      ModalBottomSheet(
-        onDismissRequest = { selectedRequest = null },
-        sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.background,
-        shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-      ) {
-        RequestBottomModalContent(
-          request = request,
-          onDownloadPdf = { req ->
-            scope.launch {
-              try {
-                viewModel.setPdfGenerating(true)
-                val fileName = "Reporte_Solicitud_${req.request_name}"
-
-                // Call the generator and capture the path
-                val resultPath = PDFUtil.generateRequestPdf(req, fileName)
-
-                if (resultPath != null) {
-                  viewModel.setGeneratedPdfPath(resultPath)
-                  selectedRequest = null // Close the bottom sheet on success
-                }
-              } catch (e: Exception) {
-                viewModel.setPdfError("Error al generar PDF: ${e.message}")
-                e.printStackTrace()
-              } finally {
-                viewModel.setPdfGenerating(false)
-              }
-            }
-          }
-        )
-      }
-    }
-
-    Scaffold(
-      snackbarHost = { SnackbarHost(snackbarHostState) },
-      floatingActionButton = {
-        FloatingActionButton(
-          onClick = { navigator.push(InvestigationRequestFormScreen()) },
-          containerColor = MaterialTheme.colorScheme.primary,
-          contentColor = MaterialTheme.colorScheme.onPrimary
-        ) {
-          Icon(Icons.Default.Add, contentDescription = "Crear")
-        }
-      },
-      topBar = {
-        Row(
-          modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 10.dp),
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.Start
-        ) {
-          Text(
-            text = "Solicitudes",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.secondary
-          )
-        }
-      }
-    ) { paddingValues ->
-      RequestsContent(
-        modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
-        state = state,
-        onView = { req -> selectedRequest = req },
-        onEdit = { req -> navigator.push(InvestigationRequestFormScreen(requestToEdit = req)) },
-        onDelete = { req -> viewModel.setRequestToDelete(req) }
-      )
-    }
-  }
+		Scaffold(
+			snackbarHost = { CustomSnackbarHost(snackbarHostState) },
+			floatingActionButton = {
+				FloatingActionButton(
+					onClick = {
+						if (state.isLoggedIn) {
+							navigator.push(InvestigationRequestFormScreen())
+						} else {
+							viewModel.updateSnackBarMessage(
+								"Esta acción requiere que inicie sesión.",
+								SnackbarType.INFO
+							)
+						}
+					},
+					containerColor = MaterialTheme.colorScheme.primary,
+					contentColor = MaterialTheme.colorScheme.onPrimary
+				) {
+					Icon(Icons.Default.Add, contentDescription = "Crear")
+				}
+			},
+			topBar = {
+				Row(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(horizontal = 20.dp, vertical = 10.dp),
+					verticalAlignment = Alignment.CenterVertically,
+					horizontalArrangement = Arrangement.Start
+				) {
+					Text(
+						text = "Solicitudes",
+						style = MaterialTheme.typography.headlineMedium,
+						fontWeight = FontWeight.Bold,
+						color = MaterialTheme.colorScheme.secondary
+					)
+				}
+			}
+		) { paddingValues ->
+			InvestigationRequestsContent(
+				modifier = Modifier
+					.padding(top = paddingValues.calculateTopPadding())
+					.padding(horizontal = 20.dp),
+				state = state,
+				onView = { req ->
+					navigator.push(InvestigationRequestDetailsScreen(req))
+				},
+				onEdit = { req -> navigator.push(InvestigationRequestFormScreen(requestToEdit = req)) },
+				onDelete = { req -> viewModel.setRequestToDelete(req) }
+			)
+		}
+	}
 }

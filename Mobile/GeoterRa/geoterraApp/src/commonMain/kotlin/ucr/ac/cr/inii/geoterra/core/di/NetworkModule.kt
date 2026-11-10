@@ -17,6 +17,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.Json.Default.encodeToString
+import kotlinx.serialization.json.Json.Default.parseToJsonElement
+import kotlinx.serialization.json.JsonElement
 import org.koin.dsl.module
 import ucr.ac.cr.inii.geoterra.core.network.ApiResponseModel
 import ucr.ac.cr.inii.geoterra.core.network.NetworkConfig
@@ -30,117 +33,128 @@ expect fun getHttpClientEngine(): HttpClientEngine
 
 @OptIn(InternalAPI::class)
 val networkModule = module {
-  single { AuthEventBus() }
-  single { TokenManager(get()) }
+	single { AuthEventBus() }
+	single { TokenManager(get()) }
 
-  single<HttpClient> {
-    val networkScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+	single<HttpClient> {
+		val networkScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-    val authEventBus = get<AuthEventBus>()
-    val client = HttpClient(getHttpClientEngine()) {
-      install(HttpTimeout) {
-        requestTimeoutMillis = 30_000
-        connectTimeoutMillis = 30_000
-        socketTimeoutMillis = 30_000
-      }
+		val authEventBus = get<AuthEventBus>()
+		val client = HttpClient(getHttpClientEngine()) {
+			install(HttpTimeout) {
+				requestTimeoutMillis = 30_000
+				connectTimeoutMillis = 30_000
+				socketTimeoutMillis = 30_000
+			}
 
-      install(ContentNegotiation) {
-        json(Json {
-          ignoreUnknownKeys = true
-          coerceInputValues = true
-          explicitNulls = true
-          encodeDefaults = true
-        })
-      }
+			install(ContentNegotiation) {
+				json(Json {
+					ignoreUnknownKeys = true
+					coerceInputValues = true
+					explicitNulls = true
+					encodeDefaults = true
+				})
+			}
 
-      install(Logging) {
-        logger = object : Logger {
-          override fun log(message: String) {
-            println("KtorClient: $message")
-          }
-        }
+			install(Logging) {
+				logger = object : Logger {
+					override fun log(message: String) {
+						val formattedMessage = try {
+							encodeToString(
+								JsonElement.serializer(),
+								parseToJsonElement(message)
+							)
+						} catch (e: Exception) {
+							message
+						}
 
-        level = LogLevel.ALL
-      }
+						println("KtorClient: $formattedMessage")					}
+				}
 
-      install(Auth) {
-        bearer {
-          sendWithoutRequest { request ->
-            val path = request.url.encodedPath
-            val isPublic = path.contains("/auth/login") ||
-              path.contains("/auth/register") ||
-              path.contains("/auth/refresh")
+				level = LogLevel.ALL
+			}
 
-            !isPublic
-          }
+			install(Auth) {
+				bearer {
+					sendWithoutRequest { request ->
+						val path = request.url.encodedPath
+						val publicPaths =
+							listOf("/auth/login", "/auth/register", "/auth/refresh", "geomanifestations/")
 
-          loadTokens {
-            val tokenManager = get<TokenManager>()
-            val access = tokenManager.getAccessToken()
-            val refresh = tokenManager.getRefreshToken()
+						val isPublicPath = publicPaths.any { publicPath ->
+							path.startsWith(publicPath)
+						}
 
-            if (access != null && refresh != null) {
-              println("Cargando tokens: $access, $refresh")
-              BearerTokens(access, refresh)
-            } else {
-              null
-            }
-          }
+						!isPublicPath
+					}
 
-          refreshTokens {
-            val tm = get<TokenManager>()
-            val refreshToken = tm.getRefreshToken() ?: return@refreshTokens null
+					// Loads tokens from the token manager
+					loadTokens {
+						val tokenManager = get<TokenManager>()
+						val access = tokenManager.getAccessToken()
+						val refresh = tokenManager.getRefreshToken()
 
-            try {
-              // Client for refreshing tokens
-              val response = client.post("auth/refresh") {
-                markAsRefreshTokenRequest()
-                contentType(ContentType.Application.Json)
-                setBody(RefreshAccessTokenRequest(refreshToken))
-              }.body<ApiResponseModel<RefreshAccessTokenResponse>>()
+						if (access != null && refresh != null) {
+							BearerTokens(access, refresh)
+						} else {
+							null
+						}
+					}
 
-              val data = response.data
-              val errors = response.errors
+					refreshTokens {
+						val tm = get<TokenManager>()
+						val refreshToken = tm.getRefreshToken() ?: return@refreshTokens null
 
-              val hasRefreshTokenError = errors.any { error ->
-                error.isAuthError()
-              }
+						try {
+							// Client for refreshing tokens
+							val response = client.post("auth/refresh") {
+								markAsRefreshTokenRequest()
+								contentType(ContentType.Application.Json)
+								setBody(RefreshAccessTokenRequest(refreshToken))
+							}.body<ApiResponseModel<RefreshAccessTokenResponse, JsonElement>>()
 
-              if (hasRefreshTokenError || data == null) {
-                tm.clearTokens()
-                authEventBus.emit(AuthEvent.Logout)
-                return@refreshTokens null
-              }
+							val data = response.data
+							val errors = response.errors
 
-              // Save new tokens
-              tm.saveTokens(data.access_token, data.refresh_token)
-              println("Refrescando tokens: ${data.access_token}, ${data.refresh_token}")
-              BearerTokens(data.access_token, data.refresh_token)
+							val expiredRefreshToken = errors.any { error ->
+								error.isAuthError()
+							}
 
-            } catch (e: Exception) {
-              tm.clearTokens()
-              authEventBus.emit(AuthEvent.Logout)
-              null
-            }
-          }
-        }
-      }
+							if (expiredRefreshToken || data == null) {
+								tm.clearTokens()
+								authEventBus.emit(AuthEvent.Logout)
+								return@refreshTokens null
+							}
 
-      defaultRequest {
-        url(NetworkConfig.API_URL)
-        header(HttpHeaders.ContentType, ContentType.Application.Json)
-        header("x-api-key", NetworkConfig.API_KEY)
-      }
-    }
+							// Save new tokens
+							tm.saveTokens(data.access_token, data.refresh_token)
+							authEventBus.emit(AuthEvent.Authorized)
+							BearerTokens(data.access_token, data.refresh_token)
 
-    networkScope.launch {
-      authEventBus.events.collect { event ->
-        if (event is AuthEvent.LoginSuccess) {
-          client.authProvider<BearerAuthProvider>()?.clearToken()
-        }
-      }
-    }
+						} catch (e: Exception) {
+							tm.clearTokens()
+							authEventBus.emit(AuthEvent.Logout)
+							null
+						}
+					}
+				}
+			}
 
-    client
-  }
+			defaultRequest {
+				url(NetworkConfig.API_URL)
+				header(HttpHeaders.ContentType, ContentType.Application.Json)
+				header("x-api-key", NetworkConfig.API_KEY)
+			}
+		}
+
+		networkScope.launch {
+			authEventBus.events.collect { event ->
+				if (event is AuthEvent.LoginSuccess) {
+					client.authProvider<BearerAuthProvider>()?.clearToken()
+				}
+			}
+		}
+
+		client
+	}
 }

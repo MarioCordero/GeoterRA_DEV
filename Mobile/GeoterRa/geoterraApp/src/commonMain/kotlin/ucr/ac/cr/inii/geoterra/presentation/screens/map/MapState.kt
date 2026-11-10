@@ -6,6 +6,7 @@ import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.PaginationResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.ProvinceResponse
 import ucr.ac.cr.inii.geoterra.domain.location.UserLocation
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
 
 /**
  * Represents a visual style layer configuration for the map view.
@@ -32,7 +33,7 @@ data class MapState(
 	val isUserLocationSelected: Boolean = false,
 	val userLocationTrigger: Long = 0L,
 	val isLoading: Boolean = false,
-	val snackBarMessage: String? = null,
+	val snackBarMessage: SnackbarMessage? = null,
 	val isFilterModalVisible: Boolean = false,
 	val availableProvinces: List<ProvinceResponse> = emptyList(),
 	val availableCantons: List<CantonResponse> = emptyList(),
