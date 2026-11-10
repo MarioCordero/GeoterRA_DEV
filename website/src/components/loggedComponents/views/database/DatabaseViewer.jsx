@@ -223,7 +223,7 @@ const DatabaseViewer = () => {
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
               Registros Globales
             </span>
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-lg">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#12467E] flex items-center justify-center text-lg">
               <HddOutlined />
             </div>
           </div>
@@ -233,7 +233,7 @@ const DatabaseViewer = () => {
             </span>
             <span className="text-xs text-gray-500 font-medium">Filas</span>
           </div>
-          <div className="mt-2 text-xs text-emerald-700 font-medium flex items-center gap-1">
+          <div className="mt-2 text-xs text-slate-600 font-medium flex items-center gap-1">
             <CheckCircleOutlined /> Sincronizado en tiempo real
           </div>
         </div>
@@ -244,7 +244,7 @@ const DatabaseViewer = () => {
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
               Tabla Seleccionada
             </span>
-            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-lg">
+            <div className="w-10 h-10 rounded-xl bg-orange-50 text-geoterra-orange flex items-center justify-center text-lg">
               <DatabaseOutlined />
             </div>
           </div>
@@ -256,20 +256,20 @@ const DatabaseViewer = () => {
               {currentTable ? `${currentTable.count} registros almacenados` : 'Selecciona una tabla'}
             </p>
           </div>
-          <div className="mt-2 text-xs text-amber-700 font-medium flex items-center gap-1">
-            <span className="font-mono text-[11px] bg-amber-100/60 px-1.5 py-0.5 rounded text-amber-900">
+          <div className="mt-2 text-xs text-geoterra-orange font-medium flex items-center gap-1">
+            <span className="font-mono text-[11px] bg-orange-50 px-1.5 py-0.5 rounded text-orange-950 border border-orange-200">
               {activeTab || 'N/A'}
             </span>
           </div>
         </div>
 
         {/* KPI 4: Nivel de Seguridad */}
-        <div className="bg-gradient-to-br from-slate-900 to-[#12467E] p-5 rounded-2xl border border-gray-800 text-white shadow-sm flex flex-col justify-between">
+        <div className="bg-[#12467E] p-5 rounded-2xl border border-blue-900 text-white shadow-sm flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-blue-200 uppercase tracking-wider">
               Acceso Seguro
             </span>
-            <div className="w-10 h-10 rounded-xl bg-white/10 text-emerald-400 flex items-center justify-center text-lg">
+            <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center text-lg">
               <SafetyCertificateOutlined />
             </div>
           </div>
@@ -279,7 +279,7 @@ const DatabaseViewer = () => {
               Integridad de base de datos blindada
             </p>
           </div>
-          <div className="mt-3 text-[11px] text-emerald-300 font-medium flex items-center gap-1">
+          <div className="mt-3 text-[11px] text-blue-100 font-medium flex items-center gap-1">
             <CheckCircleOutlined /> Sin mutaciones directas
           </div>
         </div>

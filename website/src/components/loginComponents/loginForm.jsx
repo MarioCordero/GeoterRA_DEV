@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { authLogin, authPasswordResetRequest, authPasswordResetReset } from '../../config/apiConf';
 import { useSession } from "../../hooks/useSession";
 import loginImage from "../../assets/images/login-background.png";
-import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import { EyeOutlined, EyeInvisibleOutlined, LockOutlined, ClockCircleOutlined, ExclamationCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
 
 function Login() {
   const navigate = useNavigate();
@@ -217,7 +217,7 @@ function Login() {
   return (
     <div className="min-h-screen flex bg-gray-100 relative">
       {/* Background layers */}
-      <div 
+      <div
         className="absolute inset-0 z-0"
         style={{
           ...bgImage,
@@ -236,7 +236,7 @@ function Login() {
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-geoterra-orange mb-4 sm:mb-6 poppins-bold">
                 Iniciar Sesión
               </h1>
-              
+
               {/* Error Message */}
               {errorMsg && (
                 <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-3 py-2 sm:px-4 sm:py-3 rounded relative">
@@ -319,8 +319,8 @@ function Login() {
                     disabled={loading}
                     className="mr-2 hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   />
-                  <label 
-                    htmlFor="remember" 
+                  <label
+                    htmlFor="remember"
                     className="text-gray-700 select-none hover:cursor-pointer poppins"
                   >
                     Recordar contraseña
@@ -363,7 +363,7 @@ function Login() {
             {/* Header */}
             <div className="bg-geoterra-orange px-6 py-4 flex items-center justify-between text-white">
               <h3 className="text-lg sm:text-xl font-bold poppins-bold flex items-center gap-2">
-                🔒 Recuperar Contraseña
+                <LockOutlined /> Recuperar Contraseña
               </h3>
               <button
                 type="button"
@@ -443,7 +443,7 @@ function Login() {
                   {/* Countdown Timer Badge */}
                   <div className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs sm:text-sm text-amber-900 font-medium poppins">
                     <span className="flex items-center gap-1.5 font-bold">
-                      ⏱️ Tiempo restante para el código:
+                      <ClockCircleOutlined /> Tiempo restante para el código:
                     </span>
                     <span className={`font-mono text-sm font-bold ${timerSeconds < 60 ? 'text-red-600 animate-pulse' : 'text-amber-900'}`}>
                       {formatTime(timerSeconds)}
@@ -452,7 +452,9 @@ function Login() {
 
                   {timerSeconds === 0 ? (
                     <div className="bg-red-50 border border-red-300 text-red-700 p-4 rounded-lg text-sm text-center space-y-3 poppins">
-                      <p className="font-semibold">⚠️ El código de recuperación ha expirado.</p>
+                      <p className="font-semibold flex items-center justify-center gap-1.5">
+                        <ExclamationCircleOutlined /> El código de recuperación ha expirado.
+                      </p>
                       <button
                         type="button"
                         onClick={handleRequestResetCode}
@@ -567,7 +569,9 @@ function Login() {
               {/* STEP 3: Success Confirmation */}
               {resetStep === 3 && (
                 <div className="text-center py-4 space-y-4">
-                  <div className="text-5xl">✅</div>
+                  <div className="text-5xl text-[#12467E] flex justify-center">
+                    <CheckCircleOutlined />
+                  </div>
                   <h4 className="text-lg font-bold text-gray-800 poppins-bold">
                     ¡Contraseña actualizada!
                   </h4>

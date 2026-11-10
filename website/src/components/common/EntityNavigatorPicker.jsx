@@ -76,8 +76,8 @@ export const ENTITY_SCHEMAS = {
     key: 'requests',
     name: 'Solicitud de Análisis',
     plural: 'Solicitudes',
-    icon: <InboxOutlined style={{ color: '#52c41a' }} />,
-    color: 'green',
+    icon: <InboxOutlined style={{ color: '#12467E' }} />,
+    color: 'blue',
     idField: (item) => item.request_id || item.id_soli || item.id,
     titleField: (item) => item.request_name || item.name || 'Solicitud de Análisis',
     subtitleField: (item) => item.owner_name || item.owner_email || item.email || 'Solicitante sin nombre',
@@ -93,8 +93,8 @@ export const ENTITY_SCHEMAS = {
     key: 'insitu_tests',
     name: 'Prueba In-Situ',
     plural: 'Pruebas In-Situ',
-    icon: <BulbOutlined style={{ color: '#13c2c2' }} />,
-    color: 'cyan',
+    icon: <BulbOutlined style={{ color: '#12467E' }} />,
+    color: 'blue',
     idField: (item) => item.insitu_test_id || item.id,
     titleField: (item) => item.temperature ? `Medición In-Situ (${item.temperature}°C)` : 'Prueba In-Situ',
     subtitleField: (item) => `Temp: ${item.temperature ?? 'N/A'}°C | pH: ${item.ph ?? 'N/A'} | Cond: ${item.conductivity ?? 'N/A'}`,
@@ -109,8 +109,8 @@ export const ENTITY_SCHEMAS = {
     key: 'inlab_tests',
     name: 'Prueba Lab',
     plural: 'Pruebas de Laboratorio',
-    icon: <ExperimentOutlined style={{ color: '#722ed1' }} />,
-    color: 'purple',
+    icon: <ExperimentOutlined style={{ color: '#ea580c' }} />,
+    color: 'orange',
     idField: (item) => item.inlab_test_id || item.id,
     titleField: (item) => item.ph ? `Análisis de Lab (pH ${item.ph})` : 'Prueba de Laboratorio',
     subtitleField: (item) => `pH: ${item.ph ?? 'N/A'} | Cond: ${item.conductivity ?? 'N/A'} | Cl: ${item.cl ?? 'N/A'}`,
@@ -329,12 +329,12 @@ const EntityNavigatorPicker = ({
           render: (_, record) => (
             <Space size={4}>
               {record.insitu_test_id ? (
-                <Tag color="cyan">In-Situ: {isMaintenance ? `${String(record.insitu_test_id).slice(0, 8)}...` : 'Vinculada'}</Tag>
+                <Tag color="blue">In-Situ: {isMaintenance ? `${String(record.insitu_test_id).slice(0, 8)}...` : 'Vinculada'}</Tag>
               ) : (
                 <Tag color="default">Sin In-Situ</Tag>
               )}
               {record.inlab_test_id ? (
-                <Tag color="purple">Lab: {isMaintenance ? `${String(record.inlab_test_id).slice(0, 8)}...` : 'Vinculada'}</Tag>
+                <Tag color="orange">Lab: {isMaintenance ? `${String(record.inlab_test_id).slice(0, 8)}...` : 'Vinculada'}</Tag>
               ) : (
                 <Tag color="default">Sin Lab</Tag>
               )}
@@ -482,16 +482,16 @@ const EntityNavigatorPicker = ({
                 onChange={setFieldTripFilter}
                 style={{ minWidth: 230 }}
                 options={[
-                  { value: 'all', label: '🧭 Todas las Geomanifestaciones' },
-                  { value: 'in_trip', label: '⭐ Solo en Giras de Campo' },
-                  { value: 'no_trip', label: '📍 Solo Sin Gira de Campo' },
+                  { value: 'all', label: 'Todas las Geomanifestaciones' },
+                  { value: 'in_trip', label: 'Solo en Giras de Campo' },
+                  { value: 'no_trip', label: 'Solo Sin Gira de Campo' },
                   ...(fieldTrips.length > 0
                     ? [
                         {
                           label: 'Filtrar por Gira Específica',
                           options: fieldTrips.map((t) => ({
                             value: t.field_trip_id || t.id,
-                            label: `🧭 ${t.field_trip_name} (${t.field_trip_start_date || t.field_trip_scheduled_date || 'Sin fecha'})`,
+                            label: `${t.field_trip_name} (${t.field_trip_start_date || t.field_trip_scheduled_date || 'Sin fecha'})`,
                           })),
                         },
                       ]
@@ -566,8 +566,8 @@ const EntityNavigatorPicker = ({
 
             {selectedItem && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4, flexWrap: 'wrap' }}>
-                <Text type="secondary" style={{ fontSize: '12px' }}>
-                  📍 {activeSchema.subtitleField(selectedItem)}
+                <Text type="secondary" style={{ fontSize: '12px' }} className="flex items-center gap-1">
+                  <EnvironmentOutlined className="text-gray-400" /> {activeSchema.subtitleField(selectedItem)}
                 </Text>
                 {isMaintenance && (
                   <Text type="secondary" style={{ fontSize: '11px' }} className="font-mono bg-white px-2 py-0.5 rounded border border-gray-200">
@@ -676,16 +676,16 @@ const EntityNavigatorPicker = ({
               onChange={setFieldTripFilter}
               style={{ minWidth: 240 }}
               options={[
-                { value: 'all', label: '🧭 Todas las Geomanifestaciones' },
-                { value: 'in_trip', label: '⭐ Solo en Giras de Campo' },
-                { value: 'no_trip', label: '📍 Solo Sin Gira de Campo' },
+                { value: 'all', label: 'Todas las Geomanifestaciones' },
+                { value: 'in_trip', label: 'Solo en Giras de Campo' },
+                { value: 'no_trip', label: 'Solo Sin Gira de Campo' },
                 ...(fieldTrips.length > 0
                   ? [
                       {
                         label: 'Filtrar por Gira Específica',
                         options: fieldTrips.map((t) => ({
                           value: t.field_trip_id || t.id,
-                          label: `🧭 ${t.field_trip_name} (${t.field_trip_start_date || t.field_trip_scheduled_date || 'Sin fecha'})`,
+                          label: `${t.field_trip_name} (${t.field_trip_start_date || t.field_trip_scheduled_date || 'Sin fecha'})`,
                         })),
                       },
                     ]

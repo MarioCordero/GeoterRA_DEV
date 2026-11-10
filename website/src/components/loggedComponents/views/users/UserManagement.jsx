@@ -177,9 +177,9 @@ const UserManagement = () => {
 
   const roleTagConfig = {
     admin: { color: 'blue', label: 'Administrador' },
-    maintenance: { color: 'cyan', label: 'Mantenimiento' },
+    maintenance: { color: 'default', label: 'Mantenimiento' },
     field_investigator: { color: 'orange', label: 'Investigador de Campo' },
-    investigator: { color: 'purple', label: 'Investigador Lab' },
+    investigator: { color: 'blue', label: 'Investigador Lab' },
     user: { color: 'default', label: 'Usuario General' },
   };
 
@@ -240,11 +240,10 @@ const UserManagement = () => {
       key: 'is_deleted',
       render: (isDeleted) => (
         <span
-          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-            !isDeleted
+          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${!isDeleted
               ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
               : 'bg-rose-50 text-rose-700 border border-rose-200'
-          }`}
+            }`}
         >
           {!isDeleted ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
           {!isDeleted ? 'Activo' : 'Inactivo'}
@@ -328,11 +327,10 @@ const UserManagement = () => {
             setRoleFilter('ALL');
             setStatusFilter('ALL');
           }}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            roleFilter === 'ALL' && statusFilter === 'ALL'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'ALL' && statusFilter === 'ALL'
               ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Usuarios</span>
@@ -350,11 +348,10 @@ const UserManagement = () => {
         {/* Administracion */}
         <div
           onClick={() => setRoleFilter('ADMINS')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            roleFilter === 'ADMINS'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'ADMINS'
               ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider">
@@ -374,11 +371,10 @@ const UserManagement = () => {
         {/* Investigadores */}
         <div
           onClick={() => setRoleFilter('INVESTIGATORS')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            roleFilter === 'INVESTIGATORS'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'INVESTIGATORS'
               ? 'border-amber-400 shadow-md ring-2 ring-amber-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">
@@ -398,25 +394,24 @@ const UserManagement = () => {
         {/* Usuarios Generales */}
         <div
           onClick={() => setRoleFilter('user')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            roleFilter === 'user'
-              ? 'border-emerald-400 shadow-md ring-2 ring-emerald-100'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'user'
+              ? 'border-slate-500 shadow-md ring-2 ring-slate-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
               Usuarios Generales
             </span>
-            <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-base">
+            <div className="w-9 h-9 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center text-base">
               <IdcardOutlined />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold poppins text-emerald-900">{stats.generalUsers}</span>
-            <span className="text-xs text-emerald-600">usuarios</span>
+            <span className="text-2xl font-bold poppins text-slate-900">{stats.generalUsers}</span>
+            <span className="text-xs text-slate-500">usuarios</span>
           </div>
-          <div className="mt-2 text-xs text-emerald-700 font-medium">Consulta y solicitudes</div>
+          <div className="mt-2 text-xs text-slate-600 font-medium">Consulta y solicitudes</div>
         </div>
       </div>
 
@@ -441,8 +436,8 @@ const UserManagement = () => {
               className="w-full sm:w-52"
             >
               <Select.Option value="ALL">Todos los Roles</Select.Option>
-              <Select.Option value="ADMINS">🛡️ Administradores & Mantenimiento</Select.Option>
-              <Select.Option value="INVESTIGATORS">🧪 Investigadores (Campo/Lab)</Select.Option>
+              <Select.Option value="ADMINS">Administradores & Mantenimiento</Select.Option>
+              <Select.Option value="INVESTIGATORS">Investigadores (Campo/Lab)</Select.Option>
               <Select.Option value="admin">Administrador</Select.Option>
               <Select.Option value="maintenance">Mantenimiento</Select.Option>
               <Select.Option value="field_investigator">Investigador de Campo</Select.Option>
@@ -456,8 +451,8 @@ const UserManagement = () => {
               className="w-full sm:w-40"
             >
               <Select.Option value="ALL">Todos los Estados</Select.Option>
-              <Select.Option value="active">🟢 Solo Activos</Select.Option>
-              <Select.Option value="deleted">🔴 Inactivos</Select.Option>
+              <Select.Option value="active">Solo Activos</Select.Option>
+              <Select.Option value="deleted">Inactivos</Select.Option>
             </Select>
 
             {(searchText || roleFilter !== 'ALL' || statusFilter !== 'ALL') && (
@@ -571,11 +566,11 @@ const UserManagement = () => {
                 onChange={setSelectedRole}
                 className="rounded-lg"
                 options={[
-                  { label: '🛡️ Administrador (admin)', value: 'admin' },
-                  { label: '⚙️ Mantenimiento (maintenance)', value: 'maintenance' },
-                  { label: '🧭 Investigador de Campo (field_investigator)', value: 'field_investigator' },
-                  { label: '🧪 Investigador de Laboratorio (investigator)', value: 'investigator' },
-                  { label: '👤 Usuario General (user)', value: 'user' },
+                  { label: 'Administrador (admin)', value: 'admin' },
+                  { label: 'Mantenimiento (maintenance)', value: 'maintenance' },
+                  { label: 'Investigador de Campo (field_investigator)', value: 'field_investigator' },
+                  { label: 'Investigador de Laboratorio (investigator)', value: 'investigator' },
+                  { label: 'Usuario General (user)', value: 'user' },
                 ]}
                 placeholder="Seleccionar rol"
               />

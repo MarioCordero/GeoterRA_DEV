@@ -183,21 +183,21 @@ const UserRequests = () => {
     const s = (state || 'Registrada').toLowerCase();
     if (s.includes('reg') || s.includes('pend')) {
       return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-200">
           <ClockCircleOutlined /> Registrada
         </span>
       );
     }
     if (s.includes('revis')) {
       return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-geoterra-blue border border-blue-200">
           <SyncOutlined spin /> En Revisión
         </span>
       );
     }
     if (s.includes('aprob') || s.includes('proc') || s.includes('analiz') || s.includes('acept')) {
       return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-800 border border-gray-300">
           <CheckCircleOutlined /> Aprobada en Mapa
         </span>
       );
@@ -238,7 +238,9 @@ const UserRequests = () => {
             </div>
           )}
           {request.owner_name && (
-            <p className="m-0 text-gray-600">👤 Titular: {request.owner_name}</p>
+            <p className="m-0 text-gray-600 flex items-center gap-1.5">
+              <UserOutlined className="text-gray-400" /> Titular: {request.owner_name}
+            </p>
           )}
         </div>
 
@@ -415,21 +417,21 @@ const UserRequests = () => {
           onClick={() => setStateFilter('REGISTRADA')}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
             stateFilter === 'REGISTRADA'
-              ? 'border-amber-400 shadow-md ring-2 ring-amber-100'
+              ? 'border-orange-400 shadow-sm ring-2 ring-orange-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">Registradas</span>
-            <div className="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-base">
+            <span className="text-xs font-semibold text-orange-700 uppercase tracking-wider">Registradas</span>
+            <div className="w-9 h-9 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center text-base">
               <ClockCircleOutlined />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold poppins text-amber-900">{stats.registered}</span>
-            <span className="text-xs text-amber-600">en espera</span>
+            <span className="text-2xl font-bold poppins text-gray-900">{stats.registered}</span>
+            <span className="text-xs text-orange-600">en espera</span>
           </div>
-          <div className="mt-2 text-xs text-amber-700 font-medium">Pendientes de revisión técnica</div>
+          <div className="mt-2 text-xs text-gray-500">Pendientes de revisión técnica</div>
         </div>
 
         {/* En Revision */}
@@ -437,21 +439,21 @@ const UserRequests = () => {
           onClick={() => setStateFilter('REVISION')}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
             stateFilter === 'REVISION'
-              ? 'border-blue-400 shadow-md ring-2 ring-blue-100'
+              ? 'border-blue-400 shadow-sm ring-2 ring-blue-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider">En Revisión</span>
-            <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-base">
+            <span className="text-xs font-semibold text-blue-800 uppercase tracking-wider">En Revisión</span>
+            <div className="w-9 h-9 rounded-lg bg-blue-50 text-geoterra-blue flex items-center justify-center text-base">
               <SyncOutlined />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold poppins text-blue-900">{stats.inReview}</span>
+            <span className="text-2xl font-bold poppins text-gray-900">{stats.inReview}</span>
             <span className="text-xs text-blue-600">en análisis</span>
           </div>
-          <div className="mt-2 text-xs text-blue-700 font-medium">Equipo técnico evaluando</div>
+          <div className="mt-2 text-xs text-gray-500">Equipo técnico evaluando</div>
         </div>
 
         {/* Aprobadas */}
@@ -459,28 +461,28 @@ const UserRequests = () => {
           onClick={() => setStateFilter('APROBADA')}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
             stateFilter === 'APROBADA'
-              ? 'border-emerald-400 shadow-md ring-2 ring-emerald-100'
+              ? 'border-geoterra-blue shadow-sm ring-2 ring-blue-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Aprobadas</span>
-            <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-base">
+            <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">Aprobadas</span>
+            <div className="w-9 h-9 rounded-lg bg-gray-100 text-gray-700 flex items-center justify-center text-base">
               <CheckCircleOutlined />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold poppins text-emerald-900">{stats.approved}</span>
-            <span className="text-xs text-emerald-600">en inventario</span>
+            <span className="text-2xl font-bold poppins text-gray-900">{stats.approved}</span>
+            <span className="text-xs text-gray-500">en inventario</span>
           </div>
-          <div className="mt-2 text-xs text-emerald-700 font-medium">Visibles en mapa de GeoterRA</div>
+          <div className="mt-2 text-xs text-gray-500">Visibles en mapa de GeoterRA</div>
         </div>
       </div>
 
       {/* ========================================================================= */}
       {/* WORKFLOW BANNER HELPER                                                    */}
       {/* ========================================================================= */}
-      <div className="bg-gradient-to-r from-blue-50/70 via-white to-amber-50/50 p-4 rounded-xl border border-blue-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+      <div className="bg-white p-4 rounded-xl border border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-blue-100 text-geoterra-blue flex items-center justify-center text-lg flex-shrink-0">
             <CompassOutlined />
@@ -523,9 +525,9 @@ const UserRequests = () => {
               className="w-full sm:w-48"
             >
               <Select.Option value="ALL">Todos los Estados</Select.Option>
-              <Select.Option value="REGISTRADA">🟡 Registradas</Select.Option>
-              <Select.Option value="REVISION">🔵 En Revisión</Select.Option>
-              <Select.Option value="APROBADA">🟢 Aprobadas / En Mapa</Select.Option>
+              <Select.Option value="REGISTRADA">Registradas</Select.Option>
+              <Select.Option value="REVISION">En Revisión</Select.Option>
+              <Select.Option value="APROBADA">Aprobadas / En Mapa</Select.Option>
             </Select>
 
             {(searchText || stateFilter !== 'ALL') && (
@@ -621,7 +623,7 @@ const UserRequests = () => {
         <div className="py-2 space-y-4 poppins text-sm text-gray-700">
           <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
             <h4 className="font-bold text-geoterra-blue m-0 flex items-center gap-2 text-base">
-              📝 Pasos para Registrar una Solicitud
+              <FileTextOutlined /> Pasos para Registrar una Solicitud
             </h4>
             <ol className="m-0 pl-5 space-y-1.5 text-xs text-gray-600">
               <li>Haz clic en el botón <strong>"Agregar Solicitud"</strong>.</li>
@@ -634,17 +636,17 @@ const UserRequests = () => {
 
           <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-2 text-xs">
             <h4 className="font-bold text-geoterra-blue m-0 flex items-center gap-2 text-sm">
-              📊 Estados de la Solicitud
+              <CheckCircleOutlined /> Estados de la Solicitud
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
-              <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-lg text-amber-900">
-                <strong>🟡 Registrada:</strong> Recibida por la plataforma, en espera de revisión.
+              <div className="p-2.5 bg-orange-50 border border-orange-200 rounded-lg text-orange-900">
+                <strong>Registrada:</strong> Recibida por la plataforma, en espera de revisión.
               </div>
               <div className="p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-blue-900">
-                <strong>🔵 En Revisión:</strong> Investigadores analizando contexto y programando gira.
+                <strong>En Revisión:</strong> Investigadores analizando contexto y programando gira.
               </div>
-              <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900">
-                <strong>🟢 Aprobada:</strong> Confirmada y publicada en el mapa oficial de GeoterRA.
+              <div className="p-2.5 bg-gray-100 border border-gray-300 rounded-lg text-gray-900">
+                <strong>Aprobada:</strong> Confirmada y publicada en el mapa oficial de GeoterRA.
               </div>
             </div>
           </div>

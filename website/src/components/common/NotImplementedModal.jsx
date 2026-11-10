@@ -1,4 +1,5 @@
 import React from 'react';
+import { MailOutlined, PhoneOutlined } from '@ant-design/icons';
 
 /**
  * NotImplementedModal Component
@@ -55,8 +56,12 @@ function NotImplementedModal({ isOpen, onClose }) {
               Contacto directo:
             </p>
             <div className="space-y-1">
-              <p className="text-sm text-geoterra-blue poppins">📧 geoterra.inii.ucr@gmail.com</p>
-              <p className="text-sm text-geoterra-blue poppins">📞 +506 (XXX) XXX-XXXX</p>
+              <p className="text-sm text-geoterra-blue poppins flex items-center gap-2">
+                <MailOutlined className="text-gray-400" /> geoterra.inii.ucr@gmail.com
+              </p>
+              <p className="text-sm text-geoterra-blue poppins flex items-center gap-2">
+                <PhoneOutlined className="text-gray-400" /> +506 (XXX) XXX-XXXX
+              </p>
             </div>
           </div>
 

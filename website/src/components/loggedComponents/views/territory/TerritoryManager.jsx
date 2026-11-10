@@ -681,9 +681,8 @@ const TerritoryManager = () => {
         {/* KPI 1: Provincias */}
         <div
           onClick={() => setActiveTab('1')}
-          className={`bg-white p-5 rounded-2xl border transition-all cursor-pointer shadow-sm hover:shadow-md ${
-            activeTab === '1' ? 'border-[#12467E] ring-2 ring-blue-100' : 'border-gray-200'
-          }`}
+          className={`bg-white p-5 rounded-2xl border transition-all cursor-pointer shadow-sm hover:shadow-md ${activeTab === '1' ? 'border-[#12467E] ring-2 ring-blue-100' : 'border-gray-200'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -707,15 +706,14 @@ const TerritoryManager = () => {
         {/* KPI 2: Cantones */}
         <div
           onClick={() => setActiveTab('2')}
-          className={`bg-white p-5 rounded-2xl border transition-all cursor-pointer shadow-sm hover:shadow-md ${
-            activeTab === '2' ? 'border-[#12467E] ring-2 ring-blue-100' : 'border-gray-200'
-          }`}
+          className={`bg-white p-5 rounded-2xl border transition-all cursor-pointer shadow-sm hover:shadow-md ${activeTab === '2' ? 'border-[#12467E] ring-2 ring-blue-100' : 'border-gray-200'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
               Nivel 2 • Cantones
             </span>
-            <div className="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-700 flex items-center justify-center text-lg">
+            <div className="w-10 h-10 rounded-xl bg-orange-50 text-geoterra-orange flex items-center justify-center text-lg">
               <ApartmentOutlined />
             </div>
           </div>
@@ -725,7 +723,7 @@ const TerritoryManager = () => {
             </span>
             <span className="text-xs text-gray-500 font-medium">Activos</span>
           </div>
-          <div className="mt-2 text-xs text-cyan-700 font-medium flex items-center gap-1">
+          <div className="mt-2 text-xs text-slate-600 font-medium flex items-center gap-1">
             <FilterOutlined /> Filtrables por provincia
           </div>
         </div>
@@ -733,15 +731,14 @@ const TerritoryManager = () => {
         {/* KPI 3: Distritos */}
         <div
           onClick={() => setActiveTab('3')}
-          className={`bg-white p-5 rounded-2xl border transition-all cursor-pointer shadow-sm hover:shadow-md ${
-            activeTab === '3' ? 'border-[#12467E] ring-2 ring-blue-100' : 'border-gray-200'
-          }`}
+          className={`bg-white p-5 rounded-2xl border transition-all cursor-pointer shadow-sm hover:shadow-md ${activeTab === '3' ? 'border-[#12467E] ring-2 ring-blue-100' : 'border-gray-200'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
               Nivel 3 • Distritos
             </span>
-            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center text-lg">
+            <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center text-lg">
               <EnvironmentOutlined />
             </div>
           </div>
@@ -751,18 +748,18 @@ const TerritoryManager = () => {
             </span>
             <span className="text-xs text-gray-500 font-medium">Unidades</span>
           </div>
-          <div className="mt-2 text-xs text-purple-700 font-medium flex items-center gap-1">
+          <div className="mt-2 text-xs text-slate-600 font-medium flex items-center gap-1">
             <GlobalOutlined /> Cobertura geotérmica
           </div>
         </div>
 
         {/* KPI 4: Cartografía SNIT */}
-        <div className="bg-gradient-to-br from-slate-900 to-[#12467E] p-5 rounded-2xl border border-gray-800 text-white shadow-sm flex flex-col justify-between">
+        <div className="bg-[#12467E] p-5 rounded-2xl border border-blue-900 text-white shadow-sm flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-blue-200 uppercase tracking-wider">
               Estándar Cartográfico
             </span>
-            <div className="w-10 h-10 rounded-xl bg-white/10 text-amber-400 flex items-center justify-center text-lg">
+            <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center text-lg">
               <SafetyCertificateOutlined />
             </div>
           </div>
@@ -772,7 +769,7 @@ const TerritoryManager = () => {
               Proyección cartográfica oficial del IGN / SNIT
             </p>
           </div>
-          <div className="mt-3 text-[11px] text-emerald-300 font-medium flex items-center gap-1">
+          <div className="mt-3 text-[11px] text-blue-100 font-medium flex items-center gap-1">
             <CheckCircleOutlined /> Coordenadas WGS84 compatibles
           </div>
         </div>
@@ -785,51 +782,45 @@ const TerritoryManager = () => {
           <div className="flex gap-2">
             <button
               onClick={() => setActiveTab('1')}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
-                activeTab === '1'
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === '1'
                   ? 'bg-[#12467E] text-white shadow-sm'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
+                }`}
             >
               <CompassOutlined />
               <span>Provincias</span>
-              <span className={`text-xs px-2 py-0.5 rounded-full ${
-                activeTab === '1' ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'
-              }`}>
+              <span className={`text-xs px-2 py-0.5 rounded-full ${activeTab === '1' ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'
+                }`}>
                 {provinces.length}
               </span>
             </button>
 
             <button
               onClick={() => setActiveTab('2')}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
-                activeTab === '2'
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === '2'
                   ? 'bg-[#12467E] text-white shadow-sm'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
+                }`}
             >
               <ApartmentOutlined />
               <span>Cantones</span>
-              <span className={`text-xs px-2 py-0.5 rounded-full ${
-                activeTab === '2' ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'
-              }`}>
+              <span className={`text-xs px-2 py-0.5 rounded-full ${activeTab === '2' ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'
+                }`}>
                 {cantons.length}
               </span>
             </button>
 
             <button
               onClick={() => setActiveTab('3')}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
-                activeTab === '3'
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === '3'
                   ? 'bg-[#12467E] text-white shadow-sm'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
+                }`}
             >
               <EnvironmentOutlined />
               <span>Distritos</span>
-              <span className={`text-xs px-2 py-0.5 rounded-full ${
-                activeTab === '3' ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'
-              }`}>
+              <span className={`text-xs px-2 py-0.5 rounded-full ${activeTab === '3' ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'
+                }`}>
                 {districts.length}
               </span>
             </button>

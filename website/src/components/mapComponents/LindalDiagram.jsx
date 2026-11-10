@@ -1,28 +1,28 @@
 import React from 'react';
 
 const LindalDiagram = ({ temperature }) => {
-  // Lindal diagram temperature ranges and uses
+  // Lindal diagram temperature ranges and uses (Institutional GeoterRA palette)
   const lindalRanges = [
-    { min: 200, max: 300, use: "Generación eléctrica", color: "#ff4444", icon: "⚡" },
-    { min: 150, max: 200, use: "Procesos industriales", color: "#ff8800", icon: "🏭" },
-    { min: 100, max: 150, use: "Calefacción urbana", color: "#ffaa00", icon: "🏘️" },
-    { min: 80, max: 100, use: "Secado de madera", color: "#ffcc00", icon: "🪵" },
-    { min: 60, max: 80, use: "Calefacción espacial", color: "#88cc00", icon: "🏠" },
-    { min: 40, max: 60, use: "Agricultura/Invernaderos", color: "#44cc44", icon: "🌱" },
-    { min: 30, max: 40, use: "Acuicultura", color: "#44ccaa", icon: "🐟" },
-    { min: 20, max: 30, use: "Balnearios/Turismo", color: "#4488cc", icon: "🏊" }
+    { min: 200, max: 300, use: "Generación eléctrica", color: "#9a3412" },
+    { min: 150, max: 200, use: "Procesos industriales", color: "#c2410c" },
+    { min: 100, max: 150, use: "Calefacción urbana", color: "#ea580c" },
+    { min: 80, max: 100, use: "Secado de madera", color: "#f97316" },
+    { min: 60, max: 80, use: "Calefacción espacial", color: "#0369a1" },
+    { min: 40, max: 60, use: "Agricultura/Invernaderos", color: "#0284c7" },
+    { min: 30, max: 40, use: "Acuicultura", color: "#38bdf8" },
+    { min: 20, max: 30, use: "Balnearios/Turismo", color: "#12467E" }
   ];
 
   // Find applicable uses for the given temperature
-  const applicableUses = lindalRanges.filter(range => 
+  const applicableUses = lindalRanges.filter(range =>
     temperature >= range.min && temperature <= range.max
   );
 
   // Get the primary use (highest temperature range that applies)
-  const primaryUse = applicableUses.length > 0 
-    ? applicableUses.reduce((max, current) => 
-        current.min > max.min ? current : max
-      )
+  const primaryUse = applicableUses.length > 0
+    ? applicableUses.reduce((max, current) =>
+      current.min > max.min ? current : max
+    )
     : null;
 
   if (!temperature || temperature < 20) {
@@ -33,8 +33,8 @@ const LindalDiagram = ({ temperature }) => {
         textAlign: "center",
         padding: "4px"
       }}>
-        <div>❄️</div>
-        <div>Temp. muy baja</div>
+        <div style={{ fontWeight: "bold", color: "#94a3b8" }}>-</div>
+        <div>Temp. baja</div>
         <div>No aplica Lindal</div>
       </div>
     );
@@ -42,21 +42,21 @@ const LindalDiagram = ({ temperature }) => {
 
   return (
     <div style={{
-      border: "1px solid #ddd",
-      borderRadius: "4px",
-      padding: "4px",
+      border: "1px solid #e2e8f0",
+      borderRadius: "6px",
+      padding: "6px",
       backgroundColor: "#fff",
       fontSize: "9px",
       textAlign: "center"
     }}>
       {/* Temperature indicator */}
       <div style={{
-        backgroundColor: primaryUse ? primaryUse.color : "#ccc",
+        backgroundColor: primaryUse ? primaryUse.color : "#64748b",
         color: "white",
-        padding: "2px 4px",
-        borderRadius: "3px",
-        marginBottom: "3px",
-        fontSize: "8px",
+        padding: "2px 6px",
+        borderRadius: "4px",
+        marginBottom: "4px",
+        fontSize: "9px",
         fontWeight: "bold"
       }}>
         {temperature}°C
@@ -64,13 +64,12 @@ const LindalDiagram = ({ temperature }) => {
 
       {/* Primary use */}
       {primaryUse && (
-        <div style={{ marginBottom: "2px" }}>
-          <div style={{ fontSize: "12px" }}>{primaryUse.icon}</div>
-          <div style={{ 
+        <div style={{ marginBottom: "3px" }}>
+          <div style={{
             color: primaryUse.color,
             fontWeight: "bold",
-            fontSize: "8px",
-            lineHeight: "1.1"
+            fontSize: "9px",
+            lineHeight: "1.2"
           }}>
             {primaryUse.use}
           </div>
