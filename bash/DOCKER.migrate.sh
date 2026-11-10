@@ -94,21 +94,33 @@ start_container() {
     local container_status
     container_status="$(docker inspect -f '{{.State.Status}}' "$CONTAINER_NAME" 2>/dev/null || echo "not_found")"
 
-    if [ "$container_status" == "running" ]; then
-        return 0
+    # 1. Si el contenedor existe, verificar que el puerto mapeado en Docker coincida con DB_HOST_PORT
+    if [ "$container_status" != "not_found" ]; then
+        local current_host_port
+        current_host_port="$(docker port "$CONTAINER_NAME" 3306/tcp 2>/dev/null | head -n1 | awk -F: '{print $NF}' | tr -d ' ' || echo "")"
+
+        if [ -n "$current_host_port" ] && [ "$current_host_port" != "$DB_HOST_PORT" ]; then
+            echo "⚠️ El contenedor '$CONTAINER_NAME' estaba asignado al puerto $current_host_port (se requiere $DB_HOST_PORT)."
+            echo "🔄 Recreando el contenedor en el puerto $DB_HOST_PORT automáticamente (datos intactos en volumen)..."
+            docker rm -fv "$CONTAINER_NAME" >/dev/null 2>&1 || true
+            container_status="not_found"
+        fi
     fi
 
-    if [ "$container_status" == "exited" ] || [ "$container_status" == "created" ]; then
+    # 2. Si ya está corriendo en el puerto correcto, verificar que acepte conexiones TCP
+    if [ "$container_status" == "running" ]; then
+        if timeout 1 bash -c "</dev/tcp/127.0.0.1/$DB_HOST_PORT" 2>/dev/null; then
+            return 0
+        fi
+        echo "⏳ Contenedor en ejecución pero el puerto $DB_HOST_PORT aún no responde. Esperando inicialización..."
+    elif [ "$container_status" == "exited" ] || [ "$container_status" == "created" ]; then
         echo "🔄 Iniciando contenedor existente '$CONTAINER_NAME'..."
         docker start "$CONTAINER_NAME" >/dev/null
     else
-        echo "🐳 Creando contenedor '$CONTAINER_NAME' con imagen $IMAGE..."
+        echo "🐳 Creando contenedor '$CONTAINER_NAME' con imagen $IMAGE en puerto $DB_HOST_PORT..."
 
         if is_port_in_use "$DB_HOST_PORT"; then
-            echo "⚠️ Advertencia: El puerto $DB_HOST_PORT ya está en uso en el host (posible MariaDB nativo)."
-            echo "   Si falla la vinculación del puerto, intenta ejecutar con otro puerto:"
-            echo "   DB_PORT=3307 $0 $*"
-            echo ""
+            echo "⚠️ Advertencia: El puerto $DB_HOST_PORT ya está en uso en el host (posible proceso nativo)."
         fi
 
         docker run -d \
@@ -124,10 +136,10 @@ start_container() {
             --collation-server=utf8mb4_general_ci >/dev/null
     fi
 
-    echo "⏳ Esperando a que MariaDB esté listo para recibir conexiones..."
+    echo "⏳ Esperando a que MariaDB esté listo para recibir conexiones en 127.0.0.1:$DB_HOST_PORT..."
     local ready=0
     for _ in $(seq 1 45); do
-        if mdb_root -e "SELECT 1" >/dev/null 2>&1; then
+        if timeout 1 bash -c "</dev/tcp/127.0.0.1/$DB_HOST_PORT" 2>/dev/null && mdb_root -e "SELECT 1" >/dev/null 2>&1; then
             ready=1
             break
         fi
@@ -137,7 +149,7 @@ start_container() {
     if [ $ready -eq 0 ]; then
         echo "❌ MariaDB no respondió a tiempo. Logs del contenedor:"
         docker logs --tail 25 "$CONTAINER_NAME"
-        die "Tiempo de espera agotado al iniciar MariaDB."
+        die "Tiempo de espera agotado al iniciar MariaDB en puerto $DB_HOST_PORT."
     fi
 
     # Garantizar permisos del usuario sobre la base de datos
@@ -176,7 +188,8 @@ fi
 
 if [ "$ACTION" == "--start" ]; then
     start_container
-    echo "✅ Contenedor '$CONTAINER_NAME' listo en puerto $DB_HOST_PORT."
+    REAL_PORT="$(docker port "$CONTAINER_NAME" 3306/tcp 2>/dev/null | head -n1 | awk -F: '{print $NF}' | tr -d ' ' || echo "$DB_HOST_PORT")"
+    echo "✅ Contenedor '$CONTAINER_NAME' verificado y listo en puerto $REAL_PORT."
     exit 0
 fi
 
