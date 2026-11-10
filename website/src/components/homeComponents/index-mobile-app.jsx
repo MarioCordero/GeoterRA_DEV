@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { QRCode } from 'antd';
 import {
   DownloadOutlined,
   AndroidOutlined,
@@ -8,6 +9,7 @@ import {
   CompassOutlined,
   WifiOutlined,
   MobileOutlined,
+  QrcodeOutlined,
 } from '@ant-design/icons';
 import NotImplementedModal from '../common/NotImplementedModal';
 import { getApkDownloadUrl, getAppVersionInfo } from '../../config/apiConf';
@@ -113,7 +115,7 @@ function IndexMobileApp() {
               </div>
 
               {/* Version & Technical Details */}
-              <div className="text-center grid grid-cols-2 sm:grid-cols-2 gap-3 mb-6 bg-white p-4 rounded-xl border border-gray-200 text-xs poppins">
+              <div className="text-center grid grid-cols-2 sm:grid-cols-2 gap-3 mb-5 bg-white p-4 rounded-xl border border-gray-200 text-xs poppins">
                 <div>
                   <span className="text-gray-400 block font-medium uppercase text-[10px]">Archivo</span>
                   <span className="font-semibold text-gray-800 font-mono">{versionInfo.fileName}</span>
@@ -123,6 +125,32 @@ function IndexMobileApp() {
                   <span className="font-semibold text-gray-800 font-mono">
                     {versionInfo.fileSizeMB ? `${versionInfo.fileSizeMB} MB` : '74.6 MB'}
                   </span>
+                </div>
+              </div>
+
+              {/* QR Code Card for Mobile Scan */}
+              <div className="bg-white p-4 sm:p-5 rounded-xl border border-gray-200 mb-6 flex flex-col sm:flex-row items-center gap-5">
+                <div className="bg-white p-2.5 rounded-xl border border-gray-200 shrink-0 shadow-xs flex items-center justify-center">
+                  <QRCode
+                    value={versionInfo.downloadUrl}
+                    size={118}
+                    bordered={false}
+                    color="#12467E"
+                  />
+                </div>
+                <div className="text-center sm:text-left">
+                  <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
+                    <QrcodeOutlined className="text-geoterra-orange text-sm" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-geoterra-orange poppins">
+                      Escanear con Android
+                    </span>
+                  </div>
+                  <h4 className="text-sm sm:text-base font-bold text-gray-900 m-0 poppins-bold mb-1">
+                    Descarga directa con la cámara
+                  </h4>
+                  <p className="text-xs text-gray-500 m-0 leading-relaxed poppins">
+                    Apunte la cámara de su teléfono o Google Lens hacia este código para iniciar la descarga del APK directamente en su dispositivo.
+                  </p>
                 </div>
               </div>
             </div>

@@ -962,7 +962,13 @@ export const commentsDelete = async (id) => {
 // 14. MOBILE APP DOWNLOAD & VERSION
 // ============================================
 export const getApkDownloadUrl = () => {
-  return `${getApiBaseUrl()}/app/download-apk`;
+  const base = getApiBaseUrl();
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    if (base.includes('localhost')) {
+      return base.replace('localhost', window.location.hostname) + '/app/download-apk';
+    }
+  }
+  return `${base}/app/download-apk`;
 };
 
 export const getAppVersionInfo = async () => {
