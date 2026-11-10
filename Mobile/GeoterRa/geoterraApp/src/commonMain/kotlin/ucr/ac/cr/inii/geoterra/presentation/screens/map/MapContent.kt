@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import geoterra.geoterraapp.generated.resources.Res
 import geoterra.geoterraapp.generated.resources.ic_cluster
+import geoterra.geoterraapp.generated.resources.ic_map_marker
 import geoterra.geoterraapp.generated.resources.ic_marker
 import geoterra.geoterraapp.generated.resources.ic_userMarker
 import kotlinx.coroutines.launch
@@ -63,7 +64,7 @@ fun MapContent(
 	Box(modifier = modifier.fillMaxSize()) {
 
 		val coroutineScope = rememberCoroutineScope()
-		val markerIcon = painterResource(Res.drawable.ic_marker)
+		val markerIcon = painterResource(Res.drawable.ic_map_marker)
 		val userMarkerIcon = painterResource(Res.drawable.ic_userMarker)
 		val clusterMarkerIcon = painterResource(Res.drawable.ic_cluster)
 
