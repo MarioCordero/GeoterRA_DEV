@@ -1,4 +1,5 @@
 import React from 'react';
+import { MailOutlined, PhoneOutlined } from '@ant-design/icons';
 
 /**
  * NotImplementedModal Component
@@ -8,7 +9,13 @@ import React from 'react';
  * @param {boolean} props.isOpen - Whether modal is visible
  * @param {Function} props.onClose - Callback when modal is closed
  */
-function NotImplementedModal({ isOpen, onClose }) {
+function NotImplementedModal({
+  isOpen,
+  onClose,
+  title = "Función no disponible",
+  subtitle = "Esta función aún no está implementada",
+  message = "Estamos trabajando en esta funcionalidad. Por el momento, puede contactarnos directamente a través de nuestro correo electrónico o teléfono."
+}) {
   if (!isOpen) return null;
 
   return (
@@ -35,18 +42,17 @@ function NotImplementedModal({ isOpen, onClose }) {
 
           {/* Title */}
           <h3 className="text-2xl sm:text-3xl poppins-bold text-geoterra-blue mb-4">
-            Función no disponible
+            {title}
           </h3>
 
           {/* Subtitle */}
           <h4 className="text-base font-semibold text-gray-800 poppins-medium mb-3">
-            Esta función aún no está implementada
+            {subtitle}
           </h4>
 
           {/* Main message */}
           <p className="text-sm text-gray-600 leading-relaxed poppins mb-6">
-            Estamos trabajando en esta funcionalidad. Por el momento, puede contactarnos directamente 
-            a través de nuestro correo electrónico o teléfono.
+            {message}
           </p>
 
           {/* Contact alternatives */}
@@ -55,8 +61,12 @@ function NotImplementedModal({ isOpen, onClose }) {
               Contacto directo:
             </p>
             <div className="space-y-1">
-              <p className="text-sm text-geoterra-blue poppins">📧 geoterra.inii.ucr@gmail.com</p>
-              <p className="text-sm text-geoterra-blue poppins">📞 +506 (XXX) XXX-XXXX</p>
+              <p className="text-sm text-geoterra-blue poppins flex items-center gap-2">
+                <MailOutlined className="text-gray-400" /> geoterra.inii.ucr@gmail.com
+              </p>
+              <p className="text-sm text-geoterra-blue poppins flex items-center gap-2">
+                <PhoneOutlined className="text-gray-400" /> +506 (XXX) XXX-XXXX
+              </p>
             </div>
           </div>
 

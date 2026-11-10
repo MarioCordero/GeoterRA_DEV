@@ -283,7 +283,7 @@ export default function PointDetails() {
               </h1>
             </div>
             <p className="text-gray-500 text-sm m-0">
-              📍 {pointData.region}{isMaintenance && (
+              {pointData.region}{isMaintenance && (
                 <> • ID: <span className="font-mono text-gray-700 font-semibold">{pointData.id}</span></>
               )}
             </p>
@@ -298,7 +298,7 @@ export default function PointDetails() {
         {/* Action Buttons */}
         <button 
           onClick={handlePrint}
-          className="flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition font-semibold text-sm cursor-pointer shadow-sm w-full md:w-auto justify-center shrink-0"
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#12467E] hover:bg-[#084F9D] text-white rounded-lg transition font-semibold text-sm cursor-pointer shadow-sm w-full md:w-auto justify-center shrink-0"
         >
           <FaPrint /> Imprimir / Exportar PDF
         </button>
@@ -310,7 +310,7 @@ export default function PointDetails() {
         {/* Rule 1: Location Information (Always Visible) */}
         <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
           <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            📍 Información General y Ubicación
+            <FaMapMarkerAlt className="text-geoterra-blue text-lg" /> Información General y Ubicación
           </h2>
           <div className="space-y-4 text-sm">
             <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
@@ -461,8 +461,8 @@ export default function PointDetails() {
 
               {/* Piper Diagram Component */}
               <div className="pt-4 border-t border-gray-200">
-                <h3 className="text-lg font-bold text-blue-600 mb-3 flex items-center gap-2">
-                  📊 Diagrama de Piper (Clasificación Hidrogeoquímica)
+                <h3 className="text-lg font-bold text-geoterra-blue mb-3 flex items-center gap-2">
+                  <FaFlask className="text-geoterra-blue" /> Diagrama de Piper (Clasificación Hidrogeoquímica)
                 </h3>
                 <div className="min-h-96 flex items-center justify-center bg-gray-50 rounded-xl p-4 border border-gray-200">
                   {piperData ? (

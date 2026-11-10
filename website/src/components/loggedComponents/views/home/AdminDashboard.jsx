@@ -158,27 +158,27 @@ const AdminDashboard = () => {
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
               Dictaminadas / Aprobadas
             </span>
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#12467E] flex items-center justify-center text-lg">
               <CheckCircleOutlined />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-emerald-600 poppins">
+            <span className="text-3xl font-bold text-[#12467E] poppins">
               {statsLoading ? '...' : stats.analyzed}
             </span>
             <span className="text-xs text-gray-500 font-medium">Aprobadas</span>
           </div>
-          <div className="mt-2 text-xs text-emerald-700 font-medium flex items-center gap-1">
+          <div className="mt-2 text-xs text-slate-600 font-medium flex items-center gap-1">
             Procesadas con éxito
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-slate-900 to-[#12467E] p-5 rounded-2xl border border-gray-800 text-white shadow-sm flex flex-col justify-between">
+        <div className="bg-[#12467E] p-5 rounded-2xl border border-blue-900 text-white shadow-sm flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-blue-200 uppercase tracking-wider">
               Estado de la Plataforma
             </span>
-            <div className="w-10 h-10 rounded-xl bg-white/10 text-emerald-400 flex items-center justify-center text-lg">
+            <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center text-lg">
               <SafetyCertificateOutlined />
             </div>
           </div>
@@ -188,7 +188,7 @@ const AdminDashboard = () => {
               Servicios backend y bases de datos sincronizadas
             </p>
           </div>
-          <div className="mt-3 text-[11px] text-emerald-300 font-medium flex items-center gap-1">
+          <div className="mt-3 text-[11px] text-blue-100 font-medium flex items-center gap-1">
             <CheckCircleOutlined /> 100% operatividad
           </div>
         </div>
@@ -219,7 +219,7 @@ const AdminDashboard = () => {
           </div>
 
           <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-[#12467E] transition-all group">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-lg mb-3">
+            <div className="w-10 h-10 rounded-xl bg-orange-50 text-geoterra-orange flex items-center justify-center text-lg mb-3">
               <CompassOutlined />
             </div>
             <h4 className="font-bold text-gray-800 text-base m-0 mb-1 group-hover:text-[#12467E] transition-colors">
@@ -231,7 +231,7 @@ const AdminDashboard = () => {
           </div>
 
           <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-[#12467E] transition-all group">
-            <div className="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-700 flex items-center justify-center text-lg mb-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#12467E] flex items-center justify-center text-lg mb-3">
               <TeamOutlined />
             </div>
             <h4 className="font-bold text-gray-800 text-base m-0 mb-1 group-hover:text-[#12467E] transition-colors">
@@ -243,7 +243,7 @@ const AdminDashboard = () => {
           </div>
 
           <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-[#12467E] transition-all group">
-            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center text-lg mb-3">
+            <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center text-lg mb-3">
               <DatabaseOutlined />
             </div>
             <h4 className="font-bold text-gray-800 text-base m-0 mb-1 group-hover:text-[#12467E] transition-colors">

@@ -1,7 +1,7 @@
 import 'leaflet/dist/leaflet.css';
 import React, { useState, useEffect, useRef } from 'react';
 import { Button, Input, message, Modal } from 'antd';
-import { EnvironmentOutlined, LoadingOutlined, FullscreenOutlined, CloseOutlined } from '@ant-design/icons';
+import { EnvironmentOutlined, LoadingOutlined, FullscreenOutlined, CloseOutlined, CheckCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 
 const defaultPosition = [9.93333, -84.08333];
@@ -495,11 +495,14 @@ const MapCoordinatePicker = ({
             style={{
               marginTop: 8,
               fontSize: '11px',
-              color: '#52c41a',
+              color: '#12467E',
               fontWeight: 500,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
             }}
           >
-            ✅ Coordenadas actuales: {localLatLng.lat.toFixed(6)}, {localLatLng.lng.toFixed(6)}
+            <CheckCircleOutlined /> Coordenadas actuales: {localLatLng.lat.toFixed(6)}, {localLatLng.lng.toFixed(6)}
           </div>
         )}
       </div>
@@ -553,8 +556,8 @@ const MapCoordinatePicker = ({
             loading={gettingLocation}
             disabled={gettingLocation}
             style={{
-              backgroundColor: gettingLocation ? '#ffc107' : '#34d399',
-              borderColor: gettingLocation ? '#ffc107' : '#34d399',
+              backgroundColor: gettingLocation ? '#f39c29' : '#12467E',
+              borderColor: gettingLocation ? '#f39c29' : '#12467E',
             }}
             size="small"
             title={gettingLocation ? 'Obteniendo ubicación...' : 'Obtener ubicación actual'}
@@ -565,8 +568,8 @@ const MapCoordinatePicker = ({
             icon={<FullscreenOutlined />}
             onClick={openFullscreenModal}
             style={{
-              backgroundColor: '#1890ff',
-              borderColor: '#1890ff',
+              backgroundColor: '#12467E',
+              borderColor: '#12467E',
             }}
             size="small"
             title="Pantalla completa"
@@ -578,16 +581,19 @@ const MapCoordinatePicker = ({
       <div
         style={{
           fontSize: '12px',
-          color: '#666',
-          fontStyle: 'italic',
+          color: '#64748b',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
         }}
       >
-        💡 Haz clic en el mapa para seleccionar una ubicación, usa tu ubicación actual, o ingresa las coordenadas manualmente.
+        <InfoCircleOutlined className="text-gray-400" />
+        <span>Haga clic en el mapa para seleccionar una ubicación, use su ubicación actual, o ingrese las coordenadas manualmente.</span>
       </div>
 
       {/* Fullscreen Modal */}
       <Modal
-        title="📍 Seleccionar Ubicación - Pantalla Completa"
+        title="Seleccionar Ubicación - Pantalla Completa"
         open={isFullscreenModalOpen}
         onCancel={closeFullscreenModal}
         width="90vw"
@@ -613,7 +619,7 @@ const MapCoordinatePicker = ({
           }}
         >
           <div style={{ marginBottom: 12, fontWeight: 600, fontSize: '16px', display: 'flex', alignItems: 'center', gap: 8 }}>
-            📍 {title}
+            <EnvironmentOutlined className="text-[#12467E]" /> {title}
           </div>
           <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -647,8 +653,8 @@ const MapCoordinatePicker = ({
               loading={fullscreenGettingLocation}
               disabled={fullscreenGettingLocation}
               style={{
-                backgroundColor: fullscreenGettingLocation ? '#ffc107' : '#34d399',
-                borderColor: fullscreenGettingLocation ? '#ffc107' : '#34d399',
+                backgroundColor: fullscreenGettingLocation ? '#f39c29' : '#12467E',
+                borderColor: fullscreenGettingLocation ? '#f39c29' : '#12467E',
               }}
               size="middle"
             >
@@ -660,15 +666,18 @@ const MapCoordinatePicker = ({
               style={{
                 marginTop: 12,
                 fontSize: '13px',
-                color: '#52c41a',
+                color: '#12467E',
                 fontWeight: 600,
                 padding: '8px 12px',
-                backgroundColor: '#f6ffed',
+                backgroundColor: '#f8fafc',
                 borderRadius: 4,
-                border: '1px solid #b7eb8f',
+                border: '1px solid #cbd5e1',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
               }}
             >
-              ✅ Coordenadas seleccionadas: {fullscreenLatLng.lat.toFixed(6)}, {fullscreenLatLng.lng.toFixed(6)}
+              <CheckCircleOutlined /> Coordenadas seleccionadas: {fullscreenLatLng.lat.toFixed(6)}, {fullscreenLatLng.lng.toFixed(6)}
             </div>
           )}
         </div>
@@ -716,7 +725,7 @@ const MapCoordinatePicker = ({
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
             }}
           >
-            💡 <strong>Instrucciones:</strong> Haz clic en el mapa para marcar la ubicación, usa tu ubicación actual con el botón GPS, o ingresa las coordenadas manualmente. Luego confirma para aplicar los cambios.
+            <strong>Instrucciones:</strong> Haga clic en el mapa para marcar la ubicación, use su ubicación actual con el botón GPS, o ingrese las coordenadas manualmente. Luego confirme para aplicar los cambios.
           </div>
         </div>
       </Modal>
