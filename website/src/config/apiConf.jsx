@@ -958,4 +958,15 @@ export const commentsDelete = async (id) => {
   return callApi(comments.delete(id), 'DELETE');
 };
 
+// ============================================
+// 14. MOBILE APP DOWNLOAD & VERSION
+// ============================================
+export const getApkDownloadUrl = () => {
+  return `${getApiBaseUrl()}/app/download-apk`;
+};
+
+export const getAppVersionInfo = async () => {
+  return await callApi('/app/version', 'GET');
+};
+
 export default API_CONFIG;
