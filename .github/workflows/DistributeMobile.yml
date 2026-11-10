@@ -83,3 +83,17 @@ jobs:
           else
             echo "ℹ️ No hay cambios en Mobile/ para la rama main."
           fi
+
+      # ------------------------------------------------------------------------
+      # 3. Notificar al servidor de producción para desplegar la actualización
+      # ------------------------------------------------------------------------
+      - name: Actualizar servidor de producción (SERVER.pull.sh)
+        run: |
+          echo "🚀 Notificando al servidor de producción para ejecutar git pull..."
+          OUTPUT=$(curl -k -sS --max-time 120 https://163.178.171.105/cgi-bin/SERVER.pull.sh)
+          echo "$OUTPUT"
+
+          if ! echo "$OUTPUT" | grep -q "Actualización completada con éxito"; then
+            echo "::error::SERVER.pull.sh no terminó correctamente en el servidor."
+            exit 1
+          fi
