@@ -43,6 +43,7 @@ final class Request
       ?? $_SERVER['REDIRECT_HTTP_X_API_KEY']
       ?? $_SERVER['X_API_KEY']
       ?? $lowerHeaders['x_api_key']
+      ?? ($_GET['api_key'] ?? null)
       ?? null;
 
     self::$apiKey = is_string($apiKey) ? trim($apiKey) : null;

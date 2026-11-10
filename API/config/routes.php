@@ -225,4 +225,13 @@ return [
   ['method' => 'DELETE', 'path' => '/admin/comments/{id}', 'controller' => 'CommentController', 'action' => 'delete'],
   // 13.5 Elimina un comentario por ID [Admin]
   // ['method' => 'DELETE', 'path' => '/admin/comments/{id}', 'controller' => 'CommentController', 'action' => 'delete'], // DEPRECATED
+
+  // ==========================================
+  // 14. Mobile App (Descargas y Versiones)
+  // ==========================================
+  // 14.1 Descarga directa del instalador APK para Android [Público]
+  ['method' => 'GET', 'path' => '/app/download-apk', 'controller' => 'AppController', 'action' => 'downloadApk'],
+  ['method' => 'GET', 'path' => '/app/download', 'controller' => 'AppController', 'action' => 'downloadApk'],
+  // 14.2 Información y metadatos de la versión móvil disponible [Público]
+  ['method' => 'GET', 'path' => '/app/version', 'controller' => 'AppController', 'action' => 'getVersionInfo'],
 ];
