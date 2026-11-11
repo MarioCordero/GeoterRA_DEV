@@ -921,8 +921,8 @@ const FieldTripsManager = () => {
       align: 'center',
       render: (val) => (
         <Tag className={`rounded-full text-xs font-semibold ${val
-          ? 'bg-blue-50 text-[#12467E] border-blue-200'
-          : 'bg-gray-100 text-gray-600 border-gray-200'
+            ? 'bg-blue-50 text-[#12467E] border-blue-200'
+            : 'bg-gray-100 text-gray-600 border-gray-200'
           }`}>
           {val ? 'Activa' : 'Inactiva'}
         </Tag>
@@ -1073,8 +1073,8 @@ const FieldTripsManager = () => {
             setStatusFilter('all');
           }}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${activeTab === 'all' && statusFilter === 'all'
-            ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
-            : 'border-gray-200 shadow-sm hover:border-gray-300'
+              ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
+              : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -1096,8 +1096,8 @@ const FieldTripsManager = () => {
             setStatusFilter('active');
           }}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${statusFilter === 'active'
-            ? 'border-emerald-400 shadow-md ring-2 ring-emerald-100'
-            : 'border-gray-200 shadow-sm hover:border-gray-300'
+              ? 'border-emerald-400 shadow-md ring-2 ring-emerald-100'
+              : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -1119,8 +1119,8 @@ const FieldTripsManager = () => {
             setStatusFilter('all');
           }}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${activeTab === 'my'
-            ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
-            : 'border-gray-200 shadow-sm hover:border-gray-300'
+              ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
+              : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -1142,8 +1142,8 @@ const FieldTripsManager = () => {
             setStatusFilter('inactive');
           }}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${statusFilter === 'inactive'
-            ? 'border-gray-400 shadow-md ring-2 ring-gray-100'
-            : 'border-gray-200 shadow-sm hover:border-gray-300'
+              ? 'border-gray-400 shadow-md ring-2 ring-gray-100'
+              : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -1838,10 +1838,11 @@ const FieldTripsManager = () => {
               </div>
             </div>
             {selectedTrip && (
-              <span className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold ${selectedTrip.field_trip_is_active
+              <span className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold ${
+                selectedTrip.field_trip_is_active
                   ? 'bg-blue-50 text-[#12467E] border border-blue-200'
                   : 'bg-gray-100 text-gray-600 border border-gray-200'
-                }`}>
+              }`}>
                 {selectedTrip.field_trip_is_active ? 'Activa' : 'Inactiva / Concluida'}
               </span>
             )}
