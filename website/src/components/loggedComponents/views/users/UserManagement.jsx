@@ -32,6 +32,14 @@ import {
 } from '@ant-design/icons';
 import { renderDateWithProse } from '../../../../utils/dateFormatter';
 
+const ROLE_TAG_CONFIG = {
+  admin: { color: 'blue', label: 'Administrador' },
+  maintenance: { color: 'default', label: 'Mantenimiento' },
+  field_investigator: { color: 'orange', label: 'Investigador de Campo' },
+  investigator: { color: 'blue', label: 'Investigador de Laboratorio' },
+  user: { color: 'default', label: 'Usuario General' },
+};
+
 const UserManagement = () => {
   const { hasPermission, PERMISSIONS, isMaintenance } = usePermissions();
   const [users, setUsers] = useState([]);
@@ -97,7 +105,9 @@ const UserManagement = () => {
       );
       setUsers(updatedUsers);
 
-      message.success(`Rol de usuario actualizado a "${selectedRole}" correctamente`);
+      message.success(
+        `Rol de usuario actualizado a "${ROLE_TAG_CONFIG[selectedRole]?.label || selectedRole}" correctamente`
+      );
       setIsModalVisible(false);
       setEditingUser(null);
       setSelectedRole(null);
@@ -175,13 +185,7 @@ const UserManagement = () => {
     );
   }
 
-  const roleTagConfig = {
-    admin: { color: 'blue', label: 'Administrador' },
-    maintenance: { color: 'default', label: 'Mantenimiento' },
-    field_investigator: { color: 'orange', label: 'Investigador de Campo' },
-    investigator: { color: 'blue', label: 'Investigador Lab' },
-    user: { color: 'default', label: 'Usuario General' },
-  };
+  const roleTagConfig = ROLE_TAG_CONFIG;
 
   const columns = [
     {
@@ -546,8 +550,11 @@ const UserManagement = () => {
                 <p className="text-xs text-gray-500 m-0">{editingUser.email}</p>
                 <div className="mt-1 flex items-center gap-1.5">
                   <span className="text-[11px] text-gray-400 font-semibold uppercase">Rol actual:</span>
-                  <Tag className="rounded text-[11px] m-0 font-semibold">
-                    {(editingUser.role || '').toUpperCase()}
+                  <Tag
+                    color={roleTagConfig[editingUser.role]?.color}
+                    className="rounded text-[11px] m-0 font-semibold"
+                  >
+                    {roleTagConfig[editingUser.role]?.label || editingUser.role}
                   </Tag>
                 </div>
               </div>
@@ -564,11 +571,11 @@ const UserManagement = () => {
                 onChange={setSelectedRole}
                 className="rounded-lg"
                 options={[
-                  { label: 'Administrador (admin)', value: 'admin' },
-                  { label: 'Mantenimiento (maintenance)', value: 'maintenance' },
-                  { label: 'Investigador de Campo (field_investigator)', value: 'field_investigator' },
-                  { label: 'Investigador de Laboratorio (investigator)', value: 'investigator' },
-                  { label: 'Usuario General (user)', value: 'user' },
+                  { label: 'Administrador', value: 'admin' },
+                  { label: 'Mantenimiento', value: 'maintenance' },
+                  { label: 'Investigador de Campo', value: 'field_investigator' },
+                  { label: 'Investigador de Laboratorio', value: 'investigator' },
+                  { label: 'Usuario General', value: 'user' },
                 ]}
                 placeholder="Seleccionar rol"
               />
