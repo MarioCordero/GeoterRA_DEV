@@ -241,8 +241,8 @@ const UserManagement = () => {
       render: (isDeleted) => (
         <span
           className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${!isDeleted
-              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-              : 'bg-rose-50 text-rose-700 border border-rose-200'
+            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+            : 'bg-rose-50 text-rose-700 border border-rose-200'
             }`}
         >
           {!isDeleted ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
@@ -314,8 +314,8 @@ const UserManagement = () => {
             setStatusFilter('ALL');
           }}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'ALL' && statusFilter === 'ALL'
-              ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
+            ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -335,8 +335,8 @@ const UserManagement = () => {
         <div
           onClick={() => setRoleFilter('ADMINS')}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'ADMINS'
-              ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
+            ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -358,8 +358,8 @@ const UserManagement = () => {
         <div
           onClick={() => setRoleFilter('INVESTIGATORS')}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'INVESTIGATORS'
-              ? 'border-amber-400 shadow-md ring-2 ring-amber-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
+            ? 'border-amber-400 shadow-md ring-2 ring-amber-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -381,8 +381,8 @@ const UserManagement = () => {
         <div
           onClick={() => setRoleFilter('user')}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'user'
-              ? 'border-slate-500 shadow-md ring-2 ring-slate-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
+            ? 'border-slate-500 shadow-md ring-2 ring-slate-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -554,8 +554,8 @@ const UserManagement = () => {
             </div>
 
             {/* Select Role Section */}
-            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
-              <label className="block text-sm font-semibold text-gray-700">
+            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-2">
+              <label className="block text-sm font-semibold text-gray-700 m-0">
                 Nuevo Rol para el Usuario
               </label>
               <Select
