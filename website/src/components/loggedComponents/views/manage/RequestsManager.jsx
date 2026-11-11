@@ -887,9 +887,6 @@ const RequestsManager = () => {
               <span className="text-xs uppercase tracking-wider font-bold text-geoterra-orange poppins">
                 Administración • Geociencias
               </span>
-              <Tag className="rounded-full font-semibold text-[11px] bg-blue-50 text-geoterra-blue border-blue-200">
-                {requests.length} Solicitudes
-              </Tag>
             </div>
             <h1 className="text-2xl md:text-3xl poppins-bold text-geoterra-blue m-0 flex items-center gap-2.5">
               <FileTextOutlined className="text-geoterra-blue" /> Gestión de Solicitudes
@@ -906,16 +903,6 @@ const RequestsManager = () => {
               className="poppins font-medium border-gray-300 text-gray-700 hover:text-geoterra-blue"
             >
               Guía de Flujo
-            </Button>
-            <Button
-              type="primary"
-              icon={<ReloadOutlined spin={loading} />}
-              onClick={refreshRequests}
-              loading={loading}
-              style={{ backgroundColor: '#12467E', borderColor: '#12467E' }}
-              className="poppins-bold"
-            >
-              Actualizar
             </Button>
           </div>
         </div>
@@ -1082,8 +1069,18 @@ const RequestsManager = () => {
               )}
             </div>
 
-            <div className="text-xs text-gray-400 poppins whitespace-nowrap self-end sm:self-center">
-              Mostrando <strong className="text-gray-700">{filteredRequests.length}</strong> de <strong className="text-gray-700">{requests.length}</strong> solicitudes
+            <div className="flex items-center gap-3 self-end sm:self-center flex-wrap">
+              <span className="text-xs text-gray-500 font-medium whitespace-nowrap">
+                Mostrando <strong className="text-gray-700">{filteredRequests.length}</strong> de <strong className="text-gray-700">{requests.length}</strong> solicitudes
+              </span>
+              <Button
+                icon={<ReloadOutlined spin={loading} />}
+                onClick={refreshRequests}
+                loading={loading}
+                className="poppins font-medium border-gray-300"
+              >
+                Actualizar
+              </Button>
             </div>
           </div>
 
