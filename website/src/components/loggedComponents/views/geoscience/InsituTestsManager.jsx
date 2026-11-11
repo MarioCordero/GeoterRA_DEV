@@ -1,9 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Typography, Tag, Button, Modal, Form, InputNumber, Input, Table, message, Space, Spin, Popconfirm } from 'antd';
-import { BulbOutlined, PlusOutlined, ReloadOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  Tag,
+  Button,
+  Modal,
+  Form,
+  InputNumber,
+  Input,
+  Table,
+  message,
+  Space,
+  Spin,
+  Popconfirm,
+  Tooltip
+} from 'antd';
+import {
+  BulbOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  CheckCircleOutlined,
+  SafetyCertificateOutlined,
+  GlobalOutlined,
+  FilterOutlined,
+  FireOutlined,
+} from '@ant-design/icons';
 import EntityNavigatorPicker from '../../../common/EntityNavigatorPicker';
 import { renderDateWithProse } from '../../../../utils/dateFormatter';
 import { useSession } from '../../../../hooks/useSession';
+import PillTabs from '../../../common/crud/PillTabs';
+import CrudToolbar from '../../../common/crud/CrudToolbar';
+import { CodeBadge, NameCell, DateCell, SystemIdCell, RowActions } from '../../../common/crud/cells';
 import {
   insituTestsIndex,
   insituTestsStore,
@@ -12,8 +40,6 @@ import {
   geomanifestationsAdminIndex,
   geomanifestationsIndex
 } from '../../../../config/apiConf';
-
-const { Title, Paragraph, Text } = Typography;
 
 const extractList = (resData) => {
   if (!resData) return [];
@@ -32,6 +58,7 @@ const InsituTestsManager = () => {
   const [tests, setTests] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingGeos, setLoadingGeos] = useState(true);
+  const [searchText, setSearchText] = useState('');
 
   // Form & modal states
   const [modalVisible, setModalVisible] = useState(false);
@@ -165,53 +192,78 @@ const InsituTestsManager = () => {
     }
   };
 
+  const filteredTests = useMemo(() => {
+    if (!searchText) return tests;
+    const term = searchText.toLowerCase();
+    return tests.filter((t) => {
+      const name = (t.insitu_test_name || '').toLowerCase();
+      const desc = (t.description || '').toLowerCase();
+      return name.includes(term) || desc.includes(term);
+    });
+  }, [tests, searchText]);
+
+  // KPI Calculations
+  const stats = useMemo(() => {
+    const total = tests.length;
+    const highTemp = tests.filter((t) => t.temperature != null && t.temperature >= 40).length;
+    const withConductivity = tests.filter((t) => t.conductivity != null).length;
+    return { total, highTemp, withConductivity };
+  }, [tests]);
+
   const columns = [
     {
-      title: 'Nombre',
+      title: 'Nombre de la Medición',
       dataIndex: 'insitu_test_name',
       key: 'insitu_test_name',
-      render: (val) => <span className="font-semibold text-slate-800">{val || 'Sin nombre'}</span>,
+      render: (val) => <NameCell icon={<BulbOutlined />}>{val || 'Sin nombre'}</NameCell>,
     },
     ...(isMaintenance ? [{
       title: 'ID Prueba',
       dataIndex: 'insitu_test_id',
       key: 'insitu_test_id',
-      render: (val, record) => <span className="font-mono text-xs">{val || record.id}</span>,
+      render: (val, record) => <SystemIdCell value={val || record.id} />,
     }] : []),
     {
       title: 'Temperatura (°C)',
       dataIndex: 'temperature',
       key: 'temperature',
-      render: (val) => val !== null && val !== undefined ? (
-        <Tag color={val > 50 ? 'red' : val > 30 ? 'orange' : 'blue'}>{val}°C</Tag>
-      ) : 'N/A',
+      render: (val) => {
+        if (val == null) return <span className="text-gray-400">N/A</span>;
+        const isHigh = val >= 50;
+        const isWarm = val >= 30;
+        return (
+          <Tag className={`rounded-full font-semibold text-xs ${
+            isHigh
+              ? 'bg-orange-50 text-orange-700 border-orange-200'
+              : isWarm
+              ? 'bg-blue-50 text-geoterra-blue border-blue-200'
+              : 'bg-slate-50 text-slate-700 border-slate-200'
+          }`}>
+            {val}°C
+          </Tag>
+        );
+      },
     },
     {
       title: 'Conductividad (μS/cm)',
       dataIndex: 'conductivity',
       key: 'conductivity',
-      render: (val) => val !== null && val !== undefined ? `${val} μS/cm` : 'N/A',
+      render: (val) => val != null ? `${val} μS/cm` : <span className="text-gray-400">N/A</span>,
     },
     {
-      title: 'pH',
+      title: 'pH de Campo',
       dataIndex: 'ph',
       key: 'ph',
-      render: (val) => val !== null && val !== undefined ? val : 'N/A',
+      render: (val) => val != null ? (
+        <span className="font-medium text-gray-800">{val}</span>
+      ) : <span className="text-gray-400">N/A</span>,
     },
     {
       title: 'Notas / Descripción',
       dataIndex: 'description',
       key: 'description',
       ellipsis: true,
-      render: (val) => val || 'Sin notas',
-    },
-    {
-      title: 'Creado por',
-      key: 'creator',
-      render: (_, record) => {
-        const name = [record.created_by_first_name, record.created_by_last_name].filter(Boolean).join(' ');
-        return name || 'Sistema';
-      },
+      render: (val) => val ? <span className="text-gray-600">{val}</span> : <span className="text-gray-400 italic">Sin notas</span>,
     },
     {
       title: 'Fecha de Registro',
@@ -222,53 +274,153 @@ const InsituTestsManager = () => {
     {
       title: 'Acciones',
       key: 'actions',
+      align: 'right',
       render: (_, record) => (
-        <Space size="small">
-          <Button icon={<EditOutlined />} size="small" type="primary" onClick={() => handleOpenEdit(record)} />
-          <Popconfirm title="¿Eliminar prueba in-situ?" onConfirm={() => handleDelete(record)} okText="Sí" cancelText="No">
-            <Button icon={<DeleteOutlined />} size="small" danger />
-          </Popconfirm>
-        </Space>
+        <RowActions
+          entity="prueba in-situ"
+          onEdit={() => handleOpenEdit(record)}
+          onDelete={() => handleDelete(record)}
+          deleteDescription="Esta acción es irreversible y eliminará la prueba."
+        />
       ),
     },
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
-      <Card style={{ borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <BulbOutlined style={{ fontSize: 32, color: '#52c41a' }} />
-            <div>
-              <Title level={3} style={{ margin: 0 }}>Pruebas de Campo (In-Situ)</Title>
-              <Paragraph type="secondary" style={{ margin: 0 }}>
-                Mediciones de temperatura, conductividad y pH tomadas directamente en campo.
-              </Paragraph>
-            </div>
+    <div className="w-full p-4 md:p-8 space-y-6 poppins">
+      {/* 1. Header Card */}
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-geoterra-orange poppins">
+              GEOTERMIA DE CAMPO • MEDICIONES DIRECTAS
+            </span>
           </div>
-
-          <Space flexWrap>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleOpenCreate}
-              disabled={!selectedGeoId}
-              style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
-            >
-              Nueva Prueba In-Situ
-            </Button>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={() => loadTests(selectedGeoId)}
-              loading={loading}
-              disabled={!selectedGeoId}
-            >
-              Actualizar Listado
-            </Button>
-          </Space>
+          <h1 className="text-2xl md:text-3xl font-bold text-geoterra-blue m-0 poppins">
+            Pruebas de Campo (In-Situ)
+          </h1>
+          <p className="text-sm text-gray-500 mt-1 mb-0 max-w-2xl">
+            Mediciones de temperatura, conductividad y pH tomadas directamente en campo.
+          </p>
         </div>
 
-        {/* Explorative Entity Navigator */}
+        <div className="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleOpenCreate}
+            disabled={!selectedGeoId}
+            style={{ backgroundColor: '#12467E', borderColor: '#12467E' }}
+            className="poppins-bold shadow-sm"
+          >
+            Nueva Prueba In-Situ
+          </Button>
+        </div>
+      </div>
+
+      {/* 2. KPI Metrics Dashboard */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* KPI 1: Total */}
+        <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Total Mediciones
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#12467E] flex items-center justify-center text-lg">
+              <BulbOutlined />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-gray-800 poppins">
+              {loading ? '...' : stats.total}
+            </span>
+            <span className="text-xs text-gray-500 font-medium">Registradas</span>
+          </div>
+          <div className="mt-2 text-xs text-blue-700 font-medium flex items-center gap-1">
+            <CheckCircleOutlined /> Manifestación seleccionada
+          </div>
+        </div>
+
+        {/* KPI 2: Alta Temperatura */}
+        <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Térmicas (≥40°C)
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-orange-50 text-geoterra-orange flex items-center justify-center text-lg">
+              <FireOutlined />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-gray-800 poppins">
+              {loading ? '...' : stats.highTemp}
+            </span>
+            <span className="text-xs text-gray-500 font-medium">Puntos</span>
+          </div>
+          <div className="mt-2 text-xs text-orange-700 font-medium flex items-center gap-1">
+            <GlobalOutlined /> Anomalías termales activas
+          </div>
+        </div>
+
+        {/* KPI 3: Conductividad */}
+        <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Conductividad
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-geoterra-blue flex items-center justify-center text-lg">
+              <FilterOutlined />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-gray-800 poppins">
+              {loading ? '...' : stats.withConductivity}
+            </span>
+            <span className="text-xs text-gray-500 font-medium">Lecturas</span>
+          </div>
+          <div className="mt-2 text-xs text-blue-700 font-medium flex items-center gap-1">
+            <CheckCircleOutlined /> Salinidad y sólidos disueltos
+          </div>
+        </div>
+
+        {/* KPI 4: Control Instrumental */}
+        <div className="bg-[#12467E] p-5 rounded-2xl border border-blue-900 text-white shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-blue-200 uppercase tracking-wider">
+              Instrumentación
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center text-lg">
+              <SafetyCertificateOutlined />
+            </div>
+          </div>
+          <div className="mt-2">
+            <span className="text-2xl font-bold poppins text-white">Calibrada</span>
+            <p className="text-xs text-blue-200 m-0 mt-0.5 font-normal">
+              Sondas multiparamétricas de campo
+            </p>
+          </div>
+          <div className="mt-3 text-[11px] text-blue-100 font-medium flex items-center gap-1">
+            <CheckCircleOutlined /> Validación in-situ
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Main Data Card */}
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+        {/* Navigation Tabs Header */}
+        <PillTabs
+          items={[
+            {
+              key: 'insitu',
+              label: 'Pruebas In-Situ',
+              icon: <BulbOutlined />,
+              count: tests.length,
+            },
+          ]}
+          activeKey="insitu"
+        />
+
+        {/* Entity Navigator Picker */}
         <EntityNavigatorPicker
           entityType="geomanifestations"
           selectedId={selectedGeoId}
@@ -279,71 +431,102 @@ const InsituTestsManager = () => {
           label="GEOMANIFESTACIÓN DE LA PRUEBA:"
         />
 
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <Spin size="large" tip="Cargando pruebas in-situ..." />
-          </div>
-        ) : (
-          <Table
-            dataSource={tests}
-            columns={columns}
-            rowKey={(item) => item.insitu_test_id || item.id}
-            pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50'] }}
-            locale={{ emptyText: selectedGeoId ? 'No hay pruebas in-situ registradas para esta manifestación' : 'Selecciona una geomanifestación' }}
-          />
-        )}
-      </Card>
+        {/* Filter and Search Toolbar */}
+        <CrudToolbar
+          searchPlaceholder="Buscar medición por nombre o notas..."
+          searchValue={searchText}
+          onSearchChange={setSearchText}
+          shown={filteredTests.length}
+          total={tests.length}
+          noun="pruebas in-situ"
+          onReload={selectedGeoId ? () => loadTests(selectedGeoId) : undefined}
+          loading={loading}
+        />
 
-      {/* Create / Edit Modal */}
+        {/* Table */}
+        <Table
+          dataSource={filteredTests}
+          columns={columns}
+          rowKey={(item) => item.insitu_test_id || item.id}
+          loading={loading}
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            showTotal: (total) => `Total ${total} pruebas in-situ`,
+          }}
+          locale={{
+            emptyText: selectedGeoId
+              ? 'No hay pruebas in-situ registradas para esta manifestación'
+              : 'Selecciona una geomanifestación',
+          }}
+          className="poppins border border-gray-100 rounded-xl overflow-hidden"
+        />
+      </div>
+
+      {/* 4. Create / Edit Modal */}
       <Modal
-        title={editingTest ? 'Editar Prueba In-Situ' : 'Nueva Prueba In-Situ'}
+        title={
+          <div className="flex items-center gap-2 text-geoterra-blue font-bold text-lg">
+            <BulbOutlined />
+            <span>{editingTest ? 'Editar Prueba In-Situ Oficial' : 'Nueva Prueba In-Situ Oficial'}</span>
+          </div>
+        }
         open={modalVisible}
         onOk={() => form.submit()}
         onCancel={() => setModalVisible(false)}
         confirmLoading={submitting}
-        okText={editingTest ? 'Guardar Cambios' : 'Crear Prueba'}
+        okText={editingTest ? 'Guardar Cambios' : 'Registrar Medición'}
         cancelText="Cancelar"
+        okButtonProps={{
+          style: { backgroundColor: '#12467E', borderColor: '#12467E' },
+          className: 'poppins-bold',
+        }}
+        width={560}
       >
-        <Form form={form} layout="vertical" onFinish={handleSubmit}>
-          <Form.Item
-            name="insitu_test_name"
-            label="Nombre de la Prueba In-Situ"
-            rules={[
-              { required: true, message: 'El nombre de la prueba es obligatorio' },
-              { max: 55, message: 'Máximo 55 caracteres' },
-            ]}
-          >
-            <Input placeholder="Ej: Medición Manantial Termal A" maxLength={55} />
-          </Form.Item>
+        <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm mt-4 space-y-4">
+          <Form form={form} layout="vertical" onFinish={handleSubmit}>
+            <Form.Item
+              name="insitu_test_name"
+              label={<span className="font-semibold text-gray-700">Nombre de la Prueba In-Situ</span>}
+              rules={[
+                { required: true, message: 'El nombre de la prueba es obligatorio' },
+                { max: 55, message: 'Máximo 55 caracteres' },
+              ]}
+            >
+              <Input placeholder="Ej: Medición Manantial Termal A" maxLength={55} className="rounded-lg" />
+            </Form.Item>
 
-          <Form.Item
-            name="temperature"
-            label="Temperatura (°C)"
-            rules={[{ type: 'number', min: 0, max: 200, message: 'Temperatura entre 0 y 200°C' }]}
-          >
-            <InputNumber style={{ width: '100%' }} placeholder="Ej: 55.4" step={0.1} />
-          </Form.Item>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <Form.Item
+                name="temperature"
+                label={<span className="font-semibold text-gray-700">Temperatura (°C)</span>}
+                rules={[{ type: 'number', min: 0, max: 200, message: '0-200°C' }]}
+              >
+                <InputNumber style={{ width: '100%' }} placeholder="Ej: 55.4" step={0.1} className="rounded-lg" />
+              </Form.Item>
 
-          <Form.Item
-            name="conductivity"
-            label="Conductividad Eléctrica (μS/cm)"
-            rules={[{ type: 'number', min: 0, message: 'Debe ser ≥ 0' }]}
-          >
-            <InputNumber style={{ width: '100%' }} placeholder="Ej: 1200" step={1} />
-          </Form.Item>
+              <Form.Item
+                name="conductivity"
+                label={<span className="font-semibold text-gray-700">Conductividad (μS/cm)</span>}
+                rules={[{ type: 'number', min: 0, message: '≥ 0' }]}
+              >
+                <InputNumber style={{ width: '100%' }} placeholder="Ej: 1200" step={1} className="rounded-lg" />
+              </Form.Item>
 
-          <Form.Item
-            name="ph"
-            label="pH Campo"
-            rules={[{ type: 'number', min: 0, max: 14, message: 'pH entre 0 y 14' }]}
-          >
-            <InputNumber style={{ width: '100%' }} placeholder="Ej: 6.5" step={0.01} />
-          </Form.Item>
+              <Form.Item
+                name="ph"
+                label={<span className="font-semibold text-gray-700">pH Campo</span>}
+                rules={[{ type: 'number', min: 0, max: 14, message: '0-14' }]}
+              >
+                <InputNumber style={{ width: '100%' }} placeholder="Ej: 6.5" step={0.01} className="rounded-lg" />
+              </Form.Item>
+            </div>
 
-          <Form.Item name="description" label="Notas / Descripción de la Medición">
-            <Input.TextArea rows={3} placeholder="Medición realizada a las 10:00 AM, clima despejado" />
-          </Form.Item>
-        </Form>
+            <Form.Item name="description" label={<span className="font-semibold text-gray-700">Notas / Descripción</span>} className="m-0">
+              <Input.TextArea rows={3} placeholder="Condiciones ambientales, aspecto visual del agua..." className="rounded-lg" />
+            </Form.Item>
+          </Form>
+        </div>
       </Modal>
     </div>
   );

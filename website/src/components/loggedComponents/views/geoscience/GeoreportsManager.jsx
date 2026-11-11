@@ -1,5 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Typography, Tag, Button, Modal, Form, Input, Checkbox, Table, message, Space, Spin, Popconfirm, Tooltip } from 'antd';
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  Card,
+  Tag,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Checkbox,
+  Table,
+  message,
+  Space,
+  Spin,
+  Popconfirm,
+  Tooltip
+} from 'antd';
 import {
   FileSearchOutlined,
   PlusOutlined,
@@ -9,11 +23,18 @@ import {
   StarOutlined,
   StarFilled,
   BulbOutlined,
-  ExperimentOutlined
+  ExperimentOutlined,
+  SearchOutlined,
+  CheckCircleOutlined,
+  SafetyCertificateOutlined,
+  GlobalOutlined,
 } from '@ant-design/icons';
 import EntityNavigatorPicker from '../../../common/EntityNavigatorPicker';
 import { renderDateWithProse } from '../../../../utils/dateFormatter';
 import { useSession } from '../../../../hooks/useSession';
+import PillTabs from '../../../common/crud/PillTabs';
+import CrudToolbar from '../../../common/crud/CrudToolbar';
+import { CodeBadge, NameCell, DateCell, SystemIdCell, RowActions } from '../../../common/crud/cells';
 import {
   georeportsCurrent,
   georeportsAdminIndex,
@@ -26,8 +47,6 @@ import {
   geomanifestationsAdminIndex,
   geomanifestationsIndex
 } from '../../../../config/apiConf';
-
-const { Title, Paragraph, Text } = Typography;
 
 const extractList = (resData) => {
   if (!resData) return [];
@@ -50,6 +69,7 @@ const GeoreportsManager = () => {
   const [loading, setLoading] = useState(false);
   const [loadingGeos, setLoadingGeos] = useState(true);
   const [promotingId, setPromotingId] = useState(null);
+  const [searchText, setSearchText] = useState('');
 
   // Form & modal states
   const [modalVisible, setModalVisible] = useState(false);
@@ -86,7 +106,6 @@ const GeoreportsManager = () => {
     try {
       setLoading(true);
 
-      // Load all reports for this geomanifestation
       const resIndex = await georeportsAdminIndex({ geomanifestation_id: geoId });
       if (resIndex.ok && resIndex.data) {
         const list = extractList(resIndex.data);
@@ -95,7 +114,6 @@ const GeoreportsManager = () => {
         setReports([]);
       }
 
-      // Load current report
       const resCurrent = await georeportsCurrent({ geomanifestation_id: geoId });
       if (resCurrent.ok && resCurrent.data && (resCurrent.data.georeport_id || resCurrent.data.id)) {
         setCurrentReport(resCurrent.data);
@@ -237,6 +255,25 @@ const GeoreportsManager = () => {
     }
   };
 
+  const filteredReports = useMemo(() => {
+    if (!searchText) return reports;
+    const term = searchText.toLowerCase();
+    return reports.filter((r) => {
+      const name = (r.georeport_name || '').toLowerCase();
+      const details = (r.details || '').toLowerCase();
+      const creator = `${r.created_by_first_name || ''} ${r.created_by_last_name || ''}`.toLowerCase();
+      return name.includes(term) || details.includes(term) || creator.includes(term);
+    });
+  }, [reports, searchText]);
+
+  // KPI Calculations
+  const stats = useMemo(() => {
+    const total = reports.length;
+    const withInsitu = reports.filter((r) => r.insitu_test_id).length;
+    const withInlab = reports.filter((r) => r.inlab_test_id).length;
+    return { total, withInsitu, withInlab };
+  }, [reports]);
+
   const columns = [
     {
       title: 'Vigente',
@@ -248,7 +285,7 @@ const GeoreportsManager = () => {
         const id = record.georeport_id || record.id;
         return isCurrent ? (
           <Tooltip title="Reporte Vigente Actual">
-            <StarFilled style={{ color: '#fa8c16', fontSize: 20 }} />
+            <StarFilled className="text-geoterra-orange text-xl" />
           </Tooltip>
         ) : (
           <Popconfirm
@@ -263,7 +300,7 @@ const GeoreportsManager = () => {
                 type="text"
                 size="small"
                 loading={promotingId === id}
-                icon={<StarOutlined style={{ color: '#fa8c16', fontSize: 18 }} />}
+                icon={<StarOutlined className="text-geoterra-orange text-lg" />}
               />
             </Tooltip>
           </Popconfirm>
@@ -274,13 +311,13 @@ const GeoreportsManager = () => {
       title: 'Nombre',
       dataIndex: 'georeport_name',
       key: 'georeport_name',
-      render: (val) => <span className="font-semibold text-slate-800">{val || 'Sin nombre'}</span>,
+      render: (val) => <NameCell icon={<FileSearchOutlined />}>{val || 'Sin nombre'}</NameCell>,
     },
     ...(isMaintenance ? [{
       title: 'ID Georeporte',
       dataIndex: 'georeport_id',
       key: 'georeport_id',
-      render: (val, record) => <span className="font-mono text-xs font-semibold text-gray-700">{val || record.id}</span>,
+      render: (val, record) => <SystemIdCell value={val || record.id} />,
     }] : []),
     {
       title: 'Prueba In-Situ',
@@ -288,12 +325,18 @@ const GeoreportsManager = () => {
       key: 'insitu_test_id',
       render: (val) => (
         isMaintenance ? (
-          <span className="font-mono text-xs flex items-center gap-1 text-cyan-700">
-            <BulbOutlined style={{ color: '#13c2c2' }} />
+          <span className="font-mono text-xs flex items-center gap-1 text-slate-700">
+            <BulbOutlined className="text-geoterra-blue" />
             {val || 'Ninguna'}
           </span>
         ) : (
-          val ? <Tag color="cyan">Vinculada</Tag> : <Tag color="default">Ninguna</Tag>
+          val ? (
+            <Tag className="bg-blue-50 text-geoterra-blue border-blue-200 rounded-full font-semibold text-xs">
+              Vinculada
+            </Tag>
+          ) : (
+            <Tag className="rounded-full text-xs text-gray-400">Ninguna</Tag>
+          )
         )
       ),
     },
@@ -303,12 +346,18 @@ const GeoreportsManager = () => {
       key: 'inlab_test_id',
       render: (val) => (
         isMaintenance ? (
-          <span className="font-mono text-xs flex items-center gap-1 text-purple-700">
-            <ExperimentOutlined style={{ color: '#722ed1' }} />
+          <span className="font-mono text-xs flex items-center gap-1 text-slate-700">
+            <ExperimentOutlined className="text-geoterra-orange" />
             {val || 'Ninguna'}
           </span>
         ) : (
-          val ? <Tag color="purple">Vinculada</Tag> : <Tag color="default">Ninguna</Tag>
+          val ? (
+            <Tag className="bg-orange-50 text-geoterra-orange border-orange-200 rounded-full font-semibold text-xs">
+              Vinculada
+            </Tag>
+          ) : (
+            <Tag className="rounded-full text-xs text-gray-400">Ninguna</Tag>
+          )
         )
       ),
     },
@@ -317,14 +366,14 @@ const GeoreportsManager = () => {
       dataIndex: 'details',
       key: 'details',
       ellipsis: true,
-      render: (val) => val || <Text type="secondary">Sin detalles</Text>,
+      render: (val) => val ? <span className="text-gray-600">{val}</span> : <span className="text-gray-400 italic">Sin detalles</span>,
     },
     {
       title: 'Creado por',
       key: 'creator',
       render: (_, record) => {
         const name = [record.created_by_first_name, record.created_by_last_name].filter(Boolean).join(' ');
-        return name || 'Sistema';
+        return <span className="text-gray-700 text-xs">{name || 'Sistema'}</span>;
       },
     },
     {
@@ -341,71 +390,174 @@ const GeoreportsManager = () => {
         const isCurrent = currentReport && (currentReport.georeport_id || currentReport.id) === (record.georeport_id || record.id);
         const id = record.georeport_id || record.id;
         return (
-          <Space size="small">
-            {!isCurrent && (
-              <Popconfirm
-                title="¿Promover a vigente?"
-                onConfirm={() => handlePromote(record)}
-                okText="Sí"
-                cancelText="No"
-              >
-                <Tooltip title="Promover a vigente">
-                  <Button
-                    size="small"
-                    style={{ color: '#fa8c16', borderColor: '#ffd591' }}
-                    loading={promotingId === id}
-                    icon={<StarOutlined />}
-                  >
-                    Promover
-                  </Button>
-                </Tooltip>
-              </Popconfirm>
-            )}
-            <Button icon={<EditOutlined />} size="small" type="primary" onClick={() => handleOpenEdit(record)} />
-            <Popconfirm title="¿Eliminar este georeporte?" onConfirm={() => handleDelete(record)} okText="Sí" cancelText="No">
-              <Button icon={<DeleteOutlined />} size="small" danger />
-            </Popconfirm>
-          </Space>
+          <RowActions
+            entity="georeporte"
+            onEdit={() => handleOpenEdit(record)}
+            onDelete={() => handleDelete(record)}
+            deleteDescription="Esta acción es irreversible y eliminará el georeporte."
+            extra={
+              !isCurrent && (
+                <Popconfirm
+                  title="¿Promover a vigente?"
+                  description="Se actualizará como el reporte oficial de la manifestación."
+                  onConfirm={() => handlePromote(record)}
+                  okText="Sí, promover"
+                  cancelText="Cancelar"
+                >
+                  <Tooltip title="Promover a vigente">
+                    <Button
+                      size="middle"
+                      className="text-orange-600 hover:text-orange-700 border-orange-200"
+                      loading={promotingId === id}
+                      icon={<StarOutlined />}
+                    />
+                  </Tooltip>
+                </Popconfirm>
+              )
+            }
+          />
         );
       },
     },
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
-      <Card style={{ borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <FileSearchOutlined style={{ fontSize: 32, color: '#fa8c16' }} />
-            <div>
-              <Title level={3} style={{ margin: 0 }}>Gestión de Georeportes</Title>
-              <Paragraph type="secondary" style={{ margin: 0 }}>
-                Navega y consolida geomanifestaciones con sus pruebas in-situ y de laboratorio.
-              </Paragraph>
-            </div>
+    <div className="w-full p-4 md:p-8 space-y-6 poppins">
+      {/* 1. Header Card */}
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-geoterra-orange poppins">
+              GEOCIENCIAS • CONTROL CIENTÍFICO
+            </span>
           </div>
-
-          <Space flexWrap>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleOpenCreate}
-              disabled={!selectedGeoId}
-              style={{ backgroundColor: '#fa8c16', borderColor: '#fa8c16' }}
-            >
-              Nuevo Georeporte
-            </Button>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={() => loadReports(selectedGeoId)}
-              loading={loading}
-              disabled={!selectedGeoId}
-            >
-              Actualizar Listado
-            </Button>
-          </Space>
+          <h1 className="text-2xl md:text-3xl font-bold text-geoterra-blue m-0 poppins">
+            Gestión de Georeportes
+          </h1>
+          <p className="text-sm text-gray-500 mt-1 mb-0 max-w-2xl">
+            Navega y consolida geomanifestaciones con sus pruebas in-situ y de laboratorio.
+          </p>
         </div>
 
+        <div className="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleOpenCreate}
+            disabled={!selectedGeoId}
+            style={{ backgroundColor: '#12467E', borderColor: '#12467E' }}
+            className="poppins-bold shadow-sm"
+          >
+            Nuevo Georeporte
+          </Button>
+        </div>
+      </div>
+
+      {/* 2. KPI Metrics Dashboard */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* KPI 1: Total */}
+        <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Total Georeportes
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#12467E] flex items-center justify-center text-lg">
+              <FileSearchOutlined />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-gray-800 poppins">
+              {loading ? '...' : stats.total}
+            </span>
+            <span className="text-xs text-gray-500 font-medium">Registrados</span>
+          </div>
+          <div className="mt-2 text-xs text-blue-700 font-medium flex items-center gap-1">
+            <CheckCircleOutlined /> Manifestación seleccionada
+          </div>
+        </div>
+
+        {/* KPI 2: Con Pruebas In-Situ */}
+        <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Con Prueba In-Situ
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-geoterra-blue flex items-center justify-center text-lg">
+              <BulbOutlined />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-gray-800 poppins">
+              {loading ? '...' : stats.withInsitu}
+            </span>
+            <span className="text-xs text-gray-500 font-medium">Mediciones</span>
+          </div>
+          <div className="mt-2 text-xs text-blue-700 font-medium flex items-center gap-1">
+            <CheckCircleOutlined /> Datos de campo vinculados
+          </div>
+        </div>
+
+        {/* KPI 3: Con Pruebas de Laboratorio */}
+        <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Con Prueba In-Lab
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-orange-50 text-geoterra-orange flex items-center justify-center text-lg">
+              <ExperimentOutlined />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-gray-800 poppins">
+              {loading ? '...' : stats.withInlab}
+            </span>
+            <span className="text-xs text-gray-500 font-medium">Análisis</span>
+          </div>
+          <div className="mt-2 text-xs text-orange-700 font-medium flex items-center gap-1">
+            <GlobalOutlined /> Geoquímica consolidada
+          </div>
+        </div>
+
+        {/* KPI 4: Reporte Vigente */}
+        <div className="bg-[#12467E] p-5 rounded-2xl border border-blue-900 text-white shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-blue-200 uppercase tracking-wider">
+              Reporte Vigente
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center text-lg">
+              <SafetyCertificateOutlined />
+            </div>
+          </div>
+          <div className="mt-2">
+            <span className="text-2xl font-bold poppins text-white">
+              {currentReport ? (currentReport.georeport_name || 'Vigente Asignado') : 'Sin Definir'}
+            </span>
+            <p className="text-xs text-blue-200 m-0 mt-0.5 font-normal">
+              {currentReport ? 'Reporte oficial de la manifestación' : 'Requiere promover un reporte'}
+            </p>
+          </div>
+          <div className="mt-3 text-[11px] text-blue-100 font-medium flex items-center gap-1">
+            <CheckCircleOutlined /> Publicación científica oficial
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Main Data Card */}
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+        {/* Navigation Tabs Header */}
+        <PillTabs
+          items={[
+            {
+              key: 'georeports',
+              label: 'Georeportes',
+              icon: <FileSearchOutlined />,
+              count: reports.length,
+            },
+          ]}
+          activeKey="georeports"
+        />
+
+        {/* Entity Navigator Picker */}
         <EntityNavigatorPicker
           entityType="geomanifestations"
           selectedId={selectedGeoId}
@@ -416,96 +568,145 @@ const GeoreportsManager = () => {
           label="GEOMANIFESTACIÓN SELECCIONADA:"
         />
 
+        {/* Current Report Banner */}
         {currentReport && (
-          <Card size="small" style={{ marginBottom: 16, borderLeft: '4px solid #fa8c16', background: '#fffbe6' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-              <StarFilled style={{ color: '#fa8c16', fontSize: 18 }} />
-              <Text strong style={{ color: '#d46b08' }}>Reporte Vigente Actual:</Text>
-              {isMaintenance && (
-                <span className="font-mono text-xs bg-amber-100 px-2 py-0.5 rounded border border-amber-300">
-                  {currentReport.georeport_id || currentReport.id}
-                </span>
-              )}
-              <span style={{ margin: '0 8px', color: '#ccc' }}>|</span>
-              <Text type="secondary">{currentReport.details || 'Sin detalles'}</Text>
+          <div className="p-4 rounded-xl bg-blue-50/60 border border-blue-100 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-100 text-geoterra-blue flex items-center justify-center text-lg flex-shrink-0">
+              <StarFilled />
             </div>
-          </Card>
-        )}
-
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <Spin size="large" tip="Cargando georeportes..." />
+            <div className="flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-bold uppercase tracking-wider text-geoterra-blue poppins">
+                  Reporte Vigente Actual
+                </span>
+                {isMaintenance && (
+                  <span className="font-mono text-xs text-gray-500 bg-white px-2 py-0.5 rounded border border-gray-200">
+                    ID: #{currentReport.georeport_id || currentReport.id}
+                  </span>
+                )}
+              </div>
+              <p className="text-sm font-semibold text-gray-900 m-0 mt-0.5">
+                {currentReport.georeport_name || 'Reporte Oficial'}
+              </p>
+              {currentReport.details && (
+                <p className="text-xs text-gray-500 m-0 mt-0.5">
+                  {currentReport.details}
+                </p>
+              )}
+            </div>
           </div>
-        ) : (
-          <Table
-            dataSource={reports}
-            columns={columns}
-            rowKey={(item) => item.georeport_id || item.id}
-            pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50'] }}
-            locale={{ emptyText: selectedGeoId ? 'No hay georeportes registrados para esta manifestación' : 'Selecciona una geomanifestación' }}
-          />
         )}
-      </Card>
 
-      {/* Create / Edit Modal */}
+        {/* Filter and Search Toolbar */}
+        <CrudToolbar
+          searchPlaceholder="Buscar georeporte por nombre, notas o autor..."
+          searchValue={searchText}
+          onSearchChange={setSearchText}
+          shown={filteredReports.length}
+          total={reports.length}
+          noun="georeportes"
+          onReload={selectedGeoId ? () => loadReports(selectedGeoId) : undefined}
+          loading={loading}
+        />
+
+        {/* Table */}
+        <Table
+          dataSource={filteredReports}
+          columns={columns}
+          rowKey={(item) => item.georeport_id || item.id}
+          loading={loading}
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            showTotal: (total) => `Total ${total} georeportes`,
+          }}
+          locale={{
+            emptyText: selectedGeoId
+              ? 'No hay georeportes registrados para esta manifestación'
+              : 'Selecciona una geomanifestación',
+          }}
+          className="poppins border border-gray-100 rounded-xl overflow-hidden"
+        />
+      </div>
+
+      {/* 4. Create / Edit Modal */}
       <Modal
-        title={editingReport ? 'Editar Georeporte' : 'Nuevo Georeporte'}
+        title={
+          <div className="flex items-center gap-2 text-geoterra-blue font-bold text-lg">
+            <FileSearchOutlined />
+            <span>{editingReport ? 'Editar Georeporte Oficial' : 'Nuevo Georeporte Oficial'}</span>
+          </div>
+        }
         open={modalVisible}
         onOk={() => form.submit()}
         onCancel={() => setModalVisible(false)}
         confirmLoading={submitting}
-        okText={editingReport ? 'Guardar Cambios' : 'Crear Georeporte'}
+        okText={editingReport ? 'Guardar Cambios' : 'Registrar Georeporte'}
         cancelText="Cancelar"
+        okButtonProps={{
+          style: { backgroundColor: '#12467E', borderColor: '#12467E' },
+          className: 'poppins-bold',
+        }}
         width={650}
       >
-        <Form form={form} layout="vertical" onFinish={handleSubmit}>
-          <Form.Item
-            name="georeport_name"
-            label="Nombre del Georeporte"
-            rules={[
-              { required: true, message: 'El nombre del georeporte es obligatorio' },
-              { max: 55, message: 'Máximo 55 caracteres' },
-            ]}
-          >
-            <Input placeholder="Ej: Reporte Hidrogeológico 2026-A" maxLength={55} />
-          </Form.Item>
+        <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm mt-4 space-y-4">
+          <Form form={form} layout="vertical" onFinish={handleSubmit}>
+            <Form.Item
+              name="georeport_name"
+              label={<span className="font-semibold text-gray-700">Nombre del Georeporte</span>}
+              rules={[
+                { required: true, message: 'El nombre del georeporte es obligatorio' },
+                { max: 55, message: 'Máximo 55 caracteres' },
+              ]}
+            >
+              <Input placeholder="Ej: Reporte Hidrogeológico 2026-A" maxLength={55} className="rounded-lg" />
+            </Form.Item>
 
-          <Form.Item
-            name="insitu_test_id"
-            label="Prueba In-Situ"
-            rules={[{ required: true, message: 'Selecciona una prueba in-situ' }]}
-          >
-            <EntityNavigatorPicker
-              entityType="insitu_tests"
-              items={insituOptions}
-              mode="compact"
-            />
-          </Form.Item>
+            <Form.Item
+              name="insitu_test_id"
+              label={<span className="font-semibold text-gray-700">Prueba In-Situ</span>}
+              rules={[{ required: true, message: 'Selecciona una prueba in-situ' }]}
+            >
+              <EntityNavigatorPicker
+                entityType="insitu_tests"
+                items={insituOptions}
+                mode="compact"
+              />
+            </Form.Item>
 
-          <Form.Item
-            name="inlab_test_id"
-            label="Prueba de Laboratorio"
-            rules={[{ required: true, message: 'Selecciona una prueba de laboratorio' }]}
-          >
-            <EntityNavigatorPicker
-              entityType="inlab_tests"
-              items={inlabOptions}
-              mode="compact"
-            />
-          </Form.Item>
+            <Form.Item
+              name="inlab_test_id"
+              label={<span className="font-semibold text-gray-700">Prueba de Laboratorio</span>}
+              rules={[{ required: true, message: 'Selecciona una prueba de laboratorio' }]}
+            >
+              <EntityNavigatorPicker
+                entityType="inlab_tests"
+                items={inlabOptions}
+                mode="compact"
+              />
+            </Form.Item>
 
-          <Form.Item
-            name="details"
-            label="Notas / Detalles del Georeporte"
-            rules={[{ max: 500, message: 'Máximo 500 caracteres' }]}
-          >
-            <Input.TextArea rows={3} placeholder="Notas consolidadas del reporte..." maxLength={500} showCount />
-          </Form.Item>
+            <Form.Item
+              name="details"
+              label={<span className="font-semibold text-gray-700">Notas / Detalles del Georeporte</span>}
+              rules={[{ max: 500, message: 'Máximo 500 caracteres' }]}
+            >
+              <Input.TextArea
+                rows={3}
+                placeholder="Notas consolidadas del reporte..."
+                maxLength={500}
+                showCount
+                className="rounded-lg"
+              />
+            </Form.Item>
 
-          <Form.Item name="set_as_current" valuePropName="checked">
-            <Checkbox>Establecer como el reporte vigente de la manifestación</Checkbox>
-          </Form.Item>
-        </Form>
+            <Form.Item name="set_as_current" valuePropName="checked" className="m-0">
+              <Checkbox className="font-medium text-gray-700">
+                Establecer como el reporte vigente de la manifestación
+              </Checkbox>
+            </Form.Item>
+          </Form>
+        </div>
       </Modal>
     </div>
   );

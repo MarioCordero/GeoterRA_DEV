@@ -1,7 +1,15 @@
 import 'leaflet/dist/leaflet.css';
 import React, { useState, useEffect, useRef } from 'react';
 import { Button, Input, message, Modal } from 'antd';
-import { EnvironmentOutlined, LoadingOutlined, FullscreenOutlined, CloseOutlined, CheckCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import {
+  EnvironmentOutlined,
+  LoadingOutlined,
+  FullscreenOutlined,
+  CloseOutlined,
+  CheckCircleOutlined,
+  InfoCircleOutlined,
+  AimOutlined
+} from '@ant-design/icons';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 
 const defaultPosition = [9.93333, -84.08333];
@@ -13,20 +21,62 @@ function LocationMarker({ setLatLng, latLng }) {
   const [position, setPosition] = useState(null);
 
   useEffect(() => {
-    if (latLng && latLng.lat && latLng.lng) {
+    if (
+      latLng &&
+      typeof latLng.lat === 'number' &&
+      typeof latLng.lng === 'number' &&
+      !isNaN(latLng.lat) &&
+      !isNaN(latLng.lng) &&
+      isFinite(latLng.lat) &&
+      isFinite(latLng.lng)
+    ) {
       setPosition([latLng.lat, latLng.lng]);
+    } else {
+      setPosition(null);
     }
-  }, [latLng]);
+  }, [latLng?.lat, latLng?.lng]);
 
   useMapEvents({
     click(e) {
-      const newPosition = [e.latlng.lat, e.latlng.lng];
-      setPosition(newPosition);
-      setLatLng(e.latlng);
+      if (e?.latlng && !isNaN(e.latlng.lat) && !isNaN(e.latlng.lng)) {
+        const newPosition = [e.latlng.lat, e.latlng.lng];
+        setPosition(newPosition);
+        setLatLng(e.latlng);
+      }
     },
   });
 
   return position === null ? null : <Marker position={position} />;
+}
+
+/**
+ * Recenter map viewport reliably when coordinates change or geolocation triggers
+ */
+function MapRecenter({ latLng, zoom = 15 }) {
+  const map = useMap();
+  useEffect(() => {
+    if (
+      latLng &&
+      typeof latLng.lat === 'number' &&
+      typeof latLng.lng === 'number' &&
+      !isNaN(latLng.lat) &&
+      !isNaN(latLng.lng) &&
+      isFinite(latLng.lat) &&
+      isFinite(latLng.lng) &&
+      latLng.lat >= -90 &&
+      latLng.lat <= 90 &&
+      latLng.lng >= -180 &&
+      latLng.lng <= 180
+    ) {
+      try {
+        map.invalidateSize();
+        map.setView([latLng.lat, latLng.lng], zoom, { animate: true });
+      } catch (err) {
+        console.warn('Map recenter notice:', err);
+      }
+    }
+  }, [latLng?.lat, latLng?.lng, zoom, map]);
+  return null;
 }
 
 /**
@@ -170,93 +220,87 @@ const MapCoordinatePicker = ({
   };
 
   /**
-   * Get current location using geolocation API
+   * Helper to request browser coordinates with fallback capability
    */
-  const getCurrentLocation = () => {
-    // Prevent duplicate calls
+  const requestPosition = (enableHighAccuracy, timeout = 12000) => {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy,
+        timeout,
+        maximumAge: 60000,
+      });
+    });
+  };
+
+  /**
+   * Get current location using geolocation API with auto-fallback
+   */
+  const getCurrentLocation = async () => {
     if (locationRequestRef.current !== null || gettingLocation) {
-      return Promise.reject(new Error('Location request already in progress'));
+      return;
     }
 
     if (!navigator.geolocation) {
       message.error('La geolocalización no está soportada en este navegador');
-      return Promise.reject(new Error('Geolocation not supported'));
+      return;
     }
 
-    return new Promise((resolve, reject) => {
-      const requestId = Date.now();
-      locationRequestRef.current = requestId;
-      setGettingLocation(true);
+    const requestId = Date.now();
+    locationRequestRef.current = requestId;
+    setGettingLocation(true);
 
-      const timeoutId = setTimeout(() => {
-        if (locationRequestRef.current === requestId && componentMountedRef.current) {
-          locationRequestRef.current = null;
-          setGettingLocation(false);
-          reject(new Error('Geolocation timeout'));
+    try {
+      let position;
+      try {
+        // Try high accuracy (GPS) first with 12s timeout
+        position = await requestPosition(true, 12000);
+      } catch (highAccErr) {
+        // If high accuracy times out (code 3) or position is unavailable (code 2), fallback to standard accuracy
+        if (highAccErr.code === 3 || highAccErr.code === 2) {
+          position = await requestPosition(false, 8000);
+        } else {
+          throw highAccErr;
         }
-      }, 15000);
+      }
 
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          clearTimeout(timeoutId);
+      if (locationRequestRef.current !== requestId || !componentMountedRef.current) {
+        return;
+      }
 
-          if (locationRequestRef.current !== requestId) {
-            return;
-          }
+      const { latitude, longitude } = position.coords;
+      const newLatLng = { lat: latitude, lng: longitude };
+      setManualLat(latitude.toFixed(6));
+      setManualLng(longitude.toFixed(6));
+      updateCoordinates(newLatLng);
+      message.success('Ubicación obtenida correctamente');
+      return newLatLng;
+    } catch (error) {
+      if (locationRequestRef.current !== requestId || !componentMountedRef.current) {
+        return;
+      }
 
-          if (!componentMountedRef.current) {
-            return;
-          }
-
-          const { latitude, longitude } = position.coords;
-          const newLatLng = { lat: latitude, lng: longitude };
-          setManualLat(latitude.toFixed(6));
-          setManualLng(longitude.toFixed(6));
-          updateCoordinates(newLatLng);
-          message.success('Ubicación actual obtenida correctamente');
-          setGettingLocation(false);
-          locationRequestRef.current = null;
-          resolve(newLatLng);
-        },
-        (error) => {
-          clearTimeout(timeoutId);
-
-          if (locationRequestRef.current !== requestId) {
-            return;
-          }
-
-          if (!componentMountedRef.current) {
-            return;
-          }
-
-          let errorMessage = 'Error al obtener la ubicación';
-          switch (error.code) {
-            case error.PERMISSION_DENIED:
-              errorMessage = 'Permiso de ubicación denegado. Por favor, permite el acceso a la ubicación.';
-              break;
-            case error.POSITION_UNAVAILABLE:
-              errorMessage = 'Información de ubicación no disponible.';
-              break;
-            case error.TIMEOUT:
-              errorMessage = 'Tiempo de espera agotado al obtener la ubicación.';
-              break;
-            default:
-              errorMessage = 'Error desconocido al obtener la ubicación.';
-              break;
-          }
-
-          message.error(errorMessage);
-          setGettingLocation(false);
-          locationRequestRef.current = null;
-          reject(error);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 60000,
-        }
-      );
-    });
+      let errorMessage = 'Error al obtener la ubicación';
+      switch (error.code) {
+        case 1:
+          errorMessage = 'Permiso de ubicación denegado. Permite el acceso a la ubicación en tu navegador.';
+          break;
+        case 2:
+          errorMessage = 'Información de ubicación no disponible en tu dispositivo.';
+          break;
+        case 3:
+          errorMessage = 'Tiempo de espera agotado al consultar la ubicación.';
+          break;
+        default:
+          errorMessage = error.message || 'Error desconocido al obtener la ubicación.';
+          break;
+      }
+      message.error(errorMessage);
+    } finally {
+      if (componentMountedRef.current) {
+        setGettingLocation(false);
+      }
+      locationRequestRef.current = null;
+    }
   };
 
   /**
@@ -343,92 +387,72 @@ const MapCoordinatePicker = ({
   };
 
   /**
-   * Get current location for fullscreen modal
+   * Get current location for fullscreen modal with auto-fallback
    */
-  const getFullscreenCurrentLocation = () => {
+  const getFullscreenCurrentLocation = async () => {
     if (locationRequestRef.current !== null || fullscreenGettingLocation) {
-      return Promise.reject(new Error('Location request already in progress'));
+      return;
     }
 
     if (!navigator.geolocation) {
       message.error('La geolocalización no está soportada en este navegador');
-      return Promise.reject(new Error('Geolocation not supported'));
+      return;
     }
 
-    return new Promise((resolve, reject) => {
-      const requestId = Date.now();
-      locationRequestRef.current = requestId;
-      setFullscreenGettingLocation(true);
+    const requestId = Date.now();
+    locationRequestRef.current = requestId;
+    setFullscreenGettingLocation(true);
 
-      const timeoutId = setTimeout(() => {
-        if (locationRequestRef.current === requestId && componentMountedRef.current) {
-          locationRequestRef.current = null;
-          setFullscreenGettingLocation(false);
-          reject(new Error('Geolocation timeout'));
+    try {
+      let position;
+      try {
+        position = await requestPosition(true, 12000);
+      } catch (highAccErr) {
+        if (highAccErr.code === 3 || highAccErr.code === 2) {
+          position = await requestPosition(false, 8000);
+        } else {
+          throw highAccErr;
         }
-      }, 15000);
+      }
 
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          clearTimeout(timeoutId);
+      if (locationRequestRef.current !== requestId || !componentMountedRef.current) {
+        return;
+      }
 
-          if (locationRequestRef.current !== requestId) {
-            return;
-          }
+      const { latitude, longitude } = position.coords;
+      const newLatLng = { lat: latitude, lng: longitude };
+      setFullscreenManualLat(latitude.toFixed(6));
+      setFullscreenManualLng(longitude.toFixed(6));
+      setFullscreenLatLng(newLatLng);
+      message.success('Ubicación obtenida correctamente');
+      return newLatLng;
+    } catch (error) {
+      if (locationRequestRef.current !== requestId || !componentMountedRef.current) {
+        return;
+      }
 
-          if (!componentMountedRef.current) {
-            return;
-          }
-
-          const { latitude, longitude } = position.coords;
-          const newLatLng = { lat: latitude, lng: longitude };
-          setFullscreenManualLat(latitude.toFixed(6));
-          setFullscreenManualLng(longitude.toFixed(6));
-          setFullscreenLatLng(newLatLng);
-          message.success('Ubicación actual obtenida correctamente');
-          setFullscreenGettingLocation(false);
-          locationRequestRef.current = null;
-          resolve(newLatLng);
-        },
-        (error) => {
-          clearTimeout(timeoutId);
-
-          if (locationRequestRef.current !== requestId) {
-            return;
-          }
-
-          if (!componentMountedRef.current) {
-            return;
-          }
-
-          let errorMessage = 'Error al obtener la ubicación';
-          switch (error.code) {
-            case error.PERMISSION_DENIED:
-              errorMessage = 'Permiso de ubicación denegado. Por favor, permite el acceso a la ubicación.';
-              break;
-            case error.POSITION_UNAVAILABLE:
-              errorMessage = 'Información de ubicación no disponible.';
-              break;
-            case error.TIMEOUT:
-              errorMessage = 'Tiempo de espera agotado al obtener la ubicación.';
-              break;
-            default:
-              errorMessage = 'Error desconocido al obtener la ubicación.';
-              break;
-          }
-
-          message.error(errorMessage);
-          setFullscreenGettingLocation(false);
-          locationRequestRef.current = null;
-          reject(error);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 60000,
-        }
-      );
-    });
+      let errorMessage = 'Error al obtener la ubicación';
+      switch (error.code) {
+        case 1:
+          errorMessage = 'Permiso de ubicación denegado. Permite el acceso a la ubicación en tu navegador.';
+          break;
+        case 2:
+          errorMessage = 'Información de ubicación no disponible en tu dispositivo.';
+          break;
+        case 3:
+          errorMessage = 'Tiempo de espera agotado al consultar la ubicación.';
+          break;
+        default:
+          errorMessage = error.message || 'Error desconocido al obtener la ubicación.';
+          break;
+      }
+      message.error(errorMessage);
+    } finally {
+      if (componentMountedRef.current) {
+        setFullscreenGettingLocation(false);
+      }
+      locationRequestRef.current = null;
+    }
   };
 
   return (
@@ -443,37 +467,58 @@ const MapCoordinatePicker = ({
           borderRadius: 6,
         }}
       >
-        <div style={{ marginBottom: 8, fontWeight: 500, fontSize: '14px', display: 'flex', alignItems: 'center', gap: 8 }}>
-          📍 {title}
+        <div style={{ marginBottom: 8, fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: 6, color: '#12467E' }}>
+          <EnvironmentOutlined /> {title}
         </div>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <label style={{ minWidth: 60, fontSize: '12px', color: '#666' }}>Latitud:</label>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <label style={{ minWidth: 50, fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Lat:</label>
             <Input
               placeholder="9.933333"
               value={manualLat}
               onChange={(e) => handleManualCoordinateChange(e.target.value, manualLng)}
-              style={{ width: 120 }}
+              style={{ width: 110 }}
               size="small"
             />
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <label style={{ minWidth: 65, fontSize: '12px', color: '#666' }}>Longitud:</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <label style={{ minWidth: 50, fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Lng:</label>
             <Input
               placeholder="-84.083333"
               value={manualLng}
               onChange={(e) => handleManualCoordinateChange(manualLat, e.target.value)}
-              style={{ width: 120 }}
+              style={{ width: 110 }}
               size="small"
             />
           </div>
+
+          <Button
+            type="primary"
+            size="small"
+            icon={gettingLocation ? <LoadingOutlined /> : <AimOutlined />}
+            onClick={() => {
+              getCurrentLocation().catch((err) => {
+                console.error('Location request failed:', err.message);
+              });
+            }}
+            loading={gettingLocation}
+            disabled={gettingLocation}
+            style={{
+              backgroundColor: '#12467E',
+              borderColor: '#12467E',
+            }}
+            className="poppins font-medium shadow-sm"
+          >
+            {gettingLocation ? 'Obteniendo GPS...' : 'Mi Ubicación Actual'}
+          </Button>
+
           {showApplyButton && (
             <Button
               type="primary"
               size="small"
               onClick={handleApplyCoordinates}
               disabled={!manualLat || !manualLng}
-              style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+              style={{ backgroundColor: '#12467E', borderColor: '#12467E' }}
             >
               Aplicar
             </Button>
@@ -496,13 +541,13 @@ const MapCoordinatePicker = ({
               marginTop: 8,
               fontSize: '11px',
               color: '#12467E',
-              fontWeight: 500,
+              fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
               gap: 4,
             }}
           >
-            <CheckCircleOutlined /> Coordenadas actuales: {localLatLng.lat.toFixed(6)}, {localLatLng.lng.toFixed(6)}
+            <CheckCircleOutlined /> Coordenadas fijadas: {localLatLng.lat.toFixed(6)}, {localLatLng.lng.toFixed(6)}
           </div>
         )}
       </div>
@@ -519,16 +564,20 @@ const MapCoordinatePicker = ({
           }}
         >
           <MapContainer
-            center={localLatLng.lat ? [localLatLng.lat, localLatLng.lng] : defaultPosition}
-            zoom={localLatLng.lat ? 15 : 8}
+            center={
+              localLatLng?.lat && !isNaN(localLatLng.lat) && isFinite(localLatLng.lat)
+                ? [localLatLng.lat, localLatLng.lng]
+                : defaultPosition
+            }
+            zoom={localLatLng?.lat && !isNaN(localLatLng.lat) ? 15 : 8}
             style={{ height: '100%', width: '100%' }}
-            key={`map-${localLatLng.lat}`}
           >
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
             <LocationMarker setLatLng={(coords) => updateCoordinates(coords)} latLng={localLatLng} />
+            <MapRecenter latLng={localLatLng} />
             <MapResizeHandler />
           </MapContainer>
         </div>
@@ -547,7 +596,7 @@ const MapCoordinatePicker = ({
         >
           <Button
             type="primary"
-            icon={gettingLocation ? <LoadingOutlined /> : <EnvironmentOutlined />}
+            icon={gettingLocation ? <LoadingOutlined /> : <AimOutlined />}
             onClick={() => {
               getCurrentLocation().catch((err) => {
                 console.error('Location request failed:', err.message);
@@ -556,8 +605,8 @@ const MapCoordinatePicker = ({
             loading={gettingLocation}
             disabled={gettingLocation}
             style={{
-              backgroundColor: gettingLocation ? '#f39c29' : '#12467E',
-              borderColor: gettingLocation ? '#f39c29' : '#12467E',
+              backgroundColor: '#12467E',
+              borderColor: '#12467E',
             }}
             size="small"
             title={gettingLocation ? 'Obteniendo ubicación...' : 'Obtener ubicación actual'}
@@ -693,10 +742,13 @@ const MapCoordinatePicker = ({
           }}
         >
           <MapContainer
-            center={fullscreenLatLng.lat ? [fullscreenLatLng.lat, fullscreenLatLng.lng] : defaultPosition}
-            zoom={fullscreenLatLng.lat ? 15 : 8}
+            center={
+              fullscreenLatLng?.lat && !isNaN(fullscreenLatLng.lat) && isFinite(fullscreenLatLng.lat)
+                ? [fullscreenLatLng.lat, fullscreenLatLng.lng]
+                : defaultPosition
+            }
+            zoom={fullscreenLatLng?.lat && !isNaN(fullscreenLatLng.lat) ? 15 : 8}
             style={{ height: '100%', width: '100%' }}
-            key={`fullscreen-map-${fullscreenLatLng.lat}`}
           >
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -707,6 +759,7 @@ const MapCoordinatePicker = ({
               setFullscreenManualLat(coords.lat.toFixed(6));
               setFullscreenManualLng(coords.lng.toFixed(6));
             }} latLng={fullscreenLatLng} />
+            <MapRecenter latLng={fullscreenLatLng} />
             <MapResizeHandler />
           </MapContainer>
 

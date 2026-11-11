@@ -59,6 +59,9 @@ import {
   provincesIndex,
 } from '../../../../config/apiConf';
 import { renderDateWithProse } from '../../../../utils/dateFormatter';
+import PillTabs from '../../../common/crud/PillTabs';
+import CrudToolbar from '../../../common/crud/CrudToolbar';
+import { DateCell } from '../../../common/crud/cells';
 
 const defaultPosition = [9.93333, -84.08333];
 
@@ -555,22 +558,22 @@ const RequestsManager = () => {
     const s = (state || 'Pendiente').toLowerCase();
     if (s.includes('pend')) {
       return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
-          <ClockCircleOutlined className="text-amber-500" /> Pendiente
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-200">
+          <ClockCircleOutlined className="text-geoterra-orange" /> Pendiente
         </span>
       );
     }
     if (s.includes('revis')) {
       return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-200">
-          <SyncOutlined spin className="text-blue-500" /> En Revisión
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border border-blue-200">
+          <SyncOutlined spin className="text-[#12467E]" /> En Revisión
         </span>
       );
     }
     if (s.includes('proc') || s.includes('analiz') || s.includes('acept')) {
       return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-          <CheckCircleOutlined className="text-emerald-500" /> Procesada
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border border-blue-200">
+          <CheckCircleOutlined className="text-[#12467E]" /> Procesada
         </span>
       );
     }
@@ -586,7 +589,7 @@ const RequestsManager = () => {
     {
       title: isMaintenance ? 'Solicitud / Código' : 'Solicitud',
       key: 'solicitud',
-      sorter: (a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0),
+      sorter: (a, b) => (a.name || '').localeCompare(b.name || ''),
       render: (_, record) => (
         <div className="space-y-1 poppins">
           <div
@@ -596,14 +599,13 @@ const RequestsManager = () => {
             <FileTextOutlined className="text-xs text-geoterra-blue" />
             {record.name}
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-500">
-            {isMaintenance && (
+          {isMaintenance && record.id_soli && (
+            <div className="flex items-center gap-2 text-xs text-gray-500">
               <Tag className="m-0 font-mono text-[11px] bg-gray-100 border-gray-200">
                 #{record.id_soli}
               </Tag>
-            )}
-            <span>{renderDateWithProse(record.created_at, { showIcon: false })}</span>
-          </div>
+            </div>
+          )}
         </div>
       ),
     },
@@ -665,6 +667,21 @@ const RequestsManager = () => {
       ),
     },
     {
+      title: 'Fecha',
+      dataIndex: 'created_at',
+      key: 'created_at',
+      width: 140,
+      sorter: (a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0),
+      defaultSortOrder: 'descend',
+      render: (val) => (
+        <Tooltip title={val ? new Date(val).toLocaleString('es-CR') : 'Sin fecha'}>
+          <span>
+            <DateCell value={val} fallback="Sin fecha" />
+          </span>
+        </Tooltip>
+      ),
+    },
+    {
       title: 'Estado',
       key: 'estado',
       align: 'center',
@@ -688,7 +705,8 @@ const RequestsManager = () => {
                   type="primary"
                   icon={<CheckOutlined />}
                   onClick={() => handleAcceptRequest(record)}
-                  className="bg-emerald-600 hover:bg-emerald-700 border-emerald-600 poppins-bold text-xs"
+                  style={{ backgroundColor: '#12467E', borderColor: '#12467E' }}
+                  className="poppins-bold text-xs"
                 >
                   Aceptar
                 </Button>
@@ -887,9 +905,6 @@ const RequestsManager = () => {
               <span className="text-xs uppercase tracking-wider font-bold text-geoterra-orange poppins">
                 Administración • Geociencias
               </span>
-              <Tag className="rounded-full font-semibold text-[11px] bg-blue-50 text-geoterra-blue border-blue-200">
-                {requests.length} Solicitudes
-              </Tag>
             </div>
             <h1 className="text-2xl md:text-3xl poppins-bold text-geoterra-blue m-0 flex items-center gap-2.5">
               <FileTextOutlined className="text-geoterra-blue" /> Gestión de Solicitudes
@@ -897,26 +912,6 @@ const RequestsManager = () => {
             <p className="text-xs md:text-sm text-gray-500 m-0 mt-1 poppins">
               Monitorea, revisa y aprueba solicitudes de investigación ciudadanas y de campo para su incorporación al inventario geotérmico oficial.
             </p>
-          </div>
-
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <Button
-              icon={<QuestionCircleOutlined />}
-              onClick={() => setGuideModalVisible(true)}
-              className="poppins font-medium border-gray-300 text-gray-700 hover:text-geoterra-blue"
-            >
-              Guía de Flujo
-            </Button>
-            <Button
-              type="primary"
-              icon={<ReloadOutlined spin={loading} />}
-              onClick={refreshRequests}
-              loading={loading}
-              style={{ backgroundColor: '#12467E', borderColor: '#12467E' }}
-              className="poppins-bold"
-            >
-              Actualizar
-            </Button>
           </div>
         </div>
 
@@ -1045,47 +1040,56 @@ const RequestsManager = () => {
         {/* ========================================================================= */}
         {/* FILTER & SEARCH BAR                                                       */}
         {/* ========================================================================= */}
-        <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-          <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-            <div className="flex-1 w-full sm:w-auto flex flex-col sm:flex-row gap-3 items-center">
-              <Input
-                placeholder="Buscar por ID, nombre, solicitante o correo..."
-                prefix={<SearchOutlined className="text-gray-400" />}
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                allowClear
-                className="w-full sm:max-w-md rounded-lg py-1.5"
-              />
+        <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+          <PillTabs
+            items={[
+              {
+                key: 'requests',
+                label: 'Solicitudes',
+                icon: <FileTextOutlined />,
+                count: requests.length,
+              },
+            ]}
+            activeKey="requests"
+          />
 
-              <Select
-                value={stateFilter}
-                onChange={(val) => setStateFilter(val)}
-                className="w-full sm:w-48"
-              >
-                <Select.Option value="ALL">Todos los Estados</Select.Option>
-                <Select.Option value="Pendiente">Solo Pendientes</Select.Option>
-                <Select.Option value="Revisión">En Revisión</Select.Option>
-                <Select.Option value="Procesada">Aceptadas / Procesadas</Select.Option>
-              </Select>
-
-              {(searchText || stateFilter !== 'ALL') && (
-                <Button
-                  icon={<ClearOutlined />}
-                  onClick={() => {
-                    setSearchText('');
-                    setStateFilter('ALL');
-                  }}
-                  className="poppins text-xs text-gray-500"
+          <CrudToolbar
+            searchPlaceholder="Buscar por ID, nombre, solicitante o correo..."
+            searchValue={searchText}
+            onSearchChange={setSearchText}
+            filters={
+              <>
+                <Select
+                  value={stateFilter}
+                  onChange={(val) => setStateFilter(val)}
+                  className="w-full sm:w-48"
                 >
-                  Limpiar filtros
-                </Button>
-              )}
-            </div>
+                  <Select.Option value="ALL">Todos los Estados</Select.Option>
+                  <Select.Option value="Pendiente">Solo Pendientes</Select.Option>
+                  <Select.Option value="Revisión">En Revisión</Select.Option>
+                  <Select.Option value="Procesada">Aceptadas / Procesadas</Select.Option>
+                </Select>
 
-            <div className="text-xs text-gray-400 poppins whitespace-nowrap self-end sm:self-center">
-              Mostrando <strong className="text-gray-700">{filteredRequests.length}</strong> de <strong className="text-gray-700">{requests.length}</strong> solicitudes
-            </div>
-          </div>
+                {(searchText || stateFilter !== 'ALL') && (
+                  <Button
+                    icon={<ClearOutlined />}
+                    onClick={() => {
+                      setSearchText('');
+                      setStateFilter('ALL');
+                    }}
+                    className="poppins text-xs text-gray-500"
+                  >
+                    Limpiar filtros
+                  </Button>
+                )}
+              </>
+            }
+            shown={filteredRequests.length}
+            total={requests.length}
+            noun="solicitudes"
+            onReload={refreshRequests}
+            loading={loading}
+          />
 
           {/* ========================================================================= */}
           {/* DATA LIST: TABLE OR MOBILE CARDS                                          */}
@@ -1118,6 +1122,7 @@ const RequestsManager = () => {
                   pageSize: 10,
                   showSizeChanger: true,
                   pageSizeOptions: ['10', '20', '50'],
+                  showTotal: (total) => `Total ${total} solicitudes`,
                   className: 'poppins py-2',
                 }}
                 className="poppins"

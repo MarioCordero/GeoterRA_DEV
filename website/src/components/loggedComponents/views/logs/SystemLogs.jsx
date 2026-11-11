@@ -316,14 +316,14 @@ const SystemLogs = () => {
         <div
           onClick={() => setSelectedLevel(selectedLevel === 'HTTP' ? 'ALL' : 'HTTP')}
           className={`bg-white p-5 rounded-2xl border transition-all cursor-pointer shadow-sm hover:shadow-md ${
-            selectedLevel === 'HTTP' ? 'border-cyan-500 ring-2 ring-cyan-100' : 'border-gray-200'
+            selectedLevel === 'HTTP' ? 'border-[#12467E] ring-2 ring-blue-100' : 'border-gray-200'
           }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
               Peticiones API
             </span>
-            <div className="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-lg">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#12467E] flex items-center justify-center text-lg">
               <SafetyCertificateOutlined />
             </div>
           </div>
@@ -333,7 +333,7 @@ const SystemLogs = () => {
             </span>
             <span className="text-xs text-gray-500 font-medium">Solicitudes</span>
           </div>
-          <div className="mt-2 text-xs text-cyan-700 font-medium flex items-center gap-1">
+          <div className="mt-2 text-xs text-blue-700 font-medium flex items-center gap-1">
             Endpoints REST activos
           </div>
         </div>
@@ -390,8 +390,8 @@ const SystemLogs = () => {
               onClick={() => setSelectedLevel('HTTP')}
               className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                 selectedLevel === 'HTTP'
-                  ? 'bg-cyan-600 text-white'
-                  : 'bg-white text-cyan-700 border border-cyan-200 hover:bg-cyan-50'
+                  ? 'bg-[#12467E] text-white'
+                  : 'bg-white text-blue-700 border border-blue-200 hover:bg-blue-50'
               }`}
             >
               HTTP ({metrics.http})

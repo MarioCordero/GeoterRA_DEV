@@ -317,7 +317,11 @@ const EntityNavigatorPicker = ({
           width: 100,
           render: (_, record) => {
             const isPublic = record.visibility === 1 || record.visibility === true || record.visibility === '1';
-            return isPublic ? <Tag color="green">Pública</Tag> : <Tag color="default">Borrador</Tag>;
+            return isPublic ? (
+              <Tag className="rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border-blue-200">Pública</Tag>
+            ) : (
+              <Tag className="rounded-full text-xs text-gray-500 bg-gray-100 border-gray-200">Borrador</Tag>
+            );
           },
         }
       );

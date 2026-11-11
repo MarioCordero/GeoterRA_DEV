@@ -33,8 +33,12 @@ L.Icon.Default.mergeOptions({
 function RecenterMap({ center }) {
   const map = useMap();
   useEffect(() => {
-    if (center && center[0] && center[1]) {
-      map.setView(center, 15);
+    if (center && typeof center[0] === 'number' && typeof center[1] === 'number' && !isNaN(center[0]) && !isNaN(center[1])) {
+      const timer = setTimeout(() => {
+        map.invalidateSize();
+        map.setView(center, 15);
+      }, 150);
+      return () => clearTimeout(timer);
     }
   }, [center, map]);
   return null;
@@ -208,43 +212,21 @@ const RequestDetails = ({
     return stateValue === 'Pendiente' || stateValue === 'Registrada';
   };
 
-  const renderStateTag = (state) => {
-    const value = state?.value || 'Pendiente';
-    switch (value) {
-      case 'Pendiente':
-      case 'Registrada':
-        return <Tag color="blue" className="px-3 py-1 text-sm font-semibold">{value}</Tag>;
-      case 'En revisión':
-      case 'Verificación de campo':
-      case 'Análisis en laboratorio':
-        return <Tag color="warning" className="px-3 py-1 text-sm font-semibold">{value}</Tag>;
-      case 'Aprobada':
-        return <Tag color="success" className="px-3 py-1 text-sm font-semibold">{value}</Tag>;
-      case 'Rechazada':
-        return <Tag color="error" className="px-3 py-1 text-sm font-semibold">{value}</Tag>;
-      default:
-        return <Tag color="default" className="px-3 py-1 text-sm font-semibold">{value}</Tag>;
-    }
-  };
-
   return (
     <Modal
       title={
-        <div className="flex justify-between items-center py-2 pr-6 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <span className="poppins-bold text-xl text-geoterra-blue">
-              {editMode ? 'Editar Solicitud de Análisis' : `Solicitud: ${requestData?.request_name || ''}`}
-            </span>
-          </div>
-          {!loading && requestData && !editMode && renderStateTag(requestData.current_state)}
+        <div className="py-1 pr-6 border-b border-gray-100">
+          <span className="poppins-bold text-lg sm:text-xl text-geoterra-blue">
+            {editMode ? 'Editar Solicitud de Análisis' : `Solicitud: ${requestData?.request_name || ''}`}
+          </span>
         </div>
       }
       open={visible}
       onCancel={onClose}
       footer={null}
-      width="92vw"
-      style={{ top: 20, maxWidth: '1300px' }}
-      bodyStyle={{ padding: '24px 32px 32px 32px' }}
+      width="96vw"
+      style={{ top: 16, maxWidth: '1150px', margin: '0 auto' }}
+      styles={{ body: { padding: '16px 16px 24px' } }}
       destroyOnClose
     >
       {loading ? (
@@ -257,20 +239,21 @@ const RequestDetails = ({
 
           {/* VIEW MODE */}
           {!editMode && (
-            <div className="space-y-8">
+            <div className="space-y-6">
 
               {/* Top Cards Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
 
                 {/* Solicitante Card */}
                 <Card
-                  title={<div className="flex items-center gap-2 text-geoterra-blue font-bold"><UserOutlined /> Solicitante y Propietario</div>}
+                  title={<div className="flex items-center gap-2 text-geoterra-blue font-bold text-sm sm:text-base"><UserOutlined /> Solicitante y Propietario</div>}
                   className="shadow-sm border border-gray-200 rounded-xl"
+                  styles={{ header: { padding: '12px 16px' }, body: { padding: '16px' } }}
                 >
                   <div className="space-y-3">
                     <div>
                       <p className="text-xs text-gray-500 font-semibold uppercase">Nombre del Titular</p>
-                      <p className="font-medium text-base text-gray-800">{requestData.owner_name || 'No especificado'}</p>
+                      <p className="font-medium text-base text-gray-800 break-words">{requestData.owner_name || 'No especificado'}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 font-semibold uppercase">Relación con Propietario</p>
@@ -278,7 +261,7 @@ const RequestDetails = ({
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 font-semibold uppercase">Correo Electrónico</p>
-                      <p className="font-medium text-gray-800">{requestData.owner_email || 'No especificado'}</p>
+                      <p className="font-medium text-gray-800 break-all">{requestData.owner_email || 'No especificado'}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 font-semibold uppercase">Número Telefónico</p>
@@ -289,8 +272,9 @@ const RequestDetails = ({
 
                 {/* Características Card */}
                 <Card
-                  title={<div className="flex items-center gap-2 text-geoterra-blue font-bold"><ExperimentOutlined /> Características del Sitio</div>}
+                  title={<div className="flex items-center gap-2 text-geoterra-blue font-bold text-sm sm:text-base"><ExperimentOutlined /> Características del Sitio</div>}
                   className="shadow-sm border border-gray-200 rounded-xl"
+                  styles={{ header: { padding: '12px 16px' }, body: { padding: '16px' } }}
                 >
                   <div className="space-y-3">
                     <div>
@@ -302,10 +286,18 @@ const RequestDetails = ({
                       <p className="font-medium text-gray-800">{requestData.temperature_sensation || 'Sin especificar'}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 font-semibold uppercase">Burbujeo Activo</p>
-                      <p className="font-medium">
-                        {requestData.bubbles ? <Tag color="success">Sí (Activo)</Tag> : <Tag color="default">No</Tag>}
-                      </p>
+                      <p className="text-xs text-gray-500 font-semibold uppercase mb-1">Burbujeo Activo</p>
+                      <div>
+                        {requestData.bubbles ? (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-geoterra-blue border border-blue-200">
+                            Sí (Activo)
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200">
+                            No
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 font-semibold uppercase">Fecha de Registro</p>
@@ -324,8 +316,9 @@ const RequestDetails = ({
 
                 {/* Ubicación Card */}
                 <Card
-                  title={<div className="flex items-center gap-2 text-geoterra-blue font-bold"><EnvironmentFilled /> Ubicación Geográfica</div>}
+                  title={<div className="flex items-center gap-2 text-geoterra-blue font-bold text-sm sm:text-base"><EnvironmentFilled /> Ubicación Geográfica</div>}
                   className="shadow-sm border border-gray-200 rounded-xl"
+                  styles={{ header: { padding: '12px 16px' }, body: { padding: '16px' } }}
                 >
                   <div className="space-y-3">
                     <div>
@@ -338,11 +331,11 @@ const RequestDetails = ({
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 font-semibold uppercase">Dirección Exacta</p>
-                      <p className="font-medium text-gray-800">{requestData.exact_address || 'Sin dirección exacta'}</p>
+                      <p className="font-medium text-gray-800 break-words">{requestData.exact_address || 'Sin dirección exacta'}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 font-semibold uppercase">Coordenadas GPS</p>
-                      <p className="font-mono text-sm text-blue-600 font-bold">
+                      <p className="font-mono text-sm text-geoterra-blue font-bold">
                         {latLng.lat && latLng.lng
                           ? `${latLng.lat.toFixed(6)}, ${latLng.lng.toFixed(6)}`
                           : 'No registradas'}
@@ -354,7 +347,10 @@ const RequestDetails = ({
 
               {/* Details Remarks Section */}
               {requestData.details && (
-                <Card className="shadow-sm border border-gray-200 rounded-xl">
+                <Card
+                  className="shadow-sm border border-gray-200 rounded-xl"
+                  styles={{ header: { padding: '12px 16px' }, body: { padding: '16px' } }}
+                >
                   <p className="text-xs text-gray-500 font-semibold uppercase mb-2">Detalles y Observaciones Adicionales</p>
                   <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
                     {requestData.details}
@@ -364,11 +360,14 @@ const RequestDetails = ({
 
               {/* State History Timeline Section */}
               {statesHistory && statesHistory.length > 0 && (
-                <Card className="shadow-sm border border-gray-200 rounded-xl">
+                <Card
+                  className="shadow-sm border border-gray-200 rounded-xl"
+                  styles={{ header: { padding: '12px 16px' }, body: { padding: '16px' } }}
+                >
                   <p className="text-xs text-gray-500 font-semibold uppercase mb-4">Historial de Estados y Seguimiento</p>
                   <Timeline
                     items={statesHistory.map((st) => ({
-                      color: st.value === 'Aprobada' ? 'green' : st.value === 'Rechazada' ? 'red' : st.value === 'Revisión' ? 'orange' : 'blue',
+                      color: st.value === 'Aprobada' ? '#12467E' : st.value === 'Rechazada' ? '#dc2626' : st.value === 'Revisión' ? '#F39C29' : '#12467E',
                       children: (
                         <div>
                           <p className="font-semibold text-sm m-0 text-gray-800">{st.value}</p>
@@ -384,12 +383,12 @@ const RequestDetails = ({
               )}
 
               {/* Full Width View Map Preview */}
-              <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+              <div className="bg-white p-3 sm:p-4 rounded-xl border border-gray-200 shadow-sm">
                 <p className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
                   <EnvironmentOutlined /> Mapa de la Manifestación
                 </p>
                 {latLng.lat && latLng.lng ? (
-                  <div className="h-96 w-full rounded-lg overflow-hidden border border-gray-200 z-0 relative">
+                  <div className="h-64 sm:h-96 w-full rounded-lg overflow-hidden border border-gray-200 z-0 relative">
                     <MapContainer
                       center={[latLng.lat, latLng.lng]}
                       zoom={15}
@@ -410,14 +409,14 @@ const RequestDetails = ({
                     </MapContainer>
                   </div>
                 ) : (
-                  <div className="h-48 flex items-center justify-center bg-gray-50 rounded-lg text-gray-400">
+                  <div className="h-40 sm:h-48 flex items-center justify-center bg-gray-50 rounded-lg text-gray-400 text-sm">
                     Sin coordenadas registradas para mostrar mapa
                   </div>
                 )}
               </div>
 
               {/* View Action Footer */}
-              <div className="pt-4 flex justify-between items-center border-t border-gray-200">
+              <div className="pt-4 flex flex-col-reverse sm:flex-row sm:justify-between items-stretch sm:items-center gap-3 border-t border-gray-200">
                 <Popconfirm
                   title="¿Está seguro de eliminar esta solicitud?"
                   description="Esta acción no se puede deshacer."
@@ -426,19 +425,28 @@ const RequestDetails = ({
                   cancelText="Cancelar"
                   okButtonProps={{ danger: true, loading: deleting }}
                 >
-                  <Button danger type="primary" size="large" icon={<DeleteOutlined />} loading={deleting}>
+                  <Button danger type="primary" size="large" icon={<DeleteOutlined />} loading={deleting} className="w-full sm:w-auto">
                     Eliminar
                   </Button>
                 </Popconfirm>
 
-                <Space size="large">
-                  <Button size="large" onClick={onClose}>Cerrar</Button>
+                <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+                  <Button size="large" onClick={onClose} className="flex-1 sm:flex-initial">
+                    Cerrar
+                  </Button>
                   {isEditable() && (
-                    <Button type="primary" size="large" icon={<EditOutlined />} onClick={handleEditClick}>
+                    <Button
+                      type="primary"
+                      size="large"
+                      icon={<EditOutlined />}
+                      onClick={handleEditClick}
+                      style={{ backgroundColor: '#12467E', borderColor: '#12467E' }}
+                      className="poppins-bold shadow-sm flex-1 sm:flex-initial"
+                    >
                       Editar Solicitud
                     </Button>
                   )}
-                </Space>
+                </div>
               </div>
             </div>
           )}
@@ -448,15 +456,15 @@ const RequestDetails = ({
             <Form
               form={form}
               layout="vertical"
-              className="space-y-8"
+              className="space-y-6"
               requiredMark="optional"
             >
               {/* Section 1: Solicitante */}
-              <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
-                <h3 className="text-lg font-bold text-geoterra-blue border-b border-gray-100 pb-3 flex items-center gap-2">
+              <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                <h3 className="text-base sm:text-lg font-bold text-geoterra-blue border-b border-gray-100 pb-3 flex items-center gap-2">
                   <UserOutlined /> Datos del Solicitante
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   <Form.Item
                     name="ownerName"
                     label="Nombre del Titular"
@@ -496,11 +504,11 @@ const RequestDetails = ({
               </div>
 
               {/* Section 2: Manifestación */}
-              <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
-                <h3 className="text-lg font-bold text-geoterra-blue border-b border-gray-100 pb-3 flex items-center gap-2">
+              <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                <h3 className="text-base sm:text-lg font-bold text-geoterra-blue border-b border-gray-100 pb-3 flex items-center gap-2">
                   <ExperimentOutlined /> Características de la Manifestación
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
                   <Form.Item name="usoActual" label="Uso Actual del Terreno">
                     <Select size="large" options={[
                       { value: 'Residencial', label: 'Residencial' },
@@ -522,14 +530,14 @@ const RequestDetails = ({
                     ]} />
                   </Form.Item>
                   <Form.Item name="burbujeo" label="Burbujeo Activo">
-                    <Radio.Group size="large" className="pt-2">
+                    <Radio.Group size="large" className="pt-1 flex flex-wrap gap-4">
                       <Radio value="1">Sí (Activo)</Radio>
                       <Radio value="0">No</Radio>
                     </Radio.Group>
                   </Form.Item>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 pt-2">
                   <Form.Item name="direccionExacta" label="Dirección Exacta">
                     <Input.TextArea rows={3} placeholder="Ej. De la iglesia católica 200m oeste..." />
                   </Form.Item>
@@ -541,8 +549,8 @@ const RequestDetails = ({
               </div>
 
               {/* Section 3: GPS Coordinates & Map Picker (Embedded in Edit Mode) */}
-              <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
-                <h3 className="text-lg font-bold text-geoterra-blue border-b border-gray-100 pb-3 flex items-center gap-2">
+              <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                <h3 className="text-base sm:text-lg font-bold text-geoterra-blue border-b border-gray-100 pb-3 flex items-center gap-2">
                   <EnvironmentFilled /> Geolocalización GPS
                 </h3>
 
@@ -550,21 +558,25 @@ const RequestDetails = ({
                   latLng={latLng}
                   onCoordinatesChange={(coords) => setLatLng(coords)}
                   title="Coordenadas GPS"
-                  mapHeight="350px"
+                  mapHeight="300px"
                   showApplyButton={false}
                   showClearButton={true}
                 />
               </div>
 
               {/* Edit Mode Actions Footer */}
-              <div className="pt-4 flex justify-end gap-4 border-t border-gray-200">
-                <Button size="large" onClick={handleCancelEdit}>Cancelar</Button>
+              <div className="pt-4 flex flex-col-reverse sm:flex-row justify-end gap-3 border-t border-gray-200">
+                <Button size="large" onClick={handleCancelEdit} className="w-full sm:w-auto">
+                  Cancelar
+                </Button>
                 <Button
                   type="primary"
                   size="large"
                   icon={<SaveOutlined />}
                   onClick={handleSave}
                   loading={saving}
+                  style={{ backgroundColor: '#12467E', borderColor: '#12467E' }}
+                  className="poppins-bold shadow-sm w-full sm:w-auto"
                 >
                   Guardar Cambios
                 </Button>

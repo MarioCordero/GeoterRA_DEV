@@ -33,12 +33,15 @@ import {
   EnvironmentOutlined, PlusOutlined, ReloadOutlined, EyeOutlined, EyeInvisibleOutlined,
   CheckCircleOutlined, EditOutlined, DeleteOutlined, InfoCircleOutlined, SearchOutlined,
   RocketOutlined, ExperimentOutlined, BarChartOutlined, FileSearchOutlined, BulbOutlined,
-  CompassOutlined, StarOutlined, StarFilled, CommentOutlined,
+  CompassOutlined, StarOutlined, StarFilled, CommentOutlined, FilterOutlined, FileTextOutlined,
 } from '@ant-design/icons';
 import MapCoordinatePicker from '../../../common/MapCoordinatePicker';
 import CommentsPanel from '../../../common/CommentsPanel';
 import { renderDateWithProse } from '../../../../utils/dateFormatter';
 import { usePermissions } from '../../../../hooks/usePermissions';
+import PillTabs from '../../../common/crud/PillTabs';
+import CrudToolbar from '../../../common/crud/CrudToolbar';
+import { CodeBadge, NameCell, DateCell, SystemIdCell, RowActions } from '../../../common/crud/cells';
 import {
   geomanifestationsIndex,
   geomanifestationsAdminIndex,
@@ -411,7 +414,7 @@ const GeomanifeStationsManager = () => {
         throw new Error(resReport.error || 'Error al guardar el georeporte');
       }
 
-      message.success(`Georeporte ${editingGeoreport ? 'actualizado' : 'asociado'} exitosamente 📋`);
+      message.success(`Georeporte ${editingGeoreport ? 'actualizado' : 'asociado'} exitosamente`);
       setGeoreportModalVisible(false);
       setEditingGeoreport(null);
       georeportForm.resetFields();
@@ -505,7 +508,7 @@ const GeomanifeStationsManager = () => {
       }
 
       if (res.ok) {
-        message.success(editingInsituTest ? 'Prueba In-Situ actualizada exitosamente 🌿' : 'Prueba In-Situ registrada exitosamente🌿');
+        message.success(editingInsituTest ? 'Prueba In-Situ actualizada exitosamente' : 'Prueba In-Situ registrada exitosamente');
         setQuickInsituModalVisible(false);
         setEditingInsituTest(null);
         quickInsituForm.resetFields();
@@ -594,7 +597,7 @@ const GeomanifeStationsManager = () => {
       }
 
       if (res.ok) {
-        message.success(editingInlabTest ? 'Prueba de Laboratorio actualizada exitosamente 🧪' : 'Prueba de Laboratorio registrada exitosamente 🧪');
+        message.success(editingInlabTest ? 'Prueba de Laboratorio actualizada exitosamente' : 'Prueba de Laboratorio registrada exitosamente');
         setQuickInlabModalVisible(false);
         setEditingInlabTest(null);
         quickInlabForm.resetFields();
@@ -693,7 +696,7 @@ const GeomanifeStationsManager = () => {
     try {
       const res = await geomanifestationsAdminSetVisibility(id, { visibility: true });
       if (res.ok) {
-        message.success(`🚀 "${record.name}" publicada exitosamente en el mapa geotérmico`);
+        message.success(`"${record.name}" publicada exitosamente en el mapa geotérmico`);
         loadManifestations();
       } else {
         message.error(res.error || 'Error al publicar en el mapa');
@@ -759,7 +762,7 @@ const GeomanifeStationsManager = () => {
         throw new Error(result.error || 'Error al guardar la geomanifestación');
       }
 
-      message.success(`Geomanifestación ${editingItem ? 'actualizada' : 'registrada en borrador'} correctamente 📍`);
+      message.success(`Geomanifestación ${editingItem ? 'actualizada' : 'registrada en borrador'} correctamente`);
       handleModalClose();
       loadManifestations();
     } catch (err) {
@@ -781,22 +784,22 @@ const GeomanifeStationsManager = () => {
     });
   };
 
+  const normalDrafts = acceptedRequestsManifestations.filter(item => !item.field_trip_id);
+  const tripDrafts = acceptedRequestsManifestations.filter(item => Boolean(item.field_trip_id));
+
   const filteredPublicList = filterList(manifestations);
-  const filteredDraftList = acceptedRequestsManifestations.filter(item => {
-    const matchesSearch = !searchText ||
-      (item.name && item.name.toLowerCase().includes(searchText.toLowerCase())) ||
-      (item.geomanifestation_id && item.geomanifestation_id.toLowerCase().includes(searchText.toLowerCase())) ||
-      (item.description && item.description.toLowerCase().includes(searchText.toLowerCase()));
+  const filteredNormalDrafts = filterList(normalDrafts);
+  const filteredTripDrafts = tripDrafts.filter(item => {
+    const term = searchText ? searchText.toLowerCase() : '';
+    const matchesSearch = !term ||
+      (item.name && item.name.toLowerCase().includes(term)) ||
+      (item.geomanifestation_id && String(item.geomanifestation_id).toLowerCase().includes(term)) ||
+      (item.description && item.description.toLowerCase().includes(term));
 
     let matchesTrip = true;
     if (selectedFieldTripFilter && selectedFieldTripFilter !== 'all') {
-      if (selectedFieldTripFilter === 'none') {
-        matchesTrip = !item.field_trip_id;
-      } else {
-        matchesTrip = String(item.field_trip_id) === String(selectedFieldTripFilter);
-      }
+      matchesTrip = String(item.field_trip_id) === String(selectedFieldTripFilter);
     }
-
     return matchesSearch && matchesTrip;
   });
 
@@ -844,7 +847,11 @@ const GeomanifeStationsManager = () => {
       render: (_, record) => {
         const temp = record.insitu_test?.temperature ?? record.temperature;
         return temp !== undefined && temp !== null ? (
-          <Tag color={temp > 50 ? 'red' : temp > 30 ? 'orange' : 'blue'}>
+          <Tag className={`rounded-full text-xs font-semibold ${
+            temp > 50
+              ? 'bg-orange-50 text-orange-700 border-orange-200'
+              : 'bg-blue-50 text-[#12467E] border-blue-200'
+          }`}>
             {temp}°C
           </Tag>
         ) : <span className="text-gray-400">Sin datos</span>;
@@ -855,18 +862,22 @@ const GeomanifeStationsManager = () => {
       key: 'georeport_status',
       render: (_, record) => {
         return record.hasGeoreport ? (
-          <Tag color="cyan" icon={<CheckCircleOutlined />}>
+          <Tag className="rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border-blue-200" icon={<CheckCircleOutlined />}>
             Georeporte Vigente
           </Tag>
         ) : (
-          <Tag color="default">Sin Georeporte</Tag>
+          <Tag className="rounded-full text-xs text-gray-500 bg-gray-100 border-gray-200">Sin Georeporte</Tag>
         );
       },
     },
     {
       title: 'Estado Visibilidad',
       key: 'visibility',
-      render: () => <Tag icon={<EyeOutlined />} color="success">Pública en Mapa</Tag>,
+      render: () => (
+        <Tag icon={<EyeOutlined />} className="rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border-blue-200">
+          Pública en Mapa
+        </Tag>
+      ),
     },
     {
       title: 'Acciones',
@@ -887,7 +898,7 @@ const GeomanifeStationsManager = () => {
               size="small"
               icon={<EyeInvisibleOutlined />}
               onClick={(e) => e.stopPropagation()}
-              style={{ backgroundColor: '#fa8c16', color: '#fff', borderColor: '#fa8c16' }}
+              className="text-orange-700 bg-orange-50 border-orange-200 hover:bg-orange-100"
             >
               A Borrador
             </Button>
@@ -980,7 +991,7 @@ const GeomanifeStationsManager = () => {
           <Space direction="vertical" size={2}>
             {hasReport ? (
               <div>
-                <Tag color="green" icon={<CheckCircleOutlined />}>
+                <Tag className="rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border-blue-200" icon={<CheckCircleOutlined />}>
                   Georeporte Vigente Configurado
                 </Tag>
                 {temp !== undefined && temp !== null && (
@@ -988,7 +999,9 @@ const GeomanifeStationsManager = () => {
                 )}
               </div>
             ) : (
-              <Tag color="orange">Falta Georeporte Asociado</Tag>
+              <Tag className="rounded-full text-xs font-semibold bg-orange-50 text-orange-700 border-orange-200">
+                Falta Georeporte Asociado
+              </Tag>
             )}
           </Space>
         );
@@ -999,9 +1012,13 @@ const GeomanifeStationsManager = () => {
       key: 'ready_status',
       render: (_, record) => {
         return record.hasGeoreport ? (
-          <Tag color="success">Listo para Mapa</Tag>
+          <Tag className="rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border-blue-200">
+            Listo para Mapa
+          </Tag>
         ) : (
-          <Tag color="warning">Requiere Georeporte</Tag>
+          <Tag className="rounded-full text-xs font-semibold bg-orange-50 text-orange-700 border-orange-200">
+            Requiere Georeporte
+          </Tag>
         );
       },
     },
@@ -1028,8 +1045,8 @@ const GeomanifeStationsManager = () => {
               disabled={!record.hasGeoreport}
               onClick={(e) => e.stopPropagation()}
               style={{
-                backgroundColor: record.hasGeoreport ? '#52c41a' : undefined,
-                borderColor: record.hasGeoreport ? '#52c41a' : undefined,
+                backgroundColor: record.hasGeoreport ? '#12467E' : undefined,
+                borderColor: record.hasGeoreport ? '#12467E' : undefined,
                 fontWeight: 'bold',
               }}
             >
@@ -1069,133 +1086,6 @@ const GeomanifeStationsManager = () => {
     },
   ];
 
-  const tabItems = [
-    {
-      key: '1',
-      label: (
-        <span>
-          <EnvironmentOutlined />
-          Geomanifestaciones Públicas ({manifestations.length})
-        </span>
-      ),
-      children: (
-        <div>
-          <Alert
-            message="💡 Jerarquía Geocientífica"
-            description="Toca o haz clic sobre cualquier geomanifestación para gestionar sus Georeportes. Cada georeporte asocia una prueba de campo (in-situ) y una prueba de laboratorio (geoquímica)."
-            type="info"
-            showIcon
-            style={{ marginBottom: 16, borderRadius: 8 }}
-          />
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
-            <Input
-              placeholder="Buscar por nombre, ID o descripción..."
-              prefix={<SearchOutlined style={{ color: '#aaa' }} />}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              style={{ width: 340 }}
-              allowClear
-            />
-          </div>
-
-          <Table
-            dataSource={filteredPublicList}
-            columns={columnsPublic}
-            rowKey={(item) => item.geomanifestation_id || item.id}
-            onRow={(record) => ({
-              onClick: () => handleOpenGeoDrawer(record, 'georeports'),
-              style: { cursor: 'pointer' },
-            })}
-            pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100'] }}
-            locale={{ emptyText: 'No hay geomanifestaciones públicas publicadas en el mapa' }}
-          />
-        </div>
-      ),
-    },
-    {
-      key: '2',
-      label: (
-        <span>
-          <CheckCircleOutlined />
-          Solicitudes Aceptadas / Borradores ({acceptedRequestsManifestations.length})
-        </span>
-      ),
-      children: (
-        <div>
-          <div style={{ marginBottom: 16, background: '#e6f7ff', padding: '12px 16px', borderRadius: 8, border: '1px solid #91d5ff' }}>
-            <Text strong style={{ color: '#0050b3' }}>💡 Flujo de Preparación Jerárquico para el Mapa:</Text>
-            <Paragraph style={{ margin: 0, fontSize: '12px', color: '#002766' }}>
-              Para publicar una geomanifestación en el mapa, debe asociarse a un <strong>Georeporte</strong> que integre tanto la <strong>Prueba In-Situ</strong> como la <strong>Prueba de Laboratorio</strong>.
-            </Paragraph>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-              <Input
-                placeholder="Buscar borradores por nombre, ID o descripción..."
-                prefix={<SearchOutlined style={{ color: '#aaa' }} />}
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                style={{ width: 300 }}
-                allowClear
-              />
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fafafa', padding: '4px 12px', borderRadius: 6, border: '1px solid #d9d9d9' }}>
-                <CompassOutlined style={{ color: '#fa8c16' }} />
-                <span style={{ fontSize: '13px', fontWeight: 500, color: '#595959' }}>
-                  Mostrar borradores de:
-                </span>
-                <Select
-                  value={selectedFieldTripFilter}
-                  onChange={(val) => setSelectedFieldTripFilter(val)}
-                  style={{ minWidth: 260 }}
-                  placeholder="Seleccionar gira"
-                >
-                  <Select.Option value="all">Todas las giras ({acceptedRequestsManifestations.length})</Select.Option>
-                  <Select.Option value="none">Sin gira asignada ({acceptedRequestsManifestations.filter(d => !d.field_trip_id).length})</Select.Option>
-                  {fieldTripsList.map((trip) => {
-                    const tripId = trip.field_trip_id || trip.id;
-                    const tripName = trip.field_trip_name || trip.name || `Gira #${tripId}`;
-                    const dateStr = trip.field_trip_start_date || trip.start_date || trip.field_trip_scheduled_date;
-                    const count = acceptedRequestsManifestations.filter(d => String(d.field_trip_id) === String(tripId)).length;
-                    return (
-                      <Select.Option key={tripId} value={tripId}>
-                        {tripName} {dateStr ? `(${dateStr})` : ''} ({count})
-                      </Select.Option>
-                    );
-                  })}
-                </Select>
-              </div>
-            </div>
-
-            {selectedFieldTripFilter && selectedFieldTripFilter !== 'all' && (
-              <Tag color="orange" closable onClose={() => setSelectedFieldTripFilter('all')} style={{ margin: 0, padding: '4px 8px', fontSize: '12px' }}>
-                Filtrado por:{' '}
-                {selectedFieldTripFilter === 'none'
-                  ? 'Sin gira asignada'
-                  : (fieldTripsList.find(t => String(t.field_trip_id || t.id) === String(selectedFieldTripFilter))?.field_trip_name || `Gira #${selectedFieldTripFilter}`)}
-                {' '}({filteredDraftList.length} de {acceptedRequestsManifestations.length})
-              </Tag>
-            )}
-          </div>
-
-          <Table
-            dataSource={filteredDraftList}
-            columns={columnsDrafts}
-            rowKey={(item) => item.geomanifestation_id || item.id}
-            onRow={(record) => ({
-              onClick: () => handleOpenGeoDrawer(record, 'georeports'),
-              style: { cursor: 'pointer' },
-            })}
-            pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100'] }}
-            locale={{ emptyText: 'No hay solicitudes aceptadas o borradores pendientes de estudio' }}
-          />
-        </div>
-      ),
-    },
-  ];
-
   return (
     <div className="w-full p-4 md:p-8 space-y-6 poppins">
       {/* ========================================================================= */}
@@ -1207,9 +1097,6 @@ const GeomanifeStationsManager = () => {
             <span className="text-xs uppercase tracking-wider font-bold text-geoterra-orange poppins">
               Geociencias • Inventario Geotérmico
             </span>
-            <Tag className="rounded-full font-semibold text-[11px] bg-blue-50 text-geoterra-blue border-blue-200">
-              {manifestations.length + acceptedRequestsManifestations.length} Registros
-            </Tag>
           </div>
           <h1 className="text-2xl md:text-3xl poppins-bold text-geoterra-blue m-0 flex items-center gap-2.5">
             <EnvironmentOutlined className="text-geoterra-blue" /> Gestión de Geomanifestaciones
@@ -1218,124 +1105,285 @@ const GeomanifeStationsManager = () => {
             Inventario geoquímico, georeportes consolidados, mediciones geotermales y publicación cartográfica oficial.
           </p>
         </div>
-
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <Button
-            icon={<ReloadOutlined spin={loading} />}
-            onClick={() => loadManifestations()}
-            loading={loading}
-            className="poppins font-medium border-gray-300"
-          >
-            Actualizar
-          </Button>
-        </div>
       </div>
 
       {/* ========================================================================= */}
       {/* METRICS DASHBOARD                                                         */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Total */}
+        {/* Total Sitios */}
         <div
           onClick={() => setActiveTab('1')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${activeTab === '1'
-            ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
-            : 'border-gray-200 shadow-sm hover:border-gray-300'
-            }`}
+          className="cursor-pointer bg-white p-5 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Sitios</span>
-            <div className="w-9 h-9 rounded-lg bg-blue-50 text-geoterra-blue flex items-center justify-center text-base">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-geoterra-blue flex items-center justify-center text-lg">
               <EnvironmentOutlined />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold poppins text-gray-900">
+            <span className="text-3xl font-bold poppins text-gray-800">
               {manifestations.length + acceptedRequestsManifestations.length}
             </span>
-            <span className="text-xs text-gray-400">sitios</span>
+            <span className="text-xs text-gray-500 font-medium">sitios</span>
           </div>
-          <div className="mt-2 text-xs text-gray-500">Públicas y en estudio</div>
+          <div className="mt-2 text-xs text-blue-700 font-medium flex items-center gap-1">
+            <CheckCircleOutlined /> Catálogo integral
+          </div>
         </div>
 
-        {/* Publicas en Mapa */}
+        {/* Publicas en Mapa (Tab 1) */}
         <div
           onClick={() => setActiveTab('1')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${activeTab === '1'
-            ? 'border-emerald-400 shadow-md ring-2 ring-emerald-100'
-            : 'border-gray-200 shadow-sm hover:border-gray-300'
+          className={`cursor-pointer bg-white p-5 rounded-2xl border transition-all shadow-sm hover:shadow-md ${activeTab === '1'
+            ? 'border-[#12467E] ring-2 ring-blue-100'
+            : 'border-gray-200'
             }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Públicas en Mapa</span>
-            <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-base">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Públicas en Mapa</span>
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#12467E] flex items-center justify-center text-lg">
               <EyeOutlined />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold poppins text-emerald-900">{manifestations.length}</span>
-            <span className="text-xs text-emerald-600">visibles</span>
+            <span className="text-3xl font-bold poppins text-gray-800">{manifestations.length}</span>
+            <span className="text-xs text-gray-500 font-medium">visibles</span>
           </div>
-          <div className="mt-2 text-xs text-emerald-700 font-medium">Publicadas oficialmente</div>
+          <div className="mt-2 text-xs text-blue-700 font-medium flex items-center gap-1">
+            <CheckCircleOutlined /> Publicadas oficialmente
+          </div>
         </div>
 
-        {/* Borradores */}
+        {/* Solicitudes Generales (Tab 2) */}
         <div
           onClick={() => setActiveTab('2')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${activeTab === '2'
-            ? 'border-amber-400 shadow-md ring-2 ring-amber-100'
-            : 'border-gray-200 shadow-sm hover:border-gray-300'
+          className={`cursor-pointer bg-white p-5 rounded-2xl border transition-all shadow-sm hover:shadow-md ${activeTab === '2'
+            ? 'border-[#12467E] ring-2 ring-blue-100'
+            : 'border-gray-200'
             }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">Borradores / En Estudio</span>
-            <div className="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-base">
-              <ExperimentOutlined />
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Solicitudes Generales</span>
+            <div className="w-10 h-10 rounded-xl bg-orange-50 text-geoterra-orange flex items-center justify-center text-lg">
+              <FileTextOutlined />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold poppins text-amber-900">{acceptedRequestsManifestations.length}</span>
-            <span className="text-xs text-amber-600">en preparación</span>
+            <span className="text-3xl font-bold poppins text-gray-800">{normalDrafts.length}</span>
+            <span className="text-xs text-gray-500 font-medium">en preparación</span>
           </div>
-          <div className="mt-2 text-xs text-amber-700 font-medium">Requieren completar georeporte</div>
+          <div className="mt-2 text-xs text-orange-700 font-medium flex items-center gap-1">
+            <FilterOutlined /> Sin gira asignada
+          </div>
         </div>
 
-        {/* Listas para Publicar */}
+        {/* Puntos de Giras de Campo (Tab 3) */}
         <div
-          onClick={() => setActiveTab('2')}
-          className="cursor-pointer bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:border-blue-300 transition-all"
+          onClick={() => setActiveTab('3')}
+          className={`cursor-pointer bg-white p-5 rounded-2xl border transition-all shadow-sm hover:shadow-md ${activeTab === '3'
+            ? 'border-[#12467E] ring-2 ring-blue-100'
+            : 'border-gray-200'
+            }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider">Listas para Publicar</span>
-            <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-base">
-              <RocketOutlined />
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Puntos de Giras</span>
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#12467E] flex items-center justify-center text-lg">
+              <CompassOutlined />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold poppins text-blue-900">
-              {acceptedRequestsManifestations.filter((d) => d.hasGeoreport).length}
+            <span className="text-3xl font-bold poppins text-gray-800">
+              {tripDrafts.length}
             </span>
-            <span className="text-xs text-blue-600">con georeporte</span>
+            <span className="text-xs text-gray-500 font-medium">en expedición</span>
           </div>
-          <div className="mt-2 text-xs text-blue-700 font-medium">Listas para subir al mapa</div>
+          <div className="mt-2 text-xs text-blue-700 font-medium flex items-center gap-1">
+            <CheckCircleOutlined /> Vinculados a giras
+          </div>
         </div>
       </div>
 
       {/* ========================================================================= */}
       {/* DATA TABS CARD                                                            */}
       {/* ========================================================================= */}
-      <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+        <PillTabs
+          items={[
+            { key: '1', label: 'Geomanifestaciones Públicas', icon: <EnvironmentOutlined />, count: manifestations.length },
+            { key: '2', label: 'Solicitudes Generales', icon: <FileTextOutlined />, count: normalDrafts.length },
+            { key: '3', label: 'Puntos de Giras de Campo', icon: <CompassOutlined />, count: tripDrafts.length },
+          ]}
+          activeKey={activeTab}
+          onChange={setActiveTab}
+        />
+
         {loading ? (
           <div className="text-center py-16">
             <Spin size="large" tip="Cargando geomanifestaciones..." />
           </div>
         ) : (
-          <Tabs
-            activeKey={activeTab}
-            onChange={setActiveTab}
-            className="poppins"
-            items={tabItems}
-          />
+          <>
+            {activeTab === '1' && (
+              <div className="space-y-4">
+                <Alert
+                  message="Jerarquía Geocientífica"
+                  description="Toca o haz clic sobre cualquier geomanifestación para gestionar sus Georeportes. Cada georeporte asocia una prueba de campo (in-situ) y una prueba de laboratorio (geoquímica)."
+                  type="info"
+                  showIcon
+                  className="rounded-xl border-blue-200"
+                />
+
+                <CrudToolbar
+                  searchPlaceholder="Buscar por nombre, ID o descripción..."
+                  searchValue={searchText}
+                  onSearchChange={setSearchText}
+                  shown={filteredPublicList.length}
+                  total={manifestations.length}
+                  noun="públicas"
+                  onReload={loadManifestations}
+                  loading={loading}
+                />
+
+                <Table
+                  dataSource={filteredPublicList}
+                  columns={columnsPublic}
+                  rowKey={(item) => item.geomanifestation_id || item.id}
+                  onRow={(record) => ({
+                    onClick: () => handleOpenGeoDrawer(record, 'georeports'),
+                    style: { cursor: 'pointer' },
+                  })}
+                  pagination={{
+                    pageSize: 10,
+                    showSizeChanger: true,
+                    pageSizeOptions: ['10', '20', '50', '100'],
+                    showTotal: (total) => `Total ${total} geomanifestaciones`,
+                  }}
+                  className="poppins border border-gray-100 rounded-xl overflow-hidden"
+                  locale={{ emptyText: 'No hay geomanifestaciones públicas publicadas en el mapa' }}
+                />
+              </div>
+            )}
+
+            {activeTab === '2' && (
+              <div className="space-y-4">
+                <div className="bg-blue-50/60 p-3.5 rounded-xl border border-blue-100">
+                  <span className="font-bold text-xs uppercase tracking-wider text-geoterra-blue block mb-1">
+                    Flujo de Preparación para el Mapa • Solicitudes Ciudadanas y Generales
+                  </span>
+                  <p className="m-0 text-xs text-gray-600">
+                    Solicitudes independientes recibidas. Para publicar una geomanifestación en el mapa, debe asociarse a un <strong>Georeporte</strong> que integre tanto la <strong>Prueba In-Situ</strong> como la <strong>Prueba de Laboratorio</strong>.
+                  </p>
+                </div>
+
+                <CrudToolbar
+                  searchPlaceholder="Buscar solicitudes por nombre, ID o descripción..."
+                  searchValue={searchText}
+                  onSearchChange={setSearchText}
+                  shown={filteredNormalDrafts.length}
+                  total={normalDrafts.length}
+                  noun="solicitudes generales"
+                  onReload={loadManifestations}
+                  loading={loading}
+                />
+
+                <Table
+                  dataSource={filteredNormalDrafts}
+                  columns={columnsDrafts}
+                  rowKey={(item) => item.geomanifestation_id || item.id}
+                  onRow={(record) => ({
+                    onClick: () => handleOpenGeoDrawer(record, 'georeports'),
+                    style: { cursor: 'pointer' },
+                  })}
+                  pagination={{
+                    pageSize: 10,
+                    showSizeChanger: true,
+                    pageSizeOptions: ['10', '20', '50', '100'],
+                    showTotal: (total) => `Total ${total} solicitudes generales`,
+                  }}
+                  className="poppins border border-gray-100 rounded-xl overflow-hidden"
+                  locale={{ emptyText: 'No hay solicitudes generales o independientes pendientes de estudio' }}
+                />
+              </div>
+            )}
+
+            {activeTab === '3' && (
+              <div className="space-y-4">
+                <div className="bg-orange-50/60 p-3.5 rounded-xl border border-orange-100">
+                  <span className="font-bold text-xs uppercase tracking-wider text-geoterra-orange block mb-1">
+                    Operaciones de Campo • Puntos Asignados o Recolectados en Giras
+                  </span>
+                  <p className="m-0 text-xs text-gray-600">
+                    Puntos vinculados a giras científicas operativas. Puedes filtrar por gira específica o asociar un georeporte para completar el flujo oficial hacia el mapa.
+                  </p>
+                </div>
+
+                <CrudToolbar
+                  searchPlaceholder="Buscar puntos de gira por nombre o ID..."
+                  searchValue={searchText}
+                  onSearchChange={setSearchText}
+                  filters={
+                    <div className="flex items-center gap-2">
+                      <CompassOutlined className="text-geoterra-orange" />
+                      <Select
+                        value={selectedFieldTripFilter}
+                        onChange={(val) => setSelectedFieldTripFilter(val)}
+                        className="w-full sm:w-64 rounded-lg"
+                        placeholder="Filtrar por gira de campo"
+                      >
+                        <Select.Option value="all">Todas las giras ({tripDrafts.length})</Select.Option>
+                        {fieldTripsList.map((trip) => {
+                          const tripId = trip.field_trip_id || trip.id;
+                          const tripName = trip.field_trip_name || trip.name || `Gira #${tripId}`;
+                          const dateStr = trip.field_trip_start_date || trip.start_date || trip.field_trip_scheduled_date;
+                          const count = tripDrafts.filter(d => String(d.field_trip_id) === String(tripId)).length;
+                          return (
+                            <Select.Option key={tripId} value={tripId}>
+                              {tripName} {dateStr ? `(${dateStr})` : ''} ({count})
+                            </Select.Option>
+                          );
+                        })}
+                      </Select>
+                    </div>
+                  }
+                  shown={filteredTripDrafts.length}
+                  total={tripDrafts.length}
+                  noun="puntos de giras"
+                  onReload={loadManifestations}
+                  loading={loading}
+                />
+
+                {selectedFieldTripFilter && selectedFieldTripFilter !== 'all' && (
+                  <div>
+                    <Tag color="orange" closable onClose={() => setSelectedFieldTripFilter('all')} className="rounded-full text-xs">
+                      Filtrado por:{' '}
+                      {fieldTripsList.find(t => String(t.field_trip_id || t.id) === String(selectedFieldTripFilter))?.field_trip_name || `Gira #${selectedFieldTripFilter}`}
+                      {' '}({filteredTripDrafts.length} de {tripDrafts.length})
+                    </Tag>
+                  </div>
+                )}
+
+                <Table
+                  dataSource={filteredTripDrafts}
+                  columns={columnsDrafts}
+                  rowKey={(item) => item.geomanifestation_id || item.id}
+                  onRow={(record) => ({
+                    onClick: () => handleOpenGeoDrawer(record, 'georeports'),
+                    style: { cursor: 'pointer' },
+                  })}
+                  pagination={{
+                    pageSize: 10,
+                    showSizeChanger: true,
+                    pageSizeOptions: ['10', '20', '50', '100'],
+                    showTotal: (total) => `Total ${total} puntos de giras`,
+                  }}
+                  className="poppins border border-gray-100 rounded-xl overflow-hidden"
+                  locale={{ emptyText: 'No hay puntos asignados a la gira seleccionada' }}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
 
@@ -1448,7 +1496,7 @@ const GeomanifeStationsManager = () => {
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
                         <div>
-                          <Text strong style={{ fontSize: '15px' }}>📋 Georeportes de la Geomanifestación</Text>
+                          <Text strong style={{ fontSize: '15px', color: '#12467E' }}>Georeportes de la Geomanifestación</Text>
                           <Paragraph type="secondary" style={{ margin: 0, fontSize: '12px' }}>
                             Asocia una prueba de campo (in-situ) y un análisis geoquímico (laboratorio) para consolidar un georeporte oficial.
                           </Paragraph>
@@ -1460,7 +1508,7 @@ const GeomanifeStationsManager = () => {
                             icon={<PlusOutlined />}
                             disabled={!canManageGeoreports}
                             onClick={() => handleOpenCreateGeoreportModal(selectedGeo)}
-                            style={{ backgroundColor: '#fa8c16', borderColor: '#fa8c16' }}
+                            style={{ backgroundColor: '#12467E', borderColor: '#12467E' }}
                           >
                             Asociar Georeporte
                           </Button>
@@ -1570,7 +1618,7 @@ const GeomanifeStationsManager = () => {
                                             <Tag color={linkedInsitu.temperature > 50 ? 'red' : linkedInsitu.temperature > 30 ? 'orange' : 'blue'}>
                                               {linkedInsitu.temperature}°C
                                             </Tag>
-                                            <span className="text-gray-500 ml-2">pH:</span> <Tag color="cyan">{linkedInsitu.ph ?? 'N/A'}</Tag>
+                                            <span className="text-gray-500 ml-2">pH:</span> <Tag className="rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border-blue-200">{linkedInsitu.ph ?? 'N/A'}</Tag>
                                           </div>
                                           <div>
                                             <span className="text-gray-500">Conductividad:</span> {linkedInsitu.conductivity ? `${linkedInsitu.conductivity} μS/cm` : 'N/A'}
@@ -1593,7 +1641,7 @@ const GeomanifeStationsManager = () => {
                                       size="small"
                                       title={
                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                          <span style={{ color: '#531dab', fontSize: '13px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                          <span style={{ color: '#12467E', fontSize: '13px', display: 'flex', alignItems: 'center', gap: 6 }}>
                                             <BarChartOutlined /> 2. Prueba Laboratorio (Geoquímica)
                                           </span>
                                           {linkedInlab && canManageInlab && (
@@ -1608,7 +1656,7 @@ const GeomanifeStationsManager = () => {
                                           )}
                                         </div>
                                       }
-                                      style={{ background: '#f9f0ff', border: '1px solid #d3adf7', borderRadius: 8 }}
+                                      style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8 }}
                                     >
                                       {linkedInlab ? (
                                         <div className="space-y-1 text-xs">
@@ -1618,7 +1666,7 @@ const GeomanifeStationsManager = () => {
                                             </div>
                                           )}
                                           <div>
-                                            <span className="text-gray-500">pH Lab:</span> <Tag color="purple">{linkedInlab.ph ?? 'N/A'}</Tag>
+                                            <span className="text-gray-500">pH Lab:</span> <Tag className="rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border-blue-200">{linkedInlab.ph ?? 'N/A'}</Tag>
                                             <span className="text-gray-500 ml-2">Cond:</span> {linkedInlab.conductivity ? `${linkedInlab.conductivity} μS/cm` : 'N/A'}
                                           </div>
                                           <div className="text-gray-600">
@@ -1640,7 +1688,7 @@ const GeomanifeStationsManager = () => {
                                 {/* Report Diagnosis / Details */}
                                 <div style={{ marginTop: 12, padding: '8px 12px', background: '#fafafa', borderRadius: 6, border: '1px solid #f0f0f0' }}>
                                   <Text strong style={{ fontSize: '12px', display: 'block', marginBottom: 2 }}>
-                                    📝 Conclusiones / Diagnóstico del Georeporte:
+                                    Conclusiones / Diagnóstico del Georeporte:
                                   </Text>
                                   <Paragraph style={{ margin: 0, fontSize: '13px', color: '#262626' }}>
                                     {report.details || 'Sin observaciones adicionales registradas.'}
@@ -1707,13 +1755,13 @@ const GeomanifeStationsManager = () => {
                   children: (
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                        <Text strong style={{ fontSize: '15px' }}>🌿 Historial de Mediciones In-Situ</Text>
+                        <Text strong style={{ fontSize: '15px', color: '#12467E' }}>Historial de Mediciones In-Situ</Text>
                         <Button
                           type="primary"
                           icon={<PlusOutlined />}
                           disabled={!canManageInsitu}
                           onClick={handleOpenCreateInsitu}
-                          style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+                          style={{ backgroundColor: '#12467E', borderColor: '#12467E' }}
                         >
                           Agregar Medición In-Situ
                         </Button>
@@ -1748,7 +1796,9 @@ const GeomanifeStationsManager = () => {
                             title: 'pH Campo',
                             dataIndex: 'ph',
                             key: 'ph',
-                            render: (val) => val !== null && val !== undefined ? <Tag color="cyan">{val}</Tag> : 'N/A',
+                            render: (val) => val !== null && val !== undefined ? (
+                              <Tag className="rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border-blue-200">{val}</Tag>
+                            ) : 'N/A',
                           },
                           {
                             title: 'Notas',
@@ -1804,7 +1854,7 @@ const GeomanifeStationsManager = () => {
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                         <div>
-                          <Text strong style={{ fontSize: '15px' }}>🧪 Historial de Análisis Geoquímicos</Text>
+                          <Text strong style={{ fontSize: '15px', color: '#12467E' }}>Historial de Análisis Geoquímicos</Text>
                           <Paragraph type="secondary" style={{ margin: 0, fontSize: '12px' }}>
                             Registra y consulta análisis químicos y de laboratorio para esta geomanifestación.
                           </Paragraph>
@@ -1814,7 +1864,7 @@ const GeomanifeStationsManager = () => {
                           icon={<PlusOutlined />}
                           disabled={!canManageInlab}
                           onClick={handleOpenCreateInlab}
-                          style={{ backgroundColor: '#722ed1', borderColor: '#722ed1' }}
+                          style={{ backgroundColor: '#12467E', borderColor: '#12467E' }}
                         >
                           Agregar Prueba de Lab
                         </Button>
@@ -1835,7 +1885,9 @@ const GeomanifeStationsManager = () => {
                             title: 'pH Lab',
                             dataIndex: 'ph',
                             key: 'ph',
-                            render: (val) => val !== null && val !== undefined ? <Tag color="purple">{val}</Tag> : 'N/A',
+                            render: (val) => val !== null && val !== undefined ? (
+                              <Tag className="rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border-blue-200">{val}</Tag>
+                            ) : 'N/A',
                           },
                           {
                             title: 'Cond. (μS/cm)',

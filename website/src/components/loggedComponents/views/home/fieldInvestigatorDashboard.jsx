@@ -23,7 +23,7 @@ const FieldInvestigatorDashboard = () => {
   }
 
   return (
-    <div className="w-full p-4 md:p-8 space-y-6 poppins">
+    <div className="w-full px-4 pt-6 pb-24 md:p-8 space-y-6 poppins">
       {/* Header Card */}
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -31,7 +31,7 @@ const FieldInvestigatorDashboard = () => {
             <span className="text-xs font-bold uppercase tracking-wider text-geoterra-orange poppins">
               OPERACIONES DE CAMPO • GEOTERRA
             </span>
-            <Tag color="cyan" className="m-0 text-[11px] font-semibold">
+            <Tag className="m-0 text-[11px] font-semibold rounded-full bg-blue-50 text-[#12467E] border-blue-200">
               Investigador de Campo
             </Tag>
           </div>

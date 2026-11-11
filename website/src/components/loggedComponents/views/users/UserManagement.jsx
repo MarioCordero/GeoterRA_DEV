@@ -31,6 +31,16 @@ import {
   CloseCircleOutlined,
 } from '@ant-design/icons';
 import { renderDateWithProse } from '../../../../utils/dateFormatter';
+import PillTabs from '../../../common/crud/PillTabs';
+import CrudToolbar from '../../../common/crud/CrudToolbar';
+
+const ROLE_TAG_CONFIG = {
+  admin: { color: 'blue', label: 'Administrador' },
+  maintenance: { color: 'default', label: 'Mantenimiento' },
+  field_investigator: { color: 'orange', label: 'Investigador de Campo' },
+  investigator: { color: 'blue', label: 'Investigador de Laboratorio' },
+  user: { color: 'default', label: 'Usuario General' },
+};
 
 const UserManagement = () => {
   const { hasPermission, PERMISSIONS, isMaintenance } = usePermissions();
@@ -97,7 +107,9 @@ const UserManagement = () => {
       );
       setUsers(updatedUsers);
 
-      message.success(`Rol de usuario actualizado a "${selectedRole}" correctamente`);
+      message.success(
+        `Rol de usuario actualizado a "${ROLE_TAG_CONFIG[selectedRole]?.label || selectedRole}" correctamente`
+      );
       setIsModalVisible(false);
       setEditingUser(null);
       setSelectedRole(null);
@@ -175,13 +187,7 @@ const UserManagement = () => {
     );
   }
 
-  const roleTagConfig = {
-    admin: { color: 'blue', label: 'Administrador' },
-    maintenance: { color: 'default', label: 'Mantenimiento' },
-    field_investigator: { color: 'orange', label: 'Investigador de Campo' },
-    investigator: { color: 'blue', label: 'Investigador Lab' },
-    user: { color: 'default', label: 'Usuario General' },
-  };
+  const roleTagConfig = ROLE_TAG_CONFIG;
 
   const columns = [
     {
@@ -240,11 +246,10 @@ const UserManagement = () => {
       key: 'is_deleted',
       render: (isDeleted) => (
         <span
-          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-            !isDeleted
-              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-              : 'bg-rose-50 text-rose-700 border border-rose-200'
-          }`}
+          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${!isDeleted
+            ? 'bg-blue-50 text-[#12467E] border border-blue-200'
+            : 'bg-gray-100 text-gray-600 border border-gray-200'
+            }`}
         >
           {!isDeleted ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
           {!isDeleted ? 'Activo' : 'Inactivo'}
@@ -294,9 +299,6 @@ const UserManagement = () => {
             <span className="text-xs uppercase tracking-wider font-bold text-geoterra-orange poppins">
               Control de Accesos • Administración
             </span>
-            <Tag className="rounded-full font-semibold text-[11px] bg-blue-50 text-geoterra-blue border-blue-200">
-              {users.length} Cuentas Registradas
-            </Tag>
           </div>
           <h1 className="text-2xl md:text-3xl poppins-bold text-geoterra-blue m-0 flex items-center gap-2.5">
             <UserOutlined className="text-geoterra-blue" /> Gestión de Usuarios y Roles
@@ -304,17 +306,6 @@ const UserManagement = () => {
           <p className="text-xs md:text-sm text-gray-500 m-0 mt-1 poppins">
             Supervisión de cuentas de usuario, asignación de privilegios de acceso y control de investigadores de GeoterRA.
           </p>
-        </div>
-
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <Button
-            icon={<ReloadOutlined spin={loading} />}
-            onClick={fetchUsers}
-            loading={loading}
-            className="poppins font-medium border-gray-300"
-          >
-            Actualizar
-          </Button>
         </div>
       </div>
 
@@ -328,11 +319,10 @@ const UserManagement = () => {
             setRoleFilter('ALL');
             setStatusFilter('ALL');
           }}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            roleFilter === 'ALL' && statusFilter === 'ALL'
-              ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'ALL' && statusFilter === 'ALL'
+            ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Usuarios</span>
@@ -350,11 +340,10 @@ const UserManagement = () => {
         {/* Administracion */}
         <div
           onClick={() => setRoleFilter('ADMINS')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            roleFilter === 'ADMINS'
-              ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'ADMINS'
+            ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider">
@@ -374,11 +363,10 @@ const UserManagement = () => {
         {/* Investigadores */}
         <div
           onClick={() => setRoleFilter('INVESTIGATORS')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            roleFilter === 'INVESTIGATORS'
-              ? 'border-amber-400 shadow-md ring-2 ring-amber-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'INVESTIGATORS'
+            ? 'border-amber-400 shadow-md ring-2 ring-amber-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">
@@ -398,11 +386,10 @@ const UserManagement = () => {
         {/* Usuarios Generales */}
         <div
           onClick={() => setRoleFilter('user')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            roleFilter === 'user'
-              ? 'border-slate-500 shadow-md ring-2 ring-slate-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'user'
+            ? 'border-slate-500 shadow-md ring-2 ring-slate-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
@@ -423,63 +410,71 @@ const UserManagement = () => {
       {/* ========================================================================= */}
       {/* FILTER & DATA TABLE CARD                                                  */}
       {/* ========================================================================= */}
-      <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-        <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-          <div className="flex-1 w-full sm:w-auto flex flex-col sm:flex-row gap-3 items-center">
-            <Input
-              placeholder="Buscar por nombre, correo o teléfono..."
-              prefix={<SearchOutlined className="text-gray-400" />}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              allowClear
-              className="w-full sm:max-w-md rounded-lg py-1.5"
-            />
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+        <PillTabs
+          items={[
+            {
+              key: 'users',
+              label: 'Usuarios',
+              icon: <UserOutlined />,
+              count: users.length,
+            },
+          ]}
+          activeKey="users"
+        />
 
-            <Select
-              value={roleFilter}
-              onChange={(val) => setRoleFilter(val)}
-              className="w-full sm:w-52"
-            >
-              <Select.Option value="ALL">Todos los Roles</Select.Option>
-              <Select.Option value="ADMINS">Administradores & Mantenimiento</Select.Option>
-              <Select.Option value="INVESTIGATORS">Investigadores (Campo/Lab)</Select.Option>
-              <Select.Option value="admin">Administrador</Select.Option>
-              <Select.Option value="maintenance">Mantenimiento</Select.Option>
-              <Select.Option value="field_investigator">Investigador de Campo</Select.Option>
-              <Select.Option value="investigator">Investigador</Select.Option>
-              <Select.Option value="user">Usuario General</Select.Option>
-            </Select>
-
-            <Select
-              value={statusFilter}
-              onChange={(val) => setStatusFilter(val)}
-              className="w-full sm:w-40"
-            >
-              <Select.Option value="ALL">Todos los Estados</Select.Option>
-              <Select.Option value="active">Solo Activos</Select.Option>
-              <Select.Option value="deleted">Inactivos</Select.Option>
-            </Select>
-
-            {(searchText || roleFilter !== 'ALL' || statusFilter !== 'ALL') && (
-              <Button
-                icon={<ClearOutlined />}
-                onClick={() => {
-                  setSearchText('');
-                  setRoleFilter('ALL');
-                  setStatusFilter('ALL');
-                }}
-                className="poppins text-xs text-gray-500"
+        <CrudToolbar
+          searchPlaceholder="Buscar por nombre, correo o teléfono..."
+          searchValue={searchText}
+          onSearchChange={setSearchText}
+          filters={
+            <>
+              <Select
+                value={roleFilter}
+                onChange={(val) => setRoleFilter(val)}
+                className="w-full sm:w-52"
               >
-                Limpiar filtros
-              </Button>
-            )}
-          </div>
+                <Select.Option value="ALL">Todos los Roles</Select.Option>
+                <Select.Option value="ADMINS">Administradores & Mantenimiento</Select.Option>
+                <Select.Option value="INVESTIGATORS">Investigadores (Campo/Lab)</Select.Option>
+                <Select.Option value="admin">Administrador</Select.Option>
+                <Select.Option value="maintenance">Mantenimiento</Select.Option>
+                <Select.Option value="field_investigator">Investigador de Campo</Select.Option>
+                <Select.Option value="investigator">Investigador</Select.Option>
+                <Select.Option value="user">Usuario General</Select.Option>
+              </Select>
 
-          <div className="text-xs text-gray-400 poppins whitespace-nowrap self-end sm:self-center">
-            Mostrando <strong className="text-gray-700">{filteredUsers.length}</strong> de{' '}
-            <strong className="text-gray-700">{users.length}</strong> usuarios
-          </div>
-        </div>
+              <Select
+                value={statusFilter}
+                onChange={(val) => setStatusFilter(val)}
+                className="w-full sm:w-40"
+              >
+                <Select.Option value="ALL">Todos los Estados</Select.Option>
+                <Select.Option value="active">Solo Activos</Select.Option>
+                <Select.Option value="deleted">Inactivos</Select.Option>
+              </Select>
+
+              {(searchText || roleFilter !== 'ALL' || statusFilter !== 'ALL') && (
+                <Button
+                  icon={<ClearOutlined />}
+                  onClick={() => {
+                    setSearchText('');
+                    setRoleFilter('ALL');
+                    setStatusFilter('ALL');
+                  }}
+                  className="poppins text-xs text-gray-500"
+                >
+                  Limpiar filtros
+                </Button>
+              )}
+            </>
+          }
+          shown={filteredUsers.length}
+          total={users.length}
+          noun="usuarios"
+          onReload={fetchUsers}
+          loading={loading}
+        />
 
         {/* Table */}
         {loading ? (
@@ -506,6 +501,7 @@ const UserManagement = () => {
                 pageSize: 10,
                 showSizeChanger: true,
                 pageSizeOptions: ['10', '20', '50'],
+                showTotal: (total) => `Total ${total} usuarios`,
                 className: 'poppins py-2',
               }}
               className="poppins"
@@ -553,16 +549,19 @@ const UserManagement = () => {
                 <p className="text-xs text-gray-500 m-0">{editingUser.email}</p>
                 <div className="mt-1 flex items-center gap-1.5">
                   <span className="text-[11px] text-gray-400 font-semibold uppercase">Rol actual:</span>
-                  <Tag className="rounded text-[11px] m-0 font-semibold">
-                    {(editingUser.role || '').toUpperCase()}
+                  <Tag
+                    color={roleTagConfig[editingUser.role]?.color}
+                    className="rounded text-[11px] m-0 font-semibold"
+                  >
+                    {roleTagConfig[editingUser.role]?.label || editingUser.role}
                   </Tag>
                 </div>
               </div>
             </div>
 
             {/* Select Role Section */}
-            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
-              <label className="block text-sm font-semibold text-gray-700">
+            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-2">
+              <label className="block text-sm font-semibold text-gray-700 m-0">
                 Nuevo Rol para el Usuario
               </label>
               <Select
@@ -571,11 +570,11 @@ const UserManagement = () => {
                 onChange={setSelectedRole}
                 className="rounded-lg"
                 options={[
-                  { label: 'Administrador (admin)', value: 'admin' },
-                  { label: 'Mantenimiento (maintenance)', value: 'maintenance' },
-                  { label: 'Investigador de Campo (field_investigator)', value: 'field_investigator' },
-                  { label: 'Investigador de Laboratorio (investigator)', value: 'investigator' },
-                  { label: 'Usuario General (user)', value: 'user' },
+                  { label: 'Administrador', value: 'admin' },
+                  { label: 'Mantenimiento', value: 'maintenance' },
+                  { label: 'Investigador de Campo', value: 'field_investigator' },
+                  { label: 'Investigador de Laboratorio', value: 'investigator' },
+                  { label: 'Usuario General', value: 'user' },
                 ]}
                 placeholder="Seleccionar rol"
               />

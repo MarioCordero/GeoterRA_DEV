@@ -11,10 +11,10 @@ import { useSession } from '../../hooks/useSession';
 import MapCoordinatePicker from './MapCoordinatePicker';
 import React, { useState, useEffect, useRef } from "react";
 import {
-  Modal, Button, Form, Input, Radio, Upload, message, Spin, Select, Card, Switch, Slider, Checkbox, Tag, ConfigProvider
+  Modal, Button, Form, Input, Radio, Upload, message, Spin, Select, Card, Switch, Slider, Checkbox, Tag, ConfigProvider, Alert
 } from "antd";
 import {
-  EnvironmentFilled, ExperimentOutlined, UserOutlined, PlusCircleOutlined
+  EnvironmentFilled, ExperimentOutlined, UserOutlined, PlusCircleOutlined, ExclamationCircleOutlined
 } from "@ant-design/icons";
 
 const FORM_CACHE_KEY = "addPointFormCache";
@@ -271,15 +271,7 @@ const AddRequest = ({
   const renderStatusMessage = () => {
     if (sessionLoading) {
       return (
-        <div style={{
-          padding: "10px",
-          backgroundColor: "#e6f7ff",
-          border: "1px solid #91d5ff",
-          borderRadius: "4px",
-          marginBottom: "16px",
-          color: "#1890ff",
-          textAlign: "center"
-        }}>
+        <div className="py-2.5 px-4 mb-4 bg-blue-50 border border-blue-200 rounded-xl text-xs text-[#12467E] text-center flex items-center justify-center gap-2 poppins">
           <Spin size="small" /> Verificando sesión de usuario...
         </div>
       );
@@ -287,16 +279,12 @@ const AddRequest = ({
 
     if (!userEmail) {
       return (
-        <div style={{
-          padding: "10px",
-          backgroundColor: "#fff2e8",
-          border: "1px solid #ffbb96",
-          borderRadius: "4px",
-          marginBottom: "16px",
-          color: "#d46b08"
-        }}>
-          ⚠️ Debes iniciar sesión para agregar una solicitud
-        </div>
+        <Alert
+          type="warning"
+          showIcon
+          message="Debes iniciar sesión para agregar una solicitud"
+          className="mb-4 rounded-xl poppins"
+        />
       );
     }
 
@@ -318,7 +306,7 @@ const AddRequest = ({
       <Modal
         title={
           <div className="flex items-center gap-2 py-2 pr-6 border-b border-gray-100">
-            <span className="poppins-bold text-xl text-geoterra-blue">
+            <span className="poppins-bold text-lg sm:text-xl text-geoterra-blue">
               Formulario de Solicitud de Manifestación
             </span>
           </div>
@@ -326,12 +314,12 @@ const AddRequest = ({
         open={visible}
         onOk={handleOk}
         onCancel={handleCancel}
-        width="88vw"
-        style={{ top: 20, maxWidth: '1100px' }}
-        bodyStyle={{ padding: '24px 32px 32px 32px' }}
+        width="95vw"
+        style={{ top: 16, maxWidth: '1050px', margin: '0 auto' }}
+        styles={{ body: { padding: '16px 16px 24px' } }}
         confirmLoading={loading}
         footer={[
-          <Button key="back" size="large" onClick={handleCancel} disabled={loading}>
+          <Button key="back" size="large" onClick={handleCancel} disabled={loading} className="poppins">
             Cancelar
           </Button>,
           <Button
@@ -341,6 +329,8 @@ const AddRequest = ({
             onClick={handleOk}
             loading={loading}
             disabled={!userEmail}
+            style={{ backgroundColor: '#12467E', borderColor: '#12467E' }}
+            className="poppins-bold shadow-sm"
           >
             Enviar Solicitud
           </Button>,
@@ -351,7 +341,7 @@ const AddRequest = ({
         <Form
           layout="vertical"
           form={form}
-          className="poppins space-y-8"
+          className="poppins space-y-6"
           initialValues={{
             temperatureSensation: "Natural",
             currentUsage: "Residencial",
@@ -359,14 +349,14 @@ const AddRequest = ({
           }}
         >
           {/* Section 1: Ubicación Geográfica */}
-          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
-            <h3 className="text-lg font-bold text-geoterra-blue border-b border-gray-100 pb-3 flex items-center gap-2">
+          <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <h3 className="text-base sm:text-lg font-bold text-geoterra-blue border-b border-gray-100 pb-3 flex items-center gap-2">
               <EnvironmentFilled /> Ubicación de la Manifestación
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
               <Form.Item
-                label="Provincia"
+                label={<span className="font-semibold text-gray-700 text-xs sm:text-sm">Provincia</span>}
                 name="provinceSnitCode"
                 rules={[{ required: true, message: "Seleccione una provincia" }]}
               >
@@ -385,7 +375,7 @@ const AddRequest = ({
               </Form.Item>
 
               <Form.Item
-                label="Cantón"
+                label={<span className="font-semibold text-gray-700 text-xs sm:text-sm">Cantón</span>}
                 name="cantonSnitCode"
                 rules={[{ required: true, message: "Seleccione un cantón" }]}
               >
@@ -405,7 +395,7 @@ const AddRequest = ({
               </Form.Item>
 
               <Form.Item
-                label="Distrito"
+                label={<span className="font-semibold text-gray-700 text-xs sm:text-sm">Distrito</span>}
                 name="districtSnitCode"
                 rules={[{ required: true, message: "Seleccione un distrito" }]}
               >
@@ -424,20 +414,20 @@ const AddRequest = ({
               </Form.Item>
             </div>
 
-            <Form.Item label="Dirección Exacta" name="exactAddress">
+            <Form.Item label={<span className="font-semibold text-gray-700 text-xs sm:text-sm">Dirección Exacta</span>} name="exactAddress" style={{ marginBottom: 0 }}>
               <Input.TextArea rows={2} placeholder="Ej. Camino a Bagaces, 200 m norte de escuela..." />
             </Form.Item>
           </div>
 
           {/* Section 2: Características de la Manifestación */}
-          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
-            <h3 className="text-lg font-bold text-geoterra-blue border-b border-gray-100 pb-3 flex items-center gap-2">
+          <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <h3 className="text-base sm:text-lg font-bold text-geoterra-blue border-b border-gray-100 pb-3 flex items-center gap-2">
               <ExperimentOutlined /> Características de la Manifestación
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <Form.Item
-                label="Uso Actual del Terreno"
+                label={<span className="font-semibold text-gray-700 text-xs sm:text-sm">Uso Actual del Terreno</span>}
                 name="currentUsage"
                 rules={[{ required: true, message: "Seleccione el uso actual" }]}
               >
@@ -455,20 +445,20 @@ const AddRequest = ({
                 />
               </Form.Item>
 
-              <Form.Item label="Burbujeo Activo" name="bubbles">
-                <Radio.Group size="large" className="pt-2">
+              <Form.Item label={<span className="font-semibold text-gray-700 text-xs sm:text-sm">Burbujeo Activo</span>} name="bubbles">
+                <Radio.Group size="large" className="pt-1">
                   <Radio value="1">Sí (Activo)</Radio>
                   <Radio value="0">No</Radio>
                 </Radio.Group>
               </Form.Item>
             </div>
 
-            {/* Sensación Térmica: Deslizador con gradiente térmico o casilla Sin Especificar */}
-            <div className="bg-gray-50/80 p-4.5 rounded-xl border border-gray-200 space-y-3">
+            {/* Sensación Térmica: Selector adaptativo y táctil */}
+            <div className="bg-gray-50/80 p-3.5 sm:p-4.5 rounded-xl border border-gray-200 space-y-3">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-gray-200/60 pb-2.5">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-gray-800 text-sm poppins">
+                    <span className="font-bold text-gray-800 text-xs sm:text-sm poppins">
                       Sensación Térmica Percibida:
                     </span>
                     <Tag
@@ -497,39 +487,67 @@ const AddRequest = ({
               </div>
 
               {!isUnspecifiedTemp ? (
-                <div className="pt-2 pb-5 px-3">
-                  <ConfigProvider
-                    theme={{
-                      components: {
-                        Slider: {
-                          colorPrimary: currentTempLevel.color,
-                          colorPrimaryBorder: currentTempLevel.color,
-                          colorPrimaryBorderHover: currentTempLevel.color,
-                          handleColor: currentTempLevel.color,
-                          handleActiveColor: currentTempLevel.color,
-                          dotActiveBorderColor: currentTempLevel.color,
+                <div className="pt-1 pb-2 space-y-3">
+                  <div className="px-2">
+                    <ConfigProvider
+                      theme={{
+                        components: {
+                          Slider: {
+                            colorPrimary: currentTempLevel.color,
+                            colorPrimaryBorder: currentTempLevel.color,
+                            colorPrimaryBorderHover: currentTempLevel.color,
+                            handleColor: currentTempLevel.color,
+                            handleActiveColor: currentTempLevel.color,
+                            dotActiveBorderColor: currentTempLevel.color,
+                          },
                         },
-                      },
-                    }}
-                  >
-                    <Slider
-                      min={0}
-                      max={4}
-                      step={1}
-                      value={tempSliderIndex}
-                      onChange={handleSliderChange}
-                      marks={TEMPERATURE_MARKS}
-                      railStyle={{
-                        backgroundColor: '#e2e8f0',
-                        height: 6,
-                        borderRadius: 3,
                       }}
-                      trackStyle={{ backgroundColor: currentTempLevel.color, height: 6, borderRadius: 3 }}
-                      tooltip={{
-                        formatter: (val) => TEMPERATURE_LEVELS[val]?.label,
-                      }}
-                    />
-                  </ConfigProvider>
+                    >
+                      <Slider
+                        min={0}
+                        max={4}
+                        step={1}
+                        dots
+                        value={tempSliderIndex}
+                        onChange={handleSliderChange}
+                        railStyle={{
+                          backgroundColor: '#e2e8f0',
+                          height: 6,
+                          borderRadius: 3,
+                        }}
+                        trackStyle={{ backgroundColor: currentTempLevel.color, height: 6, borderRadius: 3 }}
+                        tooltip={{
+                          formatter: (val) => TEMPERATURE_LEVELS[val]?.label,
+                        }}
+                      />
+                    </ConfigProvider>
+                    <div className="flex justify-between text-[11px] text-gray-400 font-medium -mt-1">
+                      <span>Mín: Natural</span>
+                      <span>Máx: Hirviendo</span>
+                    </div>
+                  </div>
+
+                  {/* Botones de selección rápida y táctil */}
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1">
+                    {TEMPERATURE_LEVELS.map((lvl, idx) => {
+                      const isSelected = tempSliderIndex === idx && !isUnspecifiedTemp;
+                      return (
+                        <button
+                          key={lvl.value}
+                          type="button"
+                          disabled={isUnspecifiedTemp}
+                          onClick={() => handleSliderChange(idx)}
+                          className={`px-2.5 py-2 rounded-xl text-xs font-semibold border transition-all text-center flex items-center justify-center ${
+                            isSelected
+                              ? 'bg-blue-50 border-[#12467E] text-[#12467E] ring-2 ring-blue-100 shadow-sm'
+                              : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                          } ${idx === 4 ? 'col-span-2 sm:col-span-1' : ''}`}
+                        >
+                          {lvl.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               ) : (
                 <div className="py-3 px-4 bg-white rounded-lg border border-dashed border-gray-300 text-center text-xs text-gray-500 poppins flex items-center justify-center">
@@ -543,38 +561,39 @@ const AddRequest = ({
               </Form.Item>
             </div>
 
-            <Form.Item label="Detalles u Observaciones Adicionales" name="details">
+            <Form.Item label={<span className="font-semibold text-gray-700 text-xs sm:text-sm">Detalles u Observaciones Adicionales</span>} name="details" style={{ marginBottom: 0 }}>
               <Input.TextArea rows={3} placeholder="Describa detalles adicionales sobre la emanación de vapor, gas o temperatura observada..." />
             </Form.Item>
           </div>
 
           {/* Section 3: Información del Propietario (OPCIONAL) */}
-          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-100 pb-3 gap-2">
-              <h3 className="text-lg font-bold text-geoterra-blue flex items-center gap-2 m-0">
+          <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-100 pb-3 gap-3">
+              <h3 className="text-base sm:text-lg font-bold text-geoterra-blue flex items-center gap-2 m-0">
                 <UserOutlined /> Información del Propietario <span className="text-xs text-gray-400 font-normal">(Opcional)</span>
               </h3>
 
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-semibold text-gray-600">¿Conoce al propietario?</span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+                <span className="text-xs sm:text-sm font-semibold text-gray-600">¿Conoce al propietario?</span>
                 <Radio.Group
                   value={hasOwnerInfo}
                   onChange={(e) => setHasOwnerInfo(e.target.value)}
                   buttonStyle="solid"
+                  className="w-full sm:w-auto flex"
                 >
-                  <Radio.Button value="0">No (Desconocido)</Radio.Button>
-                  <Radio.Button value="1">Sí (Ingresar datos)</Radio.Button>
+                  <Radio.Button value="0" className="flex-1 sm:flex-none text-center text-xs sm:text-sm">No (Desconocido)</Radio.Button>
+                  <Radio.Button value="1" className="flex-1 sm:flex-none text-center text-xs sm:text-sm">Sí (Ingresar datos)</Radio.Button>
                 </Radio.Group>
               </div>
             </div>
 
             {hasOwnerInfo === "1" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                <Form.Item label="Nombre del Propietario" name="ownerName">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 pt-2">
+                <Form.Item label={<span className="font-semibold text-gray-700 text-xs sm:text-sm">Nombre del Propietario</span>} name="ownerName">
                   <Input size="large" placeholder="Nombre completo del propietario" />
                 </Form.Item>
 
-                <Form.Item label="Relación con el Propietario" name="relationWithOwner">
+                <Form.Item label={<span className="font-semibold text-gray-700 text-xs sm:text-sm">Relación con el Propietario</span>} name="relationWithOwner">
                   <Select size="large" defaultValue="Titular" options={[
                     { value: 'Titular', label: 'Propietario / Titular' },
                     { value: 'Familiar', label: 'Familiar' },
@@ -584,11 +603,11 @@ const AddRequest = ({
                   ]} />
                 </Form.Item>
 
-                <Form.Item label="Correo del Propietario" name="ownerEmail">
+                <Form.Item label={<span className="font-semibold text-gray-700 text-xs sm:text-sm">Correo del Propietario</span>} name="ownerEmail">
                   <Input size="large" type="email" placeholder="correo@ejemplo.com" />
                 </Form.Item>
 
-                <Form.Item label="Teléfono del Propietario" name="contactNumber">
+                <Form.Item label={<span className="font-semibold text-gray-700 text-xs sm:text-sm">Teléfono del Propietario</span>} name="contactNumber">
                   <PhoneInput size="large" />
                 </Form.Item>
               </div>
@@ -596,8 +615,8 @@ const AddRequest = ({
           </div>
 
           {/* Section 4: Geolocalización en Mapa */}
-          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
-            <h3 className="text-lg font-bold text-geoterra-blue border-b border-gray-100 pb-3 flex items-center gap-2">
+          <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <h3 className="text-base sm:text-lg font-bold text-geoterra-blue border-b border-gray-100 pb-3 flex items-center gap-2">
               <EnvironmentFilled /> Geolocalización GPS
             </h3>
 

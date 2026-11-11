@@ -35,6 +35,9 @@ import {
 import '../../../../colorModule.css';
 import '../../../../fontsModule.css';
 import { useSession } from '../../../../hooks/useSession';
+import PillTabs from '../../../common/crud/PillTabs';
+import CrudToolbar from '../../../common/crud/CrudToolbar';
+import { CodeBadge, NameCell, DateCell, SystemIdCell, RowActions } from '../../../common/crud/cells';
 import {
   provincesIndex,
   provincesAdminStore,
@@ -72,6 +75,7 @@ const TerritoryManager = () => {
 
   // Cantons state
   const [cantons, setCantons] = useState([]);
+  const [allCantons, setAllCantons] = useState([]);
   const [selectedProvinceFilter, setSelectedProvinceFilter] = useState(null);
   const [loadingCantons, setLoadingCantons] = useState(false);
   const [cantonModalVisible, setCantonModalVisible] = useState(false);
@@ -81,7 +85,8 @@ const TerritoryManager = () => {
 
   // Districts state
   const [districts, setDistricts] = useState([]);
-  const [selectedCantonFilter, setSelectedCantonFilter] = useState(null);
+  const [selectedDistrictProvince, setSelectedDistrictProvince] = useState(null);
+  const [selectedDistrictCanton, setSelectedDistrictCanton] = useState(null);
   const [loadingDistricts, setLoadingDistricts] = useState(false);
   const [districtModalVisible, setDistrictModalVisible] = useState(false);
   const [editingDistrict, setEditingDistrict] = useState(null);
@@ -168,12 +173,26 @@ const TerritoryManager = () => {
   };
 
   // --- CANTONS CRUD ---
+  const loadAllCantons = async () => {
+    try {
+      const res = await cantonsIndex(null);
+      if (res.ok && Array.isArray(res.data)) {
+        setAllCantons(res.data);
+      }
+    } catch (err) {
+      console.error('❌ Error loading all cantons:', err);
+    }
+  };
+
   const loadCantons = async (provCode) => {
     try {
       setLoadingCantons(true);
       const res = await cantonsIndex(provCode);
       if (res.ok && Array.isArray(res.data)) {
         setCantons(res.data);
+        if (!provCode) {
+          setAllCantons(res.data);
+        }
       } else {
         setCantons([]);
       }
@@ -211,6 +230,7 @@ const TerritoryManager = () => {
       if (res.ok) {
         message.success('Cantón eliminado correctamente');
         loadCantons(selectedProvinceFilter);
+        loadAllCantons();
       } else {
         message.error(res.error || 'Error al eliminar cantón');
       }
@@ -241,6 +261,7 @@ const TerritoryManager = () => {
         setCantonModalVisible(false);
         cantonForm.resetFields();
         loadCantons(selectedProvinceFilter);
+        loadAllCantons();
       } else {
         message.error(res.error || 'Error al guardar cantón');
       }
@@ -272,8 +293,8 @@ const TerritoryManager = () => {
   const handleOpenCreateDistrict = () => {
     setEditingDistrict(null);
     districtForm.resetFields();
-    if (selectedCantonFilter) {
-      districtForm.setFieldsValue({ canton_snit_code: selectedCantonFilter });
+    if (selectedDistrictCanton) {
+      districtForm.setFieldsValue({ canton_snit_code: selectedDistrictCanton });
     }
     setDistrictModalVisible(true);
   };
@@ -294,7 +315,7 @@ const TerritoryManager = () => {
       const res = await districtsAdminDelete(id);
       if (res.ok) {
         message.success('Distrito eliminado correctamente');
-        loadDistricts(selectedCantonFilter);
+        loadDistricts(null);
       } else {
         message.error(res.error || 'Error al eliminar distrito');
       }
@@ -324,7 +345,7 @@ const TerritoryManager = () => {
         message.success(`Distrito ${editingDistrict ? 'actualizado' : 'creado'} correctamente`);
         setDistrictModalVisible(false);
         districtForm.resetFields();
-        loadDistricts(selectedCantonFilter);
+        loadDistricts(null);
       } else {
         message.error(res.error || 'Error al guardar distrito');
       }
@@ -338,7 +359,8 @@ const TerritoryManager = () => {
   const refreshAll = () => {
     loadProvinces();
     loadCantons(selectedProvinceFilter);
-    loadDistricts(selectedCantonFilter);
+    loadAllCantons();
+    loadDistricts(null);
   };
 
   useEffect(() => {
@@ -347,7 +369,31 @@ const TerritoryManager = () => {
     loadDistricts(null);
   }, []);
 
-  // Filtered lists based on search terms
+  // Lookups and maps for hierarchy
+  const provinceMap = useMemo(() => {
+    const map = new Map();
+    provinces.forEach(p => {
+      map.set(Number(p.province_snit_code), p);
+    });
+    return map;
+  }, [provinces]);
+
+  const cantonMap = useMemo(() => {
+    const map = new Map();
+    const source = allCantons.length > 0 ? allCantons : cantons;
+    source.forEach(c => {
+      map.set(Number(c.canton_snit_code), c);
+    });
+    return map;
+  }, [allCantons, cantons]);
+
+  const availableDistrictCantons = useMemo(() => {
+    const source = allCantons.length > 0 ? allCantons : cantons;
+    if (!selectedDistrictProvince) return source;
+    return source.filter(c => Number(c.province_snit_code) === Number(selectedDistrictProvince));
+  }, [allCantons, cantons, selectedDistrictProvince]);
+
+  // Filtered lists based on search terms and hierarchy filters
   const filteredProvinces = useMemo(() => {
     if (!searchProvince) return provinces;
     const term = searchProvince.toLowerCase();
@@ -370,15 +416,41 @@ const TerritoryManager = () => {
   }, [cantons, searchCanton]);
 
   const filteredDistricts = useMemo(() => {
-    if (!searchDistrict) return districts;
-    const term = searchDistrict.toLowerCase();
-    return districts.filter(d =>
-      (d.district_name && d.district_name.toLowerCase().includes(term)) ||
-      String(d.district_snit_code).includes(term) ||
-      String(d.canton_snit_code).includes(term) ||
-      (d.district_id && d.district_id.toLowerCase().includes(term))
-    );
-  }, [districts, searchDistrict]);
+    return districts.filter(d => {
+      // 1. Canton filter
+      if (selectedDistrictCanton && Number(d.canton_snit_code) !== Number(selectedDistrictCanton)) {
+        return false;
+      }
+
+      // 2. Province filter
+      if (selectedDistrictProvince) {
+        const canton = cantonMap.get(Number(d.canton_snit_code));
+        if (!canton || Number(canton.province_snit_code) !== Number(selectedDistrictProvince)) {
+          return false;
+        }
+      }
+
+      // 3. Search term
+      if (searchDistrict) {
+        const term = searchDistrict.toLowerCase();
+        const canton = cantonMap.get(Number(d.canton_snit_code));
+        const province = canton ? provinceMap.get(Number(canton.province_snit_code)) : null;
+
+        const matchName = d.district_name && d.district_name.toLowerCase().includes(term);
+        const matchCode = String(d.district_snit_code).includes(term);
+        const matchCantonCode = String(d.canton_snit_code).includes(term);
+        const matchCantonName = canton?.canton_name && canton.canton_name.toLowerCase().includes(term);
+        const matchProvName = province?.province_name && province.province_name.toLowerCase().includes(term);
+        const matchId = d.district_id && d.district_id.toLowerCase().includes(term);
+
+        if (!matchName && !matchCode && !matchCantonCode && !matchCantonName && !matchProvName && !matchId) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [districts, selectedDistrictProvince, selectedDistrictCanton, searchDistrict, cantonMap, provinceMap]);
 
   // Province columns
   const columnsProvinces = [
@@ -387,21 +459,14 @@ const TerritoryManager = () => {
       dataIndex: 'province_snit_code',
       key: 'province_snit_code',
       width: 140,
-      render: (val) => (
-        <span className="font-mono bg-blue-50 text-blue-800 border border-blue-200 px-3 py-1 rounded-md font-bold text-xs">
-          SNIT: {val}
-        </span>
-      ),
+      render: (val) => <CodeBadge>SNIT: {val}</CodeBadge>,
     },
     {
       title: 'Nombre de Provincia',
       dataIndex: 'province_name',
       key: 'province_name',
       render: (val) => (
-        <div className="flex items-center gap-2">
-          <CompassOutlined className="text-[#12467E] text-base" />
-          <span className="font-bold text-[#12467E] text-base">{val}</span>
-        </div>
+        <NameCell icon={<CompassOutlined />}>{val}</NameCell>
       ),
     },
     ...(isMaintenance ? [{
@@ -409,9 +474,7 @@ const TerritoryManager = () => {
       dataIndex: 'province_id',
       key: 'province_id',
       render: (val, r) => (
-        <span className="font-mono text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-200">
-          {val || r.id}
-        </span>
+        <SystemIdCell value={val || r.id} />
       ),
     }] : []),
     {
@@ -419,9 +482,7 @@ const TerritoryManager = () => {
       dataIndex: 'created_at',
       key: 'created_at',
       render: (val) => (
-        <span className="text-xs text-gray-600">
-          {val ? new Date(val).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Oficial Base'}
-        </span>
+        <DateCell value={val} fallback="Oficial Base" />
       ),
     },
     {
@@ -429,28 +490,12 @@ const TerritoryManager = () => {
       key: 'actions',
       align: 'right',
       render: (_, record) => (
-        <Space size="small">
-          <Tooltip title="Editar provincia">
-            <Button
-              icon={<EditOutlined />}
-              size="middle"
-              onClick={() => handleOpenEditProvince(record)}
-              className="text-[#12467E] hover:text-[#0d3460] border-gray-300"
-            />
-          </Tooltip>
-          <Popconfirm
-            title="¿Eliminar provincia?"
-            description="Se eliminarán cantones y distritos asociados a esta provincia."
-            onConfirm={() => handleDeleteProvince(record)}
-            okText="Sí, eliminar"
-            cancelText="Cancelar"
-            okButtonProps={{ danger: true }}
-          >
-            <Tooltip title="Eliminar provincia">
-              <Button icon={<DeleteOutlined />} size="middle" danger />
-            </Tooltip>
-          </Popconfirm>
-        </Space>
+        <RowActions
+          entity="provincia"
+          onEdit={() => handleOpenEditProvince(record)}
+          onDelete={() => handleDeleteProvince(record)}
+          deleteDescription="Se eliminarán cantones y distritos asociados a esta provincia."
+        />
       ),
     },
   ];
@@ -462,21 +507,14 @@ const TerritoryManager = () => {
       dataIndex: 'canton_snit_code',
       key: 'canton_snit_code',
       width: 140,
-      render: (val) => (
-        <span className="font-mono bg-cyan-50 text-cyan-800 border border-cyan-200 px-3 py-1 rounded-md font-bold text-xs">
-          SNIT: {val}
-        </span>
-      ),
+      render: (val) => <CodeBadge>SNIT: {val}</CodeBadge>,
     },
     {
       title: 'Nombre del Cantón',
       dataIndex: 'canton_name',
       key: 'canton_name',
       render: (val) => (
-        <div className="flex items-center gap-2">
-          <ApartmentOutlined className="text-[#12467E] text-base" />
-          <span className="font-bold text-[#12467E] text-base">{val}</span>
-        </div>
+        <NameCell icon={<ApartmentOutlined />}>{val}</NameCell>
       ),
     },
     {
@@ -486,9 +524,9 @@ const TerritoryManager = () => {
       render: (val) => {
         const prov = provinces.find(p => p.province_snit_code === val);
         return (
-          <Tag color="geekblue" className="px-2.5 py-0.5 rounded font-medium">
+          <span className="font-mono bg-blue-50 text-[#12467E] border border-blue-200 px-2.5 py-0.5 rounded text-xs font-semibold">
             {prov ? `${prov.province_name} (${val})` : `Provincia #${val}`}
-          </Tag>
+          </span>
         );
       },
     },
@@ -497,9 +535,7 @@ const TerritoryManager = () => {
       dataIndex: 'canton_id',
       key: 'canton_id',
       render: (val, r) => (
-        <span className="font-mono text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-200">
-          {val || r.id}
-        </span>
+        <SystemIdCell value={val || r.id} />
       ),
     }] : []),
     {
@@ -507,28 +543,12 @@ const TerritoryManager = () => {
       key: 'actions',
       align: 'right',
       render: (_, record) => (
-        <Space size="small">
-          <Tooltip title="Editar cantón">
-            <Button
-              icon={<EditOutlined />}
-              size="middle"
-              onClick={() => handleOpenEditCanton(record)}
-              className="text-[#12467E] hover:text-[#0d3460] border-gray-300"
-            />
-          </Tooltip>
-          <Popconfirm
-            title="¿Eliminar cantón?"
-            description="Se eliminarán los distritos asociados a este cantón."
-            onConfirm={() => handleDeleteCanton(record)}
-            okText="Sí, eliminar"
-            cancelText="Cancelar"
-            okButtonProps={{ danger: true }}
-          >
-            <Tooltip title="Eliminar cantón">
-              <Button icon={<DeleteOutlined />} size="middle" danger />
-            </Tooltip>
-          </Popconfirm>
-        </Space>
+        <RowActions
+          entity="cantón"
+          onEdit={() => handleOpenEditCanton(record)}
+          onDelete={() => handleDeleteCanton(record)}
+          deleteDescription="Se eliminarán los distritos asociados a este cantón."
+        />
       ),
     },
   ];
@@ -540,41 +560,43 @@ const TerritoryManager = () => {
       dataIndex: 'district_snit_code',
       key: 'district_snit_code',
       width: 140,
-      render: (val) => (
-        <span className="font-mono bg-purple-50 text-purple-800 border border-purple-200 px-3 py-1 rounded-md font-bold text-xs">
-          SNIT: {val}
-        </span>
-      ),
+      render: (val) => <CodeBadge>SNIT: {val}</CodeBadge>,
     },
     {
       title: 'Nombre del Distrito',
       dataIndex: 'district_name',
       key: 'district_name',
       render: (val) => (
-        <div className="flex items-center gap-2">
-          <EnvironmentOutlined className="text-[#12467E] text-base" />
-          <span className="font-bold text-[#12467E] text-base">{val}</span>
-        </div>
+        <NameCell icon={<EnvironmentOutlined />}>{val}</NameCell>
       ),
     },
     {
-      title: 'Cantón SNIT',
+      title: 'Cantón y Provincia',
       dataIndex: 'canton_snit_code',
       key: 'canton_snit_code',
-      render: (val) => (
-        <Tag color="cyan" className="px-2.5 py-0.5 rounded font-mono font-medium">
-          Cantón #{val}
-        </Tag>
-      ),
+      render: (val) => {
+        const canton = cantonMap.get(Number(val));
+        const province = canton ? provinceMap.get(Number(canton.province_snit_code)) : null;
+        return (
+          <div className="flex flex-col">
+            <span className="font-semibold text-gray-800 text-xs">
+              {canton ? `${canton.canton_name} (${val})` : `Cantón #${val}`}
+            </span>
+            {province && (
+              <span className="text-[11px] text-gray-500 font-normal">
+                {province.province_name}
+              </span>
+            )}
+          </div>
+        );
+      },
     },
     ...(isMaintenance ? [{
       title: 'ID Sistema (ULID)',
       dataIndex: 'district_id',
       key: 'district_id',
       render: (val, r) => (
-        <span className="font-mono text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-200">
-          {val || r.id}
-        </span>
+        <SystemIdCell value={val || r.id} />
       ),
     }] : []),
     {
@@ -582,28 +604,11 @@ const TerritoryManager = () => {
       key: 'actions',
       align: 'right',
       render: (_, record) => (
-        <Space size="small">
-          <Tooltip title="Editar distrito">
-            <Button
-              icon={<EditOutlined />}
-              size="middle"
-              onClick={() => handleOpenEditDistrict(record)}
-              className="text-[#12467E] hover:text-[#0d3460] border-gray-300"
-            />
-          </Tooltip>
-          <Popconfirm
-            title="¿Eliminar distrito?"
-            description="¿Estás seguro de que deseas eliminar este distrito?"
-            onConfirm={() => handleDeleteDistrict(record)}
-            okText="Sí, eliminar"
-            cancelText="Cancelar"
-            okButtonProps={{ danger: true }}
-          >
-            <Tooltip title="Eliminar distrito">
-              <Button icon={<DeleteOutlined />} size="middle" danger />
-            </Tooltip>
-          </Popconfirm>
-        </Space>
+        <RowActions
+          entity="distrito"
+          onEdit={() => handleOpenEditDistrict(record)}
+          onDelete={() => handleDeleteDistrict(record)}
+        />
       ),
     },
   ];
@@ -617,9 +622,6 @@ const TerritoryManager = () => {
             <span className="text-xs font-bold uppercase tracking-wider text-geoterra-orange poppins">
               DIVISIÓN TERRITORIAL • CARTOGRAFÍA SNIT
             </span>
-            <Tag color="blue" className="m-0 text-[11px] font-semibold">
-              Oficial GeoterRA
-            </Tag>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-geoterra-blue m-0 poppins">
             División Territorial de Costa Rica
@@ -630,14 +632,6 @@ const TerritoryManager = () => {
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto justify-end">
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={refreshAll}
-            className="poppins font-medium border-gray-300"
-          >
-            Actualizar
-          </Button>
-
           {activeTab === '1' && (
             <Button
               type="primary"
@@ -681,9 +675,8 @@ const TerritoryManager = () => {
         {/* KPI 1: Provincias */}
         <div
           onClick={() => setActiveTab('1')}
-          className={`bg-white p-5 rounded-2xl border transition-all cursor-pointer shadow-sm hover:shadow-md ${
-            activeTab === '1' ? 'border-[#12467E] ring-2 ring-blue-100' : 'border-gray-200'
-          }`}
+          className={`bg-white p-5 rounded-2xl border transition-all cursor-pointer shadow-sm hover:shadow-md ${activeTab === '1' ? 'border-[#12467E] ring-2 ring-blue-100' : 'border-gray-200'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -707,9 +700,8 @@ const TerritoryManager = () => {
         {/* KPI 2: Cantones */}
         <div
           onClick={() => setActiveTab('2')}
-          className={`bg-white p-5 rounded-2xl border transition-all cursor-pointer shadow-sm hover:shadow-md ${
-            activeTab === '2' ? 'border-[#12467E] ring-2 ring-blue-100' : 'border-gray-200'
-          }`}
+          className={`bg-white p-5 rounded-2xl border transition-all cursor-pointer shadow-sm hover:shadow-md ${activeTab === '2' ? 'border-[#12467E] ring-2 ring-blue-100' : 'border-gray-200'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -721,7 +713,7 @@ const TerritoryManager = () => {
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-3xl font-bold text-gray-800 poppins">
-              {loadingCantons ? '...' : cantons.length}
+              {loadingCantons ? '...' : (allCantons.length || cantons.length)}
             </span>
             <span className="text-xs text-gray-500 font-medium">Activos</span>
           </div>
@@ -733,9 +725,8 @@ const TerritoryManager = () => {
         {/* KPI 3: Distritos */}
         <div
           onClick={() => setActiveTab('3')}
-          className={`bg-white p-5 rounded-2xl border transition-all cursor-pointer shadow-sm hover:shadow-md ${
-            activeTab === '3' ? 'border-[#12467E] ring-2 ring-blue-100' : 'border-gray-200'
-          }`}
+          className={`bg-white p-5 rounded-2xl border transition-all cursor-pointer shadow-sm hover:shadow-md ${activeTab === '3' ? 'border-[#12467E] ring-2 ring-blue-100' : 'border-gray-200'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -781,79 +772,29 @@ const TerritoryManager = () => {
       {/* Tabs and Content Section */}
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
         {/* Navigation Tabs Header */}
-        <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-          <div className="flex gap-2">
-            <button
-              onClick={() => setActiveTab('1')}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
-                activeTab === '1'
-                  ? 'bg-[#12467E] text-white shadow-sm'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <CompassOutlined />
-              <span>Provincias</span>
-              <span className={`text-xs px-2 py-0.5 rounded-full ${
-                activeTab === '1' ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'
-              }`}>
-                {provinces.length}
-              </span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('2')}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
-                activeTab === '2'
-                  ? 'bg-[#12467E] text-white shadow-sm'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <ApartmentOutlined />
-              <span>Cantones</span>
-              <span className={`text-xs px-2 py-0.5 rounded-full ${
-                activeTab === '2' ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'
-              }`}>
-                {cantons.length}
-              </span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('3')}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
-                activeTab === '3'
-                  ? 'bg-[#12467E] text-white shadow-sm'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <EnvironmentOutlined />
-              <span>Distritos</span>
-              <span className={`text-xs px-2 py-0.5 rounded-full ${
-                activeTab === '3' ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'
-              }`}>
-                {districts.length}
-              </span>
-            </button>
-          </div>
-        </div>
+        <PillTabs
+          items={[
+            { key: '1', label: 'Provincias', icon: <CompassOutlined />, count: provinces.length },
+            { key: '2', label: 'Cantones', icon: <ApartmentOutlined />, count: cantons.length },
+            { key: '3', label: 'Distritos', icon: <EnvironmentOutlined />, count: districts.length },
+          ]}
+          activeKey={activeTab}
+          onChange={setActiveTab}
+        />
 
         {/* Tab 1: Provincias */}
         {activeTab === '1' && (
           <div className="space-y-4">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-              <div className="w-full md:w-96">
-                <Input
-                  prefix={<SearchOutlined className="text-gray-400" />}
-                  placeholder="Buscar provincia por nombre o código..."
-                  value={searchProvince}
-                  onChange={(e) => setSearchProvince(e.target.value)}
-                  allowClear
-                  className="rounded-lg py-2"
-                />
-              </div>
-              <span className="text-xs text-gray-500 font-medium">
-                Mostrando {filteredProvinces.length} de {provinces.length} provincias
-              </span>
-            </div>
+            <CrudToolbar
+              searchPlaceholder="Buscar provincia por nombre o código..."
+              searchValue={searchProvince}
+              onSearchChange={setSearchProvince}
+              shown={filteredProvinces.length}
+              total={provinces.length}
+              noun="provincias"
+              onReload={refreshAll}
+              loading={loadingProvinces}
+            />
 
             <Table
               dataSource={filteredProvinces}
@@ -873,19 +814,11 @@ const TerritoryManager = () => {
         {/* Tab 2: Cantones */}
         {activeTab === '2' && (
           <div className="space-y-4">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-              <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                <div className="w-full md:w-80">
-                  <Input
-                    prefix={<SearchOutlined className="text-gray-400" />}
-                    placeholder="Buscar cantón por nombre o código..."
-                    value={searchCanton}
-                    onChange={(e) => setSearchCanton(e.target.value)}
-                    allowClear
-                    className="rounded-lg py-2"
-                  />
-                </div>
-
+            <CrudToolbar
+              searchPlaceholder="Buscar cantón por nombre o código..."
+              searchValue={searchCanton}
+              onSearchChange={setSearchCanton}
+              filters={
                 <Select
                   style={{ minWidth: 220 }}
                   placeholder="Filtrar por Provincia"
@@ -903,12 +836,13 @@ const TerritoryManager = () => {
                     </Select.Option>
                   ))}
                 </Select>
-              </div>
-
-              <span className="text-xs text-gray-500 font-medium">
-                Mostrando {filteredCantons.length} de {cantons.length} cantones
-              </span>
-            </div>
+              }
+              shown={filteredCantons.length}
+              total={cantons.length}
+              noun="cantones"
+              onReload={refreshAll}
+              loading={loadingCantons}
+            />
 
             <Table
               dataSource={filteredCantons}
@@ -928,37 +862,83 @@ const TerritoryManager = () => {
         {/* Tab 3: Distritos */}
         {activeTab === '3' && (
           <div className="space-y-4">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-              <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                <div className="w-full md:w-80">
-                  <Input
-                    prefix={<SearchOutlined className="text-gray-400" />}
-                    placeholder="Buscar distrito por nombre o código..."
-                    value={searchDistrict}
-                    onChange={(e) => setSearchDistrict(e.target.value)}
+            <CrudToolbar
+              searchPlaceholder="Buscar distrito por nombre o código..."
+              searchValue={searchDistrict}
+              onSearchChange={setSearchDistrict}
+              filters={
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Select
+                    style={{ minWidth: 190 }}
+                    placeholder="Filtrar por Provincia"
                     allowClear
-                    className="rounded-lg py-2"
-                  />
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-gray-500">Cantón SNIT:</span>
-                  <InputNumber
-                    placeholder="Ej: 101"
-                    value={selectedCantonFilter}
+                    value={selectedDistrictProvince}
                     onChange={(val) => {
-                      setSelectedCantonFilter(val);
-                      loadDistricts(val);
+                      setSelectedDistrictProvince(val);
+                      if (val && selectedDistrictCanton) {
+                        const c = cantonMap.get(Number(selectedDistrictCanton));
+                        if (!c || Number(c.province_snit_code) !== Number(val)) {
+                          setSelectedDistrictCanton(null);
+                        }
+                      }
                     }}
                     className="rounded-lg"
-                  />
-                </div>
-              </div>
+                  >
+                    {provinces.map((p) => (
+                      <Select.Option key={p.province_snit_code} value={p.province_snit_code}>
+                        {p.province_name} ({p.province_snit_code})
+                      </Select.Option>
+                    ))}
+                  </Select>
 
-              <span className="text-xs text-gray-500 font-medium">
-                Mostrando {filteredDistricts.length} de {districts.length} distritos
-              </span>
-            </div>
+                  <Select
+                    style={{ minWidth: 210 }}
+                    placeholder="Filtrar por Cantón"
+                    allowClear
+                    showSearch
+                    optionFilterProp="children"
+                    value={selectedDistrictCanton}
+                    onChange={(val) => {
+                      setSelectedDistrictCanton(val);
+                      if (val && !selectedDistrictProvince) {
+                        const c = cantonMap.get(Number(val));
+                        if (c && c.province_snit_code) {
+                          setSelectedDistrictProvince(c.province_snit_code);
+                        }
+                      }
+                    }}
+                    filterOption={(input, option) =>
+                      (option?.children ?? '').toString().toLowerCase().includes(input.toLowerCase())
+                    }
+                    className="rounded-lg"
+                  >
+                    {availableDistrictCantons.map((c) => (
+                      <Select.Option key={c.canton_snit_code} value={c.canton_snit_code}>
+                        {c.canton_name} ({c.canton_snit_code})
+                      </Select.Option>
+                    ))}
+                  </Select>
+
+                  {(selectedDistrictProvince || selectedDistrictCanton) && (
+                    <Button
+                      onClick={() => {
+                        setSelectedDistrictProvince(null);
+                        setSelectedDistrictCanton(null);
+                      }}
+                      size="small"
+                      className="poppins text-xs font-medium text-gray-500 hover:text-gray-700"
+                    >
+                      Limpiar
+                    </Button>
+                  )}
+                </div>
+              }
+              shown={filteredDistricts.length}
+              total={districts.length}
+              noun="distritos"
+              onReload={refreshAll}
+              loading={loadingDistricts}
+            />
 
             <Table
               dataSource={filteredDistricts}
@@ -1111,10 +1091,27 @@ const TerritoryManager = () => {
           <Form form={districtForm} layout="vertical" onFinish={handleSubmitDistrict}>
             <Form.Item
               name="canton_snit_code"
-              label={<span className="font-semibold text-gray-700">Código SNIT del Cantón Padre</span>}
-              rules={[{ required: true, message: 'El código del cantón es obligatorio' }]}
+              label={<span className="font-semibold text-gray-700">Cantón Perteneciente (SNIT)</span>}
+              rules={[{ required: true, message: 'El cantón es obligatorio' }]}
             >
-              <InputNumber style={{ width: '100%' }} placeholder="Ej: 101" min={1} className="rounded-lg" />
+              <Select
+                showSearch
+                placeholder="Selecciona el cantón padre"
+                optionFilterProp="children"
+                filterOption={(input, option) =>
+                  (option?.children ?? '').toString().toLowerCase().includes(input.toLowerCase())
+                }
+                className="rounded-lg"
+              >
+                {(allCantons.length > 0 ? allCantons : cantons).map((c) => {
+                  const p = provinceMap.get(Number(c.province_snit_code));
+                  return (
+                    <Select.Option key={c.canton_snit_code} value={c.canton_snit_code}>
+                      {c.canton_name} (SNIT #{c.canton_snit_code}){p ? ` • ${p.province_name}` : ''}
+                    </Select.Option>
+                  );
+                })}
+              </Select>
             </Form.Item>
             <Form.Item
               name="district_snit_code"

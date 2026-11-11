@@ -22,6 +22,9 @@ import {
 import { analysisRequestIndex, analysisRequestDelete } from '../../config/apiConf';
 import { Table, Button, Modal, Tag, message, Empty, Input, Select, Tooltip, Popconfirm, Spin, Space } from 'antd';
 import { renderDateWithProse } from '../../utils/dateFormatter';
+import PillTabs from './crud/PillTabs';
+import CrudToolbar from './crud/CrudToolbar';
+import { DateCell } from './crud/cells';
 
 /**
  * UserRequests Component
@@ -223,9 +226,10 @@ const UserRequests = () => {
             >
               {loc ? `${loc.province}, ${loc.canton}` : request.request_name || (isMaintenance ? `Solicitud #${id}` : 'Solicitud de Análisis')}
             </span>
-            <span className="text-xs text-gray-400 font-mono">
-              {isMaintenance && `#{id} • `}{renderDateWithProse(request.created_at, { showIcon: false })}
-            </span>
+            <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-0.5">
+              {isMaintenance && <span className="font-mono text-gray-400">#{id} •</span>}
+              <DateCell value={request.created_at} fallback="Sin fecha" />
+            </div>
           </div>
           {renderStateBadge(request.state)}
         </div>
@@ -298,14 +302,18 @@ const UserRequests = () => {
       ),
     },
     {
-      title: 'Fecha de Creación',
+      title: 'Fecha',
       dataIndex: 'created_at',
       key: 'created_at',
+      width: 140,
       sorter: (a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0),
+      defaultSortOrder: 'descend',
       render: (date) => (
-        <span className="text-xs text-gray-500 poppins">
-          {renderDateWithProse(date, { showIcon: false })}
-        </span>
+        <Tooltip title={date ? new Date(date).toLocaleString('es-CR') : 'Sin fecha'}>
+          <span>
+            <DateCell value={date} fallback="Sin fecha" />
+          </span>
+        </Tooltip>
       ),
     },
     {
@@ -354,9 +362,6 @@ const UserRequests = () => {
             <span className="text-xs uppercase tracking-wider font-bold text-geoterra-orange poppins">
               Solicitudes Ciudadanas y de Campo • Mis Registros
             </span>
-            <Tag className="rounded-full font-semibold text-[11px] bg-blue-50 text-geoterra-blue border-blue-200">
-              {requests.length} Solicitudes
-            </Tag>
           </div>
           <h1 className="text-2xl md:text-3xl poppins-bold text-geoterra-blue m-0 flex items-center gap-2.5">
             <FileTextOutlined className="text-geoterra-blue" /> Mis Solicitudes de Análisis
@@ -365,24 +370,12 @@ const UserRequests = () => {
             Consulta el avance, evaluación geocientífica e incorporación de tus puntos geotérmicos registrados.
           </p>
         </div>
-
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <AddRequest onRequestAdded={handleRequestAdded} />
-          <Button
-            icon={<ReloadOutlined spin={loading} />}
-            onClick={loadRequests}
-            loading={loading}
-            className="poppins font-medium border-gray-300"
-          >
-            Actualizar
-          </Button>
-        </div>
       </div>
 
       {/* Error message */}
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold">
-          ⚠️ {error}
+        <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold flex items-center">
+          <ExclamationCircleOutlined className="mr-1.5 text-red-500 text-sm" /> {error}
         </div>
       )}
 
@@ -393,11 +386,10 @@ const UserRequests = () => {
         {/* Total */}
         <div
           onClick={() => setStateFilter('ALL')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            stateFilter === 'ALL'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'ALL'
               ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Enviadas</span>
@@ -415,11 +407,10 @@ const UserRequests = () => {
         {/* Registradas */}
         <div
           onClick={() => setStateFilter('REGISTRADA')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            stateFilter === 'REGISTRADA'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'REGISTRADA'
               ? 'border-orange-400 shadow-sm ring-2 ring-orange-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-orange-700 uppercase tracking-wider">Registradas</span>
@@ -437,11 +428,10 @@ const UserRequests = () => {
         {/* En Revision */}
         <div
           onClick={() => setStateFilter('REVISION')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            stateFilter === 'REVISION'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'REVISION'
               ? 'border-blue-400 shadow-sm ring-2 ring-blue-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-blue-800 uppercase tracking-wider">En Revisión</span>
@@ -459,11 +449,10 @@ const UserRequests = () => {
         {/* Aprobadas */}
         <div
           onClick={() => setStateFilter('APROBADA')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            stateFilter === 'APROBADA'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'APROBADA'
               ? 'border-geoterra-blue shadow-sm ring-2 ring-blue-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">Aprobadas</span>
@@ -507,48 +496,57 @@ const UserRequests = () => {
       {/* ========================================================================= */}
       {/* FILTER & DATA TABLE CARD                                                  */}
       {/* ========================================================================= */}
-      <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-        <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-          <div className="flex-1 w-full sm:w-auto flex flex-col sm:flex-row gap-3 items-center">
-            <Input
-              placeholder="Buscar por provincia, cantón, titular o ID..."
-              prefix={<SearchOutlined className="text-gray-400" />}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              allowClear
-              className="w-full sm:max-w-md rounded-lg py-1.5"
-            />
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+        <PillTabs
+          items={[
+            {
+              key: 'requests',
+              label: 'Mis Solicitudes',
+              icon: <FileTextOutlined />,
+              count: requests.length,
+            },
+          ]}
+          activeKey="requests"
+        />
 
-            <Select
-              value={stateFilter}
-              onChange={(val) => setStateFilter(val)}
-              className="w-full sm:w-48"
-            >
-              <Select.Option value="ALL">Todos los Estados</Select.Option>
-              <Select.Option value="REGISTRADA">Registradas</Select.Option>
-              <Select.Option value="REVISION">En Revisión</Select.Option>
-              <Select.Option value="APROBADA">Aprobadas / En Mapa</Select.Option>
-            </Select>
-
-            {(searchText || stateFilter !== 'ALL') && (
-              <Button
-                icon={<ClearOutlined />}
-                onClick={() => {
-                  setSearchText('');
-                  setStateFilter('ALL');
-                }}
-                className="poppins text-xs text-gray-500"
+        <CrudToolbar
+          searchPlaceholder="Buscar por provincia, cantón, titular o ID..."
+          searchValue={searchText}
+          onSearchChange={setSearchText}
+          filters={
+            <>
+              <Select
+                value={stateFilter}
+                onChange={(val) => setStateFilter(val)}
+                className="w-full sm:w-48"
               >
-                Limpiar filtros
-              </Button>
-            )}
-          </div>
+                <Select.Option value="ALL">Todos los Estados</Select.Option>
+                <Select.Option value="REGISTRADA">Registradas</Select.Option>
+                <Select.Option value="REVISION">En Revisión</Select.Option>
+                <Select.Option value="APROBADA">Aprobadas / En Mapa</Select.Option>
+              </Select>
 
-          <div className="text-xs text-gray-400 poppins whitespace-nowrap self-end sm:self-center">
-            Mostrando <strong className="text-gray-700">{filteredRequests.length}</strong> de{' '}
-            <strong className="text-gray-700">{requests.length}</strong> solicitudes
-          </div>
-        </div>
+              {(searchText || stateFilter !== 'ALL') && (
+                <Button
+                  icon={<ClearOutlined />}
+                  onClick={() => {
+                    setSearchText('');
+                    setStateFilter('ALL');
+                  }}
+                  className="poppins text-xs text-gray-500"
+                >
+                  Limpiar filtros
+                </Button>
+              )}
+            </>
+          }
+          shown={filteredRequests.length}
+          total={requests.length}
+          noun="solicitudes"
+          onReload={loadRequests}
+          loading={loading}
+          extra={<AddRequest onRequestAdded={handleRequestAdded} />}
+        />
 
         {/* Content */}
         {loading ? (
@@ -586,6 +584,7 @@ const UserRequests = () => {
                 pageSize: 10,
                 showSizeChanger: true,
                 pageSizeOptions: ['10', '20', '50'],
+                showTotal: (total) => `Total ${total} solicitudes`,
                 className: 'poppins py-2',
               }}
               className="poppins"

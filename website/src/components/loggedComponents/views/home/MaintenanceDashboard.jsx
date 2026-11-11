@@ -55,7 +55,7 @@ const MaintenanceDashboard = () => {
   }
 
   return (
-    <div className="w-full p-4 md:p-8 space-y-6 poppins">
+    <div className="w-full px-4 pt-6 pb-24 md:p-8 space-y-6 poppins">
       {/* Header Card */}
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -76,7 +76,7 @@ const MaintenanceDashboard = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <Tag color="cyan" className="px-3 py-1 rounded-full text-xs font-semibold">
+          <Tag className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border-blue-200">
             Solo Lectura Segura
           </Tag>
         </div>
