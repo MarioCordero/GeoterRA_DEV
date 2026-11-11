@@ -51,21 +51,21 @@ const getRoleTag = (role) => {
   switch (normalized) {
     case 'admin':
     case 'administrador':
-      return <Tag color="red" style={{ fontWeight: 500, borderRadius: 4 }}>Administrador</Tag>;
+      return <Tag className="rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border-blue-200">Administrador</Tag>;
     case 'investigator':
     case 'investigador':
-      return <Tag color="blue" style={{ fontWeight: 500, borderRadius: 4 }}>Investigador</Tag>;
+      return <Tag className="rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border-blue-200">Investigador</Tag>;
     case 'field_investigator':
     case 'investigador_campo':
     case 'investigador de campo':
-      return <Tag color="cyan" style={{ fontWeight: 500, borderRadius: 4 }}>Investigador de Campo</Tag>;
+      return <Tag className="rounded-full text-xs font-semibold bg-orange-50 text-orange-700 border-orange-200">Investigador de Campo</Tag>;
     case 'maintenance':
     case 'mantenimiento':
-      return <Tag color="orange" style={{ fontWeight: 500, borderRadius: 4 }}>Mantenimiento</Tag>;
+      return <Tag className="rounded-full text-xs font-semibold bg-slate-50 text-slate-700 border-slate-200">Mantenimiento</Tag>;
     case 'user':
     case 'usuario':
     default:
-      return <Tag color="default" style={{ fontWeight: 500, borderRadius: 4 }}>Usuario</Tag>;
+      return <Tag className="rounded-full text-xs font-semibold bg-gray-100 text-gray-700 border-gray-200">Usuario</Tag>;
   }
 };
 

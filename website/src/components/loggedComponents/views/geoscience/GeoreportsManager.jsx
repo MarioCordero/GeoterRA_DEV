@@ -32,6 +32,9 @@ import {
 import EntityNavigatorPicker from '../../../common/EntityNavigatorPicker';
 import { renderDateWithProse } from '../../../../utils/dateFormatter';
 import { useSession } from '../../../../hooks/useSession';
+import PillTabs from '../../../common/crud/PillTabs';
+import CrudToolbar from '../../../common/crud/CrudToolbar';
+import { CodeBadge, NameCell, DateCell, SystemIdCell, RowActions } from '../../../common/crud/cells';
 import {
   georeportsCurrent,
   georeportsAdminIndex,
@@ -308,13 +311,13 @@ const GeoreportsManager = () => {
       title: 'Nombre',
       dataIndex: 'georeport_name',
       key: 'georeport_name',
-      render: (val) => <span className="font-semibold text-gray-900">{val || 'Sin nombre'}</span>,
+      render: (val) => <NameCell icon={<FileSearchOutlined />}>{val || 'Sin nombre'}</NameCell>,
     },
     ...(isMaintenance ? [{
       title: 'ID Georeporte',
       dataIndex: 'georeport_id',
       key: 'georeport_id',
-      render: (val, record) => <span className="font-mono text-xs font-semibold text-gray-700">{val || record.id}</span>,
+      render: (val, record) => <SystemIdCell value={val || record.id} />,
     }] : []),
     {
       title: 'Prueba In-Situ',
@@ -387,48 +390,32 @@ const GeoreportsManager = () => {
         const isCurrent = currentReport && (currentReport.georeport_id || currentReport.id) === (record.georeport_id || record.id);
         const id = record.georeport_id || record.id;
         return (
-          <Space size="middle">
-            {!isCurrent && (
-              <Popconfirm
-                title="¿Promover a vigente?"
-                description="Se actualizará como el reporte oficial de la manifestación."
-                onConfirm={() => handlePromote(record)}
-                okText="Sí, promover"
-                cancelText="Cancelar"
-              >
-                <Tooltip title="Promover a vigente">
-                  <Button
-                    size="middle"
-                    className="text-orange-600 hover:text-orange-700 border-orange-200"
-                    loading={promotingId === id}
-                    icon={<StarOutlined />}
-                  >
-                    Promover
-                  </Button>
-                </Tooltip>
-              </Popconfirm>
-            )}
-            <Tooltip title="Editar georeporte">
-              <Button
-                icon={<EditOutlined />}
-                size="middle"
-                onClick={() => handleOpenEdit(record)}
-                className="text-blue-600 hover:text-blue-700 hover:border-blue-300"
-              />
-            </Tooltip>
-            <Popconfirm
-              title="¿Eliminar este georeporte?"
-              description="Esta acción es irreversible y eliminará el georeporte."
-              onConfirm={() => handleDelete(record)}
-              okText="Sí, eliminar"
-              cancelText="Cancelar"
-              okButtonProps={{ danger: true }}
-            >
-              <Tooltip title="Eliminar georeporte">
-                <Button icon={<DeleteOutlined />} size="middle" danger />
-              </Tooltip>
-            </Popconfirm>
-          </Space>
+          <RowActions
+            entity="georeporte"
+            onEdit={() => handleOpenEdit(record)}
+            onDelete={() => handleDelete(record)}
+            deleteDescription="Esta acción es irreversible y eliminará el georeporte."
+            extra={
+              !isCurrent && (
+                <Popconfirm
+                  title="¿Promover a vigente?"
+                  description="Se actualizará como el reporte oficial de la manifestación."
+                  onConfirm={() => handlePromote(record)}
+                  okText="Sí, promover"
+                  cancelText="Cancelar"
+                >
+                  <Tooltip title="Promover a vigente">
+                    <Button
+                      size="middle"
+                      className="text-orange-600 hover:text-orange-700 border-orange-200"
+                      loading={promotingId === id}
+                      icon={<StarOutlined />}
+                    />
+                  </Tooltip>
+                </Popconfirm>
+              )
+            }
+          />
         );
       },
     },
@@ -453,16 +440,6 @@ const GeoreportsManager = () => {
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
-          <Button
-            icon={<ReloadOutlined spin={loading} />}
-            onClick={() => loadReports(selectedGeoId)}
-            loading={loading}
-            disabled={!selectedGeoId}
-            className="poppins font-medium border-gray-300"
-          >
-            Actualizar
-          </Button>
-
           <Button
             type="primary"
             icon={<PlusOutlined />}
@@ -567,6 +544,19 @@ const GeoreportsManager = () => {
 
       {/* 3. Main Data Card */}
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+        {/* Navigation Tabs Header */}
+        <PillTabs
+          items={[
+            {
+              key: 'georeports',
+              label: 'Georeportes',
+              icon: <FileSearchOutlined />,
+              count: reports.length,
+            },
+          ]}
+          activeKey="georeports"
+        />
+
         {/* Entity Navigator Picker */}
         <EntityNavigatorPicker
           entityType="geomanifestations"
@@ -608,21 +598,16 @@ const GeoreportsManager = () => {
         )}
 
         {/* Filter and Search Toolbar */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-          <div className="w-full md:w-96">
-            <Input
-              prefix={<SearchOutlined className="text-gray-400" />}
-              placeholder="Buscar georeporte por nombre, notas o autor..."
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              allowClear
-              className="rounded-lg py-2"
-            />
-          </div>
-          <span className="text-xs text-gray-500 font-medium">
-            Mostrando {filteredReports.length} de {reports.length} georeportes
-          </span>
-        </div>
+        <CrudToolbar
+          searchPlaceholder="Buscar georeporte por nombre, notas o autor..."
+          searchValue={searchText}
+          onSearchChange={setSearchText}
+          shown={filteredReports.length}
+          total={reports.length}
+          noun="georeportes"
+          onReload={selectedGeoId ? () => loadReports(selectedGeoId) : undefined}
+          loading={loading}
+        />
 
         {/* Table */}
         <Table

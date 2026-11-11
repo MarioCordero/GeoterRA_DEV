@@ -35,6 +35,9 @@ import {
 import '../../../../colorModule.css';
 import '../../../../fontsModule.css';
 import { useSession } from '../../../../hooks/useSession';
+import PillTabs from '../../../common/crud/PillTabs';
+import CrudToolbar from '../../../common/crud/CrudToolbar';
+import { CodeBadge, NameCell, DateCell, SystemIdCell, RowActions } from '../../../common/crud/cells';
 import {
   provincesIndex,
   provincesAdminStore,
@@ -387,21 +390,14 @@ const TerritoryManager = () => {
       dataIndex: 'province_snit_code',
       key: 'province_snit_code',
       width: 140,
-      render: (val) => (
-        <span className="font-mono bg-blue-50 text-blue-800 border border-blue-200 px-3 py-1 rounded-md font-bold text-xs">
-          SNIT: {val}
-        </span>
-      ),
+      render: (val) => <CodeBadge>SNIT: {val}</CodeBadge>,
     },
     {
       title: 'Nombre de Provincia',
       dataIndex: 'province_name',
       key: 'province_name',
       render: (val) => (
-        <div className="flex items-center gap-2">
-          <CompassOutlined className="text-[#12467E] text-base" />
-          <span className="font-bold text-[#12467E] text-base">{val}</span>
-        </div>
+        <NameCell icon={<CompassOutlined />}>{val}</NameCell>
       ),
     },
     ...(isMaintenance ? [{
@@ -409,9 +405,7 @@ const TerritoryManager = () => {
       dataIndex: 'province_id',
       key: 'province_id',
       render: (val, r) => (
-        <span className="font-mono text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-200">
-          {val || r.id}
-        </span>
+        <SystemIdCell value={val || r.id} />
       ),
     }] : []),
     {
@@ -419,9 +413,7 @@ const TerritoryManager = () => {
       dataIndex: 'created_at',
       key: 'created_at',
       render: (val) => (
-        <span className="text-xs text-gray-600">
-          {val ? new Date(val).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Oficial Base'}
-        </span>
+        <DateCell value={val} fallback="Oficial Base" />
       ),
     },
     {
@@ -429,28 +421,12 @@ const TerritoryManager = () => {
       key: 'actions',
       align: 'right',
       render: (_, record) => (
-        <Space size="small">
-          <Tooltip title="Editar provincia">
-            <Button
-              icon={<EditOutlined />}
-              size="middle"
-              onClick={() => handleOpenEditProvince(record)}
-              className="text-[#12467E] hover:text-[#0d3460] border-gray-300"
-            />
-          </Tooltip>
-          <Popconfirm
-            title="¿Eliminar provincia?"
-            description="Se eliminarán cantones y distritos asociados a esta provincia."
-            onConfirm={() => handleDeleteProvince(record)}
-            okText="Sí, eliminar"
-            cancelText="Cancelar"
-            okButtonProps={{ danger: true }}
-          >
-            <Tooltip title="Eliminar provincia">
-              <Button icon={<DeleteOutlined />} size="middle" danger />
-            </Tooltip>
-          </Popconfirm>
-        </Space>
+        <RowActions
+          entity="provincia"
+          onEdit={() => handleOpenEditProvince(record)}
+          onDelete={() => handleDeleteProvince(record)}
+          deleteDescription="Se eliminarán cantones y distritos asociados a esta provincia."
+        />
       ),
     },
   ];
@@ -462,21 +438,14 @@ const TerritoryManager = () => {
       dataIndex: 'canton_snit_code',
       key: 'canton_snit_code',
       width: 140,
-      render: (val) => (
-        <span className="font-mono bg-cyan-50 text-cyan-800 border border-cyan-200 px-3 py-1 rounded-md font-bold text-xs">
-          SNIT: {val}
-        </span>
-      ),
+      render: (val) => <CodeBadge>SNIT: {val}</CodeBadge>,
     },
     {
       title: 'Nombre del Cantón',
       dataIndex: 'canton_name',
       key: 'canton_name',
       render: (val) => (
-        <div className="flex items-center gap-2">
-          <ApartmentOutlined className="text-[#12467E] text-base" />
-          <span className="font-bold text-[#12467E] text-base">{val}</span>
-        </div>
+        <NameCell icon={<ApartmentOutlined />}>{val}</NameCell>
       ),
     },
     {
@@ -486,9 +455,9 @@ const TerritoryManager = () => {
       render: (val) => {
         const prov = provinces.find(p => p.province_snit_code === val);
         return (
-          <Tag color="geekblue" className="px-2.5 py-0.5 rounded font-medium">
+          <span className="font-mono bg-blue-50 text-[#12467E] border border-blue-200 px-2.5 py-0.5 rounded text-xs font-semibold">
             {prov ? `${prov.province_name} (${val})` : `Provincia #${val}`}
-          </Tag>
+          </span>
         );
       },
     },
@@ -497,9 +466,7 @@ const TerritoryManager = () => {
       dataIndex: 'canton_id',
       key: 'canton_id',
       render: (val, r) => (
-        <span className="font-mono text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-200">
-          {val || r.id}
-        </span>
+        <SystemIdCell value={val || r.id} />
       ),
     }] : []),
     {
@@ -507,28 +474,12 @@ const TerritoryManager = () => {
       key: 'actions',
       align: 'right',
       render: (_, record) => (
-        <Space size="small">
-          <Tooltip title="Editar cantón">
-            <Button
-              icon={<EditOutlined />}
-              size="middle"
-              onClick={() => handleOpenEditCanton(record)}
-              className="text-[#12467E] hover:text-[#0d3460] border-gray-300"
-            />
-          </Tooltip>
-          <Popconfirm
-            title="¿Eliminar cantón?"
-            description="Se eliminarán los distritos asociados a este cantón."
-            onConfirm={() => handleDeleteCanton(record)}
-            okText="Sí, eliminar"
-            cancelText="Cancelar"
-            okButtonProps={{ danger: true }}
-          >
-            <Tooltip title="Eliminar cantón">
-              <Button icon={<DeleteOutlined />} size="middle" danger />
-            </Tooltip>
-          </Popconfirm>
-        </Space>
+        <RowActions
+          entity="cantón"
+          onEdit={() => handleOpenEditCanton(record)}
+          onDelete={() => handleDeleteCanton(record)}
+          deleteDescription="Se eliminarán los distritos asociados a este cantón."
+        />
       ),
     },
   ];
@@ -540,21 +491,14 @@ const TerritoryManager = () => {
       dataIndex: 'district_snit_code',
       key: 'district_snit_code',
       width: 140,
-      render: (val) => (
-        <span className="font-mono bg-purple-50 text-purple-800 border border-purple-200 px-3 py-1 rounded-md font-bold text-xs">
-          SNIT: {val}
-        </span>
-      ),
+      render: (val) => <CodeBadge>SNIT: {val}</CodeBadge>,
     },
     {
       title: 'Nombre del Distrito',
       dataIndex: 'district_name',
       key: 'district_name',
       render: (val) => (
-        <div className="flex items-center gap-2">
-          <EnvironmentOutlined className="text-[#12467E] text-base" />
-          <span className="font-bold text-[#12467E] text-base">{val}</span>
-        </div>
+        <NameCell icon={<EnvironmentOutlined />}>{val}</NameCell>
       ),
     },
     {
@@ -562,9 +506,9 @@ const TerritoryManager = () => {
       dataIndex: 'canton_snit_code',
       key: 'canton_snit_code',
       render: (val) => (
-        <Tag color="cyan" className="px-2.5 py-0.5 rounded font-mono font-medium">
+        <span className="font-mono bg-blue-50 text-[#12467E] border border-blue-200 px-2.5 py-0.5 rounded text-xs font-semibold">
           Cantón #{val}
-        </Tag>
+        </span>
       ),
     },
     ...(isMaintenance ? [{
@@ -572,9 +516,7 @@ const TerritoryManager = () => {
       dataIndex: 'district_id',
       key: 'district_id',
       render: (val, r) => (
-        <span className="font-mono text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-200">
-          {val || r.id}
-        </span>
+        <SystemIdCell value={val || r.id} />
       ),
     }] : []),
     {
@@ -582,28 +524,11 @@ const TerritoryManager = () => {
       key: 'actions',
       align: 'right',
       render: (_, record) => (
-        <Space size="small">
-          <Tooltip title="Editar distrito">
-            <Button
-              icon={<EditOutlined />}
-              size="middle"
-              onClick={() => handleOpenEditDistrict(record)}
-              className="text-[#12467E] hover:text-[#0d3460] border-gray-300"
-            />
-          </Tooltip>
-          <Popconfirm
-            title="¿Eliminar distrito?"
-            description="¿Estás seguro de que deseas eliminar este distrito?"
-            onConfirm={() => handleDeleteDistrict(record)}
-            okText="Sí, eliminar"
-            cancelText="Cancelar"
-            okButtonProps={{ danger: true }}
-          >
-            <Tooltip title="Eliminar distrito">
-              <Button icon={<DeleteOutlined />} size="middle" danger />
-            </Tooltip>
-          </Popconfirm>
-        </Space>
+        <RowActions
+          entity="distrito"
+          onEdit={() => handleOpenEditDistrict(record)}
+          onDelete={() => handleDeleteDistrict(record)}
+        />
       ),
     },
   ];
@@ -627,14 +552,6 @@ const TerritoryManager = () => {
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto justify-end">
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={refreshAll}
-            className="poppins font-medium border-gray-300"
-          >
-            Actualizar
-          </Button>
-
           {activeTab === '1' && (
             <Button
               type="primary"
@@ -775,73 +692,29 @@ const TerritoryManager = () => {
       {/* Tabs and Content Section */}
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
         {/* Navigation Tabs Header */}
-        <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-          <div className="flex gap-2">
-            <button
-              onClick={() => setActiveTab('1')}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === '1'
-                  ? 'bg-[#12467E] text-white shadow-sm'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-            >
-              <CompassOutlined />
-              <span>Provincias</span>
-              <span className={`text-xs px-2 py-0.5 rounded-full ${activeTab === '1' ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'
-                }`}>
-                {provinces.length}
-              </span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('2')}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === '2'
-                  ? 'bg-[#12467E] text-white shadow-sm'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-            >
-              <ApartmentOutlined />
-              <span>Cantones</span>
-              <span className={`text-xs px-2 py-0.5 rounded-full ${activeTab === '2' ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'
-                }`}>
-                {cantons.length}
-              </span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('3')}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === '3'
-                  ? 'bg-[#12467E] text-white shadow-sm'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-            >
-              <EnvironmentOutlined />
-              <span>Distritos</span>
-              <span className={`text-xs px-2 py-0.5 rounded-full ${activeTab === '3' ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'
-                }`}>
-                {districts.length}
-              </span>
-            </button>
-          </div>
-        </div>
+        <PillTabs
+          items={[
+            { key: '1', label: 'Provincias', icon: <CompassOutlined />, count: provinces.length },
+            { key: '2', label: 'Cantones', icon: <ApartmentOutlined />, count: cantons.length },
+            { key: '3', label: 'Distritos', icon: <EnvironmentOutlined />, count: districts.length },
+          ]}
+          activeKey={activeTab}
+          onChange={setActiveTab}
+        />
 
         {/* Tab 1: Provincias */}
         {activeTab === '1' && (
           <div className="space-y-4">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-              <div className="w-full md:w-96">
-                <Input
-                  prefix={<SearchOutlined className="text-gray-400" />}
-                  placeholder="Buscar provincia por nombre o código..."
-                  value={searchProvince}
-                  onChange={(e) => setSearchProvince(e.target.value)}
-                  allowClear
-                  className="rounded-lg py-2"
-                />
-              </div>
-              <span className="text-xs text-gray-500 font-medium">
-                Mostrando {filteredProvinces.length} de {provinces.length} provincias
-              </span>
-            </div>
+            <CrudToolbar
+              searchPlaceholder="Buscar provincia por nombre o código..."
+              searchValue={searchProvince}
+              onSearchChange={setSearchProvince}
+              shown={filteredProvinces.length}
+              total={provinces.length}
+              noun="provincias"
+              onReload={refreshAll}
+              loading={loadingProvinces}
+            />
 
             <Table
               dataSource={filteredProvinces}
@@ -861,19 +734,11 @@ const TerritoryManager = () => {
         {/* Tab 2: Cantones */}
         {activeTab === '2' && (
           <div className="space-y-4">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-              <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                <div className="w-full md:w-80">
-                  <Input
-                    prefix={<SearchOutlined className="text-gray-400" />}
-                    placeholder="Buscar cantón por nombre o código..."
-                    value={searchCanton}
-                    onChange={(e) => setSearchCanton(e.target.value)}
-                    allowClear
-                    className="rounded-lg py-2"
-                  />
-                </div>
-
+            <CrudToolbar
+              searchPlaceholder="Buscar cantón por nombre o código..."
+              searchValue={searchCanton}
+              onSearchChange={setSearchCanton}
+              filters={
                 <Select
                   style={{ minWidth: 220 }}
                   placeholder="Filtrar por Provincia"
@@ -891,12 +756,13 @@ const TerritoryManager = () => {
                     </Select.Option>
                   ))}
                 </Select>
-              </div>
-
-              <span className="text-xs text-gray-500 font-medium">
-                Mostrando {filteredCantons.length} de {cantons.length} cantones
-              </span>
-            </div>
+              }
+              shown={filteredCantons.length}
+              total={cantons.length}
+              noun="cantones"
+              onReload={refreshAll}
+              loading={loadingCantons}
+            />
 
             <Table
               dataSource={filteredCantons}
@@ -916,19 +782,11 @@ const TerritoryManager = () => {
         {/* Tab 3: Distritos */}
         {activeTab === '3' && (
           <div className="space-y-4">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-              <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                <div className="w-full md:w-80">
-                  <Input
-                    prefix={<SearchOutlined className="text-gray-400" />}
-                    placeholder="Buscar distrito por nombre o código..."
-                    value={searchDistrict}
-                    onChange={(e) => setSearchDistrict(e.target.value)}
-                    allowClear
-                    className="rounded-lg py-2"
-                  />
-                </div>
-
+            <CrudToolbar
+              searchPlaceholder="Buscar distrito por nombre o código..."
+              searchValue={searchDistrict}
+              onSearchChange={setSearchDistrict}
+              filters={
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-gray-500">Cantón SNIT:</span>
                   <InputNumber
@@ -941,12 +799,13 @@ const TerritoryManager = () => {
                     className="rounded-lg"
                   />
                 </div>
-              </div>
-
-              <span className="text-xs text-gray-500 font-medium">
-                Mostrando {filteredDistricts.length} de {districts.length} distritos
-              </span>
-            </div>
+              }
+              shown={filteredDistricts.length}
+              total={districts.length}
+              noun="distritos"
+              onReload={refreshAll}
+              loading={loadingDistricts}
+            />
 
             <Table
               dataSource={filteredDistricts}

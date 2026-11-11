@@ -76,7 +76,7 @@ const MaintenanceDashboard = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <Tag color="cyan" className="px-3 py-1 rounded-full text-xs font-semibold">
+          <Tag className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border-blue-200">
             Solo Lectura Segura
           </Tag>
         </div>

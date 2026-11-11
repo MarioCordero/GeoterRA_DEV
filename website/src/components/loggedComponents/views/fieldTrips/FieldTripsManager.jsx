@@ -53,6 +53,9 @@ import {
   ExperimentOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import PillTabs from '../../../common/crud/PillTabs';
+import CrudToolbar from '../../../common/crud/CrudToolbar';
+import { CodeBadge, NameCell, DateCell, SystemIdCell, RowActions } from '../../../common/crud/cells';
 import {
   fieldTripsIndex,
   fieldTripsMy,
@@ -914,7 +917,11 @@ const FieldTripsManager = () => {
       width: 100,
       align: 'center',
       render: (val) => (
-        <Tag color={val ? 'green' : 'default'}>
+        <Tag className={`rounded-full text-xs font-semibold ${
+          val
+            ? 'bg-blue-50 text-[#12467E] border-blue-200'
+            : 'bg-gray-100 text-gray-600 border-gray-200'
+        }`}>
           {val ? 'Activa' : 'Inactiva'}
         </Tag>
       ),
@@ -924,16 +931,12 @@ const FieldTripsManager = () => {
       dataIndex: 'field_trip_name',
       key: 'field_trip_name',
       render: (val, record) => (
-        <div>
-          <span className="font-semibold text-blue-600 hover:text-blue-800 block cursor-pointer">
-            {val}
-          </span>
-          {isMaintenance && (
-            <div style={{ fontSize: 11, color: '#8c8c8c' }} className="font-mono">
-              {record.field_trip_id || record.id}
-            </div>
-          )}
-        </div>
+        <NameCell
+          icon={<CompassOutlined />}
+          subtitle={isMaintenance ? `ID: ${record.field_trip_id || record.id}` : undefined}
+        >
+          {val}
+        </NameCell>
       ),
     },
     {
@@ -943,8 +946,8 @@ const FieldTripsManager = () => {
         const start = record.field_trip_start_date ? dayjs(record.field_trip_start_date).format('YYYY-MM-DD') : null;
         const finish = record.field_trip_finish_date ? dayjs(record.field_trip_finish_date).format('YYYY-MM-DD') : null;
         return (
-          <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <CalendarOutlined style={{ color: '#fa8c16' }} />
+          <span style={{ display: 'flex', alignItems: 'center', gap: 6 }} className="text-xs text-gray-600">
+            <CalendarOutlined className="text-geoterra-orange" />
             {start && finish ? `${start} al ${finish}` : (start || finish || 'N/A')}
           </span>
         );
@@ -960,12 +963,12 @@ const FieldTripsManager = () => {
           record.district_name || record.district,
         ].filter(Boolean);
         return parts.length > 0 ? (
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <EnvironmentOutlined style={{ color: '#1890ff' }} />
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }} className="text-xs text-gray-700">
+            <EnvironmentOutlined className="text-[#12467E]" />
             {parts.join(', ')}
           </span>
         ) : (
-          <Text type="secondary">Costa Rica</Text>
+          <Text type="secondary" style={{ fontSize: 12 }}>Costa Rica</Text>
         );
       },
     },
@@ -976,7 +979,7 @@ const FieldTripsManager = () => {
       render: (_, record) => {
         const count = Array.isArray(record.participants) ? record.participants.length : (record.participant_count || 0);
         return (
-          <Tag color="blue" icon={<TeamOutlined />}>
+          <Tag className="rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border-blue-200" icon={<TeamOutlined />}>
             {count} {count === 1 ? 'persona' : 'personas'}
           </Tag>
         );
@@ -989,7 +992,7 @@ const FieldTripsManager = () => {
       render: (_, record) => {
         const count = Array.isArray(record.geomanifestations) ? record.geomanifestations.length : (record.manifestation_count || 0);
         return (
-          <Tag color="orange" icon={<FireOutlined />}>
+          <Tag className="rounded-full text-xs font-semibold bg-orange-50 text-orange-700 border-orange-200" icon={<FireOutlined />}>
             {count} {count === 1 ? 'sitio' : 'sitios'}
           </Tag>
         );
@@ -1000,41 +1003,14 @@ const FieldTripsManager = () => {
       key: 'actions',
       align: 'right',
       render: (_, record) => (
-        <Space size="small" onClick={(e) => e.stopPropagation()}>
-          <Tooltip title="Editar Gira">
-            <Button
-              type="primary"
-              size="small"
-              icon={<EditOutlined />}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleOpenEdit(record);
-              }}
-            />
-          </Tooltip>
-
-          <Popconfirm
-            title="¿Eliminar esta gira de campo?"
-            description="Se desvincularán los participantes y manifestaciones asociadas."
-            onConfirm={(e) => {
-              e?.stopPropagation();
-              handleDeleteTrip(record);
-            }}
-            okText="Sí, eliminar"
-            cancelText="Cancelar"
-            okButtonProps={{ danger: true }}
-          >
-            <Tooltip title="Eliminar Gira">
-              <Button
-                type="text"
-                danger
-                size="small"
-                icon={<DeleteOutlined />}
-                onClick={(e) => e.stopPropagation()}
-              />
-            </Tooltip>
-          </Popconfirm>
-        </Space>
+        <div onClick={(e) => e.stopPropagation()}>
+          <RowActions
+            entity="gira de campo"
+            onEdit={() => handleOpenEdit(record)}
+            onDelete={() => handleDeleteTrip(record)}
+            deleteDescription="Se desvincularán los participantes y manifestaciones asociadas."
+          />
+        </div>
       ),
     }] : []),
   ];
@@ -1080,19 +1056,11 @@ const FieldTripsManager = () => {
               icon={<PlusOutlined />}
               onClick={handleOpenCreate}
               style={{ backgroundColor: '#12467E', borderColor: '#12467E' }}
-              className="poppins-bold"
+              className="poppins-bold shadow-sm"
             >
               Nueva Gira de Campo
             </Button>
           )}
-          <Button
-            icon={<ReloadOutlined spin={loading} />}
-            onClick={loadTrips}
-            loading={loading}
-            className="poppins font-medium border-gray-300"
-          >
-            Actualizar
-          </Button>
         </div>
       </div>
 
@@ -1200,41 +1168,31 @@ const FieldTripsManager = () => {
       {/* ========================================================================= */}
       {/* FILTER & DATA TABLE CARD                                                  */}
       {/* ========================================================================= */}
-      <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-          <Tabs
-            activeKey={activeTab}
-            onChange={setActiveTab}
-            className="poppins mb-0"
-            items={[
-              {
-                key: 'all',
-                label: (
-                  <span className="font-semibold flex items-center gap-1.5">
-                    <CompassOutlined /> Todas las Giras ({trips.length})
-                  </span>
-                ),
-              },
-              {
-                key: 'my',
-                label: (
-                  <span className="font-semibold flex items-center gap-1.5">
-                    <TeamOutlined /> Mis Giras Asignadas ({myTrips.length})
-                  </span>
-                ),
-              },
-            ]}
-          />
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+        <PillTabs
+          items={[
+            {
+              key: 'all',
+              label: 'Todas las Giras',
+              icon: <CompassOutlined />,
+              count: trips.length,
+            },
+            {
+              key: 'my',
+              label: 'Mis Giras Asignadas',
+              icon: <TeamOutlined />,
+              count: myTrips.length,
+            },
+          ]}
+          activeKey={activeTab}
+          onChange={setActiveTab}
+        />
 
-          <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
-            <Input
-              prefix={<SearchOutlined className="text-gray-400" />}
-              placeholder="Buscar por nombre o ID..."
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              className="w-full sm:w-64 rounded-lg py-1.5"
-              allowClear
-            />
+        <CrudToolbar
+          searchPlaceholder="Buscar por nombre o ID..."
+          searchValue={searchText}
+          onSearchChange={setSearchText}
+          filters={
             <Select
               value={statusFilter}
               onChange={setStatusFilter}
@@ -1245,8 +1203,13 @@ const FieldTripsManager = () => {
                 { value: 'inactive', label: 'Solo Inactivas' },
               ]}
             />
-          </div>
-        </div>
+          }
+          shown={filteredTrips.length}
+          total={currentList.length}
+          noun="giras"
+          onReload={loadTrips}
+          loading={loading}
+        />
 
         {/* Table */}
         {loading ? (
@@ -1515,7 +1478,7 @@ const FieldTripsManager = () => {
                 <AimOutlined /> Ubicación Satelital (GPS)
               </h3>
               {gpsAccuracy && (
-                <Tag color="cyan" style={{ margin: 0 }}>
+                <Tag className="m-0 rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border-blue-200">
                   Precisión: {gpsAccuracy}
                 </Tag>
               )}
@@ -1586,7 +1549,7 @@ const FieldTripsManager = () => {
                 }}
                 className="poppins-bold"
               >
-                {gettingGps ? 'Obteniendo señal satelital GPS...' : '📍 Capturar Ubicación GPS Actual'}
+                {gettingGps ? 'Obteniendo señal satelital GPS...' : 'Capturar Ubicación GPS Actual'}
               </Button>
             )}
 

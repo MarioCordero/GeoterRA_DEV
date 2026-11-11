@@ -28,6 +28,9 @@ import {
 import EntityNavigatorPicker from '../../../common/EntityNavigatorPicker';
 import { renderDateWithProse } from '../../../../utils/dateFormatter';
 import { useSession } from '../../../../hooks/useSession';
+import PillTabs from '../../../common/crud/PillTabs';
+import CrudToolbar from '../../../common/crud/CrudToolbar';
+import { CodeBadge, NameCell, DateCell, SystemIdCell, RowActions } from '../../../common/crud/cells';
 import {
   inlabTestsIndex,
   inlabTestsStore,
@@ -224,13 +227,13 @@ const InlabTestsManager = () => {
       title: 'Nombre de la Prueba',
       dataIndex: 'inlab_test_name',
       key: 'inlab_test_name',
-      render: (val) => <span className="font-semibold text-gray-900">{val || 'Sin nombre'}</span>,
+      render: (val) => <NameCell icon={<ExperimentOutlined />}>{val || 'Sin nombre'}</NameCell>,
     },
     ...(isMaintenance ? [{
       title: 'ID Prueba',
       dataIndex: 'inlab_test_id',
       key: 'inlab_test_id',
-      render: (val, record) => <span className="font-mono text-xs font-semibold text-gray-700">{val || record.id}</span>,
+      render: (val, record) => <SystemIdCell value={val || record.id} />,
     }] : []),
     {
       title: 'pH',
@@ -278,28 +281,12 @@ const InlabTestsManager = () => {
       key: 'actions',
       align: 'right',
       render: (_, record) => (
-        <Space size="middle">
-          <Tooltip title="Editar prueba">
-            <Button
-              icon={<EditOutlined />}
-              size="middle"
-              onClick={() => handleOpenEdit(record)}
-              className="text-blue-600 hover:text-blue-700 hover:border-blue-300"
-            />
-          </Tooltip>
-          <Popconfirm
-            title="¿Eliminar prueba de laboratorio?"
-            description="Esta acción es irreversible y eliminará la prueba."
-            onConfirm={() => handleDelete(record)}
-            okText="Sí, eliminar"
-            cancelText="Cancelar"
-            okButtonProps={{ danger: true }}
-          >
-            <Tooltip title="Eliminar prueba">
-              <Button icon={<DeleteOutlined />} size="middle" danger />
-            </Tooltip>
-          </Popconfirm>
-        </Space>
+        <RowActions
+          entity="prueba de laboratorio"
+          onEdit={() => handleOpenEdit(record)}
+          onDelete={() => handleDelete(record)}
+          deleteDescription="Esta acción es irreversible y eliminará la prueba."
+        />
       ),
     },
   ];
@@ -323,16 +310,6 @@ const InlabTestsManager = () => {
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
-          <Button
-            icon={<ReloadOutlined spin={loading} />}
-            onClick={() => loadTests(selectedGeoId)}
-            loading={loading}
-            disabled={!selectedGeoId}
-            className="poppins font-medium border-gray-300"
-          >
-            Actualizar
-          </Button>
-
           <Button
             type="primary"
             icon={<PlusOutlined />}
@@ -435,6 +412,19 @@ const InlabTestsManager = () => {
 
       {/* 3. Main Data Card */}
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+        {/* Navigation Tabs Header */}
+        <PillTabs
+          items={[
+            {
+              key: 'inlab',
+              label: 'Pruebas de Laboratorio',
+              icon: <ExperimentOutlined />,
+              count: tests.length,
+            },
+          ]}
+          activeKey="inlab"
+        />
+
         {/* Entity Navigator Picker */}
         <EntityNavigatorPicker
           entityType="geomanifestations"
@@ -447,21 +437,16 @@ const InlabTestsManager = () => {
         />
 
         {/* Filter and Search Toolbar */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-          <div className="w-full md:w-96">
-            <Input
-              prefix={<SearchOutlined className="text-gray-400" />}
-              placeholder="Buscar prueba por nombre o notas..."
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              allowClear
-              className="rounded-lg py-2"
-            />
-          </div>
-          <span className="text-xs text-gray-500 font-medium">
-            Mostrando {filteredTests.length} de {tests.length} pruebas de laboratorio
-          </span>
-        </div>
+        <CrudToolbar
+          searchPlaceholder="Buscar prueba por nombre o notas..."
+          searchValue={searchText}
+          onSearchChange={setSearchText}
+          shown={filteredTests.length}
+          total={tests.length}
+          noun="pruebas de laboratorio"
+          onReload={selectedGeoId ? () => loadTests(selectedGeoId) : undefined}
+          loading={loading}
+        />
 
         {/* Table */}
         <Table

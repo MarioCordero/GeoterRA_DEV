@@ -22,6 +22,8 @@ import {
 import { analysisRequestIndex, analysisRequestDelete } from '../../config/apiConf';
 import { Table, Button, Modal, Tag, message, Empty, Input, Select, Tooltip, Popconfirm, Spin, Space } from 'antd';
 import { renderDateWithProse } from '../../utils/dateFormatter';
+import PillTabs from './crud/PillTabs';
+import CrudToolbar from './crud/CrudToolbar';
 
 /**
  * UserRequests Component
@@ -489,60 +491,56 @@ const UserRequests = () => {
       {/* FILTER & DATA TABLE CARD                                                  */}
       {/* ========================================================================= */}
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-          <div className="flex-1 w-full md:w-auto flex flex-col sm:flex-row gap-3 items-center flex-wrap">
-            <Input
-              placeholder="Buscar por provincia, cantón, titular o ID..."
-              prefix={<SearchOutlined className="text-gray-400" />}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              allowClear
-              className="w-full sm:max-w-md rounded-lg py-1.5"
-            />
+        <PillTabs
+          items={[
+            {
+              key: 'requests',
+              label: 'Mis Solicitudes',
+              icon: <FileTextOutlined />,
+              count: requests.length,
+            },
+          ]}
+          activeKey="requests"
+        />
 
-            <Select
-              value={stateFilter}
-              onChange={(val) => setStateFilter(val)}
-              className="w-full sm:w-48"
-            >
-              <Select.Option value="ALL">Todos los Estados</Select.Option>
-              <Select.Option value="REGISTRADA">Registradas</Select.Option>
-              <Select.Option value="REVISION">En Revisión</Select.Option>
-              <Select.Option value="APROBADA">Aprobadas / En Mapa</Select.Option>
-            </Select>
-
-            {(searchText || stateFilter !== 'ALL') && (
-              <Button
-                icon={<ClearOutlined />}
-                onClick={() => {
-                  setSearchText('');
-                  setStateFilter('ALL');
-                }}
-                className="poppins text-xs text-gray-500"
+        <CrudToolbar
+          searchPlaceholder="Buscar por provincia, cantón, titular o ID..."
+          searchValue={searchText}
+          onSearchChange={setSearchText}
+          filters={
+            <>
+              <Select
+                value={stateFilter}
+                onChange={(val) => setStateFilter(val)}
+                className="w-full sm:w-48"
               >
-                Limpiar filtros
-              </Button>
-            )}
-          </div>
+                <Select.Option value="ALL">Todos los Estados</Select.Option>
+                <Select.Option value="REGISTRADA">Registradas</Select.Option>
+                <Select.Option value="REVISION">En Revisión</Select.Option>
+                <Select.Option value="APROBADA">Aprobadas / En Mapa</Select.Option>
+              </Select>
 
-          <div className="flex items-center gap-3 self-end sm:self-center flex-wrap">
-            <span className="text-xs text-gray-500 font-medium whitespace-nowrap">
-              Mostrando <strong className="text-gray-700">{filteredRequests.length}</strong> de{' '}
-              <strong className="text-gray-700">{requests.length}</strong> solicitudes
-            </span>
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <AddRequest onRequestAdded={handleRequestAdded} />
-              <Button
-                icon={<ReloadOutlined spin={loading} />}
-                onClick={loadRequests}
-                loading={loading}
-                className="poppins font-medium border-gray-300"
-              >
-                Actualizar
-              </Button>
-            </div>
-          </div>
-        </div>
+              {(searchText || stateFilter !== 'ALL') && (
+                <Button
+                  icon={<ClearOutlined />}
+                  onClick={() => {
+                    setSearchText('');
+                    setStateFilter('ALL');
+                  }}
+                  className="poppins text-xs text-gray-500"
+                >
+                  Limpiar filtros
+                </Button>
+              )}
+            </>
+          }
+          shown={filteredRequests.length}
+          total={requests.length}
+          noun="solicitudes"
+          onReload={loadRequests}
+          loading={loading}
+          extra={<AddRequest onRequestAdded={handleRequestAdded} />}
+        />
 
         {/* Content */}
         {loading ? (

@@ -31,7 +31,7 @@ const FieldInvestigatorDashboard = () => {
             <span className="text-xs font-bold uppercase tracking-wider text-geoterra-orange poppins">
               OPERACIONES DE CAMPO • GEOTERRA
             </span>
-            <Tag color="cyan" className="m-0 text-[11px] font-semibold">
+            <Tag className="m-0 text-[11px] font-semibold rounded-full bg-blue-50 text-[#12467E] border-blue-200">
               Investigador de Campo
             </Tag>
           </div>

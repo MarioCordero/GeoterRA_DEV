@@ -31,6 +31,8 @@ import {
   CloseCircleOutlined,
 } from '@ant-design/icons';
 import { renderDateWithProse } from '../../../../utils/dateFormatter';
+import PillTabs from '../../../common/crud/PillTabs';
+import CrudToolbar from '../../../common/crud/CrudToolbar';
 
 const ROLE_TAG_CONFIG = {
   admin: { color: 'blue', label: 'Administrador' },
@@ -245,8 +247,8 @@ const UserManagement = () => {
       render: (isDeleted) => (
         <span
           className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${!isDeleted
-            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-            : 'bg-rose-50 text-rose-700 border border-rose-200'
+            ? 'bg-blue-50 text-[#12467E] border border-blue-200'
+            : 'bg-gray-100 text-gray-600 border border-gray-200'
             }`}
         >
           {!isDeleted ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
@@ -409,74 +411,70 @@ const UserManagement = () => {
       {/* FILTER & DATA TABLE CARD                                                  */}
       {/* ========================================================================= */}
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-          <div className="flex-1 w-full md:w-auto flex flex-col sm:flex-row gap-3 items-center flex-wrap">
-            <Input
-              placeholder="Buscar por nombre, correo o teléfono..."
-              prefix={<SearchOutlined className="text-gray-400" />}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              allowClear
-              className="w-full sm:max-w-md rounded-lg py-1.5"
-            />
+        <PillTabs
+          items={[
+            {
+              key: 'users',
+              label: 'Usuarios',
+              icon: <UserOutlined />,
+              count: users.length,
+            },
+          ]}
+          activeKey="users"
+        />
 
-            <Select
-              value={roleFilter}
-              onChange={(val) => setRoleFilter(val)}
-              className="w-full sm:w-52"
-            >
-              <Select.Option value="ALL">Todos los Roles</Select.Option>
-              <Select.Option value="ADMINS">Administradores & Mantenimiento</Select.Option>
-              <Select.Option value="INVESTIGATORS">Investigadores (Campo/Lab)</Select.Option>
-              <Select.Option value="admin">Administrador</Select.Option>
-              <Select.Option value="maintenance">Mantenimiento</Select.Option>
-              <Select.Option value="field_investigator">Investigador de Campo</Select.Option>
-              <Select.Option value="investigator">Investigador</Select.Option>
-              <Select.Option value="user">Usuario General</Select.Option>
-            </Select>
-
-            <Select
-              value={statusFilter}
-              onChange={(val) => setStatusFilter(val)}
-              className="w-full sm:w-40"
-            >
-              <Select.Option value="ALL">Todos los Estados</Select.Option>
-              <Select.Option value="active">Solo Activos</Select.Option>
-              <Select.Option value="deleted">Inactivos</Select.Option>
-            </Select>
-
-            {(searchText || roleFilter !== 'ALL' || statusFilter !== 'ALL') && (
-              <Button
-                icon={<ClearOutlined />}
-                onClick={() => {
-                  setSearchText('');
-                  setRoleFilter('ALL');
-                  setStatusFilter('ALL');
-                }}
-                className="poppins text-xs text-gray-500"
+        <CrudToolbar
+          searchPlaceholder="Buscar por nombre, correo o teléfono..."
+          searchValue={searchText}
+          onSearchChange={setSearchText}
+          filters={
+            <>
+              <Select
+                value={roleFilter}
+                onChange={(val) => setRoleFilter(val)}
+                className="w-full sm:w-52"
               >
-                Limpiar filtros
-              </Button>
-            )}
-          </div>
+                <Select.Option value="ALL">Todos los Roles</Select.Option>
+                <Select.Option value="ADMINS">Administradores & Mantenimiento</Select.Option>
+                <Select.Option value="INVESTIGATORS">Investigadores (Campo/Lab)</Select.Option>
+                <Select.Option value="admin">Administrador</Select.Option>
+                <Select.Option value="maintenance">Mantenimiento</Select.Option>
+                <Select.Option value="field_investigator">Investigador de Campo</Select.Option>
+                <Select.Option value="investigator">Investigador</Select.Option>
+                <Select.Option value="user">Usuario General</Select.Option>
+              </Select>
 
-          <div className="flex items-center gap-3 self-end sm:self-center flex-wrap">
-            <span className="text-xs text-gray-400 poppins whitespace-nowrap">
-              Mostrando <strong className="text-gray-700">{filteredUsers.length}</strong> de{' '}
-              <strong className="text-gray-700">{users.length}</strong> usuarios
-            </span>
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <Button
-                icon={<ReloadOutlined spin={loading} />}
-                onClick={fetchUsers}
-                loading={loading}
-                className="poppins font-medium border-gray-300"
+              <Select
+                value={statusFilter}
+                onChange={(val) => setStatusFilter(val)}
+                className="w-full sm:w-40"
               >
-                Actualizar
-              </Button>
-            </div>
-          </div>
-        </div>
+                <Select.Option value="ALL">Todos los Estados</Select.Option>
+                <Select.Option value="active">Solo Activos</Select.Option>
+                <Select.Option value="deleted">Inactivos</Select.Option>
+              </Select>
+
+              {(searchText || roleFilter !== 'ALL' || statusFilter !== 'ALL') && (
+                <Button
+                  icon={<ClearOutlined />}
+                  onClick={() => {
+                    setSearchText('');
+                    setRoleFilter('ALL');
+                    setStatusFilter('ALL');
+                  }}
+                  className="poppins text-xs text-gray-500"
+                >
+                  Limpiar filtros
+                </Button>
+              )}
+            </>
+          }
+          shown={filteredUsers.length}
+          total={users.length}
+          noun="usuarios"
+          onReload={fetchUsers}
+          loading={loading}
+        />
 
         {/* Table */}
         {loading ? (
