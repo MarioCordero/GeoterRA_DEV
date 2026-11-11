@@ -1241,8 +1241,8 @@ const FieldTripsManager = () => {
               className="w-full sm:w-44"
               options={[
                 { value: 'all', label: 'Todos los estados' },
-                { value: 'active', label: '🟢 Solo Activas' },
-                { value: 'inactive', label: '⚪ Solo Inactivas' },
+                { value: 'active', label: 'Solo Activas' },
+                { value: 'inactive', label: 'Solo Inactivas' },
               ]}
             />
           </div>

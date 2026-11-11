@@ -381,8 +381,8 @@ const UserRequests = () => {
 
       {/* Error message */}
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold">
-          ⚠️ {error}
+        <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold flex items-center">
+          <ExclamationCircleOutlined className="mr-1.5 text-red-500 text-sm" /> {error}
         </div>
       )}
 
@@ -507,9 +507,9 @@ const UserRequests = () => {
       {/* ========================================================================= */}
       {/* FILTER & DATA TABLE CARD                                                  */}
       {/* ========================================================================= */}
-      <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-        <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-          <div className="flex-1 w-full sm:w-auto flex flex-col sm:flex-row gap-3 items-center">
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+          <div className="flex-1 w-full md:w-auto flex flex-col sm:flex-row gap-3 items-center flex-wrap">
             <Input
               placeholder="Buscar por provincia, cantón, titular o ID..."
               prefix={<SearchOutlined className="text-gray-400" />}
@@ -586,6 +586,7 @@ const UserRequests = () => {
                 pageSize: 10,
                 showSizeChanger: true,
                 pageSizeOptions: ['10', '20', '50'],
+                showTotal: (total) => `Total ${total} solicitudes`,
                 className: 'poppins py-2',
               }}
               className="poppins"

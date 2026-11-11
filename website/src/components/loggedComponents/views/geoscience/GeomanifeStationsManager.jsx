@@ -1261,63 +1261,72 @@ const GeomanifeStationsManager = () => {
         {/* Publicas en Mapa */}
         <div
           onClick={() => setActiveTab('1')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${activeTab === '1'
-            ? 'border-emerald-400 shadow-md ring-2 ring-emerald-100'
-            : 'border-gray-200 shadow-sm hover:border-gray-300'
+          className={`cursor-pointer bg-white p-5 rounded-2xl border transition-all shadow-sm hover:shadow-md ${activeTab === '1'
+            ? 'border-[#12467E] ring-2 ring-blue-100'
+            : 'border-gray-200'
             }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Públicas en Mapa</span>
-            <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-base">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Públicas en Mapa</span>
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#12467E] flex items-center justify-center text-lg">
               <EyeOutlined />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold poppins text-emerald-900">{manifestations.length}</span>
-            <span className="text-xs text-emerald-600">visibles</span>
+            <span className="text-3xl font-bold poppins text-gray-800">{manifestations.length}</span>
+            <span className="text-xs text-gray-500 font-medium">visibles</span>
           </div>
-          <div className="mt-2 text-xs text-emerald-700 font-medium">Publicadas oficialmente</div>
+          <div className="mt-2 text-xs text-blue-700 font-medium flex items-center gap-1">
+            <CheckCircleOutlined /> Publicadas oficialmente
+          </div>
         </div>
 
         {/* Borradores */}
         <div
           onClick={() => setActiveTab('2')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${activeTab === '2'
-            ? 'border-amber-400 shadow-md ring-2 ring-amber-100'
-            : 'border-gray-200 shadow-sm hover:border-gray-300'
+          className={`cursor-pointer bg-white p-5 rounded-2xl border transition-all shadow-sm hover:shadow-md ${activeTab === '2'
+            ? 'border-[#12467E] ring-2 ring-blue-100'
+            : 'border-gray-200'
             }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">Borradores / En Estudio</span>
-            <div className="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-base">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Borradores / En Estudio</span>
+            <div className="w-10 h-10 rounded-xl bg-orange-50 text-geoterra-orange flex items-center justify-center text-lg">
               <ExperimentOutlined />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold poppins text-amber-900">{acceptedRequestsManifestations.length}</span>
-            <span className="text-xs text-amber-600">en preparación</span>
+            <span className="text-3xl font-bold poppins text-gray-800">{acceptedRequestsManifestations.length}</span>
+            <span className="text-xs text-gray-500 font-medium">en preparación</span>
           </div>
-          <div className="mt-2 text-xs text-amber-700 font-medium">Requieren completar georeporte</div>
+          <div className="mt-2 text-xs text-orange-700 font-medium flex items-center gap-1">
+            <FilterOutlined /> Requieren completar georeporte
+          </div>
         </div>
 
         {/* Listas para Publicar */}
         <div
           onClick={() => setActiveTab('2')}
-          className="cursor-pointer bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:border-blue-300 transition-all"
+          className={`cursor-pointer bg-white p-5 rounded-2xl border transition-all shadow-sm hover:shadow-md ${activeTab === '2'
+            ? 'border-[#12467E] ring-2 ring-blue-100'
+            : 'border-gray-200'
+            }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider">Listas para Publicar</span>
-            <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-base">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Listas para Publicar</span>
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#12467E] flex items-center justify-center text-lg">
               <RocketOutlined />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold poppins text-blue-900">
+            <span className="text-3xl font-bold poppins text-gray-800">
               {acceptedRequestsManifestations.filter((d) => d.hasGeoreport).length}
             </span>
-            <span className="text-xs text-blue-600">con georeporte</span>
+            <span className="text-xs text-gray-500 font-medium">con georeporte</span>
           </div>
-          <div className="mt-2 text-xs text-blue-700 font-medium">Listas para subir al mapa</div>
+          <div className="mt-2 text-xs text-blue-700 font-medium flex items-center gap-1">
+            <CheckCircleOutlined /> Listas para subir al mapa
+          </div>
         </div>
       </div>
 
