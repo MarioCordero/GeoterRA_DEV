@@ -34,6 +34,10 @@ class AccountScreen : Screen {
 		val navigator = LocalNavigator.currentOrThrow
 		val snackbarHostState = remember { TypedSnackbarHostState() }
 
+		LaunchedEffect(Unit) {
+			viewModel.refreshProfile()
+		}
+
 		LaunchedEffect(state.isSessionExpired) {
 			if (state.isSessionExpired) {
 				snackbarHostState.showErrorSnackbar("Su sesión ha expirado. Inicie sesión nuevamente.")

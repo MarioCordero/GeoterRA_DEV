@@ -17,7 +17,8 @@ class AccountViewModel(
 	private val settings: Settings
 ) : BaseScreenModel<AccountState>(
 	AccountState(
-		isLoading = true,
+		isLoading = authService.userSession.value == null,
+		user = authService.userSession.value,
 		isDarkMode = settings.getBoolean("is_dark_mode", false),
 		isFieldTripMode = settings.getBoolean("is_field_trip_mode", false)
 	)
@@ -41,6 +42,12 @@ class AccountViewModel(
 					else -> Unit
 				}
 			}
+		}
+	}
+
+	fun refreshProfile() {
+		screenModelScope.launch {
+			authService.fetchAndStoreUserProfile()
 		}
 	}
 

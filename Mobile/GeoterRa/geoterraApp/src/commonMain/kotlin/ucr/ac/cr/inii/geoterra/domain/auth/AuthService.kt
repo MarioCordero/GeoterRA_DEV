@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import ucr.ac.cr.inii.geoterra.data.model.requests.LoginRequest
 import ucr.ac.cr.inii.geoterra.data.model.requests.RegisterRequest
 import ucr.ac.cr.inii.geoterra.data.model.responses.UserResponse
@@ -25,6 +26,8 @@ class AuthService(
 	private val _userSession = MutableStateFlow<UserResponse?>(null)
 	val userSession: StateFlow<UserResponse?> = _userSession.asStateFlow()
 
+	private val fetchMutex = Mutex()
+
 	val userId: String? get() = _userSession.value?.user_id
 	val userEmail: String? get() = _userSession.value?.email
 	val userRole: String? get() = _userSession.value?.role
@@ -38,7 +41,6 @@ class AuthService(
 
 		screenModelScope.launch {
 			val isUserLogged = authRepository.isUserLoggedIn()
-
 			if (authEventBus.isLoggedIn.value == null) {
 				if (isUserLogged) {
 					fetchAndStoreUserProfile()
@@ -52,10 +54,8 @@ class AuthService(
 		when (event) {
 			is AuthEvent.LoginSuccess -> {
 				authEventBus.updateLoginState(true)
-				fetchAndStoreUserProfile()
 			}
 			is AuthEvent.Authorized -> Unit
-
 			is AuthEvent.Logout,
 			is AuthEvent.Unauthorized -> {
 				_userSession.value = null
@@ -66,9 +66,14 @@ class AuthService(
 	}
 
 	suspend fun fetchAndStoreUserProfile() {
-		userRepository.getMe()
-			.onSuccess { user -> _userSession.value = user }
-			.onFailure { _userSession.value = null }
+		if (!fetchMutex.tryLock()) return
+		try {
+			userRepository.getMe()
+				.onSuccess { user -> _userSession.value = user }
+				.onFailure { _userSession.value = null }
+		} finally {
+			fetchMutex.unlock()
+		}
 	}
 
 	fun setCurrentUser(user: UserResponse?) {

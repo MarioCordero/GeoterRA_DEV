@@ -1,6 +1,7 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.map
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.CircularProgressIndicator
@@ -12,13 +13,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import geoterra.geoterraapp.generated.resources.Res
 import geoterra.geoterraapp.generated.resources.ic_cluster
 import geoterra.geoterraapp.generated.resources.ic_map_marker
-import geoterra.geoterraapp.generated.resources.ic_marker
 import geoterra.geoterraapp.generated.resources.ic_userMarker
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
@@ -61,12 +62,26 @@ fun MapContent(
 	onDetailsClick: (GeomanifestationResponse) -> Unit,
 	onDismissPanel: () -> Unit
 ) {
-	Box(modifier = modifier.fillMaxSize()) {
+	BoxWithConstraints(modifier = modifier.fillMaxSize()) {
 
 		val coroutineScope = rememberCoroutineScope()
 		val markerIcon = painterResource(Res.drawable.ic_map_marker)
 		val userMarkerIcon = painterResource(Res.drawable.ic_userMarker)
 		val clusterMarkerIcon = painterResource(Res.drawable.ic_cluster)
+
+		val (markerWidth, markerHeight) = when {
+			maxWidth >= 600.dp -> 48.dp to 73.dp
+			maxWidth >= 360.dp -> 38.dp to 58.dp
+			else -> 32.dp to 49.dp
+		}
+
+		val clusterScale = 1.1f
+		val clusterWidth = markerWidth * clusterScale
+		val clusterHeight = markerHeight * clusterScale
+
+		val markerSize = DpSize(markerWidth, markerHeight)
+		val clusterSize = DpSize(clusterWidth, clusterHeight)
+		val userSize = DpSize(markerWidth, markerHeight)
 
 		val cameraState = rememberCameraState(
 			firstPosition = CameraPosition(
@@ -170,13 +185,16 @@ fun MapContent(
 					id = "cluster-icon-layer",
 					source = manifestationSource,
 					filter = feature.has("point_count"),
-					iconImage = image(clusterMarkerIcon),
+					iconImage = image(
+						value = clusterMarkerIcon,
+						size = clusterSize
+					),
 					iconSize = interpolate(
 						linear(),
 						zoom(),
-						5f to const(1.0f),
-						10f to const(1.2f),
-						15f to const(1.5f)
+						5f to const(0.8f),
+						10f to const(1.0f),
+						15f to const(1.2f)
 					),
 					iconAllowOverlap = const(true),
 					iconIgnorePlacement = const(true),
@@ -206,13 +224,16 @@ fun MapContent(
 					id = "manifestations-layer",
 					source = manifestationSource,
 					filter = !feature.has("point_count"),
-					iconImage = image(markerIcon),
+					iconImage = image(
+						value = markerIcon,
+						size = markerSize
+					),
 					iconSize = interpolate(
 						linear(),
 						zoom(),
-						5f to const(1.0f),
-						10f to const(1.2f),
-						15f to const(1.5f)
+						5f to const(0.85f),
+						10f to const(1.0f),
+						15f to const(1.15f)
 					),
 					iconAllowOverlap = const(true),
 					iconIgnorePlacement = const(true),
@@ -250,21 +271,20 @@ fun MapContent(
 				val userSource = rememberGeoJsonSource(
 					data = GeoJsonData.JsonString(userGeoJson)
 				)
-//
-//				5f to const(2.5f),
-//				10f to const(4f),
-//				18f to const(2f)
 
 				SymbolLayer(
 					id = "user-location-layer",
 					source = userSource,
-					iconImage = image(userMarkerIcon),
+					iconImage = image(
+						value = userMarkerIcon,
+						size = userSize
+					),
 					iconSize = interpolate(
 						linear(),
 						zoom(),
-						5f to const(1.0f),
-						10f to const(1.2f),
-						15f to const(1.5f)
+						5f to const(0.85f),
+						10f to const(1.0f),
+						15f to const(1.15f)
 					),
 					iconAllowOverlap = const(false),
 					iconIgnorePlacement = const(true),

@@ -68,7 +68,8 @@ val networkModule = module {
 							message
 						}
 
-						println("KtorClient: $formattedMessage")					}
+						println("KtorClient: $formattedMessage")
+					}
 				}
 
 				level = LogLevel.ALL
@@ -122,7 +123,7 @@ val networkModule = module {
 
 							if (expiredRefreshToken || data == null) {
 								tm.clearTokens()
-								authEventBus.emit(AuthEvent.Logout)
+								authEventBus.emit(AuthEvent.Unauthorized)
 								return@refreshTokens null
 							}
 
@@ -133,7 +134,7 @@ val networkModule = module {
 
 						} catch (e: Exception) {
 							tm.clearTokens()
-							authEventBus.emit(AuthEvent.Logout)
+							authEventBus.emit(AuthEvent.Unauthorized)
 							null
 						}
 					}

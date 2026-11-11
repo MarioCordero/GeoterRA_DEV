@@ -33,19 +33,19 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation.Geomani
 
 class MapScreen : Screen {
 
-  @OptIn(ExperimentalMaterial3Api::class)
-  @Composable
-  override fun Content() {
-    val viewModel = getScreenModel<MapViewModel>()
-    val state by viewModel.state.collectAsState()
-    val navigator = LocalNavigator.currentOrThrow
+	@OptIn(ExperimentalMaterial3Api::class)
+	@Composable
+	override fun Content() {
+		val viewModel = getScreenModel<MapViewModel>()
+		val state by viewModel.state.collectAsState()
+		val navigator = LocalNavigator.currentOrThrow
 
-    val snackBarHost = remember { TypedSnackbarHostState() }
-    
-    LaunchedEffect(Unit) {
-      viewModel.requestLocationIfNeeded()
-      viewModel.loadMapMarkers()
-    }
+		val snackBarHost = remember { TypedSnackbarHostState() }
+
+		LaunchedEffect(Unit) {
+			viewModel.requestLocationIfNeeded()
+			viewModel.loadMapMarkers()
+		}
 
 		LaunchedEffect(state.snackBarMessage) {
 			state.snackBarMessage?.let { message ->
@@ -57,58 +57,58 @@ class MapScreen : Screen {
 			}
 		}
 
-    Scaffold(
-      snackbarHost = { CustomSnackbarHost(snackBarHost) },
-      floatingActionButton = {
-        Column(
-          horizontalAlignment = Alignment.End,
-          verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+		Scaffold(
+			snackbarHost = { CustomSnackbarHost(snackBarHost) },
+			floatingActionButton = {
+				Column(
+					horizontalAlignment = Alignment.End,
+					verticalArrangement = Arrangement.spacedBy(8.dp)
+				) {
 
-          FloatingActionButton(
-            onClick = { viewModel.onUserMarkerSelected() },
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
-          ) {
-            Icon(Icons.Default.MyLocation, contentDescription = "Mi ubicación")
-          }
+					FloatingActionButton(
+						onClick = { viewModel.onUserMarkerSelected() },
+						containerColor = MaterialTheme.colorScheme.primary,
+						contentColor = MaterialTheme.colorScheme.onPrimary
+					) {
+						Icon(Icons.Default.MyLocation, contentDescription = "Mi ubicación")
+					}
 
-          FloatingActionButton(
-            onClick = { viewModel.toggleFilterModal() },
-            containerColor = MaterialTheme.colorScheme.secondary,
-            contentColor = MaterialTheme.colorScheme.onSecondary,
-            modifier = Modifier.size(56.dp)
-          ) {
-            Icon(Icons.Default.FilterList, contentDescription = "Filtros")
-          }
-        }
+					FloatingActionButton(
+						onClick = { viewModel.toggleFilterModal() },
+						containerColor = MaterialTheme.colorScheme.secondary,
+						contentColor = MaterialTheme.colorScheme.onSecondary,
+						modifier = Modifier.size(56.dp)
+					) {
+						Icon(Icons.Default.FilterList, contentDescription = "Filtros")
+					}
+				}
 
-      }
-    ) { padding ->
-      MapContent(
-        modifier = Modifier.fillMaxSize(),
-        state = state,
-        onManifestationMarkerClick = viewModel::onManifestationMarkerSelected,
-        onUserMarkerClick = viewModel::onUserMarkerSelected,
-        onDismissPanel = { viewModel.onManifestationMarkerSelected("") },
-        onDetailsClick = { manifestation ->
-          navigator.push(GeomanifestationScreen(manifestation))
-        }
-      )
+			}
+		) { padding ->
+			MapContent(
+				modifier = Modifier.fillMaxSize(),
+				state = state,
+				onManifestationMarkerClick = viewModel::onManifestationMarkerSelected,
+				onUserMarkerClick = viewModel::onUserMarkerSelected,
+				onDismissPanel = { viewModel.onManifestationMarkerSelected("") },
+				onDetailsClick = { manifestation ->
+					navigator.push(GeomanifestationScreen(manifestation))
+				}
+			)
 
-      FilterBottomModal(
-        isVisible = state.isFilterModalVisible,
-        state = state,
-        onProvinceSelected = viewModel::selectProvince,
-        onCantonSelected = viewModel::selectCanton,
-        onDistrictSelected = viewModel::selectDistrict,
-        onTempMinChange = viewModel::selectTempMin,
-        onTempMaxChange = viewModel::selectTempMax,
-        toggleLayer = viewModel::toggleLayer,
-        onDismiss = viewModel::hideFilterModal,
-        onApplyFilters = viewModel::applyFilters,
-        onClearFilters = viewModel::clearAllFilters
-      )
-    }
-  }
+			FilterBottomModal(
+				isVisible = state.isFilterModalVisible,
+				state = state,
+				onProvinceSelected = viewModel::selectProvince,
+				onCantonSelected = viewModel::selectCanton,
+				onDistrictSelected = viewModel::selectDistrict,
+				onTempMinChange = viewModel::selectTempMin,
+				onTempMaxChange = viewModel::selectTempMax,
+				toggleLayer = viewModel::toggleLayer,
+				onDismiss = viewModel::hideFilterModal,
+				onApplyFilters = viewModel::applyFilters,
+				onClearFilters = viewModel::clearAllFilters
+			)
+		}
+	}
 }
