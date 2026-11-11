@@ -22,7 +22,8 @@ import {
   FaTimes,
   FaUndo,
   FaThermometerHalf,
-  FaGlobeAmericas
+  FaGlobeAmericas,
+  FaChartBar
 } from "react-icons/fa";
 
 // Fix Leaflet's default icon issue
@@ -550,50 +551,86 @@ export default function MapComponent() {
                 key={`${point.id}-${idx}`}
                 position={[lat, lng]}
               >
-                <Popup maxWidth={400} minWidth={320}>
-                  <div className="w-full max-w-[380px] min-w-0 overflow-x-hidden m-2 p-2 poppins">
-                    <h4 className="mb-2 text-[16px] text-geoterra-blue border-b-2 border-blue-500 pb-1 font-bold">
-                      {point.name || (isMaintenance ? `Punto #${point.id}` : 'Punto Geotermal')}
-                    </h4>
+                <Popup maxWidth={580} minWidth={450} className="geoterra-point-popup">
+                  <div className="w-full max-w-[530px] p-2.5 poppins">
+                    {/* Header */}
+                    <div className="mb-4 border-b-2 border-[#12467E] pb-2.5">
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="text-xs font-bold uppercase tracking-wider text-geoterra-orange poppins">
+                          MANIFESTACIÓN GEOTÉRMICA
+                        </span>
+                        {isMaintenance && point.id && (
+                          <span className="font-mono text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                            #{String(point.id).slice(0, 8)}
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="text-xl md:text-2xl font-bold text-[#12467E] m-0 leading-tight">
+                        {point.name || (isMaintenance ? `Punto #${point.id}` : 'Punto Geotermal')}
+                      </h3>
+                    </div>
 
-                    <div className="mb-2">
-                      <div className="text-[12px] text-gray-600 mb-1 font-semibold flex items-center gap-1">
-                        <FaMapMarkerAlt className="text-geoterra-blue text-xs shrink-0" />
+                    {/* Ubicación y Coordenadas */}
+                    <div className="mb-4 bg-slate-50 border border-slate-200 rounded-xl p-3.5">
+                      <div className="text-sm text-gray-800 font-semibold flex items-center gap-2 mb-1.5">
+                        <FaMapMarkerAlt className="text-[#12467E] text-sm shrink-0" />
                         <span>{point.locationName}</span>
                       </div>
-                      <div className="text-[11px] text-gray-400 font-mono">
-                        {lat.toFixed(6)}°, {lng.toFixed(6)}°
+                      <div className="flex items-center gap-2.5 text-xs text-gray-500 font-mono">
+                        <span className="bg-white border border-gray-200 px-2.5 py-1 rounded shadow-2xs">
+                          Lat: {lat.toFixed(5)}°
+                        </span>
+                        <span className="bg-white border border-gray-200 px-2.5 py-1 rounded shadow-2xs">
+                          Lon: {lng.toFixed(5)}°
+                        </span>
                       </div>
                     </div>
 
+                    {/* Métricas In-Situ & Clasificación Lindal */}
                     {temperature !== null ? (
-                      <div className="flex flex-col gap-3 text-[11px] mb-3 p-2.5 bg-gray-50 rounded-lg border border-gray-200">
-                        <div className="text-center mb-1">
-                          <div className="font-bold text-red-500 text-lg">{temperature.toFixed(1)}°C</div>
-                          <div className="text-[10px] text-gray-500 font-semibold uppercase">Temperatura in-situ</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-[10px] text-blue-700 font-semibold mb-1">
-                            Clasificación Lindal
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-4 p-4 bg-gradient-to-br from-orange-50/60 to-slate-50 rounded-xl border border-orange-100 shadow-2xs">
+                        {/* Termómetro / Temperatura */}
+                        <div className="flex flex-col justify-center items-center text-center p-3.5 bg-white rounded-xl border border-orange-100 shadow-2xs">
+                          <div className="flex items-center gap-1.5 text-orange-600 mb-1">
+                            <FaThermometerHalf className="text-base" />
+                            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                              Temp. In-Situ
+                            </span>
                           </div>
-                          <div className="max-w-[140px] mx-auto">
+                          <div className="text-4xl font-black text-orange-600 tracking-tight">
+                            {temperature.toFixed(1)}°C
+                          </div>
+                          {point.insitu_test && (point.insitu_test.ph || point.insitu_test.conductivity) ? (
+                            <div className="mt-2 pt-2 border-t border-gray-100 flex items-center justify-center gap-2.5 text-xs text-gray-500 font-mono">
+                              {Number(point.insitu_test.ph) > 0 && <span>pH: {parseFloat(point.insitu_test.ph).toFixed(1)}</span>}
+                              {Number(point.insitu_test.conductivity) > 0 && <span>• {parseFloat(point.insitu_test.conductivity).toFixed(0)} µS</span>}
+                            </div>
+                          ) : null}
+                        </div>
+
+                        {/* Clasificación Lindal */}
+                        <div className="flex flex-col justify-center">
+                          <div className="text-xs text-[#12467E] font-bold text-center mb-1.5">
+                            Clasificación de Usos (Lindal)
+                          </div>
+                          <div className="w-full">
                             <LindalDiagram temperature={temperature} />
                           </div>
                         </div>
                       </div>
                     ) : (
-                      <div className="mb-3 p-2 bg-yellow-50 rounded text-center border border-yellow-200">
-                        <div className="text-[11px] text-yellow-700">
-                          ⚠️ Datos de temperatura in-situ no registrados
-                        </div>
+                      <div className="mb-4 p-3.5 bg-amber-50 rounded-xl text-center border border-amber-200 text-sm text-amber-800">
+                        Temperatura in-situ no registrada
                       </div>
                     )}
 
+                    {/* Botón de Acción Principal */}
                     <button
                       onClick={handleViewDetails}
-                      className="w-full py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-[12px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-colors shadow-sm"
+                      className="w-full py-3 px-5 bg-[#12467E] hover:bg-[#0d3460] text-white rounded-xl text-sm md:text-base font-bold flex items-center justify-center gap-2.5 cursor-pointer transition-all duration-200 shadow-md hover:shadow-lg"
                     >
-                      📊 Ver Detalles Completos y Diagramas
+                      <FaChartBar className="text-base" />
+                      <span>Ver Detalles Completos y Diagramas</span>
                     </button>
                   </div>
                 </Popup>

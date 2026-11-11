@@ -28,10 +28,10 @@ const LindalDiagram = ({ temperature }) => {
   if (!temperature || temperature < 20) {
     return (
       <div style={{
-        fontSize: "9px",
+        fontSize: "11px",
         color: "#666",
         textAlign: "center",
-        padding: "4px"
+        padding: "6px"
       }}>
         <div style={{ fontWeight: "bold", color: "#94a3b8" }}>-</div>
         <div>Temp. baja</div>
@@ -43,20 +43,20 @@ const LindalDiagram = ({ temperature }) => {
   return (
     <div style={{
       border: "1px solid #e2e8f0",
-      borderRadius: "6px",
-      padding: "6px",
+      borderRadius: "8px",
+      padding: "8px",
       backgroundColor: "#fff",
-      fontSize: "9px",
+      fontSize: "11px",
       textAlign: "center"
     }}>
       {/* Temperature indicator */}
       <div style={{
         backgroundColor: primaryUse ? primaryUse.color : "#64748b",
         color: "white",
-        padding: "2px 6px",
-        borderRadius: "4px",
-        marginBottom: "4px",
-        fontSize: "9px",
+        padding: "3px 8px",
+        borderRadius: "6px",
+        marginBottom: "5px",
+        fontSize: "11px",
         fontWeight: "bold"
       }}>
         {temperature}°C
@@ -64,11 +64,11 @@ const LindalDiagram = ({ temperature }) => {
 
       {/* Primary use */}
       {primaryUse && (
-        <div style={{ marginBottom: "3px" }}>
+        <div style={{ marginBottom: "4px" }}>
           <div style={{ 
             color: primaryUse.color,
             fontWeight: "bold",
-            fontSize: "9px",
+            fontSize: "11px",
             lineHeight: "1.2"
           }}>
             {primaryUse.use}
@@ -78,11 +78,11 @@ const LindalDiagram = ({ temperature }) => {
 
       {/* Temperature scale visualization */}
       <div style={{
-        height: "20px",
+        height: "24px",
         display: "flex",
-        marginTop: "3px",
+        marginTop: "4px",
         border: "1px solid #eee",
-        borderRadius: "2px",
+        borderRadius: "4px",
         overflow: "hidden"
       }}>
         {lindalRanges.map((range, index) => {
@@ -105,8 +105,8 @@ const LindalDiagram = ({ temperature }) => {
       {/* Additional applicable uses */}
       {applicableUses.length > 1 && (
         <div style={{
-          marginTop: "3px",
-          fontSize: "7px",
+          marginTop: "4px",
+          fontSize: "9px",
           color: "#666",
           lineHeight: "1.2"
         }}>
