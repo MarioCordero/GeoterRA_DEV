@@ -1,6 +1,7 @@
 package ucr.ac.cr.inii.geoterra.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
@@ -10,7 +11,7 @@ import org.jetbrains.compose.resources.painterResource
 import ucr.ac.cr.inii.geoterra.presentation.screens.fieldtrip.FieldTripScreen
 
 internal object FieldTripTab : Tab {
-	override val key: String = "FieldTripTab_${hashCode()}"
+	override val key: String = "FieldTripTab"
 
 	override val options: TabOptions
 		@Composable
@@ -21,6 +22,6 @@ internal object FieldTripTab : Tab {
 
 	@Composable
 	override fun Content() {
-		Navigator(FieldTripScreen())
+		Navigator(remember { FieldTripScreen() })
 	}
 }

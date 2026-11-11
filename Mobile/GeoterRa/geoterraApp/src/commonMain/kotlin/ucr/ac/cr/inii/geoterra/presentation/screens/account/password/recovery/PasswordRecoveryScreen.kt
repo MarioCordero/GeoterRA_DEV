@@ -19,8 +19,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -33,8 +31,6 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostS
  * Voyager Screen representing the password recovery flow.
  */
 class PasswordRecoveryScreen : Screen {
-
-	override val key: ScreenKey = uniqueScreenKey
 
 	@Composable
 	override fun Content() {

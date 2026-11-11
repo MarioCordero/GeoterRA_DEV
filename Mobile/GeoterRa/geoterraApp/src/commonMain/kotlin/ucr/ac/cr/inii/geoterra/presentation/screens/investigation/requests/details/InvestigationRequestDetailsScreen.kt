@@ -24,6 +24,7 @@ import ucr.ac.cr.inii.geoterra.domain.pdf.PDFUtil
 import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.LogoutEffect
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
@@ -44,9 +45,11 @@ class InvestigationRequestDetailsScreen(
 		val state by viewModel.state.collectAsState()
 		val snackbarHostState = remember { TypedSnackbarHostState() }
 
-		LaunchedEffect(state.request?.request_id) {
+		LaunchedEffect(state.request.request_id) {
 			viewModel.fetchRequestStatuses(request.request_id)
 		}
+
+		LogoutEffect { navigator.pop() }
 
 		LaunchedEffect(state.snackBarMessage) {
 			state.snackBarMessage?.let { snackbarMsg ->

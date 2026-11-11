@@ -98,4 +98,8 @@ class GeomanifestationDetailsViewModel(
 	fun clearSnackBarMessage() {
 		_state.update { it.copy(snackBarMessage = null) }
 	}
+
+	fun updateSnackBarMessage(message: String, type: SnackbarType) {
+		_state.update { it.copy(snackBarMessage = SnackbarMessage(message, type)) }
+	}
 }

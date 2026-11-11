@@ -13,7 +13,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -28,7 +27,7 @@ data class InSituFormScreen(
 	val onSuccess: (() -> Unit)? = null
 ) : Screen {
 
-	override val key: ScreenKey = uniqueScreenKey
+	override val key: ScreenKey get() = "InSituFormScreen_${geomanifestationId}_${testToEdit?.insitu_test_id ?: "new"}"
 
 	@Composable
 	override fun Content() {

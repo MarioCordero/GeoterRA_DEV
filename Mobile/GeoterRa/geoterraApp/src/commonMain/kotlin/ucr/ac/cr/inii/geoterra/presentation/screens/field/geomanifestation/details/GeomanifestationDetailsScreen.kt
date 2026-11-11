@@ -1,12 +1,20 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.field.geomanifestation.details
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,7 +23,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -23,20 +30,21 @@ import org.koin.core.parameter.parametersOf
 import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.ConfirmDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
-import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 import ucr.ac.cr.inii.geoterra.presentation.screens.field.insitu.form.InSituFormScreen
 
 class GeomanifestationDetailsScreen(
 	private val manifestationId: String
 ) : Screen {
-	override val key: ScreenKey = uniqueScreenKey
+	override val key: ScreenKey get() = "GeomanifestationDetailsScreen_$manifestationId"
 
 	@Composable
 	override fun Content() {
 		val viewModel = getScreenModel<GeomanifestationDetailsViewModel> { parametersOf(manifestationId) }
 		val state by viewModel.state.collectAsState()
 		val snackbarHostState = remember { TypedSnackbarHostState() }
+		var isFabExpanded by remember { mutableStateOf(false) }
 		val navigator = LocalNavigator.currentOrThrow
 
 		LaunchedEffect(Unit) {
@@ -85,26 +93,68 @@ class GeomanifestationDetailsScreen(
 				}
 			},
 			floatingActionButton = {
-				ExtendedFloatingActionButton(
-					onClick = {
-						navigator.push(
-							InSituFormScreen(
-								geomanifestationId = manifestationId,
-								geomanifestationName = state.geomanifestation?.geomanifestation_name ?: "",
-								onSuccess = { viewModel.fetchDetails() }
+				Column(
+					horizontalAlignment = Alignment.End,
+					verticalArrangement = Arrangement.spacedBy(8.dp)
+				) {
+					AnimatedVisibility(
+						visible = isFabExpanded,
+						enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
+						exit = fadeOut() + slideOutVertically(targetOffsetY = { it / 2 })
+					) {
+						Column(
+							horizontalAlignment = Alignment.End,
+							verticalArrangement = Arrangement.spacedBy(8.dp)
+						) {
+							ExtendedFloatingActionButton(
+								onClick = {
+									isFabExpanded = false
+									viewModel.updateSnackBarMessage(
+										message = "Opción de generar PDF en desarrollo.",
+										type = SnackbarType.INFO
+									)
+								},
+								icon = { Icon(Icons.Default.Download, contentDescription = "Descargar PDF") },
+								text = { Text("Descargar PDF") },
+								containerColor = MaterialTheme.colorScheme.primaryContainer,
+								contentColor = MaterialTheme.colorScheme.onPrimaryContainer
 							)
-						)
-					},
-					icon = {
+
+							ExtendedFloatingActionButton(
+								onClick = {
+									isFabExpanded = false
+									navigator.push(
+										InSituFormScreen(
+											geomanifestationId = manifestationId,
+											geomanifestationName = state.geomanifestation?.geomanifestation_name ?: "",
+											onSuccess = { viewModel.fetchDetails() }
+										)
+									)
+								},
+								icon = {
+									Icon(
+										imageVector = Icons.Default.Add,
+										contentDescription = "Crear Prueba de Campo"
+									)
+								},
+								text = { Text("Prueba de Campo") },
+								containerColor = MaterialTheme.colorScheme.primaryContainer,
+								contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+							)
+						}
+					}
+
+					FloatingActionButton(
+						onClick = { isFabExpanded = !isFabExpanded },
+						containerColor = MaterialTheme.colorScheme.secondary,
+						contentColor = MaterialTheme.colorScheme.onSecondary
+					) {
 						Icon(
-							imageVector = Icons.Default.Add,
-							contentDescription = "Agregar Prueba de Campo"
+							imageVector = if (isFabExpanded) Icons.Default.Close else Icons.Default.Menu,
+							contentDescription = "Menú de acciones"
 						)
-					},
-					text = { Text("Nueva Prueba de Campo") },
-					containerColor = MaterialTheme.colorScheme.primary,
-					contentColor = MaterialTheme.colorScheme.onPrimary
-				)
+					}
+				}
 			}
 		) { paddingValues ->
 			GeomanifestationDetailsContent(

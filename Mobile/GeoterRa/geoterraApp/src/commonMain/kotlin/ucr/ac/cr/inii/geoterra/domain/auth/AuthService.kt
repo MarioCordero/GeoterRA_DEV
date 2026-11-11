@@ -5,6 +5,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.requests.LoginRequest
 import ucr.ac.cr.inii.geoterra.data.model.requests.RegisterRequest
@@ -17,6 +18,7 @@ class AuthService(
 	private val userRepository: UserRepositoryInterface,
 	private val authEventBus: AuthEventBus
 ) : ScreenModel {
+
 	val isLoggedIn: StateFlow<Boolean?> = authEventBus.isLoggedIn
 	val events = authEventBus.events
 
@@ -29,41 +31,44 @@ class AuthService(
 
 	init {
 		screenModelScope.launch {
+			authEventBus.events
+				.distinctUntilChanged()
+				.collect { event -> handleEvent(event) }
+		}
+
+		screenModelScope.launch {
 			val isUserLogged = authRepository.isUserLoggedIn()
-			authEventBus.updateLoginState(isUserLogged)
 
-			if (isUserLogged) {
-				fetchAndStoreUserProfile()
-				authEventBus.emit(AuthEvent.Authorized)
-			}
-
-			authEventBus.events.collect { event ->
-				when (event) {
-					is AuthEvent.LoginSuccess, is AuthEvent.Authorized -> {
-						authEventBus.updateLoginState(true)
-						fetchAndStoreUserProfile()
-					}
-					is AuthEvent.Logout -> {
-						executeLogoutCleanup()
-					}
-					is AuthEvent.Unauthorized -> {
-						_userSession.value = null
-						authEventBus.updateLoginState(false)
-						authRepository.logout()
-					}
+			if (authEventBus.isLoggedIn.value == null) {
+				if (isUserLogged) {
+					fetchAndStoreUserProfile()
 				}
+				authEventBus.updateLoginState(isUserLogged)
+			}
+		}
+	}
+
+	private suspend fun handleEvent(event: AuthEvent) {
+		when (event) {
+			is AuthEvent.LoginSuccess -> {
+				authEventBus.updateLoginState(true)
+				fetchAndStoreUserProfile()
+			}
+			is AuthEvent.Authorized -> Unit
+
+			is AuthEvent.Logout,
+			is AuthEvent.Unauthorized -> {
+				_userSession.value = null
+				authEventBus.updateLoginState(false)
+				authRepository.logout()
 			}
 		}
 	}
 
 	suspend fun fetchAndStoreUserProfile() {
 		userRepository.getMe()
-			.onSuccess { user ->
-				_userSession.value = user
-			}
-			.onFailure {
-				_userSession.value = null
-			}
+			.onSuccess { user -> _userSession.value = user }
+			.onFailure { _userSession.value = null }
 	}
 
 	fun setCurrentUser(user: UserResponse?) {
@@ -73,10 +78,8 @@ class AuthService(
 	suspend fun login(request: LoginRequest): Result<Unit> {
 		val result = authRepository.login(request)
 		if (result.isSuccess) {
-			fetchAndStoreUserProfile()
 			authEventBus.emit(AuthEvent.LoginSuccess)
 			authEventBus.updateLoginState(true)
-			authEventBus.emit(AuthEvent.Authorized)
 		}
 		return result
 	}
@@ -87,13 +90,6 @@ class AuthService(
 
 	suspend fun logout() {
 		authEventBus.emit(AuthEvent.Logout)
-	}
-
-	private suspend fun executeLogoutCleanup() {
-		_userSession.value = null
-		authRepository.logout()
-		authEventBus.updateLoginState(false)
-		authEventBus.emit(AuthEvent.Unauthorized)
 	}
 
 	suspend fun requestPasswordReset(email: String): Result<Unit> {

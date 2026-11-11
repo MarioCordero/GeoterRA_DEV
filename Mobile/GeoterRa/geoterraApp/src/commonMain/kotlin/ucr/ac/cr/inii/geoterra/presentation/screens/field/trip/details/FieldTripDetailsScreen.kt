@@ -24,7 +24,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -35,6 +34,7 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.ConfirmDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.LogoutEffect
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
@@ -45,7 +45,7 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.geomanifestation.form.Geoman
 class FieldTripDetailsScreen(
 	private val fieldTripId: String
 ) : Screen {
-	override val key: ScreenKey = uniqueScreenKey
+	override val key: ScreenKey get() = "FieldTripDetailsScreen_$fieldTripId"
 
 	@Composable
 	override fun Content() {
@@ -59,6 +59,8 @@ class FieldTripDetailsScreen(
 		LaunchedEffect(Unit) {
 			viewModel.fetchFieldTripDetails()
 		}
+
+		LogoutEffect { navigator.pop() }
 
 		LaunchedEffect(state.snackBarMessage) {
 			state.snackBarMessage?.let { snackbarMsg ->

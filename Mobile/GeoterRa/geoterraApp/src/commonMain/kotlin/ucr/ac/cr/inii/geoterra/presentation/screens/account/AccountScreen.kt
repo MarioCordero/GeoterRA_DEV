@@ -14,8 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -27,27 +25,17 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.account.password.change.Pass
 import ucr.ac.cr.inii.geoterra.presentation.screens.sign.`in`.SignInScreen
 import kotlin.time.Duration.Companion.milliseconds
 
-/**
- * Voyager Screen implementation for Home.
- */
 class AccountScreen : Screen {
-
-	override val key: ScreenKey = uniqueScreenKey
 
 	@Composable
 	override fun Content() {
-
 		val viewModel = getScreenModel<AccountViewModel>()
 		val state by viewModel.state.collectAsState()
 		val navigator = LocalNavigator.currentOrThrow
 		val snackbarHostState = remember { TypedSnackbarHostState() }
 
-		LaunchedEffect(Unit) {
-			viewModel.loadUserProfile()
-		}
-
-		LaunchedEffect(state.user, state.isLoading) {
-			if (state.user == null && !state.isLoading) {
+		LaunchedEffect(state.isSessionExpired) {
+			if (state.isSessionExpired) {
 				snackbarHostState.showErrorSnackbar("Su sesión ha expirado. Inicie sesión nuevamente.")
 				delay(2000.milliseconds)
 				navigator.replaceAll(SignInScreen())
