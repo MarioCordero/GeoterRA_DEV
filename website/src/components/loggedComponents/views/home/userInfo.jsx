@@ -66,7 +66,7 @@ const UserInfo = () => {
       case 'admin':
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-[#12467E] border border-blue-200">
-            <UserOutlined /> Administrador Global
+            <UserOutlined /> Administrador
           </span>
         );
       case 'maintenance':
@@ -101,7 +101,7 @@ const UserInfo = () => {
   const fullName = `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || 'Usuario';
 
   return (
-    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4 mb-6 poppins">
+    <div className="bg-white p-4 sm:p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4 mb-6 poppins">
       <div className="flex items-center justify-between border-b border-gray-100 pb-3">
         <div className="flex items-center gap-2">
           <IdcardOutlined className="text-xl text-[#12467E]" />
@@ -113,17 +113,6 @@ const UserInfo = () => {
               Información del Usuario Autenticado
             </h3>
           </div>
-        </div>
-        <div>
-          {userData.is_verified ? (
-            <Tag color="success" className="px-2.5 py-0.5 rounded-full text-xs font-semibold">
-              <CheckCircleOutlined className="mr-1" /> Verificado
-            </Tag>
-          ) : (
-            <Tag color="warning" className="px-2.5 py-0.5 rounded-full text-xs font-semibold">
-              Pendiente de Verificación
-            </Tag>
-          )}
         </div>
       </div>
 
@@ -193,10 +182,10 @@ const UserInfo = () => {
             <span className="font-bold text-gray-800 text-sm truncate block">
               {userData.created_at
                 ? new Date(userData.created_at).toLocaleDateString('es-ES', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                })
                 : 'Registro Fundacional'}
             </span>
           </div>

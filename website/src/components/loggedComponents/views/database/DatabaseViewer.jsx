@@ -25,6 +25,8 @@ import {
 import '../../../../colorModule.css';
 import '../../../../fontsModule.css';
 import { useSession } from '../../../../hooks/useSession';
+import PillTabs from '../../../common/crud/PillTabs';
+import CrudToolbar from '../../../common/crud/CrudToolbar';
 import { maintenanceAllTables } from '../../../../config/apiConf';
 
 /**
@@ -163,7 +165,7 @@ const DatabaseViewer = () => {
             <span className="text-xs font-bold uppercase tracking-wider text-geoterra-orange poppins">
               INFRAESTRUCTURA • AUDITORÍA Y LECTURA
             </span>
-            <Tag color="cyan" className="m-0 text-[11px] font-semibold">
+            <Tag className="m-0 text-[11px] font-semibold rounded-full bg-blue-50 text-[#12467E] border-blue-200">
               Solo Lectura
             </Tag>
           </div>
@@ -182,14 +184,6 @@ const DatabaseViewer = () => {
             className="poppins font-medium border-gray-300"
           >
             Guía de Auditoría
-          </Button>
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={fetchAllTables}
-            disabled={loading}
-            className="poppins font-medium border-gray-300"
-          >
-            Actualizar Tablas
           </Button>
         </div>
       </div>
@@ -287,74 +281,35 @@ const DatabaseViewer = () => {
 
       {/* Main Content Card: Dynamic Tabs & Search & Table */}
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
-        {/* Table Selector Pills */}
-        <div className="border-b border-gray-100 pb-4">
-          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-3">
-            Selecciona la Entidad para Inspeccionar:
-          </span>
-          <div className="flex flex-wrap gap-2">
-            {Object.keys(tables).map((tableName) => {
-              const table = tables[tableName];
-              const isSelected = activeTab === tableName;
-              return (
-                <button
-                  key={tableName}
-                  onClick={() => setActiveTab(tableName)}
-                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
-                    isSelected
-                      ? 'bg-[#12467E] text-white shadow-sm'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  <DatabaseOutlined className={isSelected ? 'text-blue-200' : 'text-gray-400'} />
-                  <span>{table.displayName || tableName}</span>
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded-full font-bold ${
-                      isSelected ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-800'
-                    }`}
-                  >
-                    {table.count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        <PillTabs
+          items={Object.keys(tables).map((tableName) => ({
+            key: tableName,
+            label: tables[tableName].displayName || tableName,
+            icon: <DatabaseOutlined />,
+            count: tables[tableName].count,
+          }))}
+          activeKey={activeTab}
+          onChange={setActiveTab}
+        />
 
         {/* Search and Table Content */}
         {activeTab && currentTable ? (
           <div className="space-y-4">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-              <div className="w-full md:w-96">
-                <Input
-                  prefix={<SearchOutlined className="text-gray-400" />}
-                  placeholder={`Buscar registros en ${currentTable.displayName}...`}
-                  value={searchQueries[activeTab] || ''}
-                  onChange={(e) =>
-                    setSearchQueries({
-                      ...searchQueries,
-                      [activeTab]: e.target.value,
-                    })
-                  }
-                  allowClear
-                  className="rounded-lg py-2"
-                />
-              </div>
-
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-gray-500 font-medium">
-                  Mostrando {currentFilteredData.length} de {currentTable.count} registros
-                </span>
-                <Button
-                  size="small"
-                  icon={<ReloadOutlined />}
-                  onClick={fetchAllTables}
-                  loading={loading}
-                >
-                  Refrescar
-                </Button>
-              </div>
-            </div>
+            <CrudToolbar
+              searchPlaceholder={`Buscar registros en ${currentTable.displayName}...`}
+              searchValue={searchQueries[activeTab] || ''}
+              onSearchChange={(val) =>
+                setSearchQueries({
+                  ...searchQueries,
+                  [activeTab]: val,
+                })
+              }
+              shown={currentFilteredData.length}
+              total={currentTable.count}
+              noun="registros"
+              onReload={fetchAllTables}
+              loading={loading}
+            />
 
             <Table
               columns={generateColumns(activeTab)}

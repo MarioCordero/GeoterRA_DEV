@@ -50,7 +50,7 @@ const UserWelcome = () => {
   }
 
   return (
-    <div className="w-full p-4 md:p-8 space-y-6 poppins">
+    <div className="w-full px-4 pt-6 pb-24 md:p-8 space-y-6 poppins">
       {/* Header Card */}
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -68,12 +68,6 @@ const UserWelcome = () => {
           <p className="text-sm text-gray-500 mt-1 mb-0 max-w-2xl">
             Portal de gestión de solicitudes de análisis hidrogeoquímico y seguimiento a estudios de geomanifestaciones.
           </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Tag color="success" className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-            <CheckCircleOutlined /> Cuenta Activa
-          </Tag>
         </div>
       </div>
 

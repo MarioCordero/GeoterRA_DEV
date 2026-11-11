@@ -29,7 +29,6 @@ import {
   ExclamationCircleOutlined,
   EditOutlined,
   DeleteOutlined,
-  SafetyCertificateOutlined,
   CalendarOutlined,
   IdcardOutlined,
   KeyOutlined,
@@ -205,12 +204,6 @@ const ProfilePage = () => {
           <p className="text-sm text-gray-500 mt-1 mb-0 max-w-2xl">
             Gestiona tu información de contacto personal, credenciales de acceso y credenciales institucionales.
           </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Tag color="success" className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-            <CheckCircleOutlined /> Cuenta Activa
-          </Tag>
         </div>
       </div>
 
@@ -433,7 +426,7 @@ const ProfilePage = () => {
 
       {/* Security & Password Card */}
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
-        <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+        <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${isChangingPassword ? 'border-b border-gray-100 pb-4' : ''}`}>
           <div className="flex items-center gap-2">
             <KeyOutlined className="text-xl text-[#12467E]" />
             <div>
@@ -450,32 +443,15 @@ const ProfilePage = () => {
             <Button
               onClick={() => setIsChangingPassword(true)}
               disabled={passwordLoading}
-              className="border-gray-300 poppins font-medium"
+              className="border-gray-300 poppins font-medium self-start sm:self-auto"
             >
               Cambiar Contraseña
             </Button>
           )}
         </div>
 
-        <Spin spinning={passwordLoading}>
-          {!isChangingPassword ? (
-            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#12467E] flex items-center justify-center text-lg">
-                  <SafetyCertificateOutlined />
-                </div>
-                <div>
-                  <span className="text-sm font-bold text-gray-800 block">
-                    Contraseña activa y segura
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    Última actualización de credenciales protegida con hashing bcrypt.
-                  </span>
-                </div>
-              </div>
-              <Tag color="blue" className="rounded-md font-medium">Protegido</Tag>
-            </div>
-          ) : (
+        {isChangingPassword && (
+          <Spin spinning={passwordLoading}>
             <Form
               form={passwordForm}
               layout="vertical"
@@ -550,8 +526,8 @@ const ProfilePage = () => {
                 </Button>
               </div>
             </Form>
-          )}
-        </Spin>
+          </Spin>
+        )}
       </div>
 
       {/* Danger Zone Card */}

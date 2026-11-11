@@ -53,6 +53,10 @@ import {
   ExperimentOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import PillTabs from '../../../common/crud/PillTabs';
+import CrudToolbar from '../../../common/crud/CrudToolbar';
+import { CodeBadge, NameCell, DateCell, SystemIdCell, RowActions } from '../../../common/crud/cells';
+import UserSelectModal, { ROLE_TAG_CONFIG } from './UserSelectModal';
 import {
   fieldTripsIndex,
   fieldTripsMy,
@@ -128,6 +132,8 @@ const FieldTripsManager = () => {
   const [addingParticipant, setAddingParticipant] = useState(false);
   const [selectedNewManifestation, setSelectedNewManifestation] = useState(null);
   const [linkingManifestation, setLinkingManifestation] = useState(false);
+  const [userSelectModalVisible, setUserSelectModalVisible] = useState(false);
+  const [drawerUserSelectModalVisible, setDrawerUserSelectModalVisible] = useState(false);
 
   const canManage = hasPermission(PERMISSIONS.MANAGE_FIELD_TRIPS);
   const canFastPoint =
@@ -697,12 +703,14 @@ const FieldTripsManager = () => {
           payload.participants = newParticipants;
         }
 
-        const newGms = Array.isArray(values.geomanifestations) ? values.geomanifestations : [];
-        const oldGms = Array.isArray(initial.geomanifestations) ? initial.geomanifestations : [];
-        const sortedNewGms = [...newGms].sort();
-        const sortedOldGms = [...oldGms].sort();
-        if (JSON.stringify(sortedNewGms) !== JSON.stringify(sortedOldGms)) {
-          payload.geomanifestations = newGms;
+        if (values.geomanifestations !== undefined) {
+          const newGms = Array.isArray(values.geomanifestations) ? values.geomanifestations : [];
+          const oldGms = Array.isArray(initial.geomanifestations) ? initial.geomanifestations : [];
+          const sortedNewGms = [...newGms].sort();
+          const sortedOldGms = [...oldGms].sort();
+          if (JSON.stringify(sortedNewGms) !== JSON.stringify(sortedOldGms)) {
+            payload.geomanifestations = newGms;
+          }
         }
 
         if (Object.keys(payload).length === 0) {
@@ -914,7 +922,10 @@ const FieldTripsManager = () => {
       width: 100,
       align: 'center',
       render: (val) => (
-        <Tag color={val ? 'green' : 'default'}>
+        <Tag className={`rounded-full text-xs font-semibold ${val
+            ? 'bg-blue-50 text-[#12467E] border-blue-200'
+            : 'bg-gray-100 text-gray-600 border-gray-200'
+          }`}>
           {val ? 'Activa' : 'Inactiva'}
         </Tag>
       ),
@@ -924,16 +935,12 @@ const FieldTripsManager = () => {
       dataIndex: 'field_trip_name',
       key: 'field_trip_name',
       render: (val, record) => (
-        <div>
-          <span className="font-semibold text-blue-600 hover:text-blue-800 block cursor-pointer">
-            {val}
-          </span>
-          {isMaintenance && (
-            <div style={{ fontSize: 11, color: '#8c8c8c' }} className="font-mono">
-              {record.field_trip_id || record.id}
-            </div>
-          )}
-        </div>
+        <NameCell
+          icon={<CompassOutlined />}
+          subtitle={isMaintenance ? `ID: ${record.field_trip_id || record.id}` : undefined}
+        >
+          {val}
+        </NameCell>
       ),
     },
     {
@@ -943,8 +950,8 @@ const FieldTripsManager = () => {
         const start = record.field_trip_start_date ? dayjs(record.field_trip_start_date).format('YYYY-MM-DD') : null;
         const finish = record.field_trip_finish_date ? dayjs(record.field_trip_finish_date).format('YYYY-MM-DD') : null;
         return (
-          <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <CalendarOutlined style={{ color: '#fa8c16' }} />
+          <span style={{ display: 'flex', alignItems: 'center', gap: 6 }} className="text-xs text-gray-600">
+            <CalendarOutlined className="text-geoterra-orange" />
             {start && finish ? `${start} al ${finish}` : (start || finish || 'N/A')}
           </span>
         );
@@ -960,12 +967,12 @@ const FieldTripsManager = () => {
           record.district_name || record.district,
         ].filter(Boolean);
         return parts.length > 0 ? (
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <EnvironmentOutlined style={{ color: '#1890ff' }} />
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }} className="text-xs text-gray-700">
+            <EnvironmentOutlined className="text-[#12467E]" />
             {parts.join(', ')}
           </span>
         ) : (
-          <Text type="secondary">Costa Rica</Text>
+          <Text type="secondary" style={{ fontSize: 12 }}>Costa Rica</Text>
         );
       },
     },
@@ -976,7 +983,7 @@ const FieldTripsManager = () => {
       render: (_, record) => {
         const count = Array.isArray(record.participants) ? record.participants.length : (record.participant_count || 0);
         return (
-          <Tag color="blue" icon={<TeamOutlined />}>
+          <Tag className="rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border-blue-200" icon={<TeamOutlined />}>
             {count} {count === 1 ? 'persona' : 'personas'}
           </Tag>
         );
@@ -989,7 +996,7 @@ const FieldTripsManager = () => {
       render: (_, record) => {
         const count = Array.isArray(record.geomanifestations) ? record.geomanifestations.length : (record.manifestation_count || 0);
         return (
-          <Tag color="orange" icon={<FireOutlined />}>
+          <Tag className="rounded-full text-xs font-semibold bg-orange-50 text-orange-700 border-orange-200" icon={<FireOutlined />}>
             {count} {count === 1 ? 'sitio' : 'sitios'}
           </Tag>
         );
@@ -1000,47 +1007,20 @@ const FieldTripsManager = () => {
       key: 'actions',
       align: 'right',
       render: (_, record) => (
-        <Space size="small" onClick={(e) => e.stopPropagation()}>
-          <Tooltip title="Editar Gira">
-            <Button
-              type="primary"
-              size="small"
-              icon={<EditOutlined />}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleOpenEdit(record);
-              }}
-            />
-          </Tooltip>
-
-          <Popconfirm
-            title="¿Eliminar esta gira de campo?"
-            description="Se desvincularán los participantes y manifestaciones asociadas."
-            onConfirm={(e) => {
-              e?.stopPropagation();
-              handleDeleteTrip(record);
-            }}
-            okText="Sí, eliminar"
-            cancelText="Cancelar"
-            okButtonProps={{ danger: true }}
-          >
-            <Tooltip title="Eliminar Gira">
-              <Button
-                type="text"
-                danger
-                size="small"
-                icon={<DeleteOutlined />}
-                onClick={(e) => e.stopPropagation()}
-              />
-            </Tooltip>
-          </Popconfirm>
-        </Space>
+        <div onClick={(e) => e.stopPropagation()}>
+          <RowActions
+            entity="gira de campo"
+            onEdit={() => handleOpenEdit(record)}
+            onDelete={() => handleDeleteTrip(record)}
+            deleteDescription="Se desvincularán los participantes y manifestaciones asociadas."
+          />
+        </div>
       ),
     }] : []),
   ];
 
   return (
-    <div className="w-full p-4 md:p-8 space-y-6 poppins">
+    <div className="w-full px-4 pt-6 pb-24 md:p-8 space-y-6 poppins">
       {/* ========================================================================= */}
       {/* HEADER SECTION                                                            */}
       {/* ========================================================================= */}
@@ -1050,9 +1030,6 @@ const FieldTripsManager = () => {
             <span className="text-xs uppercase tracking-wider font-bold text-geoterra-orange poppins">
               Operaciones de Campo • GeoterRA
             </span>
-            <Tag className="rounded-full font-semibold text-[11px] bg-blue-50 text-geoterra-blue border-blue-200">
-              {trips.length} Giras Registradas
-            </Tag>
           </div>
           <h1 className="text-2xl md:text-3xl poppins-bold text-geoterra-blue m-0 flex items-center gap-2.5">
             <CompassOutlined className="text-geoterra-blue" /> Gestión de Giras de Campo
@@ -1080,19 +1057,11 @@ const FieldTripsManager = () => {
               icon={<PlusOutlined />}
               onClick={handleOpenCreate}
               style={{ backgroundColor: '#12467E', borderColor: '#12467E' }}
-              className="poppins-bold"
+              className="poppins-bold shadow-sm"
             >
               Nueva Gira de Campo
             </Button>
           )}
-          <Button
-            icon={<ReloadOutlined spin={loading} />}
-            onClick={loadTrips}
-            loading={loading}
-            className="poppins font-medium border-gray-300"
-          >
-            Actualizar
-          </Button>
         </div>
       </div>
 
@@ -1105,11 +1074,10 @@ const FieldTripsManager = () => {
             setActiveTab('all');
             setStatusFilter('all');
           }}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            activeTab === 'all' && statusFilter === 'all'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${activeTab === 'all' && statusFilter === 'all'
               ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Giras</span>
@@ -1129,11 +1097,10 @@ const FieldTripsManager = () => {
             setActiveTab('all');
             setStatusFilter('active');
           }}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            statusFilter === 'active'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${statusFilter === 'active'
               ? 'border-emerald-400 shadow-md ring-2 ring-emerald-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Giras Activas</span>
@@ -1153,11 +1120,10 @@ const FieldTripsManager = () => {
             setActiveTab('my');
             setStatusFilter('all');
           }}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            activeTab === 'my'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${activeTab === 'my'
               ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider">Mis Asignadas</span>
@@ -1177,11 +1143,10 @@ const FieldTripsManager = () => {
             setActiveTab('all');
             setStatusFilter('inactive');
           }}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            statusFilter === 'inactive'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${statusFilter === 'inactive'
               ? 'border-gray-400 shadow-md ring-2 ring-gray-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Concluidas / Inactivas</span>
@@ -1200,53 +1165,48 @@ const FieldTripsManager = () => {
       {/* ========================================================================= */}
       {/* FILTER & DATA TABLE CARD                                                  */}
       {/* ========================================================================= */}
-      <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-          <Tabs
-            activeKey={activeTab}
-            onChange={setActiveTab}
-            className="poppins mb-0"
-            items={[
-              {
-                key: 'all',
-                label: (
-                  <span className="font-semibold flex items-center gap-1.5">
-                    <CompassOutlined /> Todas las Giras ({trips.length})
-                  </span>
-                ),
-              },
-              {
-                key: 'my',
-                label: (
-                  <span className="font-semibold flex items-center gap-1.5">
-                    <TeamOutlined /> Mis Giras Asignadas ({myTrips.length})
-                  </span>
-                ),
-              },
-            ]}
-          />
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+        <PillTabs
+          items={[
+            {
+              key: 'all',
+              label: 'Todas las Giras',
+              icon: <CompassOutlined />,
+              count: trips.length,
+            },
+            {
+              key: 'my',
+              label: 'Mis Giras Asignadas',
+              icon: <TeamOutlined />,
+              count: myTrips.length,
+            },
+          ]}
+          activeKey={activeTab}
+          onChange={setActiveTab}
+        />
 
-          <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
-            <Input
-              prefix={<SearchOutlined className="text-gray-400" />}
-              placeholder="Buscar por nombre o ID..."
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              className="w-full sm:w-64 rounded-lg py-1.5"
-              allowClear
-            />
+        <CrudToolbar
+          searchPlaceholder="Buscar por nombre o ID..."
+          searchValue={searchText}
+          onSearchChange={setSearchText}
+          filters={
             <Select
               value={statusFilter}
               onChange={setStatusFilter}
               className="w-full sm:w-44"
               options={[
                 { value: 'all', label: 'Todos los estados' },
-                { value: 'active', label: '🟢 Solo Activas' },
-                { value: 'inactive', label: '⚪ Solo Inactivas' },
+                { value: 'active', label: 'Solo Activas' },
+                { value: 'inactive', label: 'Solo Inactivas' },
               ]}
             />
-          </div>
-        </div>
+          }
+          shown={filteredTrips.length}
+          total={currentList.length}
+          noun="giras"
+          onReload={loadTrips}
+          loading={loading}
+        />
 
         {/* Table */}
         {loading ? (
@@ -1394,59 +1354,127 @@ const FieldTripsManager = () => {
               </Row>
             </div>
 
-            {/* Sección 3: Participantes y Manifestaciones */}
+            {/* Sección 3: Participantes de la Gira */}
             <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
               <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2.5 flex items-center gap-2 m-0">
-                <TeamOutlined /> Participantes y Manifestaciones
+                <TeamOutlined /> Participantes de la Gira
               </h3>
 
-              <Form.Item
-                name="participants"
-                label="Participantes (Investigadores / Personal Asignado)"
-                help="Selecciona los miembros del equipo que participarán en esta gira"
-              >
-                <Select
-                  mode="multiple"
-                  placeholder="Buscar y seleccionar participantes..."
-                  allowClear
-                  optionFilterProp="label"
-                  size="middle"
-                  options={allUsers.map((u) => ({
-                    value: u.user_id || u.id,
-                    label: `${[u.first_name, u.last_name].filter(Boolean).join(' ') || u.email} (${u.role || 'Usuario'})`,
-                  }))}
-                />
-              </Form.Item>
+              {/* Participantes asignados a la gira */}
+              <div className="space-y-2">
+                <Form.Item noStyle shouldUpdate={(prev, curr) => prev.participants !== curr.participants}>
+                  {({ getFieldValue }) => {
+                    const participantIds = getFieldValue('participants') || [];
+                    const selectedList = participantIds.map((pId) => {
+                      const found = allUsers.find((u) => (u.user_id || u.id) === pId);
+                      return found || { user_id: pId, first_name: `Usuario #${pId}`, role: 'user' };
+                    });
 
-              <Form.Item
-                name="geomanifestations"
-                label="Geomanifestaciones Vinculadas"
-                help="Sitios termales o manifestaciones que se estudiarán en esta gira"
-              >
-                <Select
-                  mode="multiple"
-                  placeholder="Buscar y seleccionar geomanifestaciones..."
-                  allowClear
-                  optionFilterProp="label"
-                  size="middle"
-                  options={allManifestations.map((m) => ({
-                    value: m.geomanifestation_id || m.id,
-                    label: `${m.geomanifestation_name || m.name} ${m.location?.canton ? `— ${m.location.canton}` : ''}`,
-                  }))}
-                />
-              </Form.Item>
+                    return (
+                      <div className="space-y-2.5">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <div>
+                            <label className="font-semibold text-gray-700 text-xs sm:text-sm block">
+                              Participantes Asignados ({selectedList.length})
+                            </label>
+                            <span className="text-xs text-gray-500 font-normal">
+                              Personas del equipo que participarán en esta gira de campo
+                            </span>
+                          </div>
+                          <Button
+                            type="primary"
+                            ghost
+                            size="middle"
+                            icon={<TeamOutlined />}
+                            onClick={() => setUserSelectModalVisible(true)}
+                            style={{ borderColor: '#12467E', color: '#12467E' }}
+                            className="font-medium flex items-center gap-1.5 self-start sm:self-auto hover:bg-blue-50 shadow-2xs"
+                          >
+                            Seleccionar personas para la gira
+                          </Button>
+                        </div>
 
+                        {selectedList.length === 0 ? (
+                          <div
+                            onClick={() => setUserSelectModalVisible(true)}
+                            className="p-4 rounded-xl border border-dashed border-gray-300 text-center cursor-pointer hover:border-geoterra-blue hover:bg-blue-50/40 transition-all bg-gray-50/60"
+                          >
+                            <TeamOutlined className="text-gray-400 text-xl mb-1" />
+                            <p className="text-xs text-gray-600 font-medium m-0">
+                              No hay personas asignadas a la gira todavía.
+                            </p>
+                            <p className="text-[11px] text-geoterra-blue font-semibold m-0 mt-0.5">
+                              Haz clic aquí para seleccionar personas para la gira
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="border border-gray-200 rounded-xl overflow-hidden bg-white divide-y divide-gray-100 max-h-56 overflow-y-auto">
+                            {selectedList.map((u) => {
+                              const uId = u.user_id || u.id;
+                              const name = [u.first_name, u.last_name].filter(Boolean).join(' ') || u.email;
+                              const roleConfig = ROLE_TAG_CONFIG[u.role] || { color: 'default', label: u.role || 'Usuario General' };
+                              const initials = ((u.first_name?.[0] || '') + (u.last_name?.[0] || '')).toUpperCase() || 'U';
 
+                              return (
+                                <div key={uId} className="flex items-center justify-between px-3.5 py-2.5 hover:bg-gray-50/70 transition-colors">
+                                  <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                                    <div className="w-8 h-8 rounded-full bg-blue-100 text-geoterra-blue flex items-center justify-center font-bold text-xs flex-shrink-0">
+                                      {initials}
+                                    </div>
+                                    <div className="min-w-0">
+                                      <div className="flex flex-wrap items-center gap-1.5">
+                                        <span className="font-semibold text-xs sm:text-sm text-gray-800 truncate">
+                                          {name}
+                                        </span>
+                                        <Tag color={roleConfig.color} className="rounded-full px-2 py-0 text-[10px] m-0 border-0 font-medium">
+                                          {roleConfig.label}
+                                        </Tag>
+                                      </div>
+                                      {u.email && (
+                                        <span className="text-[11px] text-gray-500 block truncate">
+                                          {u.email}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }}
+                </Form.Item>
+
+                {/* Hidden Form.Item keeps form values synced */}
+                <Form.Item name="participants" hidden>
+                  <Input />
+                </Form.Item>
+              </div>
             </div>
           </Form>
         </Spin>
       </Modal>
 
+      {/* Pop-up: Selector de Participantes con Filtros de Rol en Español para Crear/Editar Gira */}
+      <UserSelectModal
+        open={userSelectModalVisible}
+        onClose={() => setUserSelectModalVisible(false)}
+        users={allUsers}
+        selectedUserIds={form.getFieldValue('participants') || []}
+        onConfirm={(newSelectedIds) => {
+          form.setFieldsValue({ participants: newSelectedIds });
+        }}
+        title="Seleccionar personas para la gira"
+        multiple={true}
+      />
+
       {/* Modal: Fast Point (Punto Rápido en Campo) */}
       <Modal
         title={
           <div className="flex items-center gap-2 py-2 pr-6 border-b border-gray-100">
-            <span className="poppins-bold text-xl text-geoterra-blue flex items-center gap-2">
+            <span className="poppins-bold text-lg sm:text-xl text-geoterra-blue flex items-center gap-2">
               <ThunderboltOutlined style={{ color: '#F39C29' }} /> Punto Rápido en Campo (Fast Point)
             </span>
           </div>
@@ -1459,7 +1487,8 @@ const FieldTripsManager = () => {
           setShowMapPicker(false);
         }}
         footer={null}
-        width={720}
+        width={680}
+        style={{ top: 20, maxWidth: 'calc(100vw - 24px)', margin: '0 auto' }}
         destroyOnClose
       >
         <Form
@@ -1477,13 +1506,13 @@ const FieldTripsManager = () => {
           </Form.Item>
 
           {/* 1. Gira de Campo Asociada */}
-          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
-            <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2 flex items-center gap-2 m-0">
+          <div className="bg-white p-4 sm:p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <h3 className="text-sm sm:text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2 flex items-center gap-2 m-0">
               <CompassOutlined /> Gira de Campo Asociada
             </h3>
             <Form.Item
               name="field_trip_id"
-              label="Seleccionar Gira de Campo"
+              label={<span className="font-semibold text-gray-700 text-xs sm:text-sm">Seleccionar Gira de Campo</span>}
               rules={[{ required: true, message: 'Selecciona la gira a la que pertenece este punto' }]}
               style={{ marginBottom: 0 }}
             >
@@ -1492,6 +1521,7 @@ const FieldTripsManager = () => {
                 onChange={handleFastPointTripChange}
                 showSearch
                 size="large"
+                className="w-full"
                 optionFilterProp="label"
                 options={trips.map((t) => {
                   const tId = t.field_trip_id || t.id;
@@ -1509,53 +1539,26 @@ const FieldTripsManager = () => {
           </div>
 
           {/* 2. Ubicación GPS */}
-          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
-            <div className="flex justify-between items-center border-b border-gray-100 pb-2">
-              <h3 className="text-base font-bold text-geoterra-blue flex items-center gap-2 m-0">
+          <div className="bg-white p-4 sm:p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <div className="flex flex-wrap justify-between items-center gap-2 border-b border-gray-100 pb-2">
+              <h3 className="text-sm sm:text-base font-bold text-geoterra-blue flex items-center gap-2 m-0">
                 <AimOutlined /> Ubicación Satelital (GPS)
               </h3>
               {gpsAccuracy && (
-                <Tag color="cyan" style={{ margin: 0 }}>
+                <Tag className="m-0 rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border-blue-200">
                   Precisión: {gpsAccuracy}
                 </Tag>
               )}
             </div>
 
             {fastPointCoords ? (
-              <div
-                style={{
-                  background: '#f6ffed',
-                  border: '1px solid #b7eb8f',
-                  borderRadius: 8,
-                  padding: '12px 16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 12,
-                }}
-              >
-                <div>
-                  <div
-                    style={{
-                      color: '#389e0d',
-                      fontWeight: 600,
-                      fontSize: 13,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
-                    }}
-                  >
+              <div className="bg-blue-50/60 border border-blue-200 rounded-xl p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="text-[#12467E] font-semibold text-xs flex items-center gap-1.5 mb-1">
                     <CheckCircleOutlined /> Coordenadas GPS fijadas
                   </div>
-                  <div
-                    style={{
-                      fontFamily: 'monospace',
-                      fontSize: 13,
-                      color: '#262626',
-                      marginTop: 2,
-                    }}
-                  >
-                    Lat: <strong>{fastPointCoords.lat}</strong> | Lng: <strong>{fastPointCoords.lng}</strong>
+                  <div className="font-mono text-xs sm:text-sm text-gray-800 break-words">
+                    Lat: <strong className="text-geoterra-blue">{fastPointCoords.lat}</strong> &bull; Lng: <strong className="text-geoterra-blue">{fastPointCoords.lng}</strong>
                   </div>
                 </div>
                 <Button
@@ -1563,7 +1566,7 @@ const FieldTripsManager = () => {
                   icon={<ReloadOutlined />}
                   onClick={handleGetGpsLocation}
                   loading={gettingGps}
-                  style={{ borderColor: '#b7eb8f' }}
+                  className="border-blue-300 text-geoterra-blue hover:text-blue-800 hover:border-blue-400 self-stretch sm:self-auto justify-center"
                 >
                   Recapturar
                 </Button>
@@ -1586,22 +1589,21 @@ const FieldTripsManager = () => {
                 }}
                 className="poppins-bold"
               >
-                {gettingGps ? 'Obteniendo señal satelital GPS...' : '📍 Capturar Ubicación GPS Actual'}
+                {gettingGps ? 'Obteniendo señal satelital GPS...' : 'Capturar Ubicación GPS Actual'}
               </Button>
             )}
 
             {/* Toggle for Map and Manual Coordinates ONLY if user needs fallback */}
-            <div style={{ textAlign: 'right', marginTop: 4 }}>
-              <Button
-                type="link"
-                size="small"
+            <div className="pt-1">
+              <button
+                type="button"
                 onClick={() => setShowMapPicker((prev) => !prev)}
-                style={{ color: '#12467E', padding: 0, fontSize: 12 }}
+                className="text-xs text-[#12467E] hover:underline cursor-pointer inline-flex items-center gap-1 text-left w-full sm:w-auto break-words"
               >
                 {showMapPicker
                   ? '▲ Ocultar mapa interactivo'
                   : '▼ ¿Sin señal GPS? Ajustar en mapa o ingresar lat/long manual'}
-              </Button>
+              </button>
             </div>
 
             {/* Interactive Map and Manual Lat/Lng inputs (shown ONLY on demand) */}
@@ -1624,13 +1626,14 @@ const FieldTripsManager = () => {
                     mapHeight="220px"
                   />
                 </div>
-                <Row gutter={12}>
+                <Row gutter={[12, 12]}>
                   <Col xs={24} sm={12}>
                     <Form.Item
                       label={<span style={{ fontSize: 12, fontWeight: 600 }}>Latitud Manual</span>}
-                      style={{ marginBottom: 4 }}
+                      style={{ marginBottom: 0 }}
                     >
                       <InputNumber
+                        className="w-full"
                         style={{ width: '100%' }}
                         step={0.000001}
                         value={fastPointCoords?.lat}
@@ -1645,9 +1648,10 @@ const FieldTripsManager = () => {
                   <Col xs={24} sm={12}>
                     <Form.Item
                       label={<span style={{ fontSize: 12, fontWeight: 600 }}>Longitud Manual</span>}
-                      style={{ marginBottom: 4 }}
+                      style={{ marginBottom: 0 }}
                     >
                       <InputNumber
+                        className="w-full"
                         style={{ width: '100%' }}
                         step={0.000001}
                         value={fastPointCoords?.lng}
@@ -1665,48 +1669,49 @@ const FieldTripsManager = () => {
           </div>
 
           {/* 3. Nombre del Punto */}
-          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
-            <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2 flex items-center gap-2 m-0">
+          <div className="bg-white p-4 sm:p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <h3 className="text-sm sm:text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2 flex items-center gap-2 m-0">
               <EnvironmentOutlined /> Identificación del Punto
             </h3>
-            <Form.Item
-              name="geomanifestation_name"
-              label={
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                  <span style={{ fontWeight: 600 }}>Nombre del Punto</span>
-                  <Tag color="blue" style={{ fontSize: 11, fontWeight: 'normal', margin: 0 }}>
-                    Generado automáticamente
-                  </Tag>
-                </div>
-              }
-              extra={
-                <span style={{ fontSize: 11, color: '#8c8c8c' }}>
-                  ⚡ No necesitas escribirlo ahora bajo el sol. Se cambia luego con calma en el laboratorio.
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
+                <span className="font-semibold text-gray-700 text-xs sm:text-sm">
+                  Nombre del Punto <span className="text-red-500">*</span>
                 </span>
-              }
-              rules={[
-                { required: true, message: 'Ingresa un nombre para la geomanifestación' },
-                { max: 255, message: 'Máximo 255 caracteres' },
-              ]}
-              style={{ marginBottom: 0 }}
-            >
-              <Input size="large" placeholder="Ej: Punto #1 - Gira (10:15)" />
-            </Form.Item>
+                <span className="text-[11px] font-medium text-[#12467E] bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+                  Generado automáticamente
+                </span>
+              </div>
+              <Form.Item
+                name="geomanifestation_name"
+                rules={[
+                  { required: true, message: 'Ingresa un nombre para la geomanifestación' },
+                  { max: 255, message: 'Máximo 255 caracteres' },
+                ]}
+                style={{ marginBottom: 0 }}
+              >
+                <Input size="large" placeholder="Ej: Punto #1 - Gira (10:15)" className="w-full" />
+              </Form.Item>
+              <span className="text-[11px] text-gray-400 block pt-1">
+                Identificador preliminar editable posteriormente en laboratorio o gabinete.
+              </span>
+            </div>
           </div>
 
           {/* 4. Mediciones In-Situ */}
-          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
-            <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2 flex items-center gap-2 m-0">
+          <div className="bg-white p-4 sm:p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <h3 className="text-sm sm:text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2 flex items-center gap-2 m-0">
               <ExperimentOutlined /> Parámetros Físico-Químicos In-Situ
             </h3>
-            <Row gutter={12}>
+            <Row gutter={[12, 12]}>
               <Col xs={24} sm={8}>
                 <Form.Item
                   name="temperature"
-                  label="Temperatura"
-                  style={{ marginBottom: 8 }}
+                  label={<span className="text-xs font-semibold text-gray-700">Temperatura</span>}
+                  style={{ marginBottom: 0 }}
                 >
                   <InputNumber
+                    className="w-full"
                     style={{ width: '100%' }}
                     step={0.1}
                     min={0}
@@ -1720,16 +1725,17 @@ const FieldTripsManager = () => {
               <Col xs={24} sm={8}>
                 <Form.Item
                   name="ph"
-                  label="pH"
-                  style={{ marginBottom: 8 }}
+                  label={<span className="text-xs font-semibold text-gray-700">pH</span>}
+                  style={{ marginBottom: 0 }}
                 >
                   <InputNumber
+                    className="w-full"
                     style={{ width: '100%' }}
                     step={0.1}
                     min={0}
                     max={14}
                     addonAfter="pH"
-                    placeholder="Ej: 3.2"
+                    placeholder="Ej: 7.2"
                     size="middle"
                   />
                 </Form.Item>
@@ -1737,10 +1743,11 @@ const FieldTripsManager = () => {
               <Col xs={24} sm={8}>
                 <Form.Item
                   name="conductivity"
-                  label="Conductividad"
-                  style={{ marginBottom: 8 }}
+                  label={<span className="text-xs font-semibold text-gray-700">Conductividad</span>}
+                  style={{ marginBottom: 0 }}
                 >
                   <InputNumber
+                    className="w-full"
                     style={{ width: '100%' }}
                     min={0}
                     step={1}
@@ -1754,18 +1761,18 @@ const FieldTripsManager = () => {
 
             <Form.Item
               name="test_description"
-              label={<span style={{ fontSize: 12 }}>Notas breves (opcional)</span>}
-              style={{ marginBottom: 0 }}
+              label={<span className="text-xs font-semibold text-gray-700">Notas breves (opcional)</span>}
+              style={{ marginBottom: 0, marginTop: 12 }}
             >
-              <Input placeholder="Ej: Fumarola activa, olor a azufre, agua turbia" size="middle" />
+              <Input placeholder="Ej: Fumarola activa, olor a azufre, agua turbia" size="middle" className="w-full" />
             </Form.Item>
           </div>
 
           {/* Submit Actions */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, paddingTop: 8 }}>
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-3 border-t border-gray-100">
             <Button
               size="large"
-              className="poppins"
+              className="poppins w-full sm:w-auto"
               onClick={() => {
                 setFastPointModalVisible(false);
                 fastPointForm.resetFields();
@@ -1782,11 +1789,10 @@ const FieldTripsManager = () => {
               loading={fastPointSubmitting}
               icon={<ThunderboltOutlined />}
               style={{
-                minWidth: 200,
                 backgroundColor: '#12467E',
                 borderColor: '#12467E',
               }}
-              className="poppins-bold"
+              className="poppins-bold shadow-sm w-full sm:w-auto"
             >
               Guardar Punto Rápido
             </Button>
@@ -1814,9 +1820,13 @@ const FieldTripsManager = () => {
               </div>
             </div>
             {selectedTrip && (
-              <Tag color={selectedTrip.field_trip_is_active ? 'green' : 'default'} className="rounded-full text-xs font-semibold px-2.5 py-0.5">
+              <span className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold ${
+                selectedTrip.field_trip_is_active
+                  ? 'bg-blue-50 text-[#12467E] border border-blue-200'
+                  : 'bg-gray-100 text-gray-600 border border-gray-200'
+              }`}>
                 {selectedTrip.field_trip_is_active ? 'Activa' : 'Inactiva / Concluida'}
-              </Tag>
+              </span>
             )}
           </div>
         }
@@ -1865,7 +1875,7 @@ const FieldTripsManager = () => {
                           <Text type="secondary">Estado Operativo:</Text>
                           <div>
                             <Badge
-                              status={selectedTrip.field_trip_is_active ? 'success' : 'default'}
+                              status={selectedTrip.field_trip_is_active ? 'processing' : 'default'}
                               text={selectedTrip.field_trip_is_active ? 'En Curso (Activa)' : 'Finalizada / Inactiva'}
                             />
                           </div>
@@ -1873,7 +1883,7 @@ const FieldTripsManager = () => {
                         <Col span={24}>
                           <Text type="secondary">Ubicación Territorial:</Text>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
-                            <EnvironmentOutlined style={{ color: '#1890ff' }} />
+                            <EnvironmentOutlined style={{ color: '#12467E' }} />
                             <Text strong>
                               {[
                                 selectedTrip.province_name || selectedTrip.province,
@@ -1895,7 +1905,7 @@ const FieldTripsManager = () => {
                           <Statistic
                             title="Participantes Asignados"
                             value={Array.isArray(selectedTrip.participants) ? selectedTrip.participants.length : 0}
-                            prefix={<TeamOutlined style={{ color: '#1890ff' }} />}
+                            prefix={<TeamOutlined style={{ color: '#12467E' }} />}
                           />
                         </Card>
                       </Col>
@@ -1904,7 +1914,7 @@ const FieldTripsManager = () => {
                           <Statistic
                             title="Sitios / Geomanifestaciones"
                             value={Array.isArray(selectedTrip.geomanifestations) ? selectedTrip.geomanifestations.length : 0}
-                            prefix={<FireOutlined style={{ color: '#fa8c16' }} />}
+                            prefix={<FireOutlined style={{ color: '#F39C29' }} />}
                           />
                         </Card>
                       </Col>
@@ -1918,12 +1928,12 @@ const FieldTripsManager = () => {
                 children: (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                     {canManage && (
-                      <Card size="small" style={{ borderRadius: 8, background: '#f6ffed', border: '1px solid #b7eb8f' }}>
-                        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                          <UserAddOutlined style={{ color: '#52c41a', fontSize: 18 }} />
+                      <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                        <div className="flex gap-2.5 items-center flex-wrap">
+                          <UserAddOutlined className="text-geoterra-blue text-lg" />
                           <Select
                             placeholder="Selecciona un usuario para agregar..."
-                            style={{ flex: 1, minWidth: 200 }}
+                            className="flex-1 min-w-[200px]"
                             value={selectedNewUser}
                             onChange={setSelectedNewUser}
                             allowClear
@@ -1936,21 +1946,29 @@ const FieldTripsManager = () => {
                               })
                               .map((u) => ({
                                 value: u.user_id || u.id,
-                                label: `${[u.first_name, u.last_name].filter(Boolean).join(' ') || u.email} (${u.role})`,
+                                label: `${[u.first_name, u.last_name].filter(Boolean).join(' ') || u.email} (${ROLE_TAG_CONFIG[u.role]?.label || u.role || 'Usuario General'})`,
                               }))}
                           />
+                          <Button
+                            icon={<TeamOutlined />}
+                            onClick={() => setDrawerUserSelectModalVisible(true)}
+                            className="font-medium"
+                          >
+                            Elegir en Pop-up
+                          </Button>
                           <Button
                             type="primary"
                             icon={<PlusOutlined />}
                             onClick={handleAddParticipant}
                             loading={addingParticipant}
                             disabled={!selectedNewUser}
-                            style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+                            style={{ backgroundColor: '#12467E', borderColor: '#12467E' }}
+                            className="poppins-bold shadow-sm"
                           >
                             Agregar
                           </Button>
                         </div>
-                      </Card>
+                      </div>
                     )}
 
                     <List
@@ -1990,7 +2008,11 @@ const FieldTripsManager = () => {
                               description={
                                 <Space size="small">
                                   {p.email && <Text type="secondary">{p.email}</Text>}
-                                  {p.role && <Tag color="blue">{p.role}</Tag>}
+                                  {p.role && (
+                                    <Tag color={ROLE_TAG_CONFIG[p.role]?.color || 'blue'} className="rounded-full px-2 py-0 text-xs">
+                                      {ROLE_TAG_CONFIG[p.role]?.label || p.role}
+                                    </Tag>
+                                  )}
                                 </Space>
                               }
                             />
@@ -2197,6 +2219,24 @@ const FieldTripsManager = () => {
           </div>
         </div>
       </Modal>
+
+      {/* Pop-up: Selector de Participante para Agregar en Detalle de Gira */}
+      <UserSelectModal
+        open={drawerUserSelectModalVisible}
+        onClose={() => setDrawerUserSelectModalVisible(false)}
+        users={allUsers.filter((u) => {
+          const currentP = Array.isArray(selectedTrip?.participants) ? selectedTrip.participants : [];
+          return !currentP.some((p) => (p.user_id || p.id || p) === (u.user_id || u.id));
+        })}
+        selectedUserIds={selectedNewUser ? [selectedNewUser] : []}
+        onConfirm={(selectedIds) => {
+          if (selectedIds.length > 0) {
+            setSelectedNewUser(selectedIds[0]);
+          }
+        }}
+        title="Seleccionar Participante para la Gira"
+        multiple={false}
+      />
     </div>
   );
 };

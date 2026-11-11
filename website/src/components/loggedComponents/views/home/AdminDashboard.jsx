@@ -81,7 +81,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="w-full p-4 md:p-8 space-y-6 poppins">
+    <div className="w-full px-4 pt-6 pb-24 md:p-8 space-y-6 poppins">
       {/* Header Card */}
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -89,9 +89,6 @@ const AdminDashboard = () => {
             <span className="text-xs font-bold uppercase tracking-wider text-geoterra-orange poppins">
               PANEL PRINCIPAL • CONTROL GLOBAL
             </span>
-            <Tag color="magenta" className="m-0 text-[11px] font-semibold">
-              Administrador
-            </Tag>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-geoterra-blue m-0 poppins">
             ¡Bienvenido, {sessionUser?.first_name || sessionUser?.name || 'Administrador'}!
@@ -170,26 +167,6 @@ const AdminDashboard = () => {
           </div>
           <div className="mt-2 text-xs text-slate-600 font-medium flex items-center gap-1">
             Procesadas con éxito
-          </div>
-        </div>
-
-        <div className="bg-[#12467E] p-5 rounded-2xl border border-blue-900 text-white shadow-sm flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-blue-200 uppercase tracking-wider">
-              Estado de la Plataforma
-            </span>
-            <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center text-lg">
-              <SafetyCertificateOutlined />
-            </div>
-          </div>
-          <div className="mt-2">
-            <span className="text-2xl font-bold poppins text-white">Óptimo</span>
-            <p className="text-xs text-blue-200 m-0 mt-0.5 font-normal">
-              Servicios backend y bases de datos sincronizadas
-            </p>
-          </div>
-          <div className="mt-3 text-[11px] text-blue-100 font-medium flex items-center gap-1">
-            <CheckCircleOutlined /> 100% operatividad
           </div>
         </div>
       </div>
