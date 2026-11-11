@@ -1081,22 +1081,38 @@ const GeomanifeStationsManager = () => {
       children: (
         <div>
           <Alert
-            message="💡 Jerarquía Geocientífica"
+            message="Jerarquía Geocientífica"
             description="Toca o haz clic sobre cualquier geomanifestación para gestionar sus Georeportes. Cada georeporte asocia una prueba de campo (in-situ) y una prueba de laboratorio (geoquímica)."
             type="info"
             showIcon
-            style={{ marginBottom: 16, borderRadius: 8 }}
+            className="mb-4 rounded-xl border-blue-200"
           />
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
-            <Input
-              placeholder="Buscar por nombre, ID o descripción..."
-              prefix={<SearchOutlined style={{ color: '#aaa' }} />}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              style={{ width: 340 }}
-              allowClear
-            />
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100 mb-4">
+            <div className="w-full md:w-96">
+              <Input
+                placeholder="Buscar por nombre, ID o descripción..."
+                prefix={<SearchOutlined className="text-gray-400" />}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                allowClear
+                className="rounded-lg py-1.5"
+              />
+            </div>
+
+            <div className="flex items-center gap-3 self-end sm:self-center flex-wrap">
+              <span className="text-xs text-gray-500 font-medium">
+                Mostrando {filteredPublicList.length} de {manifestations.length} públicas
+              </span>
+              <Button
+                icon={<ReloadOutlined spin={loading} />}
+                onClick={() => loadManifestations()}
+                loading={loading}
+                className="poppins font-medium border-gray-300"
+              >
+                Actualizar
+              </Button>
+            </div>
           </div>
 
           <Table
@@ -1107,7 +1123,13 @@ const GeomanifeStationsManager = () => {
               onClick: () => handleOpenGeoDrawer(record, 'georeports'),
               style: { cursor: 'pointer' },
             })}
-            pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100'] }}
+            pagination={{
+              pageSize: 10,
+              showSizeChanger: true,
+              pageSizeOptions: ['10', '20', '50', '100'],
+              showTotal: (total) => `Total ${total} geomanifestaciones`,
+            }}
+            className="poppins border border-gray-100 rounded-xl overflow-hidden"
             locale={{ emptyText: 'No hay geomanifestaciones públicas publicadas en el mapa' }}
           />
         </div>
@@ -1123,33 +1145,34 @@ const GeomanifeStationsManager = () => {
       ),
       children: (
         <div>
-          <div style={{ marginBottom: 16, background: '#e6f7ff', padding: '12px 16px', borderRadius: 8, border: '1px solid #91d5ff' }}>
-            <Text strong style={{ color: '#0050b3' }}>💡 Flujo de Preparación Jerárquico para el Mapa:</Text>
-            <Paragraph style={{ margin: 0, fontSize: '12px', color: '#002766' }}>
+          <div className="mb-4 bg-blue-50/60 p-3.5 rounded-xl border border-blue-100">
+            <span className="font-bold text-xs uppercase tracking-wider text-geoterra-blue block mb-1">
+              Flujo de Preparación Jerárquico para el Mapa
+            </span>
+            <p className="m-0 text-xs text-gray-600">
               Para publicar una geomanifestación en el mapa, debe asociarse a un <strong>Georeporte</strong> que integre tanto la <strong>Prueba In-Situ</strong> como la <strong>Prueba de Laboratorio</strong>.
-            </Paragraph>
+            </p>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-              <Input
-                placeholder="Buscar borradores por nombre, ID o descripción..."
-                prefix={<SearchOutlined style={{ color: '#aaa' }} />}
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                style={{ width: 300 }}
-                allowClear
-              />
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100 mb-4">
+            <div className="flex items-center flex-wrap gap-3 w-full md:w-auto">
+              <div className="w-full sm:w-72">
+                <Input
+                  placeholder="Buscar borradores por nombre, ID o descripción..."
+                  prefix={<SearchOutlined className="text-gray-400" />}
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  allowClear
+                  className="rounded-lg py-1.5"
+                />
+              </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fafafa', padding: '4px 12px', borderRadius: 6, border: '1px solid #d9d9d9' }}>
-                <CompassOutlined style={{ color: '#fa8c16' }} />
-                <span style={{ fontSize: '13px', fontWeight: 500, color: '#595959' }}>
-                  Mostrar borradores de:
-                </span>
+              <div className="flex items-center gap-2">
+                <CompassOutlined className="text-geoterra-orange" />
                 <Select
                   value={selectedFieldTripFilter}
                   onChange={(val) => setSelectedFieldTripFilter(val)}
-                  style={{ minWidth: 260 }}
+                  className="w-full sm:w-64 rounded-lg"
                   placeholder="Seleccionar gira"
                 >
                   <Select.Option value="all">Todas las giras ({acceptedRequestsManifestations.length})</Select.Option>
@@ -1169,16 +1192,32 @@ const GeomanifeStationsManager = () => {
               </div>
             </div>
 
-            {selectedFieldTripFilter && selectedFieldTripFilter !== 'all' && (
-              <Tag color="orange" closable onClose={() => setSelectedFieldTripFilter('all')} style={{ margin: 0, padding: '4px 8px', fontSize: '12px' }}>
+            <div className="flex items-center gap-3 self-end sm:self-center flex-wrap">
+              <span className="text-xs text-gray-500 font-medium">
+                Mostrando {filteredDraftList.length} de {acceptedRequestsManifestations.length} borradores
+              </span>
+              <Button
+                icon={<ReloadOutlined spin={loading} />}
+                onClick={() => loadManifestations()}
+                loading={loading}
+                className="poppins font-medium border-gray-300"
+              >
+                Actualizar
+              </Button>
+            </div>
+          </div>
+
+          {selectedFieldTripFilter && selectedFieldTripFilter !== 'all' && (
+            <div className="mb-3">
+              <Tag color="orange" closable onClose={() => setSelectedFieldTripFilter('all')} className="rounded-full text-xs">
                 Filtrado por:{' '}
                 {selectedFieldTripFilter === 'none'
                   ? 'Sin gira asignada'
                   : (fieldTripsList.find(t => String(t.field_trip_id || t.id) === String(selectedFieldTripFilter))?.field_trip_name || `Gira #${selectedFieldTripFilter}`)}
                 {' '}({filteredDraftList.length} de {acceptedRequestsManifestations.length})
               </Tag>
-            )}
-          </div>
+            </div>
+          )}
 
           <Table
             dataSource={filteredDraftList}
@@ -1188,7 +1227,13 @@ const GeomanifeStationsManager = () => {
               onClick: () => handleOpenGeoDrawer(record, 'georeports'),
               style: { cursor: 'pointer' },
             })}
-            pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100'] }}
+            pagination={{
+              pageSize: 10,
+              showSizeChanger: true,
+              pageSizeOptions: ['10', '20', '50', '100'],
+              showTotal: (total) => `Total ${total} borradores`,
+            }}
+            className="poppins border border-gray-100 rounded-xl overflow-hidden"
             locale={{ emptyText: 'No hay solicitudes aceptadas o borradores pendientes de estudio' }}
           />
         </div>
@@ -1207,9 +1252,6 @@ const GeomanifeStationsManager = () => {
             <span className="text-xs uppercase tracking-wider font-bold text-geoterra-orange poppins">
               Geociencias • Inventario Geotérmico
             </span>
-            <Tag className="rounded-full font-semibold text-[11px] bg-blue-50 text-geoterra-blue border-blue-200">
-              {manifestations.length + acceptedRequestsManifestations.length} Registros
-            </Tag>
           </div>
           <h1 className="text-2xl md:text-3xl poppins-bold text-geoterra-blue m-0 flex items-center gap-2.5">
             <EnvironmentOutlined className="text-geoterra-blue" /> Gestión de Geomanifestaciones
@@ -1217,17 +1259,6 @@ const GeomanifeStationsManager = () => {
           <p className="text-xs md:text-sm text-gray-500 m-0 mt-1 poppins">
             Inventario geoquímico, georeportes consolidados, mediciones geotermales y publicación cartográfica oficial.
           </p>
-        </div>
-
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <Button
-            icon={<ReloadOutlined spin={loading} />}
-            onClick={() => loadManifestations()}
-            loading={loading}
-            className="poppins font-medium border-gray-300"
-          >
-            Actualizar
-          </Button>
         </div>
       </div>
 
@@ -1333,7 +1364,7 @@ const GeomanifeStationsManager = () => {
       {/* ========================================================================= */}
       {/* DATA TABS CARD                                                            */}
       {/* ========================================================================= */}
-      <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
         {loading ? (
           <div className="text-center py-16">
             <Spin size="large" tip="Cargando geomanifestaciones..." />
