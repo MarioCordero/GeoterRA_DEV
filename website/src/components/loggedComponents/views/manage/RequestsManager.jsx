@@ -61,6 +61,7 @@ import {
 import { renderDateWithProse } from '../../../../utils/dateFormatter';
 import PillTabs from '../../../common/crud/PillTabs';
 import CrudToolbar from '../../../common/crud/CrudToolbar';
+import { DateCell } from '../../../common/crud/cells';
 
 const defaultPosition = [9.93333, -84.08333];
 
@@ -588,7 +589,7 @@ const RequestsManager = () => {
     {
       title: isMaintenance ? 'Solicitud / Código' : 'Solicitud',
       key: 'solicitud',
-      sorter: (a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0),
+      sorter: (a, b) => (a.name || '').localeCompare(b.name || ''),
       render: (_, record) => (
         <div className="space-y-1 poppins">
           <div
@@ -598,14 +599,13 @@ const RequestsManager = () => {
             <FileTextOutlined className="text-xs text-geoterra-blue" />
             {record.name}
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-500">
-            {isMaintenance && (
+          {isMaintenance && record.id_soli && (
+            <div className="flex items-center gap-2 text-xs text-gray-500">
               <Tag className="m-0 font-mono text-[11px] bg-gray-100 border-gray-200">
                 #{record.id_soli}
               </Tag>
-            )}
-            <span>{renderDateWithProse(record.created_at, { showIcon: false })}</span>
-          </div>
+            </div>
+          )}
         </div>
       ),
     },
@@ -664,6 +664,21 @@ const RequestsManager = () => {
             )}
           </div>
         </div>
+      ),
+    },
+    {
+      title: 'Fecha',
+      dataIndex: 'created_at',
+      key: 'created_at',
+      width: 140,
+      sorter: (a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0),
+      defaultSortOrder: 'descend',
+      render: (val) => (
+        <Tooltip title={val ? new Date(val).toLocaleString('es-CR') : 'Sin fecha'}>
+          <span>
+            <DateCell value={val} fallback="Sin fecha" />
+          </span>
+        </Tooltip>
       ),
     },
     {
