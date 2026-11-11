@@ -33,7 +33,7 @@ import {
   EnvironmentOutlined, PlusOutlined, ReloadOutlined, EyeOutlined, EyeInvisibleOutlined,
   CheckCircleOutlined, EditOutlined, DeleteOutlined, InfoCircleOutlined, SearchOutlined,
   RocketOutlined, ExperimentOutlined, BarChartOutlined, FileSearchOutlined, BulbOutlined,
-  CompassOutlined, StarOutlined, StarFilled, CommentOutlined,
+  CompassOutlined, StarOutlined, StarFilled, CommentOutlined, FilterOutlined,
 } from '@ant-design/icons';
 import MapCoordinatePicker from '../../../common/MapCoordinatePicker';
 import CommentsPanel from '../../../common/CommentsPanel';
