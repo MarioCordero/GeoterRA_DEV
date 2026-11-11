@@ -537,10 +537,11 @@ const AddRequest = ({
                           type="button"
                           disabled={isUnspecifiedTemp}
                           onClick={() => handleSliderChange(idx)}
-                          className={`px-2.5 py-2 rounded-xl text-xs font-semibold border transition-all text-center flex items-center justify-center ${isSelected
+                          className={`px-2.5 py-2 rounded-xl text-xs font-semibold border transition-all text-center flex items-center justify-center ${
+                            isSelected
                               ? 'bg-blue-50 border-[#12467E] text-[#12467E] ring-2 ring-blue-100 shadow-sm'
                               : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
-                            } ${idx === 4 ? 'col-span-2 sm:col-span-1' : ''}`}
+                          } ${idx === 4 ? 'col-span-2 sm:col-span-1' : ''}`}
                         >
                           {lvl.label}
                         </button>
