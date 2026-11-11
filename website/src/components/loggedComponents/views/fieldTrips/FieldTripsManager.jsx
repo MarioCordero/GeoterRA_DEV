@@ -917,11 +917,10 @@ const FieldTripsManager = () => {
       width: 100,
       align: 'center',
       render: (val) => (
-        <Tag className={`rounded-full text-xs font-semibold ${
-          val
+        <Tag className={`rounded-full text-xs font-semibold ${val
             ? 'bg-blue-50 text-[#12467E] border-blue-200'
             : 'bg-gray-100 text-gray-600 border-gray-200'
-        }`}>
+          }`}>
           {val ? 'Activa' : 'Inactiva'}
         </Tag>
       ),
@@ -1026,9 +1025,6 @@ const FieldTripsManager = () => {
             <span className="text-xs uppercase tracking-wider font-bold text-geoterra-orange poppins">
               Operaciones de Campo • GeoterRA
             </span>
-            <Tag className="rounded-full font-semibold text-[11px] bg-blue-50 text-geoterra-blue border-blue-200">
-              {trips.length} Giras Registradas
-            </Tag>
           </div>
           <h1 className="text-2xl md:text-3xl poppins-bold text-geoterra-blue m-0 flex items-center gap-2.5">
             <CompassOutlined className="text-geoterra-blue" /> Gestión de Giras de Campo
@@ -1073,11 +1069,10 @@ const FieldTripsManager = () => {
             setActiveTab('all');
             setStatusFilter('all');
           }}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            activeTab === 'all' && statusFilter === 'all'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${activeTab === 'all' && statusFilter === 'all'
               ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Giras</span>
@@ -1097,11 +1092,10 @@ const FieldTripsManager = () => {
             setActiveTab('all');
             setStatusFilter('active');
           }}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            statusFilter === 'active'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${statusFilter === 'active'
               ? 'border-emerald-400 shadow-md ring-2 ring-emerald-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Giras Activas</span>
@@ -1121,11 +1115,10 @@ const FieldTripsManager = () => {
             setActiveTab('my');
             setStatusFilter('all');
           }}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            activeTab === 'my'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${activeTab === 'my'
               ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider">Mis Asignadas</span>
@@ -1145,11 +1138,10 @@ const FieldTripsManager = () => {
             setActiveTab('all');
             setStatusFilter('inactive');
           }}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            statusFilter === 'inactive'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${statusFilter === 'inactive'
               ? 'border-gray-400 shadow-md ring-2 ring-gray-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Concluidas / Inactivas</span>
