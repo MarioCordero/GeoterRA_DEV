@@ -21,18 +21,28 @@ function LocationMarker({ setLatLng, latLng }) {
   const [position, setPosition] = useState(null);
 
   useEffect(() => {
-    if (latLng && latLng.lat && latLng.lng) {
+    if (
+      latLng &&
+      typeof latLng.lat === 'number' &&
+      typeof latLng.lng === 'number' &&
+      !isNaN(latLng.lat) &&
+      !isNaN(latLng.lng) &&
+      isFinite(latLng.lat) &&
+      isFinite(latLng.lng)
+    ) {
       setPosition([latLng.lat, latLng.lng]);
     } else {
       setPosition(null);
     }
-  }, [latLng]);
+  }, [latLng?.lat, latLng?.lng]);
 
   useMapEvents({
     click(e) {
-      const newPosition = [e.latlng.lat, e.latlng.lng];
-      setPosition(newPosition);
-      setLatLng(e.latlng);
+      if (e?.latlng && !isNaN(e.latlng.lat) && !isNaN(e.latlng.lng)) {
+        const newPosition = [e.latlng.lat, e.latlng.lng];
+        setPosition(newPosition);
+        setLatLng(e.latlng);
+      }
     },
   });
 
@@ -40,13 +50,30 @@ function LocationMarker({ setLatLng, latLng }) {
 }
 
 /**
- * Recenter map viewport smoothly when coordinates change or geolocation triggers
+ * Recenter map viewport reliably when coordinates change or geolocation triggers
  */
 function MapRecenter({ latLng, zoom = 15 }) {
   const map = useMap();
   useEffect(() => {
-    if (latLng && typeof latLng.lat === 'number' && typeof latLng.lng === 'number' && !isNaN(latLng.lat) && !isNaN(latLng.lng)) {
-      map.flyTo([latLng.lat, latLng.lng], zoom, { duration: 1 });
+    if (
+      latLng &&
+      typeof latLng.lat === 'number' &&
+      typeof latLng.lng === 'number' &&
+      !isNaN(latLng.lat) &&
+      !isNaN(latLng.lng) &&
+      isFinite(latLng.lat) &&
+      isFinite(latLng.lng) &&
+      latLng.lat >= -90 &&
+      latLng.lat <= 90 &&
+      latLng.lng >= -180 &&
+      latLng.lng <= 180
+    ) {
+      try {
+        map.invalidateSize();
+        map.setView([latLng.lat, latLng.lng], zoom, { animate: true });
+      } catch (err) {
+        console.warn('Map recenter notice:', err);
+      }
     }
   }, [latLng?.lat, latLng?.lng, zoom, map]);
   return null;
@@ -537,8 +564,12 @@ const MapCoordinatePicker = ({
           }}
         >
           <MapContainer
-            center={localLatLng.lat ? [localLatLng.lat, localLatLng.lng] : defaultPosition}
-            zoom={localLatLng.lat ? 15 : 8}
+            center={
+              localLatLng?.lat && !isNaN(localLatLng.lat) && isFinite(localLatLng.lat)
+                ? [localLatLng.lat, localLatLng.lng]
+                : defaultPosition
+            }
+            zoom={localLatLng?.lat && !isNaN(localLatLng.lat) ? 15 : 8}
             style={{ height: '100%', width: '100%' }}
           >
             <TileLayer
@@ -711,8 +742,12 @@ const MapCoordinatePicker = ({
           }}
         >
           <MapContainer
-            center={fullscreenLatLng.lat ? [fullscreenLatLng.lat, fullscreenLatLng.lng] : defaultPosition}
-            zoom={fullscreenLatLng.lat ? 15 : 8}
+            center={
+              fullscreenLatLng?.lat && !isNaN(fullscreenLatLng.lat) && isFinite(fullscreenLatLng.lat)
+                ? [fullscreenLatLng.lat, fullscreenLatLng.lng]
+                : defaultPosition
+            }
+            zoom={fullscreenLatLng?.lat && !isNaN(fullscreenLatLng.lat) ? 15 : 8}
             style={{ height: '100%', width: '100%' }}
           >
             <TileLayer
