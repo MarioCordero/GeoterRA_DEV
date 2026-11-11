@@ -212,53 +212,13 @@ const RequestDetails = ({
     return stateValue === 'Pendiente' || stateValue === 'Registrada';
   };
 
-  const renderStateTag = (state) => {
-    const value = state?.value || 'Pendiente';
-    switch (value) {
-      case 'Pendiente':
-      case 'Registrada':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border border-blue-200">
-            {value}
-          </span>
-        );
-      case 'En revisión':
-      case 'Verificación de campo':
-      case 'Análisis en laboratorio':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-50 text-geoterra-orange border border-orange-200">
-            {value}
-          </span>
-        );
-      case 'Aprobada':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-[#12467E] border border-blue-300 font-bold">
-            {value}
-          </span>
-        );
-      case 'Rechazada':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-200">
-            {value}
-          </span>
-        );
-      default:
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200">
-            {value}
-          </span>
-        );
-    }
-  };
-
   return (
     <Modal
       title={
-        <div className="flex flex-wrap justify-between items-center gap-2 py-1 pr-6 border-b border-gray-100">
+        <div className="py-1 pr-6 border-b border-gray-100">
           <span className="poppins-bold text-lg sm:text-xl text-geoterra-blue">
             {editMode ? 'Editar Solicitud de Análisis' : `Solicitud: ${requestData?.request_name || ''}`}
           </span>
-          {!loading && requestData && !editMode && renderStateTag(requestData.current_state)}
         </div>
       }
       open={visible}
