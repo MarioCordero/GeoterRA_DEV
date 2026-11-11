@@ -56,6 +56,7 @@ import dayjs from 'dayjs';
 import PillTabs from '../../../common/crud/PillTabs';
 import CrudToolbar from '../../../common/crud/CrudToolbar';
 import { CodeBadge, NameCell, DateCell, SystemIdCell, RowActions } from '../../../common/crud/cells';
+import UserSelectModal, { ROLE_TAG_CONFIG } from './UserSelectModal';
 import {
   fieldTripsIndex,
   fieldTripsMy,
@@ -131,6 +132,8 @@ const FieldTripsManager = () => {
   const [addingParticipant, setAddingParticipant] = useState(false);
   const [selectedNewManifestation, setSelectedNewManifestation] = useState(null);
   const [linkingManifestation, setLinkingManifestation] = useState(false);
+  const [userSelectModalVisible, setUserSelectModalVisible] = useState(false);
+  const [drawerUserSelectModalVisible, setDrawerUserSelectModalVisible] = useState(false);
 
   const canManage = hasPermission(PERMISSIONS.MANAGE_FIELD_TRIPS);
   const canFastPoint =
@@ -918,8 +921,8 @@ const FieldTripsManager = () => {
       align: 'center',
       render: (val) => (
         <Tag className={`rounded-full text-xs font-semibold ${val
-            ? 'bg-blue-50 text-[#12467E] border-blue-200'
-            : 'bg-gray-100 text-gray-600 border-gray-200'
+          ? 'bg-blue-50 text-[#12467E] border-blue-200'
+          : 'bg-gray-100 text-gray-600 border-gray-200'
           }`}>
           {val ? 'Activa' : 'Inactiva'}
         </Tag>
@@ -1070,8 +1073,8 @@ const FieldTripsManager = () => {
             setStatusFilter('all');
           }}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${activeTab === 'all' && statusFilter === 'all'
-              ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
+            ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -1093,8 +1096,8 @@ const FieldTripsManager = () => {
             setStatusFilter('active');
           }}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${statusFilter === 'active'
-              ? 'border-emerald-400 shadow-md ring-2 ring-emerald-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
+            ? 'border-emerald-400 shadow-md ring-2 ring-emerald-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -1116,8 +1119,8 @@ const FieldTripsManager = () => {
             setStatusFilter('all');
           }}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${activeTab === 'my'
-              ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
+            ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -1139,8 +1142,8 @@ const FieldTripsManager = () => {
             setStatusFilter('inactive');
           }}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${statusFilter === 'inactive'
-              ? 'border-gray-400 shadow-md ring-2 ring-gray-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
+            ? 'border-gray-400 shadow-md ring-2 ring-gray-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -1355,23 +1358,50 @@ const FieldTripsManager = () => {
                 <TeamOutlined /> Participantes y Manifestaciones
               </h3>
 
-              <Form.Item
-                name="participants"
-                label="Participantes (Investigadores / Personal Asignado)"
-                help="Selecciona los miembros del equipo que participarán en esta gira"
-              >
-                <Select
-                  mode="multiple"
-                  placeholder="Buscar y seleccionar participantes..."
-                  allowClear
-                  optionFilterProp="label"
-                  size="middle"
-                  options={allUsers.map((u) => ({
-                    value: u.user_id || u.id,
-                    label: `${[u.first_name, u.last_name].filter(Boolean).join(' ') || u.email} (${u.role || 'Usuario'})`,
-                  }))}
-                />
-              </Form.Item>
+              <div className="space-y-1.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <label className="font-semibold text-gray-700 text-xs sm:text-sm block">
+                      Participantes (Investigadores / Personal Asignado)
+                    </label>
+                    <span className="text-xs text-gray-500 font-normal">
+                      Selecciona o busca los miembros del equipo que participarán en esta gira
+                    </span>
+                  </div>
+                  <Button
+                    type="primary"
+                    ghost
+                    size="small"
+                    icon={<TeamOutlined />}
+                    onClick={() => setUserSelectModalVisible(true)}
+                    style={{ borderColor: '#12467E', color: '#12467E' }}
+                    className="font-medium flex items-center gap-1.5 self-start sm:self-auto hover:bg-blue-50"
+                  >
+                    Elegir con Filtros (Pop-up)
+                  </Button>
+                </div>
+
+                <Form.Item
+                  name="participants"
+                  style={{ marginBottom: 0 }}
+                >
+                  <Select
+                    mode="multiple"
+                    placeholder="Buscar y seleccionar participantes..."
+                    allowClear
+                    optionFilterProp="label"
+                    size="middle"
+                    options={allUsers.map((u) => {
+                      const roleConfig = ROLE_TAG_CONFIG[u.role] || { label: u.role || 'Usuario General' };
+                      const name = [u.first_name, u.last_name].filter(Boolean).join(' ') || u.email;
+                      return {
+                        value: u.user_id || u.id,
+                        label: `${name} (${roleConfig.label})`,
+                      };
+                    })}
+                  />
+                </Form.Item>
+              </div>
 
               <Form.Item
                 name="geomanifestations"
@@ -1396,6 +1426,19 @@ const FieldTripsManager = () => {
           </Form>
         </Spin>
       </Modal>
+
+      {/* Pop-up: Selector de Participantes con Filtros de Rol en Español para Crear/Editar Gira */}
+      <UserSelectModal
+        open={userSelectModalVisible}
+        onClose={() => setUserSelectModalVisible(false)}
+        users={allUsers}
+        selectedUserIds={form.getFieldValue('participants') || []}
+        onConfirm={(newSelectedIds) => {
+          form.setFieldsValue({ participants: newSelectedIds });
+        }}
+        title="Seleccionar Participantes para la Gira"
+        multiple={true}
+      />
 
       {/* Modal: Fast Point (Punto Rápido en Campo) */}
       <Modal
@@ -1747,11 +1790,10 @@ const FieldTripsManager = () => {
               </div>
             </div>
             {selectedTrip && (
-              <span className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold ${
-                selectedTrip.field_trip_is_active
+              <span className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold ${selectedTrip.field_trip_is_active
                   ? 'bg-blue-50 text-[#12467E] border border-blue-200'
                   : 'bg-gray-100 text-gray-600 border border-gray-200'
-              }`}>
+                }`}>
                 {selectedTrip.field_trip_is_active ? 'Activa' : 'Inactiva / Concluida'}
               </span>
             )}
@@ -1873,9 +1915,16 @@ const FieldTripsManager = () => {
                               })
                               .map((u) => ({
                                 value: u.user_id || u.id,
-                                label: `${[u.first_name, u.last_name].filter(Boolean).join(' ') || u.email} (${u.role})`,
+                                label: `${[u.first_name, u.last_name].filter(Boolean).join(' ') || u.email} (${ROLE_TAG_CONFIG[u.role]?.label || u.role || 'Usuario General'})`,
                               }))}
                           />
+                          <Button
+                            icon={<TeamOutlined />}
+                            onClick={() => setDrawerUserSelectModalVisible(true)}
+                            className="font-medium"
+                          >
+                            Elegir en Pop-up
+                          </Button>
                           <Button
                             type="primary"
                             icon={<PlusOutlined />}
@@ -1928,7 +1977,11 @@ const FieldTripsManager = () => {
                               description={
                                 <Space size="small">
                                   {p.email && <Text type="secondary">{p.email}</Text>}
-                                  {p.role && <Tag color="blue">{p.role}</Tag>}
+                                  {p.role && (
+                                    <Tag color={ROLE_TAG_CONFIG[p.role]?.color || 'blue'} className="rounded-full px-2 py-0 text-xs">
+                                      {ROLE_TAG_CONFIG[p.role]?.label || p.role}
+                                    </Tag>
+                                  )}
                                 </Space>
                               }
                             />
@@ -2135,6 +2188,24 @@ const FieldTripsManager = () => {
           </div>
         </div>
       </Modal>
+
+      {/* Pop-up: Selector de Participante para Agregar en Detalle de Gira */}
+      <UserSelectModal
+        open={drawerUserSelectModalVisible}
+        onClose={() => setDrawerUserSelectModalVisible(false)}
+        users={allUsers.filter((u) => {
+          const currentP = Array.isArray(selectedTrip?.participants) ? selectedTrip.participants : [];
+          return !currentP.some((p) => (p.user_id || p.id || p) === (u.user_id || u.id));
+        })}
+        selectedUserIds={selectedNewUser ? [selectedNewUser] : []}
+        onConfirm={(selectedIds) => {
+          if (selectedIds.length > 0) {
+            setSelectedNewUser(selectedIds[0]);
+          }
+        }}
+        title="Seleccionar Participante para la Gira"
+        multiple={false}
+      />
     </div>
   );
 };
