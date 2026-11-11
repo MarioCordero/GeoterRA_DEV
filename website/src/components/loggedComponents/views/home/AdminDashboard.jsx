@@ -169,26 +169,6 @@ const AdminDashboard = () => {
             Procesadas con éxito
           </div>
         </div>
-
-        <div className="bg-[#12467E] p-5 rounded-2xl border border-blue-900 text-white shadow-sm flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-blue-200 uppercase tracking-wider">
-              Estado de la Plataforma
-            </span>
-            <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center text-lg">
-              <SafetyCertificateOutlined />
-            </div>
-          </div>
-          <div className="mt-2">
-            <span className="text-2xl font-bold poppins text-white">Óptimo</span>
-            <p className="text-xs text-blue-200 m-0 mt-0.5 font-normal">
-              Servicios backend y bases de datos sincronizadas
-            </p>
-          </div>
-          <div className="mt-3 text-[11px] text-blue-100 font-medium flex items-center gap-1">
-            <CheckCircleOutlined /> 100% operatividad
-          </div>
-        </div>
       </div>
 
       {/* Module Navigation Grid */}
