@@ -387,8 +387,8 @@ const UserRequests = () => {
         <div
           onClick={() => setStateFilter('ALL')}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'ALL'
-            ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
-            : 'border-gray-200 shadow-sm hover:border-gray-300'
+              ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
+              : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -408,8 +408,8 @@ const UserRequests = () => {
         <div
           onClick={() => setStateFilter('REGISTRADA')}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'REGISTRADA'
-            ? 'border-orange-400 shadow-sm ring-2 ring-orange-100'
-            : 'border-gray-200 shadow-sm hover:border-gray-300'
+              ? 'border-orange-400 shadow-sm ring-2 ring-orange-100'
+              : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -429,8 +429,8 @@ const UserRequests = () => {
         <div
           onClick={() => setStateFilter('REVISION')}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'REVISION'
-            ? 'border-blue-400 shadow-sm ring-2 ring-blue-100'
-            : 'border-gray-200 shadow-sm hover:border-gray-300'
+              ? 'border-blue-400 shadow-sm ring-2 ring-blue-100'
+              : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -450,8 +450,8 @@ const UserRequests = () => {
         <div
           onClick={() => setStateFilter('APROBADA')}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'APROBADA'
-            ? 'border-geoterra-blue shadow-sm ring-2 ring-blue-100'
-            : 'border-gray-200 shadow-sm hover:border-gray-300'
+              ? 'border-geoterra-blue shadow-sm ring-2 ring-blue-100'
+              : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
