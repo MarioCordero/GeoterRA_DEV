@@ -81,7 +81,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="w-full p-4 md:p-8 space-y-6 poppins">
+    <div className="w-full px-4 pt-6 pb-24 md:p-8 space-y-6 poppins">
       {/* Header Card */}
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -89,9 +89,6 @@ const AdminDashboard = () => {
             <span className="text-xs font-bold uppercase tracking-wider text-geoterra-orange poppins">
               PANEL PRINCIPAL • CONTROL GLOBAL
             </span>
-            <Tag color="magenta" className="m-0 text-[11px] font-semibold">
-              Administrador
-            </Tag>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-geoterra-blue m-0 poppins">
             ¡Bienvenido, {sessionUser?.first_name || sessionUser?.name || 'Administrador'}!
