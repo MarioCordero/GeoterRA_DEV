@@ -41,20 +41,17 @@ $safeRequire($configPath . 'init.php');
 // Error handling
 GlobalErrorHandler::register();
 
-$db = $safeRequire($configPath . 'database.php');
-
-$safeRequire($configPath . 'session.php');
-if (function_exists('validateSessionToken')) {
-  validateSessionToken($db);
-}
-
-if (!Request::isValidClient()) {
-  Http\Response::error(Http\ErrorType::unauthorized('Invalid API Key'), 403);
-}
-
 // Request parsing
 $path = Request::getPath();
+$normalizedPath = rtrim($path, '/') ?: '/';
 $method = Request::getMethod();
+
+// Exempt public app installer download and version endpoints from API key requirement
+$isPublicAppEndpoint = in_array($normalizedPath, ['/app/download-apk', '/app/download', '/app/version'], true);
+
+if (!$isPublicAppEndpoint && !Request::isValidClient()) {
+  Http\Response::error(Http\ErrorType::unauthorized('Invalid API Key'), 403);
+}
 
 // Load routes
 $routes = $safeRequire($configPath . 'routes.php');
@@ -62,6 +59,24 @@ $routes = $safeRequire($configPath . 'routes.php');
 if (!$routes) {
   Response::error(ErrorType::internal('Routes configuration missing'), 500);
   exit;
+}
+
+// Public app installer endpoints are file-based and do not require a database connection
+if ($isPublicAppEndpoint) {
+  $router = new SimpleRouter($routes, null);
+  $response = $router->dispatch($method, $normalizedPath);
+  if ($response === null) {
+    Response::error(ErrorType::notFound('Route'), 404);
+  }
+  exit;
+}
+
+// Database and session initialization for database-backed endpoints
+$db = $safeRequire($configPath . 'database.php');
+
+$safeRequire($configPath . 'session.php');
+if (function_exists('validateSessionToken')) {
+  validateSessionToken($db);
 }
 
 // Route dispatching
