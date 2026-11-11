@@ -24,6 +24,7 @@ import { Table, Button, Modal, Tag, message, Empty, Input, Select, Tooltip, Popc
 import { renderDateWithProse } from '../../utils/dateFormatter';
 import PillTabs from './crud/PillTabs';
 import CrudToolbar from './crud/CrudToolbar';
+import { DateCell } from './crud/cells';
 
 /**
  * UserRequests Component
@@ -225,9 +226,10 @@ const UserRequests = () => {
             >
               {loc ? `${loc.province}, ${loc.canton}` : request.request_name || (isMaintenance ? `Solicitud #${id}` : 'Solicitud de Análisis')}
             </span>
-            <span className="text-xs text-gray-400 font-mono">
-              {isMaintenance && `#{id} • `}{renderDateWithProse(request.created_at, { showIcon: false })}
-            </span>
+            <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-0.5">
+              {isMaintenance && <span className="font-mono text-gray-400">#{id} •</span>}
+              <DateCell value={request.created_at} fallback="Sin fecha" />
+            </div>
           </div>
           {renderStateBadge(request.state)}
         </div>
@@ -300,14 +302,18 @@ const UserRequests = () => {
       ),
     },
     {
-      title: 'Fecha de Creación',
+      title: 'Fecha',
       dataIndex: 'created_at',
       key: 'created_at',
+      width: 140,
       sorter: (a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0),
+      defaultSortOrder: 'descend',
       render: (date) => (
-        <span className="text-xs text-gray-500 poppins">
-          {renderDateWithProse(date, { showIcon: false })}
-        </span>
+        <Tooltip title={date ? new Date(date).toLocaleString('es-CR') : 'Sin fecha'}>
+          <span>
+            <DateCell value={date} fallback="Sin fecha" />
+          </span>
+        </Tooltip>
       ),
     },
     {
@@ -381,8 +387,8 @@ const UserRequests = () => {
         <div
           onClick={() => setStateFilter('ALL')}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'ALL'
-              ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
+            ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -402,8 +408,8 @@ const UserRequests = () => {
         <div
           onClick={() => setStateFilter('REGISTRADA')}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'REGISTRADA'
-              ? 'border-orange-400 shadow-sm ring-2 ring-orange-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
+            ? 'border-orange-400 shadow-sm ring-2 ring-orange-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -423,8 +429,8 @@ const UserRequests = () => {
         <div
           onClick={() => setStateFilter('REVISION')}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'REVISION'
-              ? 'border-blue-400 shadow-sm ring-2 ring-blue-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
+            ? 'border-blue-400 shadow-sm ring-2 ring-blue-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -444,8 +450,8 @@ const UserRequests = () => {
         <div
           onClick={() => setStateFilter('APROBADA')}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'APROBADA'
-              ? 'border-geoterra-blue shadow-sm ring-2 ring-blue-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
+            ? 'border-geoterra-blue shadow-sm ring-2 ring-blue-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
