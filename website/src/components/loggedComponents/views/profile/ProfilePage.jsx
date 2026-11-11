@@ -206,12 +206,6 @@ const ProfilePage = () => {
             Gestiona tu información de contacto personal, credenciales de acceso y credenciales institucionales.
           </p>
         </div>
-
-        <div className="flex items-center gap-2">
-          <Tag color="success" className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-            <CheckCircleOutlined /> Cuenta Activa
-          </Tag>
-        </div>
       </div>
 
       {/* User Hero Overview Card */}

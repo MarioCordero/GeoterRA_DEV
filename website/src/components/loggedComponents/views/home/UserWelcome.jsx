@@ -69,12 +69,6 @@ const UserWelcome = () => {
             Portal de gestión de solicitudes de análisis hidrogeoquímico y seguimiento a estudios de geomanifestaciones.
           </p>
         </div>
-
-        <div className="flex items-center gap-2">
-          <Tag color="success" className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-            <CheckCircleOutlined /> Cuenta Activa
-          </Tag>
-        </div>
       </div>
 
       {/* User Info Component */}
