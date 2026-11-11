@@ -703,12 +703,14 @@ const FieldTripsManager = () => {
           payload.participants = newParticipants;
         }
 
-        const newGms = Array.isArray(values.geomanifestations) ? values.geomanifestations : [];
-        const oldGms = Array.isArray(initial.geomanifestations) ? initial.geomanifestations : [];
-        const sortedNewGms = [...newGms].sort();
-        const sortedOldGms = [...oldGms].sort();
-        if (JSON.stringify(sortedNewGms) !== JSON.stringify(sortedOldGms)) {
-          payload.geomanifestations = newGms;
+        if (values.geomanifestations !== undefined) {
+          const newGms = Array.isArray(values.geomanifestations) ? values.geomanifestations : [];
+          const oldGms = Array.isArray(initial.geomanifestations) ? initial.geomanifestations : [];
+          const sortedNewGms = [...newGms].sort();
+          const sortedOldGms = [...oldGms].sort();
+          if (JSON.stringify(sortedNewGms) !== JSON.stringify(sortedOldGms)) {
+            payload.geomanifestations = newGms;
+          }
         }
 
         if (Object.keys(payload).length === 0) {
@@ -1352,10 +1354,10 @@ const FieldTripsManager = () => {
               </Row>
             </div>
 
-            {/* Sección 3: Participantes y Manifestaciones */}
+            {/* Sección 3: Participantes de la Gira */}
             <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
               <h3 className="text-base font-bold text-geoterra-blue border-b border-gray-100 pb-2.5 flex items-center gap-2 m-0">
-                <TeamOutlined /> Participantes y Manifestaciones
+                <TeamOutlined /> Participantes de la Gira
               </h3>
 
               {/* Participantes asignados a la gira */}
@@ -1450,26 +1452,6 @@ const FieldTripsManager = () => {
                   <Input />
                 </Form.Item>
               </div>
-
-              <Form.Item
-                name="geomanifestations"
-                label="Geomanifestaciones Vinculadas"
-                help="Sitios termales o manifestaciones que se estudiarán en esta gira"
-              >
-                <Select
-                  mode="multiple"
-                  placeholder="Buscar y seleccionar geomanifestaciones..."
-                  allowClear
-                  optionFilterProp="label"
-                  size="middle"
-                  options={allManifestations.map((m) => ({
-                    value: m.geomanifestation_id || m.id,
-                    label: `${m.geomanifestation_name || m.name} ${m.location?.canton ? `— ${m.location.canton}` : ''}`,
-                  }))}
-                />
-              </Form.Item>
-
-
             </div>
           </Form>
         </Spin>
