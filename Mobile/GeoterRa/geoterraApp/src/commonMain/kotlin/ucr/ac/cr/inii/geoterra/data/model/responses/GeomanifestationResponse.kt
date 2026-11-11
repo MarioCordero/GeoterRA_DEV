@@ -40,6 +40,10 @@ data class GeomanifestationResponse(
 	val current_georeport: GeoreportResponse? = null,
 	val insitu_test: InSituTestResponse? = null,
 	val inlab_test: InlabTestResponse? = null,
+	val field_trip_id: String? = null,
+	val field_trip_name: String? = null,
+	val visibility: Boolean = false,
+	val request_id: String? = null
 ) : JavaSerializable {
 
 }

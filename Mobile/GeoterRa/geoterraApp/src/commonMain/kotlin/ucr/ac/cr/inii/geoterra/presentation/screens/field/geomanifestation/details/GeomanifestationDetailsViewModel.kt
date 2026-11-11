@@ -4,7 +4,9 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.core.network.ApiException
+import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.InSituTestFilters
+import ucr.ac.cr.inii.geoterra.data.model.responses.InSituTestResponse
 import ucr.ac.cr.inii.geoterra.domain.repository.GeomanifestationsRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.InSituTestRepositoryInterface
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
@@ -15,7 +17,9 @@ class GeomanifestationDetailsViewModel(
 	private val geomanifestationId: String,
 	private val geomanifestationsRepository: GeomanifestationsRepositoryInterface,
 	private val inSituTestRepository: InSituTestRepositoryInterface
-) : BaseScreenModel<GeomanifestationDetailsState>(GeomanifestationDetailsState()) {
+) : BaseScreenModel<GeomanifestationDetailsState>(
+	GeomanifestationDetailsState()
+) {
 
 	init {
 		fetchDetails()
@@ -48,7 +52,41 @@ class GeomanifestationDetailsViewModel(
 						it.copy(
 							isLoading = false,
 							snackBarMessage = SnackbarMessage(
-								text = apiException?.message ?: "Error al obtener detalles de la manifestación",
+								text = apiException?.message ?: "Error al obtener detalles de la Geomanifestación",
+								type = SnackbarType.ERROR
+							)
+						)
+					}
+				}
+		}
+	}
+
+	fun setTestToDelete(test: InSituTestResponse?) {
+		_state.update { it.copy(testToDelete = test) }
+	}
+
+	fun deleteTest(testId: String) {
+		screenModelScope.launch {
+			_state.update { it.copy(isLoading = true, testToDelete = null) }
+			inSituTestRepository.deleteInsituTest(testId)
+				.onSuccess {
+					_state.update {
+						it.copy(
+							isLoading = false,
+							snackBarMessage = SnackbarMessage(
+								text = "Prueba de Campo eliminada correctamente",
+								type = SnackbarType.SUCCESS
+							),
+							inSituTests = it.inSituTests.filter { test -> test.insitu_test_id != testId }
+						)
+					}
+				}
+				.onFailure { exception ->
+					_state.update {
+						it.copy(
+							isLoading = false,
+							snackBarMessage = SnackbarMessage(
+								text = exception.message ?: "Error al eliminar la Prueba de Campo",
 								type = SnackbarType.ERROR
 							)
 						)

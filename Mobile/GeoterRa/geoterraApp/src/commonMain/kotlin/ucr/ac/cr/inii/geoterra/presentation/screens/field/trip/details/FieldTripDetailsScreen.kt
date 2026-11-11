@@ -28,17 +28,18 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import kotlinx.coroutines.launch
 import org.koin.core.parameter.parametersOf
+import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
 import ucr.ac.cr.inii.geoterra.domain.pdf.PDFUtil
 import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
+import ucr.ac.cr.inii.geoterra.presentation.components.common.ConfirmDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
-import ucr.ac.cr.inii.geoterra.presentation.screens.field.trip.details.FieldTripDetailsViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.field.geomanifestation.details.GeomanifestationDetailsScreen
+import ucr.ac.cr.inii.geoterra.presentation.screens.field.trip.details.FieldTripDetailsViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.geomanifestation.form.GeomanifestationFormScreen
 
 class FieldTripDetailsScreen(
@@ -51,9 +52,13 @@ class FieldTripDetailsScreen(
 		val viewModel = getScreenModel<FieldTripDetailsViewModel> { parametersOf(fieldTripId) }
 		val state by viewModel.state.collectAsState()
 		val snackbarHostState = remember { TypedSnackbarHostState() }
-		val scope = rememberCoroutineScope()
 		val navigator = LocalNavigator.currentOrThrow
 		var isFabExpanded by remember { mutableStateOf(false) }
+		var manifestationToDelete by remember { mutableStateOf<GeomanifestationResponse?>(null) }
+
+		LaunchedEffect(Unit) {
+			viewModel.fetchFieldTripDetails()
+		}
 
 		LaunchedEffect(state.snackBarMessage) {
 			state.snackBarMessage?.let { snackbarMsg ->
@@ -84,6 +89,20 @@ class FieldTripDetailsScreen(
 					viewModel.clearPdfStatus()
 				},
 				onDismiss = { viewModel.clearPdfStatus() }
+			)
+		}
+
+		manifestationToDelete?.let { manifestation ->
+			ConfirmDialog(
+				title = "Eliminar Geomanifestación",
+				message = "¿Estás seguro de que deseas desvincular la manifestación '${manifestation.geomanifestation_name}' de esta gira?",
+				confirmText = "Eliminar",
+				onConfirm = {
+					viewModel.deleteGeomanifestation(manifestation.geomanifestation_id)
+					manifestationToDelete = null
+				},
+				onDismiss = { manifestationToDelete = null },
+				isDanger = true
 			)
 		}
 
@@ -124,10 +143,16 @@ class FieldTripDetailsScreen(
 							ExtendedFloatingActionButton(
 								onClick = {
 									isFabExpanded = false
-									navigator.push(GeomanifestationFormScreen(fieldTripId = fieldTripId))
+									navigator.push(
+										GeomanifestationFormScreen(
+											fieldTripId = fieldTripId,
+											fieldTripName = state.fieldTrip?.field_trip_name ?: "",
+											onSuccess = { viewModel.fetchFieldTripDetails() }
+										)
+									)
 								},
 								icon = { Icon(Icons.Default.Add, contentDescription = "Añadir Geomanifestación") },
-								text = { Text("Añadir Manifestación") },
+								text = { Text("Añadir Geomanifestación") },
 								containerColor = MaterialTheme.colorScheme.primaryContainer,
 								contentColor = MaterialTheme.colorScheme.onPrimaryContainer
 							)
@@ -135,30 +160,10 @@ class FieldTripDetailsScreen(
 							ExtendedFloatingActionButton(
 								onClick = {
 									isFabExpanded = false
-									scope.launch {
-										try {
-											viewModel.setPdfGenerating(true)
-//											val fieldTripName = state.fieldTrip?.field_trip_name ?: "Gira"
-//											val fileName = "Reporte_Gira_$fieldTripName"
-//											val resultPath = PDFUtil.generateRequestPdf(state, fileName)
-//
-//											if (resultPath != null) {
-//												viewModel.setGeneratedPdfPath(resultPath)
-//												viewModel.updateSnackBarMessage(
-//													message = "PDF generado exitosamente.",
-//													type = SnackbarType.SUCCESS
-//												)
-//											}
-										} catch (e: Exception) {
-											viewModel.updateSnackBarMessage(
-												message = "Ha ocurrido un error al generar el PDF, por favor intenta de nuevo.",
-												type = SnackbarType.ERROR
-											)
-											e.printStackTrace()
-										} finally {
-											viewModel.setPdfGenerating(false)
-										}
-									}
+									viewModel.updateSnackBarMessage(
+										message = "Opción de generar PDF en desarrollo.",
+										type = SnackbarType.INFO
+									)
 								},
 								icon = { Icon(Icons.Default.Download, contentDescription = "Descargar PDF") },
 								text = { Text("Descargar PDF") },
@@ -203,6 +208,19 @@ class FieldTripDetailsScreen(
 				isForPdf = false,
 				onGeomanifestationClick = { manifestationId ->
 					navigator.push(GeomanifestationDetailsScreen(manifestationId = manifestationId))
+				},
+				onGeomanifestationEdit = { manifestation ->
+					navigator.push(
+						GeomanifestationFormScreen(
+							fieldTripId = fieldTripId,
+							fieldTripName = state.fieldTrip?.field_trip_name ?: "",
+							manifestationToEdit = manifestation,
+							onSuccess = { viewModel.fetchFieldTripDetails() }
+						)
+					)
+				},
+				onGeomanifestationDelete = { manifestation ->
+					manifestationToDelete = manifestation
 				}
 			)
 		}

@@ -2,6 +2,7 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.geomanifestation.form
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -10,7 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import ucr.ac.cr.inii.geoterra.domain.Util
 import ucr.ac.cr.inii.geoterra.presentation.components.common.ActionButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomTextField
 import ucr.ac.cr.inii.geoterra.presentation.components.common.FormSection
@@ -50,12 +53,10 @@ fun GeomanifestationFormContent(
 			)
 
 			CustomTextField(
-				value = state.request.description,
+				value = state.request.description ?: "",
 				onValueChange = { onEvent(GeomanifestationFormEvent.DescriptionChanged(it)) },
 				label = "Descripción",
 				icon = Icons.Default.Description,
-				isError = state.fieldErrors["description"] != null,
-				errorMessage = state.fieldErrors["description"]
 			)
 
 			Row(
@@ -128,28 +129,45 @@ fun GeomanifestationFormContent(
 				horizontalArrangement = Arrangement.spacedBy(8.dp)
 			) {
 				CustomTextField(
-					value = if (state.request.latitude == 0.0) "" else state.request.latitude.toString(),
-					onValueChange = { onEvent(GeomanifestationFormEvent.LatitudeChanged(it)) },
+					value = Util.truncateDecimal(state.request.latitude, 6),
+					onValueChange = {},
 					label = "Latitud",
-					icon = Icons.Default.MyLocation,
-					modifier = Modifier.weight(1f)
+					modifier = Modifier.weight(1f),
+					keyboardType = KeyboardType.Number,
+					readOnly = true,
+					isError = state.fieldErrors["location"] != null,
+					errorMessage = state.fieldErrors["location"]
 				)
+
 				CustomTextField(
-					value = if (state.request.longitude == 0.0) "" else state.request.longitude.toString(),
-					onValueChange = { onEvent(GeomanifestationFormEvent.LongitudeChanged(it)) },
+					value = Util.truncateDecimal(state.request.longitude, 6),
+					onValueChange = {},
 					label = "Longitud",
-					icon = Icons.Default.MyLocation,
-					modifier = Modifier.weight(1f)
+					modifier = Modifier.weight(1f),
+					keyboardType = KeyboardType.Number,
+					readOnly = true,
+					isError = state.fieldErrors["location"] != null,
+					errorMessage = state.fieldErrors["location"]
 				)
+			}
+
+			OutlinedButton(
+				onClick = { onEvent(GeomanifestationFormEvent.UseCurrentLocation) },
+				modifier = Modifier.fillMaxWidth(),
+				shape = RoundedCornerShape(8.dp)
+			) {
+				Icon(Icons.Default.MyLocation, contentDescription = null)
+				Spacer(Modifier.width(4.dp))
+				Text("Obtener Ubicación GPS", style = MaterialTheme.typography.labelSmall)
 			}
 		}
 
 		FormSection(title = "Asociación de Gira", icon = Icons.Default.Event) {
 			OutlinedTextField(
-				value = state.request.field_trip_id ?: "Asociado a gira actual",
+				value = state.fieldTripName.ifBlank { "Gira de Campo Asociada" },
 				onValueChange = {},
 				enabled = false,
-				label = { Text("ID de Gira de Campo (Bloqueado)") },
+				label = { Text("Gira de Campo (Bloqueado)") },
 				modifier = Modifier.fillMaxWidth()
 			)
 		}
@@ -158,7 +176,7 @@ fun GeomanifestationFormContent(
 
 		ActionButton(
 			isLoading = state.isLoading,
-			text = "Guardar Manifestación",
+			text = "Guardar Geomanifestación",
 			onClick = { onEvent(GeomanifestationFormEvent.Submit) }
 		)
 

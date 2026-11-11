@@ -25,6 +25,7 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostS
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.edit.EditAccountScreen
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.password.change.PasswordChangeScreen
 import ucr.ac.cr.inii.geoterra.presentation.screens.sign.`in`.SignInScreen
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Voyager Screen implementation for Home.
@@ -48,7 +49,7 @@ class AccountScreen : Screen {
 		LaunchedEffect(state.user, state.isLoading) {
 			if (state.user == null && !state.isLoading) {
 				snackbarHostState.showErrorSnackbar("Su sesión ha expirado. Inicie sesión nuevamente.")
-				delay(2000)
+				delay(2000.milliseconds)
 				navigator.replaceAll(SignInScreen())
 			}
 		}

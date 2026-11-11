@@ -23,7 +23,9 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.*
 
 data class GeomanifestationFormScreen(
 	val fieldTripId: String,
-	val manifestationToEdit: GeomanifestationResponse? = null
+	val fieldTripName: String,
+	val manifestationToEdit: GeomanifestationResponse? = null,
+	val onSuccess: (() -> Unit)? = null
 ) : Screen {
 
 	override val key: ScreenKey = uniqueScreenKey
@@ -32,7 +34,7 @@ data class GeomanifestationFormScreen(
 	override fun Content() {
 		val navigator = LocalNavigator.currentOrThrow
 		val viewModel = getScreenModel<GeomanifestationFormViewModel>(
-			parameters = { parametersOf(fieldTripId, manifestationToEdit) }
+			parameters = { parametersOf(fieldTripId, fieldTripName, manifestationToEdit) }
 		)
 
 		val state by viewModel.state.collectAsState()
@@ -50,6 +52,7 @@ data class GeomanifestationFormScreen(
 
 				if (state.isSuccess) {
 					viewModel.clearSuccess()
+					onSuccess?.invoke()
 					navigator.pop()
 				}
 			}
