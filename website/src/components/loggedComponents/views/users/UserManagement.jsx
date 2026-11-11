@@ -240,11 +240,10 @@ const UserManagement = () => {
       key: 'is_deleted',
       render: (isDeleted) => (
         <span
-          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-            !isDeleted
-              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-              : 'bg-rose-50 text-rose-700 border border-rose-200'
-          }`}
+          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${!isDeleted
+            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+            : 'bg-rose-50 text-rose-700 border border-rose-200'
+            }`}
         >
           {!isDeleted ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
           {!isDeleted ? 'Activo' : 'Inactivo'}
@@ -294,9 +293,6 @@ const UserManagement = () => {
             <span className="text-xs uppercase tracking-wider font-bold text-geoterra-orange poppins">
               Control de Accesos • Administración
             </span>
-            <Tag className="rounded-full font-semibold text-[11px] bg-blue-50 text-geoterra-blue border-blue-200">
-              {users.length} Cuentas Registradas
-            </Tag>
           </div>
           <h1 className="text-2xl md:text-3xl poppins-bold text-geoterra-blue m-0 flex items-center gap-2.5">
             <UserOutlined className="text-geoterra-blue" /> Gestión de Usuarios y Roles
@@ -304,17 +300,6 @@ const UserManagement = () => {
           <p className="text-xs md:text-sm text-gray-500 m-0 mt-1 poppins">
             Supervisión de cuentas de usuario, asignación de privilegios de acceso y control de investigadores de GeoterRA.
           </p>
-        </div>
-
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <Button
-            icon={<ReloadOutlined spin={loading} />}
-            onClick={fetchUsers}
-            loading={loading}
-            className="poppins font-medium border-gray-300"
-          >
-            Actualizar
-          </Button>
         </div>
       </div>
 
@@ -328,11 +313,10 @@ const UserManagement = () => {
             setRoleFilter('ALL');
             setStatusFilter('ALL');
           }}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            roleFilter === 'ALL' && statusFilter === 'ALL'
-              ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'ALL' && statusFilter === 'ALL'
+            ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Usuarios</span>
@@ -350,11 +334,10 @@ const UserManagement = () => {
         {/* Administracion */}
         <div
           onClick={() => setRoleFilter('ADMINS')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            roleFilter === 'ADMINS'
-              ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'ADMINS'
+            ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider">
@@ -374,11 +357,10 @@ const UserManagement = () => {
         {/* Investigadores */}
         <div
           onClick={() => setRoleFilter('INVESTIGATORS')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            roleFilter === 'INVESTIGATORS'
-              ? 'border-amber-400 shadow-md ring-2 ring-amber-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'INVESTIGATORS'
+            ? 'border-amber-400 shadow-md ring-2 ring-amber-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">
@@ -398,11 +380,10 @@ const UserManagement = () => {
         {/* Usuarios Generales */}
         <div
           onClick={() => setRoleFilter('user')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            roleFilter === 'user'
-              ? 'border-slate-500 shadow-md ring-2 ring-slate-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${roleFilter === 'user'
+            ? 'border-slate-500 shadow-md ring-2 ring-slate-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
@@ -475,9 +456,21 @@ const UserManagement = () => {
             )}
           </div>
 
-          <div className="text-xs text-gray-400 poppins whitespace-nowrap self-end sm:self-center">
-            Mostrando <strong className="text-gray-700">{filteredUsers.length}</strong> de{' '}
-            <strong className="text-gray-700">{users.length}</strong> usuarios
+          <div className="flex items-center gap-3 self-end sm:self-center flex-wrap">
+            <span className="text-xs text-gray-400 poppins whitespace-nowrap">
+              Mostrando <strong className="text-gray-700">{filteredUsers.length}</strong> de{' '}
+              <strong className="text-gray-700">{users.length}</strong> usuarios
+            </span>
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <Button
+                icon={<ReloadOutlined spin={loading} />}
+                onClick={fetchUsers}
+                loading={loading}
+                className="poppins font-medium border-gray-300"
+              >
+                Actualizar
+              </Button>
+            </div>
           </div>
         </div>
 
