@@ -33,7 +33,7 @@ import {
   EnvironmentOutlined, PlusOutlined, ReloadOutlined, EyeOutlined, EyeInvisibleOutlined,
   CheckCircleOutlined, EditOutlined, DeleteOutlined, InfoCircleOutlined, SearchOutlined,
   RocketOutlined, ExperimentOutlined, BarChartOutlined, FileSearchOutlined, BulbOutlined,
-  CompassOutlined, StarOutlined, StarFilled, CommentOutlined, FilterOutlined,
+  CompassOutlined, StarOutlined, StarFilled, CommentOutlined, FilterOutlined, FileTextOutlined,
 } from '@ant-design/icons';
 import MapCoordinatePicker from '../../../common/MapCoordinatePicker';
 import CommentsPanel from '../../../common/CommentsPanel';
@@ -781,22 +781,22 @@ const GeomanifeStationsManager = () => {
     });
   };
 
+  const normalDrafts = acceptedRequestsManifestations.filter(item => !item.field_trip_id);
+  const tripDrafts = acceptedRequestsManifestations.filter(item => Boolean(item.field_trip_id));
+
   const filteredPublicList = filterList(manifestations);
-  const filteredDraftList = acceptedRequestsManifestations.filter(item => {
-    const matchesSearch = !searchText ||
-      (item.name && item.name.toLowerCase().includes(searchText.toLowerCase())) ||
-      (item.geomanifestation_id && item.geomanifestation_id.toLowerCase().includes(searchText.toLowerCase())) ||
-      (item.description && item.description.toLowerCase().includes(searchText.toLowerCase()));
+  const filteredNormalDrafts = filterList(normalDrafts);
+  const filteredTripDrafts = tripDrafts.filter(item => {
+    const term = searchText ? searchText.toLowerCase() : '';
+    const matchesSearch = !term ||
+      (item.name && item.name.toLowerCase().includes(term)) ||
+      (item.geomanifestation_id && String(item.geomanifestation_id).toLowerCase().includes(term)) ||
+      (item.description && item.description.toLowerCase().includes(term));
 
     let matchesTrip = true;
     if (selectedFieldTripFilter && selectedFieldTripFilter !== 'all') {
-      if (selectedFieldTripFilter === 'none') {
-        matchesTrip = !item.field_trip_id;
-      } else {
-        matchesTrip = String(item.field_trip_id) === String(selectedFieldTripFilter);
-      }
+      matchesTrip = String(item.field_trip_id) === String(selectedFieldTripFilter);
     }
-
     return matchesSearch && matchesTrip;
   });
 
@@ -1138,19 +1138,85 @@ const GeomanifeStationsManager = () => {
     {
       key: '2',
       label: (
-        <span>
-          <CheckCircleOutlined />
-          Solicitudes Aceptadas / Borradores ({acceptedRequestsManifestations.length})
+        <span className="flex items-center gap-1.5 font-semibold">
+          <FileTextOutlined />
+          Solicitudes Generales ({normalDrafts.length})
         </span>
       ),
       children: (
         <div>
           <div className="mb-4 bg-blue-50/60 p-3.5 rounded-xl border border-blue-100">
             <span className="font-bold text-xs uppercase tracking-wider text-geoterra-blue block mb-1">
-              Flujo de Preparación Jerárquico para el Mapa
+              Flujo de Preparación para el Mapa • Solicitudes Ciudadanas y Generales
             </span>
             <p className="m-0 text-xs text-gray-600">
-              Para publicar una geomanifestación en el mapa, debe asociarse a un <strong>Georeporte</strong> que integre tanto la <strong>Prueba In-Situ</strong> como la <strong>Prueba de Laboratorio</strong>.
+              Solicitudes independientes recibidas. Para publicar una geomanifestación en el mapa, debe asociarse a un <strong>Georeporte</strong> que integre tanto la <strong>Prueba In-Situ</strong> como la <strong>Prueba de Laboratorio</strong>.
+            </p>
+          </div>
+
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100 mb-4">
+            <div className="w-full md:w-96">
+              <Input
+                placeholder="Buscar solicitudes por nombre, ID o descripción..."
+                prefix={<SearchOutlined className="text-gray-400" />}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                allowClear
+                className="rounded-lg py-1.5"
+              />
+            </div>
+
+            <div className="flex items-center gap-3 self-end sm:self-center flex-wrap">
+              <span className="text-xs text-gray-500 font-medium">
+                Mostrando {filteredNormalDrafts.length} de {normalDrafts.length} solicitudes generales
+              </span>
+              <Button
+                icon={<ReloadOutlined spin={loading} />}
+                onClick={() => loadManifestations()}
+                loading={loading}
+                className="poppins font-medium border-gray-300"
+              >
+                Actualizar
+              </Button>
+            </div>
+          </div>
+
+          <Table
+            dataSource={filteredNormalDrafts}
+            columns={columnsDrafts}
+            rowKey={(item) => item.geomanifestation_id || item.id}
+            onRow={(record) => ({
+              onClick: () => handleOpenGeoDrawer(record, 'georeports'),
+              style: { cursor: 'pointer' },
+            })}
+            pagination={{
+              pageSize: 10,
+              showSizeChanger: true,
+              pageSizeOptions: ['10', '20', '50', '100'],
+              showTotal: (total) => `Total ${total} solicitudes generales`,
+            }}
+            className="poppins border border-gray-100 rounded-xl overflow-hidden"
+            locale={{ emptyText: 'No hay solicitudes generales o independientes pendientes de estudio' }}
+          />
+        </div>
+      ),
+    },
+    {
+      key: '3',
+      label: (
+        <span className="flex items-center gap-1.5 font-semibold">
+          <CompassOutlined />
+          Puntos de Giras de Campo ({tripDrafts.length})
+        </span>
+      ),
+      children: (
+        <div>
+          <div className="mb-4 bg-orange-50/60 p-3.5 rounded-xl border border-orange-100">
+            <span className="font-bold text-xs uppercase tracking-wider text-geoterra-orange block mb-1">
+              Operaciones de Campo • Puntos Asignados o Recolectados en Giras
+            </span>
+            <p className="m-0 text-xs text-gray-600">
+              Puntos vinculados a giras científicas operativas. Puedes filtrar por gira específica o asociar un georeporte para completar el flujo oficial hacia el mapa.
             </p>
           </div>
 
@@ -1158,7 +1224,7 @@ const GeomanifeStationsManager = () => {
             <div className="flex items-center flex-wrap gap-3 w-full md:w-auto">
               <div className="w-full sm:w-72">
                 <Input
-                  placeholder="Buscar borradores por nombre, ID o descripción..."
+                  placeholder="Buscar puntos de gira por nombre o ID..."
                   prefix={<SearchOutlined className="text-gray-400" />}
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
@@ -1173,15 +1239,14 @@ const GeomanifeStationsManager = () => {
                   value={selectedFieldTripFilter}
                   onChange={(val) => setSelectedFieldTripFilter(val)}
                   className="w-full sm:w-64 rounded-lg"
-                  placeholder="Seleccionar gira"
+                  placeholder="Filtrar por gira de campo"
                 >
-                  <Select.Option value="all">Todas las giras ({acceptedRequestsManifestations.length})</Select.Option>
-                  <Select.Option value="none">Sin gira asignada ({acceptedRequestsManifestations.filter(d => !d.field_trip_id).length})</Select.Option>
+                  <Select.Option value="all">Todas las giras ({tripDrafts.length})</Select.Option>
                   {fieldTripsList.map((trip) => {
                     const tripId = trip.field_trip_id || trip.id;
                     const tripName = trip.field_trip_name || trip.name || `Gira #${tripId}`;
                     const dateStr = trip.field_trip_start_date || trip.start_date || trip.field_trip_scheduled_date;
-                    const count = acceptedRequestsManifestations.filter(d => String(d.field_trip_id) === String(tripId)).length;
+                    const count = tripDrafts.filter(d => String(d.field_trip_id) === String(tripId)).length;
                     return (
                       <Select.Option key={tripId} value={tripId}>
                         {tripName} {dateStr ? `(${dateStr})` : ''} ({count})
@@ -1194,7 +1259,7 @@ const GeomanifeStationsManager = () => {
 
             <div className="flex items-center gap-3 self-end sm:self-center flex-wrap">
               <span className="text-xs text-gray-500 font-medium">
-                Mostrando {filteredDraftList.length} de {acceptedRequestsManifestations.length} borradores
+                Mostrando {filteredTripDrafts.length} de {tripDrafts.length} puntos de giras
               </span>
               <Button
                 icon={<ReloadOutlined spin={loading} />}
@@ -1211,16 +1276,14 @@ const GeomanifeStationsManager = () => {
             <div className="mb-3">
               <Tag color="orange" closable onClose={() => setSelectedFieldTripFilter('all')} className="rounded-full text-xs">
                 Filtrado por:{' '}
-                {selectedFieldTripFilter === 'none'
-                  ? 'Sin gira asignada'
-                  : (fieldTripsList.find(t => String(t.field_trip_id || t.id) === String(selectedFieldTripFilter))?.field_trip_name || `Gira #${selectedFieldTripFilter}`)}
-                {' '}({filteredDraftList.length} de {acceptedRequestsManifestations.length})
+                {fieldTripsList.find(t => String(t.field_trip_id || t.id) === String(selectedFieldTripFilter))?.field_trip_name || `Gira #${selectedFieldTripFilter}`}
+                {' '}({filteredTripDrafts.length} de {tripDrafts.length})
               </Tag>
             </div>
           )}
 
           <Table
-            dataSource={filteredDraftList}
+            dataSource={filteredTripDrafts}
             columns={columnsDrafts}
             rowKey={(item) => item.geomanifestation_id || item.id}
             onRow={(record) => ({
@@ -1231,10 +1294,10 @@ const GeomanifeStationsManager = () => {
               pageSize: 10,
               showSizeChanger: true,
               pageSizeOptions: ['10', '20', '50', '100'],
-              showTotal: (total) => `Total ${total} borradores`,
+              showTotal: (total) => `Total ${total} puntos de giras`,
             }}
             className="poppins border border-gray-100 rounded-xl overflow-hidden"
-            locale={{ emptyText: 'No hay solicitudes aceptadas o borradores pendientes de estudio' }}
+            locale={{ emptyText: 'No hay puntos asignados a la gira seleccionada' }}
           />
         </div>
       ),
@@ -1266,30 +1329,29 @@ const GeomanifeStationsManager = () => {
       {/* METRICS DASHBOARD                                                         */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Total */}
+        {/* Total Sitios */}
         <div
           onClick={() => setActiveTab('1')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${activeTab === '1'
-            ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
-            : 'border-gray-200 shadow-sm hover:border-gray-300'
-            }`}
+          className="cursor-pointer bg-white p-5 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Sitios</span>
-            <div className="w-9 h-9 rounded-lg bg-blue-50 text-geoterra-blue flex items-center justify-center text-base">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-geoterra-blue flex items-center justify-center text-lg">
               <EnvironmentOutlined />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold poppins text-gray-900">
+            <span className="text-3xl font-bold poppins text-gray-800">
               {manifestations.length + acceptedRequestsManifestations.length}
             </span>
-            <span className="text-xs text-gray-400">sitios</span>
+            <span className="text-xs text-gray-500 font-medium">sitios</span>
           </div>
-          <div className="mt-2 text-xs text-gray-500">Públicas y en estudio</div>
+          <div className="mt-2 text-xs text-blue-700 font-medium flex items-center gap-1">
+            <CheckCircleOutlined /> Catálogo integral
+          </div>
         </div>
 
-        {/* Publicas en Mapa */}
+        {/* Publicas en Mapa (Tab 1) */}
         <div
           onClick={() => setActiveTab('1')}
           className={`cursor-pointer bg-white p-5 rounded-2xl border transition-all shadow-sm hover:shadow-md ${activeTab === '1'
@@ -1312,7 +1374,7 @@ const GeomanifeStationsManager = () => {
           </div>
         </div>
 
-        {/* Borradores */}
+        {/* Solicitudes Generales (Tab 2) */}
         <div
           onClick={() => setActiveTab('2')}
           className={`cursor-pointer bg-white p-5 rounded-2xl border transition-all shadow-sm hover:shadow-md ${activeTab === '2'
@@ -1321,42 +1383,42 @@ const GeomanifeStationsManager = () => {
             }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Borradores / En Estudio</span>
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Solicitudes Generales</span>
             <div className="w-10 h-10 rounded-xl bg-orange-50 text-geoterra-orange flex items-center justify-center text-lg">
-              <ExperimentOutlined />
+              <FileTextOutlined />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-bold poppins text-gray-800">{acceptedRequestsManifestations.length}</span>
+            <span className="text-3xl font-bold poppins text-gray-800">{normalDrafts.length}</span>
             <span className="text-xs text-gray-500 font-medium">en preparación</span>
           </div>
           <div className="mt-2 text-xs text-orange-700 font-medium flex items-center gap-1">
-            <FilterOutlined /> Requieren completar georeporte
+            <FilterOutlined /> Sin gira asignada
           </div>
         </div>
 
-        {/* Listas para Publicar */}
+        {/* Puntos de Giras de Campo (Tab 3) */}
         <div
-          onClick={() => setActiveTab('2')}
-          className={`cursor-pointer bg-white p-5 rounded-2xl border transition-all shadow-sm hover:shadow-md ${activeTab === '2'
+          onClick={() => setActiveTab('3')}
+          className={`cursor-pointer bg-white p-5 rounded-2xl border transition-all shadow-sm hover:shadow-md ${activeTab === '3'
             ? 'border-[#12467E] ring-2 ring-blue-100'
             : 'border-gray-200'
             }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Listas para Publicar</span>
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Puntos de Giras</span>
             <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#12467E] flex items-center justify-center text-lg">
-              <RocketOutlined />
+              <CompassOutlined />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-3xl font-bold poppins text-gray-800">
-              {acceptedRequestsManifestations.filter((d) => d.hasGeoreport).length}
+              {tripDrafts.length}
             </span>
-            <span className="text-xs text-gray-500 font-medium">con georeporte</span>
+            <span className="text-xs text-gray-500 font-medium">en expedición</span>
           </div>
           <div className="mt-2 text-xs text-blue-700 font-medium flex items-center gap-1">
-            <CheckCircleOutlined /> Listas para subir al mapa
+            <CheckCircleOutlined /> Vinculados a giras
           </div>
         </div>
       </div>
