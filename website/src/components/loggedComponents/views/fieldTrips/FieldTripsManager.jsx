@@ -921,8 +921,8 @@ const FieldTripsManager = () => {
       align: 'center',
       render: (val) => (
         <Tag className={`rounded-full text-xs font-semibold ${val
-            ? 'bg-blue-50 text-[#12467E] border-blue-200'
-            : 'bg-gray-100 text-gray-600 border-gray-200'
+          ? 'bg-blue-50 text-[#12467E] border-blue-200'
+          : 'bg-gray-100 text-gray-600 border-gray-200'
           }`}>
           {val ? 'Activa' : 'Inactiva'}
         </Tag>
@@ -1073,8 +1073,8 @@ const FieldTripsManager = () => {
             setStatusFilter('all');
           }}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${activeTab === 'all' && statusFilter === 'all'
-              ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
+            ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -1096,8 +1096,8 @@ const FieldTripsManager = () => {
             setStatusFilter('active');
           }}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${statusFilter === 'active'
-              ? 'border-emerald-400 shadow-md ring-2 ring-emerald-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
+            ? 'border-emerald-400 shadow-md ring-2 ring-emerald-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -1119,8 +1119,8 @@ const FieldTripsManager = () => {
             setStatusFilter('all');
           }}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${activeTab === 'my'
-              ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
+            ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -1142,8 +1142,8 @@ const FieldTripsManager = () => {
             setStatusFilter('inactive');
           }}
           className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${statusFilter === 'inactive'
-              ? 'border-gray-400 shadow-md ring-2 ring-gray-100'
-              : 'border-gray-200 shadow-sm hover:border-gray-300'
+            ? 'border-gray-400 shadow-md ring-2 ring-gray-100'
+            : 'border-gray-200 shadow-sm hover:border-gray-300'
             }`}
         >
           <div className="flex items-center justify-between">
@@ -1358,48 +1358,96 @@ const FieldTripsManager = () => {
                 <TeamOutlined /> Participantes y Manifestaciones
               </h3>
 
-              <div className="space-y-1.5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <label className="font-semibold text-gray-700 text-xs sm:text-sm block">
-                      Participantes (Investigadores / Personal Asignado)
-                    </label>
-                    <span className="text-xs text-gray-500 font-normal">
-                      Selecciona o busca los miembros del equipo que participarán en esta gira
-                    </span>
-                  </div>
-                  <Button
-                    type="primary"
-                    ghost
-                    size="small"
-                    icon={<TeamOutlined />}
-                    onClick={() => setUserSelectModalVisible(true)}
-                    style={{ borderColor: '#12467E', color: '#12467E' }}
-                    className="font-medium flex items-center gap-1.5 self-start sm:self-auto hover:bg-blue-50"
-                  >
-                    Elegir con Filtros (Pop-up)
-                  </Button>
-                </div>
+              {/* Participantes asignados a la gira */}
+              <div className="space-y-2">
+                <Form.Item noStyle shouldUpdate={(prev, curr) => prev.participants !== curr.participants}>
+                  {({ getFieldValue }) => {
+                    const participantIds = getFieldValue('participants') || [];
+                    const selectedList = participantIds.map((pId) => {
+                      const found = allUsers.find((u) => (u.user_id || u.id) === pId);
+                      return found || { user_id: pId, first_name: `Usuario #${pId}`, role: 'user' };
+                    });
 
-                <Form.Item
-                  name="participants"
-                  style={{ marginBottom: 0 }}
-                >
-                  <Select
-                    mode="multiple"
-                    placeholder="Buscar y seleccionar participantes..."
-                    allowClear
-                    optionFilterProp="label"
-                    size="middle"
-                    options={allUsers.map((u) => {
-                      const roleConfig = ROLE_TAG_CONFIG[u.role] || { label: u.role || 'Usuario General' };
-                      const name = [u.first_name, u.last_name].filter(Boolean).join(' ') || u.email;
-                      return {
-                        value: u.user_id || u.id,
-                        label: `${name} (${roleConfig.label})`,
-                      };
-                    })}
-                  />
+                    return (
+                      <div className="space-y-2.5">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <div>
+                            <label className="font-semibold text-gray-700 text-xs sm:text-sm block">
+                              Participantes Asignados ({selectedList.length})
+                            </label>
+                            <span className="text-xs text-gray-500 font-normal">
+                              Personas del equipo que participarán en esta gira de campo
+                            </span>
+                          </div>
+                          <Button
+                            type="primary"
+                            ghost
+                            size="middle"
+                            icon={<TeamOutlined />}
+                            onClick={() => setUserSelectModalVisible(true)}
+                            style={{ borderColor: '#12467E', color: '#12467E' }}
+                            className="font-medium flex items-center gap-1.5 self-start sm:self-auto hover:bg-blue-50 shadow-2xs"
+                          >
+                            Seleccionar personas para la gira
+                          </Button>
+                        </div>
+
+                        {selectedList.length === 0 ? (
+                          <div
+                            onClick={() => setUserSelectModalVisible(true)}
+                            className="p-4 rounded-xl border border-dashed border-gray-300 text-center cursor-pointer hover:border-geoterra-blue hover:bg-blue-50/40 transition-all bg-gray-50/60"
+                          >
+                            <TeamOutlined className="text-gray-400 text-xl mb-1" />
+                            <p className="text-xs text-gray-600 font-medium m-0">
+                              No hay personas asignadas a la gira todavía.
+                            </p>
+                            <p className="text-[11px] text-geoterra-blue font-semibold m-0 mt-0.5">
+                              Haz clic aquí para seleccionar personas para la gira
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="border border-gray-200 rounded-xl overflow-hidden bg-white divide-y divide-gray-100 max-h-56 overflow-y-auto">
+                            {selectedList.map((u) => {
+                              const uId = u.user_id || u.id;
+                              const name = [u.first_name, u.last_name].filter(Boolean).join(' ') || u.email;
+                              const roleConfig = ROLE_TAG_CONFIG[u.role] || { color: 'default', label: u.role || 'Usuario General' };
+                              const initials = ((u.first_name?.[0] || '') + (u.last_name?.[0] || '')).toUpperCase() || 'U';
+
+                              return (
+                                <div key={uId} className="flex items-center justify-between px-3.5 py-2.5 hover:bg-gray-50/70 transition-colors">
+                                  <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                                    <div className="w-8 h-8 rounded-full bg-blue-100 text-geoterra-blue flex items-center justify-center font-bold text-xs flex-shrink-0">
+                                      {initials}
+                                    </div>
+                                    <div className="min-w-0">
+                                      <div className="flex flex-wrap items-center gap-1.5">
+                                        <span className="font-semibold text-xs sm:text-sm text-gray-800 truncate">
+                                          {name}
+                                        </span>
+                                        <Tag color={roleConfig.color} className="rounded-full px-2 py-0 text-[10px] m-0 border-0 font-medium">
+                                          {roleConfig.label}
+                                        </Tag>
+                                      </div>
+                                      {u.email && (
+                                        <span className="text-[11px] text-gray-500 block truncate">
+                                          {u.email}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }}
+                </Form.Item>
+
+                {/* Hidden Form.Item keeps form values synced */}
+                <Form.Item name="participants" hidden>
+                  <Input />
                 </Form.Item>
               </div>
 
@@ -1436,7 +1484,7 @@ const FieldTripsManager = () => {
         onConfirm={(newSelectedIds) => {
           form.setFieldsValue({ participants: newSelectedIds });
         }}
-        title="Seleccionar Participantes para la Gira"
+        title="Seleccionar personas para la gira"
         multiple={true}
       />
 
@@ -1790,11 +1838,10 @@ const FieldTripsManager = () => {
               </div>
             </div>
             {selectedTrip && (
-              <span className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold ${
-                selectedTrip.field_trip_is_active
+              <span className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold ${selectedTrip.field_trip_is_active
                   ? 'bg-blue-50 text-[#12467E] border border-blue-200'
                   : 'bg-gray-100 text-gray-600 border border-gray-200'
-              }`}>
+                }`}>
                 {selectedTrip.field_trip_is_active ? 'Activa' : 'Inactiva / Concluida'}
               </span>
             )}
