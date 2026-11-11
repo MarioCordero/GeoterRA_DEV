@@ -895,16 +895,6 @@ const RequestsManager = () => {
               Monitorea, revisa y aprueba solicitudes de investigación ciudadanas y de campo para su incorporación al inventario geotérmico oficial.
             </p>
           </div>
-
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <Button
-              icon={<QuestionCircleOutlined />}
-              onClick={() => setGuideModalVisible(true)}
-              className="poppins font-medium border-gray-300 text-gray-700 hover:text-geoterra-blue"
-            >
-              Guía de Flujo
-            </Button>
-          </div>
         </div>
 
         {/* ========================================================================= */}
