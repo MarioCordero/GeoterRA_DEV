@@ -354,9 +354,6 @@ const UserRequests = () => {
             <span className="text-xs uppercase tracking-wider font-bold text-geoterra-orange poppins">
               Solicitudes Ciudadanas y de Campo • Mis Registros
             </span>
-            <Tag className="rounded-full font-semibold text-[11px] bg-blue-50 text-geoterra-blue border-blue-200">
-              {requests.length} Solicitudes
-            </Tag>
           </div>
           <h1 className="text-2xl md:text-3xl poppins-bold text-geoterra-blue m-0 flex items-center gap-2.5">
             <FileTextOutlined className="text-geoterra-blue" /> Mis Solicitudes de Análisis
@@ -364,18 +361,6 @@ const UserRequests = () => {
           <p className="text-xs md:text-sm text-gray-500 m-0 mt-1 poppins">
             Consulta el avance, evaluación geocientífica e incorporación de tus puntos geotérmicos registrados.
           </p>
-        </div>
-
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <AddRequest onRequestAdded={handleRequestAdded} />
-          <Button
-            icon={<ReloadOutlined spin={loading} />}
-            onClick={loadRequests}
-            loading={loading}
-            className="poppins font-medium border-gray-300"
-          >
-            Actualizar
-          </Button>
         </div>
       </div>
 
@@ -393,11 +378,10 @@ const UserRequests = () => {
         {/* Total */}
         <div
           onClick={() => setStateFilter('ALL')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            stateFilter === 'ALL'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'ALL'
               ? 'border-geoterra-blue shadow-md ring-2 ring-blue-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Enviadas</span>
@@ -415,11 +399,10 @@ const UserRequests = () => {
         {/* Registradas */}
         <div
           onClick={() => setStateFilter('REGISTRADA')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            stateFilter === 'REGISTRADA'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'REGISTRADA'
               ? 'border-orange-400 shadow-sm ring-2 ring-orange-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-orange-700 uppercase tracking-wider">Registradas</span>
@@ -437,11 +420,10 @@ const UserRequests = () => {
         {/* En Revision */}
         <div
           onClick={() => setStateFilter('REVISION')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            stateFilter === 'REVISION'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'REVISION'
               ? 'border-blue-400 shadow-sm ring-2 ring-blue-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-blue-800 uppercase tracking-wider">En Revisión</span>
@@ -459,11 +441,10 @@ const UserRequests = () => {
         {/* Aprobadas */}
         <div
           onClick={() => setStateFilter('APROBADA')}
-          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${
-            stateFilter === 'APROBADA'
+          className={`cursor-pointer bg-white p-5 rounded-xl border transition-all ${stateFilter === 'APROBADA'
               ? 'border-geoterra-blue shadow-sm ring-2 ring-blue-100'
               : 'border-gray-200 shadow-sm hover:border-gray-300'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">Aprobadas</span>
@@ -544,9 +525,22 @@ const UserRequests = () => {
             )}
           </div>
 
-          <div className="text-xs text-gray-400 poppins whitespace-nowrap self-end sm:self-center">
-            Mostrando <strong className="text-gray-700">{filteredRequests.length}</strong> de{' '}
-            <strong className="text-gray-700">{requests.length}</strong> solicitudes
+          <div className="flex items-center gap-3 self-end sm:self-center flex-wrap">
+            <span className="text-xs text-gray-500 font-medium whitespace-nowrap">
+              Mostrando <strong className="text-gray-700">{filteredRequests.length}</strong> de{' '}
+              <strong className="text-gray-700">{requests.length}</strong> solicitudes
+            </span>
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <AddRequest onRequestAdded={handleRequestAdded} />
+              <Button
+                icon={<ReloadOutlined spin={loading} />}
+                onClick={loadRequests}
+                loading={loading}
+                className="poppins font-medium border-gray-300"
+              >
+                Actualizar
+              </Button>
+            </div>
           </div>
         </div>
 
