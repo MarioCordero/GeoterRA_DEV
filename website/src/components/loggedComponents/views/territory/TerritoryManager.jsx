@@ -75,6 +75,7 @@ const TerritoryManager = () => {
 
   // Cantons state
   const [cantons, setCantons] = useState([]);
+  const [allCantons, setAllCantons] = useState([]);
   const [selectedProvinceFilter, setSelectedProvinceFilter] = useState(null);
   const [loadingCantons, setLoadingCantons] = useState(false);
   const [cantonModalVisible, setCantonModalVisible] = useState(false);
@@ -84,7 +85,8 @@ const TerritoryManager = () => {
 
   // Districts state
   const [districts, setDistricts] = useState([]);
-  const [selectedCantonFilter, setSelectedCantonFilter] = useState(null);
+  const [selectedDistrictProvince, setSelectedDistrictProvince] = useState(null);
+  const [selectedDistrictCanton, setSelectedDistrictCanton] = useState(null);
   const [loadingDistricts, setLoadingDistricts] = useState(false);
   const [districtModalVisible, setDistrictModalVisible] = useState(false);
   const [editingDistrict, setEditingDistrict] = useState(null);
@@ -171,12 +173,26 @@ const TerritoryManager = () => {
   };
 
   // --- CANTONS CRUD ---
+  const loadAllCantons = async () => {
+    try {
+      const res = await cantonsIndex(null);
+      if (res.ok && Array.isArray(res.data)) {
+        setAllCantons(res.data);
+      }
+    } catch (err) {
+      console.error('❌ Error loading all cantons:', err);
+    }
+  };
+
   const loadCantons = async (provCode) => {
     try {
       setLoadingCantons(true);
       const res = await cantonsIndex(provCode);
       if (res.ok && Array.isArray(res.data)) {
         setCantons(res.data);
+        if (!provCode) {
+          setAllCantons(res.data);
+        }
       } else {
         setCantons([]);
       }
@@ -214,6 +230,7 @@ const TerritoryManager = () => {
       if (res.ok) {
         message.success('Cantón eliminado correctamente');
         loadCantons(selectedProvinceFilter);
+        loadAllCantons();
       } else {
         message.error(res.error || 'Error al eliminar cantón');
       }
@@ -244,6 +261,7 @@ const TerritoryManager = () => {
         setCantonModalVisible(false);
         cantonForm.resetFields();
         loadCantons(selectedProvinceFilter);
+        loadAllCantons();
       } else {
         message.error(res.error || 'Error al guardar cantón');
       }
@@ -275,8 +293,8 @@ const TerritoryManager = () => {
   const handleOpenCreateDistrict = () => {
     setEditingDistrict(null);
     districtForm.resetFields();
-    if (selectedCantonFilter) {
-      districtForm.setFieldsValue({ canton_snit_code: selectedCantonFilter });
+    if (selectedDistrictCanton) {
+      districtForm.setFieldsValue({ canton_snit_code: selectedDistrictCanton });
     }
     setDistrictModalVisible(true);
   };
@@ -297,7 +315,7 @@ const TerritoryManager = () => {
       const res = await districtsAdminDelete(id);
       if (res.ok) {
         message.success('Distrito eliminado correctamente');
-        loadDistricts(selectedCantonFilter);
+        loadDistricts(null);
       } else {
         message.error(res.error || 'Error al eliminar distrito');
       }
@@ -327,7 +345,7 @@ const TerritoryManager = () => {
         message.success(`Distrito ${editingDistrict ? 'actualizado' : 'creado'} correctamente`);
         setDistrictModalVisible(false);
         districtForm.resetFields();
-        loadDistricts(selectedCantonFilter);
+        loadDistricts(null);
       } else {
         message.error(res.error || 'Error al guardar distrito');
       }
@@ -341,7 +359,8 @@ const TerritoryManager = () => {
   const refreshAll = () => {
     loadProvinces();
     loadCantons(selectedProvinceFilter);
-    loadDistricts(selectedCantonFilter);
+    loadAllCantons();
+    loadDistricts(null);
   };
 
   useEffect(() => {
@@ -350,7 +369,31 @@ const TerritoryManager = () => {
     loadDistricts(null);
   }, []);
 
-  // Filtered lists based on search terms
+  // Lookups and maps for hierarchy
+  const provinceMap = useMemo(() => {
+    const map = new Map();
+    provinces.forEach(p => {
+      map.set(Number(p.province_snit_code), p);
+    });
+    return map;
+  }, [provinces]);
+
+  const cantonMap = useMemo(() => {
+    const map = new Map();
+    const source = allCantons.length > 0 ? allCantons : cantons;
+    source.forEach(c => {
+      map.set(Number(c.canton_snit_code), c);
+    });
+    return map;
+  }, [allCantons, cantons]);
+
+  const availableDistrictCantons = useMemo(() => {
+    const source = allCantons.length > 0 ? allCantons : cantons;
+    if (!selectedDistrictProvince) return source;
+    return source.filter(c => Number(c.province_snit_code) === Number(selectedDistrictProvince));
+  }, [allCantons, cantons, selectedDistrictProvince]);
+
+  // Filtered lists based on search terms and hierarchy filters
   const filteredProvinces = useMemo(() => {
     if (!searchProvince) return provinces;
     const term = searchProvince.toLowerCase();
@@ -373,15 +416,41 @@ const TerritoryManager = () => {
   }, [cantons, searchCanton]);
 
   const filteredDistricts = useMemo(() => {
-    if (!searchDistrict) return districts;
-    const term = searchDistrict.toLowerCase();
-    return districts.filter(d =>
-      (d.district_name && d.district_name.toLowerCase().includes(term)) ||
-      String(d.district_snit_code).includes(term) ||
-      String(d.canton_snit_code).includes(term) ||
-      (d.district_id && d.district_id.toLowerCase().includes(term))
-    );
-  }, [districts, searchDistrict]);
+    return districts.filter(d => {
+      // 1. Canton filter
+      if (selectedDistrictCanton && Number(d.canton_snit_code) !== Number(selectedDistrictCanton)) {
+        return false;
+      }
+
+      // 2. Province filter
+      if (selectedDistrictProvince) {
+        const canton = cantonMap.get(Number(d.canton_snit_code));
+        if (!canton || Number(canton.province_snit_code) !== Number(selectedDistrictProvince)) {
+          return false;
+        }
+      }
+
+      // 3. Search term
+      if (searchDistrict) {
+        const term = searchDistrict.toLowerCase();
+        const canton = cantonMap.get(Number(d.canton_snit_code));
+        const province = canton ? provinceMap.get(Number(canton.province_snit_code)) : null;
+
+        const matchName = d.district_name && d.district_name.toLowerCase().includes(term);
+        const matchCode = String(d.district_snit_code).includes(term);
+        const matchCantonCode = String(d.canton_snit_code).includes(term);
+        const matchCantonName = canton?.canton_name && canton.canton_name.toLowerCase().includes(term);
+        const matchProvName = province?.province_name && province.province_name.toLowerCase().includes(term);
+        const matchId = d.district_id && d.district_id.toLowerCase().includes(term);
+
+        if (!matchName && !matchCode && !matchCantonCode && !matchCantonName && !matchProvName && !matchId) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [districts, selectedDistrictProvince, selectedDistrictCanton, searchDistrict, cantonMap, provinceMap]);
 
   // Province columns
   const columnsProvinces = [
@@ -502,14 +571,25 @@ const TerritoryManager = () => {
       ),
     },
     {
-      title: 'Cantón SNIT',
+      title: 'Cantón y Provincia',
       dataIndex: 'canton_snit_code',
       key: 'canton_snit_code',
-      render: (val) => (
-        <span className="font-mono bg-blue-50 text-[#12467E] border border-blue-200 px-2.5 py-0.5 rounded text-xs font-semibold">
-          Cantón #{val}
-        </span>
-      ),
+      render: (val) => {
+        const canton = cantonMap.get(Number(val));
+        const province = canton ? provinceMap.get(Number(canton.province_snit_code)) : null;
+        return (
+          <div className="flex flex-col">
+            <span className="font-semibold text-gray-800 text-xs">
+              {canton ? `${canton.canton_name} (${val})` : `Cantón #${val}`}
+            </span>
+            {province && (
+              <span className="text-[11px] text-gray-500 font-normal">
+                {province.province_name}
+              </span>
+            )}
+          </div>
+        );
+      },
     },
     ...(isMaintenance ? [{
       title: 'ID Sistema (ULID)',
@@ -633,7 +713,7 @@ const TerritoryManager = () => {
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-3xl font-bold text-gray-800 poppins">
-              {loadingCantons ? '...' : cantons.length}
+              {loadingCantons ? '...' : (allCantons.length || cantons.length)}
             </span>
             <span className="text-xs text-gray-500 font-medium">Activos</span>
           </div>
@@ -787,17 +867,70 @@ const TerritoryManager = () => {
               searchValue={searchDistrict}
               onSearchChange={setSearchDistrict}
               filters={
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-gray-500">Cantón SNIT:</span>
-                  <InputNumber
-                    placeholder="Ej: 101"
-                    value={selectedCantonFilter}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Select
+                    style={{ minWidth: 190 }}
+                    placeholder="Filtrar por Provincia"
+                    allowClear
+                    value={selectedDistrictProvince}
                     onChange={(val) => {
-                      setSelectedCantonFilter(val);
-                      loadDistricts(val);
+                      setSelectedDistrictProvince(val);
+                      if (val && selectedDistrictCanton) {
+                        const c = cantonMap.get(Number(selectedDistrictCanton));
+                        if (!c || Number(c.province_snit_code) !== Number(val)) {
+                          setSelectedDistrictCanton(null);
+                        }
+                      }
                     }}
                     className="rounded-lg"
-                  />
+                  >
+                    {provinces.map((p) => (
+                      <Select.Option key={p.province_snit_code} value={p.province_snit_code}>
+                        {p.province_name} ({p.province_snit_code})
+                      </Select.Option>
+                    ))}
+                  </Select>
+
+                  <Select
+                    style={{ minWidth: 210 }}
+                    placeholder="Filtrar por Cantón"
+                    allowClear
+                    showSearch
+                    optionFilterProp="children"
+                    value={selectedDistrictCanton}
+                    onChange={(val) => {
+                      setSelectedDistrictCanton(val);
+                      if (val && !selectedDistrictProvince) {
+                        const c = cantonMap.get(Number(val));
+                        if (c && c.province_snit_code) {
+                          setSelectedDistrictProvince(c.province_snit_code);
+                        }
+                      }
+                    }}
+                    filterOption={(input, option) =>
+                      (option?.children ?? '').toString().toLowerCase().includes(input.toLowerCase())
+                    }
+                    className="rounded-lg"
+                  >
+                    {availableDistrictCantons.map((c) => (
+                      <Select.Option key={c.canton_snit_code} value={c.canton_snit_code}>
+                        {c.canton_name} ({c.canton_snit_code})
+                      </Select.Option>
+                    ))}
+                  </Select>
+
+                  {(selectedDistrictProvince || selectedDistrictCanton) && (
+                    <Button
+                      onClick={() => {
+                        setSelectedDistrictProvince(null);
+                        setSelectedDistrictCanton(null);
+                      }}
+                      size="small"
+                      className="poppins text-xs font-medium text-gray-500 hover:text-gray-700"
+                    >
+                      Limpiar
+                    </Button>
+                  )}
                 </div>
               }
               shown={filteredDistricts.length}
@@ -958,10 +1091,27 @@ const TerritoryManager = () => {
           <Form form={districtForm} layout="vertical" onFinish={handleSubmitDistrict}>
             <Form.Item
               name="canton_snit_code"
-              label={<span className="font-semibold text-gray-700">Código SNIT del Cantón Padre</span>}
-              rules={[{ required: true, message: 'El código del cantón es obligatorio' }]}
+              label={<span className="font-semibold text-gray-700">Cantón Perteneciente (SNIT)</span>}
+              rules={[{ required: true, message: 'El cantón es obligatorio' }]}
             >
-              <InputNumber style={{ width: '100%' }} placeholder="Ej: 101" min={1} className="rounded-lg" />
+              <Select
+                showSearch
+                placeholder="Selecciona el cantón padre"
+                optionFilterProp="children"
+                filterOption={(input, option) =>
+                  (option?.children ?? '').toString().toLowerCase().includes(input.toLowerCase())
+                }
+                className="rounded-lg"
+              >
+                {(allCantons.length > 0 ? allCantons : cantons).map((c) => {
+                  const p = provinceMap.get(Number(c.province_snit_code));
+                  return (
+                    <Select.Option key={c.canton_snit_code} value={c.canton_snit_code}>
+                      {c.canton_name} (SNIT #{c.canton_snit_code}){p ? ` • ${p.province_name}` : ''}
+                    </Select.Option>
+                  );
+                })}
+              </Select>
             </Form.Item>
             <Form.Item
               name="district_snit_code"
