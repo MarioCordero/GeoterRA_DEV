@@ -20,26 +20,32 @@ export const SessionProvider = ({ children }) => {
     setError(null);
     try {
       // API CALL - using userMeSession() function
+      console.log('🔍 [useSession] Verificando sesión con userMeSession()...');
       const result = await userMeSession();
 
       if (result.ok && result.data) {
+        console.log('✅ [useSession] Sesión activa confirmada:', result.data.email, `(Rol: ${result.data.role})`);
         setUser(result.data);
         return result.data;
       }
 
       if (result.status === 401) {
-        console.warn('⚠️ [useSession] 401 Unauthorized - No hay sesión válida');
+        console.warn('⚠️ [useSession] 401 Unauthorized - No hay sesión activa o el token no pudo renovarse');
         setUser(null);
         return null;
       }
 
-      console.error('❌ [useSession] Error:', result.error);
+      console.error('❌ [useSession] Error al obtener sesión:', {
+        status: result.status,
+        error: result.error,
+        raw: result.raw,
+      });
       setError(result.error);
       setUser(null);
       return null;
 
     } catch (err) {
-      console.error('❌ [useSession] Exception:', err);
+      console.error('❌ [useSession] Excepción al comprobar sesión:', err);
       setError(err.message);
       setUser(null);
       return null;
