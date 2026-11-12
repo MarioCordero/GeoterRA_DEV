@@ -4,7 +4,6 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
 import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
@@ -20,7 +19,8 @@ class AccountViewModel(
 		isLoading = authService.userSession.value == null,
 		user = authService.userSession.value,
 		isDarkMode = settings.getBoolean("is_dark_mode", false),
-		isFieldTripMode = settings.getBoolean("is_field_trip_mode", false)
+		isFieldTripMode = settings.getBoolean("is_field_trip_mode", false),
+		isSessionExpired = authService.sessionExpired.value
 	)
 ) {
 
@@ -34,12 +34,9 @@ class AccountViewModel(
 		}
 
 		screenModelScope.launch {
-			authService.events.collect { event ->
-				when (event) {
-					is AuthEvent.Unauthorized -> _state.update {
-						it.copy(isSessionExpired = true)
-					}
-					else -> Unit
+			authService.sessionExpired.collect { expired ->
+				_state.update {
+					it.copy(isSessionExpired = expired)
 				}
 			}
 		}
@@ -91,9 +88,7 @@ class AccountViewModel(
 	}
 
 	fun logout() {
-		screenModelScope.launch {
-			authService.logout()
-		}
+		authService.logout()
 	}
 
 	fun clearSnackBar() {
