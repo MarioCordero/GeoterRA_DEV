@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import cafe.adriel.voyager.transitions.SlideTransition
 import geoterra.geoterraapp.generated.resources.Res
 import geoterra.geoterraapp.generated.resources.ic_account
 import org.jetbrains.compose.resources.painterResource
@@ -31,9 +32,13 @@ object AccountTab : Tab {
       }
     }
 
-    Navigator(rootScreen)
+    Navigator(rootScreen) { navigator ->
+      SlideTransition(navigator) { screen ->
+        screen.Content()
+      }
+    }
   }
-  
+
   override val options: TabOptions
     @Composable
     get() = TabOptions(

@@ -12,8 +12,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -82,7 +80,6 @@ class MapScreen : Screen {
 						Icon(Icons.Default.FilterList, contentDescription = "Filtros")
 					}
 				}
-
 			}
 		) { padding ->
 			MapContent(
@@ -92,7 +89,7 @@ class MapScreen : Screen {
 				onUserMarkerClick = viewModel::onUserMarkerSelected,
 				onDismissPanel = { viewModel.onManifestationMarkerSelected("") },
 				onDetailsClick = { manifestation ->
-					navigator.push(GeomanifestationScreen(manifestation))
+					navigator.push(GeomanifestationScreen(manifestation.geomanifestation_id))
 				}
 			)
 

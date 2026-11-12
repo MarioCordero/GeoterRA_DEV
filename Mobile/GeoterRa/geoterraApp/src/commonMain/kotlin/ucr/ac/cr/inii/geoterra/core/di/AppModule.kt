@@ -56,7 +56,12 @@ val appModule = module {
 	single { FieldTripViewModel(get(), get()) }
 
 	// Inner ViewModels
-	factory { GeomanifestationViewModel(get()) }
+	factory { params ->
+		GeomanifestationViewModel(
+		geomanifestationId = params.get<String>(),
+		repository = get()
+		)
+	}
 	factory { SignInViewModel(get()) }
 	factory { SignUpViewModel(get()) }
 	factory { PasswordChangeViewModel(get()) }
@@ -83,7 +88,8 @@ val appModule = module {
 
 	factory { params ->
 		InvestigationRequestDetailsViewModel(
-			request = params.get<InvestigationRequestResponse>(), repository = get()
+			requestId = params.get<String>(),
+			repository = get()
 		)
 	}
 

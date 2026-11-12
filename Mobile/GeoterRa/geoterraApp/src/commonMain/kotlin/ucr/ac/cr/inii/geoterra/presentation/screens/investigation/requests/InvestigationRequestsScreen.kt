@@ -106,7 +106,7 @@ class InvestigationRequestsScreen : Screen {
 					.padding(horizontal = 20.dp),
 				state = state,
 				onView = { req ->
-					navigator.push(InvestigationRequestDetailsScreen(req))
+					navigator.push(InvestigationRequestDetailsScreen(req.request_id))
 				},
 				onEdit = { req -> navigator.push(InvestigationRequestFormScreen(requestToEdit = req)) },
 				onDelete = { req -> viewModel.setRequestToDelete(req) }

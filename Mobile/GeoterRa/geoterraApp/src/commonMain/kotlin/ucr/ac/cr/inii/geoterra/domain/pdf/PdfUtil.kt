@@ -15,6 +15,7 @@ import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
 import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.details.InvestigationRequestDetailsContent
 import ucr.ac.cr.inii.geoterra.presentation.screens.investigation.requests.details.InvestigationRequestDetailsState
 import ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation.GeomanifestationContent
+import ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation.GeomanifestationState
 import ucr.ac.cr.inii.geoterra.themes.GeoterraTheme
 
 object PDFUtil {
@@ -69,14 +70,14 @@ object PDFUtil {
   }
 
   suspend fun generateManifestationReportPdf(
-		manifestation: GeomanifestationResponse,
+		state: GeomanifestationState,
 	  fileName: String
   ) : String? {
     return generatePdf(
       fileName = fileName,
       content = {
 				GeomanifestationContent(
-					manifestation = manifestation,
+					state = state,
 					isForPdf = true,
 				)
       },

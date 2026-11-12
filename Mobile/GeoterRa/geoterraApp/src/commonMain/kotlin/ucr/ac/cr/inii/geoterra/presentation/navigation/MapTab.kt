@@ -5,6 +5,7 @@ import androidx.compose.runtime.remember
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import cafe.adriel.voyager.transitions.SlideTransition
 import geoterra.geoterraapp.generated.resources.Res
 import geoterra.geoterraapp.generated.resources.ic_map
 import org.jetbrains.compose.resources.painterResource
@@ -17,11 +18,15 @@ internal object MapTab : Tab {
     @Composable
     get() {
       val icon = painterResource(Res.drawable.ic_map)
-      return TabOptions(index = 0u, title = "Mapa", icon)
+      return TabOptions(index = 1u, title = "Mapa", icon)
     }
-  
+
   @Composable
   override fun Content() {
-    Navigator(remember { MapScreen() })
+    Navigator(remember { MapScreen() }) { navigator ->
+      SlideTransition(navigator) { screen ->
+        screen.Content()
+      }
+    }
   }
 }
