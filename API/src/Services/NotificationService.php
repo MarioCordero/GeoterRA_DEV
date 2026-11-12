@@ -29,6 +29,160 @@ final class NotificationService
   }
 
   /**
+   * Sends a welcome email to the newly registered user.
+   *
+   * @param string $email User's email.
+   * @param string $firstName User's first name.
+   * @param string|null $lastName User's last name.
+   * @param string|null $phoneNumber User's phone number.
+   * @param string $time Date and time of account creation.
+   */
+  public function notifyAccountCreated(
+    string $email,
+    string $firstName,
+    ?string $lastName,
+    ?string $phoneNumber,
+    string $time
+  ): void {
+    $subject = "Bienvenido a GeoterRA: Cuenta Creada Exitosamente";
+    $antiClip = $this->getAntiClippingToken();
+
+    $safeFirstName = htmlspecialchars($firstName, ENT_QUOTES, 'UTF-8');
+    $fullName = trim($firstName . ' ' . ($lastName ?? ''));
+    $safeFullName = htmlspecialchars($fullName, ENT_QUOTES, 'UTF-8');
+    $safeEmail = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
+    $phoneText = !empty($phoneNumber)
+      ? htmlspecialchars($phoneNumber, ENT_QUOTES, 'UTF-8')
+      : 'No especificado';
+
+    $body = "
+      <div style='width: 100%; max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333333; word-break: break-word; box-sizing: border-box;'>
+        <div style='background-color: #F19B29; padding: 20px; color: white;'>
+          <h1 style='margin: 0; font-size: 24px; font-weight: bold;'>GeoterRA</h1>
+        </div>
+        
+        <div style='padding: 30px 20px;'>
+          <h2 style='font-size: 18px; font-weight: bold; margin-top: 0;'>Hola {$safeFirstName},</h2>
+          
+          <p style='line-height: 1.5;'>
+            ¡Bienvenido! Le confirmamos que su cuenta en <strong>GeoterRA</strong> ha sido creada exitosamente.
+          </p>
+
+          <div style='margin: 25px 0; padding: 20px; background-color: #f4f4f4; border-radius: 8px;'>
+            <h3 style='margin: 0 0 15px 0; font-size: 16px; color: #F19B29; border-bottom: 2px solid #F19B29; padding-bottom: 5px;'>
+              Detalles de la Cuenta
+            </h3>
+
+            <table style='width: 100%; font-size: 14px; border-collapse: collapse;'>
+              <tr>
+                <td style='padding: 6px 0; font-weight: bold; width: 40%;'>Nombre completo:</td>
+                <td style='padding: 6px 0;'>{$safeFullName}</td>
+              </tr>
+              <tr>
+                <td style='padding: 6px 0; font-weight: bold;'>Correo electrónico:</td>
+                <td style='padding: 6px 0;'>{$safeEmail}</td>
+              </tr>
+              <tr>
+                <td style='padding: 6px 0; font-weight: bold;'>Teléfono:</td>
+                <td style='padding: 6px 0;'>{$phoneText}</td>
+              </tr>
+              <tr>
+                <td style='padding: 6px 0; font-weight: bold;'>Fecha de registro:</td>
+                <td style='padding: 6px 0;'>{$time}</td>
+              </tr>
+            </table>
+          </div>
+
+          <p style='line-height: 1.5; color: #666666; font-size: 14px;'>
+            Ya puede iniciar sesión en la plataforma web o móvil utilizando sus credenciales registradas.
+          </p>
+        </div>
+        {$antiClip}
+      </div>
+    ";
+
+    $this->emailSender->send($email, $subject, trim($body));
+  }
+
+  /**
+   * Sends a notification by email when the authenticated user updates their profile information,
+   * detailing the modified fields.
+   *
+   * @param string $email User's email.
+   * @param string $firstName User's first name.
+   * @param array<string, string> $appliedChanges Map of [Field label => Applied new value].
+   * @param string $time Date and time of the update.
+   */
+  public function notifyProfileUpdated(
+    string $email,
+    string $firstName,
+    array $appliedChanges,
+    string $time
+  ): void {
+    $subject = "Actualización de Perfil: Cambios Aplicados en su Cuenta";
+    $antiClip = $this->getAntiClippingToken();
+
+    $safeFirstName = htmlspecialchars($firstName, ENT_QUOTES, 'UTF-8');
+
+    $rowsHtml = "";
+    foreach ($appliedChanges as $label => $value) {
+      $safeLabel = htmlspecialchars((string)$label, ENT_QUOTES, 'UTF-8');
+      $safeValue = htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
+      $rowsHtml .= "
+        <tr>
+          <td style='padding: 6px 0; font-weight: bold; width: 40%; vertical-align: top;'>{$safeLabel}:</td>
+          <td style='padding: 6px 0; vertical-align: top;'>{$safeValue}</td>
+        </tr>
+      ";
+    }
+
+    if ($rowsHtml === "") {
+      $rowsHtml = "
+        <tr>
+          <td colspan='2' style='padding: 6px 0; color: #555555;'>Se confirmó la actualización de los datos del perfil.</td>
+        </tr>
+      ";
+    }
+
+    $body = "
+      <div style='width: 100%; max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333333; word-break: break-word; box-sizing: border-box;'>
+        <div style='background-color: #F19B29; padding: 20px; color: white;'>
+          <h1 style='margin: 0; font-size: 24px; font-weight: bold;'>GeoterRA</h1>
+        </div>
+        
+        <div style='padding: 30px 20px;'>
+          <h2 style='font-size: 18px; font-weight: bold; margin-top: 0;'>Hola {$safeFirstName},</h2>
+          
+          <p style='line-height: 1.5;'>
+            Le informamos que la información de su perfil en <strong>GeoterRA</strong> ha sido actualizada correctamente. A continuación se detalla la información aplicada:
+          </p>
+
+          <div style='margin: 25px 0; padding: 20px; background-color: #f4f4f4; border-radius: 8px;'>
+            <h3 style='margin: 0 0 15px 0; font-size: 16px; color: #F19B29; border-bottom: 2px solid #F19B29; padding-bottom: 5px;'>
+              Información Actualizada
+            </h3>
+
+            <table style='width: 100%; font-size: 14px; border-collapse: collapse;'>
+              {$rowsHtml}
+              <tr>
+                <td style='padding: 10px 0 0 0; font-weight: bold; border-top: 1px solid #e0e0e0;'>Fecha de modificación:</td>
+                <td style='padding: 10px 0 0 0; border-top: 1px solid #e0e0e0;'>{$time}</td>
+              </tr>
+            </table>
+          </div>
+
+          <p style='line-height: 1.5; color: #666666; font-size: 14px;'>
+            Si usted no realizó estos cambios, por favor cambie su contraseña de inmediato o contacte al equipo de soporte técnico.
+          </p>
+        </div>
+        {$antiClip}
+      </div>
+    ";
+
+    $this->emailSender->send($email, $subject, trim($body));
+  }
+
+  /**
    * Sends a new login notification email to the user with device and location context.
    */
   public function notifyNewLogin(
@@ -899,7 +1053,7 @@ final class NotificationService
             </table>
 
             {$descHtml}
-          </div>
+          </div>`
 
           <p style='line-height: 1.5; color: #666666; font-size: 14px;'>
             Puede consultar esta información ingresando a la plataforma GeoterRA.
