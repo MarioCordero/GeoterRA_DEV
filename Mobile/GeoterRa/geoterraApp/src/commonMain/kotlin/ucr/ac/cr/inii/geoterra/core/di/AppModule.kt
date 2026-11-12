@@ -4,6 +4,7 @@ import com.russhwolf.settings.Settings
 import org.koin.dsl.module
 import ucr.ac.cr.inii.geoterra.data.model.responses.FieldTripResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
+import ucr.ac.cr.inii.geoterra.data.model.responses.InSituTestResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
 import ucr.ac.cr.inii.geoterra.data.model.responses.UserResponse
 import ucr.ac.cr.inii.geoterra.data.repository.AuthRepository
@@ -35,6 +36,7 @@ import ucr.ac.cr.inii.geoterra.presentation.screens.field.trip.details.FieldTrip
 import ucr.ac.cr.inii.geoterra.presentation.screens.fieldtrip.FieldTripViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.field.trip.form.FieldTripFormViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.field.geomanifestation.details.GeomanifestationDetailsViewModel
+import ucr.ac.cr.inii.geoterra.presentation.screens.field.insitu.form.InSituFormViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.geomanifestation.form.GeomanifestationFormViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeViewModel
 import ucr.ac.cr.inii.geoterra.presentation.screens.sign.`in`.SignInViewModel
@@ -54,7 +56,12 @@ val appModule = module {
 	single { FieldTripViewModel(get(), get()) }
 
 	// Inner ViewModels
-	factory { GeomanifestationViewModel(get()) }
+	factory { params ->
+		GeomanifestationViewModel(
+		geomanifestationId = params.get<String>(),
+		repository = get()
+		)
+	}
 	factory { SignInViewModel(get()) }
 	factory { SignUpViewModel(get()) }
 	factory { PasswordChangeViewModel(get()) }
@@ -81,7 +88,8 @@ val appModule = module {
 
 	factory { params ->
 		InvestigationRequestDetailsViewModel(
-			request = params.get<InvestigationRequestResponse>(), repository = get()
+			requestId = params.get<String>(),
+			repository = get()
 		)
 	}
 
@@ -100,7 +108,8 @@ val appModule = module {
 	factory { params ->
 		FieldTripDetailsViewModel(
 			fieldTripId = params.get<String>(),
-			fieldTripRepository = get()
+			fieldTripRepository = get(),
+			geomanifestationsRepository = get()
 		)
 	}
 
@@ -111,7 +120,10 @@ val appModule = module {
 			cantonsRepository = get(),
 			districtsRepository = get(),
 			geomanifestationToEdit = params.getOrNull<GeomanifestationResponse>(),
-			fieldTripId = params.get<String>()
+			fieldTripId = params.get<String>(),
+			fieldTripName = params.get<String>(),
+			locationProvider = get(),
+			permissionManager = get()
 		)
 	}
 
@@ -120,6 +132,15 @@ val appModule = module {
 			geomanifestationId = params.get<String>(),
 			geomanifestationsRepository = get(),
 			inSituTestRepository = get()
+		)
+	}
+
+	factory { params ->
+		InSituFormViewModel(
+			geomanifestationId = params.get<String>(),
+			geomanifestationName = params.get<String>(),
+			inSituTestRepository = get(),
+			testToEdit = params.getOrNull<InSituTestResponse>()
 		)
 	}
 

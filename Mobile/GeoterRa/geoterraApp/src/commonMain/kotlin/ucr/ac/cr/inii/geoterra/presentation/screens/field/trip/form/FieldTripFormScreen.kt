@@ -9,7 +9,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -24,7 +23,7 @@ data class FieldTripFormScreen(
 	val fieldTripToEdit: FieldTripResponse? = null
 ) : Screen {
 
-	override val key: ScreenKey = uniqueScreenKey
+	override val key: ScreenKey get() = "FieldTripFormScreen_${fieldTripToEdit?.field_trip_id ?: "new"}"
 
 	@Composable
 	override fun Content() {
@@ -32,11 +31,12 @@ data class FieldTripFormScreen(
 		val viewModel = getScreenModel<FieldTripFormViewModel>(
 			parameters = { parametersOf(fieldTripToEdit) }
 		)
-
 		val state by viewModel.state.collectAsState()
 		val snackbarHostState = remember { TypedSnackbarHostState() }
 
 		LoadingDialog(isVisible = state.isLoading)
+
+		LogoutEffect { navigator.pop() }
 
 		LaunchedEffect(state.snackBarMessage) {
 			state.snackBarMessage?.let { snackbarMsg ->

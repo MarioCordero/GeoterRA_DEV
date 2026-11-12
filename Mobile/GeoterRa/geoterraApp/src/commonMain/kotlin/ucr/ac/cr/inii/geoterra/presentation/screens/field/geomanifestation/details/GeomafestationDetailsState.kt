@@ -8,5 +8,6 @@ data class GeomanifestationDetailsState(
 	val isLoading: Boolean = false,
 	val geomanifestation: GeomanifestationResponse? = null,
 	val inSituTests: List<InSituTestResponse> = emptyList(),
-	val snackBarMessage: SnackbarMessage? = null
+	val snackBarMessage: SnackbarMessage? = null,
+	val testToDelete: InSituTestResponse? = null
 )

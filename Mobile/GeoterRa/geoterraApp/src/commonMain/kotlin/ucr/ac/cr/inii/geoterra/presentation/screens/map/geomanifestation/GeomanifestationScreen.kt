@@ -11,12 +11,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.koin.core.parameter.parametersOf
-import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
 import ucr.ac.cr.inii.geoterra.domain.pdf.PDFUtil
 import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
@@ -24,21 +22,19 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 
-class GeomanifestationScreen(val manifestation: GeomanifestationResponse) : Screen {
-	override val key: ScreenKey = uniqueScreenKey
+class GeomanifestationScreen(val geomanifestationId: String) : Screen {
+	override val key: ScreenKey get() = "GeomanifestationScreen_$geomanifestationId"
 
-	@OptIn(ExperimentalMaterial3Api::class)
 	@Composable
 	override fun Content() {
 		val viewModel = getScreenModel<GeomanifestationViewModel>(
-			parameters = { parametersOf(manifestation) }
+			parameters = { parametersOf(geomanifestationId) }
 		)
 
 		val state by viewModel.state.collectAsState()
 		val navigator = LocalNavigator.currentOrThrow
 		val snackbarHostState = remember { TypedSnackbarHostState() }
 
-		// Loading Dialog
 		if (state.isPdfGenerating) {
 			LoadingDialog(
 				isVisible = state.isPdfGenerating,
@@ -46,7 +42,6 @@ class GeomanifestationScreen(val manifestation: GeomanifestationResponse) : Scre
 			)
 		}
 
-		// Success Dialog
 		if (state.lastGeneratedPdfPath != null) {
 			SuccessActionDialog(
 				message = "El reporte PDF se ha generado correctamente.",
@@ -75,15 +70,15 @@ class GeomanifestationScreen(val manifestation: GeomanifestationResponse) : Scre
 		Scaffold(
 			snackbarHost = { CustomSnackbarHost(snackbarHostState) },
 			floatingActionButton = {
-				ExtendedFloatingActionButton(
-					onClick = {
-						viewModel.downloadReport()
-					},
-					icon = { Icon(Icons.Default.Download, contentDescription = "Descargar PDF") },
-					text = { Text("Descargar PDF") },
-					containerColor = MaterialTheme.colorScheme.primary,
-					contentColor = MaterialTheme.colorScheme.onPrimary
-				)
+				if (state.manifestation != null) {
+					ExtendedFloatingActionButton(
+						onClick = { viewModel.downloadReport() },
+						icon = { Icon(Icons.Default.Download, contentDescription = "Descargar PDF") },
+						text = { Text("Descargar PDF") },
+						containerColor = MaterialTheme.colorScheme.primary,
+						contentColor = MaterialTheme.colorScheme.onPrimary
+					)
+				}
 			},
 			topBar = {
 				Row(
@@ -104,13 +99,44 @@ class GeomanifestationScreen(val manifestation: GeomanifestationResponse) : Scre
 				}
 			}
 		) { paddingValues ->
-			GeomanifestationContent(
-				modifier = Modifier
-					.padding(top = paddingValues.calculateTopPadding())
-					.padding(horizontal = 20.dp),
-				manifestation = state.manifestation,
-				isForPdf = false
-			)
+			val manifestation = state.manifestation
+			when {
+				state.isLoading && manifestation == null -> {
+					Box(
+						modifier = Modifier
+							.fillMaxSize()
+							.padding(paddingValues),
+						contentAlignment = Alignment.Center
+					) {
+						CircularProgressIndicator()
+					}
+				}
+
+				manifestation == null -> {
+					Box(
+						modifier = Modifier
+							.fillMaxSize()
+							.padding(paddingValues),
+						contentAlignment = Alignment.Center
+					) {
+						Text(
+							text = "No se pudo cargar la geomanifestación",
+							style = MaterialTheme.typography.bodyLarge,
+							color = MaterialTheme.colorScheme.error
+						)
+					}
+				}
+
+				else -> {
+					GeomanifestationContent(
+						modifier = Modifier
+							.padding(top = paddingValues.calculateTopPadding())
+							.padding(horizontal = 20.dp),
+						state = state,
+						isForPdf = false
+					)
+				}
+			}
 		}
 	}
 }

@@ -1,42 +1,22 @@
 package ucr.ac.cr.inii.geoterra.presentation
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.tab.CurrentTab
-import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
-import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
-import com.russhwolf.settings.Settings
 import org.koin.compose.koinInject
 import ucr.ac.cr.inii.geoterra.presentation.components.common.BottomNavBar
 import ucr.ac.cr.inii.geoterra.presentation.navigation.AccountTab
@@ -47,8 +27,8 @@ import ucr.ac.cr.inii.geoterra.presentation.navigation.RequestTab
 import ucr.ac.cr.inii.geoterra.presentation.screens.account.AccountViewModel
 
 class MainScreen : Screen {
-  @Composable
-  override fun Content() {
+	@Composable
+	override fun Content() {
 		val accountViewModel: AccountViewModel = koinInject()
 		val accountState by accountViewModel.state.collectAsState()
 
@@ -59,20 +39,33 @@ class MainScreen : Screen {
 			listOf(HomeTab, MapTab, actionTab, AccountTab)
 		}
 
-    TabNavigator(HomeTab) { tabNavigator ->
-      Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        bottomBar = {
-          BottomNavBar(
-            items = tabs,
-            tabNavigator = tabNavigator
-          )
-        }
-      ) { padding ->
-        Box(Modifier.padding(padding)) {
-          CurrentTab()
-        }
-      }
-    }
-  }
+		TabNavigator(HomeTab) { tabNavigator ->
+			val saveableStateHolder = rememberSaveableStateHolder()
+
+			Scaffold(
+				containerColor = MaterialTheme.colorScheme.background,
+				bottomBar = {
+					BottomNavBar(
+						items = tabs,
+						tabNavigator = tabNavigator
+					)
+				}
+			) { padding ->
+				Box(Modifier.padding(padding)) {
+					AnimatedContent(
+						targetState = tabNavigator.current,
+						transitionSpec = {
+							fadeIn(animationSpec = tween(250)) togetherWith
+									fadeOut(animationSpec = tween(250))
+						},
+						label = "TabTransition"
+					) { tab ->
+						saveableStateHolder.SaveableStateProvider(tab.key) {
+							tab.Content()
+						}
+					}
+				}
+			}
+		}
+	}
 }

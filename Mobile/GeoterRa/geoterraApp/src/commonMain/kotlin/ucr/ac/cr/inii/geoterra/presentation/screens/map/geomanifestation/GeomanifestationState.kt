@@ -4,7 +4,8 @@ import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
 
 data class GeomanifestationState(
-	val manifestation: GeomanifestationResponse,
+	val geomanifestationId: String,
+	val manifestation: GeomanifestationResponse? = null,
 	val isLoading: Boolean = false,
 	val isPdfGenerating: Boolean = false,
 	val lastGeneratedPdfPath: String? = null,

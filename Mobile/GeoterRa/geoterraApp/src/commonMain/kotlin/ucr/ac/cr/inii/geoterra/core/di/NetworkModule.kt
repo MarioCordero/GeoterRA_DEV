@@ -12,10 +12,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.utils.io.InternalAPI
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.Json.Default.encodeToString
 import kotlinx.serialization.json.Json.Default.parseToJsonElement
@@ -37,8 +34,6 @@ val networkModule = module {
 	single { TokenManager(get()) }
 
 	single<HttpClient> {
-		val networkScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-
 		val authEventBus = get<AuthEventBus>()
 		val client = HttpClient(getHttpClientEngine()) {
 			install(HttpTimeout) {
@@ -68,7 +63,8 @@ val networkModule = module {
 							message
 						}
 
-						println("KtorClient: $formattedMessage")					}
+						println("KtorClient: $formattedMessage")
+					}
 				}
 
 				level = LogLevel.ALL
@@ -88,7 +84,6 @@ val networkModule = module {
 						!isPublicPath
 					}
 
-					// Loads tokens from the token manager
 					loadTokens {
 						val tokenManager = get<TokenManager>()
 						val access = tokenManager.getAccessToken()
@@ -106,7 +101,6 @@ val networkModule = module {
 						val refreshToken = tm.getRefreshToken() ?: return@refreshTokens null
 
 						try {
-							// Client for refreshing tokens
 							val response = client.post("auth/refresh") {
 								markAsRefreshTokenRequest()
 								contentType(ContentType.Application.Json)
@@ -114,26 +108,28 @@ val networkModule = module {
 							}.body<ApiResponseModel<RefreshAccessTokenResponse, JsonElement>>()
 
 							val data = response.data
-							val errors = response.errors
-
-							val expiredRefreshToken = errors.any { error ->
+							val expiredRefreshToken = response.errors.any { error ->
 								error.isAuthError()
 							}
 
-							if (expiredRefreshToken || data == null) {
-								tm.clearTokens()
-								authEventBus.emit(AuthEvent.Logout)
+							if (expiredRefreshToken) {
+								if (tm.getRefreshToken() == refreshToken) {
+									tm.clearTokens()
+									authEventBus.emit(AuthEvent.Unauthorized)
+								}
 								return@refreshTokens null
 							}
 
-							// Save new tokens
+							if (data == null) {
+								return@refreshTokens null
+							}
+
 							tm.saveTokens(data.access_token, data.refresh_token)
 							authEventBus.emit(AuthEvent.Authorized)
 							BearerTokens(data.access_token, data.refresh_token)
-
+						} catch (e: CancellationException) {
+							throw e
 						} catch (e: Exception) {
-							tm.clearTokens()
-							authEventBus.emit(AuthEvent.Logout)
 							null
 						}
 					}
@@ -147,12 +143,8 @@ val networkModule = module {
 			}
 		}
 
-		networkScope.launch {
-			authEventBus.events.collect { event ->
-				if (event is AuthEvent.LoginSuccess) {
-					client.authProvider<BearerAuthProvider>()?.clearToken()
-				}
-			}
+		authEventBus.onTokensInvalidated = {
+			client.authProvider<BearerAuthProvider>()?.clearToken()
 		}
 
 		client
