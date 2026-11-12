@@ -51,6 +51,7 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.androidx.exifinterface)
+
         }
 
         // --- Dependencias de iOS ---
@@ -104,7 +105,7 @@ kotlin {
             implementation(libs.voyager.bottomSheetNavigator)
             implementation(libs.voyager.transitions)
             implementation(libs.voyager.koin)
-
+            // PDF
         }
 
         commonTest.dependencies {

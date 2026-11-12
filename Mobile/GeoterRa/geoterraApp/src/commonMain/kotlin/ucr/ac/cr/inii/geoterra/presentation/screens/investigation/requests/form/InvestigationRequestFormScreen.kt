@@ -23,19 +23,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import org.koin.core.parameter.parametersOf
 import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.LogoutEffect
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 
 data class InvestigationRequestFormScreen(
 	val requestToEdit: InvestigationRequestResponse? = null
 ) : Screen {
 
-	override val key: ScreenKey = uniqueScreenKey
+	override val key: ScreenKey get() = "InvestigationRequestFormScreen_${requestToEdit?.request_id ?: "new"}"
 
 	@Composable
 	override fun Content() {
@@ -50,6 +50,8 @@ data class InvestigationRequestFormScreen(
 		LoadingDialog(
 			isVisible = state.isLoading,
 		)
+
+		LogoutEffect { navigator.pop() }
 
 		LaunchedEffect(state.snackBarMessage) {
 			state.snackBarMessage?.let { snackbarMsg ->

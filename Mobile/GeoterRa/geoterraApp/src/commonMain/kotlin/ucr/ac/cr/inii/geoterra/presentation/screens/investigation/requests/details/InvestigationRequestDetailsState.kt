@@ -8,7 +8,8 @@ data class InvestigationRequestDetailsState(
 	val isPdfGenerating: Boolean = false,
 	val lastGeneratedPdfPath: String? = null,
 	val pdfError: String? = null,
-	val request: InvestigationRequestResponse,
+	val requestId: String,
+	val request: InvestigationRequestResponse? = null,
 	val statuses: List<InvestigationRequestResponse.StateResponse> = emptyList(),
 	val snackBarMessage: SnackbarMessage? = null
 )

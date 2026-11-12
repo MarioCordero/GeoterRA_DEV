@@ -12,8 +12,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -23,8 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -34,21 +30,20 @@ import ucr.ac.cr.inii.geoterra.presentation.components.map.FilterBottomModal
 import ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation.GeomanifestationScreen
 
 class MapScreen : Screen {
-  override val key: ScreenKey = uniqueScreenKey
 
-  @OptIn(ExperimentalMaterial3Api::class)
-  @Composable
-  override fun Content() {
-    val viewModel = getScreenModel<MapViewModel>()
-    val state by viewModel.state.collectAsState()
-    val navigator = LocalNavigator.currentOrThrow
+	@OptIn(ExperimentalMaterial3Api::class)
+	@Composable
+	override fun Content() {
+		val viewModel = getScreenModel<MapViewModel>()
+		val state by viewModel.state.collectAsState()
+		val navigator = LocalNavigator.currentOrThrow
 
-    val snackBarHost = remember { TypedSnackbarHostState() }
-    
-    LaunchedEffect(Unit) {
-      viewModel.requestLocationIfNeeded()
-      viewModel.loadMapMarkers()
-    }
+		val snackBarHost = remember { TypedSnackbarHostState() }
+
+		LaunchedEffect(Unit) {
+			viewModel.requestLocationIfNeeded()
+			viewModel.loadMapMarkers()
+		}
 
 		LaunchedEffect(state.snackBarMessage) {
 			state.snackBarMessage?.let { message ->
@@ -60,58 +55,57 @@ class MapScreen : Screen {
 			}
 		}
 
-    Scaffold(
-      snackbarHost = { CustomSnackbarHost(snackBarHost) },
-      floatingActionButton = {
-        Column(
-          horizontalAlignment = Alignment.End,
-          verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+		Scaffold(
+			snackbarHost = { CustomSnackbarHost(snackBarHost) },
+			floatingActionButton = {
+				Column(
+					horizontalAlignment = Alignment.End,
+					verticalArrangement = Arrangement.spacedBy(8.dp)
+				) {
 
-          FloatingActionButton(
-            onClick = { viewModel.onUserMarkerSelected() },
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
-          ) {
-            Icon(Icons.Default.MyLocation, contentDescription = "Mi ubicación")
-          }
+					FloatingActionButton(
+						onClick = { viewModel.onUserMarkerSelected() },
+						containerColor = MaterialTheme.colorScheme.primary,
+						contentColor = MaterialTheme.colorScheme.onPrimary
+					) {
+						Icon(Icons.Default.MyLocation, contentDescription = "Mi ubicación")
+					}
 
-          FloatingActionButton(
-            onClick = { viewModel.toggleFilterModal() },
-            containerColor = MaterialTheme.colorScheme.secondary,
-            contentColor = MaterialTheme.colorScheme.onSecondary,
-            modifier = Modifier.size(56.dp)
-          ) {
-            Icon(Icons.Default.FilterList, contentDescription = "Filtros")
-          }
-        }
+					FloatingActionButton(
+						onClick = { viewModel.toggleFilterModal() },
+						containerColor = MaterialTheme.colorScheme.secondary,
+						contentColor = MaterialTheme.colorScheme.onSecondary,
+						modifier = Modifier.size(56.dp)
+					) {
+						Icon(Icons.Default.FilterList, contentDescription = "Filtros")
+					}
+				}
+			}
+		) { padding ->
+			MapContent(
+				modifier = Modifier.fillMaxSize(),
+				state = state,
+				onManifestationMarkerClick = viewModel::onManifestationMarkerSelected,
+				onUserMarkerClick = viewModel::onUserMarkerSelected,
+				onDismissPanel = { viewModel.onManifestationMarkerSelected("") },
+				onDetailsClick = { manifestation ->
+					navigator.push(GeomanifestationScreen(manifestation.geomanifestation_id))
+				}
+			)
 
-      }
-    ) { padding ->
-      MapContent(
-        modifier = Modifier.fillMaxSize(),
-        state = state,
-        onManifestationMarkerClick = viewModel::onManifestationMarkerSelected,
-        onUserMarkerClick = viewModel::onUserMarkerSelected,
-        onDismissPanel = { viewModel.onManifestationMarkerSelected("") },
-        onDetailsClick = { manifestation ->
-          navigator.push(GeomanifestationScreen(manifestation))
-        }
-      )
-
-      FilterBottomModal(
-        isVisible = state.isFilterModalVisible,
-        state = state,
-        onProvinceSelected = viewModel::selectProvince,
-        onCantonSelected = viewModel::selectCanton,
-        onDistrictSelected = viewModel::selectDistrict,
-        onTempMinChange = viewModel::selectTempMin,
-        onTempMaxChange = viewModel::selectTempMax,
-        toggleLayer = viewModel::toggleLayer,
-        onDismiss = viewModel::hideFilterModal,
-        onApplyFilters = viewModel::applyFilters,
-        onClearFilters = viewModel::clearAllFilters
-      )
-    }
-  }
+			FilterBottomModal(
+				isVisible = state.isFilterModalVisible,
+				state = state,
+				onProvinceSelected = viewModel::selectProvince,
+				onCantonSelected = viewModel::selectCanton,
+				onDistrictSelected = viewModel::selectDistrict,
+				onTempMinChange = viewModel::selectTempMin,
+				onTempMaxChange = viewModel::selectTempMax,
+				toggleLayer = viewModel::toggleLayer,
+				onDismiss = viewModel::hideFilterModal,
+				onApplyFilters = viewModel::applyFilters,
+				onClearFilters = viewModel::clearAllFilters
+			)
+		}
+	}
 }

@@ -53,6 +53,31 @@ class InvestigationRequestsRepository(
 		}
 	}
 
+	override suspend fun getById(id: String): Result<InvestigationRequestResponse> {
+		return try {
+			val response = client.get("analysis-requests/$id")
+			if (response.status.isSuccess()) {
+				val envelope =
+					response.body<ApiResponseModel<InvestigationRequestResponse, MetaResponse>>()
+				if (envelope.errors.isNotEmpty()) {
+					return Result.failure(ApiException(envelope.errors.first()))
+				}
+				Result.success(envelope.data ?: throw Exception("No se encontró la solicitud."))
+			} else {
+				handleErrorResponse(response)
+			}
+		} catch (e: Exception) {
+			Result.failure(
+				ApiException(
+					ApiError(
+						code = ApiError.INTERNAL_ERROR,
+						message = "Error de red: verifica tu conexión a internet."
+					)
+				)
+			)
+		}
+	}
+
 	override suspend fun getRequestStatuses(id: String): Result<List<InvestigationRequestResponse.StateResponse>> {
 		return try {
 			val response = client.get("analysis-requests/$id/states")

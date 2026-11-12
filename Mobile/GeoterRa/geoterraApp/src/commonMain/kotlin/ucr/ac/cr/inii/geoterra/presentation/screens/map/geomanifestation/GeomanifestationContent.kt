@@ -2,6 +2,7 @@ package ucr.ac.cr.inii.geoterra.presentation.screens.map.geomanifestation
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.filled.Opacity
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.Terrain
 import androidx.compose.material.icons.filled.Thermostat
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -39,10 +41,23 @@ import ucr.ac.cr.inii.geoterra.presentation.components.geomanifestation.Chemical
 @Composable
 fun GeomanifestationContent(
 	modifier: Modifier = Modifier,
-	manifestation: GeomanifestationResponse,
+	state: GeomanifestationState,
 	isForPdf: Boolean = false
 ) {
 	val scrollState = if (!isForPdf) rememberScrollState() else null
+	val manifestation = state.manifestation
+
+	if (manifestation == null) {
+		if (!isForPdf) {
+			Box(
+				modifier = modifier.fillMaxSize(),
+				contentAlignment = Alignment.Center
+			) {
+				CircularProgressIndicator()
+			}
+		}
+		return
+	}
 
 	Column(
 		modifier = modifier

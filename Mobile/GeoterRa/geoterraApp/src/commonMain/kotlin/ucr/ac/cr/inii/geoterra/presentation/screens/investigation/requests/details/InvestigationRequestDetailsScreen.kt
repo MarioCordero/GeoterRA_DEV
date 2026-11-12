@@ -17,6 +17,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import geoterra.geoterraapp.generated.resources.Res
 import kotlinx.coroutines.launch
 import org.koin.core.parameter.parametersOf
 import ucr.ac.cr.inii.geoterra.data.model.responses.InvestigationRequestResponse
@@ -24,12 +25,14 @@ import ucr.ac.cr.inii.geoterra.domain.pdf.PDFUtil
 import ucr.ac.cr.inii.geoterra.presentation.components.common.AdaptiveBackButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.CustomSnackbarHost
 import ucr.ac.cr.inii.geoterra.presentation.components.common.LoadingDialog
+import ucr.ac.cr.inii.geoterra.presentation.components.common.LogoutEffect
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SuccessActionDialog
 import ucr.ac.cr.inii.geoterra.presentation.components.common.TypedSnackbarHostState
 
 class InvestigationRequestDetailsScreen(
-	private val request: InvestigationRequestResponse
+	private val requestId: String
+
 ) : Screen {
 
 	@OptIn(ExperimentalMaterial3Api::class)
@@ -39,14 +42,12 @@ class InvestigationRequestDetailsScreen(
 		val scope = rememberCoroutineScope()
 
 		val viewModel = getScreenModel<InvestigationRequestDetailsViewModel>(
-			parameters = { parametersOf(request) }
+			parameters = { parametersOf(requestId) }
 		)
 		val state by viewModel.state.collectAsState()
 		val snackbarHostState = remember { TypedSnackbarHostState() }
 
-		LaunchedEffect(state.request?.request_id) {
-			viewModel.fetchRequestStatuses(request.request_id)
-		}
+		LogoutEffect { navigator.pop() }
 
 		LaunchedEffect(state.snackBarMessage) {
 			state.snackBarMessage?.let { snackbarMsg ->
@@ -106,7 +107,7 @@ class InvestigationRequestDetailsScreen(
 						scope.launch {
 							try {
 								viewModel.setPdfGenerating(true)
-								val fileName = "Reporte_Solicitud_${request.request_name}"
+								val fileName = "Reporte_Solicitud_${state.request?.request_name}"
 								val resultPath = PDFUtil.generateRequestPdf(state, fileName)
 
 								if (resultPath != null) {

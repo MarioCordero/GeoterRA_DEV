@@ -5,7 +5,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,11 +15,14 @@ import androidx.compose.ui.unit.dp
 import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
 import ucr.ac.cr.inii.geoterra.presentation.components.common.ActionButton
 import ucr.ac.cr.inii.geoterra.presentation.components.common.InfoChip
+import ucr.ac.cr.inii.geoterra.presentation.components.common.OutlinedActionButton
 
 @Composable
 fun GeomanifestationCardItem(
 	manifestation: GeomanifestationResponse,
 	onDetailsClick: () -> Unit,
+	onEditClick: (() -> Unit),
+	onDeleteClick: (() -> Unit),
 	modifier: Modifier = Modifier
 ) {
 	Card(
@@ -37,21 +39,6 @@ fun GeomanifestationCardItem(
 				.padding(20.dp),
 			verticalArrangement = Arrangement.spacedBy(16.dp)
 		) {
-//			Row(
-//				modifier = Modifier.fillMaxWidth(),
-//				horizontalArrangement = Arrangement.SpaceBetween,
-//				verticalAlignment = Alignment.CenterVertically
-//			) {
-//				Column(
-//					modifier = Modifier
-//						.weight(1f)
-//						.padding(end = 12.dp),
-//					verticalArrangement = Arrangement.spacedBy(4.dp)
-//				) {
-//
-//				}
-//			}
-
 			Text(
 				text = manifestation.geomanifestation_name,
 				style = MaterialTheme.typography.titleLarge.copy(
@@ -77,7 +64,7 @@ fun GeomanifestationCardItem(
 				InfoChip(
 					icon = Icons.Default.Description,
 					label = "Descripción",
-					value = manifestation.description ?: "Sin descripción registrada",
+					value = if (manifestation.description.isNullOrBlank()) "Sin Descripción" else manifestation.description,
 					modifier = Modifier.fillMaxWidth(),
 					iconColor = MaterialTheme.colorScheme.secondary,
 					maxLines = 2
@@ -86,12 +73,26 @@ fun GeomanifestationCardItem(
 
 			Row(
 				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.End,
+				horizontalArrangement = Arrangement.spacedBy(8.dp),
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				ActionButton(
 					text = "Detalles",
 					onClick = onDetailsClick,
+					modifier = Modifier.weight(1f),
+					isCompact = true
+				)
+
+				OutlinedActionButton(
+					text = "Editar",
+					onClick = onEditClick,
+					modifier = Modifier.weight(1f),
+					isCompact = true
+				)
+
+				OutlinedActionButton(
+					text = "Eliminar",
+					onClick = onDeleteClick,
 					modifier = Modifier.weight(1f),
 					isCompact = true
 				)
