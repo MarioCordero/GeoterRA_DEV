@@ -23,17 +23,16 @@ class InvestigationRequestsViewModel(
 		screenModelScope.launch {
 			authService.events.collect { event ->
 				when (event) {
-					is AuthEvent.Unauthorized -> {
+					is AuthEvent.Unauthorized, is AuthEvent.Logout -> {
 						clearData()
 						updateLoginState(false)
 					}
 
-					is AuthEvent.Authorized -> {
+					is AuthEvent.Authorized, is AuthEvent.LoginSuccess -> {
 						fetchSubmittedRequests()
 						updateLoginState(true)
 					}
 
-					else -> {}
 				}
 			}
 		}

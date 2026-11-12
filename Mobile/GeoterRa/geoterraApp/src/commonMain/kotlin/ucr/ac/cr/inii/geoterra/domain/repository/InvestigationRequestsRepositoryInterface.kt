@@ -6,6 +6,7 @@ import ucr.ac.cr.inii.geoterra.data.model.responses.PaginatedInvestigationReques
 
 interface InvestigationRequestsRepositoryInterface {
   suspend fun getMyRequests(page: Int? = null, limit: Int? = null): Result<PaginatedInvestigationRequestsRemote>
+	suspend fun getById(id: String): Result<InvestigationRequestResponse>
 	suspend fun getRequestStatuses(id: String): Result<List<InvestigationRequestResponse.StateResponse>>
   suspend fun createRequest(form: InvestigationRequestRequest): Result<Unit>
   suspend fun updateRequest(id: String, form: InvestigationRequestRequest): Result<Unit>

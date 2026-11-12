@@ -12,6 +12,7 @@ data class GeomanifestationFormState(
 	val availableProvinces: List<ProvinceResponse> = emptyList(),
 	val availableCantons: List<CantonResponse> = emptyList(),
 	val availableDistricts: List<DistrictResponse> = emptyList(),
+	val fieldTripName: String = "",
 	val request: GeomanifestationRequest = GeomanifestationRequest(
 		geomanifestation_name = "",
 		description = "",
@@ -32,10 +33,8 @@ sealed class GeomanifestationFormEvent {
 	data class ProvinceChanged(val snitCode: Int?) : GeomanifestationFormEvent()
 	data class CantonChanged(val snitCode: Int?) : GeomanifestationFormEvent()
 	data class DistrictChanged(val snitCode: Int?) : GeomanifestationFormEvent()
-	data class LatitudeChanged(val value: String) : GeomanifestationFormEvent()
-	data class LongitudeChanged(val value: String) : GeomanifestationFormEvent()
 	data class VisibilityChanged(val value: Boolean) : GeomanifestationFormEvent()
+	object UseCurrentLocation : GeomanifestationFormEvent()
 	object Submit : GeomanifestationFormEvent()
 	object ClearSnackBar : GeomanifestationFormEvent()
 }
-

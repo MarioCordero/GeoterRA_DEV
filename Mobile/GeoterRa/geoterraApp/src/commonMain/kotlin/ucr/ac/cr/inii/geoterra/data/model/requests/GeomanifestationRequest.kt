@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class GeomanifestationRequest(
 	val geomanifestation_name: String,
-	val description: String,
+	val description: String? = null,
 	val province_snit_code: Int,
 	val canton_snit_code: Int,
 	val district_snit_code: Int,

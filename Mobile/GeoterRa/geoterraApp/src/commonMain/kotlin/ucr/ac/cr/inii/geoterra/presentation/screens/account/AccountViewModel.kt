@@ -4,11 +4,8 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ucr.ac.cr.inii.geoterra.core.network.ApiException
-import ucr.ac.cr.inii.geoterra.core.network.isAuthError
-import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
-import ucr.ac.cr.inii.geoterra.domain.auth.AuthEvent
 import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
+import ucr.ac.cr.inii.geoterra.domain.repository.UserRepositoryInterface
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
@@ -17,53 +14,37 @@ class AccountViewModel(
 	private val userRepository: UserRepositoryInterface,
 	private val authService: AuthService,
 	private val settings: Settings
-) : BaseScreenModel<AccountState>(AccountState(
-	isDarkMode = settings.getBoolean("is_dark_mode", false),
-	isFieldTripMode = settings.getBoolean("is_field_trip_mode", false)
-)) {
+) : BaseScreenModel<AccountState>(
+	AccountState(
+		isLoading = authService.userSession.value == null,
+		user = authService.userSession.value,
+		isDarkMode = settings.getBoolean("is_dark_mode", false),
+		isFieldTripMode = settings.getBoolean("is_field_trip_mode", false),
+		isSessionExpired = authService.sessionExpired.value
+	)
+) {
 
 	init {
 		screenModelScope.launch {
-			authService.events.collect { event ->
-				when (event) {
-					is AuthEvent.LoginSuccess, is AuthEvent.Authorized -> loadUserProfile()
-					is AuthEvent.Logout, is AuthEvent.Unauthorized -> _state.update {
-						it.copy(
-							user = null,
-							isLoading = false
-						)
-					}
+			authService.userSession.collect { user ->
+				_state.update {
+					it.copy(user = user, isLoading = false)
+				}
+			}
+		}
+
+		screenModelScope.launch {
+			authService.sessionExpired.collect { expired ->
+				_state.update {
+					it.copy(isSessionExpired = expired)
 				}
 			}
 		}
 	}
 
-	fun loadUserProfile() {
+	fun refreshProfile() {
 		screenModelScope.launch {
-			_state.update { it.copy(isLoading = true, snackBarMessage = null) }
-			userRepository.getMe()
-				.onSuccess { user -> _state.update { it.copy(user = user, isLoading = false) } }
-				.onFailure { e ->
-					val exception = e as ApiException
-					if (exception.isAuthError()) {
-						_state.update {
-							it.copy(
-								snackBarMessage = SnackbarMessage(
-									"Su sesión ha expirado. Inicie sesión nuevamente.",
-									SnackbarType.ERROR
-								), isLoading = false
-							)
-						}
-					} else {
-						_state.update {
-							it.copy(
-								snackBarMessage = SnackbarMessage(
-									e.message ?: "Error desconocido", SnackbarType.ERROR
-								), isLoading = false
-							)
-						}
-					}
-				}
+			authService.fetchAndStoreUserProfile()
 		}
 	}
 
@@ -86,8 +67,10 @@ class AccountViewModel(
 					_state.update {
 						it.copy(
 							snackBarMessage = SnackbarMessage(
-								e.message ?: "Error al eliminar la cuenta", SnackbarType.ERROR
-							), isLoading = false
+								e.message ?: "Error al eliminar la cuenta",
+								SnackbarType.ERROR
+							),
+							isLoading = false
 						)
 					}
 				}
@@ -105,9 +88,7 @@ class AccountViewModel(
 	}
 
 	fun logout() {
-		screenModelScope.launch {
-			authService.logout()
-		}
+		authService.logout()
 	}
 
 	fun clearSnackBar() {

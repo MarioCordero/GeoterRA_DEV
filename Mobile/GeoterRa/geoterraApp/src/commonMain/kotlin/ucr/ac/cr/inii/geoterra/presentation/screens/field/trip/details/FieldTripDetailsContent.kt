@@ -1,18 +1,13 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.fieldtrip.details
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,7 +27,9 @@ fun FieldTripDetailsContent(
 	modifier: Modifier = Modifier,
 	isForPdf: Boolean = false,
 	state: FieldTripDetailsState,
-	onGeomanifestationClick: ((String) -> Unit)? = null
+	onGeomanifestationClick: ((String) -> Unit)? = null,
+	onGeomanifestationEdit: ((GeomanifestationResponse) -> Unit)? = null,
+	onGeomanifestationDelete: ((GeomanifestationResponse) -> Unit)? = null
 ) {
 	val scrollState = if (!isForPdf) rememberScrollState() else null
 	val verticalSpacing = 16.dp
@@ -151,7 +148,9 @@ fun FieldTripDetailsContent(
 					fieldTrip.geomanifestations.forEach { manifestation ->
 						GeomanifestationCardItem(
 							manifestation = manifestation,
-							onDetailsClick = { onGeomanifestationClick?.invoke(manifestation.geomanifestation_id) }
+							onDetailsClick = { onGeomanifestationClick?.invoke(manifestation.geomanifestation_id) },
+							onEditClick = { onGeomanifestationEdit?.invoke(manifestation) },
+							onDeleteClick = { onGeomanifestationDelete?.invoke(manifestation) }
 						)
 					}
 				}

@@ -8,6 +8,7 @@ import ucr.ac.cr.inii.geoterra.domain.auth.AuthService
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
+import kotlin.time.Duration.Companion.milliseconds
 
 class SignInViewModel(
 	private val authService: AuthService,
@@ -28,7 +29,6 @@ class SignInViewModel(
 	private fun validateFields(): Boolean {
 		val errors = mutableMapOf<String, String>()
 		val s = state.value
-
 		val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[a-z]+$".toRegex()
 
 		if (s.email.isBlank()) {
@@ -64,7 +64,7 @@ class SignInViewModel(
 
 			authService.login(request)
 				.onSuccess {
-					delay(100)
+					delay(100.milliseconds)
 					updateState { it.copy(isLoading = false, isSuccess = true) }
 				}
 				.onFailure { error ->
@@ -79,6 +79,11 @@ class SignInViewModel(
 					}
 				}
 		}
+	}
+
+	/** Marca el éxito como consumido para evitar re-navegaciones. */
+	fun onSuccessConsumed() {
+		updateState { it.copy(isSuccess = false) }
 	}
 
 	fun onSnackBarDismissed() {

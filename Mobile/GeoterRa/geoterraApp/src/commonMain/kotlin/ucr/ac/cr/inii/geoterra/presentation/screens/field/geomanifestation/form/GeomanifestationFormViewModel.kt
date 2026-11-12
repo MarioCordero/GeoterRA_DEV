@@ -1,10 +1,13 @@
 package ucr.ac.cr.inii.geoterra.presentation.screens.geomanifestation.form
 
 import cafe.adriel.voyager.core.model.screenModelScope
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.data.model.requests.GeomanifestationRequest
 import ucr.ac.cr.inii.geoterra.data.model.responses.GeomanifestationResponse
+import ucr.ac.cr.inii.geoterra.domain.location.LocationProvider
+import ucr.ac.cr.inii.geoterra.domain.permissions.PermissionManager
 import ucr.ac.cr.inii.geoterra.domain.repository.CantonRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.DistrictRepositoryInterface
 import ucr.ac.cr.inii.geoterra.domain.repository.GeomanifestationsRepositoryInterface
@@ -15,10 +18,13 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
 
 class GeomanifestationFormViewModel(
 	private val fieldTripId: String,
+	private val fieldTripName: String,
 	private val geomanifestationsRepository: GeomanifestationsRepositoryInterface,
 	private val provincesRepository: ProvinceRepositoryInterface,
 	private val cantonsRepository: CantonRepositoryInterface,
 	private val districtsRepository: DistrictRepositoryInterface,
+	private val locationProvider: LocationProvider,
+	private val permissionManager: PermissionManager,
 	private val geomanifestationToEdit: GeomanifestationResponse? = null
 ) : BaseScreenModel<GeomanifestationFormState>(GeomanifestationFormState()) {
 
@@ -37,10 +43,19 @@ class GeomanifestationFormViewModel(
 					district_snit_code = it.location.district_snit_code,
 					latitude = it.location.latitude ?: 0.0,
 					longitude = it.location.longitude ?: 0.0,
-					field_trip_id = fieldTripId
+					visibility = it.visibility,
+					field_trip_id = it.field_trip_id ?: fieldTripId
 				)
 			} ?: state.request.copy(field_trip_id = fieldTripId)
-			state.copy(request = baseReq)
+
+			val resolvedTripName = geomanifestationToEdit?.field_trip_name
+				?.takeIf { it.isNotBlank() }
+				?: fieldTripName
+
+			state.copy(
+				request = baseReq,
+				fieldTripName = resolvedTripName
+			)
 		}
 	}
 
@@ -107,24 +122,61 @@ class GeomanifestationFormViewModel(
 					)
 				}
 			}
-			is GeomanifestationFormEvent.LatitudeChanged -> {
-				val lat = event.value.toDoubleOrNull() ?: 0.0
-				_state.update { it.copy(request = it.request.copy(latitude = lat), fieldErrors = it.fieldErrors - "latitude") }
-			}
-			is GeomanifestationFormEvent.LongitudeChanged -> {
-				val lon = event.value.toDoubleOrNull() ?: 0.0
-				_state.update { it.copy(request = it.request.copy(longitude = lon), fieldErrors = it.fieldErrors - "longitude") }
-			}
 			is GeomanifestationFormEvent.VisibilityChanged -> {
 				_state.update { it.copy(request = it.request.copy(visibility = event.value)) }
+			}
+			is GeomanifestationFormEvent.UseCurrentLocation -> {
+				fetchCurrentLocationWithPermission()
 			}
 			is GeomanifestationFormEvent.Submit -> submitForm()
 			is GeomanifestationFormEvent.ClearSnackBar -> _state.update { it.copy(snackBarMessage = null) }
 		}
 	}
 
-	private fun submitForm() {
-		if (!validateFields()) return
+	private fun fetchCurrentLocationWithPermission() {
+		screenModelScope.launch {
+			val hasPermission = if (!permissionManager.hasLocationPermission()) {
+				permissionManager.requestLocationPermission()
+			} else {
+				true
+			}
+
+			if (hasPermission) {
+				locationProvider.observeLocation().firstOrNull()?.let { location ->
+					_state.update {
+						it.copy(
+							request = it.request.copy(
+								latitude = location.latitude,
+								longitude = location.longitude
+							),
+							fieldErrors = it.fieldErrors - "location"
+						)
+					}
+				} ?: run {
+					_state.update {
+						it.copy(
+							snackBarMessage = SnackbarMessage(
+								"No se pudo obtener la ubicación actual.",
+								SnackbarType.ERROR
+							)
+						)
+					}
+				}
+			} else {
+				_state.update {
+					it.copy(
+						snackBarMessage = SnackbarMessage(
+							"Permiso de ubicación denegado.",
+							SnackbarType.ERROR
+						)
+					)
+				}
+			}
+		}
+	}
+
+	private fun submitForm(): Boolean {
+		if (!validateFields()) return false
 		_state.update { it.copy(isLoading = true, snackBarMessage = null) }
 
 		screenModelScope.launch {
@@ -136,11 +188,12 @@ class GeomanifestationFormViewModel(
 			}
 
 			if (result.isSuccess) {
+				val msg = if (geomanifestationToEdit != null) "Manifestación actualizada correctamente." else "Manifestación guardada correctamente."
 				_state.update {
 					it.copy(
 						isSuccess = true,
 						isLoading = false,
-						snackBarMessage = SnackbarMessage("Manifestación guardada correctamente.", SnackbarType.SUCCESS)
+						snackBarMessage = SnackbarMessage(msg, SnackbarType.SUCCESS)
 					)
 				}
 			} else {
@@ -152,6 +205,7 @@ class GeomanifestationFormViewModel(
 				}
 			}
 		}
+		return true
 	}
 
 	private fun validateFields(): Boolean {
@@ -159,10 +213,13 @@ class GeomanifestationFormViewModel(
 		val req = _state.value.request
 
 		if (req.geomanifestation_name.isBlank()) errors["name"] = "El nombre es obligatorio."
-		if (req.description.isBlank()) errors["description"] = "La descripción es obligatoria."
 		if (req.province_snit_code == 0) errors["province"] = "Seleccione una provincia."
 		if (req.canton_snit_code == 0) errors["canton"] = "Seleccione un cantón."
 		if (req.district_snit_code == 0) errors["district"] = "Seleccione un distrito."
+
+		if (req.latitude == 0.0 && req.longitude == 0.0) {
+			errors["location"] = "Proporcione los datos de ubicación."
+		}
 
 		_state.update { it.copy(fieldErrors = errors) }
 		return errors.isEmpty()
