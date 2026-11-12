@@ -35,7 +35,9 @@ class AccountScreen : Screen {
 		val snackbarHostState = remember { TypedSnackbarHostState() }
 
 		LaunchedEffect(Unit) {
-			viewModel.refreshProfile()
+			if (state.user == null && !state.isSessionExpired) {
+				viewModel.refreshProfile()
+			}
 		}
 
 		LaunchedEffect(state.isSessionExpired) {

@@ -2,10 +2,11 @@ package ucr.ac.cr.inii.geoterra.domain.auth
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import ucr.ac.cr.inii.geoterra.data.model.requests.LoginRequest
@@ -21,22 +22,22 @@ class AuthService(
 ) : ScreenModel {
 
 	val isLoggedIn: StateFlow<Boolean?> = authEventBus.isLoggedIn
+	val sessionExpired: StateFlow<Boolean> = authEventBus.sessionExpired
 	val events = authEventBus.events
 
 	private val _userSession = MutableStateFlow<UserResponse?>(null)
 	val userSession: StateFlow<UserResponse?> = _userSession.asStateFlow()
 
 	private val fetchMutex = Mutex()
+	private var pendingLogout: Job? = null
 
 	val userId: String? get() = _userSession.value?.user_id
 	val userEmail: String? get() = _userSession.value?.email
 	val userRole: String? get() = _userSession.value?.role
 
 	init {
-		screenModelScope.launch {
-			authEventBus.events
-				.distinctUntilChanged()
-				.collect { event -> handleEvent(event) }
+		screenModelScope.launch(start = CoroutineStart.UNDISPATCHED) {
+			authEventBus.events.collect { event -> handleEvent(event) }
 		}
 
 		screenModelScope.launch {
@@ -45,22 +46,31 @@ class AuthService(
 				if (isUserLogged) {
 					fetchAndStoreUserProfile()
 				}
-				authEventBus.updateLoginState(isUserLogged)
+				if (authEventBus.isLoggedIn.value == null) {
+					authEventBus.updateLoginState(isUserLogged)
+				}
 			}
 		}
 	}
 
-	private suspend fun handleEvent(event: AuthEvent) {
+	private fun handleEvent(event: AuthEvent) {
 		when (event) {
-			is AuthEvent.LoginSuccess -> {
-				authEventBus.updateLoginState(true)
-			}
+			is AuthEvent.LoginSuccess -> Unit
 			is AuthEvent.Authorized -> Unit
-			is AuthEvent.Logout,
 			is AuthEvent.Unauthorized -> {
-				_userSession.value = null
-				authEventBus.updateLoginState(false)
-				authRepository.logout()
+				if (authEventBus.isLoggedIn.value == false) {
+					_userSession.value = null
+					authEventBus.invalidateTokenCache()
+				}
+			}
+			is AuthEvent.Logout -> {
+				if (authEventBus.isLoggedIn.value == false) {
+					_userSession.value = null
+					authEventBus.invalidateTokenCache()
+					pendingLogout = screenModelScope.launch {
+						authRepository.logout()
+					}
+				}
 			}
 		}
 	}
@@ -81,11 +91,22 @@ class AuthService(
 	}
 
 	suspend fun login(request: LoginRequest): Result<Unit> {
+		pendingLogout?.join()
+		pendingLogout = null
+
 		val result = authRepository.login(request)
-		if (result.isSuccess) {
-			authEventBus.emit(AuthEvent.LoginSuccess)
-			authEventBus.updateLoginState(true)
+		if (result.isFailure) return result
+
+		authEventBus.clearSessionExpired()
+		authEventBus.invalidateTokenCache()
+
+		fetchAndStoreUserProfile()
+
+		if (_userSession.value == null) {
+			return Result.failure(Exception("No se pudo obtener la información del usuario."))
 		}
+
+		authEventBus.emit(AuthEvent.LoginSuccess)
 		return result
 	}
 
@@ -93,7 +114,7 @@ class AuthService(
 		return authRepository.register(request)
 	}
 
-	suspend fun logout() {
+	fun logout() {
 		authEventBus.emit(AuthEvent.Logout)
 	}
 
