@@ -43,3 +43,32 @@
     justify-content: center !important;
   }
 }
+
+/* ========================================================
+   Print Styles for Institutional PDF Export
+   ======================================================== */
+@media print {
+  @page {
+    margin: 10mm 12mm;
+    size: portrait;
+  }
+
+  *, *::before, *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  header, nav, .print-hidden {
+    display: none !important;
+  }
+
+  .print-avoid-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}
