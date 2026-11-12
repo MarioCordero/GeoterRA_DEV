@@ -221,8 +221,21 @@ export default function MapComponent() {
   const isMaintenance = user?.role === 'maintenance';
   const navigate = useNavigate();
   const [allPoints, setAllPoints] = useState([]);
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.innerWidth < 640 : false
+  );
   const [fullscreen, setFullscreen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(
+    typeof window !== 'undefined' ? window.innerWidth >= 768 : true
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const mapContainerRef = useRef(null);
@@ -551,36 +564,42 @@ export default function MapComponent() {
                 key={`${point.id}-${idx}`}
                 position={[lat, lng]}
               >
-                <Popup maxWidth={580} minWidth={450} className="geoterra-point-popup">
-                  <div className="w-full max-w-[530px] p-2.5 poppins">
+                <Popup
+                  maxWidth={isMobile ? 320 : 580}
+                  minWidth={isMobile ? 260 : 450}
+                  autoPanPaddingTopLeft={[16, 75]}
+                  autoPanPaddingBottomRight={[16, 25]}
+                  className="geoterra-point-popup"
+                >
+                  <div className="w-full max-w-[calc(100vw-48px)] sm:max-w-[530px] p-1 sm:p-2.5 poppins">
                     {/* Header */}
-                    <div className="mb-4 border-b-2 border-[#12467E] pb-2.5">
+                    <div className="mb-2 sm:mb-4 border-b-2 border-[#12467E] pb-1.5 sm:pb-2.5">
                       <div className="flex items-center justify-between gap-2 mb-1">
-                        <span className="text-xs font-bold uppercase tracking-wider text-geoterra-orange poppins">
+                        <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-geoterra-orange poppins">
                           MANIFESTACIÓN GEOTÉRMICA
                         </span>
                         {isMaintenance && point.id && (
-                          <span className="font-mono text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                          <span className="font-mono text-[10px] sm:text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
                             #{String(point.id).slice(0, 8)}
                           </span>
                         )}
                       </div>
-                      <h3 className="text-xl md:text-2xl font-bold text-[#12467E] m-0 leading-tight">
+                      <h3 className="text-base sm:text-xl md:text-2xl font-bold text-[#12467E] m-0 leading-tight break-words">
                         {point.name || (isMaintenance ? `Punto #${point.id}` : 'Punto Geotermal')}
                       </h3>
                     </div>
 
                     {/* Ubicación y Coordenadas */}
-                    <div className="mb-4 bg-slate-50 border border-slate-200 rounded-xl p-3.5">
-                      <div className="text-sm text-gray-800 font-semibold flex items-center gap-2 mb-1.5">
-                        <FaMapMarkerAlt className="text-[#12467E] text-sm shrink-0" />
-                        <span>{point.locationName}</span>
+                    <div className="mb-2 sm:mb-4 bg-slate-50 border border-slate-200 rounded-xl p-2 sm:p-3.5">
+                      <div className="text-xs sm:text-sm text-gray-800 font-semibold flex items-center gap-1.5 sm:gap-2 mb-1">
+                        <FaMapMarkerAlt className="text-[#12467E] text-xs sm:text-sm shrink-0" />
+                        <span className="truncate">{point.locationName}</span>
                       </div>
-                      <div className="flex items-center gap-2.5 text-xs text-gray-500 font-mono">
-                        <span className="bg-white border border-gray-200 px-2.5 py-1 rounded shadow-2xs">
+                      <div className="flex items-center gap-1.5 sm:gap-2.5 text-[10px] sm:text-xs text-gray-500 font-mono">
+                        <span className="bg-white border border-gray-200 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded shadow-2xs">
                           Lat: {lat.toFixed(5)}°
                         </span>
-                        <span className="bg-white border border-gray-200 px-2.5 py-1 rounded shadow-2xs">
+                        <span className="bg-white border border-gray-200 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded shadow-2xs">
                           Lon: {lng.toFixed(5)}°
                         </span>
                       </div>
@@ -588,20 +607,20 @@ export default function MapComponent() {
 
                     {/* Métricas In-Situ & Clasificación Lindal */}
                     {temperature !== null ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-4 p-4 bg-gradient-to-br from-orange-50/60 to-slate-50 rounded-xl border border-orange-100 shadow-2xs">
+                      <div className="grid grid-cols-2 gap-2 sm:gap-3.5 mb-2.5 sm:mb-4 p-2 sm:p-4 bg-gradient-to-br from-orange-50/60 to-slate-50 rounded-xl border border-orange-100 shadow-2xs">
                         {/* Termómetro / Temperatura */}
-                        <div className="flex flex-col justify-center items-center text-center p-3.5 bg-white rounded-xl border border-orange-100 shadow-2xs">
-                          <div className="flex items-center gap-1.5 text-orange-600 mb-1">
-                            <FaThermometerHalf className="text-base" />
-                            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                        <div className="flex flex-col justify-center items-center text-center p-1.5 sm:p-3.5 bg-white rounded-xl border border-orange-100 shadow-2xs">
+                          <div className="flex items-center gap-1 text-orange-600 mb-0.5">
+                            <FaThermometerHalf className="text-xs sm:text-base shrink-0" />
+                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-gray-500">
                               Temp. In-Situ
                             </span>
                           </div>
-                          <div className="text-4xl font-black text-orange-600 tracking-tight">
+                          <div className="text-2xl sm:text-4xl font-black text-orange-600 tracking-tight my-0.5">
                             {temperature.toFixed(1)}°C
                           </div>
                           {point.insitu_test && (point.insitu_test.ph || point.insitu_test.conductivity) ? (
-                            <div className="mt-2 pt-2 border-t border-gray-100 flex items-center justify-center gap-2.5 text-xs text-gray-500 font-mono">
+                            <div className="mt-1 pt-1 border-t border-gray-100 flex items-center justify-center gap-1 sm:gap-2 text-[10px] sm:text-xs text-gray-500 font-mono flex-wrap">
                               {Number(point.insitu_test.ph) > 0 && <span>pH: {parseFloat(point.insitu_test.ph).toFixed(1)}</span>}
                               {Number(point.insitu_test.conductivity) > 0 && <span>• {parseFloat(point.insitu_test.conductivity).toFixed(0)} µS</span>}
                             </div>
@@ -610,7 +629,7 @@ export default function MapComponent() {
 
                         {/* Clasificación Lindal */}
                         <div className="flex flex-col justify-center">
-                          <div className="text-xs text-[#12467E] font-bold text-center mb-1.5">
+                          <div className="text-[10px] sm:text-xs text-[#12467E] font-bold text-center mb-1">
                             Clasificación de Usos (Lindal)
                           </div>
                           <div className="w-full">
@@ -619,7 +638,7 @@ export default function MapComponent() {
                         </div>
                       </div>
                     ) : (
-                      <div className="mb-4 p-3.5 bg-amber-50 rounded-xl text-center border border-amber-200 text-sm text-amber-800">
+                      <div className="mb-2 sm:mb-4 p-2 sm:p-3.5 bg-amber-50 rounded-xl text-center border border-amber-200 text-xs sm:text-sm text-amber-800">
                         Temperatura in-situ no registrada
                       </div>
                     )}
@@ -627,10 +646,10 @@ export default function MapComponent() {
                     {/* Botón de Acción Principal */}
                     <button
                       onClick={handleViewDetails}
-                      className="w-full py-3 px-5 bg-[#12467E] hover:bg-[#0d3460] text-white rounded-xl text-sm md:text-base font-bold flex items-center justify-center gap-2.5 cursor-pointer transition-all duration-200 shadow-md hover:shadow-lg"
+                      className="w-full py-2.5 sm:py-3 px-3 sm:px-5 bg-[#12467E] hover:bg-[#0d3460] text-white rounded-xl text-xs sm:text-sm md:text-base font-bold flex items-center justify-center gap-1.5 sm:gap-2.5 cursor-pointer transition-all duration-200 shadow-md hover:shadow-lg"
                     >
-                      <FaChartBar className="text-base" />
-                      <span>Ver Detalles Completos y Diagramas</span>
+                      <FaChartBar className="text-sm sm:text-base shrink-0" />
+                      <span className="truncate">Ver Detalles Completos y Diagramas</span>
                     </button>
                   </div>
                 </Popup>
