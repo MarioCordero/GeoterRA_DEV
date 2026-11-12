@@ -2,3 +2,73 @@
 @import "tailwindcss";
 @import "./fontsModule.css";
 @import "./colorModule.css";
+
+/* ========================================================
+   Leaflet Responsive Popup Styling
+   ======================================================== */
+.geoterra-point-popup .leaflet-popup-content-wrapper {
+  border-radius: 16px;
+  padding: 0;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.geoterra-point-popup .leaflet-popup-content {
+  margin: 12px;
+  line-height: 1.4;
+}
+
+@media (max-width: 639px) {
+  .geoterra-point-popup {
+    max-width: calc(100vw - 28px) !important;
+  }
+  .geoterra-point-popup .leaflet-popup-content-wrapper {
+    max-width: calc(100vw - 28px) !important;
+    border-radius: 14px;
+  }
+  .geoterra-point-popup .leaflet-popup-content {
+    width: auto !important;
+    max-width: calc(100vw - 48px) !important;
+    margin: 8px 6px !important;
+  }
+  .geoterra-point-popup a.leaflet-popup-close-button {
+    top: 6px !important;
+    right: 8px !important;
+    font-size: 18px !important;
+    color: #64748b !important;
+    width: 24px !important;
+    height: 24px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+/* ========================================================
+   Print Styles for Institutional PDF Export
+   ======================================================== */
+@media print {
+  @page {
+    margin: 10mm 12mm;
+    size: portrait;
+  }
+
+  *, *::before, *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  header, nav, .print-hidden {
+    display: none !important;
+  }
+
+  .print-avoid-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}
