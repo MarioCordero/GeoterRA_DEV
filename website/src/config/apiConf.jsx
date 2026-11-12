@@ -35,8 +35,8 @@ const API_CONFIG = {
     users: {
       register: '/users',                             // 2.1 POST  - Crea cuenta [No requerida]
       me: '/users/me',                                // 2.2 GET   - Datos usuario [Requerida]
-                                                      // 2.3 PUT   - Actualiza perfil [Requerida]
-                                                      // 2.5 DELETE - Soft-delete cuenta [Requerida]
+      // 2.3 PUT   - Actualiza perfil [Requerida]
+      // 2.5 DELETE - Soft-delete cuenta [Requerida]
       mePassword: '/users/me/password',               // 2.4 PUT   - Actualiza contraseña [Requerida]
       restore: '/users/restore',                      // 2.6 POST  - Restaura cuenta eliminada [No requerida]
       meSession: '/users/me/session',                 // 2.7 GET   - Datos de sesión [Requerida]
@@ -210,6 +210,9 @@ const API_CONFIG = {
 };
 
 export const getApiBaseUrl = () => {
+  if (typeof window !== 'undefined' && window.__APP_CONFIG__?.API_BASE_URL) {
+    return window.__APP_CONFIG__.API_BASE_URL;
+  }
   return API_CONFIG.baseUrls[API_CONFIG.environment];
 };
 
@@ -473,9 +476,20 @@ const _rawCallApi = async (endpoint, method = 'GET', payload = null, customHeade
       options.body = JSON.stringify(payload);
     }
 
+    console.log(`📡 [API REQ] ${method} ${finalEndpoint}`, {
+      hasApiKey: Boolean(activeApiKey),
+      keyPreview: activeApiKey ? `${activeApiKey.slice(0, 5)}...` : '(vacía)',
+      credentials: options.credentials,
+      currentOrigin: typeof window !== 'undefined' ? window.location.origin : 'N/A',
+    });
+
     const response = await fetch(finalEndpoint, options);
     const data = await response.json().catch(() => ({}));
-    console.log(`📡 [API RES] ${method} ${endpoint} (Status: ${response.status})`, data);
+
+    console.log(
+      `📡 [API RES] ${method} ${finalEndpoint} (Status: ${response.status}, ok: ${response.ok})`,
+      data
+    );
 
     // Extract error message from different response formats
     const getErrorMessage = () => {
@@ -494,6 +508,7 @@ const _rawCallApi = async (endpoint, method = 'GET', payload = null, customHeade
       error: response.ok ? null : getErrorMessage(),
     };
   } catch (error) {
+    console.error(`❌ [API FETCH ERROR] ${method} ${endpoint}:`, error);
     return {
       ok: false,
       status: null,
@@ -529,17 +544,24 @@ export const callApi = async (endpoint, method = 'GET', payload = null, customHe
   }
 
   // --- 401 on a protected endpoint: attempt silent refresh ---
+  console.warn(`🔄 [callApi] 401 Unauthorized detectado en: ${method} ${endpoint}. Iniciando flujo de renovación de tokens...`, {
+    activeBaseUrl: getApiBaseUrl(),
+    environment: API_CONFIG.environment,
+    currentOrigin: typeof window !== 'undefined' ? window.location.origin : 'N/A',
+    isAlreadyRefreshing: _isRefreshing,
+    queueSize: _refreshQueue.length,
+  });
 
   if (_isRefreshing) {
-    // Another refresh is already in progress — wait for it
+    console.log(`⏳ [callApi] Ya existe un refresco en progreso. Encolando petición: ${method} ${endpoint}`);
     try {
       await new Promise((resolve, reject) => {
         _refreshQueue.push({ resolve, reject });
       });
-      // Refresh succeeded — retry original request
+      console.log(`✅ [callApi] Refresco previo completado con éxito. Reintentando petición original: ${method} ${endpoint}`);
       return _rawCallApi(endpoint, method, payload, customHeaders);
-    } catch {
-      // Refresh failed — return original 401
+    } catch (queueErr) {
+      console.error(`❌ [callApi] La petición en cola fue rechazada tras el fallo de refresco:`, queueErr);
       return result;
     }
   }
@@ -549,22 +571,30 @@ export const callApi = async (endpoint, method = 'GET', payload = null, customHe
 
   try {
     const refreshUrl = buildApiUrl(API_CONFIG.endpoints.auth.refresh);
+    console.log(`🔑 [callApi] Disparando petición de refresco -> POST ${refreshUrl}`);
+
     const refreshResult = await _rawCallApi(refreshUrl, 'POST');
 
+    console.log(`🔑 [callApi] Resultado detallado de POST ${refreshUrl}:`, {
+      status: refreshResult.status,
+      ok: refreshResult.ok,
+      error: refreshResult.error,
+      raw: refreshResult.raw,
+      data: refreshResult.data,
+    });
+
     if (refreshResult.ok) {
-      // Refresh succeeded — new access cookie is already set by the backend
+      console.log(`✅ [callApi] Refresco exitoso. Liberando ${_refreshQueue.length} peticiones en cola y reintentando original.`);
       _processRefreshQueue(true);
-      // Retry the original request
       return _rawCallApi(endpoint, method, payload, customHeaders);
     } else {
-      // Refresh failed — session truly expired
+      console.warn(`⚠️ [callApi] El servidor rechazó el refresco (Status: ${refreshResult.status}, Error: ${refreshResult.error}). La sesión ha expirado definitivamente.`);
       _processRefreshQueue(false);
-      console.warn('⚠️ [callApi] Session expired. Refresh token is invalid or expired.');
       return result;
     }
   } catch (err) {
     _processRefreshQueue(false);
-    console.error('❌ [callApi] Error during token refresh:', err);
+    console.error('❌ [callApi] Excepción no controlada durante el refresco de token:', err);
     return result;
   } finally {
     _isRefreshing = false;

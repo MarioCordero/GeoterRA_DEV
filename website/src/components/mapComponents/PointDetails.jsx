@@ -264,31 +264,54 @@ export default function PointDetails() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-6 poppins">
-      {/* Rule 1: Header & General Info (Always Visible) */}
-      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 md:gap-6 mb-8 pb-6 border-b-2 border-gray-200">
-        <div className="flex items-start gap-4">
+    <div className="max-w-7xl mx-auto p-4 md:p-6 poppins print:max-w-full print:p-0 print:m-0">
+      {/* Institutional Header (Print Only) */}
+      <div className="hidden print:flex items-center justify-between pb-3 mb-4 border-b-2 border-[#12467E]">
+        <div className="flex items-center gap-3">
+          <div>
+            <div className="text-xl font-bold tracking-tight text-[#12467E] uppercase leading-none">
+              Geoter<span className="text-[#F39C29]">RA</span>
+            </div>
+            <div className="text-[10px] text-slate-600 font-medium tracking-wide mt-1">
+              Universidad de Costa Rica • Instituto de Investigaciones en Ingeniería (INII)
+            </div>
+          </div>
+        </div>
+        <div className="text-right">
+          <div className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+            Ficha Técnica de Geomanifestación
+          </div>
+          <div className="text-[10px] text-slate-500 mt-0.5">
+            Fecha de emisión: {new Date().toLocaleDateString('es-CR', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </div>
+        </div>
+      </div>
+
+      {/* Header & Title */}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 md:gap-6 mb-6 pb-4 border-b border-gray-200 print:mb-3 print:pb-2 print:border-slate-300">
+        <div className="flex items-start gap-3">
           <button 
             onClick={handleGoBack}
-            className="p-2.5 bg-gray-500 hover:bg-gray-600 text-white rounded-full transition cursor-pointer shadow-sm mt-1"
+            className="p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition cursor-pointer shadow-sm mt-1 print:hidden"
             title="Volver"
           >
-            <FaArrowLeft />
+            <FaArrowLeft className="text-sm" />
           </button>
           <div>
-            <div className="flex items-center gap-3 mb-1 flex-wrap">
-              <FaMapMarkerAlt className="text-red-500 text-2xl shrink-0" />
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-800 m-0">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <FaMapMarkerAlt className="text-red-500 text-xl shrink-0 print:text-[#12467E]" />
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 m-0 print:text-xl">
                 {pointData.name}
               </h1>
             </div>
-            <p className="text-gray-500 text-sm m-0">
-              {pointData.region}{isMaintenance && (
-                <> • ID: <span className="font-mono text-gray-700 font-semibold">{pointData.id}</span></>
+            <p className="text-gray-500 text-xs md:text-sm m-0 print:text-xs">
+              {pointData.region}
+              {pointData.id && (
+                <> • <span className="font-semibold text-gray-700">Código ID:</span> <span className="font-mono text-gray-800">{pointData.id}</span></>
               )}
             </p>
             {pointData.description && (
-              <p className="text-gray-600 text-sm mt-2 italic bg-gray-50 p-2.5 rounded-md border border-gray-100">
+              <p className="text-gray-600 text-xs md:text-sm mt-2 italic bg-gray-50 p-2.5 rounded-lg border border-gray-200 print:mt-1 print:p-1.5 print:text-xs">
                 "{pointData.description}"
               </p>
             )}
@@ -298,75 +321,75 @@ export default function PointDetails() {
         {/* Action Buttons */}
         <button 
           onClick={handlePrint}
-          className="flex items-center gap-2 px-5 py-2.5 bg-[#12467E] hover:bg-[#084F9D] text-white rounded-lg transition font-semibold text-sm cursor-pointer shadow-sm w-full md:w-auto justify-center shrink-0"
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#12467E] hover:bg-[#084F9D] text-white rounded-lg transition font-semibold text-sm cursor-pointer shadow-sm w-full md:w-auto justify-center shrink-0 print:hidden"
         >
           <FaPrint /> Imprimir / Exportar PDF
         </button>
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 print:grid-cols-2 print:gap-3 print:mb-3">
         
         {/* Rule 1: Location Information (Always Visible) */}
-        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <FaMapMarkerAlt className="text-geoterra-blue text-lg" /> Información General y Ubicación
+        <div className="bg-white p-5 md:p-6 rounded-xl shadow-sm border border-gray-200 print:p-3 print:rounded-lg print:shadow-none print:border-slate-300 print-avoid-break">
+          <h2 className="text-base md:text-lg font-bold text-[#12467E] mb-3 flex items-center gap-2 print:text-sm print:mb-2">
+            <FaMapMarkerAlt className="text-[#12467E] text-base" /> Información General y Ubicación
           </h2>
-          <div className="space-y-4 text-sm">
-            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-              <strong className="text-gray-700 block mb-1">Ubicación Territorial:</strong>
-              <p className="text-gray-800 font-medium m-0">{pointData.region}</p>
+          <div className="space-y-2.5 text-xs md:text-sm print:space-y-1.5 print:text-xs">
+            <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 print:p-1.5">
+              <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Ubicación Territorial</span>
+              <p className="text-slate-900 font-medium m-0 mt-0.5">{pointData.region}</p>
             </div>
-            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-              <strong className="text-gray-700 block mb-1">Coordenadas GPS:</strong>
-              <p className="text-gray-800 font-mono m-0">
+            <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 print:p-1.5">
+              <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Coordenadas Geográficas (WGS84)</span>
+              <p className="text-slate-900 font-mono m-0 mt-0.5">
                 Lat: {parseFloat(pointData.latitude).toFixed(6)}° | Lng: {parseFloat(pointData.longitude).toFixed(6)}°
               </p>
             </div>
             {pointData.created_at && (
-              <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                <strong className="text-gray-700 block mb-1">Fecha de Registro:</strong>
-                <p className="text-gray-800 m-0">{pointData.created_at}</p>
+              <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 print:p-1.5">
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Fecha de Registro</span>
+                <p className="text-slate-900 m-0 mt-0.5">{pointData.created_at}</p>
               </div>
             )}
           </div>
         </div>
 
         {/* Rule 2: In-Situ Section & Lindal Diagram (Graceful Degradation) */}
-        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-          <h2 className="text-xl font-bold text-green-600 mb-4 flex items-center gap-2">
-            <FaThermometerHalf /> Medidas de Campo e In-Situ
+        <div className="bg-white p-5 md:p-6 rounded-xl shadow-sm border border-gray-200 print:p-3 print:rounded-lg print:shadow-none print:border-slate-300 print-avoid-break">
+          <h2 className="text-base md:text-lg font-bold text-[#12467E] mb-3 flex items-center gap-2 print:text-sm print:mb-2">
+            <FaThermometerHalf className="text-[#F39C29] text-base" /> Medidas de Campo e In-Situ
           </h2>
 
           {isInsituValid ? (
             <>
-              <div className="space-y-3 mb-4">
-                <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg border border-red-200">
-                  <strong className="text-gray-700">Temperatura In-Situ:</strong>
-                  <span className="font-bold text-red-600 text-lg">{pointData.temp}°C</span>
+              <div className="grid grid-cols-3 gap-2 mb-3 print:gap-1.5 print:mb-2">
+                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-center print:p-1.5">
+                  <span className="text-[10px] md:text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Temperatura</span>
+                  <div className="font-bold text-[#ea580c] text-base md:text-lg mt-0.5">{pointData.temp}°C</div>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg border border-green-200">
-                  <strong className="text-gray-700">pH Campo:</strong>
-                  <span className="font-bold text-green-600">{pointData.pH_campo || 'N/A'}</span>
+                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-center print:p-1.5">
+                  <span className="text-[10px] md:text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">pH Campo</span>
+                  <div className="font-bold text-slate-800 text-base md:text-lg mt-0.5">{pointData.pH_campo || 'N/A'}</div>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <strong className="text-gray-700">Conductividad Campo:</strong>
-                  <span className="font-bold text-blue-600">{pointData.cond_campo || 'N/A'} μS/cm</span>
+                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-center print:p-1.5">
+                  <span className="text-[10px] md:text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Conductividad</span>
+                  <div className="font-bold text-slate-800 text-sm md:text-base mt-0.5">{pointData.cond_campo || 'N/A'} <span className="text-[10px] font-normal text-slate-500">μS/cm</span></div>
                 </div>
               </div>
 
               {/* Lindal Classification Diagram */}
-              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <h3 className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">
+              <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 print:p-1.5">
+                <h3 className="text-[10px] md:text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">
                   Diagrama de Lindal (Usos directos según temperatura)
                 </h3>
                 <LindalDiagram temperature={pointData.temp} />
               </div>
             </>
           ) : (
-            <div className="p-6 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 space-y-2">
-              <div className="flex items-center gap-2 font-bold text-amber-800 text-base">
-                <FaInfoCircle className="text-amber-600 text-xl shrink-0" />
+            <div className="p-5 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 space-y-2 print:p-3">
+              <div className="flex items-center gap-2 font-bold text-amber-800 text-sm">
+                <FaInfoCircle className="text-amber-600 text-lg shrink-0" />
                 <span>Temperatura pendiente de medición</span>
               </div>
               <p className="text-xs text-amber-700 leading-relaxed m-0">
@@ -377,116 +400,124 @@ export default function PointDetails() {
         </div>
 
         {/* Rule 3: Chemical Section & Piper Diagram (Graceful Degradation) */}
-        <div className="md:col-span-2 bg-white p-6 rounded-xl shadow-md border border-gray-200">
-          <h2 className="text-xl font-bold text-purple-600 mb-4 flex items-center gap-2">
-            <FaFlask /> Análisis Fisicoquímico de Laboratorio
+        <div className="md:col-span-2 bg-white p-5 md:p-6 rounded-xl shadow-sm border border-gray-200 print:col-span-2 print:p-3 print:rounded-lg print:shadow-none print:border-slate-300 print-avoid-break">
+          <h2 className="text-base md:text-lg font-bold text-[#12467E] mb-3 flex items-center gap-2 print:text-sm print:mb-2">
+            <FaFlask className="text-[#12467E] text-base" /> Análisis Fisicoquímico de Laboratorio
           </h2>
 
           {isInlabValid ? (
             <>
               {/* Basic Lab Parameters */}
-              <div className="mb-6">
-                <h3 className="font-semibold text-gray-700 mb-3 text-sm">Parámetros Básicos de Laboratorio</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                  <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
-                    <strong className="text-gray-700">pH Laboratorio:</strong> {pointData.pH_lab || 'N/A'}
+              <div className="mb-4 print:mb-2">
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">
+                  Parámetros Básicos de Laboratorio
+                </span>
+                <div className="grid grid-cols-2 gap-3 text-xs md:text-sm print:gap-2">
+                  <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 flex justify-between items-center print:p-1.5">
+                    <strong className="text-slate-600">pH Laboratorio:</strong>
+                    <span className="font-bold text-slate-900">{pointData.pH_lab || 'N/A'}</span>
                   </div>
-                  <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
-                    <strong className="text-gray-700">Conductividad Lab:</strong> {pointData.cond_lab || 'N/A'} μS/cm
+                  <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 flex justify-between items-center print:p-1.5">
+                    <strong className="text-slate-600">Conductividad Laboratorio:</strong>
+                    <span className="font-bold text-slate-900">{pointData.cond_lab || 'N/A'} μS/cm</span>
                   </div>
                 </div>
               </div>
 
               {/* Major Ions Grid */}
-              <div className="mb-6">
-                <h3 className="font-semibold text-gray-700 mb-3 text-sm">Iones Principales (mg/L)</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 gap-3">
-                  <div className="p-3 bg-green-50 rounded-lg text-center border border-green-300">
-                    <div className="text-xl font-bold text-green-700">{pointData.Cl}</div>
-                    <div className="text-xs text-gray-600 font-medium">Cl⁻</div>
+              <div className="mb-4 print:mb-2">
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">
+                  Iones Principales (mg/L)
+                </span>
+                <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-8 gap-2 print:gap-1.5">
+                  <div className="p-2 bg-slate-50 rounded-lg text-center border border-slate-200 print:p-1">
+                    <div className="text-sm md:text-base font-bold text-[#12467E]">{pointData.Cl}</div>
+                    <div className="text-[10px] text-slate-500 font-medium">Cl⁻</div>
                   </div>
-                  <div className="p-3 bg-green-50 rounded-lg text-center border border-green-300">
-                    <div className="text-xl font-bold text-green-700">{pointData.Ca}</div>
-                    <div className="text-xs text-gray-600 font-medium">Ca²⁺</div>
+                  <div className="p-2 bg-slate-50 rounded-lg text-center border border-slate-200 print:p-1">
+                    <div className="text-sm md:text-base font-bold text-[#12467E]">{pointData.Ca}</div>
+                    <div className="text-[10px] text-slate-500 font-medium">Ca²⁺</div>
                   </div>
-                  <div className="p-3 bg-green-50 rounded-lg text-center border border-green-300">
-                    <div className="text-xl font-bold text-green-700">{pointData.HCO3}</div>
-                    <div className="text-xs text-gray-600 font-medium">HCO₃⁻</div>
+                  <div className="p-2 bg-slate-50 rounded-lg text-center border border-slate-200 print:p-1">
+                    <div className="text-sm md:text-base font-bold text-[#12467E]">{pointData.HCO3}</div>
+                    <div className="text-[10px] text-slate-500 font-medium">HCO₃⁻</div>
                   </div>
-                  <div className="p-3 bg-green-50 rounded-lg text-center border border-green-300">
-                    <div className="text-xl font-bold text-green-700">{pointData.SO4}</div>
-                    <div className="text-xs text-gray-600 font-medium">SO₄²⁻</div>
+                  <div className="p-2 bg-slate-50 rounded-lg text-center border border-slate-200 print:p-1">
+                    <div className="text-sm md:text-base font-bold text-[#12467E]">{pointData.SO4}</div>
+                    <div className="text-[10px] text-slate-500 font-medium">SO₄²⁻</div>
                   </div>
-                  <div className="p-3 bg-green-50 rounded-lg text-center border border-green-300">
-                    <div className="text-xl font-bold text-green-700">{pointData.Na}</div>
-                    <div className="text-xs text-gray-600 font-medium">Na⁺</div>
+                  <div className="p-2 bg-slate-50 rounded-lg text-center border border-slate-200 print:p-1">
+                    <div className="text-sm md:text-base font-bold text-[#12467E]">{pointData.Na}</div>
+                    <div className="text-[10px] text-slate-500 font-medium">Na⁺</div>
                   </div>
-                  <div className="p-3 bg-green-50 rounded-lg text-center border border-green-300">
-                    <div className="text-xl font-bold text-green-700">{pointData.K}</div>
-                    <div className="text-xs text-gray-600 font-medium">K⁺</div>
+                  <div className="p-2 bg-slate-50 rounded-lg text-center border border-slate-200 print:p-1">
+                    <div className="text-sm md:text-base font-bold text-[#12467E]">{pointData.K}</div>
+                    <div className="text-[10px] text-slate-500 font-medium">K⁺</div>
                   </div>
-                  <div className="p-3 bg-green-50 rounded-lg text-center border border-green-300">
-                    <div className="text-xl font-bold text-green-700">{pointData.Mg}</div>
-                    <div className="text-xs text-gray-600 font-medium">Mg²⁺</div>
+                  <div className="p-2 bg-slate-50 rounded-lg text-center border border-slate-200 print:p-1">
+                    <div className="text-sm md:text-base font-bold text-[#12467E]">{pointData.Mg}</div>
+                    <div className="text-[10px] text-slate-500 font-medium">Mg²⁺</div>
                   </div>
-                  <div className="p-3 bg-green-50 rounded-lg text-center border border-green-300">
-                    <div className="text-xl font-bold text-green-700">{pointData.Si}</div>
-                    <div className="text-xs text-gray-600 font-medium">Si</div>
+                  <div className="p-2 bg-slate-50 rounded-lg text-center border border-slate-200 print:p-1">
+                    <div className="text-sm md:text-base font-bold text-[#12467E]">{pointData.Si}</div>
+                    <div className="text-[10px] text-slate-500 font-medium">Si</div>
                   </div>
                 </div>
               </div>
 
               {/* Trace Elements */}
-              <div className="mb-6">
-                <h3 className="font-semibold text-gray-700 mb-3 text-sm">Elementos Traza (mg/L)</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div className="p-3 bg-yellow-50 rounded-lg text-center border border-yellow-300">
-                    <div className="text-lg font-bold text-yellow-700">{pointData.Fe}</div>
-                    <div className="text-xs text-gray-600 font-medium">Fe</div>
+              <div className="mb-4 print:mb-2">
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">
+                  Elementos Traza (mg/L)
+                </span>
+                <div className="grid grid-cols-4 sm:grid-cols-4 gap-2 print:gap-1.5">
+                  <div className="p-2 bg-slate-50 rounded-lg text-center border border-slate-200 print:p-1">
+                    <div className="text-sm md:text-base font-bold text-slate-800">{pointData.Fe}</div>
+                    <div className="text-[10px] text-slate-500 font-medium">Fe</div>
                   </div>
-                  <div className="p-3 bg-yellow-50 rounded-lg text-center border border-yellow-300">
-                    <div className="text-lg font-bold text-yellow-700">{pointData.B}</div>
-                    <div className="text-xs text-gray-600 font-medium">B</div>
+                  <div className="p-2 bg-slate-50 rounded-lg text-center border border-slate-200 print:p-1">
+                    <div className="text-sm md:text-base font-bold text-slate-800">{pointData.B}</div>
+                    <div className="text-[10px] text-slate-500 font-medium">B</div>
                   </div>
-                  <div className="p-3 bg-yellow-50 rounded-lg text-center border border-yellow-300">
-                    <div className="text-lg font-bold text-yellow-700">{pointData.Li}</div>
-                    <div className="text-xs text-gray-600 font-medium">Li</div>
+                  <div className="p-2 bg-slate-50 rounded-lg text-center border border-slate-200 print:p-1">
+                    <div className="text-sm md:text-base font-bold text-slate-800">{pointData.Li}</div>
+                    <div className="text-[10px] text-slate-500 font-medium">Li</div>
                   </div>
-                  <div className="p-3 bg-yellow-50 rounded-lg text-center border border-yellow-300">
-                    <div className="text-lg font-bold text-yellow-700">{pointData.F}</div>
-                    <div className="text-xs text-gray-600 font-medium">F⁻</div>
+                  <div className="p-2 bg-slate-50 rounded-lg text-center border border-slate-200 print:p-1">
+                    <div className="text-sm md:text-base font-bold text-slate-800">{pointData.F}</div>
+                    <div className="text-[10px] text-slate-500 font-medium">F⁻</div>
                   </div>
                 </div>
               </div>
 
               {/* Piper Diagram Component */}
-              <div className="pt-4 border-t border-gray-200">
-                <h3 className="text-lg font-bold text-geoterra-blue mb-3 flex items-center gap-2">
-                  <FaFlask className="text-geoterra-blue" /> Diagrama de Piper (Clasificación Hidrogeoquímica)
+              <div className="pt-3 border-t border-slate-200 print-avoid-break">
+                <h3 className="text-sm md:text-base font-bold text-[#12467E] mb-2 flex items-center gap-2 print:text-xs print:mb-1">
+                  <FaFlask className="text-[#12467E] text-sm" /> Diagrama de Piper (Clasificación Hidrogeoquímica)
                 </h3>
-                <div className="min-h-96 flex items-center justify-center bg-gray-50 rounded-xl p-4 border border-gray-200">
+                <div className="min-h-80 md:min-h-96 print:min-h-0 flex items-center justify-center bg-slate-50 rounded-xl p-3 md:p-4 print:p-1 border border-slate-200">
                   {piperData ? (
                     <PiperDiagram data={piperData} />
                   ) : (
-                    <div className="text-gray-400 text-sm">
+                    <div className="text-slate-400 text-xs">
                       No hay concentraciones iónicas suficientes para construir el ternario de Piper.
                     </div>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 mt-3">
-                  El diagrama hidroquímico de Piper representa la proporción relativa de aniones y cationes principales para determinar las facies de agua geotermal.
+                <p className="text-[11px] text-slate-500 mt-2 print:mt-1 print:text-[10px]">
+                  El diagrama hidroquímico de Piper representa la proporción relativa de aniones y cationes principales para clasificar las facies de agua geotermal.
                 </p>
               </div>
             </>
           ) : (
-            <div className="p-8 bg-purple-50 rounded-xl border border-purple-200 text-center text-purple-900 space-y-3">
-              <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto text-2xl">
+            <div className="p-6 bg-slate-50 rounded-xl border border-slate-200 text-center text-slate-700 space-y-2 print:p-3">
+              <div className="w-10 h-10 bg-blue-50 text-[#12467E] rounded-full flex items-center justify-center mx-auto text-lg">
                 <FaFlask />
               </div>
-              <h3 className="text-lg font-bold text-purple-800 m-0">
+              <h3 className="text-base font-bold text-slate-800 m-0 print:text-sm">
                 Análisis químico de fluidos no disponible o no aplicable
               </h3>
-              <p className="text-sm text-purple-700 max-w-xl mx-auto leading-relaxed m-0">
+              <p className="text-xs text-slate-600 max-w-xl mx-auto leading-relaxed m-0">
                 Esta manifestación no cuenta con muestra o estudio hidrogeoquímico registrado (ej. emanación gaseosa de fumarola seca sin fase líquida condensada o análisis de laboratorio pendiente). El diagrama de Piper se omite para prevenir distorsiones analíticas.
               </p>
             </div>
@@ -495,10 +526,10 @@ export default function PointDetails() {
       </div>
 
       {/* Footer */}
-      <div className="mt-8 p-6 bg-gray-100 rounded-xl text-center text-gray-600 text-sm border border-gray-200">
-        <p className="mb-1 font-semibold text-gray-700">Sistema GeoterRA - Ficha Técnica de Geomanifestaciones</p>
-        <p className="m-0 text-xs text-gray-500">
-          Información oficial según catálogo del Instituto Geográfico Nacional (IGN) y SNIT Costa Rica.
+      <div className="mt-6 print:mt-3 p-4 bg-slate-50 rounded-xl text-center text-slate-500 text-xs border border-slate-200 print:p-1.5 print:text-[9px] print:bg-transparent print:border-t print:border-slate-300 print:rounded-none">
+        <p className="mb-0.5 font-semibold text-slate-700">Sistema GeoterRA — Ficha Técnica Oficial de Geomanifestaciones</p>
+        <p className="m-0 text-slate-500">
+          Universidad de Costa Rica • Instituto de Investigaciones en Ingeniería (INII) • Información con fines científicos y técnicos.
         </p>
       </div>
     </div>

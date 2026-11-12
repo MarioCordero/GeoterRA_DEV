@@ -328,12 +328,12 @@ const PiperDiagram = ({ data }) => {
   return (
     <>
       {/* VISTA NORMAL */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 w-full cursor-pointer hover:shadow-lg hover:border-blue-300 transition-all" onClick={() => setIsExpanded(true)}>
-        <div className="flex justify-center bg-gray-50/50 rounded-xl border border-gray-100 py-6 group">
+      <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-200 w-full cursor-pointer hover:shadow-lg hover:border-blue-300 transition-all print:p-1 print:border-none print:shadow-none print:cursor-default" onClick={() => setIsExpanded(true)}>
+        <div className="flex justify-center bg-gray-50/50 rounded-xl border border-gray-100 py-4 md:py-6 group print:py-1 print:bg-transparent print:border-none">
           <div className="relative w-full">
             <SVGContent />
             {/* Indicador visual de click */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/5 rounded-lg">
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/5 rounded-lg print:hidden">
               <span className="text-blue-600 font-semibold text-sm">Haz click para ampliar</span>
             </div>
           </div>
@@ -342,7 +342,7 @@ const PiperDiagram = ({ data }) => {
 
       {/* MODAL EXPANDIDO */}
       {isExpanded && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setIsExpanded(false)}>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 print:hidden" onClick={() => setIsExpanded(false)}>
           <div className="bg-white rounded-xl shadow-2xl w-full h-full max-w-6xl max-h-[95vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
             {/* Encabezado del Modal */}
             <div className="flex justify-between items-center p-6 border-b border-gray-200">
