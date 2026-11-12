@@ -1,6 +1,5 @@
 package ucr.ac.cr.inii.geoterra.presentation.navigation
 
-
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
@@ -10,7 +9,7 @@ import org.jetbrains.compose.resources.painterResource
 import ucr.ac.cr.inii.geoterra.presentation.screens.home.HomeScreen
 
 internal object HomeTab : Tab {
-  override val key: String = "HomeTab_${hashCode()}"
+  override val key: String = "HomeTab"
 
   override val options: TabOptions
     @Composable
@@ -18,7 +17,7 @@ internal object HomeTab : Tab {
       val icon = painterResource(Res.drawable.ic_home)
       return TabOptions(index = 0u, title = "Inicio", icon)
     }
-  
+
   @Composable
   override fun Content() {
     HomeScreen().Content()

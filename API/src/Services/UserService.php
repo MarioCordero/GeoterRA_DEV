@@ -49,7 +49,6 @@ final class UserService
 
     $existing = $this->repository->findByEmail($dto->email);
     if ($existing) {
-      // If user exists but is soft‑deleted, suggest restoration
       if ($existing['deleted_at'] !== null) {
         throw new ApiException(
           ErrorType::from(
@@ -59,11 +58,31 @@ final class UserService
           400
         );
       }
-      throw new ApiException(ErrorType::emailAlreadyInUse(), 409);
+      throw new ApiException(
+        ErrorType::emailAlreadyInUse(), 409
+      );
     }
 
     $hash = PasswordService::hash($dto->password);
     $userId = $this->repository->create($dto, $hash);
+
+    $createdUser = $this->repository->findById((string)$userId);
+    $email = $createdUser['email'] ?? $dto->email;
+    $firstName = $createdUser['first_name']
+      ?? ($dto->firstName ?? $dto->first_name ?? 'Usuario');
+    $lastName = $createdUser['last_name']
+      ?? ($dto->lastName ?? $dto->last_name ?? null);
+    $phoneNumber = $createdUser['phone_number']
+      ?? ($dto->phoneNumber ?? $dto->phone_number ?? null);
+
+    $this->notificationService->notifyAccountCreated(
+      $email,
+      $firstName,
+      $lastName,
+      $phoneNumber,
+      date('d/m/Y H:i:s')
+    );
+
     return [
       'data' => ['user_id' => $userId],
       'meta' => ['new_user' => true]
@@ -147,6 +166,7 @@ final class UserService
       );
     }
   }
+
   /**
    * Updates the authenticated user's profile.
    *
@@ -160,9 +180,28 @@ final class UserService
     $userId = $auth['user_id'];
     $dto->validate();
 
+    $previousUser = $this->repository->findById((string)$userId);
+    if (!$previousUser) {
+      throw new ApiException(ErrorType::notFound('User'), 404);
+    }
+
     $updated = $this->repository->update($userId, $dto);
     if (!$updated) {
       throw new ApiException(ErrorType::userUpdateFailed(), 500);
+    }
+
+    $updatedUser = $this->repository->findById((string)$userId) ?? $previousUser;
+    $appliedChanges = $this->extractAppliedProfileChanges(
+      $previousUser, $updatedUser, $dto
+    );
+
+    if (isset($updatedUser['email'], $updatedUser['first_name'])) {
+      $this->notificationService->notifyProfileUpdated(
+        $updatedUser['email'],
+        $updatedUser['first_name'],
+        $appliedChanges,
+        date('d/m/Y H:i:s')
+      );
     }
   }
 
@@ -309,6 +348,60 @@ final class UserService
       );
     }
     return $user;
+  }
+
+  /**
+   * Builds a human-readable map of the profile changes applied during an update.
+   *
+   * @param array<string, mixed> $previousUser
+   * @param array<string, mixed> $updatedUser
+   * @param UpdateUserDTO $dto
+   * @return array<string, string>
+   */
+  private function extractAppliedProfileChanges(
+    array $previousUser,
+    array $updatedUser,
+    UpdateUserDTO $dto
+  ): array {
+    $fieldLabels = [
+      'first_name'   => 'Nombre',
+      'last_name'    => 'Apellido',
+      'email'        => 'Correo electrónico',
+      'phone_number' => 'Teléfono',
+    ];
+
+    $changes = [];
+
+    foreach ($fieldLabels as $column => $label) {
+      $oldValue = $previousUser[$column] ?? null;
+      $newValue = $updatedUser[$column] ?? null;
+
+      if ($oldValue !== $newValue) {
+        $changes[$label] = ($newValue !== null && $newValue !== '')
+          ? (string)$newValue
+          : 'Eliminado / No especificado';
+      }
+    }
+
+    if (empty($changes)) {
+      $dtoMap = [
+        'firstName'    => 'Nombre',
+        'first_name'   => 'Nombre',
+        'lastName'     => 'Apellido',
+        'last_name'    => 'Apellido',
+        'email'        => 'Correo electrónico',
+        'phoneNumber'  => 'Teléfono',
+        'phone_number' => 'Teléfono',
+      ];
+
+      foreach (get_object_vars($dto) as $prop => $val) {
+        if ($val !== null && $val !== '' && isset($dtoMap[$prop])) {
+          $changes[$dtoMap[$prop]] = (string)$val;
+        }
+      }
+    }
+
+    return $changes;
   }
 
   /**

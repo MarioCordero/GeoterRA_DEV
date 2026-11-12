@@ -37,6 +37,18 @@ fun InvestigationRequestDetailsContent(
 	state: InvestigationRequestDetailsState,
 	isForPdf: Boolean = false
 ) {
+	if (state.request == null) {
+		if (!isForPdf) {
+			Box(
+				modifier = modifier.fillMaxSize(),
+				contentAlignment = Alignment.Center
+			) {
+				CircularProgressIndicator()
+			}
+		}
+		return
+	}
+
 	val scrollState = if (!isForPdf) rememberScrollState() else null
 
 	val verticalSpacing = 16.dp
@@ -51,7 +63,6 @@ fun InvestigationRequestDetailsContent(
 				if (scrollState != null) Modifier.verticalScroll(scrollState) else Modifier
 			)
 	) {
-
 		Row(
 			modifier = Modifier.fillMaxWidth(),
 			horizontalArrangement = Arrangement.SpaceBetween,

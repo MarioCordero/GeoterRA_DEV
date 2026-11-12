@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Controllers;
 
+use Core\EnvironmentDetector;
 use DTO\LoginUserDTO;
 use DTO\ResetPasswordDTO;
 use Http\ApiException;
@@ -104,12 +105,14 @@ final class AuthController
   {
     try {
       // For web: read refresh token from HttpOnly cookie
-      // For mobile: read from JSON body (existing behavior)
+      // For mobile: read from JSON body
+      $refreshToken = null;
       if (Request::isWeb()) {
         $refreshToken = $_COOKIE['geoterra_refresh_token'] ?? null;
-      } else {
-        $body = Request::parseJsonRequest();
-        $refreshToken = $body['refresh_token'] ?? null;
+      }
+      if (empty($refreshToken)) {
+        $body = Request::json() ?? [];
+        $refreshToken = $body['refresh_token'] ?? ($_COOKIE['geoterra_refresh_token'] ?? null);
       }
 
       if (empty($refreshToken)) {
@@ -126,6 +129,10 @@ final class AuthController
         $expiresIn = $result['meta']['expires_in'] ?? 60 * 5;
         $refreshTtl = 3600 * 24 * 30; // 30 days
 
+        $useSecure = EnvironmentDetector::shouldUseSecureCookie();
+        $sameSite = EnvironmentDetector::getSameSiteValue();
+        $domain = EnvironmentDetector::getCookieDomain();
+
         // Renew access token cookie
         setcookie(
           'geoterra_session_token',
@@ -133,10 +140,10 @@ final class AuthController
           [
             'expires' => time() + $expiresIn,
             'path' => '/',
-            'domain' => '',
-            'secure' => false,
+            'domain' => $domain,
+            'secure' => $useSecure,
             'httponly' => true,
-            'samesite' => 'Lax',
+            'samesite' => $sameSite,
           ]
         );
 
@@ -147,10 +154,10 @@ final class AuthController
           [
             'expires' => time() + $refreshTtl,
             'path' => '/api/auth/',
-            'domain' => '',
-            'secure' => false,
+            'domain' => $domain,
+            'secure' => $useSecure,
             'httponly' => true,
-            'samesite' => 'Lax',
+            'samesite' => $sameSite,
           ]
         );
 

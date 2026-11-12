@@ -13,7 +13,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -23,16 +22,18 @@ import ucr.ac.cr.inii.geoterra.presentation.components.common.*
 
 data class GeomanifestationFormScreen(
 	val fieldTripId: String,
-	val manifestationToEdit: GeomanifestationResponse? = null
+	val fieldTripName: String,
+	val manifestationToEdit: GeomanifestationResponse? = null,
+	val onSuccess: (() -> Unit)? = null
 ) : Screen {
 
-	override val key: ScreenKey = uniqueScreenKey
+	override val key: ScreenKey get() = "GeomanifestationFormScreen_${fieldTripId}_${manifestationToEdit?.geomanifestation_id ?: "new"}"
 
 	@Composable
 	override fun Content() {
 		val navigator = LocalNavigator.currentOrThrow
 		val viewModel = getScreenModel<GeomanifestationFormViewModel>(
-			parameters = { parametersOf(fieldTripId, manifestationToEdit) }
+			parameters = { parametersOf(fieldTripId, fieldTripName, manifestationToEdit) }
 		)
 
 		val state by viewModel.state.collectAsState()
@@ -50,6 +51,7 @@ data class GeomanifestationFormScreen(
 
 				if (state.isSuccess) {
 					viewModel.clearSuccess()
+					onSuccess?.invoke()
 					navigator.pop()
 				}
 			}

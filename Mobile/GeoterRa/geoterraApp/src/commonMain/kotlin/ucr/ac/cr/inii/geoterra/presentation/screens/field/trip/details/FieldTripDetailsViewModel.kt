@@ -5,13 +5,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucr.ac.cr.inii.geoterra.core.network.ApiException
 import ucr.ac.cr.inii.geoterra.domain.repository.FieldTripRepositoryInterface
+import ucr.ac.cr.inii.geoterra.domain.repository.GeomanifestationsRepositoryInterface
 import ucr.ac.cr.inii.geoterra.presentation.base.BaseScreenModel
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarMessage
 import ucr.ac.cr.inii.geoterra.presentation.components.common.SnackbarType
 
 class FieldTripDetailsViewModel(
 	private val fieldTripId: String,
-	private val fieldTripRepository: FieldTripRepositoryInterface
+	private val fieldTripRepository: FieldTripRepositoryInterface,
+	private val geomanifestationsRepository: GeomanifestationsRepositoryInterface
 ) : BaseScreenModel<FieldTripDetailsState>(FieldTripDetailsState()) {
 
 	init {
@@ -39,19 +41,18 @@ class FieldTripDetailsViewModel(
 				}
 		}
 	}
-
-	fun addGeomanifestation(geomanifestationId: String) {
+	fun deleteGeomanifestation(geomanifestationId: String) {
 		screenModelScope.launch {
-			fieldTripRepository.addGeomanifestationToFieldTrip(
-				id = fieldTripId,
-				geomanifestationId = geomanifestationId
-			)
-				.onSuccess { updatedFieldTrip ->
-					_state.update {
-						it.copy(
-							fieldTrip = updatedFieldTrip,
+			_state.update { it.copy(isLoading = true, snackBarMessage = null) }
+
+			geomanifestationsRepository.deleteGeomanifestation(id = geomanifestationId)
+				.onSuccess {
+					fetchFieldTripDetails()
+
+					_state.update { state ->
+						state.copy(
 							snackBarMessage = SnackbarMessage(
-								text = "Manifestación agregada exitosamente a la gira",
+								text = "Geomanifestación eliminada con éxito",
 								type = SnackbarType.SUCCESS
 							)
 						)
@@ -59,41 +60,11 @@ class FieldTripDetailsViewModel(
 				}
 				.onFailure { exception ->
 					val apiException = exception as? ApiException
-					_state.update {
-						it.copy(
+					_state.update { state ->
+						state.copy(
+							isLoading = false,
 							snackBarMessage = SnackbarMessage(
-								text = apiException?.message ?: "Error al agregar manifestación",
-								type = SnackbarType.ERROR
-							)
-						)
-					}
-				}
-		}
-	}
-
-	fun removeGeomanifestation(geomanifestationId: String) {
-		screenModelScope.launch {
-			fieldTripRepository.removeGeomanifestationFromFieldTrip(
-				id = fieldTripId,
-				geomanifestationId = geomanifestationId
-			)
-				.onSuccess { updatedFieldTrip ->
-					_state.update {
-						it.copy(
-							fieldTrip = updatedFieldTrip,
-							snackBarMessage = SnackbarMessage(
-								text = "Manifestación removida de la gira",
-								type = SnackbarType.SUCCESS
-							)
-						)
-					}
-				}
-				.onFailure { exception ->
-					val apiException = exception as? ApiException
-					_state.update {
-						it.copy(
-							snackBarMessage = SnackbarMessage(
-								text = apiException?.message ?: "Error al remover manifestación",
+								text = apiException?.message ?: "Error al eliminar Geomanifestación",
 								type = SnackbarType.ERROR
 							)
 						)
