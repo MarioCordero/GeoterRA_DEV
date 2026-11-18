@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manual de Usuario — Plataforma GeoterRA (Web y Móvil)</title>
+  <style>
+    @font-face {
+      font-family: 'Poppins';
+      src: url('../GeoterRA_DEV/website/src/assets/fonts/Poppins/Poppins-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Poppins';
+      src: url('../GeoterRA_DEV/website/src/assets/fonts/Poppins/Poppins-Medium.ttf') format('truetype');
+      font-weight: 500;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Poppins';
+      src: url('../GeoterRA_DEV/website/src/assets/fonts/Poppins/Poppins-SemiBold.ttf') format('truetype');
+      font-weight: 600;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Poppins';
+      src: url('../GeoterRA_DEV/website/src/assets/fonts/Poppins/Poppins-Bold.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'League Spartan';
+      src: url('../GeoterRA_DEV/website/src/assets/fonts/League_Spartan/static/LeagueSpartan-Bold.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    :root {
+      --geoterra-blue: #12467E;
+      --geoterra-blue-dark: #084F9D;
+      --geoterra-blue-soft: #eff6ff;
+      --geoterra-blue-border: #bfdbfe;
+      --geoterra-orange: #F39C29;
+      --geoterra-orange-dark: #ea580c;
+      --geoterra-orange-soft: #fff7ed;
+      --geoterra-orange-border: #fed7aa;
+      --bg-canvas: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-muted: #f1f5f9;
+      --border-subtle: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-body: #1e293b;
+      --text-muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-canvas);
+      color: var(--text-body);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .document-shell {
+      max-width: 1020px;
+      margin: 28px auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 40px 48px;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+    }
+
+    /* Cover Block */
+    .cover-page {
+      border: 1px solid var(--border-subtle);
+      border-top: 6px solid var(--geoterra-blue);
+      border-radius: 14px;
+      padding: 36px 36px 30px;
+      background: #ffffff;
+      margin-bottom: 32px;
+      page-break-after: always;
+      break-after: page;
+    }
+
+    .cover-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 18px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .cover-inst {
+      text-align: right;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .cover-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--geoterra-orange-dark);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .cover-title {
+      font-family: 'League Spartan', 'Poppins', sans-serif;
+      font-size: 34px;
+      line-height: 1.15;
+      color: var(--geoterra-blue);
+      margin: 0 0 10px 0;
+      font-weight: 700;
+    }
+
+    .cover-subtitle {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin: 0 0 24px 0;
+      max-width: 680px;
+    }
+
+    .cover-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .meta-box {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+
+    .meta-box-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .meta-box-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--geoterra-blue);
+    }
+
+    .toc-card {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 20px 24px;
+    }
+
+    .toc-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--geoterra-blue);
+      margin: 0 0 12px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 8px;
+    }
+
+    .toc-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+
+    .toc-list a {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 8px;
+      border-radius: 6px;
+    }
+
+    .toc-list a:hover {
+      background: var(--geoterra-blue-soft);
+      color: var(--geoterra-blue);
+    }
+
+    .toc-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: var(--geoterra-blue);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* Headings */
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--geoterra-blue);
+      border-bottom: 2px solid var(--geoterra-blue);
+      padding-bottom: 8px;
+      margin: 34px 0 16px 0;
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+
+    h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--geoterra-blue-dark);
+      margin: 24px 0 10px 0;
+      padding-left: 10px;
+      border-left: 4px solid var(--geoterra-orange);
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+
+    h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 16px 0 8px 0;
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+
+    p {
+      margin: 0 0 12px 0;
+    }
+
+    ul, ol {
+      margin: 0 0 14px 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
+
+    strong {
+      color: var(--text-primary);
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      background: var(--geoterra-blue-soft);
+      color: var(--geoterra-blue);
+      border: 1px solid var(--geoterra-blue-border);
+      padding: 1px 6px;
+      border-radius: 5px;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--border-subtle);
+      margin: 26px 0;
+    }
+
+    /* Tables */
+    .table-wrap {
+      margin: 14px 0 20px 0;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      overflow: hidden;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      background: #ffffff;
+    }
+
+    thead {
+      display: table-header-group;
+      background: var(--geoterra-blue);
+      color: #ffffff;
+    }
+
+    th {
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 12px;
+      border-bottom: 2px solid var(--geoterra-blue-dark);
+    }
+
+    td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      vertical-align: top;
+    }
+
+    tbody tr:nth-child(even) {
+      background: var(--bg-canvas);
+    }
+
+    tr {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    /* Gallery Tables (side-by-side screenshots) */
+    .gallery-table-wrap {
+      margin: 14px 0 20px 0;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .gallery-table-wrap table {
+      border-collapse: separate;
+      border-spacing: 12px 0;
+      background: transparent;
+    }
+
+    .gallery-table-wrap thead {
+      background: transparent;
+      color: var(--geoterra-blue);
+    }
+
+    .gallery-table-wrap th {
+      background: var(--geoterra-blue-soft);
+      color: var(--geoterra-blue);
+      border: 1px solid var(--geoterra-blue-border);
+      border-radius: 8px 8px 0 0;
+      text-align: center;
+      padding: 7px 10px;
+      font-size: 12px;
+    }
+
+    .gallery-table-wrap td {
+      border: 1px solid var(--border-subtle);
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+      background: #ffffff;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .gallery-table-wrap .screenshot-figure {
+      margin: 0;
+      border: none;
+      padding: 0;
+      box-shadow: none;
+    }
+
+    /* Figures & Screenshots */
+    .screenshot-figure {
+      margin: 16px 0 20px 0;
+      padding: 10px;
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      text-align: center;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .screenshot-figure img {
+      max-width: 100%;
+      height: auto;
+      max-height: 480px;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      display: block;
+      margin: 0 auto;
+    }
+
+    .screenshot-figure figcaption {
+      margin-top: 8px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Mobile Screenshot Placeholder (shown automatically when image file is not yet captured) */
+    .mobile-placeholder {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      background: var(--bg-canvas);
+      border: 2px dashed var(--geoterra-blue-border);
+      border-radius: 10px;
+      gap: 6px;
+      min-height: 150px;
+    }
+
+    .ph-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--geoterra-blue-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 4px;
+    }
+
+    .ph-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--geoterra-blue);
+      background: var(--geoterra-blue-soft);
+      border: 1px solid var(--geoterra-blue-border);
+      padding: 2px 10px;
+      border-radius: 999px;
+    }
+
+    .ph-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .ph-file {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Callouts */
+    .info-callout {
+      margin: 14px 0 18px 0;
+      padding: 12px 16px;
+      background: var(--geoterra-blue-soft);
+      border-left: 4px solid var(--geoterra-blue);
+      border-radius: 0 10px 10px 0;
+      font-size: 13px;
+      color: var(--text-body);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .info-callout p:last-child {
+      margin-bottom: 0;
+    }
+
+    .capture-callout {
+      margin: 10px 0 22px 0;
+      padding: 12px 16px;
+      background: var(--geoterra-orange-soft);
+      border: 1px solid var(--geoterra-orange-border);
+      border-left: 4px solid var(--geoterra-orange);
+      border-radius: 0 10px 10px 0;
+      font-size: 12.5px;
+      color: #7c2d12;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .capture-callout p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Mermaid Container */
+    .mermaid-box {
+      margin: 18px 0 24px 0;
+      padding: 16px;
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      text-align: center;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .mermaid-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--geoterra-orange-dark);
+      margin-bottom: 10px;
+    }
+
+    .mermaid svg {
+      max-width: 100%;
+      max-height: 580px;
+      height: auto;
+    }
+
+    /* Print Rules */
+    @page {
+      size: A4;
+      margin: 16mm 13mm 18mm 13mm;
+    }
+
+    @media print {
+      body {
+        background: #ffffff;
+        font-size: 11.5px;
+        line-height: 1.5;
+      }
+
+      .document-shell {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+      }
+
+      .cover-page {
+        margin-bottom: 0;
+      }
+
+      h2.chapter-break {
+        page-break-before: always;
+        break-before: page;
+        margin-top: 0;
+      }
+
+      h2, h3, h4 {
+        break-after: avoid;
+        page-break-after: avoid;
+      }
+
+      .screenshot-figure,
+      .screenshot-figure img,
+      .table-wrap,
+      .gallery-table-wrap,
+      .mermaid-box,
+      .capture-callout,
+      .info-callout,
+      table,
+      tr {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .screenshot-figure img {
+        max-height: 360px;
+      }
+
+      a {
+        color: var(--geoterra-blue);
+        text-decoration: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="document-shell">
+    <!-- Institutional Cover Page -->
+    <section class="cover-page">
+      <div class="cover-top">
+        <div class="cover-logo"><?xml version="1.0" encoding="UTF-8"?>
+<svg style="height:54px;width:auto;" id="LOGOTIPO_2" data-name="LOGOTIPO 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1826.82 279.71">
+  <defs>
+    <style>
+      .cls-1, .cls-2, .cls-3 {
+        stroke-width: 0px;
+      }
+
+      .cls-4 {
+        stroke-linecap: round;
+      }
+
+      .cls-4, .cls-5 {
+        fill: none;
+        stroke: #000;
+        stroke-miterlimit: 10;
+        stroke-width: 2px;
+      }
+
+      .cls-2 {
+        fill: #084f9d;
+      }
+
+      .cls-3 {
+        fill: #f49c2a;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="m226.94,255.41c-17.98,0-34.49-2.87-49.54-8.61-15.05-5.74-28.16-13.91-39.31-24.53-11.16-10.61-19.82-23.06-25.99-37.36-6.17-14.29-9.26-29.99-9.26-47.1s3.09-32.81,9.26-47.1c6.17-14.29,14.89-26.74,26.15-37.36,11.26-10.61,24.47-18.79,39.63-24.53,15.16-5.74,31.83-8.61,50.03-8.61,20.14,0,38.28,3.36,54.41,10.07,16.13,6.72,29.72,16.46,40.77,29.24l-33.78,31.19c-8.23-8.66-17.22-15.11-26.96-19.33-9.75-4.22-20.36-6.33-31.83-6.33s-21.12,1.74-30.21,5.2c-9.1,3.47-16.95,8.45-23.55,14.94-6.61,6.5-11.69,14.19-15.27,23.06-3.57,8.88-5.36,18.73-5.36,29.56s1.79,20.36,5.36,29.24c3.57,8.88,8.66,16.62,15.27,23.23,6.6,6.61,14.4,11.64,23.39,15.11,8.98,3.47,18.89,5.2,29.72,5.2s20.52-1.67,30.37-5.04c9.85-3.36,19.43-9.04,28.75-17.05l29.89,38.01c-12.34,9.31-26.69,16.46-43.04,21.44-16.35,4.98-32.65,7.47-48.89,7.47Zm43.85-35.73v-85.43h48.08v92.26l-48.08-6.82Z"/>
+  <path class="cls-1" d="m450.76,254.11c-19.93,0-37.41-3.9-52.46-11.69-15.05-7.8-26.69-18.46-34.92-32-8.23-13.53-12.34-28.96-12.34-46.29s4.06-33.08,12.18-46.62c8.12-13.53,19.22-24.15,33.3-31.83,14.07-7.68,29.99-11.53,47.75-11.53s32.54,3.63,46.29,10.88c13.75,7.26,24.63,17.65,32.65,31.19,8.01,13.54,12.02,29.72,12.02,48.56,0,1.95-.11,4.17-.32,6.66-.22,2.49-.44,4.82-.65,6.98h-141.96v-29.56h115.32l-19.49,8.77c0-9.1-1.84-17-5.52-23.71-3.68-6.71-8.77-11.96-15.27-15.76-6.5-3.79-14.08-5.68-22.74-5.68s-16.3,1.9-22.9,5.68c-6.61,3.79-11.75,9.1-15.43,15.92-3.68,6.82-5.52,14.89-5.52,24.2v7.8c0,9.53,2.11,17.92,6.33,25.18,4.22,7.26,10.18,12.78,17.87,16.57,7.68,3.79,16.73,5.68,27.12,5.68,9.31,0,17.49-1.41,24.53-4.22,7.03-2.81,13.48-7.03,19.33-12.67l26.96,29.24c-8.01,9.1-18.08,16.08-30.21,20.95-12.13,4.87-26.1,7.31-41.91,7.31Z"/>
+  <g>
+    <ellipse class="cls-5" cx="651.08" cy="163.26" rx="95.61" ry="96.24"/>
+    <ellipse class="cls-5" cx="690.21" cy="99.07" rx="14.54" ry="24.9" transform="translate(259.31 647.28) rotate(-60)"/>
+    <path class="cls-4" d="m602.41,246.1c13.92-21.06,27.92-43.2,41.88-66.44,16.8-27.98,32.19-55.31,46.27-81.76"/>
+    <path class="cls-4" d="m588.25,235.6c.2-1.94.62-4.99,1.53-8.64,2.15-8.6,5.64-14.69,7.52-17.85,15.86-26.68,34.56-49.98,34.56-49.98,13.25-16.52,21.17-26.32,33.87-38.91,9.61-9.52,18.27-16.98,24.83-22.33"/>
+    <path class="cls-4" d="m575.9,222.72c-.47-2.2-.99-5.46-.9-9.4.16-7.2,2.23-12.51,3.13-14.81,9.56-24.43,33.66-49.17,33.66-49.17,19.73-20.25,37.73-31.38,42.1-34.03,13.88-8.41,26.67-13.85,36.66-17.41"/>
+    <path class="cls-4" d="m566.95,209.01c-1.21-3.3-2.45-7.81-2.82-13.26-.18-2.62-.51-8.06,1.28-14.61.73-2.67,1.85-5.67,5.71-12.34,2.35-4.06,6.38-11.02,12.07-18.07,20.16-24.96,51.46-39.01,53.44-39.88,8.31-3.64,19.53-7.35,21.76-8.09,7.4-2.44,10.38-3.12,11.92-3.44,8.34-1.75,15.43-1.74,20.25-1.44"/>
+    <path class="cls-4" d="m557.14,181.23c0-6.68.79-16.54,5.08-27.27,15.06-37.75,58.59-49.84,70.7-53.21,11.44-3.18,31.6-7.07,57.42-2.87"/>
+    <path class="cls-4" d="m556.95,146.29c3.65-11.67,9-19.71,12.74-24.49,16.45-21.02,39.56-27.05,48.2-29.3,10.72-2.8,19.97-3.22,24.61-3.41,5.64-.23,14.21-.53,25.16,1.54,9.49,1.79,17.23,4.68,22.89,7.26"/>
+    <path class="cls-4" d="m570.22,111.89c5.95-7.56,15.33-17.04,29.11-23.56,42.37-20.03,86.66,6.71,91.22,9.56"/>
+    <path class="cls-4" d="m593.15,86.7c6.34-4.29,18.5-11.13,34.95-12.25,14.81-1.01,26.03,3.1,33.43,5.9,13.66,5.17,23.32,12.5,29.04,17.55"/>
+    <path class="cls-4" d="m620.95,71.9c6.07-1.51,18.98-3.83,34.18.58,20.75,6.03,32.03,20.63,35.43,25.42"/>
+    <path class="cls-4" d="m649.93,67.03c7.25.72,12.73,2.84,16.08,4.44,12.24,5.83,18.8,15.41,21.51,20.14,1.46,2.55,2.44,4.78,3.04,6.29"/>
+    <path class="cls-4" d="m666.24,68.22c2.2.5,5.38,1.47,8.8,3.52.19.12,3.7,2.24,6.7,5.47,6.92,7.44,8.47,17.81,8.82,20.69"/>
+    <path class="cls-4" d="m687.81,74.38c1.19,2.22,2.6,5.47,3.33,9.59,1.07,6.04.17,11.04-.58,13.93"/>
+    <path class="cls-4" d="m700.02,80.57c-3.15,5.78-6.31,11.55-9.46,17.33"/>
+    <path class="cls-4" d="m690.46,97.87c2.18-1.92,5.38-4.34,9.66-6.37,4.11-1.96,7.86-2.92,10.65-3.42"/>
+    <path class="cls-4" d="m690.56,97.89c3.41-1.42,9.31-3.36,16.81-3.2,5.6.12,10.14,1.36,13.2,2.47"/>
+    <path class="cls-4" d="m690.56,97.89c4.39-.54,11.74-.87,20.32,1.56,10.01,2.84,16.79,8.06,20.24,11.14"/>
+    <path class="cls-4" d="m690.56,97.89c5.88.64,15.31,2.43,25.41,8.04,13.82,7.68,21.41,18.33,24.76,23.78"/>
+    <path class="cls-4" d="m690.56,97.89c6.96,1.97,24.57,7.98,38.97,25.07,11.83,14.05,15.67,28.68,17.06,35.85"/>
+    <path class="cls-4" d="m741.94,193.3c1.18-9.19,1.91-25.21-4.58-43.21-11.92-33.09-39.4-48.38-46.8-52.19"/>
+    <path class="cls-4" d="m690.56,97.89c1.21.86,3.77,2.72,6.79,5.31,27.09,23.24,33.64,55.94,35.34,64.41,1.27,6.35,1.6,11.08,1.69,14.31.29,10.38-1.5,18.39-2.42,21.96-1.09,4.24-2.85,10.87-7.39,18.46-4.66,7.78-10.2,13.17-14.5,16.64"/>
+    <path class="cls-4" d="m680.49,254.85c6.9-3.45,19.23-10.84,28.65-24.94,10.68-15.98,11.72-31.77,12.29-42.23,2.31-42.92-21.51-77.48-30.87-89.79"/>
+    <path class="cls-4" d="m653.47,259.46c3.25-.45,7.56-1.39,12.31-3.46,5.97-2.6,10.27-5.97,13-8.48,3.28-3.23,7.78-8.22,11.98-15.07,1.86-3.04,5.34-9.16,8.48-19.03,12.5-39.29,6.55-72.74,6.55-72.74-1.84-10.33-5.81-25.73-15.22-42.78"/>
+    <path class="cls-4" d="m637.99,258.6c11.62-9.16,31-27.05,44.23-55.78,21.75-47.21,11.96-91.21,8.33-104.92"/>
+    <path class="cls-4" d="m617.8,253.32c13.47-13,29.81-31.74,43.78-57.05,20.1-36.43,25.58-68.86,27.22-80.65,1.01-7.24,1.5-13.35,1.75-17.72"/>
+    <path class="cls-4" d="m728.1,127.02c-2.22,5.37-7.47,8.9-9.24,9.98-7.99,4.87-16.58,3.65-21.4,2.96-5.3-.76-8.84-2.26-14.51-4.69-5.08-2.18-12.4-5.39-20.4-11.84-4.7-3.79-10.56-8.53-15.09-16.85-2.69-4.93-6.02-11.05-4.6-18.48,1.06-5.53,4.34-9.62,6.59-11.68,11.3-10.36,35.2-5.13,50.58,4.16,17.71,10.71,33.79,32.63,28.07,46.46Z"/>
+    <path class="cls-4" d="m740.04,148.62c-9.29,17.39-50.68,17.95-79.03,2.3-28.56-15.77-50.03-51.18-40.16-68.1,5.18-8.88,20.59-15.4,29.07-15.79.67-.03,4.28-.16,9,.22,0,0,5.25.42,10.85,1.61,16.47,3.51,30.11,11.66,30.11,11.66,3.33,1.99,13.81,8.67,24.26,20.66,5.63,6.46,10.98,12.73,14.21,22.62,1.84,5.62,5.8,17.11,1.68,24.82Z"/>
+    <path class="cls-4" d="m746.43,158.02c.26,2.95.23,7.54-1.84,12.38-4.65,10.86-16.14,14.8-22.04,16.82-14.3,4.9-26.84,2.53-37.23.44-4.88-.98-19.9-4.35-37.97-15.16-12.77-7.63-31.23-18.67-42.37-40.73-4.94-9.79-14.06-27.86-5.66-43.45,5.5-10.2,15.92-14.52,20.84-16.17"/>
+    <path class="cls-4" d="m742.6,191.19c-2.1,3.45-5.65,8.37-11.3,12.62-25.33,19.11-65.65,3.16-81.06-2.91-17.67-6.96-29.18-15.53-33.71-19.11-7.68-6.06-18.82-15.02-27.56-30.56-6.01-10.68-14.07-25-10.01-41.8,2.61-10.82,9.15-18.15,13.11-21.89"/>
+    <path class="cls-4" d="m730.47,216.89c-4.22,3.46-10.95,8.12-20.15,11.18-6.02,2-15.21,4.02-31.66,2.18-28.72-3.21-49.98-14.85-54.97-17.67-6.13-3.47-30.09-17.55-47.4-43.6-8.02-12.07-10.48-20.43-11.45-27.2-1.38-9.63.02-17.72,1.34-22.84"/>
+    <path class="cls-4" d="m708.32,240.34c-6.71,2.86-16.89,6.3-29.55,7.18-30.94,2.13-53.88-12.68-69.06-22.48-14.54-9.38-39.74-25.65-49.63-56.38-2.43-7.55-3.34-14.1-3.72-18.53"/>
+    <path class="cls-4" d="m558.31,186.6c5.05,10.03,19.04,34.5,48.51,51.89,30.41,17.94,59.57,17.87,70.71,17.28"/>
+  </g>
+  <path class="cls-1" d="m760.99,119.62v-38.98h121.17v38.98h-121.17Zm92.26,134.49c-20.58,0-36.6-5.25-48.08-15.76-11.48-10.5-17.22-26.15-17.22-46.94V38.09h50.68v152.68c0,7.36,1.95,13.05,5.85,17.05,3.9,4.01,9.2,6.01,15.92,6.01,8.01,0,14.83-2.16,20.47-6.5l13.64,35.73c-5.2,3.68-11.43,6.45-18.68,8.28-7.26,1.84-14.78,2.76-22.58,2.76Z"/>
+  <path class="cls-1" d="m1004.3,254.11c-19.93,0-37.41-3.9-52.46-11.69-15.05-7.8-26.69-18.46-34.92-32-8.23-13.53-12.34-28.96-12.34-46.29s4.06-33.08,12.18-46.62c8.12-13.53,19.22-24.15,33.3-31.83,14.07-7.68,29.99-11.53,47.75-11.53s32.54,3.63,46.29,10.88c13.75,7.26,24.63,17.65,32.65,31.19,8.01,13.54,12.02,29.72,12.02,48.56,0,1.95-.11,4.17-.32,6.66-.22,2.49-.44,4.82-.65,6.98h-141.96v-29.56h115.32l-19.49,8.77c0-9.1-1.84-17-5.52-23.71-3.68-6.71-8.77-11.96-15.27-15.76-6.5-3.79-14.08-5.68-22.74-5.68s-16.3,1.9-22.9,5.68c-6.61,3.79-11.75,9.1-15.43,15.92-3.68,6.82-5.52,14.89-5.52,24.2v7.8c0,9.53,2.11,17.92,6.33,25.18,4.22,7.26,10.18,12.78,17.87,16.57,7.68,3.79,16.73,5.68,27.12,5.68,9.31,0,17.49-1.41,24.53-4.22,7.03-2.81,13.48-7.03,19.33-12.67l26.96,29.24c-8.01,9.1-18.08,16.08-30.21,20.95-12.13,4.87-26.1,7.31-41.91,7.31Z"/>
+  <path class="cls-1" d="m1122.54,251.51V76.74h48.4v49.38l-6.82-14.29c5.2-12.34,13.53-21.71,25.01-28.1,11.48-6.39,25.44-9.58,41.91-9.58v46.78c-2.17-.21-4.12-.38-5.85-.49-1.74-.11-3.57-.16-5.52-.16-13.86,0-25.07,3.95-33.62,11.86-8.56,7.91-12.83,20.2-12.83,36.87v82.51h-50.68Z"/>
+  <path class="cls-2" d="m1263.85,244.71V30.92c0-3.76,3.05-6.8,6.8-6.8h91.63c20.35,0,37.9,3.3,52.63,9.91,14.72,6.61,26.09,16.08,34.11,28.42,8.01,12.34,12.02,27.07,12.02,44.18s-4.01,31.46-12.02,43.69c-8.01,12.24-19.38,21.6-34.11,28.1-14.73,6.5-32.27,9.75-52.63,9.75h-52.61c-6.08,0-9.11-7.37-4.78-11.65h0c4.3-4.24,11.58-1.19,11.58,4.84v63.35c0,3.76-3.05,6.8-6.8,6.8h-39.02c-3.76,0-6.8-3.05-6.8-6.8Zm40.88-86.15l-.77-.81c-4.11-4.34-1.03-11.48,4.94-11.48h50.45c16.24,0,28.37-3.52,36.38-10.56,8.01-7.03,12.02-16.73,12.02-29.07s-4.01-22.3-12.02-29.24c-8.01-6.93-20.14-10.4-36.38-10.4h-50.59c-5.95,0-9.03-7.1-4.97-11.45l.91-.98c4.21-4.51,11.77-1.52,11.77,4.65v94.66c0,6.15-7.51,9.14-11.74,4.68Zm101.64,90.01l-47.47-68.91c-3.11-4.51.12-10.66,5.6-10.66h39.7c2.22,0,4.31,1.09,5.58,2.91l48.02,68.91c3.14,4.51-.08,10.69-5.58,10.69h-40.24c-2.24,0-4.33-1.1-5.6-2.94Z"/>
+  <path class="cls-3" d="m1477.08,241.74l95.17-213.51c1.12-2.5,3.6-4.11,6.34-4.11h42.97c2.74,0,5.22,1.61,6.34,4.11l95.47,213.51c2.05,4.59-1.31,9.77-6.34,9.77h-39.88c-2.81,0-5.34-1.69-6.41-4.28l-77.41-186.87c-1.89-4.57,1.47-9.6,6.41-9.6h0c4.95,0,8.31,5.03,6.41,9.61l-77.71,186.87c-1.08,2.59-3.6,4.28-6.41,4.28h-38.6c-5.03,0-8.39-5.18-6.34-9.77Zm49.55-48.19l9.12-26.08c.97-2.78,3.6-4.65,6.55-4.65h107.13c2.93,0,5.55,1.84,6.53,4.6l9.33,26.08c1.62,4.52-1.73,9.28-6.53,9.28h-125.57c-4.78,0-8.13-4.72-6.55-9.23Z"/>
+</svg></div>
+        <div class="cover-inst">
+          Universidad de Costa Rica<br/>
+          Instituto de Investigaciones en Ingeniería (INII)
+        </div>
+      </div>
+
+      <span class="cover-eyebrow">DOCUMENTACIÓN OFICIAL DE USUARIO FINAL • WEB Y MÓVIL</span>
+      <h1 class="cover-title">Manual de Usuario — Plataforma GeoterRA</h1>
+      <p class="cover-subtitle">
+        Guía completa de acceso, consulta cartográfica, gestión de solicitudes de análisis, campañas de campo y administración institucional para la Plataforma Web y Aplicación Móvil GeoterRA.
+      </p>
+
+      <div class="cover-meta-grid">
+        <div class="meta-box">
+          <span class="meta-box-label">Versión</span>
+          <span class="meta-box-val">1.0 Oficial</span>
+        </div>
+        <div class="meta-box">
+          <span class="meta-box-label">Emisión</span>
+          <span class="meta-box-val">Noviembre 2026</span>
+        </div>
+        <div class="meta-box">
+          <span class="meta-box-label">Plataformas</span>
+          <span class="meta-box-val">Web + Android / iOS</span>
+        </div>
+        <div class="meta-box">
+          <span class="meta-box-label">Portal Oficial</span>
+          <span class="meta-box-val">geoterra.inii.ucr.ac.cr</span>
+        </div>
+      </div>
+
+      <div class="toc-card">
+        <div class="toc-title">Contenido del Manual</div>
+        <ul class="toc-list">
+          <li><a href="#1-introduccion-a-geoterra"><span class="toc-num">1</span> Introducción a GeoterRA (Propósito, Requisitos y Arquitectura)</a></li>
+          <li><a href="#2-gestion-de-acceso-y-roles-de-usuario"><span class="toc-num">2</span> Gestión de Acceso y Roles de Usuario (RBAC, Registro y Recuperación OTP)</a></li>
+          <li><a href="#3-guia-paso-a-paso-plataforma-web"><span class="toc-num">3</span> Guía Paso a Paso — Plataforma Web (Mapa, Fichas Técnicas y Módulos por Rol)</a></li>
+          <li><a href="#4-guia-paso-a-paso-aplicacion-movil"><span class="toc-num">4</span> Guía Paso a Paso — Aplicación Móvil (Instalación, Campo, Modo Gira y PDF)</a></li>
+          <li><a href="#5-solucion-de-problemas-frecuentes-faq-y-soporte"><span class="toc-num">5</span> Solución de Problemas Frecuentes (FAQ) y Soporte Técnico</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Main Document Body -->
+    <main>
+      <h2 id="1-introduccion-a-geoterra">1. Introducción a GeoterRA</h2>
+<h3 id="1-1-proposito-de-la-plataforma">1.1 Propósito de la Plataforma</h3>
+<p><strong>GeoterRA</strong> es la plataforma institucional web y móvil desarrollada para el <strong>Instituto de Investigaciones en Ingeniería (INII)</strong> de la <strong>Universidad de Costa Rica (UCR)</strong>. Su propósito es centralizar, validar científicamente y poner a disposición pública la información geográfica, térmica e hidrogeoquímica de las <strong>manifestaciones geotérmicas</strong> del territorio costarricense (fuentes termales, nacientes calientes, fumarolas y zonas con anomalías térmicas).</p>
+<p>A través de GeoterRA es posible:</p>
+<ul>
+<li><strong>Explorar gratuitamente</strong> en un mapa interactivo las geomanifestaciones oficialmente validadas, junto con las capas cartográficas oficiales del <strong>Sistema Nacional de Información Territorial (SNIT / IGN)</strong>.</li>
+<li><strong>Consultar fichas técnicas científicas</strong> con mediciones tomadas en campo (<em>In-Situ</em>), análisis químicos de laboratorio (<em>In-Lab</em>), <strong>Diagramas de Lindal</strong> (usos directos según temperatura) y <strong>Diagramas de Piper</strong> (clasificación hidrogeoquímica).</li>
+<li><strong>Exportar fichas técnicas y reportes en formato PDF</strong> para análisis académico, planificación energética o respaldo técnico.</li>
+<li><strong>Registrar Solicitudes de Análisis</strong> desde la web o el teléfono móvil para reportar nuevos sitios de interés geotérmico.</li>
+<li><strong>Gestionar giras de campo, pruebas y dictámenes científicos</strong> mediante flujos de control de acceso basados en roles (RBAC).</li>
+</ul>
+<hr />
+<h3 id="1-2-requisitos-de-acceso">1.2 Requisitos de Acceso</h3>
+<h4 id="plataforma-web">Plataforma Web</h4>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Requisito</th>
+<th style="text-align: left;">Especificación Mínima / Recomendada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Navegadores Soportados</strong></td>
+<td style="text-align: left;">Google Chrome (v100+), Mozilla Firefox (v100+), Microsoft Edge (v100+), Safari (v15+) o Brave.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Configuración del Navegador</strong></td>
+<td style="text-align: left;">JavaScript habilitado y almacenamiento de <strong>cookies</strong> permitido (requerido para mantener la sesión segura).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Conexión</strong></td>
+<td style="text-align: left;">Acceso estable a Internet para cargar el mapa base, capas WMS del SNIT y consultar la base de datos central.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Resolución Recomendada</strong></td>
+<td style="text-align: left;">Escritorio (1280×720 px o superior), tableta o dispositivo móvil (interfaz adaptable).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Dirección Oficial</strong></td>
+<td style="text-align: left;"><code>https://geoterra.inii.ucr.ac.cr</code></td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="aplicacion-movil-geoterra">Aplicación Móvil (<code>GeoterRA</code>)</h4>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Plataforma</th>
+<th style="text-align: left;">Requisitos Técnicos</th>
+<th style="text-align: left;">Estado de Distribución</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Android</strong></td>
+<td style="text-align: left;"><strong>Android 7.0 (API 24)</strong> o superior (recomendado Android 8.0+). Mínimo <strong>100 MB</strong> de espacio libre (paquete APK de ~74.6 MB). Receptor <strong>GPS</strong> activo y cámara opcional.</td>
+<td style="text-align: left;"><strong>Disponible</strong> mediante descarga directa del instalador <code>geoterraApp.apk</code> o código QR en el portal web. Publicación en Google Play Store en revisión.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>iOS (Apple)</strong></td>
+<td style="text-align: left;"><strong>iOS 15.0</strong> o superior en iPhone o iPad compatible.</td>
+<td style="text-align: left;"><strong>En desarrollo / optimización</strong> para publicación próxima en Apple App Store.</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h3 id="1-3-arquitectura-general-de-uso-y-flujo-de-datos">1.3 Arquitectura General de Uso y Flujo de Datos</h3>
+<p>La plataforma garantiza la rigurosidad científica separando los <strong>reportes preliminares (Solicitudes)</strong> de los <strong>datos publicados en el mapa oficial (Geomanifestaciones con GeoReporte vigente)</strong>.</p>
+
+<div class="mermaid-box">
+  <div class="mermaid-label">DIAGRAMA DE FLUJO INSTITUCIONAL</div>
+  <div class="mermaid">flowchart TD
+    A[&quot;1. Recolección Inicial&lt;br/&gt;Usuario o Técnico registra Solicitud&lt;br/&gt;(Web o App Móvil con GPS / Foto EXIF)&quot;] --&gt; B[&quot;Estado: Pendiente / Registrada&quot;]
+    B --&gt; C[&quot;2. Revisión Técnica&lt;br/&gt;Equipo científico revisa datos&lt;br/&gt;y cambia estado a En Revisión&quot;]
+    C --&gt; D{&quot;¿Solicitud Aceptada?&quot;}
+    D -- &quot;No / Rechazada&quot; --&gt; E[&quot;Archivo o Eliminación&lt;br/&gt;con registro en historial&quot;]
+    D -- &quot;Sí (Aceptar y Crear Borrador)&quot; --&gt; F[&quot;3. Borrador de Geomanifestación&lt;br/&gt;(Oculto al público general)&quot;]
+    F --&gt; G[&quot;4. Gira de Campo y Muestreo&lt;br/&gt;Registro de Pruebas In-Situ&lt;br/&gt;(Temp, pH, Conductividad)&quot;]
+    G --&gt; H[&quot;5. Análisis de Laboratorio&lt;br/&gt;Registro de Pruebas In-Lab&lt;br/&gt;(Iones principales y elementos traza)&quot;]
+    H --&gt; I[&quot;6. Consolidación de GeoReporte&lt;br/&gt;Se asocia In-Situ + In-Lab&lt;br/&gt;y se promueve a Reporte Vigente&quot;]
+    I --&gt; J[&quot;7. Publicación Oficial&lt;br/&gt;Visibilidad Pública activada:&lt;br/&gt;Visible en Mapa Web, App Móvil y PDF&quot;]</div>
+</div>
+
+<h2 class="chapter-break" id="2-gestion-de-acceso-y-roles-de-usuario">2. Gestión de Acceso y Roles de Usuario</h2>
+<h3 id="2-1-roles-del-sistema-y-matriz-de-permisos">2.1 Roles del Sistema y Matriz de Permisos</h3>
+<p>GeoterRA implementa un sistema de <strong>Control de Acceso Basado en Roles (RBAC)</strong> con <strong>cinco perfiles oficiales</strong>. Un visitante sin cuenta puede consultar el mapa público y descargar fichas técnicas, mientras que las operaciones de registro, campo, laboratorio y administración requieren autenticación.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Capacidad / Módulo</th>
+<th style="text-align: center;">Visitante (Sin Sesión)</th>
+<th style="text-align: center;">Usuario General (<code>user</code>)</th>
+<th style="text-align: center;">Investigador de Campo (<code>field_investigator</code>)</th>
+<th style="text-align: center;">Investigador Principal (<code>investigator</code>)</th>
+<th style="text-align: center;">Administrador Global (<code>admin</code>)</th>
+<th style="text-align: center;">Mantenimiento (<code>maintenance</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Consultar Mapa Público y Filtros SNIT</strong></td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Ver Ficha Técnica (Lindal / Piper) y Exportar PDF</strong></td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Crear y Ver sus Propias Solicitudes</strong></td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">No</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Editar / Eliminar Solicitudes Propias</strong></td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">No</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Revisar Todas las Solicitudes y Cambiar Estados</strong></td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">No</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Aprobar Solicitudes / Editar Química y Coordenadas</strong></td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Parcial (Estados)</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">No</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Eliminar Solicitudes de Terceros</strong></td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">No</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Gestionar Geomanifestaciones y GeoReportes</strong></td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">No</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Registrar y Editar Pruebas In-Situ (Campo)</strong></td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">No</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Registrar y Editar Pruebas In-Lab (Laboratorio)</strong></td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">No</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Consultar Giras de Campo (y Modo Gira Móvil)</strong></td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Crear / Editar Giras y Asignar Participantes</strong></td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">No</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Administrar Territorio SNIT (Provincias/Cantones/Distritos)</strong></td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Sí</td>
+<td style="text-align: center;">No</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Gestionar Usuarios y Cambiar Roles</strong></td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Parcial (Ver/Gestionar)</td>
+<td style="text-align: center;">Sí (Incluye Asignar Roles)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Ver Dashboard de Infraestructura, Tablas BD y Logs</strong></td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Sí</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote class="info-callout"><p><strong>Nota sobre Identificadores Técnicos (ULID):</strong> Por diseño institucional, los códigos internos de base de datos únicamente se muestran al rol <strong>Mantenimiento (<code>maintenance</code>)</strong> para tareas de auditoría; los demás roles trabajan con nombres legibles, códigos SNIT y códigos de solicitud (<code>SOLI-XXXXX</code>).</p></blockquote>
+<hr />
+<h3 id="2-2-registro-de-nueva-cuenta">2.2 Registro de Nueva Cuenta</h3>
+<p>Cualquier persona interesada en reportar manifestaciones geotérmicas puede crear una cuenta de <strong>Usuario General (<code>user</code>)</strong> de forma autónoma:</p>
+<ol>
+<li>En la barra superior del sitio web, haga clic en <strong>Iniciar Sesión</strong> (botón naranja) y luego seleccione el enlace <strong>Registrarse</strong>, o ingrese directamente a <code>/Register</code>.</li>
+<li>Complete su <strong>Nombre(s)</strong> y <strong>Apellido(s)</strong> (solo se permiten letras, espacios, guiones y apóstrofes).</li>
+<li>Ingrese un <strong>Correo electrónico</strong> válido y único.</li>
+<li>Ingrese su <strong>Número de teléfono</strong> seleccionando el prefijo de país (por defecto Costa Rica <code>+506</code>).</li>
+<li>Defina una <strong>Contraseña segura</strong> y confírmela. La contraseña debe cumplir con las políticas del sistema:
+   - Entre <strong>8 y 64 caracteres</strong>.
+   - Al menos <strong>una letra minúscula</strong> y <strong>una letra mayúscula</strong>.
+   - Al menos <strong>un número</strong>.
+   - Al menos <strong>un carácter especial</strong> (por ejemplo: <code>@</code>, <code>#</code>, <code>$</code>, <code>!</code>, <code>*</code>, <code>_</code>).
+   - No debe contener su dirección de correo electrónico.</li>
+<li>Haga clic en <strong>Registrarse</strong>. Al aparecer el mensaje de confirmación, seleccione <strong>Ir a Iniciar Sesión</strong>.</li>
+</ol>
+<figure class="screenshot-figure">
+  <img src="img_manual/web_register.png" alt="Pantalla de Registro de Nuevo Usuario" />
+  <figcaption>Pantalla de Registro de Nuevo Usuario</figcaption>
+</figure>
+<blockquote class="info-callout"><p><strong>Importante:</strong> Si requiere permisos de <em>Investigador de Campo</em>, <em>Investigador Principal</em> o <em>Administrador</em>, cree primero su cuenta estándar y solicite al equipo de <strong>Mantenimiento</strong> o <strong>Administración</strong> la actualización de su rol desde el panel de gestión de usuarios.</p></blockquote>
+<hr />
+<h3 id="2-3-inicio-de-sesion-y-recuperacion-de-contrasena">2.3 Inicio de Sesión y Recuperación de Contraseña</h3>
+<h4 id="como-iniciar-sesion">Cómo Iniciar Sesión</h4>
+<ol>
+<li>Haga clic en <strong>Iniciar Sesión</strong> en el encabezado superior (<code>/Login</code>).</li>
+<li>Introduzca su <strong>Correo</strong> electrónico registrado y su <strong>Contraseña</strong> (puede usar el ícono del ojo para verificar los caracteres escritos).</li>
+<li>Presione el botón <strong>Iniciar Sesión</strong>. El sistema validará sus credenciales y le redirigirá automáticamente a su <strong>Dashboard</strong> personalizado según su rol.</li>
+</ol>
+<figure class="screenshot-figure">
+  <img src="img_manual/web_login.png" alt="Pantalla de Inicio de Sesión" />
+  <figcaption>Pantalla de Inicio de Sesión</figcaption>
+</figure>
+<h4 id="como-recuperar-una-contrasena-olvidada-codigo-otp">Cómo Recuperar una Contraseña Olvidada (Código OTP)</h4>
+<ol>
+<li>En la pantalla de <strong>Iniciar Sesión</strong>, haga clic en <strong>¿Olvidaste tu contraseña?</strong> (o <strong>Recuperar</strong>).</li>
+<li><strong>Paso 1 — Solicitar código:</strong> Escriba el correo electrónico asociado a su cuenta y presione <strong>Enviar Código</strong>. Recibirá un correo con un <strong>código OTP numérico de 6 dígitos</strong>.</li>
+<li><strong>Paso 2 — Restablecer contraseña:</strong> Ingrese el código de 6 dígitos antes de que expire el temporizador de <strong>5 minutos (05:00)</strong>, escriba y confirme su nueva contraseña y presione <strong>Restablecer</strong>.</li>
+<li><strong>Paso 3 — Confirmación:</strong> Una vez actualizado el acceso, regrese al formulario e inicie sesión con su nueva contraseña.</li>
+</ol>
+<h2 class="chapter-break" id="3-guia-paso-a-paso-plataforma-web">3. Guía Paso a Paso — Plataforma Web</h2>
+<h3 id="3-1-pagina-de-inicio-y-descarga-movil">3.1 Página de Inicio y Descarga Móvil</h3>
+<p>Al ingresar al portal principal (<code>/</code>), encontrará la barra de navegación fija superior con acceso directo a: <strong>Acerca de nosotros</strong>, <strong>Cómo funciona</strong>, <strong>App Móvil</strong>, <strong>Contacto</strong>, <strong>Mapa</strong> e <strong>Iniciar Sesión</strong> (o <strong>Mi Perfil</strong> si ya inició sesión).</p>
+<ol>
+<li>En la sección de bienvenida, haga clic en <strong>Ver mapa</strong> para ir directamente al visor geoespacial sin necesidad de registrarse.</li>
+<li>Desplácese hacia abajo o haga clic en <strong>App Móvil</strong> para acceder a la sección de descarga de la aplicación Android.</li>
+</ol>
+<figure class="screenshot-figure">
+  <img src="img_manual/web_home.png" alt="Página Principal de GeoterRA" />
+  <figcaption>Página Principal de GeoterRA</figcaption>
+</figure>
+<h4 id="descarga-de-la-app-android-desde-el-portal-web">Descarga de la App Android desde el Portal Web</h4>
+<ol>
+<li>Ubíquese en la sección <strong>GeoterRA Móvil</strong> (<code>#mobile-app</code>).</li>
+<li>Puede descargar el paquete <code>geoterraApp.apk</code> de dos maneras:
+   - Haciendo clic en el botón naranja <strong>Descargar GeoterRA APK</strong> desde el navegador del teléfono o computadora.
+   - Escaneando el <strong>código QR</strong> en pantalla con la cámara de su teléfono Android o Google Lens.</li>
+</ol>
+<figure class="screenshot-figure">
+  <img src="img_manual/web_mobile_download.png" alt="Sección de Descarga de Aplicación Móvil en la Web" />
+  <figcaption>Sección de Descarga de Aplicación Móvil en la Web</figcaption>
+</figure>
+<hr />
+<h3 id="3-2-mapa-interactivo-de-geomanifestaciones-map">3.2 Mapa Interactivo de Geomanifestaciones (<code>/Map</code>)</h3>
+<p>El módulo <strong>Mapa</strong> es el núcleo de consulta pública de GeoterRA. Permite visualizar todas las geomanifestaciones validadas y publicadas sobre cartografía de OpenStreetMap y capas oficiales del IGN/SNIT.</p>
+<figure class="screenshot-figure">
+  <img src="img_manual/web_map.png" alt="Mapa Interactivo con Panel de Capas y Filtros" />
+  <figcaption>Mapa Interactivo con Panel de Capas y Filtros</figcaption>
+</figure>
+<h4 id="como-usar-el-panel-de-capas-y-filtros">Cómo Usar el Panel de Capas y Filtros</h4>
+<p>El panel lateral izquierdo (<strong>Capas y Filtros</strong>) se encuentra abierto por defecto en pantallas de escritorio; si está contraído, haga clic en el botón flotante <strong>Filtros y Capas</strong> en la esquina superior izquierda.</p>
+<ol>
+<li><strong>Activar o desactivar capas SNIT (IGN):</strong>
+   - Marque o desmarque <strong>Límite Provincial</strong>, <strong>Límite Cantonal</strong> y <strong>Límite Distrital</strong> para superponer las divisiones administrativas oficiales de Costa Rica.</li>
+<li><strong>Filtrar por Ubicación Territorial (en cascada):</strong>
+   - Seleccione una <strong>Provincia</strong> en el menú desplegable.
+   - Automáticamente se habilitará el selector de <strong>Cantón</strong> con los cantones pertenecientes a esa provincia, y al elegir uno, se habilitará el selector de <strong>Distrito</strong>.</li>
+<li><strong>Filtrar por Temperatura (°C):</strong>
+   - Utilice los botones rápidos: <strong>Todas</strong>, <strong>&lt; 40°C</strong>, <strong>40°C - 60°C</strong> o <strong>&gt; 60°C</strong>.
+   - O bien ingrese un rango numérico exacto en los campos <strong>Mín (°C)</strong> y <strong>Máx (°C)</strong>.</li>
+<li><strong>Restablecer o actualizar:</strong>
+   - En la parte inferior del panel verá el contador <strong>Puntos Filtrados</strong> (<code>X / Total</code>).
+   - Presione <strong>Limpiar</strong> para borrar todos los filtros activos, o <strong>Actualizar</strong> para recargar los puntos desde el servidor.</li>
+</ol>
+<h4 id="herramientas-espaciales-del-mapa">Herramientas Espaciales del Mapa</h4>
+<p>En la esquina superior derecha del visor encontrará dos botones de control:</p>
+<ul>
+<li><strong>Ir a mi ubicación (ícono de pin):</strong> Solicita permiso de geolocalización al navegador, centra el mapa en su posición actual y coloca un marcador azul indicador.</li>
+<li><strong>Pantalla completa (ícono de expandir):</strong> Amplía el mapa a toda la pantalla; presione nuevamente o la tecla <code>Esc</code> para salir.</li>
+</ul>
+<h4 id="consultar-resumen-rapido-de-una-geomanifestacion-popup">Consultar Resumen Rápido de una Geomanifestación (Popup)</h4>
+<ol>
+<li>Haga clic sobre cualquier marcador azul en el mapa.</li>
+<li>Se abrirá una ventana emergente con:
+   - <strong>Nombre de la manifestación</strong> y <strong>Ubicación territorial</strong> (Provincia, Cantón, Distrito) más coordenadas <strong>Lat / Lon</strong>.
+   - <strong>Temp. In-Situ</strong> en grados Celsius, junto con el <strong>pH</strong> y la <strong>conductividad eléctrica (µS)</strong> medidos en campo.
+   - <strong>Clasificación de Usos (Diagrama de Lindal):</strong> Indicador visual del rango de aprovechamiento geotérmico según la temperatura registrada (por ejemplo: <em>Balnearios/Turismo</em>, <em>Acuicultura</em>, <em>Agricultura/Invernaderos</em>, <em>Calefacción espacial</em>, <em>Secado de madera</em>, <em>Procesos industriales</em> o <em>Generación eléctrica</em>).</li>
+<li>Haga clic en el botón <strong>Ver Detalles Completos y Diagramas</strong> para abrir la ficha técnica completa.</li>
+</ol>
+<figure class="screenshot-figure">
+  <img src="img_manual/web_map_popup.png" alt="Popup de Geomanifestación con Temperatura In-Situ y Diagrama de Lindal" />
+  <figcaption>Popup de Geomanifestación con Temperatura In-Situ y Diagrama de Lindal</figcaption>
+</figure>
+<hr />
+<h3 id="3-3-ficha-tecnica-completa-y-exportacion-pdf-point-details-id">3.3 Ficha Técnica Completa y Exportación PDF (<code>/point-details/:id</code>)</h3>
+<p>La pantalla de detalles consolida toda la información oficial de una geomanifestación en cuatro bloques:</p>
+<ol>
+<li><strong>Encabezado e Identificación:</strong> Nombre del punto, ubicación administrativa, código identificador y botón <strong>Imprimir / Exportar PDF</strong> en la esquina superior derecha.</li>
+<li><strong>Información General y Ubicación:</strong> Provincia, cantón, distrito, coordenadas geográficas <strong>WGS84</strong> (<code>Lat</code> / <code>Lng</code>) y fecha de registro.</li>
+<li><strong>Medidas de Campo e In-Situ:</strong> Temperatura (°C), pH de campo, conductividad (µS/cm) y el <strong>Diagrama de Lindal</strong> completo. <em>(Si no existe temperatura válida mayor a 0°C, se muestra un aviso informativo y se oculta el diagrama para evitar interpretaciones erróneas).</em></li>
+<li><strong>Análisis Fisicoquímico de Laboratorio y Diagrama de Piper:</strong>
+   - Parámetros básicos de laboratorio (<strong>pH Laboratorio</strong> y <strong>Conductividad Laboratorio</strong>).
+   - Tabla de <strong>Iones Principales (mg/L):</strong> <code>Cl⁻</code>, <code>Ca²⁺</code>, <code>HCO₃⁻</code>, <code>SO₄²⁻</code>, <code>Na⁺</code>, <code>K⁺</code>, <code>Mg²⁺</code> y <code>Si</code>.
+   - Tabla de <strong>Elementos Traza (mg/L):</strong> <code>Fe</code>, <code>B</code>, <code>Li</code> y <code>F⁻</code>.
+   - <strong>Diagrama de Piper:</strong> Gráfico ternario de cationes, aniones y rombo central para clasificar las facies hidrogeoquímicas del agua geotermal. <em>(En fumarolas secas o puntos sin análisis químico, el diagrama se omite automáticamente).</em></li>
+</ol>
+<h4 id="como-exportar-la-ficha-tecnica-en-pdf">Cómo Exportar la Ficha Técnica en PDF</h4>
+<ol>
+<li>Dentro de la ficha técnica del punto, haga clic en <strong>Imprimir / Exportar PDF</strong>.</li>
+<li>En el cuadro de diálogo de su navegador, seleccione <strong>Guardar como PDF</strong> como destino, active la opción de gráficos de fondo si lo desea y presione <strong>Guardar</strong>. El documento incluye automáticamente el encabezado institucional de la UCR / INII y formato optimizado para impresión.</li>
+</ol>
+<figure class="screenshot-figure">
+  <img src="img_manual/web_point_details.png" alt="Ficha Técnica Completa con Diagrama de Lindal y Diagrama de Piper" />
+  <figcaption>Ficha Técnica Completa con Diagrama de Lindal y Diagrama de Piper</figcaption>
+</figure>
+<hr />
+<h3 id="3-4-panel-de-control-dashboard-segun-rol">3.4 Panel de Control (Dashboard) según Rol</h3>
+<p>Al iniciar sesión e ingresar a <code>/Dashboard</code>, el sistema presenta una barra lateral de navegación a la izquierda (en dispositivos móviles se adapta a una barra inferior) y un panel de bienvenida adaptado a su rol:</p>
+<ul>
+<li><strong>Usuario General (<code>user</code>):</strong> Muestra sus datos de identidad institucional y accesos rápidos a <em>Mis Solicitudes</em>, <em>Nueva Solicitud</em> y <em>Perfil</em>.</li>
+<li><strong>Investigador de Campo (<code>field_investigator</code>):</strong> Muestra el indicador <em>Modo Terreno Habilitado</em> y accesos directos a <em>Giras Asignadas</em>, <em>Puntos Rápidos</em> y <em>Borradores en Estudio</em>.</li>
+<li><strong>Investigador Principal (<code>investigator</code>):</strong> Presenta los espacios de trabajo científico para <em>Geomanifestaciones y Ensayos</em>, <em>Campañas y Giras de Terreno</em> y <em>División y Mapas SNIT</em>.</li>
+<li><strong>Administrador Global (<code>admin</code>):</strong> Despliega métricas globales en tiempo real (<em>Solicitudes Recibidas</em>, <em>Pendientes de Revisión</em>, <em>Dictaminadas / Aprobadas</em>) y accesos directos a todos los módulos administrativos.</li>
+<li><strong>Mantenimiento (<code>maintenance</code>):</strong> Muestra el estado de salud del servidor (<em>Estado del Servidor: Online</em>, <em>Usuarios Activos</em>, <em>Solicitudes Pendientes</em>, <em>Carga del Sistema</em>) y accesos a auditoría de base de datos, usuarios y logs.</li>
+</ul>
+<div class="gallery-table-wrap"><table>
+<thead>
+<tr>
+<th style="text-align: center;">Panel de Usuario General</th>
+<th style="text-align: center;">Panel de Investigador de Campo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><figure class="screenshot-figure">
+  <img src="img_manual/web_dashboard_user.png" alt="Dashboard Usuario General" />
+  <figcaption>Dashboard Usuario General</figcaption>
+</figure></td>
+<td style="text-align: center;"><figure class="screenshot-figure">
+  <img src="img_manual/web_dashboard_field_investigator.png" alt="Dashboard Investigador de Campo" />
+  <figcaption>Dashboard Investigador de Campo</figcaption>
+</figure></td>
+</tr>
+</tbody>
+</table></div>
+<div class="gallery-table-wrap"><table>
+<thead>
+<tr>
+<th style="text-align: center;">Panel de Investigador Principal</th>
+<th style="text-align: center;">Panel de Administrador Global</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><figure class="screenshot-figure">
+  <img src="img_manual/web_dashboard_investigator.png" alt="Dashboard Investigador Principal" />
+  <figcaption>Dashboard Investigador Principal</figcaption>
+</figure></td>
+<td style="text-align: center;"><figure class="screenshot-figure">
+  <img src="img_manual/web_dashboard_admin.png" alt="Dashboard Administrador" />
+  <figcaption>Dashboard Administrador</figcaption>
+</figure></td>
+</tr>
+</tbody>
+</table></div>
+<figure class="screenshot-figure">
+  <img src="img_manual/web_dashboard_maintenance.png" alt="Dashboard de Mantenimiento e Infraestructura" />
+  <figcaption>Dashboard de Mantenimiento e Infraestructura</figcaption>
+</figure>
+<hr />
+<h3 id="3-5-mis-solicitudes-y-registro-de-nueva-solicitud">3.5 Mis Solicitudes y Registro de Nueva Solicitud</h3>
+<p>Este módulo está disponible en el menú lateral bajo <strong>Solicitudes</strong> (o <strong>Solicitudes → Mis Solicitudes</strong> para roles con permisos ampliados).</p>
+<figure class="screenshot-figure">
+  <img src="img_manual/web_user_requests.png" alt="Vista de Mis Solicitudes" />
+  <figcaption>Vista de Mis Solicitudes</figcaption>
+</figure>
+<h4 id="como-crear-una-nueva-solicitud-de-analisis">Cómo Crear una Nueva Solicitud de Análisis</h4>
+<ol>
+<li>Ingrese a <strong>Mis Solicitudes</strong> y haga clic en el botón <strong>Agregar Solicitud</strong>.</li>
+<li>Se abrirá el <strong>Formulario de Solicitud de Manifestación</strong> (el formulario guarda un borrador temporal en su navegador mientras edita las coordenadas para evitar pérdidas accidentales).</li>
+<li><strong>Ubicación Territorial:</strong> Seleccione <strong>Provincia</strong>, <strong>Cantón</strong> y <strong>Distrito</strong> en cascada.</li>
+<li><strong>Características del Sitio:</strong>
+   - Elija el <strong>Uso actual</strong> del terreno (<code>Residencial</code>, <code>Comercial</code>, <code>Turístico</code>, <code>Conservación</code>, <code>Ganadería</code> u <code>Otro</code>).
+   - Deslice el control de <strong>Sensación térmica</strong> (<code>Natural</code>, <code>Templado</code>, <code>Caliente</code>, <code>Muy Caliente</code>, <code>Hirviendo</code>) o active la casilla <strong>Sin Especificar</strong> si no pudo percibir la temperatura.
+   - Indique si se observan <strong>Burbujas</strong> en el agua o lodo.</li>
+<li><strong>Información del Propietario (Opcional):</strong> Si usted conoce al propietario del terreno y desea incluir sus datos, active la opción correspondiente e ingrese nombre, teléfono, correo y relación (<code>Titular</code>, <code>Familiar</code>, <code>Empleado</code>, <code>Socio</code>, <code>Conocido</code>).</li>
+<li><strong>Ubicación Exacta en el Mapa:</strong> Haga clic sobre el mapa integrado para fijar la <strong>Latitud</strong> y <strong>Longitud</strong> exactas, o escriba una referencia en <strong>Dirección exacta</strong> y observaciones en <strong>Detalles adicionales</strong>.</li>
+<li>Presione <strong>Enviar</strong> (o <strong>Confirmar</strong>). Al completarse, la solicitud aparecerá en su listado con estado inicial <strong>Registrada</strong> / <strong>Pendiente</strong>.</li>
+</ol>
+<figure class="screenshot-figure">
+  <img src="img_manual/web_add_request.png" alt="Formulario Modal de Nueva Solicitud de Análisis" />
+  <figcaption>Formulario Modal de Nueva Solicitud de Análisis</figcaption>
+</figure>
+<h4 id="consultar-editar-o-eliminar-una-solicitud-propia">Consultar, Editar o Eliminar una Solicitud Propia</h4>
+<ol>
+<li>Haga clic sobre el nombre/ubicación de cualquier solicitud en la tabla (o en el ícono del ojo <strong>Ver Detalles</strong>).</li>
+<li>En el modal de detalles podrá visualizar la ubicación en el mapa y la <strong>línea de tiempo del historial de estados</strong> (fecha, estado y observación administrativa).</li>
+<li>Haga clic en <strong>Editar</strong> para corregir coordenadas, detalles o datos de contacto, o en el ícono de <strong>Eliminar</strong> para borrar la solicitud previa confirmación.</li>
+</ol>
+<hr />
+<h3 id="3-6-gestion-y-verificacion-cientifica-de-solicitudes-equipo-tecnico-y-admin">3.6 Gestión y Verificación Científica de Solicitudes (Equipo Técnico y Admin)</h3>
+<p>Disponible en <strong>Solicitudes → Gestionar Solicitudes</strong> para los roles <code>admin</code>, <code>investigator</code> y <code>field_investigator</code>.</p>
+<figure class="screenshot-figure">
+  <img src="img_manual/web_manage_requests.png" alt="Panel de Gestión de Solicitudes" />
+  <figcaption>Panel de Gestión de Solicitudes</figcaption>
+</figure>
+<h4 id="como-revisar-y-dictaminar-solicitudes">Cómo Revisar y Dictaminar Solicitudes</h4>
+<ol>
+<li>Utilice los <strong>KPIs superiores</strong> (<em>Totales</em>, <em>Pendientes</em>, <em>En Revisión</em>, <em>Procesadas</em>) o la barra de búsqueda para filtrar las solicitudes recibidas.</li>
+<li><strong>Cambiar Estado:</strong> Haga clic en el botón de cambio de estado para mover una solicitud a <code>Pendiente</code>, <code>En Revisión</code>, <code>Procesada</code> o <code>Rechazada</code>, añadiendo una descripción técnica que quedará registrada en el historial del solicitante.</li>
+<li><strong>Aceptar y Convertir en Borrador de Geomanifestación:</strong>
+   - Haga clic en la acción de aceptar solicitud y confirme en el diálogo <strong>¿Aceptar Solicitud y Crear Geomanifestación?</strong>.
+   - El sistema creará automáticamente una nueva geomanifestación en estado <strong>Borrador (oculta)</strong> con las coordenadas reportadas y cambiará la solicitud a <code>Procesada</code>.</li>
+<li><strong>Aprobar con Datos Científicos Completos:</strong> Si ya cuenta con parámetros In-Situ e In-Lab, utilice el formulario de aprobación para verificar coordenadas en el mapa e ingresar los valores fisicoquímicos iniciales.</li>
+<li><strong>Eliminar (Solo <code>admin</code>):</strong> Permite depurar solicitudes duplicadas o inválidas mediante confirmación explícita.</li>
+</ol>
+<hr />
+<h3 id="3-7-geomanifestaciones-pruebas-y-georeportes-geomanifestationsmanager">3.7 Geomanifestaciones, Pruebas y GeoReportes (<code>GeomanifeStationsManager</code>)</h3>
+<p>Disponible en el menú lateral <strong>Geomanifestaciones</strong> para <code>admin</code>, <code>investigator</code> y <code>field_investigator</code>. Centraliza el catálogo científico oficial mediante el esquema jerárquico estándar de GeoterRA.</p>
+<figure class="screenshot-figure">
+  <img src="img_manual/web_geomanifestations.png" alt="Módulo de Gestión de Geomanifestaciones" />
+  <figcaption>Módulo de Gestión de Geomanifestaciones</figcaption>
+</figure>
+<h4 id="pestanas-y-creacion-de-puntos">Pestañas y Creación de Puntos</h4>
+<ol>
+<li>En la parte superior de la tarjeta principal encontrará dos pestañas píldora:
+   - <strong>Publicadas en Mapa:</strong> Geomanifestaciones con visibilidad pública activa (<code>visibility = 1</code>) visibles para todo público en <code>/Map</code>.
+   - <strong>Borradores / En Estudio:</strong> Puntos recién creados, provenientes de solicitudes aceptadas o capturados en giras de campo (<code>visibility = 0</code>), ocultos del mapa público hasta completar su validación.</li>
+<li>Para crear un punto manualmente, presione <strong>Nuevo Registro</strong> en el encabezado, complete el nombre, descripción, provincia/cantón/distrito, gira asociada (opcional), coordenadas en el mapa y presione <strong>Guardar</strong>.</li>
+</ol>
+<h4 id="como-gestionar-estudios-pruebas-y-georeportes-de-un-punto">Cómo Gestionar Estudios, Pruebas y GeoReportes de un Punto</h4>
+<ol>
+<li>Haga clic sobre cualquier fila de la tabla de geomanifestaciones para abrir el <strong>Panel Lateral (Drawer) de Estudios, Pruebas y GeoReportes</strong>.</li>
+<li>Dentro del drawer encontrará cinco pestañas organizadas jerárquicamente:
+   - <strong>Georeportes:</strong> Muestra el GeoReporte marcado como <strong>Vigente Oficial en Mapa</strong> (con insignia destacada) y el historial de reportes del punto.<ul>
+<li>Haga clic en <strong>+ Asociar Georeporte</strong> para combinar una Prueba In-Situ existente + una Prueba de Laboratorio existente y opcionalmente marcarlo como vigente.</li>
+<li>Si hay varios reportes históricos, haga clic en el botón de estrella (<strong>Promover a Vigente</strong>) para definir cuál versión se publica en la ficha técnica oficial.</li>
+<li><strong>Pruebas In-Situ:</strong> Permite crear, editar o eliminar mediciones de campo (<code>Temperatura °C</code>, <code>Conductividad µS/cm</code>, <code>pH</code> y descripción).</li>
+<li><strong>Pruebas de Laboratorio:</strong> <em>(Disponible para <code>admin</code> e <code>investigator</code>; oculto para <code>field_investigator</code>)</em> Permite registrar o editar el análisis completo de laboratorio (<code>pH</code>, <code>Conductividad</code>, <code>Cl⁻</code>, <code>Ca²⁺</code>, <code>HCO₃⁻</code>, <code>SO₄²⁻</code>, <code>Na⁺</code>, <code>K⁺</code>, <code>Mg²⁺</code>, <code>Si</code>, <code>Fe</code>, <code>B</code>, <code>Li</code>, <code>F⁻</code>).</li>
+<li><strong>Comentarios y Colaboración:</strong> Bitácora colaborativa de notas internas del equipo investigador sobre el punto.</li>
+<li><strong>Detalles Geográficos:</strong> Resumen de ubicación SNIT y coordenadas exactas del punto.</li>
+</ul>
+</li>
+<li><strong>Publicar o Retirar del Mapa Público:</strong> Desde las acciones de fila de la tabla principal, utilice el botón <strong>Publicar en Mapa</strong> (en Borradores) o <strong>Mover a Borrador</strong> (en Publicadas) para controlar la visibilidad inmediata en el visor público.</li>
+</ol>
+<figure class="screenshot-figure">
+  <img src="img_manual/web_geomanifestations_drawer.png" alt="Drawer de Estudios, Pruebas In-Situ/In-Lab y GeoReportes" />
+  <figcaption>Drawer de Estudios, Pruebas In-Situ/In-Lab y GeoReportes</figcaption>
+</figure>
+<hr />
+<h3 id="3-8-giras-de-campo-y-punto-rapido-fieldtripsmanager">3.8 Giras de Campo y Punto Rápido (<code>FieldTripsManager</code>)</h3>
+<p>Disponible en <strong>Giras de Campo</strong> para <code>admin</code>, <code>investigator</code>, <code>field_investigator</code> y <code>maintenance</code>.</p>
+<figure class="screenshot-figure">
+  <img src="img_manual/web_field_trips.png" alt="Módulo de Giras de Campo" />
+  <figcaption>Módulo de Giras de Campo</figcaption>
+</figure>
+<h4 id="como-gestionar-giras-de-campo-admin-e-investigator">Cómo Gestionar Giras de Campo (<code>admin</code> e <code>investigator</code>)</h4>
+<ol>
+<li>Cambie entre las pestañas <strong>Todas las Giras</strong> y <strong>Mis Giras Asignadas</strong> usando las píldoras superiores, o filtre por estado (<em>Activa</em> / <em>Inactiva</em>).</li>
+<li>Presione <strong>Nueva Gira de Campo</strong>, ingrese el nombre de la expedición, fechas de inicio y finalización, ubicación SNIT (Provincia/Cantón/Distrito), estado activo y guarde.</li>
+<li>Haga clic en <strong>Ver Detalle</strong> sobre una gira para abrir su panel lateral, donde podrá:
+   - <strong>Agregar o remover participantes</strong> del equipo investigador.
+   - <strong>Vincular o desvincular geomanifestaciones</strong> visitadas durante la campaña.
+   - Revisar y publicar comentarios operativos en la bitácora de la gira.</li>
+</ol>
+<h4 id="como-usar-punto-rapido-en-campo-admin-investigator-field-investigator">Cómo Usar "Punto Rápido en Campo" (<code>admin</code>, <code>investigator</code>, <code>field_investigator</code>)</h4>
+<p>Diseñado para registrar hallazgos directamente desde el terreno con mínimos pasos:</p>
+<ol>
+<li>Dentro del módulo <strong>Giras de Campo</strong> (o en el detalle de una gira activa), haga clic en <strong>Punto Rápido</strong>.</li>
+<li>Presione <strong>Obtener Ubicación GPS</strong> para capturar automáticamente las coordenadas de su dispositivo (con indicador de precisión en metros <code>±Xm</code>), o marque el punto manualmente en el mapa desplegable.</li>
+<li>El sistema sugiere un nombre consecutivo automático vinculado a la gira (editable si lo desea).</li>
+<li>Ingrese las mediciones <strong>In-Situ</strong> rápidas (<strong>Temperatura °C</strong>, <strong>pH</strong>, <strong>Conductividad</strong>) y notas de campo.</li>
+<li>Presione <strong>Guardar</strong>. El punto quedará creado como <strong>Borrador de Geomanifestación</strong> vinculado a la gira junto con su prueba In-Situ asociada.</li>
+</ol>
+<hr />
+<h3 id="3-9-administracion-territorial-snit-territorymanager">3.9 Administración Territorial SNIT (<code>TerritoryManager</code>)</h3>
+<p>Disponible en <strong>Otros → Territorio</strong> exclusivamente para el rol <strong><code>admin</code></strong>.</p>
+<figure class="screenshot-figure">
+  <img src="img_manual/web_territory.png" alt="Módulo de Administración Territorial SNIT" />
+  <figcaption>Módulo de Administración Territorial SNIT</figcaption>
+</figure>
+<ol>
+<li>Use las pestañas píldora <strong>Provincias</strong>, <strong>Cantones</strong> y <strong>Distritos</strong> para navegar entre los tres niveles de la división político-administrativa de Costa Rica.</li>
+<li>En <strong>Cantones</strong> y <strong>Distritos</strong>, utilice los selectores de filtro superior para acotar por provincia o cantón padre.</li>
+<li>Haga clic en <strong>Nuevo Registro</strong> para agregar una nueva unidad territorial indicando su <strong>Código SNIT</strong> oficial y <strong>Nombre</strong>, o use los íconos de <strong>Editar</strong> y <strong>Eliminar</strong> en la columna de acciones.</li>
+</ol>
+<hr />
+<h3 id="3-10-gestion-de-usuarios-y-roles-usermanagement">3.10 Gestión de Usuarios y Roles (<code>UserManagement</code>)</h3>
+<p>Disponible en <strong>Otros → Gestionar Usuarios</strong> para los roles <strong><code>maintenance</code></strong> y <strong><code>admin</code></strong>.</p>
+<figure class="screenshot-figure">
+  <img src="img_manual/web_user_management.png" alt="Módulo de Gestión de Usuarios" />
+  <figcaption>Módulo de Gestión de Usuarios</figcaption>
+</figure>
+<ol>
+<li>Revise los indicadores superiores (<em>Total de Usuarios</em>, <em>Administradores y Soporte</em>, <em>Investigadores</em>, <em>Usuarios Generales</em>).</li>
+<li>Busque por nombre, correo o teléfono, o filtre por <strong>Rol</strong> y <strong>Estado</strong> (<em>Activo</em> / <em>Inactivo</em>).</li>
+<li>Para cambiar el nivel de acceso de una persona, haga clic en <strong>Editar Rol</strong> en su fila, seleccione el nuevo rol (<code>Administrador</code>, <code>Mantenimiento</code>, <code>Investigador de Laboratorio</code>, <code>Investigador de Campo</code> o <code>Usuario General</code>) y confirme.</li>
+</ol>
+<hr />
+<h3 id="3-11-auditoria-tecnica-base-de-datos-y-logs-del-sistema">3.11 Auditoría Técnica: Base de Datos y Logs del Sistema</h3>
+<p>Exclusivo para el rol <strong><code>maintenance</code></strong> desde <strong>Otros → Base de datos</strong> y <strong>Otros → Logs del Sistema</strong>.</p>
+<h4 id="explorador-de-base-de-datos-solo-lectura">Explorador de Base de Datos (Solo Lectura)</h4>
+<ol>
+<li>Seleccione cualquiera de las tablas relacionales en las píldoras superiores (<code>Usuarios</code>, <code>Solicitudes de Investigación</code>, <code>Geomanifestaciones</code>, <code>Pruebas de Campo</code>, <code>Pruebas de Laboratorio</code>, <code>GeoReportes</code>, <code>Provincias</code>, <code>Cantones</code>, <code>Distritos</code>, entre otras).</li>
+<li>Utilice la barra de búsqueda para filtrar filas por cualquier columna o identificador ULID. Este módulo opera estrictamente en modo <strong>Solo Lectura</strong> para proteger la integridad de los datos.</li>
+</ol>
+<figure class="screenshot-figure">
+  <img src="img_manual/web_database_viewer.png" alt="Explorador de Base de Datos en Solo Lectura" />
+  <figcaption>Explorador de Base de Datos en Solo Lectura</figcaption>
+</figure>
+<h4 id="logs-del-sistema-en-tiempo-real">Logs del Sistema en Tiempo Real</h4>
+<ol>
+<li>Visualice las últimas 500 líneas de registro del servidor backend PHP.</li>
+<li>Active o pause el interruptor <strong>Auto-refresh</strong> (actualización automática cada 5 segundos).</li>
+<li>Filtre eventos haciendo clic en los KPIs superiores (<strong>Buffer Total</strong>, <strong>Errores / Fallos</strong>, <strong>Advertencias</strong>, <strong>Peticiones HTTP</strong>) o buscando texto específico.</li>
+<li>Use <strong>Copiar</strong> para llevar los logs filtrados al portapapeles o <strong>Exportar</strong> para descargar un archivo <code>.log</code>.</li>
+</ol>
+<figure class="screenshot-figure">
+  <img src="img_manual/web_system_logs.png" alt="Visor de Logs del Sistema en Tiempo Real" />
+  <figcaption>Visor de Logs del Sistema en Tiempo Real</figcaption>
+</figure>
+<hr />
+<h3 id="3-12-perfil-de-usuario-y-seguridad-profilepage">3.12 Perfil de Usuario y Seguridad (<code>ProfilePage</code>)</h3>
+<p>Accesible para todos los usuarios autenticados desde <strong>Otros → Perfil</strong>.</p>
+<figure class="screenshot-figure">
+  <img src="img_manual/web_profile.png" alt="Página de Perfil de Usuario" />
+  <figcaption>Página de Perfil de Usuario</figcaption>
+</figure>
+<ol>
+<li><strong>Editar Información Personal:</strong> Haga clic en <strong>Editar Datos</strong>, actualice su nombre, apellidos, correo o teléfono y confirme los cambios.</li>
+<li><strong>Cambiar Contraseña:</strong> Despliegue la sección de seguridad, ingrese su contraseña actual, defina y confirme la nueva contraseña (cumpliendo la política de complejidad) y guarde.</li>
+<li><strong>Eliminar Cuenta:</strong> En la parte inferior puede solicitar la desactivación lógica (<em>soft-delete</em>) de su cuenta previa confirmación.</li>
+</ol>
+<h2 class="chapter-break" id="4-guia-paso-a-paso-aplicacion-movil">4. Guía Paso a Paso — Aplicación Móvil</h2>
+<p>La aplicación móvil <strong>GeoterRA</strong> está diseñada para trabajar cómodamente desde teléfonos y tabletas Android e iOS, con soporte para <strong>tema claro / oscuro</strong>, captura GPS directa, lectura de coordenadas <strong>EXIF</strong> en fotografías, generación local de reportes <strong>PDF</strong> y un <strong>Modo Gira de Campo</strong> especializado para expediciones científicas.</p>
+<h3 id="4-1-instalacion-y-permisos-requeridos">4.1 Instalación y Permisos Requeridos</h3>
+<h4 id="instalacion-en-android-apk-directo">Instalación en Android (APK Directo)</h4>
+<ol>
+<li>Desde el navegador de su dispositivo Android, visite la sección <strong>App Móvil</strong> de la web de GeoterRA (o escanee el código QR).</li>
+<li>Descargue el archivo <code>geoterraApp.apk</code>.</li>
+<li>Al abrir el archivo descargado, si Android solicita autorización para <em>"Instalar aplicaciones desconocidas"</em> desde su navegador o gestor de archivos, active <strong>Permitir desde esta fuente</strong> y toque <strong>Instalar</strong>.</li>
+<li>Abra <strong>GeoterRA</strong> desde su menú de aplicaciones.</li>
+</ol>
+<h4 id="permisos-del-sistema">Permisos del Sistema</h4>
+<p>Para aprovechar todas las funciones en campo, la aplicación solicitará los siguientes permisos cuando sean necesarios:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Permiso</th>
+<th style="text-align: left;">Finalidad en la App</th>
+<th style="text-align: left;">Qué pasa si se rechaza</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Ubicación precisa (<code>GPS</code>)</strong></td>
+<td style="text-align: left;">Mostrar su posición azul en el mapa y rellenar automáticamente Latitud/Longitud al crear solicitudes o geomanifestaciones.</td>
+<td style="text-align: left;">Podrá navegar por el mapa manualmente, pero no podrá centrar en su ubicación ni autocompletar coordenadas GPS.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Cámara y Galería</strong></td>
+<td style="text-align: left;">Tomar fotografías del punto geotérmico o elegir imágenes existentes para extraer coordenadas <strong>EXIF</strong> automáticamente.</td>
+<td style="text-align: left;">Deberá capturar su ubicación por GPS directo sin lectura de metadatos de foto.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Almacenamiento / Archivos</strong></td>
+<td style="text-align: left;">Guardar y abrir los reportes <strong>PDF</strong> generados localmente (en Android &lt; 10 o compartir archivos en iOS).</td>
+<td style="text-align: left;">No se podrá almacenar o abrir el archivo PDF descargado.</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h3 id="4-2-acceso-registro-y-recuperacion-de-contrasena">4.2 Acceso, Registro y Recuperación de Contraseña</h3>
+<ol>
+<li><strong>Inicio de Sesión:</strong> En la pantalla de acceso, ingrese su <strong>Correo Electrónico</strong> y <strong>Contraseña</strong> y toque <strong>Ingresar</strong>. Sus tokens de acceso y renovación permanecen guardados de forma segura en el dispositivo para evitar iniciar sesión cada vez que abra la app.</li>
+<li><strong>Registro:</strong> Toque <strong>Regístrese aquí</strong> si aún no tiene cuenta, complete sus datos personales, correo, teléfono (opcional) y contraseña, y toque <strong>Registrarme</strong>.</li>
+<li><strong>Recuperación de Contraseña:</strong> Toque <strong>Recuperar</strong> en la pantalla de acceso, ingrese su correo, presione <strong>Enviar Código</strong>, digite el código <strong>OTP</strong> de 6 dígitos recibido en su bandeja de entrada, establezca su nueva contraseña y toque <strong>Restablecer Contraseña</strong>.</li>
+</ol>
+<figure class="screenshot-figure">
+  <img src="img_manual/mobile_login.png" alt="Pantalla de Inicio de Sesión en la App Móvil" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+  <div class="mobile-placeholder" style="display:flex;">
+    <div class="ph-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      </svg>
+    </div>
+    <div class="ph-badge">CAPTURA MÓVIL PENDIENTE</div>
+    <div class="ph-title">Pantalla de Inicio de Sesión en la App Móvil</div>
+    <div class="ph-file">Archivo esperado: <code>img_manual/mobile_login.png</code></div>
+  </div>
+  <figcaption>Pantalla de Inicio de Sesión en la App Móvil</figcaption>
+</figure>
+<div class="capture-callout"><p><strong>[CAPTURA REQUERIDA]:</strong> Abrir la app móvil GeoterRA sin sesión iniciada en la pantalla <code>SignInScreen</code> mostrando el logo superior, fondo fotográfico de rocas y los campos "Correo Electrónico", "Contraseña" y botón "Ingresar".</p></div>
+<figure class="screenshot-figure">
+  <img src="img_manual/mobile_recuperar_contrasena.png" alt="Pantalla de Recuperación de Contraseña OTP en la App Móvil" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+  <div class="mobile-placeholder" style="display:flex;">
+    <div class="ph-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      </svg>
+    </div>
+    <div class="ph-badge">CAPTURA MÓVIL PENDIENTE</div>
+    <div class="ph-title">Pantalla de Recuperación de Contraseña OTP en la App Móvil</div>
+    <div class="ph-file">Archivo esperado: <code>img_manual/mobile_recuperar_contrasena.png</code></div>
+  </div>
+  <figcaption>Pantalla de Recuperación de Contraseña OTP en la App Móvil</figcaption>
+</figure>
+<div class="capture-callout"><p><strong>[CAPTURA REQUERIDA]:</strong> Tocar "¿Ha olvidado su contraseña? Recuperar" en <code>SignInScreen</code> para mostrar <code>PasswordRecoveryScreen</code> en el paso 2 (campos de código OTP de 6 dígitos y "Nueva Contraseña").</p></div>
+<hr />
+<h3 id="4-3-navegacion-principal-barra-inferior">4.3 Navegación Principal (Barra Inferior)</h3>
+<p>La aplicación móvil cuenta con una barra inferior fija de <strong>4 pestañas principales</strong>:</p>
+<ol>
+<li><strong>Inicio (<code>HomeTab</code>):</strong> Portada informativa con acceso rápido al mapa interactivo (<em>Ver mapa interactivo</em>), resumen del flujo de trabajo en 3 pasos, misión institucional e información de contacto de la UCR / INII.</li>
+<li><strong>Mapa (<code>MapTab</code>):</strong> Visor geoespacial interactivo basado en MapLibre con marcadores agrupados (<em>clusters</em>) y capas SNIT.</li>
+<li><strong>Solicitudes (<code>RequestTab</code>) o Giras (<code>FieldTripTab</code>):</strong>
+   - Por defecto muestra <strong>Solicitudes</strong> para consultar y crear solicitudes de análisis.
+   - Para personal autorizado (<code>field_investigator</code>, <code>investigator</code>, <code>admin</code>, <code>maintenance</code>), al activar el interruptor <strong>Modo Gira de Campo</strong> en la pestaña <em>Cuenta</em>, esta tercera pestaña cambia dinámicamente a <strong>Giras</strong> para operaciones científicas de expedición.</li>
+<li><strong>Cuenta (<code>AccountTab</code>):</strong> Perfil, rol asignado, cambio de tema Claro/Oscuro, interruptor de <em>Modo Gira de Campo</em>, edición de perfil, cambio de contraseña y cierre de sesión.</li>
+</ol>
+<figure class="screenshot-figure">
+  <img src="img_manual/mobile_home.png" alt="Pantalla de Inicio de la App Móvil" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+  <div class="mobile-placeholder" style="display:flex;">
+    <div class="ph-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      </svg>
+    </div>
+    <div class="ph-badge">CAPTURA MÓVIL PENDIENTE</div>
+    <div class="ph-title">Pantalla de Inicio de la App Móvil</div>
+    <div class="ph-file">Archivo esperado: <code>img_manual/mobile_home.png</code></div>
+  </div>
+  <figcaption>Pantalla de Inicio de la App Móvil</figcaption>
+</figure>
+<div class="capture-callout"><p><strong>[CAPTURA REQUERIDA]:</strong> Mostrar la pestaña <code>Inicio</code> (<code>HomeScreen</code>) tras iniciar sesión, dejando visible la imagen superior con el logo GeoterRA, el botón "Ver mapa interactivo" y la barra inferior de 4 pestañas.</p></div>
+<hr />
+<h3 id="4-4-mapa-movil-capas-snit-filtros-y-fichas-tecnicas">4.4 Mapa Móvil, Capas SNIT, Filtros y Fichas Técnicas</h3>
+<figure class="screenshot-figure">
+  <img src="img_manual/mobile_mapa.png" alt="Mapa Interactivo Móvil con Marcadores y Clústeres" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+  <div class="mobile-placeholder" style="display:flex;">
+    <div class="ph-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      </svg>
+    </div>
+    <div class="ph-badge">CAPTURA MÓVIL PENDIENTE</div>
+    <div class="ph-title">Mapa Interactivo Móvil con Marcadores y Clústeres</div>
+    <div class="ph-file">Archivo esperado: <code>img_manual/mobile_mapa.png</code></div>
+  </div>
+  <figcaption>Mapa Interactivo Móvil con Marcadores y Clústeres</figcaption>
+</figure>
+<div class="capture-callout"><p><strong>[CAPTURA REQUERIDA]:</strong> Abrir la pestaña <code>Mapa</code> (<code>MapScreen</code>) centrada sobre Costa Rica mostrando los marcadores de geomanifestaciones y/o agrupaciones (<code>Geomanifestaciones (N)</code>), además de los dos botones flotantes inferiores derechos (Ubicación y Filtros).</p></div>
+<h4 id="como-filtrar-capas-y-puntos-en-el-mapa-movil">Cómo Filtrar Capas y Puntos en el Mapa Móvil</h4>
+<ol>
+<li>Toque el <strong>botón flotante de Filtros</strong> (esquina inferior derecha del mapa).</li>
+<li>Se abrirá el panel inferior <strong>Configuración de Mapa</strong>:
+   - <strong>Capas:</strong> Seleccione o deseleccione las capas cartográficas y ráster SNIT disponibles.
+   - <strong>Filtros Geográficos:</strong> Elija <strong>Provincia</strong>, <strong>Cantón</strong> y <strong>Distrito</strong> mediante los selectores buscables en cascada.
+   - <strong>Rango de Temperatura (°C):</strong> Ingrese valores en <strong>Mínima</strong> y <strong>Máxima</strong>.</li>
+<li>Toque <strong>Aplicar Filtros</strong> para actualizar los marcadores visibles o <strong>Limpiar</strong> para restablecer la vista completa.</li>
+<li>Para centrar el mapa en su posición actual, toque el <strong>botón flotante de Mi Ubicación</strong>.</li>
+</ol>
+<figure class="screenshot-figure">
+  <img src="img_manual/mobile_mapa_filtros.png" alt="Modal Inferior de Capas y Filtros en el Mapa Móvil" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+  <div class="mobile-placeholder" style="display:flex;">
+    <div class="ph-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      </svg>
+    </div>
+    <div class="ph-badge">CAPTURA MÓVIL PENDIENTE</div>
+    <div class="ph-title">Modal Inferior de Capas y Filtros en el Mapa Móvil</div>
+    <div class="ph-file">Archivo esperado: <code>img_manual/mobile_mapa_filtros.png</code></div>
+  </div>
+  <figcaption>Modal Inferior de Capas y Filtros en el Mapa Móvil</figcaption>
+</figure>
+<div class="capture-callout"><p><strong>[CAPTURA REQUERIDA]:</strong> Abrir <code>FilterBottomModal</code> en <code>MapScreen</code> mostrando la sección "Configuración de Mapa", tarjetas de selección de Capas, desplegables de Provincia/Cantón/Distrito y campos de Temperatura Mínima/Máxima.</p></div>
+<h4 id="consultar-un-punto-y-descargar-su-ficha-pdf">Consultar un Punto y Descargar su Ficha PDF</h4>
+<ol>
+<li>Toque cualquier marcador individual en el mapa (si toca un clúster agrupado, el mapa hará zoom automático para separar los puntos).</li>
+<li>Aparecerá la tarjeta inferior <strong><code>ManifestationInfoPanel</code></strong> con el nombre, ubicación territorial, coordenadas y valores de <strong>Temperatura</strong>, <strong>pH</strong> y <strong>Conductividad</strong>.</li>
+<li>Toque <strong>Explorar Detalles Técnicos</strong> para abrir la pantalla completa <strong><code>GeomanifestationScreen</code></strong>, donde podrá revisar:
+   - Información general y detalles del reporte vigente.
+   - Análisis de campo (<em>In-Situ</em>).
+   - Análisis de laboratorio (<em>In-Lab</em>), iones principales y elementos traza agrupados por tarjetas.</li>
+<li>Toque el botón flotante <strong>Descargar PDF</strong> para generar localmente el informe en PDF y abrirlo o compartirlo con otras aplicaciones de su dispositivo.</li>
+</ol>
+<div class="gallery-table-wrap"><table>
+<thead>
+<tr>
+<th style="text-align: center;">Panel Resumido de Punto en Mapa</th>
+<th style="text-align: center;">Ficha Completa de Geomanifestación</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><figure class="screenshot-figure">
+  <img src="img_manual/mobile_mapa_panel_punto.png" alt="Panel Resumido en Mapa Móvil" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+  <div class="mobile-placeholder" style="display:flex;">
+    <div class="ph-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      </svg>
+    </div>
+    <div class="ph-badge">CAPTURA MÓVIL PENDIENTE</div>
+    <div class="ph-title">Panel Resumido en Mapa Móvil</div>
+    <div class="ph-file">Archivo esperado: <code>img_manual/mobile_mapa_panel_punto.png</code></div>
+  </div>
+  <figcaption>Panel Resumido en Mapa Móvil</figcaption>
+</figure></td>
+<td style="text-align: center;"><figure class="screenshot-figure">
+  <img src="img_manual/mobile_geomanifestacion_detalle.png" alt="Detalle Completo de Geomanifestación en Móvil" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+  <div class="mobile-placeholder" style="display:flex;">
+    <div class="ph-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      </svg>
+    </div>
+    <div class="ph-badge">CAPTURA MÓVIL PENDIENTE</div>
+    <div class="ph-title">Detalle Completo de Geomanifestación en Móvil</div>
+    <div class="ph-file">Archivo esperado: <code>img_manual/mobile_geomanifestacion_detalle.png</code></div>
+  </div>
+  <figcaption>Detalle Completo de Geomanifestación en Móvil</figcaption>
+</figure></td>
+</tr>
+</tbody>
+</table></div>
+<div class="capture-callout"><p><strong>[CAPTURA REQUERIDA] (<code>mobile_mapa_panel_punto.png</code>):</strong> Tocar un marcador en <code>MapScreen</code> para mostrar <code>ManifestationInfoPanel</code> en la parte inferior con Temperatura, pH, Conductividad y el botón "Explorar Detalles Técnicos".<br />
+<strong>[CAPTURA REQUERIDA] (<code>mobile_geomanifestacion_detalle.png</code>):</strong> Ingresar a <code>GeomanifestationScreen</code> desde ese botón mostrando las secciones "Información General", "Análisis de Campo" y "Parámetros Físicos", junto con el botón flotante "Descargar PDF".</p></div>
+<hr />
+<h3 id="4-5-captura-de-datos-en-campo-solicitudes-de-analisis">4.5 Captura de Datos en Campo — Solicitudes de Análisis</h3>
+<ol>
+<li>Ingrese a la pestaña <strong>Solicitudes</strong> (<code>InvestigationRequestsScreen</code>). Verá el listado de sus solicitudes con su código (<code>SOLI-XXXXX</code>), ubicación y distintivo de estado.</li>
+<li>Toque el botón flotante de nueva solicitud (<strong>+</strong> / Crear) para abrir el formulario <strong><code>InvestigationRequestFormScreen</code></strong>.</li>
+<li>Complete las secciones paso a paso:
+   - <strong>Ubicación Geográfica:</strong> Seleccione <strong>Provincia</strong>, <strong>Cantón</strong> y <strong>Distrito</strong>.
+   - <strong>Información del Sitio:</strong> Seleccione el <strong>Uso actual</strong> del sitio.
+   - <strong>Relación con el Propietario:</strong> Si elige un valor distinto de <code>Titular</code> (<code>Familiar</code>, <code>Empleado</code>, <code>Socio</code>, <code>Conocido</code>), complete los campos adicionales del propietario.
+   - <strong>Observaciones Físicas:</strong> Seleccione la <strong>Sensación térmica</strong>, active el interruptor <strong>Presencia de burbujas</strong> si aplica, y agregue <strong>Detalles adicionales</strong>.
+   - <strong>Ubicación Exacta y Evidencia:</strong> Ingrese la <strong>Dirección exacta</strong> y obtenga las coordenadas mediante:<ul>
+<li>El botón <strong>Obtener Ubicación GPS</strong> (captura directa desde el sensor del teléfono), o</li>
+<li>El selector de <strong>Cámara / Galería</strong>, que además intenta leer automáticamente las coordenadas GPS incrustadas en los <strong>metadatos EXIF</strong> de la fotografía.</li>
+</ul>
+</li>
+<li>Toque <strong>Enviar Solicitud</strong>.</li>
+<li>Al volver a la lista, puede tocar cualquier tarjeta para abrir <strong><code>InvestigationRequestDetailsScreen</code></strong>, editarla, eliminarla o presionar <strong>Descargar PDF</strong> para guardar el comprobante técnico de la solicitud.</li>
+</ol>
+<div class="gallery-table-wrap"><table>
+<thead>
+<tr>
+<th style="text-align: center;">Listado de Solicitudes</th>
+<th style="text-align: center;">Formulario de Nueva Solicitud</th>
+<th style="text-align: center;">Detalle de Solicitud y PDF</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><figure class="screenshot-figure">
+  <img src="img_manual/mobile_solicitudes_lista.png" alt="Lista de Solicitudes Móvil" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+  <div class="mobile-placeholder" style="display:flex;">
+    <div class="ph-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      </svg>
+    </div>
+    <div class="ph-badge">CAPTURA MÓVIL PENDIENTE</div>
+    <div class="ph-title">Lista de Solicitudes Móvil</div>
+    <div class="ph-file">Archivo esperado: <code>img_manual/mobile_solicitudes_lista.png</code></div>
+  </div>
+  <figcaption>Lista de Solicitudes Móvil</figcaption>
+</figure></td>
+<td style="text-align: center;"><figure class="screenshot-figure">
+  <img src="img_manual/mobile_nueva_solicitud.png" alt="Formulario de Solicitud Móvil" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+  <div class="mobile-placeholder" style="display:flex;">
+    <div class="ph-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      </svg>
+    </div>
+    <div class="ph-badge">CAPTURA MÓVIL PENDIENTE</div>
+    <div class="ph-title">Formulario de Solicitud Móvil</div>
+    <div class="ph-file">Archivo esperado: <code>img_manual/mobile_nueva_solicitud.png</code></div>
+  </div>
+  <figcaption>Formulario de Solicitud Móvil</figcaption>
+</figure></td>
+<td style="text-align: center;"><figure class="screenshot-figure">
+  <img src="img_manual/mobile_solicitud_detalle.png" alt="Detalle de Solicitud Móvil" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+  <div class="mobile-placeholder" style="display:flex;">
+    <div class="ph-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      </svg>
+    </div>
+    <div class="ph-badge">CAPTURA MÓVIL PENDIENTE</div>
+    <div class="ph-title">Detalle de Solicitud Móvil</div>
+    <div class="ph-file">Archivo esperado: <code>img_manual/mobile_solicitud_detalle.png</code></div>
+  </div>
+  <figcaption>Detalle de Solicitud Móvil</figcaption>
+</figure></td>
+</tr>
+</tbody>
+</table></div>
+<div class="capture-callout"><p><strong>[CAPTURA REQUERIDA] (<code>mobile_solicitudes_lista.png</code>):</strong> Pestaña <code>Solicitudes</code> con sesión iniciada mostrando al menos 2 tarjetas <code>RequestCardItem</code> con su badge de estado y botones de acción.<br />
+<strong>[CAPTURA REQUERIDA] (<code>mobile_nueva_solicitud.png</code>):</strong> Pantalla <code>InvestigationRequestFormScreen</code> mostrando las secciones de Provincia/Cantón/Distrito, Sensación térmica, switch de Burbujas y botón "Obtener Ubicación GPS".<br />
+<strong>[CAPTURA REQUERIDA] (<code>mobile_solicitud_detalle.png</code>):</strong> Pantalla <code>InvestigationRequestDetailsScreen</code> mostrando el detalle completo, historial de estados y botón flotante "Descargar PDF".</p></div>
+<hr />
+<h3 id="4-6-modo-gira-de-campo-geomanifestaciones-y-pruebas-in-situ-personal-autorizado">4.6 Modo Gira de Campo, Geomanifestaciones y Pruebas In-Situ (Personal Autorizado)</h3>
+<p>Esta funcionalidad está disponible únicamente para cuentas con rol <strong><code>field_investigator</code></strong>, <strong><code>investigator</code></strong>, <strong><code>admin</code></strong> o <strong><code>maintenance</code></strong>.</p>
+<h4 id="como-activar-el-modo-gira-de-campo">Cómo Activar el Modo Gira de Campo</h4>
+<ol>
+<li>Vaya a la pestaña <strong>Cuenta</strong> (<code>AccountScreen</code>).</li>
+<li>En la sección <strong>Configuración</strong>, active el interruptor <strong>Modo Gira de Campo</strong>.</li>
+<li>Observará que la tercera pestaña de la barra inferior cambia de <strong>Solicitudes</strong> a <strong>Giras</strong>.</li>
+</ol>
+<h4 id="flujo-de-trabajo-en-una-gira-de-campo">Flujo de Trabajo en una Gira de Campo</h4>
+<ol>
+<li>Abra la pestaña <strong>Giras</strong> (<code>FieldTripScreen</code>) y alterne entre <strong>Generales</strong> y <strong>Asignadas</strong> para localizar su expedición activa.</li>
+<li>Toque una gira para abrir <strong><code>FieldTripDetailsScreen</code></strong>, donde podrá consultar fechas de inicio/fin, ubicación SNIT, organizador, lista de participantes y manifestaciones geotérmicas vinculadas (además de exportar el resumen de la gira en <strong>PDF</strong>).</li>
+<li><strong>Registrar una Nueva Geomanifestación en Campo (<code>GeomanifestationFormScreen</code>):</strong>
+   - Desde el detalle de la gira, agregue una nueva geomanifestación indicando nombre, descripción, visibilidad pública (<code>Visible públicamente</code> u <code>Oculto / Privado</code>), provincia/cantón/distrito y presionando <strong>Obtener Ubicación GPS</strong>.
+   - Toque <strong>Guardar Geomanifestación</strong>.</li>
+<li><strong>Registrar una Prueba In-Situ (<code>InSituFormScreen</code>):</strong>
+   - Entre al detalle de la geomanifestación recién creada o existente (<code>GeomanifestationDetailsScreen</code>) y agregue una prueba de campo.
+   - Ingrese el <strong>Nombre de la prueba</strong>, <strong>Descripción y Notas</strong>, <strong>Temperatura (°C)</strong>, <strong>pH</strong> y <strong>Conductividad (µS/cm)</strong>.
+   - Toque <strong>Guardar Prueba de Campo</strong> para enviarla al sistema.</li>
+</ol>
+<div class="gallery-table-wrap"><table>
+<thead>
+<tr>
+<th style="text-align: center;">Modo Gira en Cuenta</th>
+<th style="text-align: center;">Lista y Detalle de Giras</th>
+<th style="text-align: center;">Formulario Prueba In-Situ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><figure class="screenshot-figure">
+  <img src="img_manual/mobile_modo_gira.png" alt="Modo Gira de Campo en Cuenta" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+  <div class="mobile-placeholder" style="display:flex;">
+    <div class="ph-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      </svg>
+    </div>
+    <div class="ph-badge">CAPTURA MÓVIL PENDIENTE</div>
+    <div class="ph-title">Modo Gira de Campo en Cuenta</div>
+    <div class="ph-file">Archivo esperado: <code>img_manual/mobile_modo_gira.png</code></div>
+  </div>
+  <figcaption>Modo Gira de Campo en Cuenta</figcaption>
+</figure></td>
+<td style="text-align: center;"><figure class="screenshot-figure">
+  <img src="img_manual/mobile_gira_detalle.png" alt="Detalle de Gira de Campo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+  <div class="mobile-placeholder" style="display:flex;">
+    <div class="ph-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      </svg>
+    </div>
+    <div class="ph-badge">CAPTURA MÓVIL PENDIENTE</div>
+    <div class="ph-title">Detalle de Gira de Campo</div>
+    <div class="ph-file">Archivo esperado: <code>img_manual/mobile_gira_detalle.png</code></div>
+  </div>
+  <figcaption>Detalle de Gira de Campo</figcaption>
+</figure></td>
+<td style="text-align: center;"><figure class="screenshot-figure">
+  <img src="img_manual/mobile_insitu_form.png" alt="Formulario Prueba In-Situ Móvil" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+  <div class="mobile-placeholder" style="display:flex;">
+    <div class="ph-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      </svg>
+    </div>
+    <div class="ph-badge">CAPTURA MÓVIL PENDIENTE</div>
+    <div class="ph-title">Formulario Prueba In-Situ Móvil</div>
+    <div class="ph-file">Archivo esperado: <code>img_manual/mobile_insitu_form.png</code></div>
+  </div>
+  <figcaption>Formulario Prueba In-Situ Móvil</figcaption>
+</figure></td>
+</tr>
+</tbody>
+</table></div>
+<div class="capture-callout"><p><strong>[CAPTURA REQUERIDA] (<code>mobile_modo_gira.png</code>):</strong> Pestaña <code>Cuenta</code> (<code>AccountScreen</code>) con un usuario investigador/admin donde se vea el toggle <strong>Modo Gira de Campo</strong> activado y la tercera pestaña inferior cambiada a <strong>Giras</strong>.<br />
+<strong>[CAPTURA REQUERIDA] (<code>mobile_gira_detalle.png</code>):</strong> Pantalla <code>FieldTripDetailsScreen</code> mostrando fechas, ubicación, participantes y tarjetas de manifestaciones geotérmicas asociadas.<br />
+<strong>[CAPTURA REQUERIDA] (<code>mobile_insitu_form.png</code>):</strong> Pantalla <code>InSituFormScreen</code> mostrando los campos "Nombre de la prueba", "Temperatura (°C)", "pH", "Conductividad (µS/cm)" y botón "Guardar Prueba de Campo".</p></div>
+<hr />
+<h3 id="4-7-operacion-en-campo-conectividad-y-sincronizacion">4.7 Operación en Campo, Conectividad y Sincronización</h3>
+<p>Comprender cómo gestiona la App Móvil los datos locales y la conexión con el servidor es fundamental durante expediciones en zonas volcánicas remotas:</p>
+<ul>
+<li><strong>Persistencia Local Automática:</strong> La aplicación conserva localmente en el dispositivo sus credenciales de sesión (<em>tokens</em> de acceso y renovación), la preferencia de tema (<strong>Modo Oscuro / Claro</strong>), el estado del <strong>Modo Gira de Campo</strong> y todos los <strong>reportes PDF</strong> generados, por lo que estos archivos pueden consultarse y compartirse sin conexión.</li>
+<li><strong>Sincronización en Línea con la API Central:</strong> El envío de nuevas solicitudes, el registro de geomanifestaciones en gira, las pruebas <em>In-Situ</em> y la descarga de marcadores actualizados del mapa se comunican directamente con el servidor central de GeoterRA al presionar <strong>Enviar</strong> o <strong>Guardar</strong>.</li>
+<li><strong>Recomendación en Zonas sin Cobertura Celular:</strong>
+  1. Mantenga el <strong>GPS del dispositivo activo</strong> (el sensor satelital GPS funciona sin internet).
+  2. Tome fotografías del sitio con la cámara del dispositivo asegurándose de tener <strong>etiquetado de ubicación (EXIF)</strong> activado en la app de Cámara, o mantenga el formulario abierto con las coordenadas capturadas.
+  3. Una vez recupere cobertura de datos móviles o Wi-Fi, presione <strong>Enviar Solicitud</strong> / <strong>Guardar</strong> para completar la sincronización con la base de datos central.</li>
+</ul>
+<hr />
+<h3 id="4-8-configuracion-de-cuenta-y-tema-oscuro">4.8 Configuración de Cuenta y Tema Oscuro</h3>
+<p>Desde la pestaña <strong>Cuenta</strong> (<code>AccountScreen</code>) podrá:</p>
+<ol>
+<li>Visualizar su tarjeta de perfil, <strong>Rol asignado</strong> y datos de contacto.</li>
+<li>Activar o desactivar el <strong>Modo Oscuro</strong> (útil para reducir fatiga visual o ahorrar batería en pantalla OLED durante trabajo nocturno o en campo).</li>
+<li>Tocar <strong>Editar información personal</strong> para actualizar nombre, apellidos, correo o teléfono.</li>
+<li>Tocar <strong>Cambiar contraseña</strong> para renovar su clave de acceso.</li>
+<li>Tocar <strong>Cerrar sesión</strong> y confirmar en el diálogo para finalizar la sesión de forma segura.</li>
+</ol>
+<figure class="screenshot-figure">
+  <img src="img_manual/mobile_cuenta.png" alt="Pantalla de Cuenta y Configuración en App Móvil" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+  <div class="mobile-placeholder" style="display:flex;">
+    <div class="ph-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#12467E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      </svg>
+    </div>
+    <div class="ph-badge">CAPTURA MÓVIL PENDIENTE</div>
+    <div class="ph-title">Pantalla de Cuenta y Configuración en App Móvil</div>
+    <div class="ph-file">Archivo esperado: <code>img_manual/mobile_cuenta.png</code></div>
+  </div>
+  <figcaption>Pantalla de Cuenta y Configuración en App Móvil</figcaption>
+</figure>
+<div class="capture-callout"><p><strong>[CAPTURA REQUERIDA]:</strong> Mostrar la pestaña <code>Cuenta</code> (<code>AccountScreen</code>) completa con el encabezado de perfil, insignia de rol, sección de contacto, toggle de tema y opciones de edición/cierre de sesión.</p></div>
+<h2 class="chapter-break" id="5-solucion-de-problemas-frecuentes-faq-y-soporte">5. Solución de Problemas Frecuentes (FAQ) y Soporte</h2>
+<h3 id="5-1-problemas-comunes-y-soluciones">5.1 Problemas Comunes y Soluciones</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Problema Detectado</th>
+<th style="text-align: left;">Causa Probable</th>
+<th style="text-align: left;">Solución Recomendada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>El mapa no muestra mi ubicación o el botón GPS falla</strong></td>
+<td style="text-align: left;">Permiso de ubicación denegado en el navegador/teléfono, o GPS del dispositivo apagado.</td>
+<td style="text-align: left;"><strong>Web:</strong> Haga clic en el ícono del candado junto a la URL y permita <strong>Ubicación</strong>. <strong>Móvil:</strong> Vaya a <em>Ajustes → Aplicaciones → GeoterRA → Permisos</em> y active <strong>Ubicación precisa</strong>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Envié una solicitud, pero no aparece en el mapa público</strong></td>
+<td style="text-align: left;">Comportamiento esperado del flujo de validación científica.</td>
+<td style="text-align: left;">Toda solicitud inicia como <strong>Pendiente</strong>. Solo aparece en el mapa público cuando un investigador la acepta, realiza las pruebas correspondientes, consolida un <strong>GeoReporte vigente</strong> y activa la <strong>Visibilidad Pública</strong>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>El código de recuperación (OTP) indica que expiró</strong></td>
+<td style="text-align: left;">El código OTP de 6 dígitos tiene una vigencia estricta de <strong>5 minutos (300 segundos)</strong>.</td>
+<td style="text-align: left;">Solicite un nuevo código desde <strong>¿Olvidaste tu contraseña?</strong> e ingréselo inmediatamente tras recibirlo. Revise también la carpeta de <em>Spam</em>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Error "Contraseña débil" al registrarse o cambiar clave</strong></td>
+<td style="text-align: left;">La contraseña no cumple con la política de complejidad del sistema.</td>
+<td style="text-align: left;">Asegúrese de usar entre <strong>8 y 64 caracteres</strong>, incluyendo al menos <strong>1 mayúscula, 1 minúscula, 1 número y 1 símbolo</strong> (ej. <code>!@#$</code>), y sin incluir su correo.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>La sesión se cierra o muestra error 401 tras estar inactivo</strong></td>
+<td style="text-align: left;">El token de acceso expira cada 5 minutos y el token de actualización pudo haber vencido o las cookies fueron bloqueadas.</td>
+<td style="text-align: left;">Verifique que su navegador no bloquee cookies de sesión (<code>HttpOnly</code>) o vuelva a iniciar sesión normalmente en <code>/Login</code> o en la App Móvil.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>No se ven los Diagramas de Lindal o Piper en la ficha técnica</strong></td>
+<td style="text-align: left;">Faltan mediciones válidas (temperatura = 0°C o ausencia de análisis químico <em>In-Lab</em>).</td>
+<td style="text-align: left;">GeoterRA oculta automáticamente estos diagramas cuando no hay datos válidos (por ejemplo, fumarolas secas sin muestra líquida) para evitar interpretaciones erróneas.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Las capas del SNIT (Límites Provinciales/Cantonales) no cargan</strong></td>
+<td style="text-align: left;">Intermitencia temporal del servicio externo WMS del IGN (<code>geos.snitcr.go.cr</code>) o falta de conexión.</td>
+<td style="text-align: left;">Desmarque y vuelva a marcar la capa en el panel <strong>Capas y Filtros</strong>, o espere unos minutos mientras se restablece el servicio WMS externo.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>En Android no me deja instalar el archivo <code>geoterraApp.apk</code></strong></td>
+<td style="text-align: left;">Bloqueo de seguridad para instalaciones fuera de Google Play Store.</td>
+<td style="text-align: left;">En Android, habilite <strong>Instalar aplicaciones desconocidas</strong> para su navegador o gestor de archivos cuando el sistema lo solicite.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>No veo la pestaña "Giras" ni "Pruebas de Laboratorio"</strong></td>
+<td style="text-align: left;">Su rol actual no posee esos permisos.</td>
+<td style="text-align: left;">Solo <code>admin</code>, <code>investigator</code>, <code>field_investigator</code> y <code>maintenance</code> ven <strong>Giras de Campo</strong> (y en móvil deben activar <em>Modo Gira de Campo</em> en <em>Cuenta</em>). Las <strong>Pruebas de Laboratorio</strong> son exclusivas de <code>admin</code> e <code>investigator</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Error al exportar o abrir PDF en la App Móvil</strong></td>
+<td style="text-align: left;">Permiso de almacenamiento pendiente o ausencia de visor PDF instalado.</td>
+<td style="text-align: left;">Verifique que tenga una aplicación lectora de PDF instalada en su teléfono y acepte los permisos de archivos si su dispositivo usa Android 9 o inferior.</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h3 id="5-2-canales-oficiales-de-soporte-tecnico">5.2 Canales Oficiales de Soporte Técnico</h3>
+<p>Si el problema persiste o requiere asignación de rol institucional, comuníquese con el equipo responsable del <strong>Instituto de Investigaciones en Ingeniería (INII) — Universidad de Costa Rica</strong>:</p>
+<ul>
+<li><strong>Correo de Soporte GeoterRA:</strong> <code>geoterra.inii.ucr@gmail.com</code></li>
+<li><strong>Correo Institucional INII:</strong> <code>inii@ucr.ac.cr</code></li>
+<li><strong>Teléfonos:</strong> <code>(506) 2511-6641</code> / <code>(506) 2511-6642</code></li>
+<li><strong>Fax:</strong> <code>(506) 2224-2619</code> | <strong>Apdo. Postal:</strong> <code>3620-60</code></li>
+<li><strong>Dirección:</strong> Ciudad Universitaria Rodrigo Facio, San Pedro, Montes de Oca, San José, Costa Rica.</li>
+</ul>
+<hr />
+<p><em>Manual de Usuario GeoterRA — Universidad de Costa Rica • Instituto de Investigaciones en Ingeniería (INII)</em></p>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'base',
+        themeVariables: {
+          primaryColor: '#eff6ff',
+          primaryTextColor: '#0f172a',
+          primaryBorderColor: '#12467E',
+          lineColor: '#12467E',
+          secondaryColor: '#fff7ed',
+          tertiaryColor: '#f8fafc',
+          fontFamily: 'Poppins, sans-serif',
+          fontSize: '13px'
+        }
+      });
+    }
+  </script>
+</body>
+</html>

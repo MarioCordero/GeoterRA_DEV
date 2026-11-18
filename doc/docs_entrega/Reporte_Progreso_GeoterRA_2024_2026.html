@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Informe Ejecutivo y Técnico del Progreso de GeoterRA (2024–2026) | UCR - INII</title>
+  <style>
+    @font-face {
+      font-family: 'Poppins';
+      src: url('../GeoterRA_DEV/website/src/assets/fonts/Poppins/Poppins-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Poppins';
+      src: url('../GeoterRA_DEV/website/src/assets/fonts/Poppins/Poppins-SemiBold.ttf') format('truetype');
+      font-weight: 600;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Poppins';
+      src: url('../GeoterRA_DEV/website/src/assets/fonts/Poppins/Poppins-Bold.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'League Spartan';
+      src: url('../GeoterRA_DEV/website/src/assets/fonts/League_Spartan/static/LeagueSpartan-Bold.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    :root {
+      --geoterra-blue: #12467E;
+      --geoterra-blue-bright: #084F9D;
+      --geoterra-blue-soft: #eff6ff;
+      --geoterra-blue-border: #bfdbfe;
+      --geoterra-orange: #F39C29;
+      --geoterra-orange-dark: #ea580c;
+      --geoterra-orange-soft: #fff7ed;
+      --geoterra-orange-border: #fed7aa;
+      --bg-canvas: #f8fafc;
+      --bg-card: #ffffff;
+      --border-subtle: #e2e8f0;
+      --text-main: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      font-family: 'Poppins', 'DejaVu Sans', system-ui, sans-serif;
+      font-size: 13.5px;
+      line-height: 1.65;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .page-container {
+      max-width: 1080px;
+      margin: 24px auto;
+      padding: 0 20px 40px;
+    }
+
+    /* Institutional Header Card (Flat, zero gradients, SkillWebDesignGeoterRA.md) */
+    .report-header {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-top: 6px solid var(--geoterra-blue);
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 18px;
+      margin-bottom: 18px;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-brand img {
+      height: 52px;
+      width: auto;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--geoterra-orange-dark);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .report-title {
+      font-family: 'League Spartan', 'Poppins', sans-serif;
+      font-size: 27px;
+      font-weight: 700;
+      color: var(--geoterra-blue);
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .report-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin: 6px 0 0;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .meta-item {
+      background-color: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 10px 14px;
+    }
+
+    .meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .meta-value {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--geoterra-blue);
+      margin-top: 2px;
+      display: block;
+    }
+
+    /* KPI Summary Cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 16px 18px;
+    }
+
+    .kpi-card.solid-blue {
+      background: var(--geoterra-blue);
+      border-color: #0d3460;
+      color: #ffffff;
+    }
+
+    .kpi-card .kpi-num {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 4px 0 2px;
+    }
+
+    .kpi-card.solid-blue .kpi-num {
+      color: #ffffff;
+    }
+
+    .kpi-card .kpi-desc {
+      font-size: 11px;
+      color: var(--geoterra-blue-bright);
+      font-weight: 600;
+    }
+
+    .kpi-card.solid-blue .kpi-desc {
+      color: var(--geoterra-orange);
+    }
+
+    /* Main Document Card */
+    .doc-body {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 32px 36px;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+    }
+
+    h2 {
+      font-family: 'League Spartan', 'Poppins', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--geoterra-blue);
+      border-bottom: 2px solid var(--geoterra-blue-soft);
+      padding-bottom: 8px;
+      margin: 34px 0 14px;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    h2:first-child {
+      margin-top: 4px;
+    }
+
+    h3 {
+      font-size: 16.5px;
+      font-weight: 700;
+      color: var(--geoterra-blue-bright);
+      border-left: 4px solid var(--geoterra-orange);
+      padding-left: 12px;
+      margin: 26px 0 10px;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    h4 {
+      font-size: 13.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--geoterra-orange-dark);
+      margin: 18px 0 8px;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    p {
+      margin: 0 0 12px;
+      color: #1e293b;
+      text-align: justify;
+    }
+
+    ul, ol {
+      margin: 0 0 14px 20px;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 6px;
+      color: #1e293b;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11.5px;
+      background-color: var(--geoterra-blue-soft);
+      color: var(--geoterra-blue);
+      border: 1px solid var(--geoterra-blue-border);
+      padding: 1px 6px;
+      border-radius: 5px;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid var(--border-subtle);
+      margin: 28px 0;
+    }
+
+    /* Tables */
+    .table-wrap {
+      margin: 14px 0 20px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      background: #ffffff;
+    }
+
+    thead th {
+      background-color: var(--geoterra-blue);
+      color: #ffffff;
+      text-align: left;
+      padding: 10px 12px;
+      font-weight: 600;
+      font-size: 11.5px;
+      letter-spacing: 0.3px;
+    }
+
+    tbody td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: #334155;
+      vertical-align: top;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: var(--bg-canvas);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .table-thumb {
+      width: 100%;
+      max-width: 240px;
+      height: 145px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      display: block;
+      margin: 4px auto;
+    }
+
+    /* Figures & Visual Evidence */
+    figure.evidence-box {
+      margin: 16px 0 22px;
+      padding: 14px;
+      background-color: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      text-align: center;
+    }
+
+    figure.evidence-box img {
+      max-width: 100%;
+      height: auto;
+      max-height: 430px;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      display: block;
+      margin: 0 auto;
+    }
+
+    figure.evidence-box figcaption {
+      margin-top: 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* Mermaid / Architecture Diagrams */
+    .mermaid-box {
+      margin: 18px 0 24px;
+      padding: 16px;
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+    }
+
+    .mermaid-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 13px;
+      color: var(--geoterra-blue);
+    }
+
+    .badge-orange {
+      display: inline-block;
+      background-color: var(--geoterra-orange-soft);
+      color: var(--geoterra-orange-dark);
+      border: 1px solid var(--geoterra-orange-border);
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    /* Callouts */
+    .callout {
+      background-color: var(--geoterra-orange-soft);
+      border: 1px solid var(--geoterra-orange-border);
+      border-left: 4px solid var(--geoterra-orange);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin: 14px 0 20px;
+      font-size: 12px;
+      color: #7c2d12;
+    }
+
+    .callout p {
+      margin: 0;
+      color: #7c2d12;
+    }
+
+    /* Footer */
+    .doc-footer {
+      margin-top: 24px;
+      padding: 16px 24px;
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .avoid-break, tr, figure, .table-wrap, .mermaid-box, .kpi-grid, .callout {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 15mm 13mm 17mm 13mm;
+      }
+
+      body {
+        background: #ffffff;
+        font-size: 11.5px;
+      }
+
+      .page-container {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      .report-header, .doc-body, .doc-footer {
+        box-shadow: none;
+        border-color: #cbd5e1;
+      }
+
+      .doc-body {
+        padding: 18px 22px;
+      }
+
+      figure.evidence-box img {
+        max-height: 320px;
+      }
+
+      h2, h3, h4 {
+        break-after: avoid;
+        page-break-after: avoid;
+      }
+
+      .avoid-break, figure, table, tr, .table-wrap, .mermaid-box, .kpi-grid, .callout {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <header class="report-header avoid-break">
+      <div class="header-top">
+        <div class="header-brand">
+          <img src="img_progreso/GeoterRA-Logo-Color.svg" alt="Logotipo Oficial GeoterRA" />
+          <div>
+            <span class="eyebrow">UNIVERSIDAD DE COSTA RICA • INSTITUTO DE INVESTIGACIONES EN INGENIERÍA (INII)</span>
+            <h1 class="report-title">Informe Ejecutivo y Técnico del Progreso de Desarrollo de GeoterRA</h1>
+            <p class="report-subtitle">Auditoría Histórica Multirrama por Semestres Académicos UCR (Abril 2024 – Noviembre 2026)</p>
+          </div>
+        </div>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-item">
+          <span class="meta-label">Período Evaluado</span>
+          <span class="meta-value">06 Abr 2024 – 12 Nov 2026</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Alcance Académico</span>
+          <span class="meta-value">6 Semestres (I-24 a II-26)</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Repositorio Auditado</span>
+          <span class="meta-value">GeoterRA_DEV (Todas las ramas)</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Fecha de Emisión</span>
+          <span class="meta-value">18 de noviembre de 2026</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="kpi-grid avoid-break">
+      <div class="kpi-card">
+        <span class="meta-label">Commits Auditados</span>
+        <div class="kpi-num">1,657</div>
+        <span class="kpi-desc">Historial completo multirrama</span>
+      </div>
+      <div class="kpi-card">
+        <span class="meta-label">Arquitectura API REST</span>
+        <div class="kpi-num">87 Rutas</div>
+        <span class="kpi-desc">14 Controllers · 44 Suites PHPUnit</span>
+      </div>
+      <div class="kpi-card">
+        <span class="meta-label">Base de Datos MariaDB</span>
+        <div class="kpi-num">19 + 1 Vista</div>
+        <span class="kpi-desc">ULID CHAR(26) · 588 reg. SNIT</span>
+      </div>
+      <div class="kpi-card solid-blue">
+        <span class="meta-label" style="color:#bfdbfe;">Ecosistema Multiplataforma</span>
+        <div class="kpi-num">Web + KMP</div>
+        <span class="kpi-desc">React 18 · Android beta2 · iOS</span>
+      </div>
+    </section>
+
+    <main class="doc-body">
+      <h2>1. Resumen Ejecutivo</h2>
+<p>El proyecto <strong>GeoterRA</strong> surge en abril de 2024 en el seno de la <strong>Universidad de Costa Rica (UCR)</strong> y el <strong>Instituto de Investigaciones en Ingeniería (INII)</strong> con el objetivo estratégico de digitalizar, centralizar, validar científicamente y divulgar información sobre manifestaciones geotermales en el territorio costarricense. A lo largo de <strong>seis semestres académicos consecutivos (I-2024 a II-2026)</strong>, la iniciativa evolucionó desde un prototipo web estático en HTML/PHP acompañado de una aplicación Android experimental hasta consolidarse en una <strong>plataforma institucional de arquitectura limpia, multiplataforma (Web, Android e iOS), respaldada por pruebas unitarias automatizadas y flujos CI/CD de despliegue continuo</strong>.</p>
+<p>La auditoría forense ejecutada sobre el repositorio oficial <code>GeoterRA_DEV/</code> —abarcando la totalidad de sus ramas (<code>origin/main</code>, <code>origin/develop</code>, <code>origin/API</code>, <code>origin/web</code>, <code>origin/mobile</code>)— contabiliza <strong>1,657 commits</strong> entre el commit fundacional (<code>a905ad29</code>, <strong>6 de abril de 2024</strong>) y la sincronización más reciente de producción (<code>e6aa80dd</code>, <strong>12 de noviembre de 2026</strong>). Durante este ciclo de 31 meses, la plataforma pasó de ejecutar consultas SQL acopladas en scripts PHP procedurales a operar una API REST desacoplada en <strong>PHP &gt;= 8.1 / 8.5</strong> con <strong>87 rutas activas</strong>, <strong>28 DTOs</strong>, <strong>44 suites de pruebas unitarias PHPUnit</strong>, una base de datos <strong>MariaDB</strong> con <strong>19 tablas base + 1 vista SQL (<code>view_logs_entries</code>)</strong> indexada mediante <strong>ULID (<code>CHAR(26)</code>)</strong>, un cliente web en <strong>React 18 + Vite + Tailwind CSS + Ant Design + Leaflet</strong>, y una aplicación móvil nativa compartida mediante <strong>Kotlin Multiplatform (KMP) y Compose Multiplatform</strong> con artefactos compilados para Android (<code>geoterraApp-1.0.0-beta2.apk</code>) e iOS.</p>
+<h3>Tabla Resumen de Métricas Globales (Abril 2024 – Noviembre 2026)</h3>
+<div class="table-wrap avoid-break"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Indicador Global</th>
+<th style="text-align: left;">Cifra Verificada</th>
+<th style="text-align: left;">Fuente / Respaldo en Repositorio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Commits Totales (<code>git log --all</code>)</strong></td>
+<td style="text-align: left;"><strong>1,657 commits</strong></td>
+<td style="text-align: left;"><code>06/04/2024</code> (<code>a905ad29</code>) al <code>12/11/2026</code> (<code>e6aa80dd</code>)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Distribución por Ramas Remotas</strong></td>
+<td style="text-align: left;"><code>origin/web</code> (1,269) · <code>origin/API</code> (1,234) · <code>origin/develop</code> (1,202) · <code>origin/mobile</code> (1,198) · <code>origin/main</code> (854)</td>
+<td style="text-align: left;">Historial completo multirrama en <code>GeoterRA_DEV/.git</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Colaboradores y Automatización</strong></td>
+<td style="text-align: left;"><strong>Mario Cordero</strong> (826 manuales + 72 CI = 898) · <strong>Aarón Carmona Sánchez</strong> (493) · <strong>Christopher Acosta</strong> (70) · <strong>GitHub Actions Bot</strong> (196)</td>
+<td style="text-align: left;"><code>git log --all --format='%an|%ae'</code> consolidado por identidad</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Base de Datos Relacional</strong></td>
+<td style="text-align: left;"><strong>19 tablas</strong> + <strong>1 vista (<code>view_logs_entries</code>)</strong> · <strong>6 migraciones</strong> (<code>001</code>–<code>006</code>) · <strong>588 registros SNIT</strong> (8 prov., 85 cant., 495 dist.)</td>
+<td style="text-align: left;"><code>database/GeoterRA_schema.sql</code>, <code>migrations/</code>, <code>GeoterRA_catalogs.sql</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Backend API REST (PHP)</strong></td>
+<td style="text-align: left;"><strong>87 rutas activas</strong> en <strong>14 módulos</strong> · <strong>14 Controladores</strong> · <strong>17 Servicios</strong> · <strong>15 Repositorios</strong> · <strong>28 DTOs</strong></td>
+<td style="text-align: left;"><code>API/config/routes.php</code>, <code>API/src/</code>, <code>Doc API GeoterRA.md</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Cobertura de Pruebas (Backend)</strong></td>
+<td style="text-align: left;"><strong>44 archivos de pruebas unitarias PHPUnit</strong> (<code>DTO</code>, <code>Services</code>, <code>Platform/Web</code>, <code>Platform/Mobile</code>)</td>
+<td style="text-align: left;"><code>API/tests/Unit/</code> y <code>API/composer.json</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Frontend Web (React SPA)</strong></td>
+<td style="text-align: left;"><strong>5 páginas públicas/privadas</strong> · <strong>19 vistas de gestión en Dashboard</strong> · <strong>4 módulos cartográficos/científicos</strong></td>
+<td style="text-align: left;"><code>website/src/pages/</code>, <code>loggedComponents/views/</code>, <code>mapComponents/</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Aplicación Móvil (KMP)</strong></td>
+<td style="text-align: left;"><strong>18 pantallas Voyager</strong> (<code>Screen.kt</code>) · <strong>45 componentes UI Compose</strong> · <strong>2 releases APK</strong> (<code>beta1</code>, <code>beta2</code>)</td>
+<td style="text-align: left;"><code>Mobile/GeoterRa/geoterraApp/</code>, <code>Mobile/Releases/Android/</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Control de Acceso (RBAC)</strong></td>
+<td style="text-align: left;"><strong>5 roles institucionales</strong>: <code>admin</code>, <code>maintenance</code>, <code>field_investigator</code>, <code>investigator</code>, <code>user</code></td>
+<td style="text-align: left;"><code>API/src/DTO/AllowedUserRoles.php</code>, <code>database/GeoterRA_schema.sql</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3>Comportamiento Estadístico del Desarrollo (2024–2026)</h3>
+<p>La gráfica siguiente evidencia la aceleración exponencial de la cadencia de ingeniería: tras una fase fundacional y de consolidación estable entre I-2024 y I-2025 (107–114 commits/semestre), la adopción de flujos de CI/CD en II-2025 duplicó la cadencia (206 commits) y la reingeniería total de I-2026 alcanzó un máximo histórico de <strong>539 commits en el semestre lectivo</strong> (+ <strong>117 commits</strong> en el interciclo preparatorio de enero–febrero 2026 = <strong>656 commits</strong> en el bloque enero–julio), manteniendo <strong>467 commits</strong> de despliegue, estabilización y nuevas funcionalidades en II-2026.</p>
+<figure class="evidence-box avoid-break"><img src="img_progreso/commits_por_semestre.png" alt="Evolución Histórica de Commits por Semestre Académico UCR" /><figcaption>Evolución Histórica de Commits por Semestre Académico UCR</figcaption></figure>
+<p>De manera complementaria, el análisis de impacto directo por módulo demuestra cómo el foco de ingeniería transitó desde el prototipado visual web en 2024 hacia una arquitectura equilibrada y altamente activa en <strong>API/Backend (300 commits en Ene–Jul 2026 y 215 en Ago–Nov 2026)</strong>, <strong>Móvil KMP</strong>, <strong>Frontend React</strong> y <strong>Base de Datos / DevOps</strong>.</p>
+<figure class="evidence-box avoid-break"><img src="img_progreso/actividad_por_modulo.png" alt="Actividad de Desarrollo por Módulo Técnico y Semestre" /><figcaption>Actividad de Desarrollo por Módulo Técnico y Semestre</figcaption></figure>
+<hr />
+<h2>2. Evolución Semestral Detallada (I-2024 a II-2026)</h2>
+<h3>2.1 I Semestre 2024 (Abril – Julio 2024): Inicio del Proyecto, Arquitectura Base y Primeros Prototipos</h3>
+<h4>Objetivos y Enfoque del Período</h4>
+<p>El primer semestre marcó el nacimiento oficial del proyecto GeoterRA en la UCR. El propósito central fue validar la viabilidad técnica de capturar reportes ciudadanos e investigativos sobre puntos termales y representarlos sobre una cartografía digital interactiva de Costa Rica, sentando simultáneamente las bases de una aplicación móvil de campo en Android.</p>
+<h4>Hitos Técnicos Alcanzados</h4>
+<ul>
+<li><strong>Fundación del Repositorio y Estructura Inicial:</strong> Creación del repositorio el <strong>6 de abril de 2024</strong> (<code>a905ad29</code>, <em>"Initial commit"</em>), seguida del primer boceto de la página de aterrizaje (<code>33a6b107</code>, 09/04/2024) y la configuración inicial del proyecto Android nativo en Kotlin (<code>98032492</code>, 09/04/2024).</li>
+<li><strong>Backend/API y Base de Datos Temprana:</strong> Establecimiento de la primera conexión a base de datos relacional (<code>8605c9b5</code>, <code>45f05c21</code>, 13/04/2024), lógica inicial de autenticación/registro de usuarios (<code>14026e2d</code>, <code>443b21e5</code>), gestión de sesiones PHP (<code>234fab18</code>, 28/06/2024) y creación de los primeros scripts PHP para recepción de solicitudes de análisis (<code>d2850851</code>, <code>c34541db</code>, 15/07/2024).</li>
+<li><strong>Frontend Web Prototipo:</strong> Implementación de pantallas HTML/CSS/JS de inicio de sesión (<code>317ad111</code>), visualización de solicitudes (<code>313a1029</code>), diseño responsivo del visor inicial (<code>3b8a1ae0</code>, <code>dfaaa032</code>), control de capas por regiones geotérmicas en el mapa (<code>0dd003c7</code>, <code>05d06c33</code>, 22/06/2024) y el primer experimento visual del Diagrama de Piper (<code>fd191785</code>).</li>
+<li><strong>Aplicación Móvil (Android Nativo):</strong> Implementación de la navegación inferior (<code>c3c48c91</code>, <code>BottomNavigationMenu</code>), flujo de registro (<code>29105e5c</code>, <code>signUpFragment</code>) y creación de solicitudes de análisis desde el teléfono (<code>9c63e656</code>, <code>e3db097c</code>, 24/07/2024).</li>
+</ul>
+<h4>Tabla de Métricas — I Semestre 2024</h4>
+<div class="table-wrap avoid-break"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Métrica</th>
+<th style="text-align: left;">Valor Registrado</th>
+<th style="text-align: left;">Detalle Verificado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Commits Totales</strong></td>
+<td style="text-align: left;"><strong>114 commits</strong></td>
+<td style="text-align: left;">Abr: 24 · May: 37 · Jun: 25 · Jul: 28</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Autores Activos</strong></td>
+<td style="text-align: left;"><strong>3 desarrolladores</strong></td>
+<td style="text-align: left;">Aarón Sánchez / Svndda (48), Mario Cordero (36), Christopher Acosta (30)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Ramas Activas</strong></td>
+<td style="text-align: left;"><code>main</code>, <code>headerWeb</code>, <code>headerAndroid</code>, <code>testing</code></td>
+<td style="text-align: left;">24 merges registrados entre ramas de trabajo web y móvil</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Archivos Únicos Modificados</strong></td>
+<td style="text-align: left;"><strong>432 archivos</strong></td>
+<td style="text-align: left;">Impactos por módulo: <code>website</code> (51 commits), <code>Android</code> (29), <code>API</code> (6), <code>database</code> (2)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Componentes Clave Creados</strong></td>
+<td style="text-align: left;">Prototipo HTML/JS + PHP + Android</td>
+<td style="text-align: left;">Landing, login/registro, mapa por regiones, <code>BottomNavigationMenu</code>, formulario de solicitud</td>
+</tr>
+</tbody>
+</table></div>
+<h4>Evidencia Visual — I Semestre 2024</h4>
+<figure class="evidence-box avoid-break"><img src="img_progreso/sem1_prototipo_inicial_2024.png" alt="Prototipo Fundacional GeoterRA I-2024" /><figcaption>Prototipo Fundacional GeoterRA I-2024</figcaption></figure>
+<figure class="evidence-box avoid-break"><img src="img_progreso/evidencia_captura_historica_nota.png" alt="Evidencia Histórica del Prototipo Temprano" /><figcaption>Evidencia Histórica del Prototipo Temprano</figcaption></figure>
+<div class="callout avoid-break">
+<p><strong>Nota editorial sobre evidencia histórica (I-2024):</strong> En el espacio superior puede sustituirse <code>img_progreso/evidencia_captura_historica_nota.png</code> por una captura de pantalla original de archivo del primer prototipo HTML/PHP desplegado en abril–julio de 2024 o fotografías de las sesiones iniciales de diseño con el equipo investigador.</p>
+</div>
+<hr />
+<h3>2.2 II Semestre 2024 (Agosto – Diciembre 2024): Evolución del Backend, Identidad Visual y Primeras Vistas Funcionales</h3>
+<h4>Objetivos y Enfoque del Período</h4>
+<p>Superada la fase exploratoria, el II Semestre 2024 se enfocó en dotar al sistema de una identidad gráfica institucional coherente, asegurar el manejo de credenciales de base de datos, resolver la interoperabilidad geodésica oficial de Costa Rica y modernizar las primeras vistas funcionales del portal web y móvil.</p>
+<h4>Hitos Técnicos Alcanzados</h4>
+<ul>
+<li><strong>Identidad Institucional y Estandarización Tipográfica:</strong> Incorporación del <strong>Manual de Identidad GeoterRA 2024</strong> (<code>3d0ff8c1</code>, 26/08/2024) en el repositorio y adopción oficial de la paleta Azul GeoterRA / Naranja Geotérmico junto con las fuentes <strong>Poppins</strong> y <strong>League Spartan</strong> tanto en la web como en la aplicación Android (<code>65de914d</code>, <code>76aa78d1</code>, 05/11/2024).</li>
+<li><strong>Backend/API y Seguridad de Credenciales:</strong> Integración directa de los endpoints PHP en la aplicación web (<code>8026b1cd</code>, <code>72e79336</code>, 23/08/2024) y migración del manejo de credenciales hacia archivos <code>.config</code> desacoplados del código fuente (<code>4cd7b9fe</code>, <code>0e2d093b</code>, <code>cd877763</code>, 16/10/2024).</li>
+<li><strong>Frontend Web y Adopción de Tailwind CSS:</strong> Rediseño completo de la vista autenticada <code>logged.html</code> y del detalle de puntos <code>show-point</code> (<code>30255a24</code>, <code>f7b27cc6</code>, <code>4ac1e4b2</code>), incorporación de <strong>Tailwind CSS</strong> (<code>91ce7915</code>, <code>f593edf0</code>, 09/11/2024) y generalización de cabeceras y pies de página dinámicos en <code>.php</code> (<code>a8fd19e8</code>, 10/11/2024).</li>
+<li><strong>Aplicación Móvil y Geodesia CRTM05:</strong> Refactorización de gestión asíncrona IO mediante <code>Lifecycle</code> (<code>a378a3d8</code>), implementación de la función de conversión geodésica <strong>CRTM05 a WGS84</strong> en <code>RequestSheet</code> para compatibilidad con datos oficiales del SNIT (<code>4d3253d7</code>, 16/10/2024), sincronización de campos API (<code>45e6ddb5</code>) y consulta de perfil <code>userInformation</code> (<code>13bdb866</code>, 20/11/2024).</li>
+</ul>
+<h4>Tabla de Métricas — II Semestre 2024</h4>
+<div class="table-wrap avoid-break"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Métrica</th>
+<th style="text-align: left;">Valor Registrado</th>
+<th style="text-align: left;">Detalle Verificado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Commits Totales</strong></td>
+<td style="text-align: left;"><strong>107 commits</strong></td>
+<td style="text-align: left;">Ago: 20 · Sep: 43 · Oct: 18 · Nov: 26</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Autores Activos</strong></td>
+<td style="text-align: left;"><strong>3 desarrolladores</strong></td>
+<td style="text-align: left;">Aarón Sánchez / Svndda (41), Mario Cordero (41), Christopher Acosta (25)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Ramas Activas</strong></td>
+<td style="text-align: left;"><code>main</code>, <code>headerWeb</code>, <code>headerAndroid</code>, <code>testing</code></td>
+<td style="text-align: left;">16 merges consolidados hacia <code>testing</code> y <code>main</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Archivos Únicos Modificados</strong></td>
+<td style="text-align: left;"><strong>13,500 archivos</strong></td>
+<td style="text-align: left;">Incluye integración de dependencias frontend (<code>Tailwind</code>) · Commits: Web (48), Mobile (36), API (14), DB (2)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Componentes Clave Creados</strong></td>
+<td style="text-align: left;">Manual Identidad 2024, <code>.config</code>, CRTM05–WGS84</td>
+<td style="text-align: left;">Plantillas PHP compartidas, vistas <code>logged</code>/<code>show-point</code>, <code>userInformation</code> en Android</td>
+</tr>
+</tbody>
+</table></div>
+<h4>Evidencia Visual — II Semestre 2024</h4>
+<figure class="evidence-box avoid-break"><img src="img_progreso/sem2_identidad_conversion_crtm05.png" alt="Identidad Visual 2024 y Conversión CRTM05 en II-2024" /><figcaption>Identidad Visual 2024 y Conversión CRTM05 en II-2024</figcaption></figure>
+<hr />
+<h3>2.3 I Semestre 2025 (Marzo – Julio 2025): Consolidación de Módulos Core, Migración a React y Primera Beta</h3>
+<h4>Objetivos y Enfoque del Período</h4>
+<p>El I Semestre 2025 representó el punto de inflexión tecnológica del frontend web. Se abandonó la manipulación directa del DOM sobre páginas HTML/PHP monolíticas para migrar la experiencia completa hacia una aplicación SPA moderna basada en <strong>React + Vite + Tailwind CSS + Ant Design</strong>, culminando con el lanzamiento de la <strong>Primera Beta funcional</strong> del ecosistema GeoterRA.</p>
+<h4>Hitos Técnicos Alcanzados</h4>
+<ul>
+<li><strong>Migración Web a React 18, Vite y Ant Design:</strong> Configuración del entorno React sobre la plataforma (<code>e25081be</code>, <code>74df41a9</code>, <code>f63f17bd</code>, abril 2025), integración de la librería empresarial <strong>Ant Design</strong> (<code>2ae939bd</code>, 19/05/2025) y desarrollo de los módulos informativos institucionales <code>About-us</code>, <code>How Works</code> y <code>Contact Us</code> (<code>749e2c6e</code>, <code>d8e6551e</code>, <code>31240d9d</code>).</li>
+<li><strong>Consolidación de Roles y Sesiones en Web y API:</strong> Implementación de un nuevo protocolo de comunicación API y manejo de sesiones activas (<code>585c84b0</code> a <code>3a2f1bd6</code>, 03/07/2025), incorporación de control de <strong>roles en la plataforma web</strong>, encabezados de sesión activa y barras laterales (<code>Sidebar</code>) adaptadas por rol (<code>b565d2f3</code>, 10/07/2025).</li>
+<li><strong>Aplicación Móvil (Estabilización y ViewBinding):</strong> Refactorización de clases y paquetes para alinear la interfaz con el prototipo de Figma (<code>c3290a2c</code>, <code>57a14f84</code>), adopción de <code>ViewBinding</code> y abstracción de lógica en <code>PageFragment</code> (<code>d1fc05bc</code>, <code>2b00be1d</code>), manejo formal de permisos de galería y almacenamiento (<code>b05b29d3</code>, <code>509b2807</code>), y corrección del mapeo latitud/longitud en <code>ThermalPoint</code> (<code>228e0e5a</code>, 03/07/2025).</li>
+<li><strong>Base de Datos y Primera Versión Beta:</strong> Generación del respaldo estructurado de la base de datos (<code>7622165b</code>, 11/07/2025) y liberación del hito <strong>Primera BETA de la aplicación</strong> con todas las funcionalidades mínimas operativas en etapa de pruebas (<code>bb15fd93</code>, 11/07/2025).</li>
+</ul>
+<h4>Tabla de Métricas — I Semestre 2025</h4>
+<div class="table-wrap avoid-break"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Métrica</th>
+<th style="text-align: left;">Valor Registrado</th>
+<th style="text-align: left;">Detalle Verificado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Commits Totales</strong></td>
+<td style="text-align: left;"><strong>107 commits</strong></td>
+<td style="text-align: left;">Mar: 1 · Abr: 8 · May: 35 · Jun: 33 · Jul: 30</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Autores Activos</strong></td>
+<td style="text-align: left;"><strong>3 desarrolladores</strong></td>
+<td style="text-align: left;">Aarón Sánchez / Svndda (48), Mario Cordero (46), Christopher Acosta (13)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Ramas Activas</strong></td>
+<td style="text-align: left;"><code>main</code>, <code>headerWeb</code>, <code>Features</code>, <code>testing</code></td>
+<td style="text-align: left;">8 merges destacados (incl. PR #21 hacia rama principal)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Archivos Únicos Modificados</strong></td>
+<td style="text-align: left;"><strong>10,861 archivos</strong></td>
+<td style="text-align: left;">Commits por módulo: Web (46), Mobile (45), API (17), DB/DevOps (5)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Componentes Clave Creados</strong></td>
+<td style="text-align: left;">SPA React + Ant Design + Sidebar por Roles</td>
+<td style="text-align: left;"><code>ThermalPoint</code>, <code>ViewBinding</code>, protocolo sesiones API, Primera Beta (11/07/2025)</td>
+</tr>
+</tbody>
+</table></div>
+<h4>Evidencia Visual — I Semestre 2025</h4>
+<figure class="evidence-box avoid-break"><img src="img_progreso/sem3_migracion_react_mapa_beta.png" alt="Visor Cartográfico React y Primera Beta I-2025" /><figcaption>Visor Cartográfico React y Primera Beta I-2025</figcaption></figure>
+<hr />
+<h3>2.4 II Semestre 2025 (Agosto – Diciembre 2025): Arquitectura MVVM Móvil, Analítica Hidrogeoquímica y CI/CD</h3>
+<h4>Objetivos y Enfoque del Período</h4>
+<p>Con una versión Beta operativa, el II Semestre 2025 se dedicó a elevar el rigor científico de la visualización web —implementando gráficos especializados de geotermia e hidrogeoquímica—, reestructurar la aplicación móvil bajo el patrón <strong>MVVM</strong> libre de dependencias propietarias cerradas, y automatizar los despliegues mediante <strong>GitHub Actions</strong>.</p>
+<h4>Hitos Técnicos Alcanzados</h4>
+<ul>
+<li><strong>Módulo Científico Web (Diagrama de Piper y Lindal):</strong> Culminación de la implementación matemática y gráfica interactiva del <strong>Diagrama de Piper</strong> con proyecciones ternarias de cationes y aniones sobre el rombo hidrogeoquímico (<code>a1d1f89c</code> a <code>77544bf5</code>, PR #53 del 12/12/2025), complementado con la escala térmica del <strong>Diagrama de Lindal</strong> para clasificación de usos directos de energía geotérmica.</li>
+<li><strong>Refactorización MVVM en Móvil y Desacoplamiento GPS:</strong> Migración de las vistas Android al patrón <strong>MVVM</strong> (<code>PageViewModel.kt</code>, <code>6fb7ee55</code>, 16/08/2025), creación de observadores de ciclo de vida y <code>PermissionRequester.kt</code> (<code>92eb3ef1</code>, <code>6c9e9aec</code>), y eliminación de la dependencia propietaria <code>FusedLocation</code> de Google (<code>b40b04d3</code>, 16/08/2025) en favor de un <code>LocationCallbackListener.kt</code> nativo desacoplado.</li>
+<li><strong>Configuración Dinámica de Entornos y Automatización CI/CD:</strong> Implementación de <code>apiConf</code> en Web para conmutar ágilmente entre el servidor local de desarrollo y el servidor productivo del INII (<code>fe016481</code>, <code>7d3c998e</code>, 16/08/2025), refactorización de <code>RegisterForm</code> (PR #51) y <code>RequestSheet</code> (PR #52), y puesta en marcha de los primeros pipelines de despliegue automático en <code>.github/workflows/</code> (<code>8c38e60b</code>, <code>91f61919</code>).</li>
+</ul>
+<h4>Tabla de Métricas — II Semestre 2025</h4>
+<div class="table-wrap avoid-break"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Métrica</th>
+<th style="text-align: left;">Valor Registrado</th>
+<th style="text-align: left;">Detalle Verificado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Commits Totales</strong></td>
+<td style="text-align: left;"><strong>206 commits</strong></td>
+<td style="text-align: left;">Ago: 97 · Sep: 6 · Oct: 28 · Nov: 65 · Dic: 10</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Autores y Automatización</strong></td>
+<td style="text-align: left;"><strong>3 desarrolladores + CI</strong></td>
+<td style="text-align: left;">Mario Cordero (146 + 8 CI = 154), Aarón Sánchez (43), GitHub Actions (8), Chris4Fun (1)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Ramas Activas</strong></td>
+<td style="text-align: left;"><code>main</code>, <code>headerWeb</code>, <code>refractPiper</code>, <code>Refact-RequestSheet</code>, <code>refractRegisterForm</code></td>
+<td style="text-align: left;">10 merges (PRs #51, #52, #53) y flujos iniciales de CI</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Archivos Únicos Modificados</strong></td>
+<td style="text-align: left;"><strong>573 archivos</strong></td>
+<td style="text-align: left;">Commits por módulo: Web (100), DB/DevOps/CI (53), Mobile (44), API (11)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Componentes Clave Creados</strong></td>
+<td style="text-align: left;"><code>PiperDiagram.jsx</code>, <code>PageViewModel.kt</code>, CI/CD</td>
+<td style="text-align: left;">Configurador <code>apiConf</code>, <code>PermissionRequester.kt</code>, workflows GitHub Actions</td>
+</tr>
+</tbody>
+</table></div>
+<h4>Evidencia Visual — II Semestre 2025</h4>
+<figure class="evidence-box avoid-break"><img src="img_progreso/sem4_diagramas_piper_lindal.png" alt="Analítica Hidrogeoquímica Piper y Lindal con MVVM en II-2025" /><figcaption>Analítica Hidrogeoquímica Piper y Lindal con MVVM en II-2025</figcaption></figure>
+<hr />
+<h3>2.5 I Semestre 2026 (Enero – Julio 2026): Reingeniería de Arquitectura Limpia, KMP Multiplataforma y Calidad PHPUnit</h3>
+<h4>Objetivos y Enfoque del Período</h4>
+<p>Este período constituyó la transformación estructural más profunda en la historia de GeoterRA. Iniciado con un intenso <strong>interciclo preparatorio en enero y febrero de 2026 (117 commits)</strong> y consolidado durante el <strong>semestre lectivo marzo–julio de 2026 (539 commits)</strong> —totalizando <strong>656 commits en siete meses</strong>—, el equipo ejecutó una reingeniería completa de la API hacia una <strong>Arquitectura Limpia Orientada a Objetos</strong>, migró la app Android hacia <strong>Kotlin Multiplatform (KMP)</strong> con soporte simultáneo para <strong>Android e iOS</strong>, adoptó identificadores <strong>ULID</strong> en la base de datos e instauró pruebas unitarias automatizadas y portales de documentación técnica.</p>
+<h4>Hitos Técnicos Alcanzados</h4>
+<ul>
+<li><strong>Reingeniería Total del Backend/API en Capas (PHP 8.1+ / 8.5):</strong></li>
+<li>Relegación de los antiguos scripts procedurales a <code>API/legacy/</code> (29 archivos preservados para trazabilidad) e instauración de una arquitectura limpia en <code>API/src/</code>: <code>SimpleRouter.php</code>, <strong>14 Controladores</strong>, <strong>17 Servicios</strong>, <strong>15 Repositorios</strong>, <strong>28 DTOs</strong> con validación estricta en tiempo de instanciación, y manejo global de errores (<code>ApiException.php</code>, <code>ErrorType.php</code>, <code>GlobalErrorHandler.php</code>) bajo formato uniforme <code>{ data, meta, errors }</code>.</li>
+<li><strong>Seguridad Dual por Plataforma:</strong> Implementación de <code>X-API-Key</code> por plataforma (<code>web-secret-key</code>, <code>android-key</code>, <code>ios-key</code>), autenticación Web mediante <strong>cookies HTTP-only</strong> (<code>geoterra_session_token</code>), y autenticación Móvil mediante <strong>Bearer Access Token + Refresh Token Rotation</strong> con <code>family_id</code> para detección de reuso (<code>TokensRotationDTO.php</code>).</li>
+<li><strong>Base de Datos Relacional ULID y Catálogos SNIT:</strong></li>
+<li>Adopción de llaves primarias <strong>ULID (<code>CHAR(26)</code>)</strong> ordenables cronológicamente en todas las entidades principales mediante <code>UlidGenerator.php</code> (<code>symfony/uid</code>).</li>
+<li>Incorporación íntegra del catálogo territorial oficial de Costa Rica (<strong>SNIT</strong>): <strong>8 provincias</strong>, <strong>85 cantones</strong> y <strong>495 distritos</strong> (<code>GeoterRA_catalogs.sql</code>, PR #87 <code>d6fa1e16</code>), además del trigger SQL <code>prevent_double_use_before_insert</code> sobre <code>refresh_tokens</code>.</li>
+<li><strong>Expansión Multiplataforma con Kotlin Multiplatform (KMP):</strong></li>
+<li>Creación de <code>Mobile/GeoterRa/</code> con código compartido en <code>commonMain</code> y módulos específicos <code>androidMain</code> e <code>iosMain</code> (integración CocoaPods <code>0aa9d5a4</code>, soporte nativo de cámara, galería con metadatos <strong>EXIF</strong> <code>8a03c8f2</code> y localización GPS multiplataforma <code>fb12fdf2</code>), inyección de dependencias con <strong>Koin</strong>, red con <strong>Ktor</strong> y navegación reactiva con <strong>Voyager</strong>.</li>
+<li><strong>Pruebas Unitarias, Documentación y Dominio Institucional UCR:</strong></li>
+<li>Creación de <strong>44 suites de pruebas unitarias con PHPUnit 11 + Mockery + ParaTest</strong> cubriendo <code>DTO/</code>, <code>Services/</code> y <code>Platform/</code> (<code>65dbdc38</code>, <code>8bd88856</code>, <code>e84b79e1</code>), ejecutables tanto localmente como en GitHub Actions.</li>
+<li>Despliegue del sitio de documentación interactiva en <strong>Docusaurus</strong> (<code>docApiWebsite/</code>) y redacción de <code>Doc API GeoterRA.md</code> (<code>76e0a162</code>).</li>
+<li>Configuración del dominio institucional UCR con HTTPS (<code>fb364017</code>, <code>2c846632</code>) y trazabilidad de historial de estados en solicitudes (<code>725fb2c0</code>, <code>d9115a52</code>).</li>
+</ul>
+<h4>Tabla de Métricas — I Semestre 2026</h4>
+<div class="table-wrap avoid-break"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Métrica</th>
+<th style="text-align: left;">Valor Registrado</th>
+<th style="text-align: left;">Detalle Verificado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Commits Totales</strong></td>
+<td style="text-align: left;"><strong>539</strong> <em>(Mar–Jul)</em> + <strong>117</strong> <em>(Ene–Feb)</em> = <strong>656</strong></td>
+<td style="text-align: left;">Ene: 47 · Feb: 70 · Mar: 134 · Abr: 206 · May: 60 · Jun: 31 · Jul: 108</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Autores y CI</strong></td>
+<td style="text-align: left;"><strong>3 desarrolladores + CI</strong></td>
+<td style="text-align: left;">Bloque Ene–Jul: Mario Cordero (433), Aarón Carmona Sánchez (219), GitHub Actions (3), Chris4Fun (1)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Ramas Activas</strong></td>
+<td style="text-align: left;"><code>develop</code>, <code>main</code>, <code>API</code>, <code>web</code>, <code>mobile</code>, <code>refact-API-mario</code>, <code>refactor/api</code>, <code>fix-snitcode-params</code></td>
+<td style="text-align: left;">43 merges en Mar–Jul + 1 en Ene–Feb</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Archivos Únicos Modificados</strong></td>
+<td style="text-align: left;"><strong>54,138</strong> <em>(Mar–Jul)</em> + <strong>456</strong> <em>(Ene–Feb)</em></td>
+<td style="text-align: left;">Incluye portal <code>docApiWebsite</code> · Commits Ene–Jul: API (300), Web (138), Mobile (102), DB/CI (98)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Componentes Clave Creados</strong></td>
+<td style="text-align: left;">API Limpia PHP, KMP iOS/Android, 44 PHPUnit, Docusaurus</td>
+<td style="text-align: left;"><code>SimpleRouter</code>, <code>UlidGenerator</code>, <code>TokenManager</code>, <code>AllowedUserRoles</code>, <code>GeoterRA_schema.sql</code></td>
+</tr>
+</tbody>
+</table></div>
+<h4>Evidencia Visual — I Semestre 2026</h4>
+<figure class="evidence-box avoid-break"><img src="img_progreso/sem5_arquitectura_api_kmp_rbac.png" alt="Reingeniería API Limpia, KMP Multiplataforma y Pruebas PHPUnit I-2026" /><figcaption>Reingeniería API Limpia, KMP Multiplataforma y Pruebas PHPUnit I-2026</figcaption></figure>
+<hr />
+<h3>2.6 II Semestre 2026 (Agosto – Noviembre 2026): Producción, Giras de Campo, Cascada de Visibilidad y Releases</h3>
+<h4>Objetivos y Enfoque del Período</h4>
+<p>El segundo semestre de 2026 consolidó a GeoterRA como un sistema en producción estable para el INII y la comunidad científica costarricense. Se incorporaron módulos avanzados de planificación logística (<strong>Giras de Campo</strong>), colaboración científica (<strong>Comentarios Polimórficos</strong>), gobernanza de publicación (<strong>Promoción de Georeportes y Cascada de Visibilidad</strong>), comunicación automatizada (<strong>SMTP</strong>), estandarización total de interfaz (<code>SkillWebDesignGeoterRA.md</code>), exportación oficial en <strong>PDF</strong> y publicación de artefactos Android para distribución en campo.</p>
+<h4>Hitos Técnicos Alcanzados</h4>
+<ul>
+<li><strong>Migraciones Incrementales de Base de Datos (<code>003</code> a <code>006</code>) y Nuevos Módulos:</strong></li>
+<li><strong>Giras de Campo (<code>field_trips</code>, <code>field_trip_participants</code>):</strong> Gestión completa de expediciones científicas, asignación de investigadores mediante <code>UserSelectModal.jsx</code> con filtros por rol en español (<code>9b8c017e</code>) y vinculación directa con geomanifestaciones (<code>FieldTripsManager.jsx</code>, <code>FieldTripScreen.kt</code>).</li>
+<li><strong>Comentarios Polimórficos (<code>comments</code>):</strong> Sistema transversal de bitácora y observaciones asociado a <code>field_trip</code>, <code>request</code> o <code>geomanifestation</code> (<code>CommentsPanel.jsx</code>, <code>CommentController.php</code>).</li>
+<li><strong>Promoción y Cascada de Visibilidad (<code>004_add_visibility_to_georeports_and_tests.sql</code>):</strong> Endpoints <code>PATCH /admin/georeports/{id}/promote</code> y <code>PATCH /admin/geomanifestations/{id}/visibility</code> que propagan de manera coherente la publicación pública hacia el georeporte vigente, sus pruebas <em>in-situ</em> y sus análisis químicos de laboratorio (14 parámetros físico-químicos).</li>
+<li><strong>Nomenclatura Estandarizada (<code>006_add_name_to_tests_and_reports.sql</code>):</strong> Adición de nombres descriptivos <code>insitu_test_name</code>, <code>inlab_test_name</code> y <code>georeport_name</code> en pruebas y reportes.</li>
+<li><strong>Notificaciones Institucionales SMTP y Seguridad:</strong></li>
+<li>Integración de <code>SmtpEmailService.php</code> y <code>NotificationService.php</code> (PHPMailer) para recuperación de contraseñas con códigos OTP (<code>3ec568d8</code>), alertas de cambio de estado en solicitudes (<code>5e10111d</code>, <code>3d08665a</code>) y notificaciones de cuenta/perfil (<code>54372d87</code>).</li>
+<li>Refuerzo de cookies seguras <code>HttpOnly</code> y dominio en <code>AuthController</code> (<code>a5686cb5</code>, 12/11/2026).</li>
+<li><strong>Sistema de Diseño Institucional (<code>SkillWebDesignGeoterRA.md</code>) y Exportación PDF:</strong></li>
+<li>Adopción del patrón canónico <code>TerritoryManager</code> en todas las vistas CRUD web mediante <code>PillTabs.jsx</code>, <code>CrudToolbar.jsx</code>, <code>CodeBadge</code>, <code>NameCell</code> y <code>RowActions</code>, erradicando emojis y gradientes.</li>
+<li>Mejora del selector cartográfico <code>MapCoordinatePicker.jsx</code> con fallback automático de geolocalización GPS/red y validación estricta contra dimensiones cero en modales (<code>fee3069d</code>, <code>5963b899</code>).</li>
+<li><strong>Exportación Oficial en PDF:</strong> Generación de fichas hidrogeoquímicas imprimibles con encabezado UCR e iconos vectoriales en Web (<code>498b5c43</code>, 12/11/2026) y generación nativa multiplataforma de PDFs en Móvil (<code>b607a5bf</code>, <code>508099ba</code>, <code>pdfkmp</code>).</li>
+<li><strong>Distribución Móvil, Releases APK y Orquestación CI/CD:</strong></li>
+<li>Publicación de las versiones <strong>Android <code>1.0.0-beta1</code></strong> (07/11/2026) y <strong><code>1.0.0-beta2</code></strong> (11/11/2026, <code>4d537b05</code>) servidas directamente desde <code>AppController.php</code> (<code>/api/app/download-apk</code>, <code>/api/app/version</code>).</li>
+<li>Automatización integral mediante GitHub Actions (<code>185 commits</code> de sincronización de ramas especializadas <code>API</code>, <code>web</code>, <code>mobile</code> hacia <code>develop</code> y build productivo de <code>main</code>), respaldada por scripts de migración controlada (<code>SERVER.migrate.sh</code>, <code>DOCKER.migrate.sh</code>).</li>
+</ul>
+<h4>Tabla de Métricas — II Semestre 2026</h4>
+<div class="table-wrap avoid-break"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Métrica</th>
+<th style="text-align: left;">Valor Registrado</th>
+<th style="text-align: left;">Detalle Verificado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Commits Totales</strong></td>
+<td style="text-align: left;"><strong>467 commits</strong></td>
+<td style="text-align: left;">Ago: 117 · Sep: 63 · Oct: 155 · Nov: 132 <em>(al 12/11/2026)</em></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Autores y CI</strong></td>
+<td style="text-align: left;"><strong>2 desarrolladores + CI</strong></td>
+<td style="text-align: left;">Mario Cordero (180 + 8 CI = 188), Aarón Carmona Sánchez (94), <code>github-actions[bot]</code> (185)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Ramas Activas</strong></td>
+<td style="text-align: left;"><code>main</code>, <code>develop</code>, <code>API</code>, <code>web</code>, <code>mobile</code></td>
+<td style="text-align: left;">Flujo multirrama automatizado con sincronización hacia <code>develop</code> y <code>main</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Archivos Únicos Modificados</strong></td>
+<td style="text-align: left;"><strong>433 archivos</strong></td>
+<td style="text-align: left;">Commits por módulo: API (215), Web (104), DB/CI/Bash (103), Mobile (42)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Componentes Clave Creados</strong></td>
+<td style="text-align: left;">Migraciones <code>003</code>–<code>006</code>, Giras, Comentarios, Cascada, PDF, APK <code>beta2</code></td>
+<td style="text-align: left;"><code>FieldTripsManager</code>, <code>CommentsPanel</code>, <code>SmtpEmailService</code>, <code>AppController</code>, <code>UserSelectModal</code></td>
+</tr>
+</tbody>
+</table></div>
+<h4>Evidencia Visual — II Semestre 2026</h4>
+<figure class="evidence-box avoid-break"><img src="img_progreso/sem6_estandar_crud_giras_pdf.png" alt="Estándar CRUD TerritoryManager, Giras de Campo y Ficha PDF II-2026" /><figcaption>Estándar CRUD TerritoryManager, Giras de Campo y Ficha PDF II-2026</figcaption></figure>
+<figure class="evidence-box avoid-break"><img src="img_progreso/trabajo_campo_ucr.jpeg" alt="Levantamiento de Datos Geotérmicos en Campo - Equipo UCR" /><figcaption>Levantamiento de Datos Geotérmicos en Campo - Equipo UCR</figcaption></figure>
+<figure class="evidence-box avoid-break"><img src="img_progreso/evidencia_validacion_comunitaria_nota.png" alt="Evidencia de Validación Comunitaria e Institucional" /><figcaption>Evidencia de Validación Comunitaria e Institucional</figcaption></figure>
+<div class="callout avoid-break">
+<p><strong>Nota editorial sobre validación comunitaria e institucional (II-2026):</strong> Se incluye fotografía de referencia de trabajo de campo del repositorio (<code>trabajo_campo_ucr.jpeg</code>). En el marcador inferior (<code>img_progreso/evidencia_validacion_comunitaria_nota.png</code>) puede incorporarse la fotografía oficial de cierre o taller de validación comunitaria e institucional con actores locales e investigadores del INII-UCR.</p>
+</div>
+<hr />
+<h2>3. Evolución de la Arquitectura y Stack Tecnológico</h2>
+<h3>3.1 Comparativa Técnica: Inicio (Abril 2024) vs. Producción Actual (Noviembre 2026)</h3>
+<div class="table-wrap avoid-break"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Dimensión Técnica</th>
+<th style="text-align: left;">Arquitectura Inicial (Abril 2024)</th>
+<th style="text-align: left;">Arquitectura Actual en Producción (Noviembre 2026)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Backend API</strong></td>
+<td style="text-align: left;">Scripts PHP procedurales dispersos (<code>login.inc.php</code>, <code>request.inc.php</code>, <code>dbhandler.inc.php</code>) con SQL directo</td>
+<td style="text-align: left;">Arquitectura Limpia en Capas (PHP &gt;= 8.1 / 8.5): <code>SimpleRouter</code>, <strong>14 Controllers</strong>, <strong>17 Services</strong>, <strong>15 Repositories</strong>, <strong>28 DTOs</strong>, <code>GlobalErrorHandler</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Identificadores de BD</strong></td>
+<td style="text-align: left;">Llaves enteras autoincrementales (<code>AUTO_INCREMENT</code>) expuestas</td>
+<td style="text-align: left;">Identificadores <strong>ULID (<code>CHAR(26)</code>)</strong> generados con <code>symfony/uid</code>, no predecibles y ordenables cronológicamente</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Base de Datos y Migraciones</strong></td>
+<td style="text-align: left;">Esquema básico inicial sin versionamiento formal</td>
+<td style="text-align: left;"><strong>MariaDB</strong> (<code>GeoterRA_schema.sql</code>) con <strong>19 tablas + 1 vista SQL</strong>, <strong>6 migraciones idempotentes (<code>001</code>–<code>006</code>)</strong>, catálogos <strong>SNIT</strong> (588 registros) y trigger anti-reuso</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Autenticación y Seguridad</strong></td>
+<td style="text-align: left;">Sesiones PHP básicas en servidor (<code>$_SESSION</code>)</td>
+<td style="text-align: left;">Esquema dual validado por <code>X-API-Key</code>: <strong>Cookies HTTP-only</strong> (Web) y <strong>Bearer + Refresh Token Rotation con <code>family_id</code></strong> (Mobile), OTP SMTP y <strong>5 roles RBAC</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Frontend Web</strong></td>
+<td style="text-align: left;">Páginas estáticas HTML/CSS/JS y PHP con jQuery/DOM manual</td>
+<td style="text-align: left;"><strong>SPA React 18.3 + Vite 6.3 + Tailwind CSS 4.1 + Ant Design 5.27</strong>, <code>react-router-dom 7</code>, <code>Leaflet 1.9</code> y <code>Recharts 3.4</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Aplicación Móvil</strong></td>
+<td style="text-align: left;">Prototipo Android nativo básico en Kotlin con Fragments y <code>FusedLocation</code></td>
+<td style="text-align: left;"><strong>Kotlin Multiplatform (KMP 2.2.21) + Compose Multiplatform 1.7.1</strong> (<code>Android</code> + <code>iOS</code>), <strong>Koin 4.1</strong>, <strong>Ktor 3.0</strong>, <strong>Voyager 1.1</strong>, <code>MapLibre</code>, cámara EXIF y <strong>PDF nativo</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Analítica Geocientífica</strong></td>
+<td style="text-align: left;">Marcadores geográficos simples sin procesamiento químico</td>
+<td style="text-align: left;"><strong>Diagrama de Piper</strong> (facies ternarias), <strong>Diagrama de Lindal</strong>, conversión <strong>CRTM05–WGS84</strong> (<code>proj4php</code>), análisis <em>in-situ</em> y 14 parámetros de laboratorio</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Calidad y Documentación</strong></td>
+<td style="text-align: left;">Pruebas manuales ad-hoc sin cobertura ni documentación formal</td>
+<td style="text-align: left;"><strong>44 suites PHPUnit 11 + Mockery + ParaTest</strong>, Playwright configurado en web, portal <strong>Docusaurus</strong>, referencia <code>Doc API GeoterRA.md</code> y colección Postman</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Despliegue e Infraestructura</strong></td>
+<td style="text-align: left;">Subida manual de archivos y merges directos a <code>main</code></td>
+<td style="text-align: left;">Orquestación <strong>GitHub Actions CI/CD</strong> multirrama (<code>API</code>, <code>web</code>, <code>mobile</code> -&gt; <code>develop</code> -&gt; <code>main</code>), build automatizado Vite y scripts <code>SERVER.migrate.sh</code> / <code>DOCKER.migrate.sh</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3>3.2 Diagrama de Arquitectura Integral en Producción (Noviembre 2026)</h3>
+
+    <div class="mermaid-box avoid-break">
+      <div class="mermaid-header">
+        <span class="badge-orange">DIAGRAMA ARQUITECTÓNICO 1</span>
+        <strong>Diagrama de Arquitectura Integral en Producción (Noviembre 2026)</strong>
+      </div>
+      <div class="mermaid-svg-render">
+<svg viewBox="0 0 960 540" width="100%" xmlns="http://www.w3.org/2000/svg" style="font-family:'Poppins','DejaVu Sans',sans-serif;">
+  <rect width="960" height="540" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <!-- Group 1: Clients -->
+  <rect x="24" y="18" width="912" height="106" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="40" y="38" font-size="11" font-weight="700" fill="#ea580c">CAPA DE CLIENTES MULTIPLATAFORMA</text>
+  <rect x="40" y="50" width="280" height="60" rx="8" fill="#eff6ff" stroke="#12467E" stroke-width="1.5"/>
+  <text x="180" y="72" font-size="12" font-weight="700" text-anchor="middle" fill="#12467E">Cliente Web SPA (React 18 + Vite)</text>
+  <text x="180" y="92" font-size="10" text-anchor="middle" fill="#334155">AntD · Tailwind · Leaflet · Piper · Lindal · PDF</text>
+
+  <rect x="340" y="50" width="280" height="60" rx="8" fill="#eff6ff" stroke="#12467E" stroke-width="1.5"/>
+  <text x="480" y="72" font-size="12" font-weight="700" text-anchor="middle" fill="#12467E">App Móvil Android (KMP + Compose)</text>
+  <text x="480" y="92" font-size="10" text-anchor="middle" fill="#334155">APK v1.0.0-beta2 · Koin · Ktor · EXIF · GPS</text>
+
+  <rect x="640" y="50" width="280" height="60" rx="8" fill="#eff6ff" stroke="#12467E" stroke-width="1.5"/>
+  <text x="780" y="72" font-size="12" font-weight="700" text-anchor="middle" fill="#12467E">App Móvil iOS (KMP + CocoaPods)</text>
+  <text x="780" y="92" font-size="10" text-anchor="middle" fill="#334155">Shared Framework · Ktor Darwin · PdfManager iOS</text>
+
+  <!-- Arrows down -->
+  <line x1="180" y1="110" x2="180" y2="148" stroke="#12467E" stroke-width="1.8"/>
+  <polygon points="180,152 175,143 185,143" fill="#12467E"/>
+  <line x1="480" y1="110" x2="480" y2="148" stroke="#12467E" stroke-width="1.8"/>
+  <polygon points="480,152 475,143 485,143" fill="#12467E"/>
+  <line x1="780" y1="110" x2="780" y2="148" stroke="#12467E" stroke-width="1.8"/>
+  <polygon points="780,152 775,143 785,143" fill="#12467E"/>
+
+  <!-- Group 2: Security -->
+  <rect x="24" y="152" width="912" height="92" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="40" y="172" font-size="11" font-weight="700" fill="#ea580c">CAPA DE ENTRADA, ENRUTAMIENTO Y SEGURIDAD</text>
+  <rect x="40" y="182" width="460" height="48" rx="8" fill="#12467E"/>
+  <text x="270" y="203" font-size="11.5" font-weight="700" text-anchor="middle" fill="#ffffff">SimpleRouter.php + CORS + X-API-Key</text>
+  <text x="270" y="219" font-size="9.5" text-anchor="middle" fill="#dbeafe">Cookie HTTP-only (Web) | Bearer + Refresh Rotation (Mobile)</text>
+
+  <line x1="500" y1="206" x2="532" y2="206" stroke="#12467E" stroke-width="1.8"/>
+  <polygon points="536,206 527,201 527,211" fill="#12467E"/>
+
+  <rect x="536" y="182" width="384" height="48" rx="8" fill="#fff7ed" stroke="#F39C29" stroke-width="1.5"/>
+  <text x="728" y="203" font-size="11.5" font-weight="700" text-anchor="middle" fill="#c2410c">Control RBAC (5 Roles Institucionales)</text>
+  <text x="728" y="219" font-size="9.5" text-anchor="middle" fill="#7c2d12">admin · maintenance · field_investigator · investigator · user</text>
+
+  <!-- Arrow down -->
+  <line x1="480" y1="244" x2="480" y2="270" stroke="#12467E" stroke-width="1.8"/>
+  <polygon points="480,274 475,265 485,265" fill="#12467E"/>
+
+  <!-- Group 3: Backend Layers -->
+  <rect x="24" y="274" width="912" height="106" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="40" y="294" font-size="11" font-weight="700" fill="#ea580c">CAPA DE NEGOCIO Y DATOS (API PHP &gt;= 8.1 / 8.5)</text>
+
+  <rect x="40" y="306" width="215" height="58" rx="8" fill="#f1f5f9" stroke="#084F9D" stroke-width="1.4"/>
+  <text x="147" y="328" font-size="11" font-weight="700" text-anchor="middle" fill="#12467E">14 Controladores REST</text>
+  <text x="147" y="346" font-size="9.5" text-anchor="middle" fill="#475569">87 Rutas · JSON Uniforme</text>
+
+  <line x1="255" y1="335" x2="275" y2="335" stroke="#12467E" stroke-width="1.6"/>
+  <polygon points="279,335 271,330 271,340" fill="#12467E"/>
+
+  <rect x="279" y="306" width="205" height="58" rx="8" fill="#f1f5f9" stroke="#084F9D" stroke-width="1.4"/>
+  <text x="381" y="328" font-size="11" font-weight="700" text-anchor="middle" fill="#12467E">28 DTOs Tipados</text>
+  <text x="381" y="346" font-size="9.5" text-anchor="middle" fill="#475569">Validación + ULID (26 chars)</text>
+
+  <line x1="484" y1="335" x2="504" y2="335" stroke="#12467E" stroke-width="1.6"/>
+  <polygon points="508,335 500,330 500,340" fill="#12467E"/>
+
+  <rect x="508" y="306" width="215" height="58" rx="8" fill="#f1f5f9" stroke="#084F9D" stroke-width="1.4"/>
+  <text x="615" y="328" font-size="11" font-weight="700" text-anchor="middle" fill="#12467E">17 Servicios de Dominio</text>
+  <text x="615" y="346" font-size="9.5" text-anchor="middle" fill="#475569">Cascada · Proj4 · Notif.</text>
+
+  <line x1="723" y1="335" x2="743" y2="335" stroke="#12467E" stroke-width="1.6"/>
+  <polygon points="747,335 739,330 739,340" fill="#12467E"/>
+
+  <rect x="747" y="306" width="173" height="58" rx="8" fill="#f1f5f9" stroke="#084F9D" stroke-width="1.4"/>
+  <text x="833" y="328" font-size="11" font-weight="700" text-anchor="middle" fill="#12467E">15 Repositorios PDO</text>
+  <text x="833" y="346" font-size="9.5" text-anchor="middle" fill="#475569">Queries &amp; Transacciones</text>
+
+  <!-- Arrows to Infra -->
+  <line x1="200" y1="380" x2="200" y2="410" stroke="#12467E" stroke-width="1.8"/>
+  <polygon points="200,414 195,405 205,405" fill="#12467E"/>
+  <line x1="510" y1="380" x2="510" y2="410" stroke="#12467E" stroke-width="1.8"/>
+  <polygon points="510,414 505,405 515,405" fill="#12467E"/>
+  <line x1="800" y1="380" x2="800" y2="410" stroke="#475569" stroke-dasharray="4,3" stroke-width="1.8"/>
+  <polygon points="800,414 795,405 805,405" fill="#475569"/>
+
+  <!-- Group 4: Infra -->
+  <rect x="24" y="414" width="912" height="106" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="40" y="434" font-size="11" font-weight="700" fill="#ea580c">PERSISTENCIA, CORREO Y AUTOMATIZACIÓN CI/CD</text>
+
+  <rect x="40" y="446" width="310" height="60" rx="8" fill="#0f172a"/>
+  <text x="195" y="470" font-size="11.5" font-weight="700" text-anchor="middle" fill="#ffffff">MariaDB (19 Tablas + 1 Vista SQL)</text>
+  <text x="195" y="489" font-size="9.5" text-anchor="middle" fill="#cbd5e1">6 Migraciones · SNIT (588) · Trigger Anti-Reuso</text>
+
+  <rect x="370" y="446" width="265" height="60" rx="8" fill="#fff7ed" stroke="#F39C29" stroke-width="1.4"/>
+  <text x="502" y="470" font-size="11.5" font-weight="700" text-anchor="middle" fill="#c2410c">SmtpEmailService (PHPMailer)</text>
+  <text x="502" y="489" font-size="9.5" text-anchor="middle" fill="#7c2d12">OTP Contraseñas · Alertas de Solicitudes</text>
+
+  <rect x="655" y="446" width="265" height="60" rx="8" fill="#eff6ff" stroke="#12467E" stroke-width="1.4"/>
+  <text x="787" y="470" font-size="11.5" font-weight="700" text-anchor="middle" fill="#12467E">GitHub Actions + 44 PHPUnit</text>
+  <text x="787" y="489" font-size="9.5" text-anchor="middle" fill="#334155">Auto-sync API/web/mobile -> develop/main</text>
+</svg>
+</div>
+      <pre class="mermaid" style="display:none;">flowchart TB
+    subgraph CLIENTS["Capa de Clientes Multiplataforma"]
+        WEB["Cliente Web SPA<br/>React 18 + Vite + Ant Design + Tailwind<br/>Leaflet · Piper · Lindal · Exportación PDF"]
+        AND["App Móvil Android<br/>KMP + Compose Multiplatform<br/>APK v1.0.0-beta2 · Cámara EXIF · GPS"]
+        IOS["App Móvil iOS<br/>KMP + CocoaPods Shared Framework<br/>Ktor Darwin · PdfManager iOS"]
+    end
+
+    subgraph SECURITY["Capa de Entrada, Enrutamiento y Seguridad"]
+        GW["SimpleRouter.php + CORS + X-API-Key<br/>Auth Dual: Cookie HTTP-only (Web) | Bearer + Refresh Rotation (Mobile)"]
+        RBAC["Control RBAC (5 Roles)<br/>admin · maintenance · field_investigator · investigator · user"]
+    end
+
+    subgraph BACKEND["Capa de Negocio y Datos (API PHP >= 8.1 / 8.5)"]
+        CTRL["14 Controladores REST (87 Rutas)<br/>Auth · Users · Requests · FieldTrips · Comments · Georeports · Tests · Territory · App"]
+        DTO["28 DTOs Tipados + Validation + ULID Generator"]
+        SRV["17 Servicios de Dominio<br/>Promoción en Cascada · Proj4 CRTM05-WGS84 · Notificaciones"]
+        REPO["15 Repositorios PDO"]
+    end
+
+    subgraph INFRA["Persistencia y Servicios Externos"]
+        DB[("MariaDB (19 Tablas + 1 Vista)<br/>ULID CHAR(26) · Trigger refresh_tokens<br/>Catálogos SNIT (588 registros)")]
+        SMTP["SmtpEmailService (PHPMailer)<br/>OTP Recuperación · Alertas de Solicitudes"]
+        CI["GitHub Actions CI/CD + PHPUnit (44 Suites)<br/>Auto-sync API / web / mobile -> develop / main"]
+    end
+
+    WEB -->|Cookie HTTP-only + X-API-Key| GW
+    AND -->|Bearer JWT/Token + X-API-Key| GW
+    IOS -->|Bearer JWT/Token + X-API-Key| GW
+    GW --> RBAC --> CTRL --> DTO --> SRV --> REPO
+    REPO --> DB
+    SRV --> SMTP
+    CI -.->|Tests y Despliegue Continuo| CTRL
+    CI -.->|Build Vite Dist| WEB</pre>
+    </div>
+    
+
+<h3>3.3 Línea de Tiempo Evolutiva por Semestres Académicos (2024–2026)</h3>
+
+    <div class="mermaid-box avoid-break">
+      <div class="mermaid-header">
+        <span class="badge-orange">DIAGRAMA ARQUITECTÓNICO 2</span>
+        <strong>Línea de Tiempo Evolutiva por Semestres Académicos UCR (2024–2026)</strong>
+      </div>
+      <div class="mermaid-svg-render">
+<svg viewBox="0 0 960 220" width="100%" xmlns="http://www.w3.org/2000/svg" style="font-family:'Poppins','DejaVu Sans',sans-serif;">
+  <rect width="960" height="220" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <line x1="65" y1="60" x2="895" y2="60" stroke="#12467E" stroke-width="3"/>
+  <!-- 6 nodes -->
+  <!-- S1 -->
+  <circle cx="85" cy="60" r="16" fill="#12467E" stroke="#ffffff" stroke-width="3"/>
+  <text x="85" y="64" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">I-24</text>
+  <rect x="18" y="88" width="136" height="114" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="86" y="106" font-size="10.5" font-weight="700" text-anchor="middle" fill="#12467E">I-2024 (Abr–Jul)</text>
+  <text x="86" y="122" font-size="10" font-weight="700" text-anchor="middle" fill="#ea580c">114 commits</text>
+  <text x="86" y="142" font-size="9.2" text-anchor="middle" fill="#334155">Prototipo HTML/PHP</text>
+  <text x="86" y="157" font-size="9.2" text-anchor="middle" fill="#334155">Android inicial</text>
+  <text x="86" y="172" font-size="9.2" text-anchor="middle" fill="#334155">Mapa por regiones</text>
+
+  <!-- S2 -->
+  <circle cx="243" cy="60" r="16" fill="#12467E" stroke="#ffffff" stroke-width="3"/>
+  <text x="243" y="64" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">II-24</text>
+  <rect x="175" y="88" width="136" height="114" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="243" y="106" font-size="10.5" font-weight="700" text-anchor="middle" fill="#12467E">II-2024 (Ago–Dic)</text>
+  <text x="243" y="122" font-size="10" font-weight="700" text-anchor="middle" fill="#ea580c">107 commits</text>
+  <text x="243" y="142" font-size="9.2" text-anchor="middle" fill="#334155">Manual Identidad 2024</text>
+  <text x="243" y="157" font-size="9.2" text-anchor="middle" fill="#334155">Tailwind CSS &amp; .config</text>
+  <text x="243" y="172" font-size="9.2" text-anchor="middle" fill="#334155">CRTM05 -&gt; WGS84</text>
+
+  <!-- S3 -->
+  <circle cx="401" cy="60" r="16" fill="#084F9D" stroke="#ffffff" stroke-width="3"/>
+  <text x="401" y="64" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">I-25</text>
+  <rect x="333" y="88" width="136" height="114" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="401" y="106" font-size="10.5" font-weight="700" text-anchor="middle" fill="#12467E">I-2025 (Mar–Jul)</text>
+  <text x="401" y="122" font-size="10" font-weight="700" text-anchor="middle" fill="#ea580c">107 commits</text>
+  <text x="401" y="142" font-size="9.2" text-anchor="middle" fill="#334155">Migración React + Vite</text>
+  <text x="401" y="157" font-size="9.2" text-anchor="middle" fill="#334155">Ant Design + Roles</text>
+  <text x="401" y="172" font-size="9.2" text-anchor="middle" fill="#334155">Primera Beta (Jul 25)</text>
+
+  <!-- S4 -->
+  <circle cx="559" cy="60" r="16" fill="#084F9D" stroke="#ffffff" stroke-width="3"/>
+  <text x="559" y="64" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">II-25</text>
+  <rect x="491" y="88" width="136" height="114" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="559" y="106" font-size="10.5" font-weight="700" text-anchor="middle" fill="#12467E">II-2025 (Ago–Dic)</text>
+  <text x="559" y="122" font-size="10" font-weight="700" text-anchor="middle" fill="#ea580c">206 commits</text>
+  <text x="559" y="142" font-size="9.2" text-anchor="middle" fill="#334155">Piper &amp; Lindal en React</text>
+  <text x="559" y="157" font-size="9.2" text-anchor="middle" fill="#334155">MVVM Móvil sin GMS</text>
+  <text x="559" y="172" font-size="9.2" text-anchor="middle" fill="#334155">CI/CD GitHub Actions</text>
+
+  <!-- S5 -->
+  <circle cx="717" cy="60" r="18" fill="#F39C29" stroke="#ffffff" stroke-width="3"/>
+  <text x="717" y="64" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">I-26</text>
+  <rect x="649" y="88" width="136" height="114" rx="8" fill="#fff7ed" stroke="#F39C29" stroke-width="1.4"/>
+  <text x="717" y="106" font-size="10.5" font-weight="700" text-anchor="middle" fill="#12467E">I-2026 (Ene–Jul)</text>
+  <text x="717" y="122" font-size="10" font-weight="700" text-anchor="middle" fill="#c2410c">656 commits</text>
+  <text x="717" y="142" font-size="9.2" text-anchor="middle" fill="#334155">API Limpia + ULID</text>
+  <text x="717" y="157" font-size="9.2" text-anchor="middle" fill="#334155">KMP Android &amp; iOS</text>
+  <text x="717" y="172" font-size="9.2" text-anchor="middle" fill="#334155">44 Suites PHPUnit</text>
+
+  <!-- S6 -->
+  <circle cx="875" cy="60" r="18" fill="#12467E" stroke="#F39C29" stroke-width="3"/>
+  <text x="875" y="64" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">II-26</text>
+  <rect x="807" y="88" width="136" height="114" rx="8" fill="#eff6ff" stroke="#12467E" stroke-width="1.4"/>
+  <text x="875" y="106" font-size="10.5" font-weight="700" text-anchor="middle" fill="#12467E">II-2026 (Ago–Nov)</text>
+  <text x="875" y="122" font-size="10" font-weight="700" text-anchor="middle" fill="#ea580c">467 commits</text>
+  <text x="875" y="142" font-size="9.2" text-anchor="middle" fill="#334155">Giras + Comentarios</text>
+  <text x="875" y="157" font-size="9.2" text-anchor="middle" fill="#334155">Cascada + CRUD + PDF</text>
+  <text x="875" y="172" font-size="9.2" text-anchor="middle" fill="#334155">APK v1.0.0-beta2</text>
+</svg>
+</div>
+      <pre class="mermaid" style="display:none;">flowchart LR
+    S1["I-2024 (Abr–Jul)<br/>114 commits<br/>Prototipo HTML/PHP + Android<br/>Primer mapa y solicitudes"]
+    S2["II-2024 (Ago–Dic)<br/>107 commits<br/>Manual Identidad 2024<br/>Tailwind + CRTM05->WGS84"]
+    S3["I-2025 (Mar–Jul)<br/>107 commits<br/>Migración React + Ant Design<br/>Roles y Primera Beta"]
+    S4["II-2025 (Ago–Dic)<br/>206 commits<br/>Piper & Lindal en React<br/>MVVM Móvil + CI/CD inicial"]
+    S5["I-2026 (Ene–Jul)<br/>656 commits (117+539)<br/>API Limpia PHP + ULID + SNIT<br/>KMP Android/iOS + 44 PHPUnit"]
+    S6["II-2026 (Ago–Nov)<br/>467 commits<br/>Giras + Comentarios + Cascada<br/>Estándar CRUD + PDF + APK beta2"]
+
+    S1 --> S2 --> S3 --> S4 --> S5 --> S6</pre>
+    </div>
+    
+
+<h3>3.4 Flujo Transaccional de Curaduría Científica y Visibilidad en Cascada</h3>
+
+    <div class="mermaid-box avoid-break">
+      <div class="mermaid-header">
+        <span class="badge-orange">DIAGRAMA ARQUITECTÓNICO 3</span>
+        <strong>Flujo Transaccional de Curaduría Científica y Visibilidad en Cascada</strong>
+      </div>
+      <div class="mermaid-svg-render">
+<svg viewBox="0 0 960 320" width="100%" xmlns="http://www.w3.org/2000/svg" style="font-family:'Poppins','DejaVu Sans',sans-serif;">
+  <rect width="960" height="320" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <!-- 4 Lifelines -->
+  <rect x="35" y="18" width="190" height="36" rx="8" fill="#12467E"/>
+  <text x="130" y="40" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff">Investigador / Usuario</text>
+  <line x1="130" y1="54" x2="130" y2="296" stroke="#94a3b8" stroke-dasharray="5,4" stroke-width="1.5"/>
+
+  <rect x="270" y="18" width="190" height="36" rx="8" fill="#084F9D"/>
+  <text x="365" y="40" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff">GeoterRA API (PHP)</text>
+  <line x1="365" y1="54" x2="365" y2="296" stroke="#94a3b8" stroke-dasharray="5,4" stroke-width="1.5"/>
+
+  <rect x="505" y="18" width="190" height="36" rx="8" fill="#0f172a"/>
+  <text x="600" y="40" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff">MariaDB (ULID)</text>
+  <line x1="600" y1="54" x2="600" y2="296" stroke="#94a3b8" stroke-dasharray="5,4" stroke-width="1.5"/>
+
+  <rect x="740" y="18" width="190" height="36" rx="8" fill="#F39C29"/>
+  <text x="835" y="40" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff">Coordinador / Mapa</text>
+  <line x1="835" y1="54" x2="835" y2="296" stroke="#94a3b8" stroke-dasharray="5,4" stroke-width="1.5"/>
+
+  <!-- Step 1 -->
+  <line x1="130" y1="84" x2="358" y2="84" stroke="#12467E" stroke-width="1.8"/>
+  <polygon points="363,84 354,79 354,89" fill="#12467E"/>
+  <text x="247" y="77" font-size="10" font-weight="600" text-anchor="middle" fill="#0f172a">1. POST /analysis-requests</text>
+
+  <!-- Step 2 -->
+  <line x1="365" y1="114" x2="593" y2="114" stroke="#12467E" stroke-width="1.8"/>
+  <polygon points="598,114 589,109 589,119" fill="#12467E"/>
+  <text x="482" y="107" font-size="10" font-weight="600" text-anchor="middle" fill="#0f172a">2. Guarda estado 'Pendiente'</text>
+
+  <!-- Step 3 -->
+  <line x1="835" y1="146" x2="372" y2="146" stroke="#ea580c" stroke-width="1.8"/>
+  <polygon points="367,146 376,141 376,151" fill="#ea580c"/>
+  <text x="600" y="139" font-size="10" font-weight="600" text-anchor="middle" fill="#c2410c">3. Admin cambia estado ('Revisión' / 'Procesada') + SMTP</text>
+
+  <!-- Step 4 -->
+  <line x1="835" y1="180" x2="372" y2="180" stroke="#12467E" stroke-width="1.8"/>
+  <polygon points="367,180 376,175 376,185" fill="#12467E"/>
+  <text x="600" y="173" font-size="10" font-weight="600" text-anchor="middle" fill="#0f172a">4. Registra Geomanifestación + In-Situ + Lab + Georeporte</text>
+
+  <!-- Step 5 -->
+  <line x1="835" y1="214" x2="372" y2="214" stroke="#ea580c" stroke-width="1.8"/>
+  <polygon points="367,214 376,209 376,219" fill="#ea580c"/>
+  <text x="600" y="207" font-size="10" font-weight="600" text-anchor="middle" fill="#c2410c">5. PATCH /admin/georeports/{id}/promote</text>
+
+  <!-- Step 6 -->
+  <line x1="365" y1="246" x2="593" y2="246" stroke="#12467E" stroke-width="1.8"/>
+  <polygon points="598,246 589,241 589,251" fill="#12467E"/>
+  <text x="482" y="239" font-size="10" font-weight="600" text-anchor="middle" fill="#0f172a">6. Propaga visibility=1 en cascada</text>
+
+  <!-- Step 7 -->
+  <line x1="365" y1="278" x2="828" y2="278" stroke="#084F9D" stroke-dasharray="4,3" stroke-width="1.8"/>
+  <polygon points="833,278 824,273 824,283" fill="#084F9D"/>
+  <text x="600" y="271" font-size="10" font-weight="600" text-anchor="middle" fill="#12467E">7. GET /geomanifestations &amp; /georeports -&gt; Publicado en Mapa y PDF</text>
+</svg>
+</div>
+      <pre class="mermaid" style="display:none;">sequenceDiagram
+    actor INV as Investigador / Usuario (Móvil o Web)
+    participant API as GeoterRA API (Controllers / Services)
+    participant DB as MariaDB (ULID + Cascada)
+    actor ADM as Coordinador Científico (Admin)
+    actor PUB as Ciudadanía / Mapa Público
+
+    INV->>API: POST /analysis-requests (Coordenadas, sensación térmica, uso)
+    API->>DB: Inserta en requests + requests_state ('Pendiente')
+    ADM->>API: POST /admin/analysis-requests/{id}/states ('Revisión' / 'Procesada')
+    API-->>INV: Notificación automática vía SmtpEmailService
+    ADM->>API: POST /admin/geomanifestations + /insitu-tests + /inlab-tests
+    ADM->>API: POST /admin/georeports (Vincula in-situ + laboratorio)
+    ADM->>API: PATCH /admin/georeports/{id}/promote
+    API->>DB: Actualiza current_georeport_id y propaga visibility = 1 en cascada
+    PUB->>API: GET /geomanifestations & GET /georeports
+    API-->>PUB: Ficha oficial validada (Piper, Lindal y exportación PDF)</pre>
+    </div>
+    
+
+<hr />
+<h2>4. Estado Actual del Producto y Próximos Pasos</h2>
+<h3>4.1 Capacidades Activas en Producción (Noviembre 2026)</h3>
+<p>A la fecha de corte del presente informe (<strong>noviembre de 2026</strong>), el ecosistema <strong>GeoterRA</strong> opera integralmente con los siguientes módulos validados en sus tres plataformas:</p>
+<ol>
+<li><strong>Portal Público e Interactivo de Divulgación Geotermal (Web y Móvil):</strong></li>
+<li>Visor cartográfico nacional sobre <strong>Leaflet</strong> (Web) y <strong>MapLibre</strong> (Móvil) con filtrado territorial multinivel (<strong>8 provincias, 85 cantones, 495 distritos SNIT</strong>) y capas térmicas.</li>
+<li>Paneles de detalle científico (<code>PointDetails.jsx</code>, <code>GeomanifestationScreen.kt</code>) con representación automática de <strong>Diagramas de Piper</strong> (caracterización hidrogeoquímica mediante 14 parámetros de laboratorio: pH, conductividad, Cl, Ca, HCO3, SO4, Fe, Si, B, Li, F, Na, K, Mg) y <strong>Diagramas de Lindal</strong> (aprovechamiento térmico directo).</li>
+<li>
+<p><strong>Exportación Oficial en PDF:</strong> Generación de fichas técnicas imprimibles con membrete UCR desde navegador y descarga/compartición de PDF en dispositivos móviles.</p>
+</li>
+<li>
+<p><strong>Gestión Operativa y Gobernanza por Roles (RBAC de 5 Perfiles):</strong></p>
+</li>
+<li><strong><code>user</code>:</strong> Creación, seguimiento de historial de estados y edición de sus propias solicitudes de análisis geotermal mientras permanezcan en estado <code>Pendiente</code>.</li>
+<li><strong><code>investigator</code> y <code>field_investigator</code>:</strong> Gestión de geomanifestaciones, registro de pruebas <em>in-situ</em> y laboratorio, planificación y participación en <strong>Giras de Campo</strong> (<code>FieldTripsManager</code>), y trazabilidad colaborativa mediante <strong>Comentarios Polimórficos</strong>.</li>
+<li><strong><code>admin</code> (Coordinador Científico):</strong> Curaduría total de solicitudes, promoción de georeportes a vigentes y control de <strong>visibilidad pública en cascada</strong>.</li>
+<li>
+<p><strong><code>maintenance</code> (DevOps / Sistemas):</strong> Dashboard de salud del sistema, gestión de usuarios y asignación de roles, visor de tablas de base de datos (<code>DatabaseViewer.jsx</code>) e inspección de logs de servidor (<code>SystemLogs.jsx</code>).</p>
+</li>
+<li>
+<p><strong>Distribución Móvil y Operación Institucional:</strong></p>
+</li>
+<li>Distribución directa de la aplicación Android <strong><code>geoterraApp</code> v1.0.0-beta2</strong> mediante endpoints públicos de la API institucional (<code>/api/app/download-apk</code>), junto con base de código iOS compilable vía CocoaPods.</li>
+<li>Soporte de notificaciones institucionales por correo electrónico (OTP de recuperación, estados de solicitudes y cambios de perfil) y sincronización continua automatizada mediante GitHub Actions.</li>
+</ol>
+<h3>4.2 Evidencia de Campo de Recursos Geotérmicos Catalogados</h3>
+<p>Los activos visuales integrados en la aplicación móvil reflejan las tipologías de manifestaciones geotermales documentadas y catalogadas dentro del ecosistema GeoterRA:</p>
+<div class="table-wrap avoid-break"><table>
+<thead>
+<tr>
+<th style="text-align: center;">Manifestación Fumarólica</th>
+<th style="text-align: center;">Naciente Termal (Hot Spring)</th>
+<th style="text-align: center;">Inspección Territorial con Dron</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><img src="img_progreso/fumarolas_campo.jpg" alt="Fumarolas en campo" class="table-thumb" /></td>
+<td style="text-align: center;"><img src="img_progreso/termales_campo.jpg" alt="Naciente termal en campo" class="table-thumb" /></td>
+<td style="text-align: center;"><img src="img_progreso/vista_dron_campo.jpg" alt="Vista aérea de reconocimiento" class="table-thumb" /></td>
+</tr>
+</tbody>
+</table></div>
+<h3>4.3 Próximos Pasos y Hoja de Ruta Post-Despliegue (2027)</h3>
+<p>Para dar continuidad al ciclo de maduración tecnológica y académica en la Universidad de Costa Rica, se recomiendan cuatro líneas prioritarias de evolución:</p>
+<ol>
+<li><strong>Sincronización Offline-First en Campo:</strong> Incorporar persistencia local en SQLDelight o Room KMP dentro de <code>Mobile/GeoterRa</code> para permitir la captura completa de pruebas <em>in-situ</em>, fotografías con metadatos EXIF y formularios de giras de campo en zonas volcánicas sin cobertura celular, con sincronización diferida automática al recuperar conectividad.</li>
+<li><strong>Publicación Formal en Tiendas Oficiales (Google Play Store y Apple App Store):</strong> Completar los procesos de firma institucional UCR/INII y revisión en tiendas para sustituir gradualmente la distribución directa de APK por actualizaciones gestionadas en tienda, manteniendo el endpoint <code>/api/app/version</code> para verificación de compatibilidad.</li>
+<li><strong>Expansión de Pruebas E2E Automatizadas y Telemetría:</strong> Ampliar la suite existente de <strong>Playwright</strong> en <code>website/tests/</code> para cubrir flujos completos de curaduría científica y consolidar métricas de monitoreo en tiempo real en el panel de mantenimiento.</li>
+<li><strong>Interoperabilidad Abierta y Ciencia Ciudadana (API Pública / GeoJSON):</strong> Exponer endpoints de descarga abierta en formatos estándar geocientíficos (<strong>GeoJSON / CSV / OGC</strong>) para facilitar el consumo directo de los datos validados por parte de investigadores nacionales, instituciones del sector energético costarricense (ICE, MINAE, OVSICORI) y proyectos académicos interdisciplinarios.</li>
+</ol>
+<hr />
+<p><strong>Elaborado para:</strong> Dirección del Proyecto GeoterRA — Instituto de Investigaciones en Ingeniería (INII), Universidad de Costa Rica.<br />
+<strong>Auditoría basada en datos verificables del repositorio <code>GeoterRA_DEV/</code> (1,657 commits · 06/04/2024 – 12/11/2026).</strong></p>
+    </main>
+
+    <footer class="doc-footer avoid-break">
+      <span><strong>GeoterRA • UCR / INII</strong> — Sistema de Gestión y Visualización Geotermal</span>
+      <span>Informe Técnico Semestral 2024–2026</span>
+    </footer>
+  </div>
+
+  <!-- Soporte opcional Mermaid CDN si el lector abre el HTML con acceso a internet -->
+  <script type="module">
+    try {
+      const mermaidMod = await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs');
+      mermaidMod.default.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        themeVariables: {
+          primaryColor: '#eff6ff',
+          primaryTextColor: '#12467E',
+          primaryBorderColor: '#12467E',
+          lineColor: '#12467E',
+          secondaryColor: '#fff7ed',
+          tertiaryColor: '#f8fafc'
+        }
+      });
+    } catch (e) {
+      // Modo offline: se mantiene el renderizado SVG vectorial embebido de alta precisión.
+    }
+  </script>
+</body>
+</html>
