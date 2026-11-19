@@ -1,368 +1,144 @@
-# Informe Ejecutivo y Técnico del Progreso de Desarrollo de GeoterRA (2024–2026)
+# Informe Ejecutivo de Progreso del Proyecto GeoterRA (2024–2026)
 
-**Institución:** Universidad de Costa Rica (UCR) — Instituto de Investigaciones en Ingeniería (INII)  
-**Plataforma:** GeoterRA — Sistema Multiplataforma de Gestión, Análisis Hidrogeoquímico y Visualización Geotermal  
-**Período Evaluado:** 6 de abril de 2024 – 12 de noviembre de 2026 (6 semestres académicos UCR)  
-**Fecha de Emisión:** 18 de noviembre de 2026  
-**Responsable Técnico:** Líder Técnico e Investigador Académico (UCR / INII)
+**Institución Ejecutora:** Universidad de Costa Rica (UCR) — Instituto de Investigaciones en Ingeniería (INII)  
+**Plataforma:** GeoterRA — Sistema Nacional de Información Geotermal  
+**Período del Proyecto:** Abril 2024 – Noviembre 2026 (6 semestres académicos UCR)  
+**Fecha de Emisión:** Noviembre de 2026  
 
 ---
 
 ## 1. Resumen Ejecutivo
 
-El proyecto **GeoterRA** surge en abril de 2024 en el seno de la **Universidad de Costa Rica (UCR)** y el **Instituto de Investigaciones en Ingeniería (INII)** con el objetivo estratégico de digitalizar, centralizar, validar científicamente y divulgar información sobre manifestaciones geotermales en el territorio costarricense. A lo largo de **seis semestres académicos consecutivos (I-2024 a II-2026)**, la iniciativa evolucionó desde un prototipo web estático en HTML/PHP acompañado de una aplicación Android experimental hasta consolidarse en una **plataforma institucional de arquitectura limpia, multiplataforma (Web, Android e iOS), respaldada por pruebas unitarias automatizadas y flujos CI/CD de despliegue continuo**.
+El proyecto **GeoterRA** nace en abril de 2024 en el **Instituto de Investigaciones en Ingeniería (INII) de la Universidad de Costa Rica (UCR)** con un propósito estratégico claro: recopilar, verificar científicamente, resguardar y poner a disposición del país la información sobre manifestaciones geotermales del territorio costarricense —tales como nacientes de aguas termales, fumarolas y surgencias hidrotermales—.
 
-La auditoría forense ejecutada sobre el repositorio oficial `GeoterRA_DEV/` —abarcando la totalidad de sus ramas (`origin/main`, `origin/develop`, `origin/API`, `origin/web`, `origin/mobile`)— contabiliza **1,657 commits** entre el commit fundacional (`a905ad29`, **6 de abril de 2024**) y la sincronización más reciente de producción (`e6aa80dd`, **12 de noviembre de 2026**). Durante este ciclo de 31 meses, la plataforma pasó de ejecutar consultas SQL acopladas en scripts PHP procedurales a operar una API REST desacoplada en **PHP >= 8.1 / 8.5** con **87 rutas activas**, **28 DTOs**, **44 suites de pruebas unitarias PHPUnit**, una base de datos **MariaDB** con **19 tablas base + 1 vista SQL (`view_logs_entries`)** indexada mediante **ULID (`CHAR(26)`)**, un cliente web en **React 18 + Vite + Tailwind CSS + Ant Design + Leaflet**, y una aplicación móvil nativa compartida mediante **Kotlin Multiplatform (KMP) y Compose Multiplatform** con artefactos compilados para Android (`geoterraApp-1.0.0-beta2.apk`) e iOS.
+A lo largo de **seis semestres académicos consecutivos (2024–2026)**, GeoterRA evolucionó desde una propuesta exploratoria inicial hasta convertirse en una **plataforma institucional unificada** compuesta por un portal web interactivo y una aplicación móvil para trabajo de campo. Hoy, el sistema permite que tanto la ciudadanía como los equipos de investigación reporten sitios de interés, que los especialistas organicen giras de muestreo y análisis de laboratorio, y que la información validada se publique con precisión geográfica y respaldo técnico en formato digital y en reportes oficiales descargables en PDF.
 
-### Tabla Resumen de Métricas Globales (Abril 2024 – Noviembre 2026)
+> **Valor público e institucional:** GeoterRA cierra la brecha entre la observación ciudadana en comunidades, el rigor científico universitario y la toma de decisiones en materia energética, ambiental, turística y territorial en Costa Rica, garantizando que únicamente los datos revisados y aprobados por especialistas sean publicados como referencia oficial.
 
-| Indicador Global | Cifra Verificada | Fuente / Respaldo en Repositorio |
-| :--- | :--- | :--- |
-| **Commits Totales (`git log --all`)** | **1,657 commits** | `06/04/2024` (`a905ad29`) al `12/11/2026` (`e6aa80dd`) |
-| **Distribución por Ramas Remotas** | `origin/web` (1,269) · `origin/API` (1,234) · `origin/develop` (1,202) · `origin/mobile` (1,198) · `origin/main` (854) | Historial completo multirrama en `GeoterRA_DEV/.git` |
-| **Colaboradores y Automatización** | **Mario Cordero** (826 manuales + 72 CI = 898) · **Aarón Carmona Sánchez** (493) · **Christopher Acosta** (70) · **GitHub Actions Bot** (196) | `git log --all --format='%an|%ae'` consolidado por identidad |
-| **Base de Datos Relacional** | **19 tablas** + **1 vista (`view_logs_entries`)** · **6 migraciones** (`001`–`006`) · **588 registros SNIT** (8 prov., 85 cant., 495 dist.) | `database/GeoterRA_schema.sql`, `migrations/`, `GeoterRA_catalogs.sql` |
-| **Backend API REST (PHP)** | **87 rutas activas** en **14 módulos** · **14 Controladores** · **17 Servicios** · **15 Repositorios** · **28 DTOs** | `API/config/routes.php`, `API/src/`, `Doc API GeoterRA.md` |
-| **Cobertura de Pruebas (Backend)** | **44 archivos de pruebas unitarias PHPUnit** (`DTO`, `Services`, `Platform/Web`, `Platform/Mobile`) | `API/tests/Unit/` y `API/composer.json` |
-| **Frontend Web (React SPA)** | **5 páginas públicas/privadas** · **19 vistas de gestión en Dashboard** · **4 módulos cartográficos/científicos** | `website/src/pages/`, `loggedComponents/views/`, `mapComponents/` |
-| **Aplicación Móvil (KMP)** | **18 pantallas Voyager** (`Screen.kt`) · **45 componentes UI Compose** · **2 releases APK** (`beta1`, `beta2`) | `Mobile/GeoterRa/geoterraApp/`, `Mobile/Releases/Android/` |
-| **Control de Acceso (RBAC)** | **5 roles institucionales**: `admin`, `maintenance`, `field_investigator`, `investigator`, `user` | `API/src/DTO/AllowedUserRoles.php`, `database/GeoterRA_schema.sql` |
+### Resumen de Capacidades Consolidadas
 
-### Comportamiento Estadístico del Desarrollo (2024–2026)
-
-La gráfica siguiente evidencia la aceleración exponencial de la cadencia de ingeniería: tras una fase fundacional y de consolidación estable entre I-2024 y I-2025 (107–114 commits/semestre), la adopción de flujos de CI/CD en II-2025 duplicó la cadencia (206 commits) y la reingeniería total de I-2026 alcanzó un máximo histórico de **539 commits en el semestre lectivo** (+ **117 commits** en el interciclo preparatorio de enero–febrero 2026 = **656 commits** en el bloque enero–julio), manteniendo **467 commits** de despliegue, estabilización y nuevas funcionalidades en II-2026.
-
-![Evolución Histórica de Commits por Semestre Académico UCR](img_progreso/commits_por_semestre.png)
-
-De manera complementaria, el análisis de impacto directo por módulo demuestra cómo el foco de ingeniería transitó desde el prototipado visual web en 2024 hacia una arquitectura equilibrada y altamente activa en **API/Backend (300 commits en Ene–Jul 2026 y 215 en Ago–Nov 2026)**, **Móvil KMP**, **Frontend React** y **Base de Datos / DevOps**.
-
-![Actividad de Desarrollo por Módulo Técnico y Semestre](img_progreso/actividad_por_modulo.png)
+| Área de Impacto | Qué logra la plataforma hoy para el país y la UCR |
+| :--- | :--- |
+| **Mapa Nacional y Ubicación Oficial** | Visualización interactiva de manifestaciones geotermales en todo Costa Rica, organizada por provincia, cantón y distrito conforme a la nomenclatura oficial del Sistema Nacional de Información Territorial (SNIT). |
+| **Portal Web Público e Institucional** | Espacio abierto de consulta ciudadana, educación sobre energía geotérmica, solicitud de análisis de nuevos sitios y gestión integral para equipos científicos y administrativos. |
+| **Aplicación Móvil de Campo** | Herramienta portátil diseñada para teléfonos Android (y con base preparada para dispositivos iPhone) que facilita capturar coordenadas GPS, fotografías y formularios directamente desde zonas rurales o volcánicas. |
+| **Rigor Científico y Gráficos Especializados** | Registro estructurado de mediciones realizadas en el sitio (temperatura, acidez y observaciones) junto con 14 análisis físico-químicos de laboratorio, representados automáticamente en gráficos científicos de fácil interpretación. |
+| **Control de Calidad y Visibilidad** | Ningún dato sin verificar aparece como oficial: un coordinador científico revisa cada estudio y promueve la versión vigente para que se publique de forma coherente y segura. |
+| **Giras de Campo y Fichas PDF** | Planificación ordenada de expediciones universitarias, bitácora compartida de observaciones y generación automática de fichas técnicas oficiales en PDF con el membrete institucional de la UCR. |
 
 ---
 
-## 2. Evolución Semestral Detallada (I-2024 a II-2026)
+## 2. Evolución del Proyecto por Etapas (2024–2026)
 
-### 2.1 I Semestre 2024 (Abril – Julio 2024): Inicio del Proyecto, Arquitectura Base y Primeros Prototipos
+El crecimiento de GeoterRA se planificó de manera gradual en seis etapas semestrales, pasando de comprobar la viabilidad de la idea en 2024 a consolidar una herramienta científica en operación hacia finales de 2026.
 
-#### Objetivos y Enfoque del Período
-El primer semestre marcó el nacimiento oficial del proyecto GeoterRA en la UCR. El propósito central fue validar la viabilidad técnica de capturar reportes ciudadanos e investigativos sobre puntos termales y representarlos sobre una cartografía digital interactiva de Costa Rica, sentando simultáneamente las bases de una aplicación móvil de campo en Android.
+### 2.1 Primera Etapa — I Semestre 2024 (Abril – Julio 2024): Inicio del Proyecto y Primeros Prototipos
 
-#### Hitos Técnicos Alcanzados
-- **Fundación del Repositorio y Estructura Inicial:** Creación del repositorio el **6 de abril de 2024** (`a905ad29`, *"Initial commit"*), seguida del primer boceto de la página de aterrizaje (`33a6b107`, 09/04/2024) y la configuración inicial del proyecto Android nativo en Kotlin (`98032492`, 09/04/2024).
-- **Backend/API y Base de Datos Temprana:** Establecimiento de la primera conexión a base de datos relacional (`8605c9b5`, `45f05c21`, 13/04/2024), lógica inicial de autenticación/registro de usuarios (`14026e2d`, `443b21e5`), gestión de sesiones PHP (`234fab18`, 28/06/2024) y creación de los primeros scripts PHP para recepción de solicitudes de análisis (`d2850851`, `c34541db`, 15/07/2024).
-- **Frontend Web Prototipo:** Implementación de pantallas HTML/CSS/JS de inicio de sesión (`317ad111`), visualización de solicitudes (`313a1029`), diseño responsivo del visor inicial (`3b8a1ae0`, `dfaaa032`), control de capas por regiones geotérmicas en el mapa (`0dd003c7`, `05d06c33`, 22/06/2024) y el primer experimento visual del Diagrama de Piper (`fd191785`).
-- **Aplicación Móvil (Android Nativo):** Implementación de la navegación inferior (`c3c48c91`, `BottomNavigationMenu`), flujo de registro (`29105e5c`, `signUpFragment`) y creación de solicitudes de análisis desde el teléfono (`9c63e656`, `e3db097c`, 24/07/2024).
+**Propósito de la Etapa:** Validar la viabilidad de reunir en un solo lugar reportes ciudadanos e investigativos sobre puntos termales y mostrarlos sobre un mapa digital interactivo de Costa Rica, iniciando al mismo tiempo los primeros ensayos de una aplicación móvil para trabajo en terreno.
 
-#### Tabla de Métricas — I Semestre 2024
+**Principales Logros:**
+- **Arranque formal del proyecto:** Diseño de la primera página informativa, pantallas iniciales de acceso para personas usuarias y estructura básica de almacenamiento de información.
+- **Primer mapa exploratorio:** Visualización inicial de regiones geotérmicas del país y recepción de las primeras solicitudes de análisis de puntos termales.
+- **Primer prototipo móvil:** Versión experimental para teléfonos Android orientada a registrar solicitudes directamente desde el campo.
 
-| Métrica | Valor Registrado | Detalle Verificado |
-| :--- | :--- | :--- |
-| **Commits Totales** | **114 commits** | Abr: 24 · May: 37 · Jun: 25 · Jul: 28 |
-| **Autores Activos** | **3 desarrolladores** | Aarón Sánchez / Svndda (48), Mario Cordero (36), Christopher Acosta (30) |
-| **Ramas Activas** | `main`, `headerWeb`, `headerAndroid`, `testing` | 24 merges registrados entre ramas de trabajo web y móvil |
-| **Archivos Únicos Modificados** | **432 archivos** | Impactos por módulo: `website` (51 commits), `Android` (29), `API` (6), `database` (2) |
-| **Componentes Clave Creados** | Prototipo HTML/JS + PHP + Android | Landing, login/registro, mapa por regiones, `BottomNavigationMenu`, formulario de solicitud |
+### 2.2 Segunda Etapa — II Semestre 2024 (Agosto – Diciembre 2024): Identidad Institucional y Precisión Geográfica
 
-#### Evidencia Visual — I Semestre 2024
+**Propósito de la Etapa:** Dotar al proyecto de una identidad visual propia y profesional acorde con la Universidad de Costa Rica, proteger la información del sistema y asegurar que las ubicaciones geográficas coincidieran con los mapas oficiales del país.
 
-![Prototipo Fundacional GeoterRA I-2024](img_progreso/sem1_prototipo_inicial_2024.png)
+**Principales Logros:**
+- **Identidad oficial GeoterRA:** Adopción del Manual de Identidad Gráfica 2024 con los colores institucionales (Azul GeoterRA y Naranja Geotérmico) y una presentación unificada tanto en la web como en la aplicación móvil.
+- **Compatibilidad cartográfica nacional:** Incorporación de conversión automática de coordenadas al estándar oficial costarricense (CRTM05 / SNIT), evitando desfases entre mediciones de campo y mapas gubernamentales.
+- **Mejora de vistas de consulta:** Rediseño de las fichas de detalle para mostrar de forma más ordenada la información de cada sitio termal y el perfil de las personas usuarias.
 
-![Evidencia Histórica del Prototipo Temprano](img_progreso/evidencia_captura_historica_nota.png)
+### 2.3 Tercera Etapa — I Semestre 2025 (Marzo – Julio 2025): Modernización del Portal y Primera Versión Beta
 
-> **Nota editorial sobre evidencia histórica (I-2024):** En el espacio superior puede sustituirse `img_progreso/evidencia_captura_historica_nota.png` por una captura de pantalla original de archivo del primer prototipo HTML/PHP desplegado en abril–julio de 2024 o fotografías de las sesiones iniciales de diseño con el equipo investigador.
+**Propósito de la Etapa:** Renovar por completo la experiencia del portal web para hacerlo ágil, claro y fácil de usar desde computadoras o tabletas, diferenciando las herramientas disponibles según el rol de cada persona y alcanzando la primera versión de pruebas completa.
 
----
+**Principales Logros:**
+- **Portal web renovado y secciones informativas:** Implementación de una interfaz moderna junto con apartados claros para explicar a la población qué es el proyecto, cómo funciona y cómo contactar al equipo investigador.
+- **Acceso diferenciado por perfiles:** Incorporación de sesiones seguras y paneles adaptados según el nivel de responsabilidad (ciudadanía, investigadores y administración).
+- **Primera versión Beta funcional:** En julio de 2025 se consolidó la primera versión integral de pruebas con captura de fotografías, permisos de dispositivo y mapeo corregido de puntos termales.
 
-### 2.2 II Semestre 2024 (Agosto – Diciembre 2024): Evolución del Backend, Identidad Visual y Primeras Vistas Funcionales
+### 2.4 Cuarta Etapa — II Semestre 2025 (Agosto – Diciembre 2025): Herramientas Científicas y Estabilidad Operativa
 
-#### Objetivos y Enfoque del Período
-Superada la fase exploratoria, el II Semestre 2024 se enfocó en dotar al sistema de una identidad gráfica institucional coherente, asegurar el manejo de credenciales de base de datos, resolver la interoperabilidad geodésica oficial de Costa Rica y modernizar las primeras vistas funcionales del portal web y móvil.
+**Propósito de la Etapa:** Elevar el valor científico de la plataforma mediante gráficos hidrogeoquímicos especializados, fortalecer la independencia tecnológica de la aplicación móvil en zonas de campo y automatizar las actualizaciones del servicio.
 
-#### Hitos Técnicos Alcanzados
-- **Identidad Institucional y Estandarización Tipográfica:** Incorporación del **Manual de Identidad GeoterRA 2024** (`3d0ff8c1`, 26/08/2024) en el repositorio y adopción oficial de la paleta Azul GeoterRA / Naranja Geotérmico junto con las fuentes **Poppins** y **League Spartan** tanto en la web como en la aplicación Android (`65de914d`, `76aa78d1`, 05/11/2024).
-- **Backend/API y Seguridad de Credenciales:** Integración directa de los endpoints PHP en la aplicación web (`8026b1cd`, `72e79336`, 23/08/2024) y migración del manejo de credenciales hacia archivos `.config` desacoplados del código fuente (`4cd7b9fe`, `0e2d093b`, `cd877763`, 16/10/2024).
-- **Frontend Web y Adopción de Tailwind CSS:** Rediseño completo de la vista autenticada `logged.html` y del detalle de puntos `show-point` (`30255a24`, `f7b27cc6`, `4ac1e4b2`), incorporación de **Tailwind CSS** (`91ce7915`, `f593edf0`, 09/11/2024) y generalización de cabeceras y pies de página dinámicos en `.php` (`a8fd19e8`, 10/11/2024).
-- **Aplicación Móvil y Geodesia CRTM05:** Refactorización de gestión asíncrona IO mediante `Lifecycle` (`a378a3d8`), implementación de la función de conversión geodésica **CRTM05 a WGS84** en `RequestSheet` para compatibilidad con datos oficiales del SNIT (`4d3253d7`, 16/10/2024), sincronización de campos API (`45e6ddb5`) y consulta de perfil `userInformation` (`13bdb866`, 20/11/2024).
+**Principales Logros:**
+- **Analítica visual para especialistas y público:** Integración del **Diagrama de Piper** (para identificar la composición y el origen químico del agua termal) y del **Diagrama de Lindal** (que orienta sobre posibles aprovechamientos según la temperatura, desde balneología y agricultura hasta generación eléctrica).
+- **Mayor autonomía de ubicación en campo:** Mejora en la captura de ubicación GPS desde la aplicación móvil sin depender de servicios cerrados de terceros, aumentando su confiabilidad en zonas alejadas.
+- **Continuidad operativa:** Estandarización de los procesos de actualización para reducir errores manuales al publicar mejoras.
 
-#### Tabla de Métricas — II Semestre 2024
+### 2.5 Quinta Etapa — I Semestre 2026 (Enero – Julio 2026): Reestructuración Integral y Alcance Multiplataforma
 
-| Métrica | Valor Registrado | Detalle Verificado |
-| :--- | :--- | :--- |
-| **Commits Totales** | **107 commits** | Ago: 20 · Sep: 43 · Oct: 18 · Nov: 26 |
-| **Autores Activos** | **3 desarrolladores** | Aarón Sánchez / Svndda (41), Mario Cordero (41), Christopher Acosta (25) |
-| **Ramas Activas** | `main`, `headerWeb`, `headerAndroid`, `testing` | 16 merges consolidados hacia `testing` y `main` |
-| **Archivos Únicos Modificados** | **13,500 archivos** | Incluye integración de dependencias frontend (`Tailwind`) · Commits: Web (48), Mobile (36), API (14), DB (2) |
-| **Componentes Clave Creados** | Manual Identidad 2024, `.config`, CRTM05–WGS84 | Plantillas PHP compartidas, vistas `logged`/`show-point`, `userInformation` en Android |
+**Propósito de la Etapa:** Ejecutar una renovación profunda de toda la plataforma para garantizar estabilidad a largo plazo, ampliar la compatibilidad móvil tanto para Android como para iPhone (iOS), integrar la división territorial completa de Costa Rica y formalizar el acceso web institucional de la UCR.
 
-#### Evidencia Visual — II Semestre 2024
+**Principales Logros:**
+- **Base tecnológica sólida y verificada:** Reorganización completa del núcleo del sistema con controles automáticos de calidad, garantizando integridad de los registros y prevención de errores en las operaciones diarias.
+- **División territorial oficial completa:** Integración íntegra del catálogo del SNIT con el detalle oficial de Costa Rica (provincias, **85 cantones** y **495 distritos**) para clasificar y filtrar cada sitio con exactitud administrativa.
+- **Expansión a Android e iPhone (iOS):** Unificación de la aplicación móvil para operar en ambos ecosistemas, con registro fotográfico nativo, captura de fecha/ubicación automática y consulta directa en terreno.
+- **Seguridad y dominio institucional UCR:** Publicación bajo entorno institucional seguro con cifrado de comunicaciones y trazabilidad completa del historial de cada solicitud recibida.
 
-![Identidad Visual 2024 y Conversión CRTM05 en II-2024](img_progreso/sem2_identidad_conversion_crtm05.png)
+### 2.6 Sexta Etapa — II Semestre 2026 (Agosto – Noviembre 2026): Operación en Producción, Giras y Reportes PDF
 
----
+**Propósito de la Etapa:** Completar las funciones operativas que necesita el equipo investigador en su trabajo diario, reforzar la transparencia y trazabilidad científica, automatizar la comunicación por correo electrónico y entregar reportes formales listos para uso institucional.
 
-### 2.3 I Semestre 2025 (Marzo – Julio 2025): Consolidación de Módulos Core, Migración a React y Primera Beta
+**Principales Logros:**
+- **Módulo de Giras de Campo:** Planificación de expediciones científicas, asignación de investigadores participantes y vinculación directa con los sitios geotermales visitados.
+- **Bitácora colaborativa de observaciones:** Registro ordenado de notas y seguimiento sobre solicitudes, giras de campo y sitios estudiados para mantener memoria institucional entre equipos.
+- **Publicación controlada por validación científica:** Cuando un coordinador aprueba un nuevo estudio, el sistema actualiza automáticamente la ficha oficial y libera de forma coordinada los datos de campo y laboratorio para consulta pública.
+- **Notificaciones automáticas por correo:** Envío automático de códigos de recuperación de contraseña y avisos oportunos cuando una solicitud ciudadana o investigativa cambia de estado.
+- **Diseño unificado y exportación oficial en PDF:** Estandarización visual de todas las pantallas de gestión y emisión automática de **fichas hidrogeoquímicas en PDF** con el logotipo y encabezado oficial UCR/INII tanto desde la web como desde el teléfono.
+- **Distribución directa de la aplicación móvil:** Disponibilidad de versiones listas para instalar en dispositivos Android utilizados durante las giras de campo del INII.
 
-#### Objetivos y Enfoque del Período
-El I Semestre 2025 representó el punto de inflexión tecnológica del frontend web. Se abandonó la manipulación directa del DOM sobre páginas HTML/PHP monolíticas para migrar la experiencia completa hacia una aplicación SPA moderna basada en **React + Vite + Tailwind CSS + Ant Design**, culminando con el lanzamiento de la **Primera Beta funcional** del ecosistema GeoterRA.
-
-#### Hitos Técnicos Alcanzados
-- **Migración Web a React 18, Vite y Ant Design:** Configuración del entorno React sobre la plataforma (`e25081be`, `74df41a9`, `f63f17bd`, abril 2025), integración de la librería empresarial **Ant Design** (`2ae939bd`, 19/05/2025) y desarrollo de los módulos informativos institucionales `About-us`, `How Works` y `Contact Us` (`749e2c6e`, `d8e6551e`, `31240d9d`).
-- **Consolidación de Roles y Sesiones en Web y API:** Implementación de un nuevo protocolo de comunicación API y manejo de sesiones activas (`585c84b0` a `3a2f1bd6`, 03/07/2025), incorporación de control de **roles en la plataforma web**, encabezados de sesión activa y barras laterales (`Sidebar`) adaptadas por rol (`b565d2f3`, 10/07/2025).
-- **Aplicación Móvil (Estabilización y ViewBinding):** Refactorización de clases y paquetes para alinear la interfaz con el prototipo de Figma (`c3290a2c`, `57a14f84`), adopción de `ViewBinding` y abstracción de lógica en `PageFragment` (`d1fc05bc`, `2b00be1d`), manejo formal de permisos de galería y almacenamiento (`b05b29d3`, `509b2807`), y corrección del mapeo latitud/longitud en `ThermalPoint` (`228e0e5a`, 03/07/2025).
-- **Base de Datos y Primera Versión Beta:** Generación del respaldo estructurado de la base de datos (`7622165b`, 11/07/2025) y liberación del hito **Primera BETA de la aplicación** con todas las funcionalidades mínimas operativas en etapa de pruebas (`bb15fd93`, 11/07/2025).
-
-#### Tabla de Métricas — I Semestre 2025
-
-| Métrica | Valor Registrado | Detalle Verificado |
-| :--- | :--- | :--- |
-| **Commits Totales** | **107 commits** | Mar: 1 · Abr: 8 · May: 35 · Jun: 33 · Jul: 30 |
-| **Autores Activos** | **3 desarrolladores** | Aarón Sánchez / Svndda (48), Mario Cordero (46), Christopher Acosta (13) |
-| **Ramas Activas** | `main`, `headerWeb`, `Features`, `testing` | 8 merges destacados (incl. PR #21 hacia rama principal) |
-| **Archivos Únicos Modificados** | **10,861 archivos** | Commits por módulo: Web (46), Mobile (45), API (17), DB/DevOps (5) |
-| **Componentes Clave Creados** | SPA React + Ant Design + Sidebar por Roles | `ThermalPoint`, `ViewBinding`, protocolo sesiones API, Primera Beta (11/07/2025) |
-
-#### Evidencia Visual — I Semestre 2025
-
-![Visor Cartográfico React y Primera Beta I-2025](img_progreso/sem3_migracion_react_mapa_beta.png)
+![Levantamiento de información geotérmica en campo — Equipo UCR / INII](img_progreso/trabajo_campo_ucr.jpeg)
 
 ---
 
-### 2.4 II Semestre 2025 (Agosto – Diciembre 2025): Arquitectura MVVM Móvil, Analítica Hidrogeoquímica y CI/CD
+## 3. Cómo Funciona la Plataforma y Flujo de Validación
 
-#### Objetivos y Enfoque del Período
-Con una versión Beta operativa, el II Semestre 2025 se dedicó a elevar el rigor científico de la visualización web —implementando gráficos especializados de geotermia e hidrogeoquímica—, reestructurar la aplicación móvil bajo el patrón **MVVM** libre de dependencias propietarias cerradas, y automatizar los despliegues mediante **GitHub Actions**.
+### 3.1 Comparativa de Avance: Inicio (2024) vs. Situación Actual (2026)
 
-#### Hitos Técnicos Alcanzados
-- **Módulo Científico Web (Diagrama de Piper y Lindal):** Culminación de la implementación matemática y gráfica interactiva del **Diagrama de Piper** con proyecciones ternarias de cationes y aniones sobre el rombo hidrogeoquímico (`a1d1f89c` a `77544bf5`, PR #53 del 12/12/2025), complementado con la escala térmica del **Diagrama de Lindal** para clasificación de usos directos de energía geotérmica.
-- **Refactorización MVVM en Móvil y Desacoplamiento GPS:** Migración de las vistas Android al patrón **MVVM** (`PageViewModel.kt`, `6fb7ee55`, 16/08/2025), creación de observadores de ciclo de vida y `PermissionRequester.kt` (`92eb3ef1`, `6c9e9aec`), y eliminación de la dependencia propietaria `FusedLocation` de Google (`b40b04d3`, 16/08/2025) en favor de un `LocationCallbackListener.kt` nativo desacoplado.
-- **Configuración Dinámica de Entornos y Automatización CI/CD:** Implementación de `apiConf` en Web para conmutar ágilmente entre el servidor local de desarrollo y el servidor productivo del INII (`fe016481`, `7d3c998e`, 16/08/2025), refactorización de `RegisterForm` (PR #51) y `RequestSheet` (PR #52), y puesta en marcha de los primeros pipelines de despliegue automático en `.github/workflows/` (`8c38e60b`, `91f61919`).
-
-#### Tabla de Métricas — II Semestre 2025
-
-| Métrica | Valor Registrado | Detalle Verificado |
+| Aspecto | Situación Inicial (Abril 2024) | Plataforma Actual en Operación (Noviembre 2026) |
 | :--- | :--- | :--- |
-| **Commits Totales** | **206 commits** | Ago: 97 · Sep: 6 · Oct: 28 · Nov: 65 · Dic: 10 |
-| **Autores y Automatización** | **3 desarrolladores + CI** | Mario Cordero (146 + 8 CI = 154), Aarón Sánchez (43), GitHub Actions (8), Chris4Fun (1) |
-| **Ramas Activas** | `main`, `headerWeb`, `refractPiper`, `Refact-RequestSheet`, `refractRegisterForm` | 10 merges (PRs #51, #52, #53) y flujos iniciales de CI |
-| **Archivos Únicos Modificados** | **573 archivos** | Commits por módulo: Web (100), DB/DevOps/CI (53), Mobile (44), API (11) |
-| **Componentes Clave Creados** | `PiperDiagram.jsx`, `PageViewModel.kt`, CI/CD | Configurador `apiConf`, `PermissionRequester.kt`, workflows GitHub Actions |
+| **Experiencia en Portal Web** | Páginas básicas informativas con funciones limitadas y diseño preliminar. | Portal ágil, adaptable a cualquier pantalla, con mapa nacional interactivo, buscadores territoriales y paneles especializados por perfil. |
+| **Aplicación Móvil de Campo** | Versión experimental inicial únicamente para pruebas básicas en Android. | Aplicación estructurada para trabajo real en Android (con base compartida compatible con iOS), cámara integrada, ubicación GPS y exportación PDF. |
+| **Precisión Territorial** | Ubicaciones generales sin catálogo administrativo completo. | Compatibilidad con coordenadas oficiales costarricenses (CRTM05 / WGS84) y clasificación exacta por provincias, 85 cantones y 495 distritos del SNIT. |
+| **Análisis Científico** | Registro simple de puntos en el mapa sin gráficos ni datos químicos procesados. | Evaluación completa con mediciones en sitio, 14 parámetros de laboratorio y generación automática de diagramas de Piper y Lindal. |
+| **Seguridad y Roles** | Acceso básico sin diferenciación clara de permisos institucionales. | Cinco niveles de acceso claramente definidos, protección de sesiones y recuperación de cuentas mediante verificación por correo. |
+| **Comunicación y Reportes** | Seguimiento manual fuera de la plataforma y sin generación de documentos. | Notificaciones automáticas por correo electrónico, bitácora interna de seguimiento y descarga inmediata de fichas oficiales en PDF. |
 
-#### Evidencia Visual — II Semestre 2025
+### 3.2 Flujo de Revisión y Publicación de Datos Validados
 
-![Analítica Hidrogeoquímica Piper y Lindal con MVVM en II-2025](img_progreso/sem4_diagramas_piper_lindal.png)
+1. **Envío de solicitud:** Una persona ciudadana o investigadora registra un posible sitio geotermal desde el portal web o la aplicación móvil, indicando ubicación GPS y observaciones.
+2. **Registro y confirmación:** La plataforma guarda la solicitud en estado *Pendiente* y envía un correo automático de confirmación.
+3. **Gira de campo y laboratorio:** La coordinación científica asigna una gira de campo, el equipo realiza mediciones en el terreno (*in-situ*) y registra los análisis de agua en laboratorio.
+4. **Aprobación oficial:** El coordinador científico revisa la consistencia del estudio y aprueba su publicación como reporte vigente.
+5. **Consulta pública y PDF:** La información validada aparece en el mapa nacional junto con sus diagramas científicos y queda lista para descargarse como ficha oficial en PDF.
 
 ---
 
-### 2.5 I Semestre 2026 (Enero – Julio 2026): Reingeniería de Arquitectura Limpia, KMP Multiplataforma y Calidad PHPUnit
+## 4. Estado Actual del Producto y Proyección 2027
 
-#### Objetivos y Enfoque del Período
-Este período constituyó la transformación estructural más profunda en la historia de GeoterRA. Iniciado con un intenso **interciclo preparatorio en enero y febrero de 2026 (117 commits)** y consolidado durante el **semestre lectivo marzo–julio de 2026 (539 commits)** —totalizando **656 commits en siete meses**—, el equipo ejecutó una reingeniería completa de la API hacia una **Arquitectura Limpia Orientada a Objetos**, migró la app Android hacia **Kotlin Multiplatform (KMP)** con soporte simultáneo para **Android e iOS**, adoptó identificadores **ULID** en la base de datos e instauró pruebas unitarias automatizadas y portales de documentación técnica.
+### 4.1 Beneficios y Funciones Disponibles Hoy (Noviembre 2026)
 
-#### Hitos Técnicos Alcanzados
-- **Reingeniería Total del Backend/API en Capas (PHP 8.1+ / 8.5):**
-  - Relegación de los antiguos scripts procedurales a `API/legacy/` (29 archivos preservados para trazabilidad) e instauración de una arquitectura limpia en `API/src/`: `SimpleRouter.php`, **14 Controladores**, **17 Servicios**, **15 Repositorios**, **28 DTOs** con validación estricta en tiempo de instanciación, y manejo global de errores (`ApiException.php`, `ErrorType.php`, `GlobalErrorHandler.php`) bajo formato uniforme `{ data, meta, errors }`.
-  - **Seguridad Dual por Plataforma:** Implementación de `X-API-Key` por plataforma (`web-secret-key`, `android-key`, `ios-key`), autenticación Web mediante **cookies HTTP-only** (`geoterra_session_token`), y autenticación Móvil mediante **Bearer Access Token + Refresh Token Rotation** con `family_id` para detección de reuso (`TokensRotationDTO.php`).
-- **Base de Datos Relacional ULID y Catálogos SNIT:**
-  - Adopción de llaves primarias **ULID (`CHAR(26)`)** ordenables cronológicamente en todas las entidades principales mediante `UlidGenerator.php` (`symfony/uid`).
-  - Incorporación íntegra del catálogo territorial oficial de Costa Rica (**SNIT**): **8 provincias**, **85 cantones** y **495 distritos** (`GeoterRA_catalogs.sql`, PR #87 `d6fa1e16`), además del trigger SQL `prevent_double_use_before_insert` sobre `refresh_tokens`.
-- **Expansión Multiplataforma con Kotlin Multiplatform (KMP):**
-  - Creación de `Mobile/GeoterRa/` con código compartido en `commonMain` y módulos específicos `androidMain` e `iosMain` (integración CocoaPods `0aa9d5a4`, soporte nativo de cámara, galería con metadatos **EXIF** `8a03c8f2` y localización GPS multiplataforma `fb12fdf2`), inyección de dependencias con **Koin**, red con **Ktor** y navegación reactiva con **Voyager**.
-- **Pruebas Unitarias, Documentación y Dominio Institucional UCR:**
-  - Creación de **44 suites de pruebas unitarias con PHPUnit 11 + Mockery + ParaTest** cubriendo `DTO/`, `Services/` y `Platform/` (`65dbdc38`, `8bd88856`, `e84b79e1`), ejecutables tanto localmente como en GitHub Actions.
-  - Despliegue del sitio de documentación interactiva en **Docusaurus** (`docApiWebsite/`) y redacción de `Doc API GeoterRA.md` (`76e0a162`).
-  - Configuración del dominio institucional UCR con HTTPS (`fb364017`, `2c846632`) y trazabilidad de historial de estados en solicitudes (`725fb2c0`, `d9115a52`).
-
-#### Tabla de Métricas — I Semestre 2026
-
-| Métrica | Valor Registrado | Detalle Verificado |
-| :--- | :--- | :--- |
-| **Commits Totales** | **539** *(Mar–Jul)* + **117** *(Ene–Feb)* = **656** | Ene: 47 · Feb: 70 · Mar: 134 · Abr: 206 · May: 60 · Jun: 31 · Jul: 108 |
-| **Autores y CI** | **3 desarrolladores + CI** | Bloque Ene–Jul: Mario Cordero (433), Aarón Carmona Sánchez (219), GitHub Actions (3), Chris4Fun (1) |
-| **Ramas Activas** | `develop`, `main`, `API`, `web`, `mobile`, `refact-API-mario`, `refactor/api`, `fix-snitcode-params` | 43 merges en Mar–Jul + 1 en Ene–Feb |
-| **Archivos Únicos Modificados** | **54,138** *(Mar–Jul)* + **456** *(Ene–Feb)* | Incluye portal `docApiWebsite` · Commits Ene–Jul: API (300), Web (138), Mobile (102), DB/CI (98) |
-| **Componentes Clave Creados** | API Limpia PHP, KMP iOS/Android, 44 PHPUnit, Docusaurus | `SimpleRouter`, `UlidGenerator`, `TokenManager`, `AllowedUserRoles`, `GeoterRA_schema.sql` |
-
-#### Evidencia Visual — I Semestre 2026
-
-![Reingeniería API Limpia, KMP Multiplataforma y Pruebas PHPUnit I-2026](img_progreso/sem5_arquitectura_api_kmp_rbac.png)
-
----
-
-### 2.6 II Semestre 2026 (Agosto – Noviembre 2026): Producción, Giras de Campo, Cascada de Visibilidad y Releases
-
-#### Objetivos y Enfoque del Período
-El segundo semestre de 2026 consolidó a GeoterRA como un sistema en producción estable para el INII y la comunidad científica costarricense. Se incorporaron módulos avanzados de planificación logística (**Giras de Campo**), colaboración científica (**Comentarios Polimórficos**), gobernanza de publicación (**Promoción de Georeportes y Cascada de Visibilidad**), comunicación automatizada (**SMTP**), estandarización total de interfaz (`SkillWebDesignGeoterRA.md`), exportación oficial en **PDF** y publicación de artefactos Android para distribución en campo.
-
-#### Hitos Técnicos Alcanzados
-- **Migraciones Incrementales de Base de Datos (`003` a `006`) y Nuevos Módulos:**
-  - **Giras de Campo (`field_trips`, `field_trip_participants`):** Gestión completa de expediciones científicas, asignación de investigadores mediante `UserSelectModal.jsx` con filtros por rol en español (`9b8c017e`) y vinculación directa con geomanifestaciones (`FieldTripsManager.jsx`, `FieldTripScreen.kt`).
-  - **Comentarios Polimórficos (`comments`):** Sistema transversal de bitácora y observaciones asociado a `field_trip`, `request` o `geomanifestation` (`CommentsPanel.jsx`, `CommentController.php`).
-  - **Promoción y Cascada de Visibilidad (`004_add_visibility_to_georeports_and_tests.sql`):** Endpoints `PATCH /admin/georeports/{id}/promote` y `PATCH /admin/geomanifestations/{id}/visibility` que propagan de manera coherente la publicación pública hacia el georeporte vigente, sus pruebas *in-situ* y sus análisis químicos de laboratorio (14 parámetros físico-químicos).
-  - **Nomenclatura Estandarizada (`006_add_name_to_tests_and_reports.sql`):** Adición de nombres descriptivos `insitu_test_name`, `inlab_test_name` y `georeport_name` en pruebas y reportes.
-- **Notificaciones Institucionales SMTP y Seguridad:**
-  - Integración de `SmtpEmailService.php` y `NotificationService.php` (PHPMailer) para recuperación de contraseñas con códigos OTP (`3ec568d8`), alertas de cambio de estado en solicitudes (`5e10111d`, `3d08665a`) y notificaciones de cuenta/perfil (`54372d87`).
-  - Refuerzo de cookies seguras `HttpOnly` y dominio en `AuthController` (`a5686cb5`, 12/11/2026).
-- **Sistema de Diseño Institucional (`SkillWebDesignGeoterRA.md`) y Exportación PDF:**
-  - Adopción del patrón canónico `TerritoryManager` en todas las vistas CRUD web mediante `PillTabs.jsx`, `CrudToolbar.jsx`, `CodeBadge`, `NameCell` y `RowActions`, erradicando emojis y gradientes.
-  - Mejora del selector cartográfico `MapCoordinatePicker.jsx` con fallback automático de geolocalización GPS/red y validación estricta contra dimensiones cero en modales (`fee3069d`, `5963b899`).
-  - **Exportación Oficial en PDF:** Generación de fichas hidrogeoquímicas imprimibles con encabezado UCR e iconos vectoriales en Web (`498b5c43`, 12/11/2026) y generación nativa multiplataforma de PDFs en Móvil (`b607a5bf`, `508099ba`, `pdfkmp`).
-- **Distribución Móvil, Releases APK y Orquestación CI/CD:**
-  - Publicación de las versiones **Android `1.0.0-beta1`** (07/11/2026) y **`1.0.0-beta2`** (11/11/2026, `4d537b05`) servidas directamente desde `AppController.php` (`/api/app/download-apk`, `/api/app/version`).
-  - Automatización integral mediante GitHub Actions (`185 commits` de sincronización de ramas especializadas `API`, `web`, `mobile` hacia `develop` y build productivo de `main`), respaldada por scripts de migración controlada (`SERVER.migrate.sh`, `DOCKER.migrate.sh`).
-
-#### Tabla de Métricas — II Semestre 2026
-
-| Métrica | Valor Registrado | Detalle Verificado |
-| :--- | :--- | :--- |
-| **Commits Totales** | **467 commits** | Ago: 117 · Sep: 63 · Oct: 155 · Nov: 132 *(al 12/11/2026)* |
-| **Autores y CI** | **2 desarrolladores + CI** | Mario Cordero (180 + 8 CI = 188), Aarón Carmona Sánchez (94), `github-actions[bot]` (185) |
-| **Ramas Activas** | `main`, `develop`, `API`, `web`, `mobile` | Flujo multirrama automatizado con sincronización hacia `develop` y `main` |
-| **Archivos Únicos Modificados** | **433 archivos** | Commits por módulo: API (215), Web (104), DB/CI/Bash (103), Mobile (42) |
-| **Componentes Clave Creados** | Migraciones `003`–`006`, Giras, Comentarios, Cascada, PDF, APK `beta2` | `FieldTripsManager`, `CommentsPanel`, `SmtpEmailService`, `AppController`, `UserSelectModal` |
-
-#### Evidencia Visual — II Semestre 2026
-
-![Estándar CRUD TerritoryManager, Giras de Campo y Ficha PDF II-2026](img_progreso/sem6_estandar_crud_giras_pdf.png)
-
-![Levantamiento de Datos Geotérmicos en Campo - Equipo UCR](img_progreso/trabajo_campo_ucr.jpeg)
-
-![Evidencia de Validación Comunitaria e Institucional](img_progreso/evidencia_validacion_comunitaria_nota.png)
-
-> **Nota editorial sobre validación comunitaria e institucional (II-2026):** Se incluye fotografía de referencia de trabajo de campo del repositorio (`trabajo_campo_ucr.jpeg`). En el marcador inferior (`img_progreso/evidencia_validacion_comunitaria_nota.png`) puede incorporarse la fotografía oficial de cierre o taller de validación comunitaria e institucional con actores locales e investigadores del INII-UCR.
-
----
-
-## 3. Evolución de la Arquitectura y Stack Tecnológico
-
-### 3.1 Comparativa Técnica: Inicio (Abril 2024) vs. Producción Actual (Noviembre 2026)
-
-| Dimensión Técnica | Arquitectura Inicial (Abril 2024) | Arquitectura Actual en Producción (Noviembre 2026) |
-| :--- | :--- | :--- |
-| **Backend API** | Scripts PHP procedurales dispersos (`login.inc.php`, `request.inc.php`, `dbhandler.inc.php`) con SQL directo | Arquitectura Limpia en Capas (PHP >= 8.1 / 8.5): `SimpleRouter`, **14 Controllers**, **17 Services**, **15 Repositories**, **28 DTOs**, `GlobalErrorHandler` |
-| **Identificadores de BD** | Llaves enteras autoincrementales (`AUTO_INCREMENT`) expuestas | Identificadores **ULID (`CHAR(26)`)** generados con `symfony/uid`, no predecibles y ordenables cronológicamente |
-| **Base de Datos y Migraciones** | Esquema básico inicial sin versionamiento formal | **MariaDB** (`GeoterRA_schema.sql`) con **19 tablas + 1 vista SQL**, **6 migraciones idempotentes (`001`–`006`)**, catálogos **SNIT** (588 registros) y trigger anti-reuso |
-| **Autenticación y Seguridad** | Sesiones PHP básicas en servidor (`$_SESSION`) | Esquema dual validado por `X-API-Key`: **Cookies HTTP-only** (Web) y **Bearer + Refresh Token Rotation con `family_id`** (Mobile), OTP SMTP y **5 roles RBAC** |
-| **Frontend Web** | Páginas estáticas HTML/CSS/JS y PHP con jQuery/DOM manual | **SPA React 18.3 + Vite 6.3 + Tailwind CSS 4.1 + Ant Design 5.27**, `react-router-dom 7`, `Leaflet 1.9` y `Recharts 3.4` |
-| **Aplicación Móvil** | Prototipo Android nativo básico en Kotlin con Fragments y `FusedLocation` | **Kotlin Multiplatform (KMP 2.2.21) + Compose Multiplatform 1.7.1** (`Android` + `iOS`), **Koin 4.1**, **Ktor 3.0**, **Voyager 1.1**, `MapLibre`, cámara EXIF y **PDF nativo** |
-| **Analítica Geocientífica** | Marcadores geográficos simples sin procesamiento químico | **Diagrama de Piper** (facies ternarias), **Diagrama de Lindal**, conversión **CRTM05–WGS84** (`proj4php`), análisis *in-situ* y 14 parámetros de laboratorio |
-| **Calidad y Documentación** | Pruebas manuales ad-hoc sin cobertura ni documentación formal | **44 suites PHPUnit 11 + Mockery + ParaTest**, Playwright configurado en web, portal **Docusaurus**, referencia `Doc API GeoterRA.md` y colección Postman |
-| **Despliegue e Infraestructura** | Subida manual de archivos y merges directos a `main` | Orquestación **GitHub Actions CI/CD** multirrama (`API`, `web`, `mobile` -> `develop` -> `main`), build automatizado Vite y scripts `SERVER.migrate.sh` / `DOCKER.migrate.sh` |
-
-### 3.2 Diagrama de Arquitectura Integral en Producción (Noviembre 2026)
-
-```mermaid
-flowchart TB
-    subgraph CLIENTS["Capa de Clientes Multiplataforma"]
-        WEB["Cliente Web SPA<br/>React 18 + Vite + Ant Design + Tailwind<br/>Leaflet · Piper · Lindal · Exportación PDF"]
-        AND["App Móvil Android<br/>KMP + Compose Multiplatform<br/>APK v1.0.0-beta2 · Cámara EXIF · GPS"]
-        IOS["App Móvil iOS<br/>KMP + CocoaPods Shared Framework<br/>Ktor Darwin · PdfManager iOS"]
-    end
-
-    subgraph SECURITY["Capa de Entrada, Enrutamiento y Seguridad"]
-        GW["SimpleRouter.php + CORS + X-API-Key<br/>Auth Dual: Cookie HTTP-only (Web) | Bearer + Refresh Rotation (Mobile)"]
-        RBAC["Control RBAC (5 Roles)<br/>admin · maintenance · field_investigator · investigator · user"]
-    end
-
-    subgraph BACKEND["Capa de Negocio y Datos (API PHP >= 8.1 / 8.5)"]
-        CTRL["14 Controladores REST (87 Rutas)<br/>Auth · Users · Requests · FieldTrips · Comments · Georeports · Tests · Territory · App"]
-        DTO["28 DTOs Tipados + Validation + ULID Generator"]
-        SRV["17 Servicios de Dominio<br/>Promoción en Cascada · Proj4 CRTM05-WGS84 · Notificaciones"]
-        REPO["15 Repositorios PDO"]
-    end
-
-    subgraph INFRA["Persistencia y Servicios Externos"]
-        DB[("MariaDB (19 Tablas + 1 Vista)<br/>ULID CHAR(26) · Trigger refresh_tokens<br/>Catálogos SNIT (588 registros)")]
-        SMTP["SmtpEmailService (PHPMailer)<br/>OTP Recuperación · Alertas de Solicitudes"]
-        CI["GitHub Actions CI/CD + PHPUnit (44 Suites)<br/>Auto-sync API / web / mobile -> develop / main"]
-    end
-
-    WEB -->|Cookie HTTP-only + X-API-Key| GW
-    AND -->|Bearer JWT/Token + X-API-Key| GW
-    IOS -->|Bearer JWT/Token + X-API-Key| GW
-    GW --> RBAC --> CTRL --> DTO --> SRV --> REPO
-    REPO --> DB
-    SRV --> SMTP
-    CI -.->|Tests y Despliegue Continuo| CTRL
-    CI -.->|Build Vite Dist| WEB
-```
-
-### 3.3 Línea de Tiempo Evolutiva por Semestres Académicos (2024–2026)
-
-```mermaid
-flowchart LR
-    S1["I-2024 (Abr–Jul)<br/>114 commits<br/>Prototipo HTML/PHP + Android<br/>Primer mapa y solicitudes"]
-    S2["II-2024 (Ago–Dic)<br/>107 commits<br/>Manual Identidad 2024<br/>Tailwind + CRTM05->WGS84"]
-    S3["I-2025 (Mar–Jul)<br/>107 commits<br/>Migración React + Ant Design<br/>Roles y Primera Beta"]
-    S4["II-2025 (Ago–Dic)<br/>206 commits<br/>Piper & Lindal en React<br/>MVVM Móvil + CI/CD inicial"]
-    S5["I-2026 (Ene–Jul)<br/>656 commits (117+539)<br/>API Limpia PHP + ULID + SNIT<br/>KMP Android/iOS + 44 PHPUnit"]
-    S6["II-2026 (Ago–Nov)<br/>467 commits<br/>Giras + Comentarios + Cascada<br/>Estándar CRUD + PDF + APK beta2"]
-
-    S1 --> S2 --> S3 --> S4 --> S5 --> S6
-```
-
-### 3.4 Flujo Transaccional de Curaduría Científica y Visibilidad en Cascada
-
-```mermaid
-sequenceDiagram
-    actor INV as Investigador / Usuario (Móvil o Web)
-    participant API as GeoterRA API (Controllers / Services)
-    participant DB as MariaDB (ULID + Cascada)
-    actor ADM as Coordinador Científico (Admin)
-    actor PUB as Ciudadanía / Mapa Público
-
-    INV->>API: POST /analysis-requests (Coordenadas, sensación térmica, uso)
-    API->>DB: Inserta en requests + requests_state ('Pendiente')
-    ADM->>API: POST /admin/analysis-requests/{id}/states ('Revisión' / 'Procesada')
-    API-->>INV: Notificación automática vía SmtpEmailService
-    ADM->>API: POST /admin/geomanifestations + /insitu-tests + /inlab-tests
-    ADM->>API: POST /admin/georeports (Vincula in-situ + laboratorio)
-    ADM->>API: PATCH /admin/georeports/{id}/promote
-    API->>DB: Actualiza current_georeport_id y propaga visibility = 1 en cascada
-    PUB->>API: GET /geomanifestations & GET /georeports
-    API-->>PUB: Ficha oficial validada (Piper, Lindal y exportación PDF)
-```
-
----
-
-## 4. Estado Actual del Producto y Próximos Pasos
-
-### 4.1 Capacidades Activas en Producción (Noviembre 2026)
-
-A la fecha de corte del presente informe (**noviembre de 2026**), el ecosistema **GeoterRA** opera integralmente con los siguientes módulos validados en sus tres plataformas:
-
-1. **Portal Público e Interactivo de Divulgación Geotermal (Web y Móvil):**
-   - Visor cartográfico nacional sobre **Leaflet** (Web) y **MapLibre** (Móvil) con filtrado territorial multinivel (**8 provincias, 85 cantones, 495 distritos SNIT**) y capas térmicas.
-   - Paneles de detalle científico (`PointDetails.jsx`, `GeomanifestationScreen.kt`) con representación automática de **Diagramas de Piper** (caracterización hidrogeoquímica mediante 14 parámetros de laboratorio: pH, conductividad, Cl, Ca, HCO3, SO4, Fe, Si, B, Li, F, Na, K, Mg) y **Diagramas de Lindal** (aprovechamiento térmico directo).
-   - **Exportación Oficial en PDF:** Generación de fichas técnicas imprimibles con membrete UCR desde navegador y descarga/compartición de PDF en dispositivos móviles.
-
-2. **Gestión Operativa y Gobernanza por Roles (RBAC de 5 Perfiles):**
-   - **`user`:** Creación, seguimiento de historial de estados y edición de sus propias solicitudes de análisis geotermal mientras permanezcan en estado `Pendiente`.
-   - **`investigator` y `field_investigator`:** Gestión de geomanifestaciones, registro de pruebas *in-situ* y laboratorio, planificación y participación en **Giras de Campo** (`FieldTripsManager`), y trazabilidad colaborativa mediante **Comentarios Polimórficos**.
-   - **`admin` (Coordinador Científico):** Curaduría total de solicitudes, promoción de georeportes a vigentes y control de **visibilidad pública en cascada**.
-   - **`maintenance` (DevOps / Sistemas):** Dashboard de salud del sistema, gestión de usuarios y asignación de roles, visor de tablas de base de datos (`DatabaseViewer.jsx`) e inspección de logs de servidor (`SystemLogs.jsx`).
-
-3. **Distribución Móvil y Operación Institucional:**
-   - Distribución directa de la aplicación Android **`geoterraApp` v1.0.0-beta2** mediante endpoints públicos de la API institucional (`/api/app/download-apk`), junto con base de código iOS compilable vía CocoaPods.
-   - Soporte de notificaciones institucionales por correo electrónico (OTP de recuperación, estados de solicitudes y cambios de perfil) y sincronización continua automatizada mediante GitHub Actions.
+- **Para la Ciudadanía y el Sector Público:** Consulta abierta del mapa geotermal de Costa Rica con filtros por provincia, cantón y distrito; acceso a fichas explicativas con gráficos visuales sobre temperatura, composición química del agua y posibles usos sostenibles; descarga directa de reportes en PDF con respaldo de la UCR; y envío de nuevas solicitudes de análisis con seguimiento del estado de trámite.
+- **Para Equipos de Investigación y Trabajo de Campo:** Planificación y seguimiento de giras de campo; registro ordenado de mediciones tomadas en el terreno y de 14 parámetros físico-químicos de laboratorio; captura de fotografías desde la aplicación móvil Android; y bitácora compartida de observaciones.
+- **Para la Coordinación Científica:** Revisión y control de calidad de cada solicitud recibida; autorización explícita para decidir qué estudios pasan a consulta pública; y coherencia automática entre el reporte oficial vigente y sus pruebas científicas asociadas.
+- **Para la Administración y Continuidad del Servicio:** Gestión segura de cuentas y perfiles de usuario, envío automatizado de notificaciones institucionales por correo electrónico y herramientas de supervisión del funcionamiento general.
 
 ### 4.2 Evidencia de Campo de Recursos Geotérmicos Catalogados
 
-Los activos visuales integrados en la aplicación móvil reflejan las tipologías de manifestaciones geotermales documentadas y catalogadas dentro del ecosistema GeoterRA:
-
-| Manifestación Fumarólica | Naciente Termal (Hot Spring) | Inspección Territorial con Dron |
+| Manifestación Fumarólica | Naciente de Agua Termal | Reconocimiento Territorial con Dron |
 | :---: | :---: | :---: |
 | ![Fumarolas en campo](img_progreso/fumarolas_campo.jpg) | ![Naciente termal en campo](img_progreso/termales_campo.jpg) | ![Vista aérea de reconocimiento](img_progreso/vista_dron_campo.jpg) |
 
-### 4.3 Próximos Pasos y Hoja de Ruta Post-Despliegue (2027)
+### 4.3 Proyección y Próximos Pasos (2027)
 
-Para dar continuidad al ciclo de maduración tecnológica y académica en la Universidad de Costa Rica, se recomiendan cuatro líneas prioritarias de evolución:
-
-1. **Sincronización Offline-First en Campo:** Incorporar persistencia local en SQLDelight o Room KMP dentro de `Mobile/GeoterRa` para permitir la captura completa de pruebas *in-situ*, fotografías con metadatos EXIF y formularios de giras de campo en zonas volcánicas sin cobertura celular, con sincronización diferida automática al recuperar conectividad.
-2. **Publicación Formal en Tiendas Oficiales (Google Play Store y Apple App Store):** Completar los procesos de firma institucional UCR/INII y revisión en tiendas para sustituir gradualmente la distribución directa de APK por actualizaciones gestionadas en tienda, manteniendo el endpoint `/api/app/version` para verificación de compatibilidad.
-3. **Expansión de Pruebas E2E Automatizadas y Telemetría:** Ampliar la suite existente de **Playwright** en `website/tests/` para cubrir flujos completos de curaduría científica y consolidar métricas de monitoreo en tiempo real en el panel de mantenimiento.
-4. **Interoperabilidad Abierta y Ciencia Ciudadana (API Pública / GeoJSON):** Exponer endpoints de descarga abierta en formatos estándar geocientíficos (**GeoJSON / CSV / OGC**) para facilitar el consumo directo de los datos validados por parte de investigadores nacionales, instituciones del sector energético costarricense (ICE, MINAE, OVSICORI) y proyectos académicos interdisciplinarios.
+1. **Registro sin Conexión en Zonas Remotas:** Habilitar el almacenamiento temporal en el teléfono para que los investigadores puedan completar formularios, mediciones y fotografías en zonas volcánicas o montañosas sin señal celular, enviando los datos automáticamente al recuperar conexión.
+2. **Publicación en Tiendas Oficiales de Aplicaciones:** Completar los trámites de registro institucional para distribuir la aplicación de manera directa a través de Google Play Store y Apple App Store, simplificando su descarga y actualización para toda la comunidad.
+3. **Ampliación de Controles de Calidad y Seguimiento:** Reforzar las verificaciones automáticas de los procesos más importantes y consolidar tableros de monitoreo operativo para garantizar disponibilidad continua.
+4. **Intercambio de Datos Abiertos con Instituciones Nacionales:** Facilitar mecanismos estandarizados de exportación de datos validados para fortalecer la colaboración con instituciones costarricenses del sector energético, ambiental y geocientífico (como ICE, MINAE y OVSICORI).
 
 ---
 
-**Elaborado para:** Dirección del Proyecto GeoterRA — Instituto de Investigaciones en Ingeniería (INII), Universidad de Costa Rica.  
-**Auditoría basada en datos verificables del repositorio `GeoterRA_DEV/` (1,657 commits · 06/04/2024 – 12/11/2026).**
+**Elaborado para:** Dirección del Proyecto GeoterRA y autoridades institucionales — Instituto de Investigaciones en Ingeniería (INII), Universidad de Costa Rica.
